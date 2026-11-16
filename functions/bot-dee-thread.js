@@ -35,7 +35,8 @@ function emptyState(settings) {
     archiveRetained: false,
     hasUsedBotDee: 0,
     personalization: prefs.normalizePersonalization({}),
-    [prefs.LAST_USED_FIELD]: 0
+    [prefs.LAST_USED_FIELD]: 0,
+    [prefs.SESSION_RESET_FIELD]: 0
   };
 }
 
@@ -56,7 +57,7 @@ function snapshotToState(snap, uid, settings, nowMs) {
   const turns = idleEnded ? [] : bot.clipStoredTurns(data.turns);
   const consent = memory.normalizeConsent(data.consent);
   const personalization = prefs.fromThread(data);
-  const staleGeneration = prefs.needsOnboarding(personalization);
+  const staleGeneration = prefs.needsSessionReset(data);
   const liveTurns = staleGeneration || idleEnded ? [] : turns;
   return {
     durable: true,
@@ -77,7 +78,8 @@ function snapshotToState(snap, uid, settings, nowMs) {
     archiveRetained: staleGeneration ? false : memory.consentAllows(consent, "archive"),
     hasUsedBotDee: staleGeneration ? 0 : memory.hasUsedFromThread(data),
     personalization,
-    [prefs.LAST_USED_FIELD]: staleGeneration ? 0 : (Number(data[prefs.LAST_USED_FIELD]) || 0)
+    [prefs.LAST_USED_FIELD]: staleGeneration ? 0 : (Number(data[prefs.LAST_USED_FIELD]) || 0),
+    [prefs.SESSION_RESET_FIELD]: staleGeneration ? 0 : prefs.sessionResetVersionOf(data)
   };
 }
 
@@ -111,12 +113,13 @@ async function savePersonalization(uid, input, nowMs) {
   await db().runTransaction(async tx => {
     const snap = await tx.get(ref);
     const prev = snap.exists ? snap.data() : {};
-    const resetSession = prefs.needsOnboarding(prefs.fromThread(prev));
+    const resetSession = prefs.needsSessionReset(prev);
     const patch = {
       uid,
       threadId: bot.threadIdForUid(uid),
       personalization,
-      updatedAtMs: now
+      updatedAtMs: now,
+      [prefs.SESSION_RESET_FIELD]: prefs.CURRENT_VERSION
     };
     if (resetSession) {
       patch.status = "fresh";
@@ -149,7 +152,7 @@ function nextTranscript(prev, settings, receivedAtMs) {
   const last = Number(row.lastMessageAtMs) || 0;
   let epoch = Math.max(1, Math.floor(Number(row.conversationEpoch) || 1));
   let turns = Array.isArray(row.turns) ? row.turns : [];
-  const staleGeneration = prefs.needsOnboarding(prefs.fromThread(row));
+  const staleGeneration = prefs.needsSessionReset(row);
   if (staleGeneration || bot.isThreadIdle(last, settings.conversationIdleSeconds, receivedAtMs)) {
     epoch += (staleGeneration || last) ? 1 : 0;
     turns = [];
@@ -226,7 +229,8 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
       hasUsedBotDee: 1,
       hasUsedBotDeeAtMs: now,
       updatedAtMs: now,
-      [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs)
+      [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs),
+      [prefs.SESSION_RESET_FIELD]: prefs.CURRENT_VERSION
     }, {merge: true});
   });
   return {ok: true};
@@ -332,7 +336,8 @@ async function persistUserTurn(uid, settings, userText, opts) {
       hasUsedBotDee: 1,
       hasUsedBotDeeAtMs: now,
       updatedAtMs: now,
-      [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs)
+      [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs),
+      [prefs.SESSION_RESET_FIELD]: prefs.CURRENT_VERSION
     }, {merge: true});
     written = {seq: userSeq, epoch, receivedAtMs, userStored};
   });

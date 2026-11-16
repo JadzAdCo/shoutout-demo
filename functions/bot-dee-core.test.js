@@ -62,6 +62,9 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   const dumped = "Hey! I'm BOT DEE, your FLOQR assistant. What can I help you with today — ShoutOut, VIP reserV, or floqCast?";
   assert.equal(bot.isProductCatalogGreeting(dumped), true);
   assert.doesNotMatch(bot.sanitizeBotReply(dumped), /ShoutOut|VIP reserV|floqCast/i);
+  const realAnswer = "You can throw a ShoutOut, book VIP at Decades, or go live with floqCast after club approval.";
+  assert.equal(bot.isProductCatalogGreeting(realAnswer), false);
+  assert.match(bot.sanitizeBotReply(realAnswer), /ShoutOut/);
   assert.doesNotMatch(reply, /Here is what I found/i);
   assert.doesNotMatch(bot.formatSearchFallback(heyHits), /Here is what I found/i);
   assert.match(bot.moodReply(), /thanks for asking|doing great/i);
@@ -513,7 +516,11 @@ test("thread snapshot reports idle vs active without leaking another uid", () =>
   const threads = require("./bot-dee-thread");
   const now = 1_700_000_060_000;
   const settings = {durableThreads: 1, conversationIdleSeconds: 60};
-  const currentPrefs = {personalization: {botDeePersonalizationVersion: require("./botdee-personalization").CURRENT_VERSION}};
+  const prefsMod = require("./botdee-personalization");
+  const currentPrefs = {
+    personalization: {botDeePersonalizationVersion: prefsMod.CURRENT_VERSION},
+    [prefsMod.SESSION_RESET_FIELD]: prefsMod.CURRENT_VERSION
+  };
   const active = threads.snapshotToState({
     exists: true,
     data: () => ({
@@ -539,6 +546,27 @@ test("thread snapshot reports idle vs active without leaking another uid", () =>
   }, "abc", settings, now);
   assert.equal(stale.status, "fresh");
   assert.deepEqual(stale.turns, []);
+  const alreadyReset = threads.snapshotToState({
+    exists: true,
+    data: () => ({
+      uid: "abc",
+      turns: [{role: "user", text: "book a table"}, {role: "model", text: "VIP hold is ready."}],
+      lastMessageAtMs: now - 10_000,
+      conversationEpoch: 3,
+      personalization: {botDeePersonalizationVersion: 1},
+      [prefsMod.SESSION_RESET_FIELD]: prefsMod.CURRENT_VERSION
+    })
+  }, "abc", settings, now);
+  assert.equal(alreadyReset.status, "active");
+  assert.equal(alreadyReset.turns.length, 2);
+  const afterResetPersist = threads.nextTranscript({
+    lastMessageAtMs: now - 10_000,
+    conversationEpoch: 3,
+    turns: [{role: "user", text: "book a table"}, {role: "model", text: "VIP hold is ready."}],
+    personalization: {botDeePersonalizationVersion: 1},
+    [prefsMod.SESSION_RESET_FIELD]: prefsMod.CURRENT_VERSION
+  }, settings, now);
+  assert.equal(afterResetPersist.turns.length, 2, "skipping the overlay must not wipe later turns");
   const idle = threads.snapshotToState({
     exists: true,
     data: () => ({

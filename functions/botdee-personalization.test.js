@@ -52,6 +52,9 @@ test("first name, demeanor, last-used, and greeting stay short", () => {
   assert.equal(p.needsOnboarding({botDeePersonalizationVersion: 0}), true);
   assert.equal(p.needsOnboarding({botDeePersonalizationVersion: 1}), true);
   assert.equal(p.needsOnboarding({botDeePersonalizationVersion: 2}), false);
+  assert.equal(p.needsSessionReset({}), true);
+  assert.equal(p.needsSessionReset({botDeeSessionResetVersion: 1}), true);
+  assert.equal(p.needsSessionReset({botDeeSessionResetVersion: 2}), false);
   assert.equal(p.LAST_USED_FIELD, "userbotdeelastUsedtime");
 });
 
@@ -155,9 +158,9 @@ test("saveBotDeePersonalization is wired and last-used is persisted on send", ()
   assert.match(read("botdee-personalization-ui.js"), /loadGuestPrefs/);
   assert.match(read("botdee-personalization-ui.js"), /state\.setupStep = ""/);
   assert.match(read("bot-dee-chat.js"), /applyFromThread\?\.\(\{\}, false\)/);
-  assert.match(read("bot-dee-chat.js"), /needsOnboarding\?\.\(\)/);
   assert.match(read("botdee-personalization-ui.js"), /CURRENT_VERSION = 2/);
-  assert.match(read("functions/bot-dee-thread.js"), /staleGeneration/);
+  assert.match(read("functions/bot-dee-thread.js"), /needsSessionReset/);
+  assert.doesNotMatch(read("bot-dee-chat.js"), /needsOnboarding\?\.\(\)\s*\?\s*\{[\s\S]{0,80}welcome\(\)/);
   assert.match(read("bot-dee-chat.js"), /botdee\.chatWelcome/);
   assert.doesNotMatch(
     read("bot-dee-chat.js"),

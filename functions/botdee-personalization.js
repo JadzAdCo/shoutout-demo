@@ -5,6 +5,7 @@
 
 const CURRENT_VERSION = 2;
 const LAST_USED_FIELD = "userbotdeelastUsedtime";
+const SESSION_RESET_FIELD = "botDeeSessionResetVersion";
 const DEMEANORS = Object.freeze(["sociallyCool", "professional", "balanced"]);
 const MAX_NAME = 40;
 
@@ -116,6 +117,16 @@ function needsOnboarding(personalization) {
   return row.botDeePersonalizationVersion < CURRENT_VERSION;
 }
 
+function sessionResetVersionOf(row) {
+  const src = row && typeof row === "object" ? row : {};
+  return Math.max(0, Math.floor(Number(src[SESSION_RESET_FIELD]) || 0));
+}
+
+/** One-shot chat reset per generation. Overlay skip must not wipe later turns. */
+function needsSessionReset(row) {
+  return sessionResetVersionOf(row) < CURRENT_VERSION;
+}
+
 function nextLastUsed(previousMs, nowMs) {
   const prev = Number(previousMs) || 0;
   const now = Number(nowMs) || Date.now();
@@ -222,6 +233,9 @@ function writePayload(input) {
 module.exports = {
   CURRENT_VERSION,
   LAST_USED_FIELD,
+  SESSION_RESET_FIELD,
+  needsSessionReset,
+  sessionResetVersionOf,
   DEMEANORS,
   clipName,
   firstNameFromDisplayName,

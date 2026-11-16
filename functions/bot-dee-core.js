@@ -657,13 +657,16 @@ function isSearchMissReply(raw) {
 
 /** Gemini/old-thread intro that lists products — never show this as a greeting. */
 function isProductCatalogGreeting(raw) {
-  const text = String(raw || "");
+  const text = String(raw || "").trim();
   if (!text) return false;
   const shout = /shout\s*out/i.test(text);
   const vip = /\bvip\b/i.test(text);
   const floq = /floq\s*cast/i.test(text);
-  if (shout && vip && floq) return true;
-  return /i['’]?m bot dee, your floqr assistant/i.test(text) && (shout || vip || floq);
+  if (!(shout || vip || floq)) return false;
+  if (/i['’]?m bot dee(?:,|\s)/i.test(text) || /your floqr assistant/i.test(text)) return true;
+  return shout && vip && floq
+    && text.length <= 280
+    && /(?:what can i help|how can i help|i can help|let me know)/i.test(text);
 }
 
 function sanitizeBotReply(raw) {
