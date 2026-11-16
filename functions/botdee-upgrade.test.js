@@ -40,7 +40,7 @@ test("Phase 1 threat model helpers: thread id is owner uid, foreign ids ignored"
   const settings = {durableThreads: 1, conversationIdleSeconds: 300};
   const snap = threads.snapshotToState({
     exists: true,
-    data: () => ({uid: "uid-a", turns: [{role: "user", text: "secret"}], lastMessageAtMs: Date.now(), conversationEpoch: 1})
+    data: () => ({uid: "uid-a", turns: [{role: "user", text: "secret"}], lastMessageAtMs: Date.now(), conversationEpoch: 1, personalization: {botDeePersonalizationVersion: require("./botdee-personalization").CURRENT_VERSION}})
   }, "uid-a", settings, Date.now());
   assert.equal(snap.threadId, "uid-a");
 });

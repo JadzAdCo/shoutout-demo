@@ -30,8 +30,14 @@ test("BOT DEE header is title only — no ? bubble or Showing answers for…", (
   assert.match(html, /botdee-chat-header-main/);
   assert.match(html, /botdee-title-row feature-landing-title-row/);
   assert.match(html, /floqr-page-title"[^>]*data-i18n="page\.botdee\.title"/);
+  assert.doesNotMatch(html, /id="botDeePrefsOpen"|botdee-prefs-row/);
+  assert.match(html, /id="botDeePersonalizationDialog"/);
   assert.doesNotMatch(html, /help-popout|botdee-help-popout|botDeeScopeNote|Showing answers for/);
   assert.doesNotMatch(html, /aria-label="Help"|summary[^>]*>\?</);
+  assert.match(read("bot-dee-chat.js"), /isProductCatalogGreeting/);
+  assert.match(read("patron-portal.html"), /id="botDeePersonalizationPanel"/);
+  assert.match(read("patron-portal.html"), /id="botDeePrefName"/);
+  assert.match(read("patron-portal.html"), /botdee-personalization-ui\.js/);
   assert.match(read("bot-dee-chat.js"), /isVersionPrompt/);
   assert.match(read("bot-dee-chat.js"), /versionReply/);
   assert.match(read("bot-dee-chat.js"), /isHelpPrompt/);
@@ -121,9 +127,10 @@ test("BOT DEE page is a guarded satellite with chat only (no Quick intent search
   assert.doesNotMatch(read("botdee.html"), /placeholder="Ask BOT DEE… Enter sends/);
   assert.match(read("botdee.html"), /botDeeComposerHint/);
   assert.match(read("botdee.html"), /Press Enter to send a message/);
-  assert.match(read("botdee.html"), /id="botDeePrefsOpen"/);
+  assert.doesNotMatch(read("botdee.html"), /id="botDeePrefsOpen"/);
   assert.match(read("botdee.html"), /id="botDeePersonalizationDialog"/);
   assert.match(read("botdee.html"), /botdee-personalization-ui\.js/);
+  assert.match(read("patron-portal.html"), /id="botDeePersonalizationPanel"/);
   assert.match(read("botdee-help-repository.js"), /id: "help-botdee-privacy-session"/);
   assert.match(read("bot-dee-chat.js"), /botdee-msg-avatar/);
   assert.match(read("bot-dee-chat.js"), /botdee-bubble-tail/);

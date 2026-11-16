@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.025";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.025";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.026";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.026";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -224,7 +224,7 @@
       version: "s3.3.023",
       title: "s3.3.023 — BOT DEE personalization + marked composer",
       checks: [
-        {label:"Composer placeholder only", file:"botdee.html", includes:["placeholder=\"Ask BOT DEE…\"", "botDeeComposerHint", "botDeePrefsOpen", "botDeePersonalizationDialog"], notIncludes:["placeholder=\"Ask BOT DEE… Enter sends"]},
+        {label:"Composer placeholder only", file:"botdee.html", includes:["placeholder=\"Ask BOT DEE…\"", "botDeeComposerHint", "botDeePersonalizationDialog"], notIncludes:["placeholder=\"Ask BOT DEE… Enter sends", "botDeePrefsOpen"]},
         {label:"Personalization UI", file:"botdee-personalization-ui.js", includes:["saveBotDeePersonalization", "userbotdeelastUsedtime", "Socially Cool"]},
         {label:"Hello sir is chitchat", file:"functions/bot-dee-core.js", includes:["sir|ma'?am", "function privacyReply", "botdee-personalization"]},
         {label:"Last-used field", file:"functions/botdee-personalization.js", includes:["userbotdeelastUsedtime", "botDeePersonalizationVersion"]},
@@ -237,7 +237,7 @@
       title: "s3.3.022 — BOT DEE chat-only + My BOT DEE portal + Master Admin subtabs",
       checks: [
         {label:"Chat-only botdee.html", file:"botdee.html", notIncludes:["botDeeSettingsBubble", "botDeeMemoryPanel", "botdee-upgrade-ui.js"], includes:["botDeeChatForm", "botDeeTranscript"]},
-        {label:"My BOT DEE tab", file:"patron-portal.html", includes:["foBotDeePane", "nav.myBotDee", "botdee-upgrade-ui.js", "botDeeKnowsList"]},
+        {label:"My BOT DEE tab", file:"patron-portal.html", includes:["foBotDeePane", "nav.myBotDee", "botdee-upgrade-ui.js", "botDeeKnowsList", "botDeePersonalizationPanel", "botDeePrefName"]},
         {label:"Master Admin subtabs", file:"master-admin.html", includes:["data-botdee-page=\"pause\"", "data-botdee-page=\"legal\"", "data-botdee-page=\"smartviews\"", "botDeeMasterSmartViewDemo"]},
         {label:"Save label", file:"master-admin.html", includes:["data-i18n=\"app.save\""], notIncludes:["Save BOT DEE settings"]},
         {label:"Portal chrome keys", file:"floqr-i18n.js", includes:["nav.myBotDee", "botdee.knowsTitle", "master.botDeeSubSmartviews"], notIncludes:["botdee.settingsBubble"]},
@@ -3235,10 +3235,10 @@
       id:"s3-3-023-botdee-personalization",
       area:"BOT DEE",
       feature:"Marked composer + first-use name/demeanor",
-      changed:"s3.3.023 — Placeholder is Ask BOT DEE… only. Keyboard lives in Help (type help or privacy). Pause restore says Session paused. Continue chatting. Hello sir is a short time-of-day greeting, not a product catalog. First-use asks what to call you and demeanor (Socially Cool / Professional / Balanced), then Save & Close. Last used is userbotdeelastUsedtime. Recap default on. Functions deploy needed for save + last-used.",
-      howToTest:"1) Hard-refresh botdee.html s3.3.023, sign in with botDee access. 2) Composer shows Ask BOT DEE… — no Enter/Shift+Enter in the box. 3) Type Hello sir — short greeting, no ShoutOut/VIP/floqCast list. 4) Type privacy — pause vs saved history + keyboard. 5) First visit: BOT DEE asks what to call you, then demeanor; Save & Close. Reopen Settings, change name, Save. 6) If a paused archive restores, status is Session paused. Continue chatting. — not the five-minute paragraph on the composer. 7) Mark Succeed/Failed. Save/last-used need Functions deploy.",
-      expected:"Placeholder is short. Hello sir is conversational. Privacy is in Help. Settings pop-out covers the chat, not a ? . Pause copy is one short line. No product dump on greeting.",
-      troubleshoot:"Hello sir still lists products → Functions not deployed or cached bot-dee-chat.js. Hello sir saved as the preferred name → first-use capture still intercepting reserved chat; hard-refresh botdee-personalization-ui.js. Guest Settings empty after reload → guest localStorage not applied on bind. Mixed-language greeting (Hey, bon après-midi) → greeting templates missing from floqr-i18n.js. Placeholder still crowded → cached botdee.html. Long privacy paragraph under the box → restore still sets botdee.memoryTimeoutNote; hard-refresh bot-dee-chat.js. Settings missing → botdee-personalization-ui.js not loaded."
+      changed:"s3.3.026 — First-use overlay asks name/tone once (generation 2). No Settings bar under the composer. Later edits are Profile & Settings → Feature & Orders → My BOT DEE. Stale sessions restore as new users (no old Gemini dump).",
+      howToTest:"1) Hard-refresh botdee.html, sign in with botDee access. 2) First visit: overlay setup screen (name, Socially Cool / Professional / Balanced, recap) — no Settings button under the box. 3) Save & Close, then composer is free. 4) Type Hello sir — short greeting, no ShoutOut/VIP/floqCast list. 5) Later edits: My Profile → Feature & Orders → My BOT DEE. 6) Mark Succeed/Failed. Generation reset needs Functions deploy.",
+      expected:"Everyone is treated as a new user until they complete the first-use overlay (personalization version 2). Chat has no standing Settings bar. Old durable turns do not restore. Later name/tone live on My BOT DEE.",
+      troubleshoot:"Hello sir still lists products → hard-refresh bot-dee-chat.js; restored old Gemini intros are rewritten. Settings bar still under the composer → cached botdee.html. Name/tone form missing → Feature & Orders → My BOT DEE on patron-portal.html. Hello sir saved as the preferred name → first-use capture still intercepting reserved chat; hard-refresh botdee-personalization-ui.js. Mixed-language greeting (Hey, bon après-midi) → greeting templates missing from floqr-i18n.js. Placeholder still crowded → cached botdee.html. Long privacy paragraph under the box → restore still sets botdee.memoryTimeoutNote; hard-refresh bot-dee-chat.js."
     },
     {
       id:"s3-3-022-sinema-search-tile",

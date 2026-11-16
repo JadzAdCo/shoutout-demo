@@ -55,24 +55,29 @@ function snapshotToState(snap, uid, settings, nowMs) {
   const idleEnded = bot.isThreadIdle(lastMessageAtMs, settings.conversationIdleSeconds, nowMs);
   const turns = idleEnded ? [] : bot.clipStoredTurns(data.turns);
   const consent = memory.normalizeConsent(data.consent);
+  const personalization = prefs.fromThread(data);
+  const staleGeneration = prefs.needsOnboarding(personalization);
+  const liveTurns = staleGeneration || idleEnded ? [] : turns;
   return {
     durable: true,
-    status: idleEnded ? "idle_ended" : (turns.length ? "active" : "fresh"),
+    status: staleGeneration ? "fresh" : (idleEnded ? "idle_ended" : (liveTurns.length ? "active" : "fresh")),
     threadId,
-    turns,
-    history: turns.map(row => ({role: row.role, text: row.text})),
+    turns: liveTurns,
+    history: liveTurns.map(row => ({role: row.role, text: row.text})),
     conversationEpoch: Math.max(1, Math.floor(Number(data.conversationEpoch) || 1)),
-    lastMessageAtMs,
-    remainingMs: bot.remainingIdleMs(lastMessageAtMs, settings.conversationIdleSeconds, nowMs),
-    idleEnded,
+    lastMessageAtMs: staleGeneration ? 0 : lastMessageAtMs,
+    remainingMs: staleGeneration
+      ? settings.conversationIdleSeconds * 1000
+      : bot.remainingIdleMs(lastMessageAtMs, settings.conversationIdleSeconds, nowMs),
+    idleEnded: staleGeneration ? false : idleEnded,
     revision: Math.max(0, Math.floor(Number(data.revision) || 0)),
     eventCount: Math.max(0, Math.floor(Number(data.eventCount) || 0)),
     firstSeq: Math.max(0, Math.floor(Number(data.firstSeq) || 0)),
     consent,
-    archiveRetained: memory.consentAllows(consent, "archive"),
-    hasUsedBotDee: memory.hasUsedFromThread(data),
-    personalization: prefs.fromThread(data),
-    [prefs.LAST_USED_FIELD]: Number(data[prefs.LAST_USED_FIELD]) || 0
+    archiveRetained: staleGeneration ? false : memory.consentAllows(consent, "archive"),
+    hasUsedBotDee: staleGeneration ? 0 : memory.hasUsedFromThread(data),
+    personalization,
+    [prefs.LAST_USED_FIELD]: staleGeneration ? 0 : (Number(data[prefs.LAST_USED_FIELD]) || 0)
   };
 }
 
@@ -103,12 +108,24 @@ async function savePersonalization(uid, input, nowMs) {
   if (!ref) return {ok: false, error: "missing_uid"};
   const now = Number(nowMs) || Date.now();
   const personalization = prefs.writePayload(input);
-  await ref.set({
-    uid,
-    threadId: bot.threadIdForUid(uid),
-    personalization,
-    updatedAtMs: now
-  }, {merge: true});
+  await db().runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    const prev = snap.exists ? snap.data() : {};
+    const resetSession = prefs.needsOnboarding(prefs.fromThread(prev));
+    const patch = {
+      uid,
+      threadId: bot.threadIdForUid(uid),
+      personalization,
+      updatedAtMs: now
+    };
+    if (resetSession) {
+      patch.status = "fresh";
+      patch.turns = [];
+      patch.lastMessageAtMs = 0;
+      patch.conversationEpoch = Math.max(1, Math.floor(Number(prev.conversationEpoch) || 1)) + 1;
+    }
+    tx.set(ref, patch, {merge: true});
+  });
   return {ok: true, personalization};
 }
 
@@ -132,8 +149,9 @@ function nextTranscript(prev, settings, receivedAtMs) {
   const last = Number(row.lastMessageAtMs) || 0;
   let epoch = Math.max(1, Math.floor(Number(row.conversationEpoch) || 1));
   let turns = Array.isArray(row.turns) ? row.turns : [];
-  if (bot.isThreadIdle(last, settings.conversationIdleSeconds, receivedAtMs)) {
-    epoch += last ? 1 : 0;
+  const staleGeneration = prefs.needsOnboarding(prefs.fromThread(row));
+  if (staleGeneration || bot.isThreadIdle(last, settings.conversationIdleSeconds, receivedAtMs)) {
+    epoch += (staleGeneration || last) ? 1 : 0;
     turns = [];
   }
   return {epoch, turns};

@@ -3,7 +3,7 @@
    Guest prefs stay in the browser; signed-in prefs live on botDeeThreads/{uid}. */
 "use strict";
 
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 2;
 const LAST_USED_FIELD = "userbotdeelastUsedtime";
 const DEMEANORS = Object.freeze(["sociallyCool", "professional", "balanced"]);
 const MAX_NAME = 40;

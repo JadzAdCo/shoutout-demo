@@ -48,8 +48,10 @@ test("first name, demeanor, last-used, and greeting stay short", () => {
   assert.equal(p.looksLikeReservedComposerText("help"), true);
   assert.equal(p.looksLikeReservedComposerText("privacy"), true);
   assert.equal(p.looksLikeReservedComposerText("Don"), false);
+  assert.equal(p.CURRENT_VERSION, 2);
   assert.equal(p.needsOnboarding({botDeePersonalizationVersion: 0}), true);
-  assert.equal(p.needsOnboarding({botDeePersonalizationVersion: 1}), false);
+  assert.equal(p.needsOnboarding({botDeePersonalizationVersion: 1}), true);
+  assert.equal(p.needsOnboarding({botDeePersonalizationVersion: 2}), false);
   assert.equal(p.LAST_USED_FIELD, "userbotdeelastUsedtime");
 });
 
@@ -97,7 +99,7 @@ test("composer name capture skips greetings and cancel clears intercept", () => 
   const {api, memory} = loadUi();
   api.maybeStartSetup();
   assert.equal(api.interceptSend("Hello sir"), false);
-  assert.equal(memory.session["floqr.botDeeSetupDeferred"], "1");
+  assert.equal(memory.session["floqr.botDeeSetupDeferred.v2"], "1");
 
   const again = loadUi();
   again.api.maybeStartSetup();
@@ -119,13 +121,14 @@ test("composer name capture skips greetings and cancel clears intercept", () => 
   cancelled.api.maybeStartSetup();
   cancelled.api.closeDialog();
   assert.equal(cancelled.api.interceptSend("Don"), false);
+  assert.match(read("botdee-personalization-ui.js"), /CURRENT_VERSION = 2/);
 
   const guest = loadUi();
   guest.memory.local["floqr.botDeePersonalization.guest"] = JSON.stringify({
     preferredAddressName: "Boss",
     demeanor: "sociallyCool",
     remindWhereLeftOff: 1,
-    botDeePersonalizationVersion: 1
+    botDeePersonalizationVersion: 2
   });
   guest.api.applyFromThread({}, false);
   assert.equal(guest.api.get().preferredAddressName, "Boss");
@@ -144,10 +147,17 @@ test("saveBotDeePersonalization is wired and last-used is persisted on send", ()
   assert.doesNotMatch(read("botdee.html"), /placeholder="Ask BOT DEE… Enter sends/);
   assert.match(read("botdee.html"), /placeholder="Ask BOT DEE…"/);
   assert.match(read("botdee.html"), /botdee-personalization-ui\.js/);
+  assert.doesNotMatch(read("botdee.html"), /id="botDeePrefsOpen"/);
+  assert.match(read("botdee.html"), /id="botDeePersonalizationDialog"/);
+  assert.match(read("patron-portal.html"), /id="botDeePersonalizationPanel"/);
+  assert.match(read("patron-portal.html"), /id="botDeePrefName"/);
   assert.match(read("botdee-personalization-ui.js"), /looksLikeReservedComposerText\(raw\)/);
   assert.match(read("botdee-personalization-ui.js"), /loadGuestPrefs/);
   assert.match(read("botdee-personalization-ui.js"), /state\.setupStep = ""/);
   assert.match(read("bot-dee-chat.js"), /applyFromThread\?\.\(\{\}, false\)/);
+  assert.match(read("bot-dee-chat.js"), /needsOnboarding\?\.\(\)/);
+  assert.match(read("botdee-personalization-ui.js"), /CURRENT_VERSION = 2/);
+  assert.match(read("functions/bot-dee-thread.js"), /staleGeneration/);
   assert.match(read("bot-dee-chat.js"), /botdee\.chatWelcome/);
   assert.doesNotMatch(
     read("bot-dee-chat.js"),

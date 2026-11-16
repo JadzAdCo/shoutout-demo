@@ -59,6 +59,9 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   const reply = bot.chitchatReply("master");
   assert.match(reply, /Good afternoon|Wassup|How can I help|working on/i);
   assert.doesNotMatch(reply, /ShoutOut|VIP|floqCast/i);
+  const dumped = "Hey! I'm BOT DEE, your FLOQR assistant. What can I help you with today — ShoutOut, VIP reserV, or floqCast?";
+  assert.equal(bot.isProductCatalogGreeting(dumped), true);
+  assert.doesNotMatch(bot.sanitizeBotReply(dumped), /ShoutOut|VIP reserV|floqCast/i);
   assert.doesNotMatch(reply, /Here is what I found/i);
   assert.doesNotMatch(bot.formatSearchFallback(heyHits), /Here is what I found/i);
   assert.match(bot.moodReply(), /thanks for asking|doing great/i);
@@ -510,6 +513,7 @@ test("thread snapshot reports idle vs active without leaking another uid", () =>
   const threads = require("./bot-dee-thread");
   const now = 1_700_000_060_000;
   const settings = {durableThreads: 1, conversationIdleSeconds: 60};
+  const currentPrefs = {personalization: {botDeePersonalizationVersion: require("./botdee-personalization").CURRENT_VERSION}};
   const active = threads.snapshotToState({
     exists: true,
     data: () => ({
@@ -517,24 +521,38 @@ test("thread snapshot reports idle vs active without leaking another uid", () =>
       turns: [{role: "user", text: "hi"}, {role: "model", text: "hey"}],
       lastMessageAtMs: now - 10_000,
       conversationEpoch: 2,
-      revision: 4
+      revision: 4,
+      ...currentPrefs
     })
   }, "abc", settings, now);
   assert.equal(active.status, "active");
   assert.equal(active.history.length, 2);
+  const stale = threads.snapshotToState({
+    exists: true,
+    data: () => ({
+      uid: "abc",
+      turns: [{role: "user", text: "Hello sir"}, {role: "model", text: "ShoutOut, VIP, floqCast"}],
+      lastMessageAtMs: now - 10_000,
+      conversationEpoch: 2,
+      personalization: {botDeePersonalizationVersion: 1}
+    })
+  }, "abc", settings, now);
+  assert.equal(stale.status, "fresh");
+  assert.deepEqual(stale.turns, []);
   const idle = threads.snapshotToState({
     exists: true,
     data: () => ({
       uid: "abc",
       turns: [{role: "user", text: "hi"}],
       lastMessageAtMs: now - 61_000,
-      conversationEpoch: 2
+      conversationEpoch: 2,
+      ...currentPrefs
     })
   }, "abc", settings, now);
   assert.equal(idle.status, "idle_ended");
   assert.deepEqual(idle.turns, []);
   const last = now - 59_000;
-  const prev = {lastMessageAtMs: last, conversationEpoch: 3, turns: [{role: "user", text: "hi"}, {role: "model", text: "hey"}]};
+  const prev = {lastMessageAtMs: last, conversationEpoch: 3, turns: [{role: "user", text: "hi"}, {role: "model", text: "hey"}], ...currentPrefs};
   const duringGemini = threads.nextTranscript(prev, settings, last + 59_000);
   assert.equal(duringGemini.turns.length, 2, "idle clock starts when the patron sent, not when Gemini returns");
   assert.equal(duringGemini.epoch, 3);

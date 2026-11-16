@@ -1,14 +1,14 @@
-/* BOT DEE first-use + Settings pop-out — name, demeanor, recap.
-   Authorized overlay over the conversation. Not a ? help popout.
-   Guest prefs stay in localStorage; signed-in prefs go to saveBotDeePersonalization. */
+/* BOT DEE first-use chips on chat + standing prefs on My Profile → My BOT DEE.
+   No Settings button on botdee.html. Guest prefs stay in localStorage;
+   signed-in prefs go to saveBotDeePersonalization. */
 (function (global) {
   "use strict";
 
-  const CURRENT_VERSION = 1;
+  const CURRENT_VERSION = 2;
   const LAST_USED_FIELD = "userbotdeelastUsedtime";
   const GUEST_KEY = "floqr.botDeePersonalization.guest";
-  const VISIT_KEY = "floqr.botDeeSetupVisit";
-  const DEFERRED_KEY = "floqr.botDeeSetupDeferred";
+  const VISIT_KEY = `floqr.botDeeSetupVisit.v${CURRENT_VERSION}`;
+  const DEFERRED_KEY = `floqr.botDeeSetupDeferred.v${CURRENT_VERSION}`;
 
   const state = {
     personalization: {
@@ -228,7 +228,7 @@
     try {
       await persist({preferredAddressName: name, demeanor, remindWhereLeftOff: recap});
       if (status) status.textContent = t("botdee.prefsSaved", "Saved.");
-      closeDialog();
+      if (byId("botDeePersonalizationDialog")) closeDialog();
       state.setupStep = "done";
     } catch (_) {
       if (status) status.textContent = t("botdee.prefsFailed", "Could not save. Try again.");
@@ -278,9 +278,8 @@
     choices.push({
       label: t("botdee.anotherName", "Another name or title"),
       onPick: () => {
-        state.setupStep = "dialog";
-        openDialog();
-        byId("botDeePrefName")?.focus();
+        state.setupStep = byId("botDeePersonalizationDialog") ? "dialog" : "name";
+        if (state.setupStep === "dialog") openDialog();
       }
     });
     appendChoiceRow(t("botdee.callMe", "What should I call you?"), choices);
@@ -305,7 +304,7 @@
       remindWhereLeftOff: state.personalization.remindWhereLeftOff
     });
     state.setupStep = "done";
-    openDialog();
+    if (byId("botDeePersonalizationDialog")) openDialog();
   }
 
   function maybeStartSetup() {
@@ -315,6 +314,11 @@
       if (sessionStorage.getItem(VISIT_KEY) === "1") return;
       sessionStorage.setItem(VISIT_KEY, "1");
     } catch (_) {}
+    if (byId("botDeePersonalizationDialog")) {
+      state.setupStep = "dialog";
+      openDialog();
+      return;
+    }
     askName();
   }
 
@@ -407,11 +411,23 @@
     fillDialog();
   }
 
+  async function hydratePortal() {
+    if (!byId("botDeePrefName")) return;
+    const user = global.firebase?.auth?.()?.currentUser;
+    if (user) state.signedIn = true;
+    fillDialog();
+    const fn = callable("getBotDeeThread");
+    if (!fn || !user) return;
+    try {
+      const data = (await fn({}))?.data || {};
+      applyFromThread(data, true);
+    } catch (_) {}
+  }
+
   function bind() {
     if (state.bound) return;
     state.bound = true;
     loadGuestPrefs();
-    byId("botDeePrefsOpen")?.addEventListener("click", openDialog);
     byId("botDeePrefSave")?.addEventListener("click", event => {
       event.preventDefault();
       saveFromDialog();
@@ -423,11 +439,13 @@
     byId("botDeePersonalizationDialog")?.addEventListener("click", event => {
       if (event.target?.id === "botDeePersonalizationDialog") closeDialog();
     });
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape" && byId("botDeePersonalizationDialog") && !byId("botDeePersonalizationDialog").hidden) {
-        closeDialog();
-      }
-    });
+    if (byId("botDeePersonalizationDialog")) {
+      document.addEventListener("keydown", event => {
+        const dialog = byId("botDeePersonalizationDialog");
+        if (event.key === "Escape" && dialog && !dialog.hidden) closeDialog();
+      });
+    }
+    hydratePortal();
   }
 
   global.FLOQRBotDeePersonalization = {

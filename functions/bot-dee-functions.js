@@ -532,7 +532,7 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
     }
     const state = await threads.loadThreadState(uid, settings);
     let archiveTurns = [];
-    if (state.idleEnded && state.archiveRetained) {
+    if (state.idleEnded && state.archiveRetained && !prefs.needsOnboarding(state.personalization)) {
       try {
         archiveTurns = await threads.loadArchiveHistory(uid, 12);
       } catch (_) {}

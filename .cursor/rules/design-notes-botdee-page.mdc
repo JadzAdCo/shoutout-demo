@@ -14,7 +14,7 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 | Piece | Role |
 |---|---|
 | Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `botDee` gate + classification → Gemini + `contextualSearch`); local `isHelpPrompt` / `isVersionPrompt` / `isPrivacyPrompt` |
-| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Chat-only** canvas (transcript + composer). Placeholder is **Ask BOT DEE…** — Enter / Shift+Enter live in Help (`help` / `privacy`). Saved chats/memories + approved facts → **My Profile → Feature & Orders → My BOT DEE** (`#foBotDeePane`). Authorized **Settings** pop-out (`#botDeePersonalizationDialog`) for name / demeanor / recap — not a `?`. Mock SMARTviews → **Master Admin → Features Mgmt → BOT DEE** subtabs. |
+| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Chat-only** canvas (transcript + composer). Placeholder is **Ask BOT DEE…** — Enter / Shift+Enter live in Help (`help` / `privacy`). Name / demeanor / recap + saved chats/memories + approved facts → **My Profile → Feature & Orders → My BOT DEE** (`#foBotDeePane`, `#botDeePersonalizationPanel`). No Settings button on the chat. Mock SMARTviews → **Master Admin → Features Mgmt → BOT DEE** subtabs. |
 | Modules | `botdee-page.js`, `botdee-access.js`, `botdee-help-repository.js`, `bot-dee-chat.js` / `.css`, `botdee-upgrade-ui.js`, `botdee-smartview.js` / `.css` |
 
 ## Routing
@@ -45,7 +45,7 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 
 ## Conversation personalization (s3.3.023)
 
-Versioned first-use (`personalization.botDeePersonalizationVersion`). Ask name (prefill profile first name) then demeanor (Socially Cool / Professional / Balanced) once per version. Save & Close on the Settings pop-out over the chat. Closing without saving does not loop the same visit (`sessionStorage`) and **clears name-capture** so later short messages send. Composer capture **never** treats greetings / `help` / `privacy` as a name. Guest prefs reload from `localStorage` on bind / signed-out restore; signed-in prefs persist on `botDeeThreads/{uid}`. Last meaningful send stamps `userbotdeelastUsedtime` (read-before-write; not on page open). Recap default on: last two meaningful turns. First bubble uses `botdee.chatWelcome`; later hellos use localized demeanor templates. Never list ShoutOut / VIP / floqCast. Pause status on restore: **Session paused. Continue chatting.** Idle remains 300s. Functions deploy required for save + last-used.
+Versioned first-use (`personalization.botDeePersonalizationVersion`, current **2**). First visit opens the **setup overlay** on `botdee.html` (`#botDeePersonalizationDialog`) — name, demeanor, recap, Save & Close. There is **no** standing Settings button under the composer. Later edits live in **Profile & Settings → Feature & Orders → My BOT DEE**. Bumping the version treats every account as a new user: get/restore skip old turns, persist starts a new epoch. Composer capture **never** treats greetings / `help` / `privacy` as a name. Guest prefs reload from `localStorage`; signed-in prefs persist on `botDeeThreads/{uid}`. Recap default on. Never list ShoutOut / VIP / floqCast. Pause status: **Session paused. Continue chatting.** Idle 300s. Functions deploy required for save + session reset.
 
 ## Durable resume (s3.3.006)
 

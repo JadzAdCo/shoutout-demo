@@ -1366,6 +1366,10 @@ html.floqr-embed-mode .topbar .card[data-floqr-auth-chrome] .eyebrow{opacity:.75
 
 .portal-botdee-panel label{display:flex;gap:.45rem;align-items:flex-start;margin:.4rem 0;font-size:.95rem}
 .portal-botdee-panel label input{margin-top:.2rem;flex:0 0 auto}
+.portal-botdee-panel .botdee-pref-field{flex-direction:column;gap:.4rem;margin:.7rem 0}
+.portal-botdee-panel .botdee-pref-field input[type=text]{width:100%;max-width:22rem;margin:0}
+.portal-botdee-panel fieldset.botdee-pref-field{border:0;padding:0}
+.portal-botdee-panel .botdee-pref-check{align-items:center}
 .portal-botdee-fact{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
 .portal-botdee-fact .buttonlike{min-height:44px}
 .botdee-mgmt-subtabs{margin-top:10px}

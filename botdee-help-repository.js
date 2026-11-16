@@ -486,7 +486,7 @@
     {
       id: "help-botdee-privacy-session",
       title: "BOT DEE privacy and session",
-      body: "The five-minute pause ends this live BOT DEE chat. It does not delete history you opted to save in My Profile → Feature & Orders → My BOT DEE. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send a message; Shift+Enter starts a new line. Type help or privacy on the BOT DEE page. Tap Settings to choose what BOT DEE calls you, the tone (Socially Cool, Professional, or Balanced), and whether BOT DEE reminds you where you left off. Closing Settings without saving does not loop the same questions during this visit.",
+      body: "The five-minute pause ends this live BOT DEE chat. It does not delete history you opted to save in My Profile → Feature & Orders → My BOT DEE. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send a message; Shift+Enter starts a new line. Type help or privacy on the BOT DEE page. Name, tone, and recap live in My Profile → Feature & Orders → My BOT DEE — not as a button on the chat.",
       searchPhrases: ["privacy", "session", "pause", "five minute pause", "5 minute pause", "keyboard", "enter sends", "shift enter", "bot dee settings", "call me", "demeanor", "socially cool", "remind me where we left off"],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
@@ -494,7 +494,7 @@
       ],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
-      page: "botdee.html#botDeePersonalizationDialog"
+      page: "patron-portal.html#foBotDeePane"
     },
     {
       id: "help-bot-dee-mgmt",

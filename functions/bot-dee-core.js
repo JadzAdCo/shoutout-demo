@@ -655,8 +655,20 @@ function isSearchMissReply(raw) {
     || text === SEARCH_MISS_FALLBACK_LEGACY;
 }
 
+/** Gemini/old-thread intro that lists products — never show this as a greeting. */
+function isProductCatalogGreeting(raw) {
+  const text = String(raw || "");
+  if (!text) return false;
+  const shout = /shout\s*out/i.test(text);
+  const vip = /\bvip\b/i.test(text);
+  const floq = /floq\s*cast/i.test(text);
+  if (shout && vip && floq) return true;
+  return /i['’]?m bot dee, your floqr assistant/i.test(text) && (shout || vip || floq);
+}
+
 function sanitizeBotReply(raw) {
   if (isSearchMissReply(raw)) return SEARCH_MISS_FALLBACK;
+  if (isProductCatalogGreeting(raw)) return chitchatReply("patron", null, null);
   return clipModelText(stripBackendLinks(raw));
 }
 
@@ -1056,6 +1068,7 @@ module.exports = {
   clipModelText,
   SEARCH_MISS_FALLBACK,
   isSearchMissReply,
+  isProductCatalogGreeting,
   sanitizeBotReply,
   normalizeUiLanguage,
   localizeResultRow,

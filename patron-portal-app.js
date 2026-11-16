@@ -480,6 +480,7 @@
     if (target === "foBotDeePane") {
       window.FLOQRBotDeeUpgradeUi?.bind?.();
       window.FLOQRBotDeeUpgradeUi?.loadConsent?.();
+      window.FLOQRBotDeePersonalization?.bind?.();
     }
     if (target === "foShoutoutsPane") {
       const activeSub = document.querySelector("#shoutoutSubtabs .admin-subtab.active");

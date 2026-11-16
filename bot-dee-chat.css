@@ -82,7 +82,7 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   min-width: 0;
 }
 
-/* Icon + title + ? on one row (feature-landing title-row pattern). */
+/* Icon + title. Name / demeanor / recap live in My Profile → My BOT DEE, not on this canvas. */
 .botdee-chat-header-main {
   display: flex;
   align-items: center;
@@ -705,17 +705,9 @@ html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
   display: none !important;
 }
 
-.botdee-prefs-row {
-  margin: 0;
-  display: flex;
-  justify-content: flex-start;
-}
-
+.botdee-prefs-row,
 .botdee-prefs-open {
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 999px;
-  font-weight: 700;
+  display: none !important;
 }
 
 .botdee-pref-dialog {

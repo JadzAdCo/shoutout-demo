@@ -237,7 +237,7 @@
     ["botDeeThreads", "personalization.preferredAddressName", "ownMaster", 1, "What BOT DEE should call the signed-in patron (chosen name or title); Functions-write"],
     ["botDeeThreads", "personalization.demeanor", "ownMaster", 0, "BOT DEE tone: sociallyCool | professional | balanced; Functions-write"],
     ["botDeeThreads", "personalization.remindWhereLeftOff", "ownMaster", 0, "0|1 recap last two meaningful turns on return; default 1 for this experience; Functions-write"],
-    ["botDeeThreads", "personalization.botDeePersonalizationVersion", "ownMaster", 0, "Versioned first-use marker; 0 = ask name/demeanor once; bump does not wipe history"],
+    ["botDeeThreads", "personalization.botDeePersonalizationVersion", "ownMaster", 0, "Versioned first-use marker; below current generation restores as a new session (no prior turns)"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
   ];

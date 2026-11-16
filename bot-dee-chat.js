@@ -221,7 +221,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.025";  }
+    return "s3.3.026";  }
 
   function isVersionPrompt(raw) {
     const q = normalizeChat(raw);
@@ -990,6 +990,16 @@
     global.FLOQRBotDeePersonalization?.maybeStartSetup?.();
   }
 
+  function isProductCatalogGreeting(raw) {
+    const text = String(raw || "");
+    if (!text) return false;
+    const shout = /shout\s*out/i.test(text);
+    const vip = /\bvip\b/i.test(text);
+    const floq = /floq\s*cast/i.test(text);
+    if (shout && vip && floq) return true;
+    return /i['’]?m bot dee, your floqr assistant/i.test(text) && (shout || vip || floq);
+  }
+
   function displayReply(raw) {
     const text = String(raw || "").trim();
     // Server stores English botdee.chatEmpty; live + restore both localize it.
@@ -1000,6 +1010,11 @@
       || text === "No answer yet — try quick intent search."
     ) {
       return t("botdee.chatEmpty", "No answer yet — try asking another way.");
+    }
+    if (isProductCatalogGreeting(text)) {
+      const fromPrefs = global.FLOQRBotDeePersonalization?.greetingFor?.();
+      if (fromPrefs) return fromPrefs;
+      return t("botdee.chatHello", "Good afternoon. How can I help?");
     }
     return scrubGatedBrands(stripBackendLinks(text));
   }
@@ -1036,6 +1051,11 @@
           if (data.threadId) threadId = String(data.threadId);
           applyHasUsed(data);
           global.FLOQRBotDeePersonalization?.applyFromThread?.(data, true);
+          if (global.FLOQRBotDeePersonalization?.needsOnboarding?.()) {
+            setStatus("");
+            welcome();
+            return;
+          }
           if (durableEnabled && data.status === "active" && Array.isArray(data.turns) && data.turns.length) {
             restoreTurns(data.turns);
             phase = "active";
