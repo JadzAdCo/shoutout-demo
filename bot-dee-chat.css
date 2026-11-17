@@ -769,12 +769,25 @@ html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
   font: inherit;
 }
 
-/* Phone: overflow-wrap:anywhere on label was stacking Socially Cool one letter per line. */
+/* Phone: overflow-wrap:anywhere on label was stacking Socially Cool one letter per line.
+   iOS native radios also ignore width in a flex label — paint custom 22px controls on a grid. */
+.botdee-pref-dialog,
+.botdee-pref-dialog label,
+.botdee-pref-dialog legend,
+.botdee-pref-dialog span {
+  overflow-wrap: break-word;
+  word-break: normal;
+  writing-mode: horizontal-tb;
+}
+
 .botdee-pref-demeanor {
   display: block;
   border: 0;
   padding: 0;
   min-width: 0;
+  min-inline-size: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .botdee-pref-demeanor > legend {
@@ -793,14 +806,57 @@ html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
   flex-direction: column;
   gap: 8px;
   min-width: 0;
+  width: 100%;
 }
 
-.botdee-pref-demeanor-option {
-  display: flex !important;
-  flex-direction: row !important;
-  flex: 0 0 auto !important;
-  align-items: center !important;
-  gap: 10px;
+.botdee-pref-dialog input[type="radio"],
+.botdee-pref-dialog input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  display: block;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  min-height: 22px;
+  max-height: 22px;
+  margin: 0;
+  padding: 0;
+  flex: none;
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  background: transparent;
+  overflow: hidden;
+}
+
+.botdee-pref-dialog input[type="radio"] {
+  border-radius: 50%;
+}
+
+.botdee-pref-dialog input[type="radio"]:checked {
+  border-color: #1597ff;
+  background: radial-gradient(circle, #1597ff 0 6px, transparent 7px);
+}
+
+.botdee-pref-dialog input[type="checkbox"] {
+  border-radius: 4px;
+}
+
+.botdee-pref-dialog input[type="checkbox"]:checked {
+  border-color: #1597ff;
+  background-color: #1597ff;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='%23fff' stroke-width='2.2' d='M3 8.2l3.2 3.1L13 4.6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px 12px;
+}
+
+.botdee-pref-demeanor-option,
+.botdee-pref-check {
+  display: grid !important;
+  grid-template-columns: 22px minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: center;
   margin: 0;
   min-height: 44px;
   height: auto;
@@ -811,42 +867,18 @@ html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
   white-space: normal;
 }
 
-.botdee-pref-demeanor-option input[type="radio"] {
-  -webkit-appearance: radio;
-  appearance: radio;
-  flex: 0 0 22px !important;
-  width: 22px !important;
-  height: 22px !important;
-  min-width: 22px !important;
-  max-width: 22px !important;
-  min-height: 22px !important;
-  max-height: 22px !important;
+.botdee-pref-demeanor-option input,
+.botdee-pref-check input {
   margin: 0 !important;
-  align-self: center;
-  accent-color: #1597ff;
+  justify-self: center;
 }
 
-.botdee-pref-demeanor-option span {
-  flex: 1 1 auto;
+.botdee-pref-demeanor-option span,
+.botdee-pref-check span {
   min-width: 0;
   overflow-wrap: break-word;
   writing-mode: horizontal-tb;
   white-space: normal;
-}
-
-.botdee-pref-check {
-  flex-direction: row;
-  overflow-wrap: normal;
-  writing-mode: horizontal-tb;
-}
-
-.botdee-pref-check input[type="checkbox"] {
-  flex: 0 0 22px;
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  max-width: 22px;
-  margin: 0;
 }
 
 @media (min-width: 720px) {

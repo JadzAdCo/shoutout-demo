@@ -1458,6 +1458,20 @@ img,video,iframe{max-width:100%}
 .app,.page,.card,.login-card,.club-option,.notice,.queue-item,.selected-summary,.receipt{min-width:0}
 input,select,textarea,button,.buttonlike{max-width:100%;min-width:0}
 label,.sub,.message-body,.queue-item,.selected-summary,.receipt,.club-option p{overflow-wrap:anywhere}
+/* My BOT DEE: do not let the 100% input rule stretch iOS radios into a letter column. */
+.portal-botdee-panel input[type=radio],
+.portal-botdee-panel input[type=checkbox],
+.botdee-pref-dialog input[type=radio],
+.botdee-pref-dialog input[type=checkbox]{
+  -webkit-appearance:none;
+  appearance:none;
+  min-width:22px;
+  max-width:22px;
+  width:22px;
+  height:22px;
+  min-height:22px;
+  max-height:22px;
+}
 .filters,.template-grid,.auth-grid,.club-grid,.profile-grid,.metric-grid,.profile-media-grid,.role-template-grid,.public-profile-gallery{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
 .button-row,.queue-actions,.manual-test-actions{align-items:center}
 .queue-actions button,.button-row button,.manual-test-actions button{white-space:normal}
