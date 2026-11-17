@@ -222,8 +222,14 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.032",
-      title: "s3.3.032 — SMARTcard hero from public Profile Media",
+      title: "s3.3.032 — Version SMARTview + SMARTcard public Profile Media hero",
       checks: [
+        {label:"Version SMARTview aliases", file:"functions/botdee-version-smartview.js", includes:["function isVersionSmartViewAlias(", "floqr.botDeeVersionSmartView/1", "status: \"not_checked\""]},
+        {label:"localSession attaches card", file:"functions/bot-dee-functions.js", includes:["buildVersionSmartView", "smartViews: [versionView]"]},
+        {label:"Client renderer", file:"botdee-smartview.js", includes:["function renderVersionCard(", "botdee.vs.title", "localVersionPayload"]},
+        {label:"Site Chrome CSS", file:"botdee-smartview.css", includes:[".botdee-sv-version", "var(--accent"]},
+        {label:"Help Version SMARTview", file:"botdee-help-repository.js", includes:["help-botdee-version-smartview", "Ver, Vers, or Version"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-032-version-smartview"]},
         {label:"Shared public media helper", file:"functions/botdee-smartview-v2-core.js", includes:["function applyPublicPageMedia("]},
         {label:"SMARTcard search uses helper", file:"functions/botdee-smartcard-functions.js", includes:["applyPublicPageMedia"], notIncludes:["volunteered.photoUrl = data.photoURL || data.publicPhotoUrl"]},
         {label:"getPeopleSmartView uses helper", file:"functions/botdee-smartview-v2-functions.js", includes:["applyPublicPageMedia"]},
@@ -3311,14 +3317,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-032-version-smartview",
+      area:"BOT DEE",
+      feature:"Version SMARTview (Ver / Vers / Version)",
+      changed:"s3.3.032 — Typing Ver, Vers, or Version in BOT DEE chat opens an inline Version SMARTview card (tabs Overview / What's New / Help, Technical Details). Live package stamps come from the app — not from the iPhone design picture. Status is Not checked (never Operational without a real probe). People SMARTview is unchanged.",
+      howToTest:"1) Hard-refresh botdee.html after Pages publish — confirm botdee-smartview.js?v=s3.3.032. Sign in with BOT DEE access. 2) Type Ver, then Vers, then Version (try VERSION and Version?). Each opens one Version SMARTview in the same chat bubble. 3) Confirm BOT DEE version and FLOQR version show the live package (s3.3.032), AI model says Not used this turn (plus configured id if the server sent one), Service status is Not checked — not Operational, not v2.6.0 / Gemini 2.5 Pro from the design picture. 4) Tap What's New — real README package bullets. Tap Help. Expand Technical Details. Type a few letters in the composer first — draft and scroll stay. 5) Type version history — that is NOT this card. 6) Switch Appearance Site Chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) — card colors follow the theme. 7) Ask what is your version? — still answers, plus the card. 8) Master Admin: Technical Details may list extra diagnostics; a patron account must not. 9) Mark Succeed/Failed. Do not expect this on live until Don approves Pages + Functions.",
+      expected:"Each alias paints one Version SMARTview with honest live stamps. Not checked, not Operational. Composer draft survives tab changes. People cards still work. version history is a normal question.",
+      troubleshoot:"No card → cached botdee-smartview.js / bot-dee-chat.js; hard-refresh until ?v=s3.3.032. Card shows Operational or v2.6.0 → old prototype HTML, not this branch. Durable chat has no What's New bullets → Functions not deployed from this branch (local-client fallback has empty changelog). Green health pill → CSS still using the design mock; confirm .botdee-sv-version-pill uses --muted. People card broken → this PR must not touch usercharacter_analysis; check you did not open PR 102's branch."
+    },
+    {
       id:"s3-3-031-smartsummary-locale-source",
       area:"BOT DEE",
       feature:"SMARTsummary source locale + translation fan-out",
       changed:"s3.3.031 — Patron default UI language is the SMARTsummary source. Gemini drafts in that language. Owner edit stores translations.B as source and queues every other locale, including English. English is canonical only when the patron’s default is EN. Brand copy is SMARTsummary (untranslated spelling).",
       howToTest:"1) After Pages + Functions deploy. Hard-refresh botdee.html / patron-portal.html (asset ?v=s3.3.031). Sign in as Patron A. 2) Set default UI language to French (or any non-EN of the 11). Reload — chrome is language B. 3) Open My BOT DEE → View my SMARTview. SMARTsummary is in B (Gemini/background), not forced English. 4) Edit my SMARTsummary in B, save. Overlay labels read SMARTsummary. 5) In Firestore usercharacter_analysis/{uid}: sourceLocale=B, translations.B.status=source, smartViewTranslationJobs include locale en (id {uid}_{revision}_en_{hash16}). 6) Sign in as an English patron and open Patron A’s People SMARTview — SMARTsummary is English once the en job is done (pending shows B with a label). 7) Overlay/hide/dating-off still work. 8) With chrome English and profile French, Edit my SMARTsummary still shows the French source. 9) Mark Succeed/Failed.",
       expected:"Source = Patron A’s UI language. Save in B updates all other locales including EN. English reader sees translations.en. Chrome says SMARTsummary in all 11 langs. No live Places/Yelp.",
-      troubleshoot:"Still English-only source → Functions not deployed from this SHA (saveSmartSummary / getPeopleSmartView / translation onWrite). French save missing en job → old enqueue skipped en; confirm sourceLocale is fr. English viewer still sees French after jobs done → getPeopleSmartView used subject uiLanguage; hard-refresh botdee-upgrade-ui.js passing viewer uiLanguage. Label still Smart Summary → cached floqr-i18n.js / botdee-smartview.js not s3.3.031."
-    },
+      troubleshoot:"Still English-only source → Functions not deployed from this SHA (saveSmartSummary / getPeopleSmartView / translation onWrite). French save missing en job → old enqueue skipped en; confirm sourceLocale is fr. English viewer still sees French after jobs done → getPeopleSmartView used subject uiLanguage; hard-refresh botdee-upgrade-ui.js passing viewer uiLanguage. Label still Smart Summary → cached floqr-i18n.js / botdee-smartview.js not s3.3.031."    },
     {
       id:"s3-3-031-smartview-public-media",
       area:"BOT DEE",

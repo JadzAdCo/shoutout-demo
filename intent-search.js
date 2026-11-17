@@ -177,6 +177,24 @@
   /* “I want to be able to…” / how-to help for patrons & service members */
   const HELP_INTENTS = [
     {
+      id: "help-botdee-version-smartview",
+      kind: "help",
+      label: "Version SMARTview",
+      blurb: "Type Ver, Vers, or Version in BOT DEE chat for a Version SMARTview card. Live package stamps and honest service status — not the numbers from a design picture.",
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
+      searchPhrases: [
+        "version smartview", "ver command", "vers command", "version command",
+        "bot dee version", "floqr version card"
+      ],
+      patterns: [
+        /version\s*smart\s*view/,
+        /\bver\s+command\b/,
+        /\bvers\s+command\b/,
+        /bot\s*dee\s+version/,
+        /show\s+(me\s+)?(the\s+)?version\s+card/
+      ]
+    },
+    {
       id: "help-post-ad",
       kind: "help",
       label: "Post an ad on FLOQR",
@@ -1033,6 +1051,7 @@
     "ad-campaigns": ["patron"], mingl: ["patron"], rydr: ["patron"], bartr: ["patron"], shoutout: ["patron"],
     "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], "black-card": ["patron"], "ballers-alert": ["patron"], floqcast: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
+    "help-botdee-version-smartview": ["patron"], "help-botdee-version-smartview-status": ["patron"], "help-botdee-version-smartview-tabs": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-profile-account-type": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],
     "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],

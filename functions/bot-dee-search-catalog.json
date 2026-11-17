@@ -801,6 +801,62 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-version-smartview",
+      "id": "help-botdee-version-smartview",
+      "kind": "help",
+      "label": "Version SMARTview",
+      "blurb": "In BOT DEE chat, type Ver, Vers, or Version (any capitalization, optional ?). A Version SMARTview card opens in the same bubble. It shows the real FLOQR package stamp, whether this turn used an AI model, and service status. Numbers in design pictures are examples — live values co",
+      "href": "./botdee.html",
+      "phrases": [
+        "version smartview",
+        "in bot dee chat type ver vers or version any capitalization optional . a version smartview card opens in the same bubble. it shows the real floqr package stamp ",
+        "ver command",
+        "vers command",
+        "version command",
+        "bot dee version",
+        "floqr version",
+        "what version is bot dee",
+        "open bot dee",
+        "help-botdee-version-smartview"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-version-smartview-status",
+      "id": "help-botdee-version-smartview-status",
+      "kind": "help",
+      "label": "Version SMARTview status is honest",
+      "blurb": "Service status is Not checked until FLOQR actually probes the service. The card never shows Operational from a picture or a guess. AI model is Not used this turn on the Version command because that path does not call Gemini. Frontend and backend package stamps can differ; both ar",
+      "href": "./botdee.html",
+      "phrases": [
+        "version smartview status is honest",
+        "service status is not checked until floqr actually probes the service. the card never shows operational from a picture or a guess. ai model is not used this tur",
+        "version operational",
+        "not checked",
+        "bot dee health",
+        "service status smartview",
+        "gemini version card",
+        "open bot dee",
+        "help-botdee-version-smartview-status"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-version-smartview-tabs",
+      "id": "help-botdee-version-smartview-tabs",
+      "kind": "help",
+      "label": "Version SMARTview tabs",
+      "blurb": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified FLOQR package notes from the current README. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses",
+      "href": "./botdee.html",
+      "phrases": [
+        "version smartview tabs",
+        "overview describes bot dee and opens technical details without leaving chat. what s new lists verified floqr package notes from the current readme. help repeats",
+        "version what s new",
+        "version overview",
+        "technical details bot dee",
+        "open bot dee",
+        "help-botdee-version-smartview-tabs"
+      ]
+    },
+    {
       "sourceId": "help:help-chrome-audit",
       "id": "help-chrome-audit",
       "kind": "help",
@@ -3408,6 +3464,24 @@
         "ip language",
         "country language",
         "help-app-language"
+      ]
+    },
+    {
+      "sourceId": "intent:help-botdee-version-smartview",
+      "id": "help-botdee-version-smartview",
+      "kind": "help",
+      "label": "Version SMARTview",
+      "blurb": "Type Ver, Vers, or Version in BOT DEE chat for a Version SMARTview card. Live package stamps and honest service status — not the numbers from a design picture.",
+      "href": "./botdee.html",
+      "phrases": [
+        "version smartview",
+        "type ver vers or version in bot dee chat for a version smartview card. live package stamps and honest service status not the numbers from a design picture.",
+        "ver command",
+        "vers command",
+        "version command",
+        "bot dee version",
+        "floqr version card",
+        "help-botdee-version-smartview"
       ]
     },
     {

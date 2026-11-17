@@ -378,8 +378,12 @@ function isIdentityPrompt(raw) {
 }
 
 /** Package / build / version — answer locally with the FLOQR stamp; never dump search hits.
- *  Do NOT match product “package” questions (VIP package, ShoutOut package, etc.). */
+ *  Do NOT match product “package” questions (VIP package, ShoutOut package, etc.).
+ *  Exact aliases Ver / Vers / Version (optional trailing ?) open Version SmartView. */
 function isVersionPrompt(raw) {
+  try {
+    if (require("./botdee-version-smartview").isVersionSmartViewAlias(raw)) return true;
+  } catch (_) {}
   const q = normalize(raw);
   if (!q || q.length > 140) return false;
   // Product commerce / feature wording — never hijack as FLOQR stamp.
@@ -1092,6 +1096,13 @@ module.exports = {
   isMoodPrompt,
   isIdentityPrompt,
   isVersionPrompt,
+  isVersionSmartViewAlias: raw => {
+    try {
+      return require("./botdee-version-smartview").isVersionSmartViewAlias(raw);
+    } catch (_) {
+      return false;
+    }
+  },
   isHelpPrompt,
   isPrivacyPrompt,
   isAckPrompt,

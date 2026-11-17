@@ -1,20 +1,20 @@
 # CURRENT PACKAGE: FLOQR ShoutOut s3.3.032 (stable)
 
-- s3.3.032: SMARTcard / SMARTview hero uses public Profile Media slots
+- s3.3.032: BOT DEE Version SMARTview (Ver / Vers / Version aliases, honest stamps); SMARTcard / SMARTview hero uses public Profile Media slots
 - s3.3.031: SMARTsummary source locale is patron UI language; fan-out includes English
 - s3.3.031: SMARTview spelling + public-page Profile Media on People cards
 - s3.3.030: Edit Profile iOS select text unclip + Account type help; My BOT DEE View my SMARTview (real patron card, mocks stay on Master Admin)
 - s3.3.029: My BOT DEE iOS demeanor radios (custom 22px grid, cache-bust from s3.3.028)
-- s3.3.028: People SmartView v2 (inline patron card, owner edit, translation queue, Site Chrome)
+- s3.3.028: People SMARTview v2 (inline patron card, owner edit, translation queue, Site Chrome)
 - s3.3.027: BOT DEE recall after 300s pause — retrieve stored events, recap last two turns, discussed vs booked
 - s3.3.026: BOT DEE first-use overlay + My BOT DEE prefs; sessions reset as new users; no Settings bar
 - s3.3.025: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help
-- s3.3.024: BOT DEE SmartView link resolver + mock JSON fallback; Master hash #featuresBotDee-smartviews
+- s3.3.024: BOT DEE SMARTview link resolver + mock JSON fallback; Master hash #featuresBotDee-smartviews
 - s3.3.023: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help
 - s3.3.023: Master Admin BOT DEE subtabs always visible (showBotDeeMgmtPage cards-only)
 - s3.3.022: BOT DEE chat-only; My BOT DEE on Feature & Orders; Master Admin BOT DEE subtabs (Pause / Legal / SMARTviews)
 - s3.3.021: BOT DEE Settings bubble + hasUsedBotDee 0|1 first-use popout (saved chats no longer an inline card)
-- s3.3.020: BOT DEE six-phase upgrade (opt-in memory, mock SmartViews, legal gates) + AI Crawling Instant Crawl greys out on click; workspace tabs; last-run banner
+- s3.3.020: BOT DEE six-phase upgrade (opt-in memory, mock SMARTviews, legal gates) + AI Crawling Instant Crawl greys out on click; workspace tabs; last-run banner
 - s3.3.019: AI crawl publishing rules, CSV import/export, past-event cleanup, crawl diagnostics
 - s3.3.018: AI crawl Import datapoints, duplicate establishment check, club vs event
 - s3.3.017: VCC queue links, FloqCAST label, AI crawl KPI jump, IP language, Prior/Future travel, nights/splash/handle

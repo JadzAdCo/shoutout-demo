@@ -2,8 +2,8 @@
 (function (global) {
   "use strict";
 
-  const t = (key, fallback) => {
-    const value = global.FLOQRI18n?.t?.(key);
+  const t = (key, fallback, vars) => {
+    const value = global.FLOQRI18n?.t?.(key, vars);
     return value && value !== key ? value : fallback;
   };
 
@@ -339,8 +339,179 @@
     </article>`;
   }
 
+  function isVersionPayload(payload) {
+    return !!(payload && typeof payload === "object" && payload.kind === "botDeeVersion");
+  }
+
+  function overlayFrontendPackage(payload) {
+    const next = payload && typeof payload === "object" ? payload : {};
+    const navV = global.FLOQRNav?.appVersion ? String(global.FLOQRNav.appVersion) : "";
+    const floqr = next.floqr && typeof next.floqr === "object" ? {...next.floqr} : {};
+    if (navV && !floqr.frontendPackage) floqr.frontendPackage = navV;
+    return {...next, floqr};
+  }
+
+  function localVersionPayload() {
+    const label = global.FLOQRNav?.appVersion ? String(global.FLOQRNav.appVersion) : "";
+    return {
+      schemaVersion: "floqr.botDeeVersionSmartView/1",
+      kind: "botDeeVersion",
+      generatedAtIso: new Date().toISOString(),
+      botDee: {packageLabel: label || null, packageVersion: label.replace(/^s/, "") || null},
+      floqr: {backendPackage: null, frontendPackage: label || null},
+      model: {configuredId: null, sessionPath: "local-client", sessionModel: null, usedThisTurn: false},
+      service: {status: "not_checked", lastCheckAtIso: null},
+      changelog: []
+    };
+  }
+
+  function statusCopy(payload) {
+    const status = String(payload?.service?.status || "not_checked");
+    if (status === "unavailable") return t("botdee.vs.statusUnavailable", "Unavailable");
+    return t("botdee.vs.statusNotChecked", "Not checked");
+  }
+
+  function modelCopy(payload) {
+    const model = payload?.model && typeof payload.model === "object" ? payload.model : {};
+    if (model.usedThisTurn && model.sessionModel) return esc(model.sessionModel);
+    if (model.usedThisTurn === false) return esc(t("botdee.vs.notUsedThisTurn", "Not used this turn"));
+    return esc(t("botdee.vs.unavailable", "Unavailable"));
+  }
+
+  function formatWhen(iso) {
+    if (!iso) return t("botdee.vs.unavailable", "Unavailable");
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return t("botdee.vs.unavailable", "Unavailable");
+    try {
+      return d.toLocaleString(undefined, {dateStyle: "medium", timeStyle: "short"});
+    } catch (_) {
+      return t("botdee.vs.unavailable", "Unavailable");
+    }
+  }
+
+  function privilegedHtml(payload) {
+    const priv = payload?.privileged;
+    if (!priv || typeof priv !== "object") return "";
+    const phases = Array.isArray(priv.phases) ? priv.phases : [];
+    const caps = priv.capabilities && typeof priv.capabilities === "object" ? priv.capabilities : {};
+    const capKeys = Object.keys(caps).slice(0, 8);
+    return `<div class="botdee-sv-version-priv">
+      <h4>${esc(t("botdee.vs.privilegedHeading", "Privileged diagnostics"))}</h4>
+      <p>${esc(t("botdee.vs.privilegedNote", "Master Admin only. These flags do not prove a production deploy."))}</p>
+      <p>${esc(t("botdee.vs.deployedClaim", "Deployed claim"))}: ${esc(priv.deployedClaim === true ? "true" : "false")}</p>
+      ${phases.length ? `<ul>${phases.map(row => `<li>${esc(row.name || "")}: ${row.deployed ? "deployed" : "not-deployed"}</li>`).join("")}</ul>` : ""}
+      ${capKeys.length ? `<ul>${capKeys.map(key => `<li>${esc(key)}: ${esc(caps[key].state || "")}</li>`).join("")}</ul>` : ""}
+    </div>`;
+  }
+
+  function renderVersionCard(payload) {
+    const view = overlayFrontendPackage(payload);
+    const botLabel = view.botDee?.packageLabel || t("botdee.vs.unavailable", "Unavailable");
+    const backend = view.floqr?.backendPackage || t("botdee.vs.unavailable", "Unavailable");
+    const frontend = view.floqr?.frontendPackage || t("botdee.vs.unavailable", "Unavailable");
+    const floqrShown = frontend !== t("botdee.vs.unavailable", "Unavailable") && frontend !== backend
+      ? `${frontend} / ${backend}`
+      : (frontend !== t("botdee.vs.unavailable", "Unavailable") ? frontend : backend);
+    const changelog = Array.isArray(view.changelog) ? view.changelog : [];
+    const when = formatWhen(view.generatedAtIso);
+    const status = statusCopy(view);
+    return `<article class="botdee-sv-version" data-kind="botDeeVersion" data-tab="overview">
+      <h2 class="botdee-sv-version-title"><span class="botdee-sv-version-spark" aria-hidden="true">✦</span>${esc(t("botdee.vs.title", "BOT DEE — Version SMARTview"))}</h2>
+      <div class="botdee-sv-version-id"><div class="botdee-sv-version-robot" aria-hidden="true">🤖</div><div class="botdee-sv-version-id-copy"><strong>${esc(t("botdee.vs.identityName", "BOT DEE"))} ✓</strong><p class="botdee-sv-version-sub">${esc(t("botdee.vs.identitySub", "System & Version Information"))}</p></div><span class="botdee-sv-version-pill">${esc(status)}</span></div>
+      <div class="botdee-sv-version-rows">
+        <div class="botdee-sv-version-row"><span>${esc(t("botdee.vs.rowBotDee", "BOT DEE version"))}</span><strong>${esc(botLabel)}</strong></div>
+        <div class="botdee-sv-version-row"><span>${esc(t("botdee.vs.rowFloqr", "FLOQR version"))}</span><strong>${esc(floqrShown)}</strong></div>
+        <div class="botdee-sv-version-row"><span>${esc(t("botdee.vs.rowModel", "AI model"))}</span><strong>${modelCopy(view)}</strong></div>
+        <div class="botdee-sv-version-row"><span>${esc(t("botdee.vs.rowStatus", "Service status"))}</span><strong>${esc(status)}</strong></div>
+      </div>
+      <div class="botdee-sv-version-tabs" role="tablist" aria-label="${esc(t("botdee.vs.title", "BOT DEE — Version SMARTview"))}">
+        <button type="button" role="tab" class="is-active" data-vs-tab="overview" aria-selected="true"><svg class="botdee-sv-version-tab-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="8" width="12" height="2" rx="0.6" fill="currentColor"/><rect x="2" y="11.5" width="12" height="2" rx="0.6" fill="currentColor"/><rect x="4" y="4.5" width="8" height="2" rx="0.6" fill="currentColor"/></svg>${esc(t("botdee.vs.tabOverview", "Overview"))}</button>
+        <button type="button" role="tab" data-vs-tab="updates" aria-selected="false"><svg class="botdee-sv-version-tab-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2.5" width="10" height="11" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>${esc(t("botdee.vs.tabWhatsNew", "What's New"))}</button>
+        <button type="button" role="tab" data-vs-tab="help" aria-selected="false"><svg class="botdee-sv-version-tab-ico" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.4 6.4a1.7 1.7 0 1 1 2.5 1.5c-.5.3-.9.7-.9 1.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="11.3" r="0.7" fill="currentColor"/></svg>${esc(t("botdee.vs.tabHelp", "Help"))}</button>
+      </div>
+      <div class="botdee-sv-version-panel" data-vs-panel="overview" role="tabpanel">
+        <h3>${esc(t("botdee.vs.aboutHeading", "About BOT DEE"))}</h3>
+        <p>${esc(t("botdee.vs.aboutBody", "BOT DEE is FLOQR's in-app assistant for discovery, reservations, and other authorized actions across people, venues, events, and services."))}</p>
+        <button type="button" class="botdee-sv-version-expand" data-vs-expand aria-expanded="false">${esc(t("botdee.vs.technical", "Technical Details"))} ▾</button>
+        <div class="botdee-sv-version-tech" data-vs-tech hidden>
+          <p>          ${esc(t("botdee.vs.techEnv", "Deployment environment"))}: ${esc(view.environment || t("botdee.vs.unavailable", "Unavailable"))}<br/>
+          ${esc(t("botdee.vs.techBuild", "Build identifier"))}: ${esc(botLabel)}<br/>
+          ${esc(t("botdee.vs.frontendLabel", "FLOQR frontend"))}: ${esc(frontend)}<br/>
+          ${esc(t("botdee.vs.backendLabel", "FLOQR backend"))}: ${esc(backend)}<br/>
+          ${esc(t("botdee.vs.configuredModel", "Configured: {id}", {id: view.model?.configuredId || t("botdee.vs.unavailable", "Unavailable")}))}<br/>
+          ${esc(t("botdee.vs.techCheck", "Last successful health check"))}: ${esc(t("botdee.vs.unavailable", "Unavailable"))}</p>
+          ${privilegedHtml(view)}
+        </div>
+      </div>
+      <div class="botdee-sv-version-panel" data-vs-panel="updates" role="tabpanel" hidden>
+        <h3>${esc(t("botdee.vs.whatsNewHeading", "What's New"))}</h3>
+        ${changelog.length
+          ? `<ul>${changelog.map(item => `<li>${esc(item.text || item.id || "")}</li>`).join("")}</ul>`
+          : `<p>${esc(t("botdee.vs.whatsNewEmpty", "No verified package notes are available for this build."))}</p>`}
+      </div>
+      <div class="botdee-sv-version-panel" data-vs-panel="help" role="tabpanel" hidden>
+        <h3>${esc(t("botdee.vs.helpHeading", "Version command"))}</h3>
+        <p>${esc(t("botdee.vs.helpBody", "Enter Ver, Vers, or Version to display this SMARTview. The command is case-insensitive. Longer questions like “what is your version?” still get a text answer plus this card."))}</p>
+      </div>
+      <div class="botdee-sv-version-foot">
+        <span>${esc(t("botdee.vs.footBrand", "FLOQR · System Information"))}</span>
+        <span>${esc(t("botdee.vs.footUpdated", "Last updated: {when}", {when}))}</span>
+      </div>
+    </article>`;
+  }
+
+  function paintVersionTab(card, tab) {
+    if (!card) return;
+    const next = tab === "updates" || tab === "help" ? tab : "overview";
+    card.dataset.tab = next;
+    card.querySelectorAll("[data-vs-tab]").forEach(btn => {
+      const on = btn.getAttribute("data-vs-tab") === next;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    card.querySelectorAll("[data-vs-panel]").forEach(panel => {
+      panel.hidden = panel.getAttribute("data-vs-panel") !== next;
+    });
+  }
+
+  function bindVersionCard(card) {
+    if (!card || card.dataset.vsBound === "1") return;
+    card.dataset.vsBound = "1";
+    card.querySelectorAll("[data-vs-tab]").forEach(btn => {
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        paintVersionTab(card, btn.getAttribute("data-vs-tab"));
+      });
+    });
+    const expand = card.querySelector("[data-vs-expand]");
+    const tech = card.querySelector("[data-vs-tech]");
+    if (expand && tech) {
+      expand.addEventListener("click", event => {
+        event.preventDefault();
+        const open = tech.hidden;
+        tech.hidden = !open;
+        expand.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    }
+    const tabs = [...card.querySelectorAll("[data-vs-tab]")];
+    card.querySelector("[role='tablist']")?.addEventListener("keydown", event => {
+      const keys = {ArrowLeft: -1, ArrowRight: 1, Home: "home", End: "end"};
+      const move = keys[event.key];
+      if (move == null) return;
+      event.preventDefault();
+      const current = tabs.findIndex(btn => btn.classList.contains("is-active"));
+      let idx = current < 0 ? 0 : current;
+      if (move === "home") idx = 0;
+      else if (move === "end") idx = tabs.length - 1;
+      else idx = (idx + move + tabs.length) % tabs.length;
+      tabs[idx]?.focus();
+      paintVersionTab(card, tabs[idx]?.getAttribute("data-vs-tab"));
+    });
+  }
+
   function renderCard(payload) {
     if (!payload || typeof payload !== "object") return "";
+    if (isVersionPayload(payload)) return renderVersionCard(payload);
     if (isCompactCard(payload)) return renderCompactPeopleCard(payload);
     if (peopleOf(payload)) return renderPeopleCard(payload);
     const mock = payload.sources && payload.sources.some(s => s.provider === "mock" || s.reuseRights === "unknown");
@@ -889,6 +1060,7 @@
       : "";
     el.innerHTML = list.map(renderCard).join("") + more || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SMARTviews yet."))}</p>`;
     wireActionLinks(el);
+    el.querySelectorAll(".botdee-sv-version").forEach(card => bindVersionCard(card));
     const cards = el.querySelectorAll(".botdee-sv-people");
     let index = 0;
     list.forEach(payload => {
@@ -920,6 +1092,9 @@
     renderCard,
     renderPeopleCard,
     renderCompactPeopleCard,
+    renderVersionCard,
+    isVersionPayload,
+    localVersionPayload,
     peopleHeroMedia,
     isCompactCard,
     mount,

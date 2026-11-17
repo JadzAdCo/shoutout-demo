@@ -36,6 +36,18 @@
         title: "SMARTcard людей",
         body: "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SMARTview. Это тот же публичный профиль и SMARTsummary. Открытие не вызывает Gemini."
       },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "В чате BOT DEE введите Ver, Vers или Version (регистр не важен, ? по желанию). Карточка Version SMARTview открывается в том же пузыре. На ней реальный штамп пакета FLOQR, использовалась ли модель ИИ в этом ходе, и статус службы. Цифры на дизайн-макетах — примеры; живые значения берутся из приложения. Site Chrome следует теме Appearance."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "Статус Version SMARTview честный",
+        body: "Состояние службы — Не проверено, пока FLOQR реально не опросит службу. Карточка никогда не показывает Operational с картинки или догадки. Модель ИИ — Не использовано в этом ходе, потому что команда Version не вызывает Gemini. Штампы фронтенда и бэкенда могут различаться; оба подписаны. Master Admin видит доп. диагностику в технических сведениях — гости нет."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "Вкладки Version SMARTview",
+        body: "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового — проверенные заметки пакета FLOQR из текущего README. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ваш Site Chrome — второй темы нет."
+      },
       "help-botdee-smartview-review": {
         title: "Проверить и исправить SMARTsummary",
         body: "Gemini составляет черновик только из публичных полей FLOQR — не при каждом просмотре. Неверный факт: скройте поле или правьте описание. Ваш текст не перезаписывается. Конфликт профиля просит проверку. Сообщите о неверной карточке в оверлее."
@@ -477,6 +489,18 @@
       "help-botdee-smartcard": {
         title: "Mensen-SMARTcards",
         body: "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SMARTview te openen. Kaarten gebruiken hetzelfde openbare profiel en dezelfde SMARTsummary. Openen roept Gemini niet aan."
+      },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "Typ in de BOT DEE-chat Ver, Vers of Version (hoofdletters maken niet uit, ? optioneel). Er opent een Version SMARTview-kaart in dezelfde bubble. Die toont de echte FLOQR-packagestempel, of deze beurt een AI-model gebruikte, en de servicestatus. Cijfers op ontwerpbeelden zijn voorbeelden — live waarden komen uit de app. Site Chrome volgt je Appearance-thema."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "Version SMARTview-status is eerlijk",
+        body: "Servicestatus is Niet gecontroleerd tot FLOQR de dienst echt peilt. De kaart toont nooit Operational uit een plaatje of een gok. Het AI-model is Niet gebruikt deze beurt omdat het Version-commando Gemini niet aanroept. Frontend- en backendstempels kunnen verschillen; beide zijn gelabeld. Master Admin kan extra diagnostiek zien onder Technische details — patrons niet."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "Version SMARTview-tabbladen",
+        body: "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont geverifieerde FLOQR-packagenotities uit de huidige README. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaart gebruikt jouw Site Chrome — er is geen tweede thema."
       },
       "help-botdee-smartview-review": {
         title: "SMARTsummary controleren en corrigeren",
@@ -920,6 +944,18 @@
         title: "SMARTcards Personnes",
         body: "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SMARTview complet. Les cartes utilisent le même profil public et le même SMARTsummary que SMARTview. Ouvrir une carte n’appelle pas Gemini."
       },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "Dans le chat BOT DEE, saisissez Ver, Vers ou Version (casse indifférente, ? optionnel). Une carte Version SMARTview s’ouvre dans la même bulle. Elle affiche le vrai tampon de package FLOQR, si ce tour a utilisé un modèle d’IA, et l’état du service. Les chiffres des visuels de design sont des exemples — les valeurs live viennent de l’app. Site Chrome suit votre thème Appearance."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "L’état Version SMARTview est honnête",
+        body: "L’état du service est Non vérifié tant que FLOQR n’a pas réellement sondé le service. La carte n’affiche jamais Operational d’après une image ou une supposition. Le modèle d’IA est Non utilisé ce tour car la commande Version n’appelle pas Gemini. Les tampons frontend et backend peuvent différer ; les deux sont étiquetés. Master Admin peut voir des diagnostics sous Détails techniques — pas les patrons."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "Onglets Version SMARTview",
+        body: "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés liste les notes de package FLOQR vérifiées du README actuel. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte utilise votre Site Chrome — pas de second thème."
+      },
       "help-botdee-smartview-review": {
         title: "Relire et corriger un SMARTsummary",
         body: "Gemini rédige uniquement à partir des champs publics dans FLOQR — jamais à chaque vue. Si un fait est faux, masquez le champ dans la visibilité du profil ou modifiez le résumé. Un texte rédigé par vous n’est pas écrasé. Un conflit de profil demande une relecture. Signalez une carte incorrecte depuis l’overlay."
@@ -1361,6 +1397,18 @@
       "help-botdee-smartcard": {
         title: "Personen-SMARTcards",
         body: "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SMARTview. Karten nutzen dasselbe öffentliche Profil und dieselbe SMARTsummary. Öffnen ruft Gemini nicht auf."
+      },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "Im BOT DEE-Chat tippen Sie Ver, Vers oder Version (Groß/Klein egal, optional ?). Eine Version-SMARTview-Karte öffnet sich in derselben Blase. Sie zeigt den echten FLOQR-Package-Stempel, ob dieser Zug ein KI-Modell genutzt hat, und den Dienststatus. Zahlen in Designbildern sind Beispiele — Live-Werte kommen aus der App. Site Chrome folgt Ihrem Appearance-Thema."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "Version-SMARTview-Status ist ehrlich",
+        body: "Der Dienststatus ist Nicht geprüft, bis FLOQR den Dienst wirklich prüft. Die Karte zeigt nie Operational aus einem Bild oder einer Vermutung. Das KI-Modell ist In diesem Zug nicht verwendet, weil der Version-Befehl Gemini nicht aufruft. Frontend- und Backend-Stempel können sich unterscheiden; beide sind beschriftet. Master Admin sieht extra Diagnosen unter Technische Details — Gäste nicht."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "Version-SMARTview-Reiter",
+        body: "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet geprüfte FLOQR-Package-Hinweise aus der aktuellen README. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und den Scroll. Die Karte nutzt Ihr Site Chrome — kein zweites Thema."
       },
       "help-botdee-smartview-review": {
         title: "SMARTsummary prüfen und korrigieren",
@@ -1804,6 +1852,18 @@
         title: "SMARTcards de personas",
         body: "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SMARTview completo. Las tarjetas usan el mismo perfil público y SMARTsummary. Abrir una tarjeta no llama a Gemini."
       },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "En el chat de BOT DEE, escriba Ver, Vers o Version (mayúsculas da igual, ? opcional). Se abre una tarjeta Version SMARTview en la misma burbuja. Muestra el sello real del paquete FLOQR, si este turno usó un modelo de IA y el estado del servicio. Los números de las imágenes de diseño son ejemplos — los valores en vivo salen de la app. Site Chrome sigue su tema de Appearance."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "El estado de Version SMARTview es honesto",
+        body: "El estado del servicio es Sin comprobar hasta que FLOQR sondee de verdad el servicio. La tarjeta nunca muestra Operational por una imagen o una suposición. El modelo de IA es No usado en este turno porque el comando Version no llama a Gemini. Los sellos de frontend y backend pueden diferir; ambos se etiquetan. Master Admin puede ver diagnósticos extra en Detalles técnicos — los patrons no."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "Pestañas de Version SMARTview",
+        body: "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista notas de paquete FLOQR verificadas del README actual. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su Site Chrome — no hay un segundo tema."
+      },
       "help-botdee-smartview-review": {
         title: "Revisar y corregir un SMARTsummary",
         body: "Gemini redacta solo con campos públicos en FLOQR — no en cada vista. Si un dato es falso, oculte el campo o edite el resumen. Su texto no se sobrescribe. Un conflicto de perfil pide revisión. Informe una tarjeta incorrecta desde la superposición."
@@ -2245,6 +2305,18 @@
       "help-botdee-smartcard": {
         title: "SMARTcard persone",
         body: "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SMARTview completo. Le schede usano lo stesso profilo pubblico e SMARTsummary. Aprire una scheda non chiama Gemini."
+      },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "Nella chat BOT DEE, digita Ver, Vers o Version (maiuscole indifferenti, ? opzionale). Si apre una scheda Version SMARTview nella stessa bolla. Mostra il vero timbro del package FLOQR, se questo turno ha usato un modello IA e lo stato del servizio. I numeri nelle immagini di design sono esempi — i valori live arrivano dall’app. Site Chrome segue il tema Appearance."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "Lo stato Version SMARTview è onesto",
+        body: "Lo stato del servizio è Non verificato finché FLOQR non sonda davvero il servizio. La scheda non mostra mai Operational da un’immagine o da una stima. Il modello IA è Non usato in questo turno perché il comando Version non chiama Gemini. I timbri frontend e backend possono differire; entrambi sono etichettati. Master Admin può vedere diagnostica extra in Dettagli tecnici — i patron no."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "Schede Version SMARTview",
+        body: "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca note di package FLOQR verificate dal README attuale. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il tuo Site Chrome — non c’è un secondo tema."
       },
       "help-botdee-smartview-review": {
         title: "Rivedi e correggi lo SMARTsummary",
@@ -2688,6 +2760,18 @@
         title: "SMARTcards de pessoas",
         body: "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SMARTview completo. As cards usam o mesmo perfil público e SMARTsummary. Abrir não chama o Gemini."
       },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "No chat BOT DEE, digite Ver, Vers ou Version (maiúsculas não importam, ? opcional). Um cartão Version SMARTview abre no mesmo balão. Mostra o carimbo real do pacote FLOQR, se esta vez usou um modelo de IA e o estado do serviço. Números nas imagens de design são exemplos — os valores ao vivo vêm do app. Site Chrome segue o tema Appearance."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "O estado do Version SMARTview é honesto",
+        body: "O estado do serviço é Não verificado até a FLOQR realmente sondar o serviço. O cartão nunca mostra Operational a partir de uma imagem ou palpite. O modelo de IA é Não usado nesta vez porque o comando Version não chama o Gemini. Os carimbos de frontend e backend podem diferir; ambos são rotulados. Master Admin pode ver diagnósticos extra em Detalhes técnicos — patrons não."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "Abas do Version SMARTview",
+        body: "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista notas de pacote FLOQR verificadas do README atual. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site Chrome — não há um segundo tema."
+      },
       "help-botdee-smartview-review": {
         title: "Rever e corrigir o SMARTsummary",
         body: "O Gemini redige só a partir de campos públicos no FLOQR — não em cada vista. Se um facto estiver errado, oculte o campo ou edite o resumo. O seu texto não é substituído. Um conflito de perfil pede revisão. Reporte um cartão errado na sobreposição."
@@ -3129,6 +3213,18 @@
       "help-botdee-smartcard": {
         title: "SMARTcard ατόμων",
         body: "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SMARTview. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SMARTsummary. Το άνοιγμα δεν καλεί Gemini."
+      },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "Στη συνομιλία BOT DEE πληκτρολογήστε Ver, Vers ή Version (κεφαλαία αδιάφορα, προαιρετικό ;). Ανοίγει κάρτα Version SMARTview στην ίδια φυσαλίδα. Δείχνει την πραγματική σφραγίδα πακέτου FLOQR, αν αυτός ο γύρος χρησιμοποίησε μοντέλο ΤΝ και την κατάσταση υπηρεσίας. Οι αριθμοί στις εικόνες σχεδίασης είναι παραδείγματα — οι ζωντανές τιμές έρχονται από την εφαρμογή. Το Site Chrome ακολουθεί το θέμα Appearance."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "Η κατάσταση Version SMARTview είναι ειλικρινής",
+        body: "Η κατάσταση υπηρεσίας είναι Δεν ελέγχθηκε μέχρι η FLOQR να ελέγξει πραγματικά την υπηρεσία. Η κάρτα δεν δείχνει ποτέ Operational από εικόνα ή εικασία. Το μοντέλο ΤΝ είναι Δεν χρησιμοποιήθηκε σε αυτόν τον γύρο γιατί η εντολή Version δεν καλεί Gemini. Τα σφραγίσματα frontend και backend μπορεί να διαφέρουν· και τα δύο έχουν ετικέτα. Ο Master Admin μπορεί να δει επιπλέον διάγνωση στις Τεχνικές λεπτομέρειες — οι patrons όχι."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "Καρτέλες Version SMARTview",
+        body: "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει επαληθευμένες σημειώσεις πακέτου FLOQR από το τρέχον README. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο πρόχειρο και την κύλιση. Η κάρτα χρησιμοποιεί το Site Chrome σας — δεν υπάρχει δεύτερο θέμα."
       },
       "help-botdee-smartview-review": {
         title: "Έλεγχος και διόρθωση SMARTsummary",
@@ -3572,6 +3668,18 @@
         title: "SMARTcard osób",
         body: "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SMARTview. Karty używają tego samego profilu i SMARTsummary. Otwarcie nie wywołuje Gemini."
       },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "W czacie BOT DEE wpisz Ver, Vers lub Version (wielkość liter nieważna, opcjonalny ?). Karta Version SMARTview otwiera się w tej samej dymku. Pokazuje prawdziwy stempel pakietu FLOQR, czy ta tura użyła modelu AI i status usługi. Liczby na obrazach projektu to przykłady — żywe wartości pochodzą z aplikacji. Site Chrome idzie za motywem Appearance."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "Status Version SMARTview jest uczciwy",
+        body: "Status usługi to Nie sprawdzono, dopóki FLOQR naprawdę nie zbada usługi. Karta nigdy nie pokazuje Operational z obrazka ani zgadywania. Model AI to Nie użyto w tej turze, bo polecenie Version nie woła Gemini. Stemple frontendu i backendu mogą się różnić; oba są opisane. Master Admin może zobaczyć dodatkową diagnostykę w Szczegółach technicznych — patroni nie."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "Karty Version SMARTview",
+        body: "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje zweryfikowane notatki pakietu FLOQR z bieżącego README. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa Twojego Site Chrome — nie ma drugiego motywu."
+      },
       "help-botdee-smartview-review": {
         title: "Przejrzyj i popraw SMARTsummary",
         body: "Gemini szkicuje tylko z publicznych pól FLOQR — nie przy każdym otwarciu. Błędny fakt: ukryj pole lub edytuj podsumowanie. Twój tekst nie jest nadpisywany. Konflikt profilu prosi o przegląd. Zgłoś błędną kartę z nakładki."
@@ -4013,6 +4121,18 @@
       "help-botdee-smartcard": {
         title: "SMARTcard الأشخاص",
         body: "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SMARTview الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
+      },
+      "help-botdee-version-smartview": {
+        title: "Version SMARTview",
+        body: "في دردشة BOT DEE اكتب Ver أو Vers أو Version (حجم الأحرف لا يهم، ? اختياري). تُفتح بطاقة Version SMARTview في نفس الفقاعة. تعرض ختم حزمة FLOQR الحقيقي، وما إذا استخدم هذا الدور نموذجاً للذكاء الاصطناعي، وحالة الخدمة. الأرقام في صور التصميم أمثلة — القيم الحية تأتي من التطبيق. يتبع Site Chrome مظهر Appearance."
+      },
+      "help-botdee-version-smartview-status": {
+        title: "حالة Version SMARTview صادقة",
+        body: "حالة الخدمة «لم يُتحقق» حتى تفحص FLOQR الخدمة فعلاً. لا تعرض البطاقة Operational من صورة أو تخمين. نموذج الذكاء الاصطناعي «لم يُستخدم في هذه الجولة» لأن أمر Version لا يستدعي Gemini. يمكن أن يختلف ختم الواجهة عن الخلفية؛ كلاهما مُسمّى. قد يرى Master Admin تشخيصاً إضافياً تحت التفاصيل التقنية — الضيوف لا."
+      },
+      "help-botdee-version-smartview-tabs": {
+        title: "علامات Version SMARTview",
+        body: "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض ملاحظات حزمة FLOQR الموثّقة من README الحالي. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظهر ثانٍ."
       },
       "help-botdee-smartview-review": {
         title: "مراجعة وتصحيح SMARTsummary",

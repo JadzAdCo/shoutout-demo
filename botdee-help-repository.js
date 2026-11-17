@@ -424,6 +424,43 @@
       page: "patron-portal.html#foBotDeePane"
     },
     {
+      id: "help-botdee-version-smartview",
+      title: "Version SMARTview",
+      body: "In BOT DEE chat, type Ver, Vers, or Version (any capitalization, optional ?). A Version SMARTview card opens in the same bubble. It shows the real FLOQR package stamp, whether this turn used an AI model, and service status. Numbers in design pictures are examples — live values come from the app. Site Chrome follows your Appearance theme.",
+      searchPhrases: [
+        "version smartview", "ver command", "vers command", "version command",
+        "bot dee version", "floqr version", "what version is bot dee"
+      ],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-version-smartview-status",
+      title: "Version SMARTview status is honest",
+      body: "Service status is Not checked until FLOQR actually probes the service. The card never shows Operational from a picture or a guess. AI model is Not used this turn on the Version command because that path does not call Gemini. Frontend and backend package stamps can differ; both are labeled. Master Admin may see extra diagnostics after Technical Details — patrons do not.",
+      searchPhrases: [
+        "version operational", "not checked", "bot dee health", "service status smartview", "gemini version card"
+      ],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-version-smartview-tabs",
+      title: "Version SMARTview tabs",
+      body: "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified FLOQR package notes from the current README. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme.",
+      searchPhrases: [
+        "version what's new", "version overview", "technical details bot dee", "version smartview tabs"
+      ],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
       id: "help-botdee-smartview",
       title: "View my SMARTview",
       body: "View my SMARTview shows your People card from public-within-FLOQR fields, using the same Profile Media as your FLOQR public page — not venue or restaurant mocks. Edit my SMARTsummary changes the text in your default profile language. Save translates it to every other FLOQR language, including English. Master Admin → Features → BOT DEE → SMARTviews is where labeled mock venue and restaurant cards live. There is no live Places or Yelp.",
