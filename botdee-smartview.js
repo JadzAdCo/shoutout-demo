@@ -779,17 +779,13 @@
     };
     const unsubs = [];
     let sawReadable = false;
-    unsubs.push(db.collection("usercharacter_analysis").doc(uid).onSnapshot(snap => {
+    unsubs.push(db.collection("usercharacter_analysis").doc(uid).onSnapshot(() => {
       sawReadable = true;
-      if (!el.isConnected || el.__floqrLiveToken !== token) return;
-      if (!snap.exists) {
-        patchHostView(el, uid, null);
-        return;
-      }
       applyRefetch();
     }, () => {
       /* Initial deny (unstamped / mock) keeps the search-authorized card.
-         After a successful listen, hide/delete makes the listener error — refetch. */
+         After a successful listen, hide makes the listener error — refetch.
+         Missing analysis is readable for the owner; getPeopleSmartView decides. */
       if (!sawReadable) return;
       applyRefetch();
     }));

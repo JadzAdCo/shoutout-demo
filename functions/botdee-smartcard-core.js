@@ -51,7 +51,9 @@ function isPersonNameNeedle(rest) {
   if (VENUE_NEEDLE.test(needle) || OPERATIONAL.test(needle)) return false;
   const tokens = needle.split(" ").filter(Boolean);
   if (!tokens.length || tokens.length > 4) return false;
-  return tokens.every(token => /^@?[\w.'-]+$/.test(token) && !/^(who|what|where|when|how|the|a|an)$/.test(token));
+  return tokens.every(token => /^@?[\w.'-]+$/.test(token)
+    && !/^(my|mine|our|your|their|his|her|this|that|these|those|who|what|where|when|how|the|a|an)$/.test(token)
+    && !/^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?)$/.test(token));
 }
 
 function isFindPersonPrompt(raw) {

@@ -50,6 +50,7 @@ test("v6 people-search intent: Who am I / Who is / generic person / unrelated", 
   assert.equal(cards.classifyPeopleSearchIntent("tell me about VIP").intent, "none");
   assert.equal(cards.classifyPeopleSearchIntent("search for events tonight").intent, "none");
   assert.equal(cards.classifyPeopleSearchIntent("find events").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("find my table").intent, "none");
 });
 
 test("routing: self / one / many compact / none / error; no existence leak", () => {
@@ -183,7 +184,7 @@ test("client compact cards inherit Site Chrome tokens; no hardcoded Tiffany; no 
   assert.match(client, /__floqrLiveToken/);
   assert.match(client, /let sawReadable = false/);
   assert.match(client, /if \(!sawReadable\) return;/);
-  assert.match(client, /if \(!snap.exists\)/);
+  assert.match(client, /getPeopleSmartView decides/);
   const css = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.css"), "utf8");
   assert.match(css, /\.botdee-sc-card/);
   assert.match(css, /var\(--accent/);
