@@ -332,6 +332,7 @@ body.botdee-sv-overlay-open { overflow: hidden; }
   background: color-mix(in srgb, var(--accent, #00d4fe) 10%, #000);
 }
 .botdee-sc-thumb img,
+.botdee-sc-thumb video,
 .botdee-sc-thumb-empty {
   display: block;
   width: 100%;

@@ -83,14 +83,13 @@ async function loadAuthorizedPeopleView({viewerUid, subjectUid, uiLanguage, allo
   const published = people.isPublic(data);
   if (!isOwner && !published) return {hidden: true, view: null};
   if (!isOwner && !allowPrivateSelf && !published) return {hidden: true, view: null};
-  const volunteered = tools.volunteeredPublicDatapoints(data);
+  const volunteered = v2.applyPublicPageMedia(tools.volunteeredPublicDatapoints(data), data);
   volunteered.uid = subjectUid;
   volunteered.viewerUid = viewerUid;
   volunteered.viewerLocale = v2.normalizeLocale(uiLanguage || "en");
   volunteered.handle = String(data.floqrHandle || data.username || "").replace(/^@+/, "");
   volunteered.instagram = data.instagramHandle || data.instagram;
   volunteered.xHandle = data.xHandle || data.twitter;
-  volunteered.photoUrl = data.photoURL || data.publicPhotoUrl;
   volunteered.verified = data.identityVerified === 1 || data.floqrVerified === 1;
   volunteered.sourceLocale = v2.normalizeLocale(data.uiLanguage || data.preferredLanguage || "en");
   volunteered.bio = data.publicBio || data.bio || volunteered.bio;

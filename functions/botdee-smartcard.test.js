@@ -96,6 +96,97 @@ test("compact card is a projection of the same peopleV2 subject, not a second su
   assert.equal(compact.floqrPublicData.peopleV2.photo.url, full.floqrPublicData.peopleV2.photo.url);
 });
 
+test("SMARTcard search copies Profile Media slots, not Auth photoURL alone", () => {
+  const hero = "https://firebasestorage.googleapis.com/v0/b/demo.appspot.com/o/profileMedia%2Florna.jpg?alt=media";
+  const volunteered = v2.applyPublicPageMedia({
+    uid: "lorna",
+    viewerUid: "viewer-1",
+    viewerLocale: "en",
+    handle: "lorna",
+    datapoints: {location: {city: "Washington"}},
+    sharedDatapoints: ["location", "media"]
+  }, {
+    displayName: "Lorna",
+    photoURL: "",
+    profileMediaSlots: [{type: "image", url: hero}]
+  });
+  volunteered.analysis = v2.emptyAnalysis("lorna", v2.publicFieldsSnapshot({
+    displayName: "Lorna",
+    profileMediaSlots: volunteered.profileMediaSlots
+  }, volunteered));
+  const view = smart.patronSmartView({
+    displayName: "Lorna",
+    volunteered,
+    profileHref: "./?start=search",
+    viewerMaySee: true
+  });
+  assert.equal(view.floqrPublicData.peopleV2.photo.url, hero);
+  assert.equal(cards.asSmartCardView(view).floqrPublicData.peopleV2.photo.url, hero);
+  const src = fs.readFileSync(path.join(__dirname, "botdee-smartcard-functions.js"), "utf8");
+  assert.match(src, /applyPublicPageMedia/);
+  assert.doesNotMatch(src, /volunteered\.photoUrl = data\.photoURL \|\| data\.publicPhotoUrl/);
+});
+
+test("compact card HTML paints the public-page hero (photo or video)", () => {
+  const vm = require("node:vm");
+  const code = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
+  const sandbox = {
+    window: {
+      FLOQRI18n: {t: (_k, f) => f},
+      FLOQRNav: null,
+      location: {href: "https://jadzadco.github.io/shoutout-demo/botdee.html"},
+      document: {},
+      addEventListener() {}
+    }
+  };
+  sandbox.global = sandbox.window;
+  vm.runInNewContext(code.replace("(window)", "(window)"), sandbox);
+  const api = sandbox.window.FLOQRBotDeeSmartView;
+  const photo = "https://firebasestorage.googleapis.com/v0/b/demo.appspot.com/o/profileMedia%2Florna.jpg?alt=media";
+  const clip = "https://firebasestorage.googleapis.com/v0/b/demo.appspot.com/o/profileMedia%2Fclip.mp4?alt=media";
+  const photoHtml = api.renderCompactPeopleCard({
+    title: "Lorna",
+    floqrPublicData: {
+      peopleV2: {
+        presentation: "peopleSmartCard",
+        displayName: "Lorna",
+        photo: {url: photo, kind: "image", count: 1},
+        media: {photos: [{url: photo}], videos: []},
+        summary: {text: "Nightlife host in DC.", excerpt: "Nightlife host in DC.", clampLines: 4}
+      }
+    }
+  });
+  assert.match(photoHtml, /botdee-sc-thumb/);
+  assert.match(photoHtml, /lorna\.jpg/);
+  assert.doesNotMatch(photoHtml, /botdee-sc-thumb-empty/);
+  const videoHtml = api.renderCompactPeopleCard({
+    title: "Lorna",
+    floqrPublicData: {
+      peopleV2: {
+        presentation: "peopleSmartCard",
+        displayName: "Lorna",
+        photo: {url: clip, kind: "video", count: 1},
+        media: {photos: [], videos: [{url: clip}]},
+        summary: {text: "Nightlife host in DC."}
+      }
+    }
+  });
+  assert.match(videoHtml, /<video src=/);
+  const fallbackHtml = api.renderCompactPeopleCard({
+    title: "Lorna",
+    floqrPublicData: {
+      peopleV2: {
+        presentation: "peopleSmartCard",
+        displayName: "Lorna",
+        photo: null,
+        media: {photos: [{url: photo}], videos: []},
+        summary: {text: "Nightlife host in DC."}
+      }
+    }
+  });
+  assert.match(fallbackHtml, /lorna\.jpg/);
+});
+
 test("live projection updates the same subject only; other cards stay put", () => {
   const a = cards.asSmartCardView(amaraView());
   const next = JSON.parse(JSON.stringify(amaraView()));

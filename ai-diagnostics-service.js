@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.031";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.031";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.032";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.032";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -221,6 +221,17 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.032",
+      title: "s3.3.032 — SMARTcard hero from public Profile Media",
+      checks: [
+        {label:"Shared public media helper", file:"functions/botdee-smartview-v2-core.js", includes:["function applyPublicPageMedia("]},
+        {label:"SMARTcard search uses helper", file:"functions/botdee-smartcard-functions.js", includes:["applyPublicPageMedia"], notIncludes:["volunteered.photoUrl = data.photoURL || data.publicPhotoUrl"]},
+        {label:"getPeopleSmartView uses helper", file:"functions/botdee-smartview-v2-functions.js", includes:["applyPublicPageMedia"]},
+        {label:"Compact thumb paints photo or video", file:"botdee-smartview.js", includes:["function peopleHeroMedia(", "botdee-sc-thumb"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-032-smartcard-profile-media"]}
+      ]
+    },
+    {
       version: "s3.3.031",
       title: "s3.3.031 — SMARTsummary locale source + SMARTview public-page media + People SMARTcard v6",
       checks: [
@@ -231,7 +242,8 @@
         {label:"Help source fan-out", file:"botdee-help-repository.js", includes:["including English", "SMARTsummary"]},
         {label:"SMARTview chrome spelling", file:"floqr-i18n.js", includes:["SMARTview — Person", "Show mock SMARTviews"], notIncludes:["SmartView — Person"]},
         {label:"Public-page media helper", file:"functions/botdee-smartview-v2-core.js", includes:["function publicPageMedia(", "profileMediaSlots", "function peopleHeroPhoto("]},
-        {label:"getPeopleSmartView copies slots", file:"functions/botdee-smartview-v2-functions.js", includes:["volunteered.profileMediaSlots = data.profileMediaSlots"]},
+        {label:"getPeopleSmartView copies slots", file:"functions/botdee-smartview-v2-functions.js", includes:["applyPublicPageMedia"]},
+        {label:"SMARTcard search copies slots", file:"functions/botdee-smartcard-functions.js", includes:["applyPublicPageMedia"], notIncludes:["volunteered.photoUrl = data.photoURL || data.publicPhotoUrl"]},
         {label:"Overlay plays videos", file:"botdee-smartview.js", includes:["<video src=", "overlayMediaList", "botdee.sv.videoIndex"]},
         {label:"Help public Profile Media", file:"botdee-help-repository.js", includes:["same hero as your FLOQR public profile", "8 photos + 2 videos"]},
         {label:"Manual test locale", file:"ai-diagnostics-service.js", includes:["s3-3-031-smartsummary-locale-source"]},
@@ -241,7 +253,7 @@
         {label:"Search callable", file:"functions/index.js", includes:["searchPeopleSmartCards"]},
         {label:"Chat attach", file:"functions/bot-dee-functions.js", includes:["attachPeopleSearch", "people-smartcard"]},
         {label:"Help", file:"botdee-help-repository.js", includes:["help-botdee-smartcard", "help-botdee-smartcard-search", "help-botdee-smartcard-sync"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-032-people-smartcard-v6"]}
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-032-people-smartcard-v6", "s3-3-032-smartcard-profile-media"]}
       ]
     },
     {
@@ -3344,13 +3356,22 @@
       troubleshoot:"Still vertical letters or giant radios → iPhone still has admin.css?v=s3.3.028; hard-refresh until the HTML link is s3.3.029. Overlay still broken → cached bot-dee-chat.css on botdee.html. Native iOS radio still showing → appearance:none missing from admin.css."
     },
     {
+      id:"s3-3-032-smartcard-profile-media",
+      area:"BOT DEE",
+      feature:"SMARTcard / SMARTview hero from public Profile Media",
+      changed:"s3.3.032 — Who is / compact SMARTcard uses the same profileMediaSlots as the FLOQR public page. Auth photoURL is only the empty-slot-0 fallback. Empty slot 0 is skipped when later slots are filled. Video heroes play in the square thumb.",
+      howToTest:"1) Hard-refresh botdee.html until botdee-smartview.js?v=s3.3.032. Sign in with botDee. 2) Open a patron (Lorna) whose public Profile Media has photos/videos but whose Google avatar is empty or different. Ask Who is Lorna (or that unique name). 3) One match: full SMARTview portrait is the public-page hero. Several matches: compact card square is that same hero, not a blank box beside the name. 4) Tap the square — Photos/Videos overlay lists those public slots. 5) Mark Succeed/Failed on this row.",
+      expected:"SMARTcard and SMARTview show the public Profile Media hero next to the name and SMARTsummary. Text-only cards with an empty square mean Functions were not redeployed or the page is still s3.3.031.",
+      troubleshoot:"Still text-only → searchPeopleSmartCards / executeBotSession not on this SHA; confirm applyPublicPageMedia in Functions. Cached JS → hard-refresh until s3.3.032. Public page has photos but card does not → subject profileMediaSlots empty in Firestore; upload Profile Media on My Profile first."
+    },
+    {
       id:"s3-3-032-people-smartcard-v6",
       area:"BOT DEE",
       feature:"People SMARTcard v6 (search routing + live SMARTsummary)",
       changed:"s3.3.032 — Who am I? opens your SmartView. Who is <name> with one public match opens their SmartView. Several matches show compact SMARTcards (photo left, 4-line SMARTsummary right). Private / blocked / unpublished never listed. Cards and SmartView share one analysis record; owner edits update open cards. Site Chrome follows the viewer. Functions/Pages pending Don.",
       howToTest:"1) Hard-refresh botdee.html after Pages publish (do not test live until Don approves). Sign in with botDee access. 2) Ask Who am I? — your SmartView appears in the chat (not a compact card). 3) Ask Who is <a unique public name> — one SmartView. 4) Ask a name that hits several public profiles — compact cards; tap one to open SmartView. 5) Ask Do you know this person? — generic no-result, no names. 6) Switch Site Chrome through Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green — cards restyle, chat draft stays. 7) Owner edits SMARTsummary on My BOT DEE — open cards update without a Gemini call on view. 8) Hide public profile or block the viewer — that card disappears. 9) Mark Succeed/Failed.",
       expected:"Self and one-match open full SmartView. Many matches show compact cards that inherit Site Chrome. No leak of private/blocked accounts. SMARTsummary stays in sync. No Gemini when only viewing a card.",
-      troubleshoot:"Still prose-only answers → Functions executeBotSession / searchPeopleSmartCards not deployed, or cached bot-dee-chat.js. Compact cards look like Black Tiffany on every theme → cached botdee-smartview.css. Cards do not update after edit → publicWithinFloqr not stamped (Functions persistAnalysis) or Firestore rules not deployed. Private names appear → getPeopleSmartView still returning a stub; hard-refresh after this SHA."
+      troubleshoot:"Still prose-only answers → Functions executeBotSession / searchPeopleSmartCards not deployed, or cached bot-dee-chat.js. Compact cards look like Black Tiffany on every theme → cached botdee-smartview.css. Cards do not update after edit → publicWithinFloqr not stamped (Functions persistAnalysis) or Firestore rules not deployed. Private names appear → getPeopleSmartView still returning a stub; hard-refresh after this SHA. Text-only SMARTcard (no photo) → searchPeopleSmartCards still using Auth photoURL; Profile Media is profileMediaSlots. Redeploy BOT DEE Functions and hard-refresh botdee-smartview.js."
     },
     {
       id:"s3-3-028-people-smartview-v2",
