@@ -168,6 +168,24 @@
     "help-botdee-template-search": [
       "patron"
     ],
+    "help-botdee-version-smartview": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-version-smartview-status": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-version-smartview-tabs": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-chrome-audit": [
       "masterAdmin"
     ],
@@ -542,6 +560,9 @@
       "patron"
     ],
     "help-app-language": [
+      "patron"
+    ],
+    "help-botdee-version-smartview": [
       "patron"
     ],
     "help-club-admin": [

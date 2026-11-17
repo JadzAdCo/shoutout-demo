@@ -38,7 +38,7 @@ function run(root) {
   edit("functions/package.json", src => src.replace(/"version": "[^"]+"/, `"version": "${NEXT_NUM}"`));
   edit("README.md", src => src
     .replace(/^# CURRENT PACKAGE: FLOQR ShoutOut s3\.\d+\.\d+[^\n]*/m, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)
-    .replace(/^(- s3\.\d+\.\d+:)/m, `- ${NEXT}: SMARTcard / SMARTview hero uses public Profile Media slots\n$1`));
+    .replace(/^(- s3\.\d+\.\d+:)/m, `- ${NEXT}: BOT DEE Version SMARTview (Ver / Vers / Version aliases, honest stamps)\n$1`));
   edit("functions/i18n-coverage.test.js", src => src
     .replace(/floqr-i18n and help VERSION are s3\.\d+\.\d+/, `floqr-i18n and help VERSION are ${NEXT}`)
     .replace(/assert\.match\(i18n, \/const VERSION\\s\*=\\s\*"s3\.\d+\.\d+"\/\)/g, `assert.match(i18n, /const VERSION\\s*=\\s*"${NEXT}"/)`)

@@ -223,7 +223,17 @@
     } catch (_) {}
     return "s3.3.032";  }
 
+  function isVersionSmartViewAlias(raw) {
+    const q = String(raw || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[?؟]+$/g, "")
+      .trim();
+    return q === "ver" || q === "vers" || q === "version";
+  }
+
   function isVersionPrompt(raw) {
+    if (isVersionSmartViewAlias(raw)) return true;
     const q = normalizeChat(raw);
     if (!q || q.length > 140) return false;
     // Product commerce / feature wording — never hijack as FLOQR stamp.
@@ -338,8 +348,20 @@
 
   function versionReply() {
     const label = packageLabel();
+    const intro = t("botdee.vs.intro", "Here's the current version information for FLOQR and BOT DEE.");
+    if (intro && intro !== "botdee.vs.intro") return intro;
     const template = t("botdee.chatVersion", "I'm BOT DEE on FLOQR package {version}.");
     return String(template).replace(/\{version\}/g, label);
+  }
+
+  function ensureVersionSmartViews(text, views) {
+    const list = Array.isArray(views) ? views.slice() : [];
+    if (!isVersionPrompt(text)) return list;
+    const hasVersion = list.some(row => row && row.kind === "botDeeVersion");
+    if (hasVersion) return list;
+    const local = global.FLOQRBotDeeSmartView?.localVersionPayload?.();
+    if (local) list.push(local);
+    return list;
   }
 
   function helpReply() {
@@ -892,7 +914,8 @@
     // Durable path always hits executeBotSession so refresh / another phone can resume.
     if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text))) {
       const reply = localBotReply(text, {resuming});
-      appendBubble("bot", reply);
+      const versionViews = isVersionPrompt(text) ? ensureVersionSmartViews(text, []) : [];
+      appendBubble("bot", reply, [], [], versionViews);
       pushHistory("model", reply);
       setStatus("");
       if (isFarewellPrompt(text)) {
@@ -938,7 +961,7 @@
       const reply = peopleSearch?.replyKey
         ? t(peopleSearch.replyKey, displayReply(data.reply))
         : displayReply(data.reply);
-      appendBubble("bot", reply, localizeResults(data.results), media, data.smartViews, peopleSearch);
+      appendBubble("bot", reply, localizeResults(data.results), media, ensureVersionSmartViews(text, data.smartViews), peopleSearch);
       pushHistory("model", reply);
       if (data.threadId) threadId = String(data.threadId);
       if (data.durable === true) durableEnabled = true;

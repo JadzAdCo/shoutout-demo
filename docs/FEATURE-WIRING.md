@@ -719,7 +719,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Feature access (s3.3.005) | **Least privilege:** session loads Features & Services via `canAccessFeature` (live / test+beta grant / Master Admin). Search cards, Gemini tools, pitches, and help blurbs include products **this viewer may use**; scrub sibling betas they lack (multi-product help too). Granted floqCast/VIP/etc. **must** stay visible. Client `scrubGatedBrands` + `FLOQRFeatureServices.canAccess` safety net. |
 | Public profiles | `lookupPublicProfiles` is viewer-context: the same volunteered public datapoints a signed-in patron can already see (not PII/PCI — never email/phone/PAN/GPS). Cards include `sharedDatapoints` (opted-in keys) + `datapoints` (every filled value; lists up to 40). Default missing `publicMinglDatapoints` = all keys; explicit `[]` = share none. **About me:** query `me` / `isSelfQuery` returns the viewer's public card (`relation:"self"`). Unpublished self = identity-only. **Friends:** Mingl/chat connections preferred; public profiles only. Missing key = empty or opted out — never “FLOQR doesn’t track that.” Data class: public P fields; Functions Admin SDK read. |
 | Public photos | `executeBotSession` returns `media[]` (https image URLs only). Gemini sees `photoCount`, not storage URLs. Client `.botdee-photo-gallery` thumbnails fly out (`.botdee-photo-flyout`) into a frameless `window.open` of `botdee-photo-popout.html` (X + Close; chat stays visible). Popup blocked → status, no covering overlay. |
-| Version (s3.3.008) | `isVersionPrompt` / `versionReply` (client + `localSession`) state FLOQR package stamp from `functions/package.json` (`PACKAGE_LABEL` e.g. `s3.3.008`). System instruction also names the stamp. |
+| Version (s3.3.008 / s3.3.032) | `isVersionPrompt` / `versionReply` (client + `localSession`) state FLOQR package stamp from `functions/package.json`. Exact aliases **Ver / Vers / Version** (optional `?`) also match and attach a **Version SMARTview** card (`kind: botDeeVersion`). Longer questions like “what is your version?” still answer locally. `version history` is not an alias. See **Version SMARTview**. |
 | Mobile header (s3.3.008) | `botdee.html`: icon + `.feature-landing-title-row` (title + `?` beside title) + full-width `#botDeeScopeNote` under the row — fixes 1-char vertical scope text and far-right `?`. |
 | VIP pay path | `createVipCheckout` reads hold + `loadClubPaymentSettings` → **`clubPos`**: `runConfirmVipReservationForClubPos` (Toast/SpotOn at door; `checkoutUrl:null` + `passHref`); **no deposit**: `runConfirmVipReservationWithoutDeposit`; **`floqrStripe`/`clubStripe`**: `runCreateFloqrCheckoutSession` → `checkoutUrl`. Same branching as `vip-terms-app.js` — never hardcode Stripe. |
 | Secrets | `GEMINI_API_KEY` + `STRIPE_SECRET_KEY` (Stripe collectors only); local `contextualSearch` fallback if Gemini missing/fails |
@@ -753,7 +753,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Data | Classified: `botDeeThreads/archive\|memories\|research\|summaries\|executions`, `botDeeExecutions`, `botDeeFeedback`, `botDeeLegalGates`, `botDeeProviderSlots`, `botDeeCapabilityManifest`, `usercharacter_analysis/{uid}`, `smartViewTranslationJobs`, `botDeeSmartViewDiagnostics`. **`botDeeThreads/{uid}.hasUsedBotDee`** integer **0\|1** (never boolean): 0 = never used BOT DEE (first attempt / first-time Settings); 1 = has used. Functions-write on the existing thread/consent doc. Written `1` on first successful `persistUserTurn` / `executeBotSession` (and `markHasUsedBotDee` when durable threads are off). Fail-closed read → 0. **No stored IP.** Mingl `messages` never imported. Slots store `enabled` 0\|1, `secretName`, `legalEvidenceRef`, `expiresAtMs`, `billingAccountRef` — **never secret values**. |
 | Legal / slots | Master Admin → Features Mgmt → BOT DEE. `setBotDeeLegalGate` and `setBotDeeProviderSlot` need SOS2FA + `FLOQRReasonPrompt`. Runtime mock unless `enabled=1` **and** named Firebase secret present **and** `legalEvidenceRef` set **and** not expired. Even then adapters do not call vendors. Ticketmaster is two slots: Discovery vs Partner. |
 | Secrets | Accounts profile account `botDeeProviders` (`scripts/seed-accounts-profile.js`). Names: `BOTDEE_GOOGLE_PLACES_API_KEY`, `BOTDEE_GEMINI_GROUNDING_API_KEY`, `BOTDEE_YELP_API_KEY`, `BOTDEE_TICKETMASTER_DISCOVERY_API_KEY`, `BOTDEE_TICKETMASTER_PARTNER_API_KEY`, `BOTDEE_EVENTBRITE_API_KEY`. `readByCodeToday: false`. |
-| Help | `help-botdee-memory`, `help-botdee-smartview`, `help-botdee-smartview-edit`, `help-botdee-smartview-translation`, `help-botdee-smartview-privacy`, `help-botdee-smartview-media`, `help-botdee-smartview-categories`, `help-botdee-smartview-chrome`, `help-botdee-smartview-review`, `help-botdee-smartview-troubleshoot`, `help-botdee-research-library`, `help-botdee-explain`, `help-botdee-privacy-assistant`, `help-bot-dee-mgmt` |
+| Help | `help-botdee-memory`, `help-botdee-smartview`, `help-botdee-smartview-edit`, `help-botdee-smartview-translation`, `help-botdee-smartview-privacy`, `help-botdee-smartview-media`, `help-botdee-smartview-categories`, `help-botdee-smartview-chrome`, `help-botdee-smartview-review`, `help-botdee-smartview-troubleshoot`, `help-botdee-version-smartview`, `help-botdee-version-smartview-status`, `help-botdee-version-smartview-tabs`, `help-botdee-research-library`, `help-botdee-explain`, `help-botdee-privacy-assistant`, `help-bot-dee-mgmt` |
 | Gate | Feature key `botDee`. |
 | Docs | `docs/BOT-DEE-SIX-PHASE.md`, `docs/BOT-DEE-LEGAL-PROVIDER-GATE.md`, `docs/BOT-DEE-SMARTVIEW-V2.md` |
 
@@ -792,6 +792,24 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Help | `help-botdee-smartcard`, `help-botdee-smartcard-search`, `help-botdee-smartcard-sync`. |
 | Tests | `functions/botdee-smartcard.test.js`. Manual Feature Test `s3-3-032-people-smartcard-v6`. |
 | Deploy | Needs Pages + Functions (`executeBotSession`, `searchPeopleSmartCards`, `getPeopleSmartView`, analysis persist/trigger) + Firestore rules from `origin/main`. Combined with SMARTsummary locale source fan-out (PR 101). |
+
+---
+
+## Version SMARTview (s3.3.032)
+
+**Purpose:** Inline BOT DEE chat card for the exact aliases **Ver / Vers / Version**. Visual layout follows Don’s iPhone rendering (tabs, identity, rows, expander, composer stays in chat). Live numbers are **not** copied from that picture. Distinct from People SMARTview (`botdee.sv.*` / `botdee.sc.*`).
+
+| Layer | Wiring |
+|---|---|
+| UI | Card inside the BOT DEE bubble (`bot-dee-chat.js` `appendBubble` → `FLOQRBotDeeSmartView.mount`). Tabs: Overview, What's New, Help. Technical Details expander. Status pill is muted **Not checked** (never green Operational without a probe). Composer and unsent draft stay. |
+| Client | `botdee-smartview.js` `renderVersionCard` / `bindVersionCard` / `localVersionPayload`. CSS `.botdee-sv-version*` uses Site Chrome tokens (`--accent` `--text` `--muted` `--floqr-ink`). Chrome keys `botdee.vs.*`. Frontend package overlay from `FLOQRNav.appVersion` when the payload omits it. Durable-off still paints a local card; durable-on uses `executeBotSession.smartViews`. |
+| Backend | `functions/botdee-version-smartview.js` `buildVersionSmartView`. `isVersionPrompt` folds exact aliases. `localSession` attaches `smartViews: [{kind: botDeeVersion}]` and does **not** call Gemini. Changelog from bundled `functions/botdee-version-changelog.json` (Functions deploy does not include repo-root README). `service.status` is always `not_checked` until a real probe exists. Privileged diagnostics only when viewer role is `master`. |
+| Data | **No new Firestore docs.** Payload is request-scoped on the callable response. No stored IP. People `usercharacter_analysis` untouched. |
+| URL / contract | `botdee.html` satellite (`data-floqr-feature="botDee"`). Display boards never get `?v=`. Asset cache-bust `s3.3.032` on app scripts. |
+| Security | Same `assertFeatureAccess(botDee)` as chat. Privileged block is omitted unless `resolveViewerRole` is `master`. Client cannot mint Master diagnostics. |
+| Observability | Manual Feature Test `s3-3-032-version-smartview`. |
+| Help | `help-botdee-version-smartview`, `help-botdee-version-smartview-status`, `help-botdee-version-smartview-tabs`. BOT DEE intent `help-botdee-version-smartview`. |
+| Deploy | Pages + Functions both needed for live package stamp and What's New (bundled changelog). |
 
 ---
 

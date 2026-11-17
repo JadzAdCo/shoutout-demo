@@ -220,13 +220,18 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
     };
   }
   if (bot.isVersionPrompt(userPrompt)) {
+    const versionView = require("./botdee-version-smartview").buildVersionSmartView({
+      role,
+      sessionPath: "local-version"
+    });
     return {
       reply: bot.versionReply(role),
       results: [],
       provider: "local-version",
       model: "version",
       toolRounds: 0,
-      uiLanguage: lang
+      uiLanguage: lang,
+      smartViews: [versionView]
     };
   }
   if (bot.isPrivacyPrompt(userPrompt)) {
@@ -458,8 +463,11 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       }
     }
     try {
+      const alreadyVersion = Array.isArray(outcome.smartViews)
+        && outcome.smartViews.some(row => row && row.kind === "botDeeVersion");
       if (
-        !outcome.smartViews
+        !alreadyVersion
+        && !outcome.smartViews
         && /\b(smartview|smart view|research library|explain (?:my )?recommendation)\b/i.test(userPrompt)
       ) {
         outcome.smartViews = smart.mockCatalog();
