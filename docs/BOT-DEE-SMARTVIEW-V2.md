@@ -10,7 +10,7 @@ Black Tiffany pack is illustration only. Production inherits the viewing patronâ
 - Source locale is the patronâ€™s default UI language. Gemini drafts SMARTsummary in that language. Owner edits store `translations.{B}` as source and fan out to every other locale, including English.
 - Site Chrome tokens (`--accent`, `--hot`, `--text`, `--muted`, `--floqr-ink`). Theme change updates the card without dropping the chat draft.
 - `usercharacter_analysis/{uid}` + `smartViewTranslationJobs` + `botDeeSmartViewDiagnostics` (Functions-write).
-- Owner-only `saveSmartSummary` in default profile language (`uiLanguage`); revision/hash stale-job guard; source fallback labeled while pending/failed.
+- Owner-only `saveSmartSummary` in default profile language (`uiLanguage`); editor loads source text in B, never a viewer translation; ready translations cannot be re-stamped as source. Deterministic Gemini-off draft is in B. Revision/hash stale-job guard; source fallback labeled while pending/failed.
 - Gemini drafts asynchronously after profile save **in the source locale**; never on `getPeopleSmartView`. Owner-authored text is not overwritten. An English viewer reads `translations.en`.
 - Dating only with explicit opt-in. Public-within-FLOQR fields only. Blocks honored.
 - 11-language chrome (`botdee.sv.*`) + help ids. Master Admin SMARTviews subtab preserved (`#featuresBotDee-smartviews`).

@@ -189,6 +189,98 @@ test("sourceLocale is patron uiLanguage; French save fans out including English"
   assert.equal(pending.status, "fallback");
   assert.equal(pending.pending, true);
   assert.equal(pending.text, valid.summary);
+  assert.match(drafted.sourceText, /aime /);
+  assert.doesNotMatch(drafted.sourceText, /\benjoys\b|\bgoes out for\b|public-within-app profile/);
+  v2.SUPPORTED_LOCALES.forEach(locale => {
+    const localSnap = v2.publicFieldsSnapshot({displayName: "Amara", uiLanguage: locale}, volunteered({
+      datapoints: {music: ["Afrobeats"], events: [], food: [], travel: [], futureTravel: [], hobbies: []}
+    }));
+    const draft = v2.draftSummaryFromPublicFields(localSnap);
+    if (locale === "en") assert.match(draft, /enjoys Afrobeats/);
+    else assert.doesNotMatch(draft, /\benjoys\b|public-within-app profile/);
+  });
+});
+
+test("owner editor uses source text; save rejects a translation as the new source", () => {
+  const snap = v2.publicFieldsSnapshot({displayName: "Amara", uiLanguage: "fr"}, volunteered());
+  let doc = v2.emptyAnalysis("u1", snap, 1);
+  doc = v2.applyOwnerSave(doc, {
+    summary: "Amara aime l'Afrobeats.",
+    sourceLocale: "fr",
+    editorUid: "u1",
+    now: 2
+  });
+  const enJob = v2.enqueueTranslationJobs({
+    uid: "u1", revision: doc.revision, sourceHash: doc.sourceHash, sourceLocale: "fr", now: 3
+  }).find(job => job.locale === "en");
+  const patched = v2.translationLocalePatch(doc, enJob, {
+    text: "Amara loves Afrobeats.",
+    engine: "gemini"
+  });
+  const merged = v2.applyLocalePatches(doc, [patched]);
+  const ownerEnChrome = v2.peopleV2Payload({
+    subjectUid: "u1",
+    snap,
+    analysis: merged,
+    viewerUid: "u1",
+    viewerMaySee: true,
+    viewerLocale: "en"
+  });
+  assert.equal(ownerEnChrome.summary.text, "Amara loves Afrobeats.");
+  assert.equal(ownerEnChrome.summary.editLocale, "fr");
+  assert.equal(ownerEnChrome.summary.editText, "Amara aime l'Afrobeats.");
+  assert.equal(ownerEnChrome.summary.sourceText, "Amara aime l'Afrobeats.");
+  const stranger = v2.peopleV2Payload({
+    subjectUid: "u1",
+    snap,
+    analysis: merged,
+    viewerUid: "u2",
+    viewerMaySee: true,
+    viewerLocale: "en"
+  });
+  assert.equal(stranger.summary.editText, undefined);
+  assert.equal(v2.resolveOwnerSaveLocale({
+    previous: merged,
+    uiLanguage: "fr",
+    requestLocale: "fr",
+    submittedText: "Amara loves Afrobeats."
+  }).error, "translation_not_source");
+  assert.equal(v2.resolveOwnerSaveLocale({
+    previous: merged,
+    uiLanguage: "en",
+    requestLocale: "en",
+    submittedText: "Amara aime l'Afrobeats."
+  }).error, "rewrite_in_new_language");
+  assert.equal(v2.resolveOwnerSaveLocale({
+    previous: merged,
+    uiLanguage: "fr",
+    requestLocale: "en",
+    submittedText: "Nouveau texte en français."
+  }).error, "locale_mismatch");
+  const ok = v2.resolveOwnerSaveLocale({
+    previous: merged,
+    uiLanguage: "fr",
+    requestLocale: "fr",
+    submittedText: "Amara aime l'Afrobeats et les rooftops."
+  });
+  assert.equal(ok.ok, true);
+  assert.equal(ok.sourceLocale, "fr");
+  const switched = v2.peopleV2Payload({
+    subjectUid: "u1",
+    snap: v2.publicFieldsSnapshot({displayName: "Amara", uiLanguage: "en"}, volunteered()),
+    analysis: merged,
+    viewerUid: "u1",
+    viewerMaySee: true,
+    viewerLocale: "en"
+  });
+  assert.equal(switched.summary.editLocale, "en");
+  assert.equal(switched.summary.editText, "");
+  const client = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
+  assert.match(client, /summary\?\.editText/);
+  assert.match(client, /callable\(\{summary: value, locale:/);
+  const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
+  assert.match(src, /resolveOwnerSaveLocale/);
+  assert.match(src, /request\.data\?\.locale/);
 });
 
 test("persistAnalysis merge:false is a new revision only; fan-out uses dotted locale patches", () => {
@@ -437,6 +529,7 @@ test("people card renderer: tabs, shrink tags, overlays restore draft helpers ex
   assert.match(client, /currentOverlaySession/);
   assert.match(client, /rememberOverlaySession/);
   assert.match(client, /bindOverlayDocument/);
+  assert.match(client, /editLocale/);
   assert.doesNotMatch(client, /activePeople = people/);
   const css = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.css"), "utf8");
   assert.match(css, /var\(--accent/);

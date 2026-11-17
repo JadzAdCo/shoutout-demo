@@ -497,8 +497,12 @@
       overlay.hidden = false;
       const localeInput = overlay.querySelector("#botdeeSvSourceLocale");
       const editor = overlay.querySelector("#botdeeSvSummaryEditor");
-      if (localeInput) localeInput.value = people.summary?.sourceLocale || "en";
-      if (editor) editor.value = people.summary?.text || "";
+      if (localeInput) localeInput.value = people.summary?.editLocale || people.summary?.sourceLocale || "en";
+      if (editor) {
+        editor.value = people.summary?.editText != null
+          ? people.summary.editText
+          : (people.summary?.sourceText || "");
+      }
       editor?.focus();
     }
   }
@@ -559,7 +563,13 @@
           finish(false, t("botdee.sv.saveOffline", "Sign in to save. Translations are queued on the server, not in this browser."));
           return;
         }
-        callable({summary: value}).then(() => {
+        const locale = String(
+          overlay.querySelector("#botdeeSvSourceLocale")?.value
+          || session.people?.summary?.editLocale
+          || session.people?.summary?.sourceLocale
+          || ""
+        ).trim();
+        callable({summary: value, locale: locale || undefined}).then(() => {
           finish(true, t("botdee.sv.savedQueued", "Saved. Translations queued."));
         }).catch(err => {
           finish(false, err?.message || t("botdee.sv.saveFailed", "Could not save the summary."));

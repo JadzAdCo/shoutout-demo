@@ -322,18 +322,26 @@ exports.saveSmartSummary = onCall(CALL_OPTS, async request => {
     const uid = await requireBotDee(request);
     const userSnap = await db.collection("users").doc(uid).get();
     const data = userSnap.data() || {};
-    const locale = v2.normalizeLocale(data.uiLanguage || data.preferredLanguage || request.data?.locale || "en");
-    const check = v2.validateOwnerEdit({
-      text: request.data?.summary,
-      locale,
-      previous: null
-    });
-    if (!check.ok) throw new HttpsError("invalid-argument", `Invalid summary (${check.errors.join(",")}).`);
+    const uiLanguage = v2.normalizeLocale(data.uiLanguage || data.preferredLanguage || "en");
+    const requestLocale = request.data?.locale ? v2.normalizeLocale(request.data.locale) : "";
     const now = Date.now();
     const result = await db.runTransaction(async tx => {
       const ref = analysisRef(uid);
       const snap = await tx.get(ref);
       const prev = snap.exists ? snap.data() : v2.emptyAnalysis(uid, snapshotFromUser(data, tools.volunteeredPublicDatapoints(data)), now);
+      const resolved = v2.resolveOwnerSaveLocale({
+        previous: prev,
+        uiLanguage,
+        requestLocale,
+        submittedText: request.data?.summary
+      });
+      if (!resolved.ok) throw new HttpsError("invalid-argument", `Invalid summary (${resolved.error}).`);
+      const check = v2.validateOwnerEdit({
+        text: request.data?.summary,
+        locale: resolved.sourceLocale,
+        previous: prev
+      });
+      if (!check.ok) throw new HttpsError("invalid-argument", `Invalid summary (${check.errors.join(",")}).`);
       const saved = v2.applyOwnerSave(prev, {
         summary: check.summary,
         sourceLocale: check.sourceLocale,
