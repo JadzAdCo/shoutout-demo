@@ -77,3 +77,38 @@ test("FloqR / Mingl handle ? sits on the label row, not in the input bubble", ()
   assert.doesNotMatch(read("patron-app.js"), /attachHelpPopout\([^)]*HandleHelp/);
   assert.doesNotMatch(read("patron-portal-app.js"), /attachHelpPopout\([^)]*HandleHelp/);
 });
+
+test("Account type ? sits on the label row and select options stay in the control", () => {
+  const html = read("patron-portal.html");
+  const block = labelBlock(html, "editAccountType");
+  assert.match(block, /class="label-inline-row"/);
+  assert.match(block, /data-floqr-help-id="help-profile-account-type"/);
+  assert.match(block, /portal\.field\.accountType/);
+  assert.match(
+    block,
+    /<span class="label-inline-row">[\s\S]*data-floqr-help-id="help-profile-account-type"[\s\S]*<\/span>\s*<select id="editAccountType">/,
+    "Account type ? is on the label row; select is the next field"
+  );
+  assert.match(block, /<option value="personal"/);
+  assert.match(block, /<option value="business"/);
+  const selectStart = html.indexOf('<select id="editAccountType">');
+  const selectEnd = html.indexOf("</select>", selectStart);
+  const selectHtml = html.slice(selectStart, selectEnd);
+  assert.doesNotMatch(selectHtml, /data-floqr-help-body/);
+  const attach = read("help-attach.js");
+  assert.match(attach, /function isFormControl\(/);
+  assert.match(attach, /if \(isFormControl\(node\)\) return;/);
+  assert.match(read("botdee-help-repository.js"), /id:\s*"help-profile-account-type"/);
+});
+
+test("native selects keep glyph room instead of clipping Patron to Datron", () => {
+  const css = read("styles.css");
+  assert.match(css, /select:not\(\[multiple\]\)\{/);
+  assert.match(css, /-webkit-appearance:none/);
+  assert.match(css, /min-height:44px/);
+  assert.match(css, /height:auto/);
+  assert.match(css, /padding:12px 40px 12px 16px/);
+  assert.match(css, /background-image:url\("data:image\/svg\+xml/);
+  assert.match(css, /\.profile-grid > label > select\{min-height:44px;height:auto/);
+  assert.doesNotMatch(css, /\.profile-grid > label > select\{min-height:44px;height:44px/);
+});
