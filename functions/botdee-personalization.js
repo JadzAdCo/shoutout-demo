@@ -146,13 +146,25 @@ function greetingFor(personalization, opts) {
   return fillTemplate(tpl, {name, lead, leadLower: lead.toLowerCase()});
 }
 
+function isRecapNoise(text) {
+  const q = String(text || "").replace(/\s+/g, " ").trim();
+  if (!q) return true;
+  if (/^(hey|hi|hello|howdy|yo|sup|hiya|hola)\b/i.test(q)) return true;
+  if (/i['’]ll pause here for now/i.test(q)) return true;
+  if (/^wassup\b/i.test(q)) return true;
+  if (/what's the move/i.test(q)) return true;
+  if (/how can i help/i.test(q)) return true;
+  if (/where (?:did |do )?we leave off|where we left off|we['’]?re were we/i.test(q)) return true;
+  return false;
+}
+
 function recapFromTurns(turns) {
   const rows = (Array.isArray(turns) ? turns : [])
     .map(row => ({
       role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
       text: String(row?.text || "").replace(/\s+/g, " ").trim()
     }))
-    .filter(row => row.text && !/^(hey|hi|hello|howdy|yo|sup|hiya|hola)\b/i.test(row.text));
+    .filter(row => !isRecapNoise(row.text));
   const last = rows.slice(-2);
   if (!last.length) return "";
   return last
@@ -200,7 +212,7 @@ function personalizationInstruction(personalization) {
         ? 'Demeanor Professional: calm and precise (e.g. "Good afternoon. How can I help?"). Keep dates, prices, payment requirements, and errors clear.'
         : 'Demeanor Balanced: friendly and efficient (e.g. "Hey, good afternoon. What are we working on?"). Keep dates, prices, payment requirements, and errors clear.';
   const recap = row.remindWhereLeftOff === 1
-    ? "If they ask where you left off, recap the last two meaningful turns plus the latest real action status — not the full transcript."
+    ? "If they ask where you left off, recap the last two meaningful retrieved turns (skip a post-pause hello) plus the latest real action status — not the full transcript. Distinguish discussed vs booked: never claim a reservation is confirmed unless a tool result or stored execution receipt shows it."
     : "Do not volunteer a recap unless they ask.";
   return [
     nameLine,
@@ -249,6 +261,7 @@ module.exports = {
   fillTemplate,
   looksLikeReservedComposerText,
   greetingFor,
+  isRecapNoise,
   recapFromTurns,
   formatActionLine,
   formatActionHistory,

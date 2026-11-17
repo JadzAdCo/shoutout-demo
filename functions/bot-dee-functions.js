@@ -84,11 +84,13 @@ async function loadAllowedFeatures(auth) {
   return {keys, labels, viewer};
 }
 
-async function runGeminiSession({apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures, personalization}) {
+async function runGeminiSession({apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures, personalization, modelContext}) {
   const lang = bot.normalizeUiLanguage(uiLanguage || session?.uiLanguage);
   const allowed = allowedFeatures || session?.allowedFeatures || null;
   const ai = new GoogleGenAI({apiKey});
-  const contents = bot.historyToContents(history, userPrompt);
+  const contents = modelContext
+    ? bot.contextToContents(modelContext, userPrompt)
+    : bot.historyToContents(history, userPrompt);
   const tools = [{functionDeclarations: bot.toolDeclarations(allowed)}];
   let lastSearch = null;
   const actionLinks = [];
@@ -289,14 +291,63 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     }
     const consent = memory.normalizeConsent(stored.consent);
     let history = settings.durableThreads ? stored.history : clientHistory;
-    if (settings.durableThreads && stored.idleEnded && memory.consentAllows(consent, "archive")) {
+    let memories = [];
+    let summary = "";
+    let executions = [];
+    const sessionReset = !!(stored.sessionReset || prefs.needsSessionReset(stored));
+    if (settings.durableThreads) {
+      let events = [];
+      let archived = [];
+      if (!sessionReset) {
+        try {
+          events = await threads.loadEventHistory(uid, 12);
+        } catch (err) {
+          console.warn("BOT DEE event load failed", err?.message || err);
+        }
+        if (!events.length && stored.idleEnded && memory.consentAllows(consent, "archive")) {
+          try {
+            archived = await threads.loadArchiveHistory(uid, 12);
+          } catch (err) {
+            console.warn("BOT DEE archive load failed", err?.message || err);
+          }
+        }
+      }
+      history = threads.assembleRetrievalTurns({
+        docTurns: stored.history,
+        events,
+        archiveTurns: archived,
+        idleEnded: stored.idleEnded,
+        archiveConsent: memory.consentAllows(consent, "archive"),
+        sessionReset,
+        retrievalFromSeq: stored.retrievalFromSeq
+      });
+      if (memory.consentAllows(consent, "memory")) {
+        try {
+          memories = await threads.loadAuthorizedMemories(uid, consent);
+        } catch (err) {
+          console.warn("BOT DEE memory load failed", err?.message || err);
+        }
+      }
+      if (!sessionReset) {
+        try {
+          summary = stored.summary || await threads.loadLatestSummary(uid);
+        } catch (err) {
+          console.warn("BOT DEE summary load failed", err?.message || err);
+        }
+      }
       try {
-        const archived = await threads.loadArchiveHistory(uid, 12);
-        if (archived.length) history = archived;
+        executions = await threads.loadExecutionReceipts(uid, 12);
       } catch (err) {
-        console.warn("BOT DEE archive load failed", err?.message || err);
+        console.warn("BOT DEE execution load failed", err?.message || err);
       }
     }
+    const modelContext = execution.buildModelContext({
+      turns: history,
+      summary,
+      memories: memory.consentAllows(consent, "memory") ? memories : [],
+      executions
+    });
+    history = modelContext.recentTurns;
     const active = bot.conversationIsActive(
       history,
       stored.lastMessageAtMs,
@@ -355,7 +406,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     } else if (apiKey) {
       try {
         outcome = await runGeminiSession({
-          apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures, personalization
+          apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures, personalization, modelContext
         });
       } catch (error) {
         console.warn("BOT DEE Gemini failed; using contextualSearch fallback", error?.message || error);
@@ -531,19 +582,35 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       };
     }
     const state = await threads.loadThreadState(uid, settings);
+    let eventTurns = [];
     let archiveTurns = [];
-    if (state.idleEnded && state.archiveRetained && !prefs.needsSessionReset(state)) {
+    const sessionReset = !!(state.sessionReset || prefs.needsSessionReset(state));
+    if (!sessionReset) {
       try {
-        archiveTurns = await threads.loadArchiveHistory(uid, 12);
+        eventTurns = await threads.loadEventHistory(uid, 12);
       } catch (_) {}
+      if (!eventTurns.length && !state.turns.length && state.idleEnded && state.archiveRetained) {
+        try {
+          archiveTurns = await threads.loadArchiveHistory(uid, 12);
+        } catch (_) {}
+      }
     }
+    const retrievalTurns = threads.assembleRetrievalTurns({
+      docTurns: state.turns,
+      events: eventTurns,
+      archiveTurns,
+      idleEnded: state.idleEnded,
+      archiveConsent: state.archiveRetained,
+      sessionReset,
+      retrievalFromSeq: state.retrievalFromSeq
+    });
     const profileFirstName = await readProfileFirstName(uid);
     return {
       ok: true,
       durable: true,
       status: state.status,
       threadId: state.threadId,
-      turns: state.turns,
+      turns: retrievalTurns,
       archiveTurns,
       consent: state.consent,
       hasUsedBotDee: state.hasUsedBotDee === 1 ? 1 : 0,

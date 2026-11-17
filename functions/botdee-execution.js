@@ -126,7 +126,8 @@ function applyReceipt(existing, nextState, result, nowMs) {
   };
 }
 
-function contextBudget({maxTurns, summaryTokens, memoryCount, toolReserve}) {
+function contextBudget(raw) {
+  const {maxTurns, summaryTokens, memoryCount, toolReserve} = raw && typeof raw === "object" ? raw : {};
   const turns = Math.max(1, Math.min(24, Number(maxTurns) || 12));
   return {
     maxTurns: turns,
@@ -137,7 +138,7 @@ function contextBudget({maxTurns, summaryTokens, memoryCount, toolReserve}) {
   };
 }
 
-function buildModelContext({turns, summary, memories, budget}) {
+function buildModelContext({turns, summary, memories, budget, executions}) {
   const cap = contextBudget(budget);
   const recent = Array.isArray(turns) ? turns.slice(-cap.maxTurns) : [];
   const mems = Array.isArray(memories) ? memories.slice(0, cap.memoryCount) : [];
@@ -146,8 +147,36 @@ function buildModelContext({turns, summary, memories, budget}) {
     recentTurns: recent,
     summary: summaryText,
     memories: mems,
-    budget: cap
+    budget: cap,
+    reservationClaim: reservationClaimFromContext({turns: recent, executions})
   };
+}
+
+const BOOKING_TOOLS = Object.freeze([
+  "createVipHold",
+  "recordVipConsent",
+  "createVipCheckout"
+]);
+
+/** Discussed vs booked: talking about VIP / a venue is not a confirmed reservation. */
+function reservationClaimFromContext({turns, executions}) {
+  const receipts = Array.isArray(executions) ? executions : [];
+  const confirmed = receipts.some(row => {
+    const name = String(row?.toolName || "");
+    if (!BOOKING_TOOLS.includes(name)) return false;
+    const state = String(row?.state || "").toLowerCase();
+    const code = String(row?.resultCode || "").toLowerCase();
+    return state === "succeeded" || code === "ok";
+  });
+  if (confirmed) return "confirmed";
+  const blob = (Array.isArray(turns) ? turns : [])
+    .map(row => String(row?.text || ""))
+    .join(" ")
+    .toLowerCase();
+  if (/\bvip\b|reserv|hold table|book me/.test(blob)) {
+    return "discussed";
+  }
+  return "none";
 }
 
 module.exports = {
@@ -164,5 +193,7 @@ module.exports = {
   checkpointDoc,
   applyReceipt,
   contextBudget,
-  buildModelContext
+  buildModelContext,
+  reservationClaimFromContext,
+  BOOKING_TOOLS
 };

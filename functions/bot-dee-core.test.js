@@ -208,6 +208,7 @@ test("Help questions answer locally like version (no search dump)", () => {
   assert.equal(bot.isPrivacyPrompt("privacy"), true);
   assert.equal(bot.isPrivacyPrompt("session"), true);
   assert.match(bot.privacyReply(), /five-minute pause/i);
+  assert.match(bot.privacyReply(), /does not delete this signed-in chat/i);
   assert.match(bot.privacyReply(), /Enter/i);
 
   const fns = require("./bot-dee-functions");
@@ -578,14 +579,15 @@ test("thread snapshot reports idle vs active without leaking another uid", () =>
     })
   }, "abc", settings, now);
   assert.equal(idle.status, "idle_ended");
-  assert.deepEqual(idle.turns, []);
+  assert.equal(idle.idleEnded, true);
+  assert.equal(idle.turns.length, 1, "idle lease must not empty the retrieval cursor");
   const last = now - 59_000;
   const prev = {lastMessageAtMs: last, conversationEpoch: 3, turns: [{role: "user", text: "hi"}, {role: "model", text: "hey"}], ...currentPrefs};
   const duringGemini = threads.nextTranscript(prev, settings, last + 59_000);
   assert.equal(duringGemini.turns.length, 2, "idle clock starts when the patron sent, not when Gemini returns");
   assert.equal(duringGemini.epoch, 3);
   const alreadyIdle = threads.nextTranscript(prev, settings, last + 61_000);
-  assert.equal(alreadyIdle.turns.length, 0);
+  assert.equal(alreadyIdle.turns.length, 2, "idle must not wipe stored turns");
   assert.equal(alreadyIdle.epoch, 4);
 });
 
