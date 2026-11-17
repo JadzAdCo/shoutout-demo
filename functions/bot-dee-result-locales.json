@@ -73,27 +73,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "SMARTsummary bleibt synchron",
-          "blurb": "Bearbeiten Sie Ihre SMARTsummary in der Standard-Profilsprache. Speichern ist sofort. Offene Karten und SmartView aktualisieren sich aus demselben Datensatz. Übersetzungen laufen im Hintergrund und überschreiben keine neuere Bearbeitung. Wenn Sie das Profil verbergen, jemanden bl"
+          "blurb": "Bearbeiten Sie Ihre SMARTsummary in der Standard-Profilsprache. Speichern ist sofort. Offene Karten und SMARTview aktualisieren sich aus demselben Datensatz. Übersetzungen laufen im Hintergrund und überschreiben keine neuere Bearbeitung. Wenn Sie das Profil verbergen, jemanden bl"
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "SMARTsummary bleibt synchron",
-          "blurb": "Bearbeiten Sie Ihre SMARTsummary in der Standard-Profilsprache. Speichern ist sofort. Offene Karten und SmartView aktualisieren sich aus demselben Datensatz. Übersetzungen laufen im Hintergrund und überschreiben keine neuere Bearbeitung. Wenn Sie das Profil verbergen, jemanden bl"
+          "blurb": "Bearbeiten Sie Ihre SMARTsummary in der Standard-Profilsprache. Speichern ist sofort. Offene Karten und SMARTview aktualisieren sich aus demselben Datensatz. Übersetzungen laufen im Hintergrund und überschreiben keine neuere Bearbeitung. Wenn Sie das Profil verbergen, jemanden bl"
         },
         "help:help-botdee-smartcard-search": {
           "label": "BOT DEE fragen, wer jemand ist",
-          "blurb": "„Who am I?“ öffnet Ihre SmartView. „Who is …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet SmartView. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
+          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet SMARTview. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "BOT DEE fragen, wer jemand ist",
-          "blurb": "„Who am I?“ öffnet Ihre SmartView. „Who is …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet SmartView. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
+          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet SMARTview. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
         },
         "help:help-botdee-smartcard": {
           "label": "Personen-SMARTcards",
-          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SmartView. Karten nutzen dasselbe öffentliche Profil und diesel"
+          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SMARTview. Karten nutzen dasselbe öffentliche Profil und diesel"
         },
         "intent:help-botdee-smartcard": {
           "label": "Personen-SMARTcards",
-          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SmartView. Karten nutzen dasselbe öffentliche Profil und diesel"
+          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SMARTview. Karten nutzen dasselbe öffentliche Profil und diesel"
         },
         "help:help-botdee-smartview-review": {
           "label": "SMARTsummary prüfen und korrigieren",
@@ -1023,27 +1023,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "Le SMARTsummary reste synchronisé",
-          "blurb": "Modifiez votre SMARTsummary dans la langue par défaut du profil. L’enregistrement est immédiat. Les cartes et SmartView déjà ouverts se mettent à jour depuis le même enregistrement. Les traductions partent en arrière-plan et n’écrasent pas une édition plus récente. Si vous masque"
+          "blurb": "Modifiez votre SMARTsummary dans la langue par défaut du profil. L’enregistrement est immédiat. Les cartes et SMARTview déjà ouverts se mettent à jour depuis le même enregistrement. Les traductions partent en arrière-plan et n’écrasent pas une édition plus récente. Si vous masque"
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "Le SMARTsummary reste synchronisé",
-          "blurb": "Modifiez votre SMARTsummary dans la langue par défaut du profil. L’enregistrement est immédiat. Les cartes et SmartView déjà ouverts se mettent à jour depuis le même enregistrement. Les traductions partent en arrière-plan et n’écrasent pas une édition plus récente. Si vous masque"
+          "blurb": "Modifiez votre SMARTsummary dans la langue par défaut du profil. L’enregistrement est immédiat. Les cartes et SMARTview déjà ouverts se mettent à jour depuis le même enregistrement. Les traductions partent en arrière-plan et n’écrasent pas une édition plus récente. Si vous masque"
         },
         "help:help-botdee-smartcard-search": {
           "label": "Demander à BOT DEE qui est quelqu’un",
-          "blurb": "« Who am I ? » ouvre votre SmartView. « Who is … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre SmartView. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existenc"
+          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre SMARTview. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existenc"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Demander à BOT DEE qui est quelqu’un",
-          "blurb": "« Who am I ? » ouvre votre SmartView. « Who is … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre SmartView. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existenc"
+          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre SMARTview. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existenc"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards Personnes",
-          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SmartView complet. Les cartes utilisent le m"
+          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SMARTview complet. Les cartes utilisent le m"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcards Personnes",
-          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SmartView complet. Les cartes utilisent le m"
+          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SMARTview complet. Les cartes utilisent le m"
         },
         "help:help-botdee-smartview-review": {
           "label": "Relire et corriger un SMARTsummary",
@@ -1973,27 +1973,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "SMARTsummary permanece sincronizado",
-          "blurb": "Edite su SMARTsummary en el idioma predeterminado del perfil. El guardado es inmediato. Las tarjetas y SmartView abiertos se actualizan desde el mismo registro. Las traducciones van en segundo plano y no sobrescriben una edición más nueva. Si oculta el perfil, bloquea a alguien o"
+          "blurb": "Edite su SMARTsummary en el idioma predeterminado del perfil. El guardado es inmediato. Las tarjetas y SMARTview abiertos se actualizan desde el mismo registro. Las traducciones van en segundo plano y no sobrescriben una edición más nueva. Si oculta el perfil, bloquea a alguien o"
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "SMARTsummary permanece sincronizado",
-          "blurb": "Edite su SMARTsummary en el idioma predeterminado del perfil. El guardado es inmediato. Las tarjetas y SmartView abiertos se actualizan desde el mismo registro. Las traducciones van en segundo plano y no sobrescriben una edición más nueva. Si oculta el perfil, bloquea a alguien o"
+          "blurb": "Edite su SMARTsummary en el idioma predeterminado del perfil. El guardado es inmediato. Las tarjetas y SMARTview abiertos se actualizan desde el mismo registro. Las traducciones van en segundo plano y no sobrescriben una edición más nueva. Si oculta el perfil, bloquea a alguien o"
         },
         "help:help-botdee-smartcard-search": {
           "label": "Preguntar a BOT DEE quién es alguien",
-          "blurb": "«Who am I?» abre su SmartView. «Who is …» más un nombre o @identificador busca perfiles públicos. Un resultado abre SmartView. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
+          "blurb": "«Who am I?» abre su SMARTview. «Who is …» más un nombre o @identificador busca perfiles públicos. Un resultado abre SMARTview. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Preguntar a BOT DEE quién es alguien",
-          "blurb": "«Who am I?» abre su SmartView. «Who is …» más un nombre o @identificador busca perfiles públicos. Un resultado abre SmartView. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
+          "blurb": "«Who am I?» abre su SMARTview. «Who is …» más un nombre o @identificador busca perfiles públicos. Un resultado abre SMARTview. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards de personas",
-          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SmartView completo. Las tarjetas usan e"
+          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SMARTview completo. Las tarjetas usan e"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcards de personas",
-          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SmartView completo. Las tarjetas usan e"
+          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SMARTview completo. Las tarjetas usan e"
         },
         "help:help-botdee-smartview-review": {
           "label": "Revisar y corregir un SMARTsummary",
@@ -2923,27 +2923,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "SMARTsummary resta sincronizzato",
-          "blurb": "Modifica lo SMARTsummary nella lingua predefinita del profilo. Il salvataggio è immediato. Schede e SmartView aperti si aggiornano dallo stesso record. Le traduzioni partono in background e non sovrascrivono una modifica più recente. Se nascondi il profilo, blocchi qualcuno o eli"
+          "blurb": "Modifica lo SMARTsummary nella lingua predefinita del profilo. Il salvataggio è immediato. Schede e SMARTview aperti si aggiornano dallo stesso record. Le traduzioni partono in background e non sovrascrivono una modifica più recente. Se nascondi il profilo, blocchi qualcuno o eli"
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "SMARTsummary resta sincronizzato",
-          "blurb": "Modifica lo SMARTsummary nella lingua predefinita del profilo. Il salvataggio è immediato. Schede e SmartView aperti si aggiornano dallo stesso record. Le traduzioni partono in background e non sovrascrivono una modifica più recente. Se nascondi il profilo, blocchi qualcuno o eli"
+          "blurb": "Modifica lo SMARTsummary nella lingua predefinita del profilo. Il salvataggio è immediato. Schede e SMARTview aperti si aggiornano dallo stesso record. Le traduzioni partono in background e non sovrascrivono una modifica più recente. Se nascondi il profilo, blocchi qualcuno o eli"
         },
         "help:help-botdee-smartcard-search": {
           "label": "Chiedere a BOT DEE chi è qualcuno",
-          "blurb": "“Who am I?” apre il tuo SmartView. “Who is …” più nome o @handle cerca profili pubblici. Un risultato apre SmartView. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
+          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …” più nome o @handle cerca profili pubblici. Un risultato apre SMARTview. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Chiedere a BOT DEE chi è qualcuno",
-          "blurb": "“Who am I?” apre il tuo SmartView. “Who is …” più nome o @handle cerca profili pubblici. Un risultato apre SmartView. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
+          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …” più nome o @handle cerca profili pubblici. Un risultato apre SMARTview. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard persone",
-          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SmartView completo. Le schede usano lo stesso profilo pubblico e SMART"
+          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SMARTview completo. Le schede usano lo stesso profilo pubblico e SMART"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard persone",
-          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SmartView completo. Le schede usano lo stesso profilo pubblico e SMART"
+          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SMARTview completo. Le schede usano lo stesso profilo pubblico e SMART"
         },
         "help:help-botdee-smartview-review": {
           "label": "Rivedi e correggi lo SMARTsummary",
@@ -3873,27 +3873,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "O SMARTsummary fica sincronizado",
-          "blurb": "Edite o SMARTsummary no idioma predefinido do perfil. A gravação é imediata. Cards e SmartView abertos atualizam a partir do mesmo registo. As traduções correm em segundo plano e não substituem uma edição mais nova. Se ocultar o perfil, bloquear alguém ou apagar a conta, essas ca"
+          "blurb": "Edite o SMARTsummary no idioma predefinido do perfil. A gravação é imediata. Cards e SMARTview abertos atualizam a partir do mesmo registo. As traduções correm em segundo plano e não substituem uma edição mais nova. Se ocultar o perfil, bloquear alguém ou apagar a conta, essas ca"
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "O SMARTsummary fica sincronizado",
-          "blurb": "Edite o SMARTsummary no idioma predefinido do perfil. A gravação é imediata. Cards e SmartView abertos atualizam a partir do mesmo registo. As traduções correm em segundo plano e não substituem uma edição mais nova. Se ocultar o perfil, bloquear alguém ou apagar a conta, essas ca"
+          "blurb": "Edite o SMARTsummary no idioma predefinido do perfil. A gravação é imediata. Cards e SMARTview abertos atualizam a partir do mesmo registo. As traduções correm em segundo plano e não substituem uma edição mais nova. Se ocultar o perfil, bloquear alguém ou apagar a conta, essas ca"
         },
         "help:help-botdee-smartcard-search": {
           "label": "Perguntar ao BOT DEE quem é alguém",
-          "blurb": "“Who am I?” abre o seu SmartView. “Who is …” mais um nome ou @handle procura perfis públicos. Um resultado abre o SmartView. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
+          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …” mais um nome ou @handle procura perfis públicos. Um resultado abre o SMARTview. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Perguntar ao BOT DEE quem é alguém",
-          "blurb": "“Who am I?” abre o seu SmartView. “Who is …” mais um nome ou @handle procura perfis públicos. Um resultado abre o SmartView. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
+          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …” mais um nome ou @handle procura perfis públicos. Um resultado abre o SMARTview. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards de pessoas",
-          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SmartView completo. As cards usam o mesmo perfil público e SMARTsum"
+          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SMARTview completo. As cards usam o mesmo perfil público e SMARTsum"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcards de pessoas",
-          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SmartView completo. As cards usam o mesmo perfil público e SMARTsum"
+          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SMARTview completo. As cards usam o mesmo perfil público e SMARTsum"
         },
         "help:help-botdee-smartview-review": {
           "label": "Rever e corrigir o SMARTsummary",
@@ -4823,27 +4823,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "SMARTsummary остаётся синхронным",
-          "blurb": "Правите SMARTsummary на языке профиля. Сохранение сразу. Открытые карточки и SmartView обновляются из той же записи. Переводы идут в фоне и не затирают более новую правку. Если скрыть профиль, заблокировать человека или удалить аккаунт, карточки исчезают. Gemini не перезаписывает"
+          "blurb": "Правите SMARTsummary на языке профиля. Сохранение сразу. Открытые карточки и SMARTview обновляются из той же записи. Переводы идут в фоне и не затирают более новую правку. Если скрыть профиль, заблокировать человека или удалить аккаунт, карточки исчезают. Gemini не перезаписывает"
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "SMARTsummary остаётся синхронным",
-          "blurb": "Правите SMARTsummary на языке профиля. Сохранение сразу. Открытые карточки и SmartView обновляются из той же записи. Переводы идут в фоне и не затирают более новую правку. Если скрыть профиль, заблокировать человека или удалить аккаунт, карточки исчезают. Gemini не перезаписывает"
+          "blurb": "Правите SMARTsummary на языке профиля. Сохранение сразу. Открытые карточки и SMARTview обновляются из той же записи. Переводы идут в фоне и не затирают более новую правку. Если скрыть профиль, заблокировать человека или удалить аккаунт, карточки исчезают. Gemini не перезаписывает"
         },
         "help:help-botdee-smartcard-search": {
           "label": "Спросить BOT DEE, кто это",
-          "blurb": "«Who am I?» открывает ваш SmartView. «Who is …» и имя или @хендл ищут публичные профили. Один результат — SmartView. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
+          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …» и имя или @хендл ищут публичные профили. Один результат — SMARTview. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Спросить BOT DEE, кто это",
-          "blurb": "«Who am I?» открывает ваш SmartView. «Who is …» и имя или @хендл ищут публичные профили. Один результат — SmartView. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
+          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …» и имя или @хендл ищут публичные профили. Один результат — SMARTview. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard людей",
-          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SmartView. Это тот же публичный профиль и SMARTsummary. О"
+          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SMARTview. Это тот же публичный профиль и SMARTsummary. О"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard людей",
-          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SmartView. Это тот же публичный профиль и SMARTsummary. О"
+          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SMARTview. Это тот же публичный профиль и SMARTsummary. О"
         },
         "help:help-botdee-smartview-review": {
           "label": "Проверить и исправить SMARTsummary",
@@ -5773,27 +5773,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "Το SMARTsummary μένει συγχρονισμένο",
-          "blurb": "Επεξεργαστείτε το SMARTsummary στην προεπιλεγμένη γλώσσα προφίλ. Η αποθήκευση είναι άμεση. Ανοιχτές κάρτες και SmartView ενημερώνονται από την ίδια εγγραφή. Οι μεταφράσεις τρέχουν στο παρασκήνιο και δεν αντικαθιστούν νεότερη επεξεργασία. Αν κρύψετε το προφίλ, αποκλείσετε κάποιον "
+          "blurb": "Επεξεργαστείτε το SMARTsummary στην προεπιλεγμένη γλώσσα προφίλ. Η αποθήκευση είναι άμεση. Ανοιχτές κάρτες και SMARTview ενημερώνονται από την ίδια εγγραφή. Οι μεταφράσεις τρέχουν στο παρασκήνιο και δεν αντικαθιστούν νεότερη επεξεργασία. Αν κρύψετε το προφίλ, αποκλείσετε κάποιον "
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "Το SMARTsummary μένει συγχρονισμένο",
-          "blurb": "Επεξεργαστείτε το SMARTsummary στην προεπιλεγμένη γλώσσα προφίλ. Η αποθήκευση είναι άμεση. Ανοιχτές κάρτες και SmartView ενημερώνονται από την ίδια εγγραφή. Οι μεταφράσεις τρέχουν στο παρασκήνιο και δεν αντικαθιστούν νεότερη επεξεργασία. Αν κρύψετε το προφίλ, αποκλείσετε κάποιον "
+          "blurb": "Επεξεργαστείτε το SMARTsummary στην προεπιλεγμένη γλώσσα προφίλ. Η αποθήκευση είναι άμεση. Ανοιχτές κάρτες και SMARTview ενημερώνονται από την ίδια εγγραφή. Οι μεταφράσεις τρέχουν στο παρασκήνιο και δεν αντικαθιστούν νεότερη επεξεργασία. Αν κρύψετε το προφίλ, αποκλείσετε κάποιον "
         },
         "help:help-botdee-smartcard-search": {
           "label": "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
-          "blurb": "Το «Who am I?» ανοίγει το SmartView σας. Το «Who is …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει SmartView. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
+          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει SMARTview. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
-          "blurb": "Το «Who am I?» ανοίγει το SmartView σας. Το «Who is …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει SmartView. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
+          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει SMARTview. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard ατόμων",
-          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SmartView. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SM"
+          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SMARTview. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SM"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard ατόμων",
-          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SmartView. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SM"
+          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SMARTview. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SM"
         },
         "help:help-botdee-smartview-review": {
           "label": "Έλεγχος και διόρθωση SMARTsummary",
@@ -6723,27 +6723,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "SMARTsummary zostaje zsynchronizowane",
-          "blurb": "Edytuj SMARTsummary w domyślnym języku profilu. Zapis jest natychmiastowy. Otwarte karty i SmartView aktualizują się z tego samego rekordu. Tłumaczenia idą w tle i nie nadpisują nowszej edycji. Ukrycie profilu, blokada lub usunięcie konta chowa te karty. Gemini nie nadpisuje Twoj"
+          "blurb": "Edytuj SMARTsummary w domyślnym języku profilu. Zapis jest natychmiastowy. Otwarte karty i SMARTview aktualizują się z tego samego rekordu. Tłumaczenia idą w tle i nie nadpisują nowszej edycji. Ukrycie profilu, blokada lub usunięcie konta chowa te karty. Gemini nie nadpisuje Twoj"
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "SMARTsummary zostaje zsynchronizowane",
-          "blurb": "Edytuj SMARTsummary w domyślnym języku profilu. Zapis jest natychmiastowy. Otwarte karty i SmartView aktualizują się z tego samego rekordu. Tłumaczenia idą w tle i nie nadpisują nowszej edycji. Ukrycie profilu, blokada lub usunięcie konta chowa te karty. Gemini nie nadpisuje Twoj"
+          "blurb": "Edytuj SMARTsummary w domyślnym języku profilu. Zapis jest natychmiastowy. Otwarte karty i SMARTview aktualizują się z tego samego rekordu. Tłumaczenia idą w tle i nie nadpisują nowszej edycji. Ukrycie profilu, blokada lub usunięcie konta chowa te karty. Gemini nie nadpisuje Twoj"
         },
         "help:help-botdee-smartcard-search": {
           "label": "Zapytaj BOT DEE, kim ktoś jest",
-          "blurb": "„Who am I?” otwiera Twoje SmartView. „Who is …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera SmartView. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
+          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera SMARTview. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Zapytaj BOT DEE, kim ktoś jest",
-          "blurb": "„Who am I?” otwiera Twoje SmartView. „Who is …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera SmartView. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
+          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera SMARTview. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard osób",
-          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SmartView. Karty używają tego samego profilu i SMARTsummary. O"
+          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SMARTview. Karty używają tego samego profilu i SMARTsummary. O"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard osób",
-          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SmartView. Karty używają tego samego profilu i SMARTsummary. O"
+          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SMARTview. Karty używają tego samego profilu i SMARTsummary. O"
         },
         "help:help-botdee-smartview-review": {
           "label": "Przejrzyj i popraw SMARTsummary",
@@ -7673,27 +7673,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "SMARTsummary blijft synchroon",
-          "blurb": "Bewerk uw SMARTsummary in de standaard profieltaal. Opslaan is direct. Open kaarten en SmartView werken bij vanaf hetzelfde record. Vertalingen lopen op de achtergrond en overschrijven geen nieuwere bewerking. Als u het profiel verbergt, iemand blokkeert of het account verwijdert"
+          "blurb": "Bewerk uw SMARTsummary in de standaard profieltaal. Opslaan is direct. Open kaarten en SMARTview werken bij vanaf hetzelfde record. Vertalingen lopen op de achtergrond en overschrijven geen nieuwere bewerking. Als u het profiel verbergt, iemand blokkeert of het account verwijdert"
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "SMARTsummary blijft synchroon",
-          "blurb": "Bewerk uw SMARTsummary in de standaard profieltaal. Opslaan is direct. Open kaarten en SmartView werken bij vanaf hetzelfde record. Vertalingen lopen op de achtergrond en overschrijven geen nieuwere bewerking. Als u het profiel verbergt, iemand blokkeert of het account verwijdert"
+          "blurb": "Bewerk uw SMARTsummary in de standaard profieltaal. Opslaan is direct. Open kaarten en SMARTview werken bij vanaf hetzelfde record. Vertalingen lopen op de achtergrond en overschrijven geen nieuwere bewerking. Als u het profiel verbergt, iemand blokkeert of het account verwijdert"
         },
         "help:help-botdee-smartcard-search": {
           "label": "BOT DEE vragen wie iemand is",
-          "blurb": "“Who am I?” opent uw SmartView. “Who is …” plus naam of @handle zoekt openbare profielen. Eén match opent SmartView. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
+          "blurb": "“Who am I?” opent uw SMARTview. “Who is …” plus naam of @handle zoekt openbare profielen. Eén match opent SMARTview. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "BOT DEE vragen wie iemand is",
-          "blurb": "“Who am I?” opent uw SmartView. “Who is …” plus naam of @handle zoekt openbare profielen. Eén match opent SmartView. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
+          "blurb": "“Who am I?” opent uw SMARTview. “Who is …” plus naam of @handle zoekt openbare profielen. Eén match opent SMARTview. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
         },
         "help:help-botdee-smartcard": {
           "label": "Mensen-SMARTcards",
-          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SmartView te openen. Kaarten gebruiken hetzelfde openbare profiel en "
+          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SMARTview te openen. Kaarten gebruiken hetzelfde openbare profiel en "
         },
         "intent:help-botdee-smartcard": {
           "label": "Mensen-SMARTcards",
-          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SmartView te openen. Kaarten gebruiken hetzelfde openbare profiel en "
+          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SMARTview te openen. Kaarten gebruiken hetzelfde openbare profiel en "
         },
         "help:help-botdee-smartview-review": {
           "label": "SMARTsummary controleren en corrigeren",
@@ -8623,27 +8623,27 @@
         },
         "help:help-botdee-smartcard-sync": {
           "label": "يبقى SMARTsummary متزامنًا",
-          "blurb": "عدّل SMARTsummary بلغة الملف الافتراضية. الحفظ فوري. البطاقات وSmartView المفتوحة تتحدّث من نفس السجل. تُترجم اللغات الأخرى في الخلفية ولا تستبدل تعديلاً أحدث. إذا أخفيت الملف أو حظرت شخصًا أو حذفت الحساب تختفي البطاقات. لا يستبدل Gemini نصك."
+          "blurb": "عدّل SMARTsummary بلغة الملف الافتراضية. الحفظ فوري. البطاقات وSMARTview المفتوحة تتحدّث من نفس السجل. تُترجم اللغات الأخرى في الخلفية ولا تستبدل تعديلاً أحدث. إذا أخفيت الملف أو حظرت شخصًا أو حذفت الحساب تختفي البطاقات. لا يستبدل Gemini نصك."
         },
         "intent:help-botdee-smartcard-sync": {
           "label": "يبقى SMARTsummary متزامنًا",
-          "blurb": "عدّل SMARTsummary بلغة الملف الافتراضية. الحفظ فوري. البطاقات وSmartView المفتوحة تتحدّث من نفس السجل. تُترجم اللغات الأخرى في الخلفية ولا تستبدل تعديلاً أحدث. إذا أخفيت الملف أو حظرت شخصًا أو حذفت الحساب تختفي البطاقات. لا يستبدل Gemini نصك."
+          "blurb": "عدّل SMARTsummary بلغة الملف الافتراضية. الحفظ فوري. البطاقات وSMARTview المفتوحة تتحدّث من نفس السجل. تُترجم اللغات الأخرى في الخلفية ولا تستبدل تعديلاً أحدث. إذا أخفيت الملف أو حظرت شخصًا أو حذفت الحساب تختفي البطاقات. لا يستبدل Gemini نصك."
         },
         "help:help-botdee-smartcard-search": {
           "label": "اسأل BOT DEE من هذا الشخص",
-          "blurb": "«Who am I?» يفتح SmartView الخاص بك. «Who is …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح SmartView. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
+          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح SMARTview. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "اسأل BOT DEE من هذا الشخص",
-          "blurb": "«Who am I?» يفتح SmartView الخاص بك. «Who is …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح SmartView. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
+          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح SMARTview. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard الأشخاص",
-          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SmartView الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
+          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SMARTview الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard الأشخاص",
-          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SmartView الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
+          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SMARTview الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
         },
         "help:help-botdee-smartview-review": {
           "label": "مراجعة وتصحيح SMARTsummary",

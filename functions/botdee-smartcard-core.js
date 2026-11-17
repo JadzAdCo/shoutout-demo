@@ -1,5 +1,5 @@
 /* People SMARTcard v6 — compact projections of the same authorized
-   usercharacter_analysis + public profile as People SmartView.
+   usercharacter_analysis + public profile as People SMARTview.
    No independent card summary store. No Gemini on card render. */
 "use strict";
 
@@ -259,9 +259,9 @@ function replyKeyForMode(mode) {
 }
 
 function fallbackReply(mode) {
-  if (mode === "self") return "Here is your SmartView.";
-  if (mode === "one") return "Here is their SmartView.";
-  if (mode === "many") return "I found more than one eligible public profile. Select the right person to open their SmartView.";
+  if (mode === "self") return "Here is your SMARTview.";
+  if (mode === "one") return "Here is their SMARTview.";
+  if (mode === "many") return "I found more than one eligible public profile. Select the right person to open their SMARTview.";
   if (mode === "error") return "People search could not finish. Try again in a moment.";
   return "No eligible public profile matched.";
 }

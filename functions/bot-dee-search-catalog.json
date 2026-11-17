@@ -547,7 +547,7 @@
       "id": "help-botdee-smartcard",
       "kind": "help",
       "label": "People SMARTcards",
-      "blurb": "When more than one public FLOQR profile matches, BOT DEE shows compact People SMARTcards in the chat: square photo on the left, name, public handles, city, and a 4-line SMARTsummary on the right. Tap a card to open that person’s full SmartView. Cards use the same public profile a",
+      "blurb": "When more than one public FLOQR profile matches, BOT DEE shows compact People SMARTcards in the chat: square photo on the left, name, public handles, city, and a 4-line SMARTsummary on the right. Tap a card to open that person’s full SMARTview. Cards use the same public profile a",
       "href": "./botdee.html",
       "phrases": [
         "people smartcards",
@@ -569,7 +569,7 @@
       "id": "help-botdee-smartcard-search",
       "kind": "help",
       "label": "Ask BOT DEE who someone is",
-      "blurb": "Ask “Who am I?” to open your own SmartView. Ask “Who is …” plus a name or @handle to look up public FLOQR profiles. One match opens SmartView. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether",
+      "blurb": "Ask “Who am I?” to open your own SMARTview. Ask “Who is …” plus a name or @handle to look up public FLOQR profiles. One match opens SMARTview. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether",
       "href": "./botdee.html",
       "phrases": [
         "ask bot dee who someone is",
@@ -589,7 +589,7 @@
       "id": "help-botdee-smartcard-sync",
       "kind": "help",
       "label": "SMARTsummary stays in sync",
-      "blurb": "Edit your SMARTsummary in your default profile language. Save is immediate. Cards and SmartView already showing you update from the same record. Translations to other FLOQR languages run in the background and never overwrite a newer edit. If you hide your public profile, block so",
+      "blurb": "Edit your SMARTsummary in your default profile language. Save is immediate. Cards and SMARTview already showing you update from the same record. Translations to other FLOQR languages run in the background and never overwrite a newer edit. If you hide your public profile, block so",
       "href": "./patron-portal.html?tab=feature-orders&sub=botdee",
       "phrases": [
         "smartsummary stays in sync",

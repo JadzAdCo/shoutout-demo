@@ -237,7 +237,7 @@
     const photoAlt = photo
       ? (name || t("botdee.sc.photoAlt", "Public profile photo"))
       : t("botdee.sc.photoAlt", "Public profile photo");
-    return `<article class="botdee-sv-people botdee-sc-card" data-kind="patron" data-presentation="peopleSmartCard" data-subject-uid="${esc(uid)}" role="button" tabindex="0" aria-label="${esc(t("botdee.sc.openSmartView", "Open SmartView"))}">
+    return `<article class="botdee-sv-people botdee-sc-card" data-kind="patron" data-presentation="peopleSmartCard" data-subject-uid="${esc(uid)}" role="button" tabindex="0" aria-label="${esc(t("botdee.sc.openSMARTview", "Open SMARTview"))}">
       <div class="botdee-sc-row">
         <div class="botdee-sc-thumb" aria-hidden="${photo ? "false" : "true"}">
           ${photo ? `<img src="${esc(photo)}" alt="${esc(photoAlt)}"/>` : `<span class="botdee-sc-thumb-empty" aria-hidden="true"></span>`}

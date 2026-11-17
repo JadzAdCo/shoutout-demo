@@ -791,7 +791,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Security | Signed-in + `assertFeatureAccess(botDee)`. Firestore: owner or (`publicWithinFloqr==1` and not blocked). Functions-write. Blocks via sorted `userBlocks` pair id. |
 | Help | `help-botdee-smartcard`, `help-botdee-smartcard-search`, `help-botdee-smartcard-sync`. |
 | Tests | `functions/botdee-smartcard.test.js`. Manual Feature Test `s3-3-032-people-smartcard-v6`. |
-| Deploy | **Code only** — do not merge/deploy until Don asks. Independent of PR 101 SMARTsummary locale source. |
+| Deploy | Needs Pages + Functions (`executeBotSession`, `searchPeopleSmartCards`, `getPeopleSmartView`, analysis persist/trigger) + Firestore rules from `origin/main`. Combined with SMARTsummary locale source fan-out (PR 101). |
 
 ---
 

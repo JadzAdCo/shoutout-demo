@@ -209,7 +209,7 @@ test("chrome keys botdee.sc.* exist in all 11 languages", () => {
     "botdee.sc.none",
     "botdee.sc.searchFailed",
     "botdee.sc.moreResults",
-    "botdee.sc.openSmartView",
+    "botdee.sc.openSMARTview",
     "botdee.sc.summaryPending"
   ];
   keys.forEach(key => {
