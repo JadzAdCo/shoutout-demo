@@ -9,7 +9,10 @@ const PAGE_SIZE = 4;
 const SCHEMA_VERSION = "floqr.peopleSmartCard/6";
 const SELF_QUERY = /^(me|myself|my profile|my account|my info|my information|about me|who am i|what(?:'s| is| do you) know about (?:me|myself)|tell me about (?:me|myself)|describe (?:me|myself))$/i;
 
-const PERSON_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|find|look up|lookup|search for|tell me about|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|show me)\s+/i;
+const WHO_IS = /^(?:who(?:'s| is| s))\s+/i;
+const DO_YOU_KNOW = /^(?:do you know|did you meet)\s+/i;
+const PROFILE_OF = /^(?:what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|look up|lookup)\s+/i;
+const PERSON_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|lookup|find|search for|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for))\s+/i;
 const PERSON_SUFFIX = /\s+(?:on floqr|on mingl|on here)\s*$/i;
 const STOP_AFTER = /^(working|on (?:duty|tonight)|the (?:dj|club)|playing|singing|available)\b/i;
 const GENERIC_PERSON = /^(this person|that person|them|him|her|someone|anybody|anyone)$/i;
@@ -36,17 +39,37 @@ function extractPersonNeedle(raw) {
   return rest;
 }
 
+function isFindPersonPrompt(raw) {
+  const match = text(raw, 200).match(/^(?:find|search for)\s+(.+)$/i);
+  if (!match) return false;
+  const rest = match[1].replace(/[?!]+$/g, "").trim();
+  if (/^@[\w.-]+$/.test(rest)) return true;
+  return /^[A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*){0,4}$/.test(rest);
+}
+
+function isPeopleLookupPrompt(raw) {
+  const original = text(raw, 200);
+  return WHO_IS.test(original)
+    || DO_YOU_KNOW.test(original)
+    || PROFILE_OF.test(original)
+    || isFindPersonPrompt(original)
+    || PERSON_SUFFIX.test(original);
+}
+
 function classifyPeopleSearchIntent(raw) {
   const n = normalizeQuery(raw);
   if (!n || n.length < 2) return {intent: "none", needle: "", self: false};
   if (SELF_QUERY.test(n) || /^(what do you know about me|tell me about my (?:public )?profile)$/.test(n)) {
     return {intent: "self", needle: "me", self: true};
   }
-  if (PERSON_PREFIX.test(text(raw, 200)) || PERSON_SUFFIX.test(text(raw, 200))) {
-    const needle = extractPersonNeedle(raw);
-    if (!needle) return {intent: "empty", needle: "", self: false};
-    return {intent: "person", needle, self: false};
-  }
+  const original = text(raw, 200);
+  if (!isPeopleLookupPrompt(original)) return {intent: "none", needle: "", self: false};
+  const needle = extractPersonNeedle(raw);
+  if (needle) return {intent: "person", needle, self: false};
+  const rest = normalizeQuery(
+    original.replace(WHO_IS, "").replace(DO_YOU_KNOW, "").replace(PROFILE_OF, "").replace(PERSON_SUFFIX, "")
+  );
+  if (GENERIC_PERSON.test(rest)) return {intent: "empty", needle: "", self: false};
   return {intent: "none", needle: "", self: false};
 }
 

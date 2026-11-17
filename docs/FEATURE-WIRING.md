@@ -777,13 +777,13 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
-## People SMARTcard v6 (s3.3.032)
+## People SMARTcard v6
 
 **Purpose:** Compact People cards in BOT DEE chat for multi-match people search. Same authorized public profile + `usercharacter_analysis` as People SmartView — no second summary store. Deterministic eligibility; Gemini never decides existence. No Gemini on card view. Viewer Site Chrome only.
 
 | Layer | Wiring |
 |---|---|
-| UI | Compact horizontal cards (`botdee-smartview.js` `renderCompactPeopleCard`): square photo left, name / public handles / city + 4-line SMARTsummary right. Tap → `getPeopleSmartView({subjectUid})` full SmartView in the same bubble. Live `onSnapshot` on `usercharacter_analysis/{uid}` then refetch callable (does not remount the host). Pagination via `searchPeopleSmartCards` page. Chat: `bot-dee-chat.js` localizes `peopleSearch.replyKey`. |
+| UI | Compact horizontal cards (`botdee-smartview.js` `renderCompactPeopleCard`): square photo left, name / public handles / city + 4-line SMARTsummary right. Tap → `getPeopleSmartView({subjectUid})` full SmartView in the same bubble. Live `onSnapshot` on `usercharacter_analysis/{uid}` then refetch callable (does not remount the host). Listen errors do not remove a card the search already authorized; full SmartView articles carry `data-subject-uid`; live patches never insert a new uid. Also listen to `userBlocks/{sortedPair}` so a block hides an open card. Pagination via `searchPeopleSmartCards` page. Chat: `bot-dee-chat.js` localizes `peopleSearch.replyKey`. |
 | Client | `botdee-smartview.js` + `.botdee-sc-*` in `botdee-smartview.css` (tokens `--accent` `--text` `--muted`; never hardcoded Black Tiffany). Chrome keys `botdee.sc.*`. Feature key `botDee`. |
 | Backend | `functions/botdee-smartcard-core.js` + `functions/botdee-smartcard-functions.js`. `executeBotSession` `attachPeopleSearch` before Gemini. Callable `searchPeopleSmartCards`. Intent: self / person / empty (generic “this person”) / none. One match = full SmartView; many = compact cards; none/private/blocked = generic no-result (no name leak). `getPeopleSmartView` private non-owner returns empty `views` (`hidden: true`). `persistAnalysis` / owner save stamp `publicWithinFloqr` + `summary_source`. |
 | Data | Same `usercharacter_analysis/{uid}`. Discoverability stamp `publicWithinFloqr` 0\|1. Provenance `summary_source` `patron_edit`\|`gemini`. Diagnostics `people_smartcard_search` (latency, eligible count / mode; **no query text**). |

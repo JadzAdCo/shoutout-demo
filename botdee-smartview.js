@@ -282,7 +282,8 @@
     const minglHref = resolveSameOriginHref(people.minglHref || "./?start=search");
     const summaryText = people.summary?.text || "";
     const localeNote = statusLabel(people.summary);
-    return `<article class="botdee-sv-people" data-kind="patron" data-primary="${esc(primary)}" data-secondary="${esc(secondary)}">
+    const uid = people.subjectUid || "";
+    return `<article class="botdee-sv-people" data-kind="patron" data-primary="${esc(primary)}" data-secondary="${esc(secondary)}" data-subject-uid="${esc(uid)}">
       <div class="botdee-sv-people-head">
         <strong>${esc(t("botdee.sv.person", "SMARTview — Person"))}</strong>
         ${people.verified ? `<span class="botdee-sv-verified">${esc(t("botdee.sv.verified", "Verified on FLOQR"))}</span>` : ""}
@@ -680,6 +681,7 @@
   const liveByHost = new WeakMap();
 
   function stopLive(el) {
+    el.__floqrLiveToken = (Number(el.__floqrLiveToken) || 0) + 1;
     const rows = liveByHost.get(el) || [];
     rows.forEach(fn => {
       try { fn(); } catch (_) { /* ignore */ }
@@ -716,8 +718,8 @@
       if (gone) gone.remove();
       return;
     }
-    if (idx >= 0) current[idx] = nextPayload;
-    else current.push(nextPayload);
+    if (idx < 0) return;
+    current[idx] = nextPayload;
     el.__floqrSmartViews = current;
     const html = renderCard(nextPayload);
     const wrap = el.ownerDocument.createElement("div");
@@ -726,7 +728,6 @@
     if (!nextCard) return;
     const existing = el.querySelector(`[data-subject-uid="${cssAttr(uid)}"]`);
     if (existing) existing.replaceWith(nextCard);
-    else el.insertAdjacentElement("afterbegin", nextCard);
     wireActionLinks(el);
     if (isCompactCard(nextPayload)) bindCompactCard(nextCard, nextPayload, el);
     else bindPeopleCard(nextCard, nextPayload);
@@ -746,21 +747,54 @@
     }).catch(() => null);
   }
 
+  function pairBlockDocId(a, b) {
+    return [String(a || ""), String(b || "")].filter(Boolean).sort().join("_");
+  }
+
+  function currentViewerUid() {
+    try {
+      return global.firebase?.auth?.()?.currentUser?.uid || "";
+    } catch (_) {
+      return "";
+    }
+  }
+
   function listenSubject(el, uid) {
     const db = global.firebase?.firestore?.();
-    if (!db || !uid) return () => {};
-    return db.collection("usercharacter_analysis").doc(uid).onSnapshot(() => {
+    if (!db || !uid || /^mock[-_]/i.test(uid)) return () => {};
+    const token = el.__floqrLiveToken;
+    const applyRefetch = () => {
       refetchSubject(uid).then(view => {
-        if (!el.isConnected) return;
+        if (!el.isConnected || el.__floqrLiveToken !== token) return;
         const current = Array.isArray(el.__floqrSmartViews) ? el.__floqrSmartViews : [];
         const idx = current.findIndex(row => subjectUidOf(row) === uid);
-        const keepCompact = idx >= 0 && isCompactCard(current[idx]);
-        patchHostView(el, uid, view ? (keepCompact ? asClientCompact(view) : view) : null);
+        if (idx < 0) return;
+        if (!view) {
+          patchHostView(el, uid, null);
+          return;
+        }
+        const keepCompact = isCompactCard(current[idx]);
+        patchHostView(el, uid, keepCompact ? asClientCompact(view) : view);
       });
+    };
+    const unsubs = [];
+    unsubs.push(db.collection("usercharacter_analysis").doc(uid).onSnapshot(() => {
+      applyRefetch();
     }, () => {
-      if (!el.isConnected) return;
-      patchHostView(el, uid, null);
-    });
+      /* permission-denied / unstamped / unpublished: keep the search-authorized card */
+    }));
+    const viewerUid = currentViewerUid();
+    if (viewerUid && viewerUid !== uid) {
+      unsubs.push(db.collection("userBlocks").doc(pairBlockDocId(viewerUid, uid)).onSnapshot(snap => {
+        if (!el.isConnected || el.__floqrLiveToken !== token) return;
+        if (snap.exists && snap.data()?.active !== false) patchHostView(el, uid, null);
+      }, () => {}));
+    }
+    return () => {
+      unsubs.forEach(fn => {
+        try { fn(); } catch (_) { /* ignore */ }
+      });
+    };
   }
 
   function asClientCompact(view) {

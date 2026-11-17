@@ -255,7 +255,8 @@
         {label:"Patron SMARTview not mocks", file:"patron-portal.html", includes:["botdee.sv.viewMine", "botdee-sv-bubble"], notIncludes:["Show mock SmartViews"]},
         {label:"loadMySmartView", file:"botdee-upgrade-ui.js", includes:["function loadMySmartView(", "getPeopleSmartView"], notIncludes:["loadDemos(\"botDeeSmartViewDemo\")"]},
         {label:"Master mock tab", file:"master-admin.html", includes:["botDeeMasterLoadSmartViews", "botdee.libraryRefresh"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-030-profile-select-text", "s3-3-030-patron-smartview"]}
+        {label:"People SMARTcard compact", file:"botdee-smartview.js", includes:["renderCompactPeopleCard", "peopleSmartCard", "userBlocks", "__floqrLiveToken"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-030-profile-select-text", "s3-3-030-patron-smartview", "s3-3-032-people-smartcard-v6"]}
       ]
     },
     {

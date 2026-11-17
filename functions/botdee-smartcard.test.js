@@ -41,9 +41,13 @@ test("v6 people-search intent: Who am I / Who is / generic person / unrelated", 
   assert.equal(person.intent, "person");
   assert.match(person.needle, /Amara/i);
   assert.equal(cards.classifyPeopleSearchIntent("Do you know this person?").intent, "empty");
+  assert.equal(cards.classifyPeopleSearchIntent("Who is this person?").intent, "empty");
   assert.equal(cards.classifyPeopleSearchIntent("Find Amara J.").intent, "person");
-  assert.equal(cards.classifyPeopleSearchIntent("Who is working tonight?").intent, "empty");
+  assert.equal(cards.classifyPeopleSearchIntent("Who is working tonight?").intent, "none");
   assert.equal(cards.classifyPeopleSearchIntent("book a table").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("show me tables").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("tell me about VIP").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("search for events tonight").intent, "none");
 });
 
 test("routing: self / one / many compact / none / error; no existence leak", () => {
@@ -172,6 +176,10 @@ test("client compact cards inherit Site Chrome tokens; no hardcoded Tiffany; no 
   assert.match(client, /peopleSmartCard/);
   assert.match(client, /usercharacter_analysis/);
   assert.match(client, /getPeopleSmartView/);
+  assert.match(client, /data-subject-uid="\$\{esc\(uid\)\}"/);
+  assert.match(client, /userBlocks/);
+  assert.match(client, /__floqrLiveToken/);
+  assert.match(client, /permission-denied \/ unstamped \/ unpublished: keep the search-authorized card/);
   const css = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.css"), "utf8");
   assert.match(css, /\.botdee-sc-card/);
   assert.match(css, /var\(--accent/);
