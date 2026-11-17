@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.031 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.032 (stable)
 
+- s3.3.032: SMARTcard / SMARTview hero uses public Profile Media slots
 - s3.3.031: SMARTsummary source locale is patron UI language; fan-out includes English
 - s3.3.031: SMARTview spelling + public-page Profile Media on People cards
 - s3.3.030: Edit Profile iOS select text unclip + Account type help; My BOT DEE View my SMARTview (real patron card, mocks stay on Master Admin)

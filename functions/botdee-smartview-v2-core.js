@@ -231,6 +231,20 @@ function publicPageMedia(profile = {}) {
   };
 }
 
+/** Copy public-page media onto volunteered so SMARTview and SMARTcard share one path. */
+function applyPublicPageMedia(volunteered = {}, data = {}) {
+  const next = volunteered && typeof volunteered === "object" ? volunteered : {};
+  const media = publicPageMedia(data);
+  next.photoURL = data.photoURL;
+  next.publicPhotoUrl = data.publicPhotoUrl;
+  next.profilePhotoUrl = data.profilePhotoUrl;
+  next.avatarUrl = data.avatarUrl;
+  next.mainPhotoUrl = data.mainPhotoUrl;
+  next.profileMediaSlots = data.profileMediaSlots;
+  next.photoUrl = media.photoUrl;
+  return next;
+}
+
 function defaultSubtab(primary) {
   if (primary === "Social") return DEFAULT_SOCIAL;
   if (primary === "Dating") return DATING_SUBTABS[0];
@@ -924,6 +938,7 @@ module.exports = {
   sanitizeHref,
   isVideoSlot,
   publicPageMedia,
+  applyPublicPageMedia,
   defaultSubtab,
   selectTabs,
   emptyCategories,

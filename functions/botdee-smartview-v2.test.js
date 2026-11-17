@@ -514,7 +514,7 @@ test("no Gemini on view: peopleV2 payload uses stored analysis only", () => {
   const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
   assert.match(src, /getPeopleSmartView/);
   assert.doesNotMatch(src, /generateContent[\s\S]{0,80}getPeopleSmartView/);
-  assert.match(src, /volunteered\.profileMediaSlots = data\.profileMediaSlots/);
+  assert.match(src, /applyPublicPageMedia/);
   assert.match(src, /hidden: true, geminiOnView: false/);
   const fn = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-core.js"), "utf8");
   assert.match(fn, /No Gemini on view/);
@@ -642,6 +642,14 @@ test("public-page Profile Media is the SMARTview hero, gallery, and videos", () 
   assert.equal(payload.photo.kind, "image");
   assert.equal(payload.media.photos.length, 2);
   assert.equal(payload.media.videos[0].url, clip);
+  const volunteered = v2.applyPublicPageMedia({}, {
+    photoURL: "",
+    profileMediaSlots: [{type: "image", url: hero}]
+  });
+  assert.equal(volunteered.photoUrl, hero);
+  assert.equal(volunteered.profileMediaSlots[0].url, hero);
+  const fnSrc = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
+  assert.match(fnSrc, /applyPublicPageMedia/);
   const emptySlots = v2.publicPageMedia({displayName: "Don Papi", photoURL: google, profileMediaSlots: []});
   assert.equal(emptySlots.photoUrl, google);
   const extrasIgnored = v2.publicPageMedia({

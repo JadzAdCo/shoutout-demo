@@ -225,22 +225,43 @@
     return peopleOf(payload)?.subjectUid || "";
   }
 
+  function peopleHeroMedia(people) {
+    const photosList = Array.isArray(people?.media?.photos) ? people.media.photos : [];
+    const videosList = Array.isArray(people?.media?.videos) ? people.media.videos : [];
+    const fromPhoto = people?.photo?.kind !== "video" && people?.photo?.url
+      ? people.photo.url
+      : (photosList[0]?.url || "");
+    const fromVideo = people?.photo?.kind === "video" && people?.photo?.url
+      ? people.photo.url
+      : (!fromPhoto && videosList[0]?.url ? videosList[0].url : "");
+    const photo = fromPhoto ? resolveImageSrc(fromPhoto) : "";
+    const video = fromVideo ? resolveImageSrc(fromVideo) : "";
+    const count = photosList.length + videosList.length
+      || (people?.photo && people.photo.count)
+      || (photo || video ? 1 : 0);
+    return {photosList, videosList, photo, video, count};
+  }
+
   function renderCompactPeopleCard(payload) {
     const people = peopleOf(payload);
     if (!people) return "";
-    const photo = people.photo && people.photo.url ? resolveImageSrc(people.photo.url) : "";
+    const hero = peopleHeroMedia(people);
     const handles = Array.isArray(people.handles) ? people.handles : [];
     const summaryText = people.summary?.excerpt || people.summary?.text || "";
     const localeNote = statusLabel(people.summary);
     const name = people.displayName || payload.title || "";
     const uid = people.subjectUid || "";
-    const photoAlt = photo
-      ? (name || t("botdee.sc.photoAlt", "Public profile photo"))
-      : t("botdee.sc.photoAlt", "Public profile photo");
+    const hasMedia = !!(hero.photo || hero.video);
+    const photoAlt = name || t("botdee.sc.photoAlt", "Public profile photo");
+    const thumb = hero.photo
+      ? `<img src="${esc(hero.photo)}" alt="${esc(photoAlt)}"/>`
+      : (hero.video
+        ? `<video src="${esc(hero.video)}" muted playsinline preload="metadata" aria-hidden="true"></video>`
+        : `<span class="botdee-sc-thumb-empty" aria-hidden="true"></span>`);
     return `<article class="botdee-sv-people botdee-sc-card" data-kind="patron" data-presentation="peopleSmartCard" data-subject-uid="${esc(uid)}" role="button" tabindex="0" aria-label="${esc(t("botdee.sc.openSMARTview", "Open SMARTview"))}">
       <div class="botdee-sc-row">
-        <div class="botdee-sc-thumb" aria-hidden="${photo ? "false" : "true"}">
-          ${photo ? `<img src="${esc(photo)}" alt="${esc(photoAlt)}"/>` : `<span class="botdee-sc-thumb-empty" aria-hidden="true"></span>`}
+        <div class="botdee-sc-thumb" aria-hidden="${hasMedia ? "false" : "true"}">
+          ${thumb}
         </div>
         <div class="botdee-sc-body">
           <div class="botdee-sc-name">${esc(name)}${people.verified ? " <span class=\"botdee-sv-tick\" aria-hidden=\"true\">◆</span>" : ""}</div>
@@ -265,18 +286,10 @@
     const primary = people.defaultPrimary || "Social";
     const secondary = people.defaultSecondary || "Music";
     const tags = tagsForPeople(people, primary, secondary);
-    const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [];
-    const videosList = Array.isArray(people.media?.videos) ? people.media.videos : [];
-    const heroKind = people.photo?.kind === "video" ? "video" : "image";
-    const heroUrl = (people.photo && people.photo.url)
-      || (heroKind === "video" ? videosList[0]?.url : photosList[0]?.url)
-      || "";
-    const photo = heroKind !== "video" && heroUrl ? resolveImageSrc(heroUrl) : "";
-    const videoHero = (heroKind === "video" && heroUrl ? resolveImageSrc(heroUrl) : "")
-      || (!photo && videosList[0]?.url ? resolveImageSrc(videosList[0].url) : "");
-    const count = photosList.length + videosList.length
-      || (people.photo && people.photo.count)
-      || (photo || videoHero ? 1 : 0);
+    const hero = peopleHeroMedia(people);
+    const photo = hero.photo;
+    const videoHero = hero.video;
+    const count = hero.count;
     const handles = Array.isArray(people.handles) ? people.handles : [];
     const profileHref = resolveSameOriginHref(people.profileHref || "./patron-portal.html?tab=profile");
     const minglHref = resolveSameOriginHref(people.minglHref || "./?start=search");
@@ -907,6 +920,7 @@
     renderCard,
     renderPeopleCard,
     renderCompactPeopleCard,
+    peopleHeroMedia,
     isCompactCard,
     mount,
     resolveSameOriginHref,

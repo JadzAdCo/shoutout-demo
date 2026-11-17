@@ -272,7 +272,7 @@ exports.getPeopleSmartView = onCall(CALL_OPTS, async request => {
     if (!viewerMaySee) {
       return {ok: true, views: [], hidden: true, geminiOnView: false};
     }
-    const volunteered = tools.volunteeredPublicDatapoints(data);
+    const volunteered = v2.applyPublicPageMedia(tools.volunteeredPublicDatapoints(data), data);
     volunteered.uid = subjectUid;
     volunteered.viewerUid = viewerUid;
     let viewerData = data;
@@ -286,16 +286,6 @@ exports.getPeopleSmartView = onCall(CALL_OPTS, async request => {
     volunteered.handle = String(data.floqrHandle || data.username || "").replace(/^@+/, "");
     volunteered.instagram = data.instagramHandle || data.instagram;
     volunteered.xHandle = data.xHandle || data.twitter;
-    volunteered.photoURL = data.photoURL;
-    volunteered.publicPhotoUrl = data.publicPhotoUrl;
-    volunteered.profilePhotoUrl = data.profilePhotoUrl;
-    volunteered.avatarUrl = data.avatarUrl;
-    volunteered.mainPhotoUrl = data.mainPhotoUrl;
-    volunteered.profileMediaSlots = data.profileMediaSlots;
-    volunteered.publicPhotos = data.publicPhotos;
-    volunteered.galleryUrls = data.galleryUrls;
-    volunteered.publicGallery = data.publicGallery;
-    volunteered.photoUrl = v2.publicPageMedia(data).photoUrl;
     volunteered.verified = data.identityVerified === 1 || data.floqrVerified === 1;
     volunteered.sourceLocale = v2.normalizeLocale(data.uiLanguage || data.preferredLanguage || "en");
     volunteered.bio = data.publicBio || data.bio || volunteered.bio;
