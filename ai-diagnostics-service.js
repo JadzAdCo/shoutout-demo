@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.029";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.029";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.028";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.028";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -3263,9 +3263,9 @@
       area:"BOT DEE",
       feature:"My BOT DEE demeanor radios on phone + PC",
       changed:"s3.3.029 — Socially Cool / Professional / Balanced are 44px rows with 22px radios. Labels stay horizontal (not one letter per line). Phone stacks; PC wraps as chips.",
-      howToTest:"1) Hard-refresh patron-portal.html?v=s3.3.029 (admin.css s3.3.029). Sign in. 2) Feature & Orders → My BOT DEE. 3) On phone (~390): three labeled radios, each on its own row, text left-to-right. 4) On PC (~1280): same three options, not giant circles, not vertical letters. 5) First-use overlay on botdee.html uses the same rows. 6) Mark Succeed/Failed.",
+      howToTest:"1) Hard-refresh patron-portal.html after Pages publish (admin.css must include botdee-pref-demeanor-option). Sign in. 2) Feature & Orders → My BOT DEE. 3) On phone (~390): three labeled radios, each on its own row, text left-to-right. 4) On PC (~1280): same three options, not giant circles, not vertical letters. 5) First-use overlay on botdee.html uses the same rows. 6) Mark Succeed/Failed.",
       expected:"Name field, then three readable demeanor choices, then recap checkbox. No letter-column Socially Cool on the right edge.",
-      troubleshoot:"Still vertical letters → cached admin.css; hard-refresh patron-portal.html?v=s3.3.029. Overlay still broken → cached bot-dee-chat.css on botdee.html. Radios huge → iOS cache; confirm .botdee-pref-demeanor-option is on the labels."
+      troubleshoot:"Still vertical letters → cached admin.css; hard-refresh Profile & Settings. Overlay still broken → cached bot-dee-chat.css on botdee.html. Radios huge → iOS cache; confirm .botdee-pref-demeanor-option is on the labels."
     },
     {
       id:"s3-3-028-people-smartview-v2",
