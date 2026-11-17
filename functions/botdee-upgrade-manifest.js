@@ -104,6 +104,7 @@ const CAPABILITIES = Object.freeze({
   userMemories: {state: "implemented", default: 0, deployed: false},
   executionCheckpoints: {state: "implemented", deployed: false},
   smartViews: {state: "implemented_mock", deployed: false},
+  peopleSmartViewV2: {state: "implemented", deployed: false, note: "Inline People SmartView + owner edit + translation queue; Functions deploy pending owner approval"},
   publicWebResearch: {state: "disabled_legal_gate", deployed: false},
   partnerActions: {state: "mock_only", deployed: false},
   langchain: {state: "forbidden", deployed: false},

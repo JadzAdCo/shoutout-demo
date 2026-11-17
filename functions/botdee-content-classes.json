@@ -99,6 +99,54 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-smartview-categories": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-smartview-chrome": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-smartview-edit": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-smartview-media": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-smartview-privacy": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-smartview-review": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-smartview-translation": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-smartview-troubleshoot": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-template-search": [
       "patron"
     ],

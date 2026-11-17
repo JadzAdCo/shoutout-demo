@@ -6,6 +6,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const v2 = require("./botdee-smartview-v2-core");
 
 const SCHEMA_VERSION = "floqr.smartView/1";
 const KINDS = Object.freeze([
@@ -156,17 +157,47 @@ function cuisinePipelineMeta() {
   };
 }
 
+function attachPeopleV2(publicFields, {displayName, volunteered, profileHref, viewerMaySee}) {
+  if (viewerMaySee === false || !publicFields || !Object.keys(publicFields).length) return publicFields;
+  const snap = v2.publicFieldsSnapshot({
+    displayName,
+    floqrHandle: volunteered?.handle,
+    instagramHandle: volunteered?.instagram || volunteered?.instagramHandle,
+    xHandle: volunteered?.xHandle,
+    photoURL: volunteered?.photoUrl,
+    preferredLanguage: volunteered?.sourceLocale,
+    identityVerified: volunteered?.verified ? 1 : 0,
+    floqrVerified: volunteered?.verified ? 1 : 0
+  }, volunteered);
+  if (Array.isArray(publicFields.cuisines) && publicFields.cuisines.length) {
+    snap.cuisines = publicFields.cuisines.slice();
+  }
+  const analysis = volunteered?.analysis || v2.emptyAnalysis(volunteered?.uid || "patron", snap);
+  const peopleV2 = v2.peopleV2Payload({
+    subjectUid: volunteered?.uid || "",
+    snap,
+    analysis,
+    viewerUid: volunteered?.viewerUid,
+    viewerLocale: volunteered?.viewerLocale || "en",
+    viewerMaySee: true,
+    profileHref,
+    minglHref: volunteered?.minglHref || "./?start=search"
+  });
+  if (!peopleV2) return publicFields;
+  return {...publicFields, peopleV2};
+}
+
 function patronSmartView({displayName, volunteered, profileHref, viewerMaySee}) {
   const food = viewerMaySee === false ? [] : (volunteered?.datapoints?.food || []);
   const cuisines = classifyCuisineLabels(food);
-  const publicFields = viewerMaySee === false ? {} : {
+  const publicFields = viewerMaySee === false ? {} : attachPeopleV2({
     displayName: String(displayName || "").slice(0, 120),
     handle: volunteered?.handle || "",
     bio: volunteered?.datapoints ? String(volunteered.bio || volunteered.datapoints.bio || "").slice(0, 400) : "",
     sharedDatapoints: Array.isArray(volunteered?.sharedDatapoints) ? volunteered.sharedDatapoints : [],
     datapoints: volunteered?.datapoints && typeof volunteered.datapoints === "object" ? volunteered.datapoints : {},
     cuisines
-  };
+  }, {displayName, volunteered, profileHref, viewerMaySee});
   return basePayload({
     kind: "patron",
     title: publicFields.displayName || "FLOQR patron",
@@ -314,12 +345,30 @@ function mockCatalog() {
       floqrPublicData: {legs: ["IAD → DCA mock"], advisories: []}
     }),
     patronSmartView({
-      displayName: "Mock patron",
+      displayName: v2.amaraMockSnapshot().displayName,
       volunteered: {
-        handle: "@mock",
-        sharedDatapoints: ["food", "music"],
-        datapoints: {food: ["Nigerian jollof", "sushi"], music: ["Afrobeats"]},
-        bio: "Public-within-FLOQR bio"
+        uid: "mock-amara",
+        handle: "amaraj",
+        instagram: "amaraj",
+        xHandle: "amarajdc",
+        photoUrl: "./images/smartview/amara-mock.png",
+        verified: true,
+        sourceLocale: "en",
+        sharedDatapoints: ["food", "music", "events", "travel", "hobbies", "location", "media"],
+        datapoints: {
+          food: ["Nigerian jollof", "sushi", "Mediterranean"],
+          music: v2.amaraMockSnapshot().music,
+          events: v2.amaraMockSnapshot().events,
+          nightlifeStyle: "Rooftop lounges",
+          travel: v2.amaraMockSnapshot().pastTravel,
+          futureTravel: v2.amaraMockSnapshot().futureTravel,
+          hobbies: v2.amaraMockSnapshot().hobbies,
+          location: {city: "Washington, DC"},
+          photoCount: 1
+        },
+        bio: "Public-within-FLOQR bio",
+        analysis: v2.amaraMockAnalysis(),
+        minglHref: "./?start=search&q=%40amaraj"
       },
       profileHref: "./patron-portal.html?tab=profile",
       viewerMaySee: true
@@ -364,6 +413,7 @@ module.exports = {
   classifyCuisineLabels,
   cuisinePipelineMeta,
   patronSmartView,
+  attachPeopleV2,
   mockCatalog,
   explainRecommendation,
   researchLibraryItem

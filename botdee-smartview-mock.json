@@ -1,6 +1,6 @@
 {
   "schemaVersion": "floqr.smartViewMock/export",
-  "updatedAt": "2026-11-15",
+  "updatedAt": "2026-11-17",
   "views": [
     {
       "schemaVersion": "floqr.smartView/1",
@@ -333,7 +333,7 @@
     {
       "schemaVersion": "floqr.smartView/1",
       "kind": "patron",
-      "title": "Mock patron",
+      "title": "Amara J.",
       "visibility": "restricted",
       "canonicalFloqrPageId": null,
       "summary": "FLOQR public-within-app profile fields only. Not indexed for the open web.",
@@ -354,26 +354,162 @@
         "label": "Public Web Research"
       },
       "floqrPublicData": {
-        "displayName": "Mock patron",
-        "handle": "@mock",
+        "displayName": "Amara J.",
+        "handle": "amaraj",
         "bio": "Public-within-FLOQR bio",
         "sharedDatapoints": [
           "food",
-          "music"
+          "music",
+          "events",
+          "travel",
+          "hobbies",
+          "location",
+          "media"
         ],
         "datapoints": {
           "food": [
             "Nigerian jollof",
-            "sushi"
+            "sushi",
+            "Mediterranean"
           ],
           "music": [
-            "Afrobeats"
-          ]
+            "Afrobeats",
+            "Amapiano",
+            "Tech House",
+            "EDM",
+            "Hip-Hop",
+            "R&B"
+          ],
+          "events": [
+            "Concerts",
+            "Game nights",
+            "Festivals"
+          ],
+          "nightlifeStyle": "Rooftop lounges",
+          "travel": [
+            "Miami",
+            "Paris",
+            "Dubai"
+          ],
+          "futureTravel": [
+            "Mykonos"
+          ],
+          "hobbies": [
+            "NBA",
+            "Formula 1",
+            "Soccer",
+            "fashion"
+          ],
+          "location": {
+            "city": "Washington, DC"
+          },
+          "photoCount": 1
         },
         "cuisines": [
           "Nigerian",
           "Japanese"
-        ]
+        ],
+        "peopleV2": {
+          "presentation": "peopleV2",
+          "subjectUid": "mock-amara",
+          "displayName": "Amara J.",
+          "handle": "@amaraj",
+          "verified": true,
+          "city": "Washington, DC",
+          "handles": [
+            {
+              "network": "instagram",
+              "handle": "@amaraj",
+              "href": "https://instagram.com/amaraj"
+            },
+            {
+              "network": "x",
+              "handle": "@amarajdc",
+              "href": "https://x.com/amarajdc"
+            }
+          ],
+          "photo": {
+            "url": "./images/smartview/amara-mock.png",
+            "count": 1
+          },
+          "media": {
+            "photos": [
+              {
+                "url": "./images/smartview/amara-mock.png",
+                "alt": "Amara J."
+              }
+            ],
+            "videos": []
+          },
+          "summary": {
+            "text": "Amara is a creative nightlife and travel enthusiast who enjoys Afrobeats, Amapiano, Tech House, rooftop lounges, live EDM DJs, NBA basketball, Formula 1, fashion, and discovering new restaurants. She's also an active event-goer and frequent traveler, with past trips to Miami, Paris, and Dubai, and an upcoming trip to Mykonos.",
+            "locale": "en",
+            "status": "source",
+            "sourceLocale": "en",
+            "revision": 1,
+            "pending": false,
+            "failed": false,
+            "pendingLocale": null,
+            "ownerAuthored": false
+          },
+          "ownerMayEdit": false,
+          "conflictFlag": false,
+          "categories": {
+            "Social": {
+              "Music": [
+                "Afrobeats",
+                "Amapiano",
+                "Tech House",
+                "EDM",
+                "Hip-Hop",
+                "R&B"
+              ],
+              "Nightlife": [
+                "Rooftop lounges",
+                "VIP clubs",
+                "Beach clubs"
+              ],
+              "Sports": [
+                "NBA",
+                "Formula 1",
+                "Soccer"
+              ],
+              "Events": [
+                "Concerts",
+                "Game nights",
+                "Festivals"
+              ]
+            },
+            "Dating": {
+              "Preferences": [],
+              "Discovery": []
+            },
+            "Dining": {
+              "Cuisines": [
+                "African",
+                "Japanese",
+                "Mediterranean"
+              ],
+              "Experiences": []
+            },
+            "Future Travels": {
+              "Upcoming": [
+                "Mykonos"
+              ],
+              "Past": [
+                "Miami",
+                "Paris",
+                "Dubai"
+              ],
+              "Interests": []
+            }
+          },
+          "datingVisible": false,
+          "profileHref": "./patron-portal.html?tab=profile",
+          "minglHref": "./?start=search&q=%40amaraj",
+          "defaultPrimary": "Social",
+          "defaultSecondary": "Music"
+        }
       },
       "recommendationExplanation": {
         "personalized": false,

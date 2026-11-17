@@ -74,7 +74,9 @@ test("BOT DEE page is a guarded satellite with chat only (no Quick intent search
   assert.deepEqual([...order].sort((a, b) => a - b), order, "script order");
   assert.doesNotMatch(html, /botDeeScopeNote|help-popout/);
   assert.doesNotMatch(html, /id="botDeeSettingsBubble"|botDeeMemoryPopout|botDeeMemoryPanel|botdee-upgrade-ui/);
-  assert.doesNotMatch(html, /botdee-smartview|botDeeLibraryPanel/);
+  assert.match(html, /botdee-smartview\.js/);
+  assert.match(html, /botdee-smartview\.css/);
+  assert.doesNotMatch(html, /botDeeLibraryPanel|botDeeSmartViewDemo|botdee-upgrade-ui/);
   assert.match(read("patron-portal.html"), /id="foBotDeePane"/);
   assert.match(read("patron-portal.html"), /data-i18n="nav\.myBotDee"/);
   assert.match(read("patron-portal.html"), /botdee-upgrade-ui\.js/);

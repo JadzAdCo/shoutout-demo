@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.027 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.028 (stable)
 
+- s3.3.028: People SmartView v2 (inline patron card, owner edit, translation queue, Site Chrome)
 - s3.3.027: BOT DEE recall after 300s pause — retrieve stored events, recap last two turns, discussed vs booked
 - s3.3.026: BOT DEE first-use overlay + My BOT DEE prefs; sessions reset as new users; no Settings bar
 - s3.3.025: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help

@@ -162,7 +162,8 @@ service cloud.firestore {
  "stripeConnectStatus",
  "stripeConnectCapabilityStatus",
  "stripeConnectLivemode",
- "stripeConnectUpdatedAt"
+ "stripeConnectUpdatedAt",
+ "usercharacter_analysis"
  ]);
  }
 
@@ -179,7 +180,8 @@ service cloud.firestore {
  "stripeConnectStatus",
  "stripeConnectCapabilityStatus",
  "stripeConnectLivemode",
- "stripeConnectUpdatedAt"
+ "stripeConnectUpdatedAt",
+ "usercharacter_analysis"
  ]);
  }
 
@@ -815,6 +817,20 @@ service cloud.firestore {
 
  match /botDeeCapabilityManifest/{docId} {
  allow read: if signedIn();
+ allow write: if false;
+ }
+
+ // People SmartView v2 — Functions-write. Owner may read own analysis (translations + source).
+ match /usercharacter_analysis/{uid} {
+ allow read: if signedIn() && request.auth.uid == uid;
+ allow write: if false;
+ }
+ match /smartViewTranslationJobs/{jobId} {
+ allow read: if signedIn() && resource.data.uid == request.auth.uid;
+ allow write: if false;
+ }
+ match /botDeeSmartViewDiagnostics/{id} {
+ allow read: if isMasterAdmin();
  allow write: if false;
  }
 

@@ -1003,7 +1003,7 @@
       ],
       searchPhrases: [
         "ask floqr", "bot dee help", "help popout", "what can bot dee", "floqai help", "what can floqai",
-        "saved chat", "bot dee memory", "smartview", "research library", "explain my recommendation", "privacy assistant", "settings bubble", "memory settings"
+        "saved chat", "bot dee memory", "smartview", "people smartview", "smart summary", "research library", "explain my recommendation", "privacy assistant", "settings bubble", "memory settings"
       ],
       patterns: [
         /help\s*me/, /how\s+do\s+i/, /i\s+want\s+to\s+be\s+able/,
