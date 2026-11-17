@@ -52,7 +52,7 @@ test("payload is honest: not Operational, no fake rendering numbers, no privileg
 test("What's New ships inside Functions (no repo-root README required)", () => {
   const bundled = vs.changelogFromBundle();
   assert.ok(bundled.length >= 1);
-  assert.equal(bundled[0].id, "s3.3.032");
+  assert.equal(bundled[0].id, "s3.3.033");
   const missingRoot = vs.buildVersionSmartView({
     role: "patron",
     rootDir: path.join(__dirname, "no-such-readme-dir")

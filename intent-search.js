@@ -195,6 +195,23 @@
       ]
     },
     {
+      id: "help-botdee-room-smartview",
+      kind: "help",
+      label: "Room SMARTview",
+      blurb: "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm before anything is created. Private chat stays private. Group rooms are not live yet.",
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
+      searchPhrases: [
+        "room smartview", "start a group chat", "open room smartview", "create a room",
+        "invite others to this chat", "share this conversation"
+      ],
+      patterns: [
+        /room\s*smart\s*view/,
+        /start\s+a\s+group\s+chat/,
+        /open\s+room\s+smartview/,
+        /share\s+this\s+conversation/
+      ]
+    },
+    {
       id: "help-post-ad",
       kind: "help",
       label: "Post an ad on FLOQR",
@@ -1052,6 +1069,9 @@
     "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], "black-card": ["patron"], "ballers-alert": ["patron"], floqcast: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
     "help-botdee-version-smartview": ["patron"], "help-botdee-version-smartview-status": ["patron"], "help-botdee-version-smartview-tabs": ["patron"],
+    "help-botdee-room-smartview": ["patron"], "help-botdee-room-smartview-invite": ["patron"], "help-botdee-room-smartview-join": ["patron"],
+    "help-botdee-room-smartview-end": ["patron"], "help-botdee-room-smartview-tab": ["patron"], "help-botdee-room-smartview-who-pays": ["patron"],
+    "help-botdee-room-smartview-kick": ["patron"], "help-botdee-room-smartview-share": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-profile-account-type": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],
     "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],

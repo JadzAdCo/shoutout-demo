@@ -93,6 +93,54 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-room-smartview": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-room-smartview-end": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-room-smartview-invite": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-room-smartview-join": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-room-smartview-kick": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-room-smartview-share": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-room-smartview-tab": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-room-smartview-who-pays": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-smartcard": [
       "masterAdmin",
       "patron",
@@ -560,6 +608,9 @@
       "patron"
     ],
     "help-app-language": [
+      "patron"
+    ],
+    "help-botdee-room-smartview": [
       "patron"
     ],
     "help-botdee-version-smartview": [

@@ -105,6 +105,7 @@ const CAPABILITIES = Object.freeze({
   executionCheckpoints: {state: "implemented", deployed: false},
   smartViews: {state: "implemented_mock", deployed: false},
   peopleSmartViewV2: {state: "implemented", deployed: false, note: "Inline People SmartView + owner edit + translation queue; Functions deploy pending owner approval"},
+  roomSmartView: {state: "intent_routing", deployed: false, note: "Room SMARTview intent card in BOT DEE; group rooms / invites / shared tab not live"},
   publicWebResearch: {state: "disabled_legal_gate", deployed: false},
   partnerActions: {state: "mock_only", deployed: false},
   langchain: {state: "forbidden", deployed: false},

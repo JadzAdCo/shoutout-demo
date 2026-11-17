@@ -1103,6 +1103,20 @@ module.exports = {
       return false;
     }
   },
+  isRoomSmartViewPrompt: (raw, opts) => {
+    try {
+      return require("./botdee-room-smartview").isRoomSmartViewPrompt(raw, opts);
+    } catch (_) {
+      return false;
+    }
+  },
+  classifyRoomIntent: (raw, opts) => {
+    try {
+      return require("./botdee-room-smartview").classifyRoomIntent(raw, opts);
+    } catch (_) {
+      return {handled: false, route: "none", level: "none"};
+    }
+  },
   isHelpPrompt,
   isPrivacyPrompt,
   isAckPrompt,

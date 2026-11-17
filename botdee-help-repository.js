@@ -461,6 +461,89 @@
       page: "botdee.html#botDeeChatPage"
     },
     {
+      id: "help-botdee-room-smartview",
+      title: "Room SMARTview",
+      body: "In BOT DEE chat, say Open Room SMARTview or Start a group chat. A Room SMARTview card opens in the same bubble. Confirm before anything is created. Private BOT DEE messages stay private. Group rooms, invites, and a shared tab are not live yet — Confirm does not create a room, send an invite, or charge anyone. Site Chrome follows your Appearance theme.",
+      searchPhrases: [
+        "room smartview", "start a group chat", "open room smartview", "create a room",
+        "group chat bot dee", "talk to bot dee together"
+      ],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-room-smartview-invite",
+      title: "Room SMARTview invite",
+      body: "Invite others from Room SMARTview after you confirm. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Wrong-account, blocked, and non-friend invites will refuse when group rooms ship. Nothing is sent today; group rooms are not live.",
+      searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-room-smartview-join",
+      title: "Join a Room SMARTview",
+      body: "Joining a Room SMARTview is not the same as joining a shared tab or approving a payment. When rooms ship, you will sign in and accept a bound invite. Opening a link does not join you automatically.",
+      searchPhrases: ["join room smartview", "join this bot dee chat", "can my friends join us"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-room-smartview-end",
+      title: "End Room SMARTview",
+      body: "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats. There is no live room to close yet.",
+      searchPhrases: ["end this room", "close room smartview", "end group chat bot dee"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-room-smartview-tab",
+      title: "Room SMARTview shared tab",
+      body: "A shared tab is a later opt-in. Joining the room does not join a tab. Joining a tab does not approve a payment. BOT DEE never takes card numbers. Split-the-bill talk is not a charge.",
+      searchPhrases: ["shared tab", "split the bill", "who is paying room", "pay together bot dee"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-room-smartview-who-pays",
+      title: "Who is paying",
+      body: "Ask Who’s paying in a Room SMARTview to see privacy-filtered opt-in status when tabs ship. Nobody is charged because someone said buy. Card last four stay on the payer’s own receipt.",
+      searchPhrases: ["who's paying", "who is paying", "who pays in the room"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-room-smartview-kick",
+      title: "Remove someone from Room SMARTview",
+      body: "Only a verified host can remove a member, and only after confirm. A model reply cannot kick anyone. There is no live room to change yet.",
+      searchPhrases: ["remove from room", "kick from room smartview", "remove jalen"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-room-smartview-share",
+      title: "Share into Room SMARTview",
+      body: "Share this conversation never copies your private BOT DEE thread. BOT DEE shows a preview of selected shareable facts from this message, marked tentative. You can edit or drop facts. Nothing is published until rooms are live and you approve.",
+      searchPhrases: ["share this conversation", "share our plans", "share with my friends bot dee"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
       id: "help-botdee-smartview",
       title: "View my SMARTview",
       body: "View my SMARTview shows your People card from public-within-FLOQR fields, using the same Profile Media as your FLOQR public page — not venue or restaurant mocks. Edit my SMARTsummary changes the text in your default profile language. Save translates it to every other FLOQR language, including English. Master Admin → Features → BOT DEE → SMARTviews is where labeled mock venue and restaurant cards live. There is no live Places or Yelp.",

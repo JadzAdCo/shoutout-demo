@@ -221,7 +221,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.032";  }
+    return "s3.3.033";  }
 
   function isVersionSmartViewAlias(raw) {
     const q = String(raw || "")
@@ -362,6 +362,68 @@
     const local = global.FLOQRBotDeeSmartView?.localVersionPayload?.();
     if (local) list.push(local);
     return list;
+  }
+
+  const ROOM_DECLINE_KEY = "floqr.roomSmartView.declined";
+
+  function loadRoomDeclined() {
+    try {
+      const rows = JSON.parse(global.sessionStorage?.getItem(ROOM_DECLINE_KEY) || "[]");
+      return Array.isArray(rows) ? rows.map(String).slice(0, 24) : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function rememberRoomDecline(key) {
+    const token = String(key || "").slice(0, 80);
+    if (!token) return;
+    const next = [...new Set(loadRoomDeclined().concat(token))].slice(-24);
+    try {
+      global.sessionStorage?.setItem(ROOM_DECLINE_KEY, JSON.stringify(next));
+    } catch (_) {}
+  }
+
+  function roomApi() {
+    return global.FLOQRBotDeeRoomSmartView || null;
+  }
+
+  function isRoomSmartViewPrompt(raw) {
+    try {
+      return !!(roomApi() && roomApi().isRoomSmartViewPrompt(raw, {
+        hasActiveRoom: false,
+        declinedKeys: loadRoomDeclined()
+      }));
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function buildLocalRoomSession(text) {
+    const api = roomApi();
+    if (!api || typeof api.buildRoomSession !== "function") return null;
+    const session = api.buildRoomSession(text, {
+      hasActiveRoom: false,
+      declinedKeys: loadRoomDeclined()
+    });
+    return session && session.handled ? session : null;
+  }
+
+  function ensureRoomSmartViews(text, views) {
+    const list = Array.isArray(views) ? views.slice() : [];
+    if (list.some(row => row && row.kind === "botDeeRoom")) return list;
+    const session = buildLocalRoomSession(text);
+    if (session && session.smartViews && session.smartViews[0]) list.push(session.smartViews[0]);
+    return list;
+  }
+
+  function roomReplyText(session, fallback) {
+    const key = session && session.replyKey;
+    if (key) {
+      const localized = t(key, fallback || session.reply || "");
+      if (localized && localized !== key) return localized;
+    }
+    return fallback || (session && session.reply) || "";
   }
 
   function helpReply() {
@@ -912,10 +974,16 @@
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
-    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text))) {
-      const reply = localBotReply(text, {resuming});
+    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text) || isRoomSmartViewPrompt(text))) {
+      const roomSession = !isVersionPrompt(text) && !isHelpPrompt(text) && !isPrivacyPrompt(text)
+        ? buildLocalRoomSession(text)
+        : null;
+      const reply = roomSession
+        ? roomReplyText(roomSession)
+        : localBotReply(text, {resuming});
       const versionViews = isVersionPrompt(text) ? ensureVersionSmartViews(text, []) : [];
-      appendBubble("bot", reply, [], [], versionViews);
+      const roomViews = roomSession ? ensureRoomSmartViews(text, roomSession.smartViews || []) : [];
+      appendBubble("bot", reply, [], [], versionViews.concat(roomViews));
       pushHistory("model", reply);
       setStatus("");
       if (isFarewellPrompt(text)) {
@@ -952,16 +1020,22 @@
         message: text,
         history: history.slice(0, -1).map(row => ({role: row.role, text: row.text})),
         threadId: threadId || undefined,
-        uiLanguage: currentUiLanguage()
+        uiLanguage: currentUiLanguage(),
+        roomSmartViewDeclined: loadRoomDeclined()
       };
       const data = (await fn(payload))?.data || {};
       applyHasUsed(data, 1);
       const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
       const peopleSearch = data.peopleSearch || null;
+      const roomView = Array.isArray(data.smartViews)
+        ? data.smartViews.find(row => row && row.kind === "botDeeRoom")
+        : null;
       const reply = peopleSearch?.replyKey
         ? t(peopleSearch.replyKey, displayReply(data.reply))
-        : displayReply(data.reply);
-      appendBubble("bot", reply, localizeResults(data.results), media, ensureVersionSmartViews(text, data.smartViews), peopleSearch);
+        : (data.replyKey || roomView?.replyKey)
+          ? t(data.replyKey || roomView.replyKey, displayReply(data.reply))
+          : displayReply(data.reply);
+      appendBubble("bot", reply, localizeResults(data.results), media, ensureVersionSmartViews(text, ensureRoomSmartViews(text, data.smartViews)), peopleSearch);
       pushHistory("model", reply);
       if (data.threadId) threadId = String(data.threadId);
       if (data.durable === true) durableEnabled = true;

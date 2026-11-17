@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.032";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.032";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.033";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.033";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -220,6 +220,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.033",
+      title: "s3.3.033 — Room SMARTview intent routing",
+      checks: [
+        {label:"Room classifier", file:"functions/botdee-room-smartview.js", includes:["function classifyRoomIntent(", "floqr.botDeeRoomSmartView/1", "roomsLive: ROOMS_LIVE", "ROOMS_LIVE = false"]},
+        {label:"executeBotSession room before people", file:"functions/bot-dee-functions.js", includes:["buildRoomSession", "roomAttached.handled"]},
+        {label:"Client card", file:"botdee-smartview.js", includes:["function renderRoomCard(", "botdee.rs.title", "data-rs-confirm"]},
+        {label:"Site Chrome CSS", file:"botdee-smartview.css", includes:[".botdee-sv-room", "var(--accent"]},
+        {label:"Help Room SMARTview", file:"botdee-help-repository.js", includes:["help-botdee-room-smartview", "Open Room SMARTview"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-033-room-smartview-intent"]}
+      ]
+    },
     {
       version: "s3.3.032",
       title: "s3.3.032 — Version SMARTview + SMARTcard public Profile Media hero",
@@ -3317,6 +3329,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-033-room-smartview-intent",
+      area:"BOT DEE",
+      feature:"Room SMARTview intent routing",
+      changed:"s3.3.033 — BOT DEE recognizes Open Room SMARTview / Start a group chat / invite-or-share / plan-together phrases and opens an inline Room SMARTview card. Confirm is required. Group rooms, invites, and shared tab are not live — Confirm creates nothing and charges no one. Version SMARTview and People cards are unchanged.",
+      howToTest:"1) Hard-refresh botdee.html until botdee-room-smartview.js?v=s3.3.033 and botdee-smartview.js?v=s3.3.033. Sign in with BOT DEE access. 2) Type Start a group chat, then Open Room SMARTview. Each opens a Room SMARTview card in the same bubble. Title is Room SMARTview — not Mingl Room SmartView. Participants show 0 / 8. 3) Tap Not now — the same plan-together offer should not keep repeating. Type Open Room SMARTview again — the card still opens. 4) Type I wish to invite orders to this chat (typo) — offer card, no account lookup. Type Share our Mykonos plans — share preview, tentative, Approve does not publish. 5) Type My friends like this club and Tell me about group reservations — normal answers, no room card. 6) Type Who is in this room? / End this room / Remove Jalen — command cards, no kick/end without confirm, nothing live to change. 7) Type Ver — Version SMARTview still opens. Ask Who is plus a real public name — People card still works. 8) Switch Appearance Site Chrome — Room card colors follow the theme. Type in the composer first — draft stays. 9) Mark Succeed/Failed. Do not expect this on live until Don approves Pages + Functions. Do not expect a real group room, invite, or charge.",
+      expected:"Explicit and strong phrases open a confirmation Room SMARTview. Mere mention of friends does not. Confirm creates nothing. Version and People cards still work. Composer draft survives.",
+      troubleshoot:"No card → cached botdee-smartview.js / bot-dee-chat.js / botdee-room-smartview.js; hard-refresh until ?v=s3.3.033. Card titled Mingl Room SmartView → old prototype HTML, not this branch. Confirm created a room or charged someone → stop and report; this build must not call create/invite/pay. Version card gone → Room routing stole Ver; confirm isVersionPrompt still wins. People search missing → room intent must not wrap Who is Name; Who is in this room is the room command."
+    },
     {
       id:"s3-3-032-version-smartview",
       area:"BOT DEE",
