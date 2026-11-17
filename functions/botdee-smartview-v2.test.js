@@ -278,6 +278,8 @@ test("owner editor uses source text; save rejects a translation as the new sourc
   const client = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
   assert.match(client, /summary\?\.editText/);
   assert.match(client, /callable\(\{summary: value, locale:/);
+  assert.match(client, /summary\.editText = value/);
+  assert.match(client, /summary\.sourceText = value/);
   const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
   assert.match(src, /resolveOwnerSaveLocale/);
   assert.match(src, /request\.data\?\.locale/);

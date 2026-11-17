@@ -545,14 +545,26 @@
         }
         if (status) status.textContent = t("botdee.sv.saving", "Saving…");
         const callable = global.firebase?.app?.()?.functions?.("us-central1")?.httpsCallable?.("saveSmartSummary");
+        const locale = String(
+          overlay.querySelector("#botdeeSvSourceLocale")?.value
+          || session.people?.summary?.editLocale
+          || session.people?.summary?.sourceLocale
+          || ""
+        ).trim();
         const finish = (ok, message) => {
           if (status) status.textContent = message;
           if (ok) {
             if (session.people) {
               session.people.summary = session.people.summary || {};
               session.people.summary.text = value;
+              session.people.summary.editText = value;
+              session.people.summary.sourceText = value;
               session.people.summary.status = "source";
               session.people.summary.pending = true;
+              if (locale) {
+                session.people.summary.editLocale = locale;
+                session.people.summary.sourceLocale = locale;
+              }
             }
             const short = session.card?.querySelector(".botdee-sv-summary-text");
             if (short) short.textContent = value;
@@ -563,12 +575,6 @@
           finish(false, t("botdee.sv.saveOffline", "Sign in to save. Translations are queued on the server, not in this browser."));
           return;
         }
-        const locale = String(
-          overlay.querySelector("#botdeeSvSourceLocale")?.value
-          || session.people?.summary?.editLocale
-          || session.people?.summary?.sourceLocale
-          || ""
-        ).trim();
         callable({summary: value, locale: locale || undefined}).then(() => {
           finish(true, t("botdee.sv.savedQueued", "Saved. Translations queued."));
         }).catch(err => {
