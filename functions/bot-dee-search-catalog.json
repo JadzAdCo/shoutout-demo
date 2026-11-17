@@ -546,12 +546,12 @@
       "sourceId": "help:help-botdee-smartview",
       "id": "help-botdee-smartview",
       "kind": "help",
-      "label": "BOT DEE SmartViews",
-      "blurb": "SmartViews are compact cards inside BOT DEE chat. Venue cards open the existing FLOQR Public Page — not a second profile. People SmartView shows public-within-FLOQR fields, a Smart Summary, Social (Music first), Dating, Dining, and Future Travels. Mock cards stay labeled until pr",
+      "label": "View my SMARTview",
+      "blurb": "View my SMARTview shows your People card from public-within-FLOQR fields — not venue or restaurant mocks. Edit My SMART Summary changes the summary in your default profile language. Master Admin → Features → BOT DEE → SMARTviews is where labeled mock venue and restaurant cards li",
       "href": "./botdee.html",
       "phrases": [
-        "bot dee smartviews",
-        "smartviews are compact cards inside bot dee chat. venue cards open the existing floqr public page not a second profile. people smartview shows public-within-flo",
+        "view my smartview",
+        "view my smartview shows your people card from public-within-floqr fields not venue or restaurant mocks. edit my smart summary changes the summary in your defaul",
         "smartview",
         "smart view",
         "venue card",
@@ -560,6 +560,7 @@
         "mock smartview",
         "people smartview",
         "person card",
+        "edit my smart summary",
         "open bot dee",
         "my bot dee",
         "smartviews master admin",
@@ -2038,6 +2039,25 @@
         "spell country",
         "profile settings",
         "help-prior-travels"
+      ]
+    },
+    {
+      "sourceId": "help:help-profile-account-type",
+      "id": "help-profile-account-type",
+      "kind": "help",
+      "label": "Account type",
+      "blurb": "Personal is the default FloqR patron account. Choose Business only if you need Ad Campaigns (Inline or Mingl Gist ads that Master Admin must approve). You stay a patron either way. Business shows a business-name field and the Ad Campaigns tab.",
+      "href": "./patron-portal.html?from=botdee&tab=profile",
+      "phrases": [
+        "account type",
+        "personal is the default floqr patron account. choose business only if you need ad campaigns inline or mingl gist ads that master admin must approve . you stay a",
+        "business account",
+        "personal account",
+        "ad campaigns",
+        "advertise",
+        "isbusinessaccount",
+        "profile settings",
+        "help-profile-account-type"
       ]
     },
     {
@@ -3759,6 +3779,24 @@
         "cities i visited",
         "spell city",
         "help-prior-travels"
+      ]
+    },
+    {
+      "sourceId": "intent:help-profile-account-type",
+      "id": "help-profile-account-type",
+      "kind": "help",
+      "label": "Account type",
+      "blurb": "Personal is the default FloqR patron account. Choose Business only if you need Ad Campaigns. You stay a patron either way.",
+      "href": "./botdee.html",
+      "phrases": [
+        "account type",
+        "personal is the default floqr patron account. choose business only if you need ad campaigns. you stay a patron either way.",
+        "business account",
+        "personal account",
+        "ad campaigns",
+        "advertise",
+        "isbusinessaccount",
+        "help-profile-account-type"
       ]
     },
     {

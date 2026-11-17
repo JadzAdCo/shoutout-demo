@@ -639,6 +639,17 @@
       patterns: [/my\s+profile/, /profile\s*(and\s*)?settings/, /\bsettings\b/, /\baccount\b/]
     },
     {
+      id: "help-profile-account-type",
+      kind: "help",
+      label: "Account type",
+      blurb: "Personal is the default FloqR patron account. Choose Business only if you need Ad Campaigns. You stay a patron either way.",
+      links: [
+        {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}
+      ],
+      searchPhrases: ["account type", "business account", "personal account", "ad campaigns", "advertise", "IsBusinessAccount"],
+      patterns: [/account\s*type/, /business\s*account/, /personal\s*account/, /ad\s*campaigns?/]
+    },
+    {
       id: "help-profile-height",
       kind: "help",
       label: "Height",
@@ -1023,7 +1034,7 @@
     "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], "black-card": ["patron"], "ballers-alert": ["patron"], floqcast: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
-    "help-my-profile": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],
+    "help-my-profile": ["patron"], "help-profile-account-type": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],
     "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],
     "help-media-creator": ["patron"], "help-service-member": ["patron"], "help-general-notifications": ["patron"],
     "help-do-not-sell": ["patron"], "help-guest-list": ["patron"], "help-shoutout": ["patron"],

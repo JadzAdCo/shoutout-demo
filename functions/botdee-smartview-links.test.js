@@ -48,3 +48,23 @@ test("client resolver and portal/master hosts wired", () => {
   assert.match(read("master-admin-app.js"), /botDeeMasterSmartViewDemo/);
   assert.match(read("functions/botdee-upgrade-functions.js"), /isServerAdminAuth\(request\.auth\)/);
 });
+
+test("patron My BOT DEE shows real SMARTview; mocks stay on Master Admin", () => {
+  const portal = read("patron-portal.html");
+  const upgrade = read("botdee-upgrade-ui.js");
+  const master = read("master-admin.html");
+  assert.match(portal, /data-i18n="botdee\.sv\.viewMine"/);
+  assert.match(portal, /data-i18n="botdee\.sv\.editSummary"/);
+  assert.match(portal, /class="[^"]*botdee-sv-bubble/);
+  assert.doesNotMatch(portal, /Show mock SmartViews/);
+  assert.doesNotMatch(portal, /botdee\.libraryRefresh/);
+  assert.doesNotMatch(portal, /Research Library and SmartViews/);
+  assert.match(upgrade, /function loadMySmartView\(/);
+  assert.match(upgrade, /getPeopleSmartView/);
+  assert.match(upgrade, /botDeeLoadSmartViews[\s\S]*loadMySmartView/);
+  assert.match(upgrade, /botDeeMasterLoadSmartViews[\s\S]*loadDemos\("botDeeMasterSmartViewDemo"\)/);
+  assert.doesNotMatch(upgrade, /loadDemos\("botDeeSmartViewDemo"\)/);
+  assert.match(master, /id="botDeeMasterLoadSmartViews"/);
+  assert.match(master, /botdee\.libraryRefresh/);
+  assert.match(master, /data-botdee-page="smartviews"/);
+});

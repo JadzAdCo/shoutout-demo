@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.029";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.029";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.030";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.030";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -221,6 +221,20 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.030",
+      title: "s3.3.030 — Profile select text + patron SMARTview",
+      checks: [
+        {label:"Select unclip CSS", file:"styles.css", includes:["select:not([multiple])", "-webkit-appearance:none", "padding:12px 40px 12px 16px", "height:auto"]},
+        {label:"Help-attach skips form controls", file:"help-attach.js", includes:["function isFormControl(", "if (isFormControl(node)) return;"]},
+        {label:"Account type help on label", file:"patron-portal.html", includes:["help-profile-account-type", "editAccountType", "portal.accountType.personal"]},
+        {label:"Account type help id", file:"botdee-help-repository.js", includes:["help-profile-account-type"]},
+        {label:"Patron SMARTview not mocks", file:"patron-portal.html", includes:["botdee.sv.viewMine", "botdee-sv-bubble"], notIncludes:["Show mock SmartViews"]},
+        {label:"loadMySmartView", file:"botdee-upgrade-ui.js", includes:["function loadMySmartView(", "getPeopleSmartView"], notIncludes:["loadDemos(\"botDeeSmartViewDemo\")"]},
+        {label:"Master mock tab", file:"master-admin.html", includes:["botDeeMasterLoadSmartViews", "botdee.libraryRefresh"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-030-profile-select-text", "s3-3-030-patron-smartview"]}
+      ]
+    },
+    {
       version: "s3.3.029",
       title: "s3.3.029 — My BOT DEE demeanor radios readable on phone",
       checks: [
@@ -239,7 +253,7 @@
         {label:"People card renderer", file:"botdee-smartview.js", includes:["renderPeopleCard", "peopleV2", "captureChatState", "floqr-chrome-change"]},
         {label:"Site Chrome tokens not hardcoded Tiffany", file:"botdee-smartview.css", includes:["var(--accent", "botdee-sv-people"], notIncludes:["#20d9d8"]},
         {label:"Chat mounts SmartViews", file:"botdee.html", includes:["botdee-smartview.js", "botdee-smartview.css"]},
-        {label:"Owner edit on My BOT DEE", file:"patron-portal.html", includes:["botDeeEditSmartSummary", "botdee.sv.editSummary"]},
+        {label:"Owner edit on My BOT DEE", file:"patron-portal.html", includes:["botDeeEditSmartSummary", "botdee.sv.editSummary", "botdee.sv.viewMine", "botdee-sv-bubble"]},
         {label:"Master Admin SMARTviews host", file:"master-admin.html", includes:["data-botdee-page=\"smartviews\"", "botDeeMasterSmartViewDemo", "botDeeMasterLoadSmartViews"]},
         {label:"Callables", file:"functions/index.js", includes:["getPeopleSmartView", "saveSmartSummary", "queuePeopleSmartViewAnalysis"]},
         {label:"Collection key", file:"functions/botdee-smartview-v2-core.js", includes:["usercharacter_analysis", "smartViewTranslationJobs"]},
@@ -3259,6 +3273,24 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-030-patron-smartview",
+      area:"BOT DEE",
+      feature:"View my SMARTview (real patron card)",
+      changed:"s3.3.030 — My BOT DEE no longer shows venue/restaurant mock SmartViews. View my SMARTview + Edit My SMART Summary load getPeopleSmartView into a bubble. Mock catalog stays on Master Admin → Features → BOT DEE → SMARTviews.",
+      howToTest:"1) Hard-refresh Profile & Settings after Pages publish (styles.css?v=s3.3.030). Sign in. 2) Feature & Orders → My BOT DEE. 3) Buttons read View my SMARTview and Edit My SMART Summary (adjacent). 4) Bubble below shows YOUR People SmartView (name, photo, public fields) — not Aurelia / restaurant mocks. 5) Edit My SMART Summary opens the summary overlay. 6) Master Admin → Features / Svc → BOT DEE → SMARTviews → Show mock SmartViews still paints venue/restaurant mocks. 7) Mark Succeed/Failed.",
+      expected:"Patron page is only the signed-in person's SmartView. Mocks live only on the Master Admin SMARTviews tab.",
+      troubleshoot:"Still seeing Aurelia/restaurants on My BOT DEE → cached patron-portal.html / botdee-upgrade-ui.js still calling listBotDeeSmartViews. Empty bubble → getPeopleSmartView not deployed or botDee gate off; Functions deploy from origin/main. Master mocks missing → #featuresBotDee-smartviews."
+    },
+    {
+      id:"s3-3-030-profile-select-text",
+      area:"Profile",
+      feature:"Edit Profile dropdown text + Account type",
+      changed:"s3.3.030 — iOS native selects no longer clip glyphs (Patron/Public/original). Account type help is on the label `?`, not inside the select (empty bubble). Values: Personal (default) or Business (Ad Campaigns).",
+      howToTest:"1) Hard-refresh Profile & Settings after Pages publish — confirm styles.css?v=s3.3.030. Sign in. 2) Open Edit Profile on iPhone. 3) Account type shows Personal or Business (not blank). Tap `?` — Personal vs Business copy. 4) Public Profile Type reads Patron (not Datron). Visibility reads Public (not Dublic). Language reads Preferred/original language (not oriclinal). 5) Open any other page with dropdowns (Country, pickup State) — text is fully visible. 6) Mark Succeed/Failed.",
+      expected:"Every select shows full letters including P, g, y. Account type is Personal by default. Business reveals business name + Ad Campaigns. Asset stamp is s3.3.030.",
+      troubleshoot:"Still Datron/blank → iPhone still has styles.css?v=s3.3.029; hard-refresh until HTML links are s3.3.030. Account type still empty → cached help-attach.js still wrapping SELECT options. Native iOS chevron doubled → appearance:none missing."
+    },
     {
       id:"s3-3-029-botdee-demeanor-layout",
       area:"BOT DEE",

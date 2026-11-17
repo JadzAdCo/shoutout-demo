@@ -323,6 +323,9 @@
     "help-prior-travels": [
       "patron"
     ],
+    "help-profile-account-type": [
+      "patron"
+    ],
     "help-profile-country": [
       "patron"
     ],
@@ -587,6 +590,9 @@
       "patron"
     ],
     "help-prior-travels": [
+      "patron"
+    ],
+    "help-profile-account-type": [
       "patron"
     ],
     "help-profile-country": [

@@ -10,7 +10,7 @@ const { analyze, CHROME_LANGS, HELP_LANGS } = require(reportPath);
 
 test("chrome packs match en key count for every supported language", () => {
   const { chrome } = analyze();
-  assert.equal(chrome.enKeys, 1559); // + People SmartView v2 chrome (botdee.sv.*)
+  assert.equal(chrome.enKeys, 1563); // + View my SMARTview / mineEmpty
   for (const row of chrome.rows) {
     assert.equal(row.keys, chrome.enKeys, `chrome ${row.lang} keys`);
     assert.equal(row.missing, 0, `chrome ${row.lang} missing`);
@@ -25,7 +25,7 @@ test("chrome packs match en key count for every supported language", () => {
 
 test("help packs cover the canonical help ids for every localized language", () => {
   const { help } = analyze();
-  assert.equal(help.canonical, 106); // + People SmartView v2 help ids
+  assert.equal(help.canonical, 107); // + help-profile-account-type
   for (const code of HELP_LANGS) {
     assert.ok(help.packsPresent.includes(code), `missing help pack ${code}`);
   }
@@ -38,9 +38,9 @@ test("help packs cover the canonical help ids for every localized language", () 
   assert.equal(help.gaps.length, 0, JSON.stringify(help.gaps));
 });
 
-test("floqr-i18n and help VERSION are s3.3.029", () => {  const fs = require("fs");
+test("floqr-i18n and help VERSION are s3.3.030", () => {  const fs = require("fs");
   const root = path.join(__dirname, "..");
   const i18n = fs.readFileSync(path.join(root, "floqr-i18n.js"), "utf8");
   const help = fs.readFileSync(path.join(root, "floqr-i18n-help.js"), "utf8");
-  assert.match(i18n, /const VERSION\s*=\s*"s3.3.029"/);
-  assert.match(help, /const VERSION\s*=\s*"s3.3.029"/);});
+  assert.match(i18n, /const VERSION\s*=\s*"s3.3.030"/);
+  assert.match(help, /const VERSION\s*=\s*"s3.3.030"/);});

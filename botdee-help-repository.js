@@ -425,9 +425,9 @@
     },
     {
       id: "help-botdee-smartview",
-      title: "BOT DEE SmartViews",
-      body: "SmartViews are compact cards inside BOT DEE chat. Venue cards open the existing FLOQR Public Page — not a second profile. People SmartView shows public-within-FLOQR fields, a Smart Summary, Social (Music first), Dating, Dining, and Future Travels. Mock cards stay labeled until providers are approved. There is no live Places or Yelp.",
-      searchPhrases: ["smartview", "smart view", "venue card", "restaurant card", "public page", "mock smartview", "people smartview", "person card"],
+      title: "View my SMARTview",
+      body: "View my SMARTview shows your People card from public-within-FLOQR fields — not venue or restaurant mocks. Edit My SMART Summary changes the summary in your default profile language. Master Admin → Features → BOT DEE → SMARTviews is where labeled mock venue and restaurant cards live. There is no live Places or Yelp.",
+      searchPhrases: ["smartview", "smart view", "view my smartview", "venue card", "restaurant card", "public page", "mock smartview", "people smartview", "person card", "edit my smart summary"],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
         {label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})},
@@ -1777,6 +1777,18 @@
         "my profile & settings", "manage profile", "floqr inbox", "guest lists", "public media"
       ],
       links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee"})}],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
+      id: "help-profile-account-type",
+      title: "Account type",
+      body: "Personal is the default FloqR patron account. Choose Business only if you need Ad Campaigns (Inline or Mingl Gist ads that Master Admin must approve). You stay a patron either way. Business shows a business-name field and the Ad Campaigns tab.",
+      searchPhrases: [
+        "account type", "business account", "personal account", "ad campaigns", "advertise", "IsBusinessAccount"
+      ],
+      links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
+      audiences: ["patron"],
       source: "help-repository-seed",
       page: "patron-portal.html"
     },

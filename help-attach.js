@@ -142,9 +142,20 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
     };
   }
 
+  function isFormControl(node) {
+    return !!node?.matches?.("input,select,textarea,option");
+  }
+
+  function helpHostFor(target) {
+    if (!target || !target.nodeType) return null;
+    if (isFormControl(target)) return target.closest?.("label") || target.parentElement;
+    return target;
+  }
+
   function ensureLabelShell(target) {
     if (!target) return null;
-    let host = target;
+    let host = helpHostFor(target);
+    if (!host || isFormControl(host)) return null;
     if (!host.classList.contains("help-label")) {
       host.classList.add("help-label");
     }
@@ -377,6 +388,7 @@ h1.help-label,h2.help-label,h3.help-label,label.help-label,span.help-label{
     hydrateInlineHelpButtons(root);
     root.querySelectorAll?.("[data-floqr-help-body]").forEach(node => {
       if (node.matches?.("button.floqr-help-popout")) return;
+      if (isFormControl(node)) return;
       if (node.dataset.floqrHelpMounted === "1") return;
       node.dataset.floqrHelpMounted = "1";
       attach({

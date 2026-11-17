@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.029";  const packs = {
+  const VERSION = "s3.3.030";  const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
         title: "Расписание персонала",
@@ -73,8 +73,8 @@
         body: "Сохраняйте места и карточки, о которых вы спрашивали BOT DEE. Place ID Google — не копия фото или отзывов. Можно обновить или удалить. Лицензионные кэши выключены, пока провайдер не одобрен."
       },
       "help-botdee-smartview": {
-        title: "SmartViews BOT DEE",
-        body: "SmartViews — компактные карточки в чате BOT DEE. Карточка клуба открывает существующую публичную страницу FLOQR — не второй профиль. People SmartView показывает публичные поля FLOQR, Smart Summary, Социальное (сначала Музыка), Знакомства, Еду и будущие поездки. Макеты помечены. Нет живых Places или Yelp."
+        title: "Мой SMARTview",
+        body: "«Мой SMARTview» показывает вашу карточку человека из публичных полей FLOQR — не макеты клубов или ресторанов. «Изменить мой SMART Summary» меняет текст на языке профиля. Макеты клубов и ресторанов живут в Master Admin → Features → BOT DEE → SMARTviews. Нет живых Places или Yelp."
       },
       "help-botdee-memory": {
         title: "Сохранённые чаты BOT DEE",
@@ -288,6 +288,10 @@
         title: "Профиль и настройки",
         body: "Управляйте профилем, My Privacy, уведомлениями AI, шаблонами ShoutOut, публичными медиа, ShoutOuts, списками гостей, FloqR Inbox и Mingl. Откройте Профиль и настройки для ролей, инструментов продавца и параметров аккаунта."
       },
+      "help-profile-account-type": {
+        title: "Тип аккаунта",
+        body: "Личный — стандартный FloqR-аккаунт посетителя. Выберите Бизнес только если нужны рекламные кампании (объявления Inline или Mingl Gist, которые утверждает Master Admin). Вы остаётесь patron в любом случае. Бизнес показывает поле названия компании и вкладку Рекламные кампании."
+      },
       "help-profile-height": {
         title: "Рост",
         body: "Сначала выберите ft или m, затем введите рост в этой единице. Футы: 6'0\". Метры: 1.78. Смешивать нельзя — 1.78 нельзя сохранить как ft, а 6'0\" нельзя сохранить как m. США по умолчанию ft. Все остальные страны и интернет-место вне США — m. Единицу всё равно можно переключить."
@@ -499,8 +503,8 @@
         body: "Bewaar plaatsen en kaarten die u BOT DEE vroeg. Een Google Place-ID is geen kopie van foto’s of reviews. U kunt vernieuwen of wissen. Gelicentieerde caches blijven uit tot de provider is goedgekeurd."
       },
       "help-botdee-smartview": {
-        title: "BOT DEE SmartViews",
-        body: "SmartViews zijn compacte kaarten in de BOT DEE-chat. Een clubkaart opent de bestaande FLOQR Public Page — geen tweede profiel. People SmartView toont openbare FLOQR-velden, een Smart Summary, Sociaal (eerst Muziek), Daten, Dineren en Toekomstige reizen. Mocks blijven gelabeld. Geen live Places of Yelp."
+        title: "Mijn SMARTview bekijken",
+        body: "Mijn SMARTview toont uw Person-kaart uit openbare FLOQR-velden — geen club- of restaurantmocks. Mijn SMART Summary bewerken wijzigt de samenvatting in uw profieltaal. Gelabelde mock-kaarten staan in Master Admin → Features → BOT DEE → SMARTviews. Geen live Places of Yelp."
       },
       "help-botdee-memory": {
         title: "Opgeslagen BOT DEE-chats",
@@ -714,6 +718,10 @@
         title: "Profiel & instellingen",
         body: "Beheer je profiel, My Privacy, AI-meldingen, ShoutOut-templates, openbare media, ShoutOuts, gastenlijsten, FloqR Inbox en Mingl. Open Profiel & instellingen voor rollen, verkoperstools en accountopties."
       },
+      "help-profile-account-type": {
+        title: "Accounttype",
+        body: "Persoonlijk is het standaard FloqR-patronaccount. Kies Zakelijk alleen als u advertentiecampagnes nodig hebt (Inline- of Mingl Gist-advertenties die Master Admin moet goedkeuren). U blijft in beide gevallen patron. Zakelijk toont een bedrijfsnaamveld en het tabblad Advertentiecampagnes."
+      },
       "help-profile-height": {
         title: "Lengte",
         body: "Kies eerst ft of m en voer daarna je lengte in die eenheid in. Voet: 6'0\". Meter: 1.78. Mengen is geblokkeerd — 1.78 kan niet als ft, 6'0\" niet als m. De VS starten op ft. Alle andere landen en een niet-Amerikaanse internetlocatie starten op m. Je kunt de eenheid nog wisselen."
@@ -925,8 +933,8 @@
         body: "Enregistrez les lieux et cartes demandés à BOT DEE. Un identifiant Google Place n’est pas une copie des photos ou avis Google. Vous pouvez actualiser ou supprimer. Les caches licenciés restent off tant que le fournisseur n’est pas approuvé."
       },
       "help-botdee-smartview": {
-        title: "SmartViews BOT DEE",
-        body: "Les SmartViews sont des cartes compactes dans le chat BOT DEE. Une carte de club ouvre la page publique FLOQR existante — pas un second profil. People SmartView affiche les champs publics dans FLOQR, un Smart Summary, Social (Musique d’abord), Rencontre, Cuisine et Voyages à venir. Les maquettes restent marquées. Pas de Places ni Yelp en direct."
+        title: "Voir mon SMARTview",
+        body: "Voir mon SMARTview affiche votre carte Personne depuis les champs publics FLOQR — pas des maquettes de club ou restaurant. Modifier mon SMART Summary change le résumé dans la langue du profil. Les maquettes club/restaurant sont dans Master Admin → Features → BOT DEE → SMARTviews. Pas de Places ni Yelp en direct."
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE enregistrés",
@@ -1140,6 +1148,10 @@
         title: "Profil et paramètres",
         body: "Gérez votre profil, My Privacy, les notifications AI, les modèles ShoutOut, les médias publics, les ShoutOuts, les listes d’invités, FloqR Inbox et Mingl. Ouvrez Profil et paramètres pour les rôles, les outils vendeur et les options de compte."
       },
+      "help-profile-account-type": {
+        title: "Type de compte",
+        body: "Personnel est le compte patron FloqR par défaut. Choisissez Professionnel seulement si vous avez besoin des campagnes publicitaires (annonces Inline ou Mingl Gist que Master Admin doit approuver). Vous restez un patron dans les deux cas. Professionnel affiche un champ nom d'entreprise et l'onglet Campagnes publicitaires."
+      },
       "help-profile-height": {
         title: "Taille",
         body: "Choisissez d'abord ft ou m, puis saisissez votre taille dans cette unité. Pieds : 6'0\". Mètres : 1.78. Le mélange est bloqué — 1.78 ne peut pas être enregistré en ft, ni 6'0\" en m. Les États-Unis : ft par défaut. Tous les autres pays et une localisation internet hors USA : m. Vous pouvez toujours changer l'unité."
@@ -1351,8 +1363,8 @@
         body: "Speichern Sie Orte und Karten, die Sie BOT DEE gefragt haben. Eine Google Place-ID ist keine Kopie von Fotos oder Bewertungen. Sie können aktualisieren oder löschen. Lizenzierte Caches bleiben aus, bis der Anbieter genehmigt ist."
       },
       "help-botdee-smartview": {
-        title: "BOT DEE SmartViews",
-        body: "SmartViews sind kompakte Karten im BOT-DEE-Chat. Clubkarten öffnen die bestehende FLOQR Public Page — kein zweites Profil. People SmartView zeigt öffentliche FLOQR-Felder, Smart Summary, Social (Musik zuerst), Dating, Dining und Zukünftige Reisen. Mocks bleiben gekennzeichnet. Kein Live-Places oder Yelp."
+        title: "Mein SMARTview anzeigen",
+        body: "Mein SMARTview zeigt Ihre Personenkarte aus öffentlichen FLOQR-Feldern — keine Club- oder Restaurant-Mocks. Meine SMART Summary bearbeiten ändert den Text in Ihrer Profilsprache. Gekennzeichnete Mock-Karten liegen unter Master Admin → Features → BOT DEE → SMARTviews. Kein Live-Places oder Yelp."
       },
       "help-botdee-memory": {
         title: "Gespeicherte BOT DEE-Chats",
@@ -1566,6 +1578,10 @@
         title: "Profil & Einstellungen",
         body: "Verwalte dein Profil, My Privacy, AI-Benachrichtigungen, ShoutOut-Vorlagen, öffentliche Medien, ShoutOuts, Gästelisten, FloqR Inbox und Mingl. Öffne Profil & Einstellungen für Rollen, Verkäufer-Tools und Kontooptionen."
       },
+      "help-profile-account-type": {
+        title: "Kontotyp",
+        body: "Privat ist das Standard-FloqR-Patron-Konto. Wählen Sie Geschäftlich nur, wenn Sie Werbekampagnen brauchen (Inline- oder Mingl-Gist-Anzeigen, die Master Admin freigeben muss). Sie bleiben in beiden Fällen Patron. Geschäftlich zeigt ein Firmennamensfeld und den Tab Werbekampagnen."
+      },
       "help-profile-height": {
         title: "Größe",
         body: "Wählen Sie zuerst ft oder m, dann geben Sie die Größe in dieser Einheit ein. Fuß: 6'0\". Meter: 1.78. Mischen ist gesperrt — 1.78 nicht als ft, 6'0\" nicht als m. Die USA starten mit ft. Alle anderen Länder und ein nicht-US-Internetstandort mit m. Die Einheit lässt sich weiter wechseln."
@@ -1777,8 +1793,8 @@
         body: "Guarde lugares y tarjetas que pidió a BOT DEE. Un Place ID de Google no copia fotos ni reseñas. Puede actualizar o borrar. Las cachés con licencia siguen apagadas hasta aprobar al proveedor."
       },
       "help-botdee-smartview": {
-        title: "SmartViews de BOT DEE",
-        body: "Los SmartViews son tarjetas compactas en el chat de BOT DEE. Una tarjeta de club abre la página pública FLOQR existente — no un segundo perfil. People SmartView muestra campos públicos en FLOQR, Smart Summary, Social (Música primero), Citas, Gastronomía y Viajes futuros. Las maquetas siguen etiquetadas. No hay Places ni Yelp en vivo."
+        title: "Ver mi SMARTview",
+        body: "Ver mi SMARTview muestra tu tarjeta de persona con campos públicos de FLOQR — no maquetas de club o restaurante. Editar mi SMART Summary cambia el resumen en el idioma del perfil. Las maquetas de club/restaurante están en Master Admin → Features → BOT DEE → SMARTviews. No hay Places ni Yelp en vivo."
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE guardados",
@@ -1992,6 +2008,10 @@
         title: "Perfil y ajustes",
         body: "Gestiona tu perfil, My Privacy, notificaciones AI, plantillas ShoutOut, medios públicos, ShoutOuts, listas de invitados, FloqR Inbox y Mingl. Abre Perfil y ajustes para roles, herramientas de vendedor y opciones de cuenta."
       },
+      "help-profile-account-type": {
+        title: "Tipo de cuenta",
+        body: "Personal es la cuenta de patron FloqR predeterminada. Elija Empresa solo si necesita campañas publicitarias (anuncios Inline o Mingl Gist que Master Admin debe aprobar). Sigue siendo patron en ambos casos. Empresa muestra un campo de nombre comercial y la pestaña Campañas."
+      },
       "help-profile-height": {
         title: "Estatura",
         body: "Elija primero ft o m y luego escriba su estatura en esa unidad. Pies: 6'0\". Metros: 1.78. No se puede mezclar: 1.78 no se guarda como ft ni 6'0\" como m. EE. UU. usa ft. Todos los demás países y una ubicación de internet no estadounidense usan m. Aun así puede cambiar la unidad."
@@ -2203,8 +2223,8 @@
         body: "Salva luoghi e schede chieste a BOT DEE. Un Place ID Google non è una copia di foto o recensioni. Puoi aggiornare o eliminare. Le cache con licenza restano off finché il provider non è approvato."
       },
       "help-botdee-smartview": {
-        title: "SmartViews BOT DEE",
-        body: "Le SmartViews sono schede compatte nella chat BOT DEE. Una scheda locale apre la FLOQR Public Page esistente — non un secondo profilo. People SmartView mostra campi pubblici in FLOQR, Smart Summary, Social (prima Musica), Dating, Dining e Viaggi futuri. I mock restano etichettati. Niente Places o Yelp live."
+        title: "Vedi il mio SMARTview",
+        body: "Vedi il mio SMARTview mostra la tua scheda Persona dai campi pubblici FLOQR — non mock di club o ristoranti. Modifica il mio SMART Summary cambia il riassunto nella lingua del profilo. I mock club/ristorante stanno in Master Admin → Features → BOT DEE → SMARTviews. Niente Places o Yelp live."
       },
       "help-botdee-memory": {
         title: "Chat BOT DEE salvate",
@@ -2418,6 +2438,10 @@
         title: "Profilo e impostazioni",
         body: "Gestisci il tuo profilo, My Privacy, notifiche AI, modelli ShoutOut, media pubblici, ShoutOuts, liste ospiti, FloqR Inbox e Mingl. Apri Profilo e impostazioni per ruoli, strumenti venditore e opzioni account."
       },
+      "help-profile-account-type": {
+        title: "Tipo di account",
+        body: "Personale è l'account patron FloqR predefinito. Scegli Aziendale solo se ti servono le campagne pubblicitarie (annunci Inline o Mingl Gist che Master Admin deve approvare). Restate patron in entrambi i casi. Aziendale mostra un campo ragione sociale e la scheda Campagne."
+      },
       "help-profile-height": {
         title: "Altezza",
         body: "Scegli prima ft o m, poi inserisci l'altezza in quell'unità. Piedi: 6'0\". Metri: 1.78. Il mix è bloccato: 1.78 non si salva come ft e 6'0\" non si salva come m. Gli Stati Uniti partono da ft. Tutti gli altri Paesi e una posizione internet non USA da m. Puoi comunque cambiare unità."
@@ -2629,8 +2653,8 @@
         body: "Guarde lugares e cartões que pediu ao BOT DEE. Um Place ID do Google não copia fotos ou avaliações. Pode atualizar ou apagar. Caches licenciados ficam desligados até o fornecedor ser aprovado."
       },
       "help-botdee-smartview": {
-        title: "SmartViews BOT DEE",
-        body: "Os SmartViews são cartões compactos no chat BOT DEE. Um cartão de clube abre a página pública FLOQR existente — não um segundo perfil. O People SmartView mostra campos públicos no FLOQR, Smart Summary, Social (Música primeiro), Dating, Dining e Viagens futuras. Os mocks ficam etiquetados. Sem Places ou Yelp em direto."
+        title: "Ver o meu SMARTview",
+        body: "Ver o meu SMARTview mostra o seu cartão de Pessoa a partir dos campos públicos FLOQR — não mocks de clube ou restaurante. Editar o meu SMART Summary altera o resumo no idioma do perfil. Os mocks de clube/restaurante ficam em Master Admin → Features → BOT DEE → SMARTviews. Sem Places ou Yelp em direto."
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE guardados",
@@ -2844,6 +2868,10 @@
         title: "Perfil e configurações",
         body: "Gerencie seu perfil, My Privacy, notificações AI, modelos ShoutOut, mídia pública, ShoutOuts, listas de convidados, FloqR Inbox e Mingl. Abra Perfil e configurações para funções, ferramentas de vendedor e opções de conta."
       },
+      "help-profile-account-type": {
+        title: "Tipo de conta",
+        body: "Pessoal é a conta de patron FloqR padrão. Escolha Empresarial só se precisar de campanhas publicitárias (anúncios Inline ou Mingl Gist que o Master Admin deve aprovar). Continua patron nos dois casos. Empresarial mostra um campo de nome comercial e o separador Campanhas."
+      },
       "help-profile-height": {
         title: "Altura",
         body: "Escolha primeiro ft ou m e depois indique a altura nessa unidade. Pés: 6'0\". Metros: 1.78. Misturar é bloqueado — 1.78 não grava como ft nem 6'0\" como m. Os EUA começam em ft. Todos os outros países e uma localização de internet fora dos EUA em m. Ainda pode mudar a unidade."
@@ -3055,8 +3083,8 @@
         body: "Αποθηκεύστε μέρη και κάρτες που ρωτήσατε το BOT DEE. Ένα Google Place ID δεν αντιγράφει φωτογραφίες ή κριτικές. Μπορείτε να ανανεώσετε ή να διαγράψετε. Οι αδειοδοτημένες μνήμες μένουν κλειστές μέχρι έγκριση παρόχου."
       },
       "help-botdee-smartview": {
-        title: "SmartViews BOT DEE",
-        body: "Τα SmartViews είναι συμπαγείς κάρτες στη συνομιλία BOT DEE. Η κάρτα χώρου ανοίγει την υπάρχουσα δημόσια σελίδα FLOQR — όχι δεύτερο προφίλ. Το People SmartView δείχνει δημόσια πεδία FLOQR, Smart Summary, Κοινωνικά (πρώτα Μουσική), Γνωριμίες, Εστίαση και Μελλοντικά ταξίδια. Τα mock μένουν επισημασμένα. Χωρίς ζωντανά Places ή Yelp."
+        title: "Το SMARTview μου",
+        body: "Το SMARTview μου δείχνει την κάρτα Προσώπου από δημόσια πεδία FLOQR — όχι mock χώρων ή εστιατορίων. Η επεξεργασία SMART Summary αλλάζει την περίληψη στη γλώσσα προφίλ. Τα mock χώρων/εστιατορίων είναι στο Master Admin → Features → BOT DEE → SMARTviews. Χωρίς ζωντανά Places ή Yelp."
       },
       "help-botdee-memory": {
         title: "Αποθηκευμένες συνομιλίες BOT DEE",
@@ -3270,6 +3298,10 @@
         title: "Προφίλ και ρυθμίσεις",
         body: "Διαχειριστείτε το προφίλ σας, My Privacy, ειδοποιήσεις AI, πρότυπα ShoutOut, δημόσια μέσα, ShoutOuts, λίστες επισκεπτών, FloqR Inbox και Mingl. Ανοίξτε Προφίλ και ρυθμίσεις για ρόλους, εργαλεία πωλητή και επιλογές λογαριασμού."
       },
+      "help-profile-account-type": {
+        title: "Τύπος λογαριασμού",
+        body: "Προσωπικός είναι ο προεπιλεγμένος λογαριασμός patron FloqR. Επιλέξτε Επιχείρηση μόνο αν χρειάζεστε διαφημιστικές καμπάνιες (Inline ή Mingl Gist που πρέπει να εγκρίνει ο Master Admin). Παραμένετε patron και στις δύο περιπτώσεις. Η Επιχείρηση εμφανίζει πεδίο επωνυμίας και την καρτέλα Καμπάνιες."
+      },
       "help-profile-height": {
         title: "Ύψος",
         body: "Επιλέξτε πρώτα ft ή m και μετά εισαγάγετε το ύψος σε αυτή τη μονάδα. Πόδια: 6'0\". Μέτρα: 1.78. Η ανάμειξη αποκλείεται — το 1.78 δεν αποθηκεύεται ως ft και το 6'0\" όχι ως m. Οι ΗΠΑ ξεκινούν σε ft. Όλες οι άλλες χώρες και μη αμερικανική θέση διαδικτύου σε m. Μπορείτε ακόμα να αλλάξετε μονάδα."
@@ -3481,8 +3513,8 @@
         body: "Zapisuj miejsca i karty, o które pytałeś BOT DEE. Google Place ID to nie kopia zdjęć ani recenzji. Możesz odświeżyć lub usunąć. Licencjonowane cache zostaje wyłączone, dopóki dostawca nie zostanie zatwierdzony."
       },
       "help-botdee-smartview": {
-        title: "SmartViews BOT DEE",
-        body: "SmartViews to zwarte karty w czacie BOT DEE. Karta klubu otwiera istniejącą publiczną stronę FLOQR — nie drugi profil. People SmartView pokazuje publiczne pola FLOQR, Smart Summary, Społeczność (najpierw Muzyka), Randki, Jedzenie i przyszłe podróże. Mocki zostają oznaczone. Brak żywego Places ani Yelp."
+        title: "Zobacz mój SMARTview",
+        body: "Zobacz mój SMARTview pokazuje Twoją kartę osoby z publicznych pól FLOQR — nie mocki klubów ani restauracji. Edytuj mój SMART Summary zmienia streszczenie w języku profilu. Mocki klubów/restauracji są w Master Admin → Features → BOT DEE → SMARTviews. Brak żywego Places ani Yelp."
       },
       "help-botdee-memory": {
         title: "Zapisane czaty BOT DEE",
@@ -3696,6 +3728,10 @@
         title: "Profil i ustawienia",
         body: "Zarządzaj profilem, My Privacy, powiadomieniami AI, szablonami ShoutOut, mediami publicznymi, ShoutOuts, listami gości, FloqR Inbox i Mingl. Otwórz Profil i ustawienia, aby uzyskać dostęp do ról, narzędzi sprzedawcy i opcji konta."
       },
+      "help-profile-account-type": {
+        title: "Typ konta",
+        body: "Osobiste to domyślne konto patron FloqR. Wybierz Firmowe tylko, gdy potrzebujesz kampanii reklamowych (Inline lub Mingl Gist, które musi zatwierdzić Master Admin). W obu przypadkach pozostajesz patronem. Firmowe pokazuje pole nazwy firmy i kartę Kampanie."
+      },
       "help-profile-height": {
         title: "Wzrost",
         body: "Najpierw wybierz ft lub m, potem wpisz wzrost w tej jednostce. Stopy: 6'0\". Metry: 1.78. Mieszanie jest zablokowane — 1.78 nie zapisze się jako ft, a 6'0\" jako m. USA startują od ft. Wszystkie inne kraje i nielokacja internetowa spoza USA od m. Jednostkę nadal można zmienić."
@@ -3907,8 +3943,8 @@
         body: "احفظ الأماكن والبطاقات التي سألت BOT DEE عنها. معرّف Google Place ليس نسخة من صور أو مراجعات Google. يمكنك التحديث أو الحذف. تبقى ذاكرة التخزين المرخّصة متوقفة حتى اعتماد المزود."
       },
       "help-botdee-smartview": {
-        title: "SmartViews BOT DEE",
-        body: "SmartViews بطاقات مدمجة داخل دردشة BOT DEE. بطاقة النادي تفتح صفحة FLOQR العامة الحالية — ليست ملفًا ثانيًا. يعرض People SmartView الحقول العامة داخل FLOQR وSmart Summary والاجتماعي (الموسيقى أولًا) والمواعدة والطعام والرحلات القادمة. تبقى بطاقات المحاكاة موسومة. لا Places أو Yelp مباشر."
+        title: "عرض SMARTview الخاص بي",
+        body: "عرض SMARTview يظهر بطاقة الشخص من الحقول العامة في FLOQR — وليست نماذج نوادٍ أو مطاعم. تعديل SMART Summary يغيّر الملخص بلغة الملف. نماذج النوادي/المطاعم في Master Admin → Features → BOT DEE → SMARTviews. لا Places أو Yelp مباشر."
       },
       "help-botdee-memory": {
         title: "محادثات BOT DEE المحفوظة",
@@ -4121,6 +4157,10 @@
       "help-my-profile": {
         title: "الملف والإعدادات",
         body: "أدِر ملفك وMy Privacy وإشعارات AI وقوالب ShoutOut والوسائط العامة وShoutOuts وقوائم الضيوف وFloqR Inbox وMingl. افتح الملف والإعدادات للأدوار وأدوات البائع وخيارات الحساب."
+      },
+      "help-profile-account-type": {
+        title: "نوع الحساب",
+        body: "شخصي هو حساب FloqR الافتراضي للزائر. اختر أعمال فقط إذا كنت تحتاج حملات إعلانية (إعلانات Inline أو Mingl Gist التي يجب أن يوافق عليها Master Admin). تبقى زائرًا في الحالتين. أعمال يظهر حقل اسم النشاط التجاري وعلامة تبويب الحملات."
       },
       "help-profile-height": {
         title: "الطول",

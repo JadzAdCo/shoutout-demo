@@ -127,6 +127,10 @@
     "title": "Profile & Settings",
     "body": "Manage your profile, My Privacy, AI notifications, ShoutOut templates, public media, ShoutOuts, guest lists, FloqR Inbox, and Mingl. Open Profile & Settings for roles, seller tools, and account options."
   },
+  "help-profile-account-type": {
+    "title": "Account type",
+    "body": "Personal is the default FloqR patron account. Choose Business only if you need Ad Campaigns (Inline or Mingl Gist ads that Master Admin must approve). You stay a patron either way. Business shows a business-name field and the Ad Campaigns tab."
+  },
   "help-profile-height": {
     "title": "Height",
     "body": "Choose ft or m first, then type your height in that unit. Feet uses 6'0\". Meters uses 1.78. Mixing them is blocked — 1.78 cannot be saved as ft, and 6'0\" cannot be saved as m. United States defaults to ft. Every other country, and a non-U.S. internet location, defaults to m. You can still switch the unit."
@@ -364,8 +368,8 @@
     "body": "Open Feature & Orders → My BOT DEE to save chats after the pause, export, or delete history. The five-minute pause ends the live BOT DEE session. If you opt in, BOT DEE keeps that chat so you can come back later. Guests are not saved. Mingl conversations stay in Mingl."
   },
   "help-botdee-smartview": {
-    "title": "BOT DEE SmartViews",
-    "body": "SmartViews are compact cards inside BOT DEE chat. Venue cards open the existing FLOQR Public Page — not a second profile. People SmartView shows public-within-FLOQR fields, a Smart Summary, Social (Music first), Dating, Dining, and Future Travels. Mock cards stay labeled until providers are approved. There is no live Places or Yelp."
+    "title": "View my SMARTview",
+    "body": "View my SMARTview shows your People card from public-within-FLOQR fields — not venue or restaurant mocks. Edit My SMART Summary changes the summary in your default profile language. Master Admin → Features → BOT DEE → SMARTviews is where labeled mock venue and restaurant cards live. There is no live Places or Yelp."
   },
   "help-botdee-research-library": {
     "title": "BOT DEE Research Library",
