@@ -93,6 +93,24 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-smartcard": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-smartcard-search": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-smartcard-sync": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-smartview": [
       "masterAdmin",
       "patron",

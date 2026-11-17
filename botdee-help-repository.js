@@ -511,6 +511,39 @@
       page: "patron-portal.html#foBotDeePane"
     },
     {
+      id: "help-botdee-smartcard",
+      title: "People SMARTcards",
+      body: "When more than one public FLOQR profile matches, BOT DEE shows compact People SMARTcards in the chat: square photo on the left, name, public handles, city, and a 4-line SMARTsummary on the right. Tap a card to open that person’s full SmartView. Cards use the same public profile and SMARTsummary as SmartView — not a second stored summary. Opening a card does not call Gemini.",
+      searchPhrases: ["smartcard", "smart card", "people smartcard", "who is", "who am i", "compact people card", "select person smartview"],
+      links: [
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
+        {label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}
+      ],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-smartcard-search",
+      title: "Ask BOT DEE who someone is",
+      body: "Ask “Who am I?” to open your own SmartView. Ask “Who is …” plus a name or @handle to look up public FLOQR profiles. One match opens SmartView. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether that account exists.",
+      searchPhrases: ["who am i", "who is", "find person on floqr", "do you know this person", "people search bot dee", "lookup public profile"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-smartcard-sync",
+      title: "SMARTsummary stays in sync",
+      body: "Edit your SMARTsummary in your default profile language. Save is immediate. Cards and SmartView already showing you update from the same record. Translations to other FLOQR languages run in the background and never overwrite a newer edit. If you hide your public profile, block someone, or delete the account, those cards disappear. Gemini does not overwrite text you wrote.",
+      searchPhrases: ["smartsummary sync", "card update live", "edit summary translations", "hide profile smartcard", "gemini overwrite summary"],
+      links: [{label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html#foBotDeePane"
+    },
+    {
       id: "help-botdee-smartview-troubleshoot",
       title: "SMARTview troubleshooting",
       body: "Empty card: the patron hid those fields or you are blocked. Save failed: sign in and retry — translations queue on the server, not this browser. Pending or failed translation shows the source language with a label. Edit is owner-only. Master Admin SMARTviews is still the mock catalog; live Places and Yelp stay off until counsel. Theme follows Site Chrome — there is no second SMARTview theme.",

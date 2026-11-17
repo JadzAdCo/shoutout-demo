@@ -228,6 +228,7 @@ jobs:
               deleteBotDeeArchive \
               listBotDeeSmartViews \
               getPeopleSmartView \
+              searchPeopleSmartCards \
               saveSmartSummary \
               queuePeopleSmartViewAnalysis \
               processSmartViewTranslationJob \
@@ -271,6 +272,7 @@ jobs:
               deleteBotDeeArchive \
               listBotDeeSmartViews \
               getPeopleSmartView \
+              searchPeopleSmartCards \
               saveSmartSummary \
               queuePeopleSmartViewAnalysis \
               processSmartViewTranslationJob \

@@ -710,7 +710,7 @@
     article.appendChild(gallery);
   }
 
-  function appendBubble(role, text, results, media, smartViews) {
+  function appendBubble(role, text, results, media, smartViews, peopleSearch) {
     const log = byId("botDeeTranscript");
     if (!log) return;
     const isUser = role === "user";
@@ -768,7 +768,7 @@
       const host = document.createElement("div");
       host.className = "botdee-sv-host";
       article.appendChild(host);
-      global.FLOQRBotDeeSmartView.mount(host, smartViews);
+      global.FLOQRBotDeeSmartView.mount(host, smartViews, peopleSearch);
     }
     row.appendChild(article);
     log.appendChild(row);
@@ -934,8 +934,11 @@
       const data = (await fn(payload))?.data || {};
       applyHasUsed(data, 1);
       const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
-      const reply = displayReply(data.reply);
-      appendBubble("bot", reply, localizeResults(data.results), media, data.smartViews);
+      const peopleSearch = data.peopleSearch || null;
+      const reply = peopleSearch?.replyKey
+        ? t(peopleSearch.replyKey, displayReply(data.reply))
+        : displayReply(data.reply);
+      appendBubble("bot", reply, localizeResults(data.results), media, data.smartViews, peopleSearch);
       pushHistory("model", reply);
       if (data.threadId) threadId = String(data.threadId);
       if (data.durable === true) durableEnabled = true;

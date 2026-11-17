@@ -515,6 +515,7 @@ test("no Gemini on view: peopleV2 payload uses stored analysis only", () => {
   assert.match(src, /getPeopleSmartView/);
   assert.doesNotMatch(src, /generateContent[\s\S]{0,80}getPeopleSmartView/);
   assert.match(src, /volunteered\.profileMediaSlots = data\.profileMediaSlots/);
+  assert.match(src, /hidden: true, geminiOnView: false/);
   const fn = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-core.js"), "utf8");
   assert.match(fn, /No Gemini on view/);
   assert.match(fn, /function publicPageMedia\(/);
@@ -587,7 +588,7 @@ test("Master Admin SMARTviews subtab preserved", () => {
 
 test("BOT DEE Functions deploy tag includes People SmartView v2 callables", () => {
   const wf = fs.readFileSync(path.join(__dirname, "..", ".github/workflows/functions-ci.yml"), "utf8");
-  ["getPeopleSmartView", "saveSmartSummary", "queuePeopleSmartViewAnalysis",
+  ["getPeopleSmartView", "searchPeopleSmartCards", "saveSmartSummary", "queuePeopleSmartViewAnalysis",
     "processSmartViewTranslationJob", "onUserProfileSmartViewWrite", "onSmartViewTranslationJobCreated"]
     .forEach(name => assert.match(wf, new RegExp(name)));
 });

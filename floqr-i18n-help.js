@@ -24,6 +24,18 @@
         title: "Устранение неполадок SMARTview",
         body: "Пустая карточка: поля скрыты или вы в блоке. Ошибка сохранения: войдите — переводы на сервере. Ожидание или сбой: исходный язык с меткой. Правит только владелец. SMARTviews Master Admin — mock; Places и Yelp выключены. Тема следует Site Chrome."
       },
+      "help-botdee-smartcard-sync": {
+        title: "SMARTsummary остаётся синхронным",
+        body: "Правите SMARTsummary на языке профиля. Сохранение сразу. Открытые карточки и SmartView обновляются из той же записи. Переводы идут в фоне и не затирают более новую правку. Если скрыть профиль, заблокировать человека или удалить аккаунт, карточки исчезают. Gemini не перезаписывает ваш текст."
+      },
+      "help-botdee-smartcard-search": {
+        title: "Спросить BOT DEE, кто это",
+        body: "«Who am I?» открывает ваш SmartView. «Who is …» и имя или @хендл ищут публичные профили. Один результат — SmartView. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
+      },
+      "help-botdee-smartcard": {
+        title: "SMARTcard людей",
+        body: "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SmartView. Это тот же публичный профиль и SMARTsummary. Открытие не вызывает Gemini."
+      },
       "help-botdee-smartview-review": {
         title: "Проверить и исправить SMARTsummary",
         body: "Gemini составляет черновик только из публичных полей FLOQR — не при каждом просмотре. Неверный факт: скройте поле или правьте описание. Ваш текст не перезаписывается. Конфликт профиля просит проверку. Сообщите о неверной карточке в оверлее."
@@ -453,6 +465,18 @@
       "help-botdee-smartview-troubleshoot": {
         title: "SMARTview-problemen",
         body: "Lege kaart: velden verborgen of geblokkeerd. Opslaan mislukt: meld u aan — vertalingen staan op de server. Wachtend of mislukt: brontaal met label. Alleen de eigenaar bewerkt. Master Admin SMARTviews blijft de mock-catalogus; Places en Yelp blijven uit. Thema volgt Site Chrome."
+      },
+      "help-botdee-smartcard-sync": {
+        title: "SMARTsummary blijft synchroon",
+        body: "Bewerk uw SMARTsummary in de standaard profieltaal. Opslaan is direct. Open kaarten en SmartView werken bij vanaf hetzelfde record. Vertalingen lopen op de achtergrond en overschrijven geen nieuwere bewerking. Als u het profiel verbergt, iemand blokkeert of het account verwijdert, verdwijnen die kaarten. Gemini overschrijft uw tekst niet."
+      },
+      "help-botdee-smartcard-search": {
+        title: "BOT DEE vragen wie iemand is",
+        body: "“Who am I?” opent uw SmartView. “Who is …” plus naam of @handle zoekt openbare profielen. Eén match opent SmartView. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
+      },
+      "help-botdee-smartcard": {
+        title: "Mensen-SMARTcards",
+        body: "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SmartView te openen. Kaarten gebruiken hetzelfde openbare profiel en dezelfde SMARTsummary. Openen roept Gemini niet aan."
       },
       "help-botdee-smartview-review": {
         title: "SMARTsummary controleren en corrigeren",
@@ -884,6 +908,18 @@
         title: "Dépannage SMARTview",
         body: "Carte vide : champs masqués ou blocage. Échec d’enregistrement : reconnectez-vous — les traductions sont sur le serveur. Traduction en attente ou en échec : langue source étiquetée. Seul le titulaire édite. SMARTviews Master Admin reste le catalogue mock ; Places et Yelp restent coupés. Le thème suit Site Chrome."
       },
+      "help-botdee-smartcard-sync": {
+        title: "Le SMARTsummary reste synchronisé",
+        body: "Modifiez votre SMARTsummary dans la langue par défaut du profil. L’enregistrement est immédiat. Les cartes et SmartView déjà ouverts se mettent à jour depuis le même enregistrement. Les traductions partent en arrière-plan et n’écrasent pas une édition plus récente. Si vous masquez le profil, bloquez quelqu’un ou supprimez le compte, les cartes disparaissent. Gemini n’écrase pas votre texte."
+      },
+      "help-botdee-smartcard-search": {
+        title: "Demander à BOT DEE qui est quelqu’un",
+        body: "« Who am I ? » ouvre votre SmartView. « Who is … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre SmartView. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existence du compte."
+      },
+      "help-botdee-smartcard": {
+        title: "SMARTcards Personnes",
+        body: "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SmartView complet. Les cartes utilisent le même profil public et le même SMARTsummary que SmartView. Ouvrir une carte n’appelle pas Gemini."
+      },
       "help-botdee-smartview-review": {
         title: "Relire et corriger un SMARTsummary",
         body: "Gemini rédige uniquement à partir des champs publics dans FLOQR — jamais à chaque vue. Si un fait est faux, masquez le champ dans la visibilité du profil ou modifiez le résumé. Un texte rédigé par vous n’est pas écrasé. Un conflit de profil demande une relecture. Signalez une carte incorrecte depuis l’overlay."
@@ -1313,6 +1349,18 @@
       "help-botdee-smartview-troubleshoot": {
         title: "SMARTview-Fehlerbehebung",
         body: "Leere Karte: Felder ausgeblendet oder blockiert. Speichern fehlgeschlagen: anmelden — Übersetzungen laufen auf dem Server. Ausstehend/Fehler: Quellsprache mit Label. Nur der Inhaber bearbeitet. Master-Admin-SMARTviews bleibt Mock; Places/Yelp aus. Theme folgt Site Chrome."
+      },
+      "help-botdee-smartcard-sync": {
+        title: "SMARTsummary bleibt synchron",
+        body: "Bearbeiten Sie Ihre SMARTsummary in der Standard-Profilsprache. Speichern ist sofort. Offene Karten und SmartView aktualisieren sich aus demselben Datensatz. Übersetzungen laufen im Hintergrund und überschreiben keine neuere Bearbeitung. Wenn Sie das Profil verbergen, jemanden blockieren oder das Konto löschen, verschwinden die Karten. Gemini überschreibt Ihren Text nicht."
+      },
+      "help-botdee-smartcard-search": {
+        title: "BOT DEE fragen, wer jemand ist",
+        body: "„Who am I?“ öffnet Ihre SmartView. „Who is …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet SmartView. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
+      },
+      "help-botdee-smartcard": {
+        title: "Personen-SMARTcards",
+        body: "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SmartView. Karten nutzen dasselbe öffentliche Profil und dieselbe SMARTsummary. Öffnen ruft Gemini nicht auf."
       },
       "help-botdee-smartview-review": {
         title: "SMARTsummary prüfen und korrigieren",
@@ -1744,6 +1792,18 @@
         title: "Solución de problemas de SMARTview",
         body: "Tarjeta vacía: campos ocultos o bloqueo. Fallo al guardar: inicie sesión — las traducciones van al servidor. Pendiente o error: idioma de origen etiquetado. Solo el titular edita. SMARTviews de Master Admin sigue siendo el catálogo mock; Places y Yelp apagados. El tema sigue Site Chrome."
       },
+      "help-botdee-smartcard-sync": {
+        title: "SMARTsummary permanece sincronizado",
+        body: "Edite su SMARTsummary en el idioma predeterminado del perfil. El guardado es inmediato. Las tarjetas y SmartView abiertos se actualizan desde el mismo registro. Las traducciones van en segundo plano y no sobrescriben una edición más nueva. Si oculta el perfil, bloquea a alguien o elimina la cuenta, esas tarjetas desaparecen. Gemini no sobrescribe su texto."
+      },
+      "help-botdee-smartcard-search": {
+        title: "Preguntar a BOT DEE quién es alguien",
+        body: "«Who am I?» abre su SmartView. «Who is …» más un nombre o @identificador busca perfiles públicos. Un resultado abre SmartView. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
+      },
+      "help-botdee-smartcard": {
+        title: "SMARTcards de personas",
+        body: "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SmartView completo. Las tarjetas usan el mismo perfil público y SMARTsummary. Abrir una tarjeta no llama a Gemini."
+      },
       "help-botdee-smartview-review": {
         title: "Revisar y corregir un SMARTsummary",
         body: "Gemini redacta solo con campos públicos en FLOQR — no en cada vista. Si un dato es falso, oculte el campo o edite el resumen. Su texto no se sobrescribe. Un conflicto de perfil pide revisión. Informe una tarjeta incorrecta desde la superposición."
@@ -2173,6 +2233,18 @@
       "help-botdee-smartview-troubleshoot": {
         title: "Risoluzione problemi SMARTview",
         body: "Scheda vuota: campi nascosti o blocco. Salvataggio fallito: accedi — le traduzioni stanno sul server. In attesa o errore: lingua di origine etichettata. Solo il titolare modifica. SMARTviews Master Admin resta il catalogo mock; Places e Yelp restano off. Il tema segue Site Chrome."
+      },
+      "help-botdee-smartcard-sync": {
+        title: "SMARTsummary resta sincronizzato",
+        body: "Modifica lo SMARTsummary nella lingua predefinita del profilo. Il salvataggio è immediato. Schede e SmartView aperti si aggiornano dallo stesso record. Le traduzioni partono in background e non sovrascrivono una modifica più recente. Se nascondi il profilo, blocchi qualcuno o elimini l’account, le schede scompaiono. Gemini non sovrascrive il tuo testo."
+      },
+      "help-botdee-smartcard-search": {
+        title: "Chiedere a BOT DEE chi è qualcuno",
+        body: "“Who am I?” apre il tuo SmartView. “Who is …” più nome o @handle cerca profili pubblici. Un risultato apre SmartView. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
+      },
+      "help-botdee-smartcard": {
+        title: "SMARTcard persone",
+        body: "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SmartView completo. Le schede usano lo stesso profilo pubblico e SMARTsummary. Aprire una scheda non chiama Gemini."
       },
       "help-botdee-smartview-review": {
         title: "Rivedi e correggi lo SMARTsummary",
@@ -2604,6 +2676,18 @@
         title: "Resolução de problemas SMARTview",
         body: "Cartão vazio: campos ocultos ou bloqueio. Falha ao guardar: inicie sessão — as traduções ficam no servidor. Pendente ou falha: idioma de origem com etiqueta. Só o dono edita. SMARTviews Master Admin continua o catálogo mock; Places e Yelp desligados. O tema segue o Site Chrome."
       },
+      "help-botdee-smartcard-sync": {
+        title: "O SMARTsummary fica sincronizado",
+        body: "Edite o SMARTsummary no idioma predefinido do perfil. A gravação é imediata. Cards e SmartView abertos atualizam a partir do mesmo registo. As traduções correm em segundo plano e não substituem uma edição mais nova. Se ocultar o perfil, bloquear alguém ou apagar a conta, essas cards desaparecem. O Gemini não substitui o seu texto."
+      },
+      "help-botdee-smartcard-search": {
+        title: "Perguntar ao BOT DEE quem é alguém",
+        body: "“Who am I?” abre o seu SmartView. “Who is …” mais um nome ou @handle procura perfis públicos. Um resultado abre o SmartView. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
+      },
+      "help-botdee-smartcard": {
+        title: "SMARTcards de pessoas",
+        body: "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SmartView completo. As cards usam o mesmo perfil público e SMARTsummary. Abrir não chama o Gemini."
+      },
       "help-botdee-smartview-review": {
         title: "Rever e corrigir o SMARTsummary",
         body: "O Gemini redige só a partir de campos públicos no FLOQR — não em cada vista. Se um facto estiver errado, oculte o campo ou edite o resumo. O seu texto não é substituído. Um conflito de perfil pede revisão. Reporte um cartão errado na sobreposição."
@@ -3033,6 +3117,18 @@
       "help-botdee-smartview-troubleshoot": {
         title: "Αντιμετώπιση SMARTview",
         body: "Κενή κάρτα: κρυμμένα πεδία ή αποκλεισμός. Αποτυχία αποθήκευσης: συνδεθείτε — οι μεταφράσεις είναι στον διακομιστή. Εκκρεμές/αποτυχία: γλώσσα πηγής με σήμανση. Μόνο ο κάτοχος επεξεργάζεται. Το SMARTviews Master Admin μένει mock. Places/Yelp κλειστά. Το θέμα ακολουθεί το Site Chrome."
+      },
+      "help-botdee-smartcard-sync": {
+        title: "Το SMARTsummary μένει συγχρονισμένο",
+        body: "Επεξεργαστείτε το SMARTsummary στην προεπιλεγμένη γλώσσα προφίλ. Η αποθήκευση είναι άμεση. Ανοιχτές κάρτες και SmartView ενημερώνονται από την ίδια εγγραφή. Οι μεταφράσεις τρέχουν στο παρασκήνιο και δεν αντικαθιστούν νεότερη επεξεργασία. Αν κρύψετε το προφίλ, αποκλείσετε κάποιον ή διαγράψετε τον λογαριασμό, οι κάρτες εξαφανίζονται. Το Gemini δεν αντικαθιστά το κείμενό σας."
+      },
+      "help-botdee-smartcard-search": {
+        title: "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
+        body: "Το «Who am I?» ανοίγει το SmartView σας. Το «Who is …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει SmartView. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
+      },
+      "help-botdee-smartcard": {
+        title: "SMARTcard ατόμων",
+        body: "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SmartView. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SMARTsummary. Το άνοιγμα δεν καλεί Gemini."
       },
       "help-botdee-smartview-review": {
         title: "Έλεγχος και διόρθωση SMARTsummary",
@@ -3464,6 +3560,18 @@
         title: "Rozwiązywanie problemów SMARTview",
         body: "Pusta karta: ukryte pola lub blokada. Zapis nieudany: zaloguj się — tłumaczenia są na serwerze. Oczekujące/błąd: język źródłowy z etykietą. Edytuje tylko właściciel. SMARTviews Master Admin to nadal mock; Places i Yelp wyłączone. Motyw idzie za Site Chrome."
       },
+      "help-botdee-smartcard-sync": {
+        title: "SMARTsummary zostaje zsynchronizowane",
+        body: "Edytuj SMARTsummary w domyślnym języku profilu. Zapis jest natychmiastowy. Otwarte karty i SmartView aktualizują się z tego samego rekordu. Tłumaczenia idą w tle i nie nadpisują nowszej edycji. Ukrycie profilu, blokada lub usunięcie konta chowa te karty. Gemini nie nadpisuje Twojego tekstu."
+      },
+      "help-botdee-smartcard-search": {
+        title: "Zapytaj BOT DEE, kim ktoś jest",
+        body: "„Who am I?” otwiera Twoje SmartView. „Who is …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera SmartView. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
+      },
+      "help-botdee-smartcard": {
+        title: "SMARTcard osób",
+        body: "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SmartView. Karty używają tego samego profilu i SMARTsummary. Otwarcie nie wywołuje Gemini."
+      },
       "help-botdee-smartview-review": {
         title: "Przejrzyj i popraw SMARTsummary",
         body: "Gemini szkicuje tylko z publicznych pól FLOQR — nie przy każdym otwarciu. Błędny fakt: ukryj pole lub edytuj podsumowanie. Twój tekst nie jest nadpisywany. Konflikt profilu prosi o przegląd. Zgłoś błędną kartę z nakładki."
@@ -3893,6 +4001,18 @@
       "help-botdee-smartview-troubleshoot": {
         title: "استكشاف أخطاء SMARTview",
         body: "بطاقة فارغة: الحقول مخفية أو أنت محظور. فشل الحفظ: سجّل الدخول — الترجمات على الخادم. انتظار أو فشل: لغة المصدر بوسم. التعديل للمالك فقط. SMARTviews في Master Admin ما زال كتالوج المحاكاة؛ Places وYelp متوقفان. السمة تتبع Site Chrome."
+      },
+      "help-botdee-smartcard-sync": {
+        title: "يبقى SMARTsummary متزامنًا",
+        body: "عدّل SMARTsummary بلغة الملف الافتراضية. الحفظ فوري. البطاقات وSmartView المفتوحة تتحدّث من نفس السجل. تُترجم اللغات الأخرى في الخلفية ولا تستبدل تعديلاً أحدث. إذا أخفيت الملف أو حظرت شخصًا أو حذفت الحساب تختفي البطاقات. لا يستبدل Gemini نصك."
+      },
+      "help-botdee-smartcard-search": {
+        title: "اسأل BOT DEE من هذا الشخص",
+        body: "«Who am I?» يفتح SmartView الخاص بك. «Who is …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح SmartView. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
+      },
+      "help-botdee-smartcard": {
+        title: "SMARTcard الأشخاص",
+        body: "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SmartView الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
       },
       "help-botdee-smartview-review": {
         title: "مراجعة وتصحيح SMARTsummary",

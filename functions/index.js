@@ -29,6 +29,7 @@ module.exports = {
   deleteBotDeeArchive: require("./botdee-upgrade-functions").deleteBotDeeArchive,
   listBotDeeSmartViews: require("./botdee-upgrade-functions").listBotDeeSmartViews,
   getPeopleSmartView: require("./botdee-smartview-v2-functions").getPeopleSmartView,
+  searchPeopleSmartCards: require("./botdee-smartcard-functions").searchPeopleSmartCards,
   saveSmartSummary: require("./botdee-smartview-v2-functions").saveSmartSummary,
   queuePeopleSmartViewAnalysis: require("./botdee-smartview-v2-functions").queuePeopleSmartViewAnalysis,
   processSmartViewTranslationJob: require("./botdee-smartview-v2-functions").processSmartViewTranslationJob,
