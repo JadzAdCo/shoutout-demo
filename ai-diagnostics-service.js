@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.030";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.030";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.031";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.031";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -220,6 +220,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.031",
+      title: "s3.3.031 — SMARTview spelling + public-page media",
+      checks: [
+        {label:"SMARTview chrome spelling", file:"floqr-i18n.js", includes:["SMARTview — Person", "Show mock SMARTviews"], notIncludes:["SmartView — Person"]},
+        {label:"Public-page media helper", file:"functions/botdee-smartview-v2-core.js", includes:["function publicPageMedia(", "profileMediaSlots"]},
+        {label:"getPeopleSmartView copies slots", file:"functions/botdee-smartview-v2-functions.js", includes:["volunteered.profileMediaSlots = data.profileMediaSlots"]},
+        {label:"Overlay plays videos", file:"botdee-smartview.js", includes:["<video src=", "overlayMediaList"]},
+        {label:"Help public Profile Media", file:"botdee-help-repository.js", includes:["same hero as your FLOQR public profile", "8 photos + 2 videos"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-031-smartview-public-media"]}
+      ]
+    },
     {
       version: "s3.3.030",
       title: "s3.3.030 — Profile select text + patron SMARTview",
@@ -3273,6 +3285,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-031-smartview-public-media",
+      area:"BOT DEE",
+      feature:"SMARTview spelling + public-page photos/videos",
+      changed:"s3.3.031 — Brand spelling is SMARTview app-wide. People card hero and Photos/Videos overlay use the same Profile Media as the FLOQR public page (8 photos + 2 videos in profileMediaSlots), not Google Auth photoURL alone.",
+      howToTest:"1) Hard-refresh after Pages publish — confirm floqr-i18n.js?v=s3.3.031. Sign in as Don Papi (or any patron with public Profile Media). 2) Feature & Orders → My BOT DEE → View my SMARTview. 3) Compact card main image is the same hero as Edit Profile → public preview (first Profile Media item), not a blank or a different Google avatar. 4) Tap the photo — Photos lists every public image; Videos plays public clips. 5) Chrome/help/Master Admin mock button read SMARTview / SMARTviews (not SmartView). 6) Functions must be deployed from origin/main or live getPeopleSmartView still returns photoURL-only. 7) Mark Succeed/Failed.",
+      expected:"Don Papi (and every patron) SMARTview shows the FLOQR public-page hero plus that page’s photos and videos. Spelling is SMARTview everywhere a patron or admin reads it.",
+      troubleshoot:"Blank portrait after Pages refresh → Functions still on s3.3.030; deploy getPeopleSmartView from origin/main. Hero is Google avatar not public gallery → profileMediaSlots not copied; confirm public preview uses the gallery photo. Videos tab empty → slots 9–10 empty or callable not deployed. Still seeing SmartView → cached floqr-i18n.js / help; hard-refresh until ?v=s3.3.031."
+    },
     {
       id:"s3-3-030-patron-smartview",
       area:"BOT DEE",

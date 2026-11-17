@@ -107,7 +107,8 @@
   background: color-mix(in srgb, var(--accent, #00d4fe) 8%, #000);
   position: relative;
 }
-.botdee-sv-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.botdee-sv-portrait img,
+.botdee-sv-portrait video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .botdee-sv-counter {
   position: absolute;
   right: 6px;

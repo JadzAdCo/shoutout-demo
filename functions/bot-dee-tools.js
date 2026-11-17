@@ -320,16 +320,20 @@ function imageUrlsFromUser(data = {}) {
   const urls = [];
   const push = value => {
     const url = text(value, 500);
-    if (url && /^https?:\/\//i.test(url) && !urls.includes(url) && urls.length < 8) urls.push(url);
+    if (url && /^(https?:\/\/|\.\/)/i.test(url) && !urls.includes(url) && urls.length < 8) urls.push(url);
   };
+  const slots = Array.isArray(data.profileMediaSlots) ? data.profileMediaSlots : [];
+  const fallback = data.photoURL || data.profilePhotoUrl || data.publicPhotoUrl || data.avatarUrl || data.mainPhotoUrl || "";
+  for (let i = 0; i < 8; i += 1) {
+    const slot = slots[i] && typeof slots[i] === "object" ? slots[i] : {};
+    if (slot.type === "video") continue;
+    push(slot.url || slot.mediaUrl || (i === 0 ? fallback : ""));
+  }
   push(data.photoURL);
   push(data.profilePhotoUrl);
   push(data.mainPhotoUrl);
   push(data.avatarUrl);
   push(data.publicPhotoUrl);
-  (Array.isArray(data.profileMediaSlots) ? data.profileMediaSlots : []).forEach(slot => {
-    if (slot && slot.type !== "video") push(slot.url || slot.mediaUrl);
-  });
   (Array.isArray(data.galleryUrls) ? data.galleryUrls : []).forEach(item => {
     if (typeof item === "string") push(item);
     else push(item?.url || item?.mediaUrl);
@@ -466,7 +470,8 @@ function volunteeredPublicDatapoints(data = {}) {
     const lookingToMeet = text(data.lookingToMeet || "", 200);
     if (lookingToMeet) datapoints.lookingToMeet = lookingToMeet;
   }
-  if (allowed("media")) datapoints.photoCount = imageUrlsFromUser(data).length;
+  const publicPhotos = imageUrlsFromUser(data);
+  if (publicPhotos.length) datapoints.photoCount = publicPhotos.length;
   return {sharedDatapoints, datapoints};
 }
 
@@ -488,8 +493,7 @@ function publicUserFacts(data = {}) {
 
 function publicUserCard(uid, data = {}, score, extras = {}) {
   const handle = text(data.floqrHandle || data.username || data.minglHandle, 80).replace(/^@+/, "");
-  const allowed = key => datapointAllowed(data, key);
-  const images = allowed("media") ? imageUrlsFromUser(data) : [];
+  const images = imageUrlsFromUser(data);
   const instagram = text(data.instagram || data.instagramHandle, 80).replace(/^@+/, "");
   const volunteered = volunteeredPublicDatapoints(data);
   const relation = extras.relation === "self" || extras.relation === "connection" ? extras.relation : "public";

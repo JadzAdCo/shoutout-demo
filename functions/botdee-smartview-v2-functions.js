@@ -91,7 +91,15 @@ function snapshotFromUser(data, volunteered) {
     floqrHandle: data.floqrHandle || data.username,
     instagramHandle: data.instagramHandle || data.instagram,
     xHandle: data.xHandle || data.twitter || data.x,
-    photoURL: data.photoURL || data.publicPhotoUrl,
+    photoURL: data.photoURL,
+    publicPhotoUrl: data.publicPhotoUrl,
+    profilePhotoUrl: data.profilePhotoUrl,
+    avatarUrl: data.avatarUrl,
+    mainPhotoUrl: data.mainPhotoUrl,
+    profileMediaSlots: data.profileMediaSlots,
+    publicPhotos: data.publicPhotos,
+    galleryUrls: data.galleryUrls,
+    publicGallery: data.publicGallery,
     preferredLanguage: data.preferredLanguage || data.uiLanguage,
     uiLanguage: data.uiLanguage,
     identityVerified: data.identityVerified,
@@ -268,7 +276,16 @@ exports.getPeopleSmartView = onCall(CALL_OPTS, async request => {
     volunteered.handle = String(data.floqrHandle || data.username || "").replace(/^@+/, "");
     volunteered.instagram = data.instagramHandle || data.instagram;
     volunteered.xHandle = data.xHandle || data.twitter;
-    volunteered.photoUrl = data.photoURL || data.publicPhotoUrl;
+    volunteered.photoURL = data.photoURL;
+    volunteered.publicPhotoUrl = data.publicPhotoUrl;
+    volunteered.profilePhotoUrl = data.profilePhotoUrl;
+    volunteered.avatarUrl = data.avatarUrl;
+    volunteered.mainPhotoUrl = data.mainPhotoUrl;
+    volunteered.profileMediaSlots = data.profileMediaSlots;
+    volunteered.publicPhotos = data.publicPhotos;
+    volunteered.galleryUrls = data.galleryUrls;
+    volunteered.publicGallery = data.publicGallery;
+    volunteered.photoUrl = v2.publicPageMedia(data).photoUrl;
     volunteered.verified = data.identityVerified === 1 || data.floqrVerified === 1;
     volunteered.sourceLocale = v2.normalizeLocale(data.preferredLanguage || data.uiLanguage || "en");
     volunteered.bio = data.publicBio || data.bio || volunteered.bio;
