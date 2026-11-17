@@ -259,7 +259,7 @@
             return `<a href="${esc(href)}" rel="noopener noreferrer" target="_blank">${esc(row.handle || "")}</a>`;
           }).join("")}${people.city ? `<span>${esc(people.city)}</span>` : ""}</div>
           <button type="button" class="botdee-sv-summary-btn" data-sv-open="summary">
-            <span class="botdee-sv-summary-kicker">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}</span>
+            <span class="botdee-sv-summary-kicker">${esc(t("botdee.sv.smartSummary", "SMARTsummary"))}</span>
             <p class="botdee-sv-summary-text">${esc(summaryText)}</p>
             ${localeNote ? `<span class="botdee-sv-locale">${localeNote}</span>` : ""}
             <span class="botdee-sv-more">${esc(t("botdee.sv.tapMore", "Tap for more information"))}</span>
@@ -465,7 +465,7 @@
       renderMediaFor(session, overlay);
       overlay.querySelector("[data-sv-close]")?.focus();
     } else if (kind === "summary") {
-      const overlay = ensureOverlay("botdeeSvSummaryOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvSummaryTitle">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
+      const overlay = ensureOverlay("botdeeSvSummaryOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvSummaryTitle">${esc(t("botdee.sv.smartSummary", "SMARTsummary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
         <div class="botdee-sv-long" data-sv-long></div>`);
       overlay.setAttribute("aria-labelledby", "botdeeSvSummaryTitle");
       overlay.hidden = false;
@@ -474,7 +474,7 @@
         ? `<p class="botdee-sv-locale">${esc(t("botdee.sv.translationPending", "Translation pending. Showing the source language."))}</p>`
         : "";
       const edit = people.ownerMayEdit
-        ? `<p class="botdee-sv-owner-row"><button type="button" class="botdee-sv-action" data-sv-edit>${esc(t("botdee.sv.editSummary", "Edit my Smart Summary"))}</button></p>`
+        ? `<p class="botdee-sv-owner-row"><button type="button" class="botdee-sv-action" data-sv-edit>${esc(t("botdee.sv.editSummary", "Edit my SMARTsummary"))}</button></p>`
         : "";
       const conflict = people.conflictFlag
         ? `<p class="botdee-sv-locale">${esc(t("botdee.sv.conflictReview", "Your public profile changed. Review this summary — it was not overwritten."))}</p>`
@@ -483,12 +483,12 @@
         <p class="botdee-sv-foot">${esc(t("botdee.sv.summaryFoot", "Drafted from public-within-FLOQR fields. Facts are not guaranteed. Hide or correct them in Profile visibility."))}</p>`;
       overlay.querySelector("[data-sv-close]")?.focus();
     } else if (kind === "edit" && people.ownerMayEdit) {
-      const overlay = ensureOverlay("botdeeSvEditOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvEditTitle">${esc(t("botdee.sv.editSummary", "Edit my Smart Summary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
-        <p class="botdee-sv-foot">${esc(t("botdee.sv.editHint", "Edit in your default profile language. Translations update in the background."))}</p>
+      const overlay = ensureOverlay("botdeeSvEditOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvEditTitle">${esc(t("botdee.sv.editSummary", "Edit my SMARTsummary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
+        <p class="botdee-sv-foot">${esc(t("botdee.sv.editHint", "Edit in your default profile language. Translations to every other language, including English, update in the background."))}</p>
         <label class="botdee-sv-edit-label">${esc(t("botdee.sv.sourceLanguage", "Default profile language"))}
           <input id="botdeeSvSourceLocale" type="text" maxlength="8" readonly/>
         </label>
-        <label class="botdee-sv-edit-label">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}
+        <label class="botdee-sv-edit-label">${esc(t("botdee.sv.smartSummary", "SMARTsummary"))}
           <textarea id="botdeeSvSummaryEditor" rows="8" maxlength="1400"></textarea>
         </label>
         <button type="button" class="botdee-sv-action botdee-sv-action-main" data-sv-save>${esc(t("botdee.sv.saveSummary", "Save and queue translations"))}</button>

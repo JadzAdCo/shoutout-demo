@@ -94,6 +94,8 @@ test("usercharacter_analysis schema, source-version matching, owner edit, stale 
   assert.equal(jobs.length, 10);
   assert.ok(jobs.every(job => job.locale !== "en"));
   assert.ok(jobs.every(job => job.id === v2.translationJobId("u1", 2, job.locale, saved.sourceHash)));
+  assert.equal(saved.translations.en.status, "source");
+  assert.equal(saved.translations.en.text, "Amara loves Afrobeats.");
   const stale = v2.applyTranslationResult(saved, {...jobs[0], revision: 1, sourceHash: "old"}, {
     text: "stale french",
     engine: "gemini"
@@ -112,6 +114,95 @@ test("usercharacter_analysis schema, source-version matching, owner edit, stale 
   assert.equal(shownDe.status, "fallback");
   assert.equal(shownDe.pending, true);
   assert.equal(shownDe.locale, "en");
+});
+
+test("sourceLocale is patron uiLanguage; French save fans out including English", () => {
+  const snap = v2.publicFieldsSnapshot({displayName: "Amara", uiLanguage: "fr"}, volunteered());
+  assert.equal(snap.sourceLocale, "fr");
+  const drafted = v2.emptyAnalysis("u1", snap, 1);
+  assert.equal(drafted.sourceLocale, "fr");
+  assert.equal(drafted.translations.fr.status, "source");
+  assert.equal(drafted.translations.fr.text, drafted.sourceText);
+  const prompt = v2.geminiAnalysisPrompt(snap);
+  assert.match(prompt, /French \(fr\)/);
+  assert.match(prompt, /SMARTsummary/);
+  assert.match(prompt, /Do not write English unless the source language is English/);
+  const enPrompt = v2.geminiAnalysisPrompt({...snap, sourceLocale: "en"});
+  assert.match(enPrompt, /English \(en\)/);
+  const valid = v2.validateOwnerEdit({
+    text: "Amara aime l'Afrobeats et les rooftops.",
+    locale: "fr",
+    previous: drafted
+  });
+  assert.equal(valid.ok, true);
+  assert.equal(valid.sourceLocale, "fr");
+  const saved = v2.applyOwnerSave(drafted, {
+    summary: valid.summary,
+    sourceLocale: valid.sourceLocale,
+    editorUid: "u1",
+    now: 2
+  });
+  assert.equal(saved.sourceLocale, "fr");
+  assert.equal(saved.sourceAuthoredBy, "owner");
+  assert.equal(saved.translations.fr.status, "source");
+  assert.equal(saved.translations.fr.text, valid.summary);
+  assert.equal(saved.translations.en, undefined);
+  const jobs = v2.enqueueTranslationJobs({
+    uid: "u1",
+    revision: saved.revision,
+    sourceHash: saved.sourceHash,
+    sourceLocale: saved.sourceLocale,
+    now: 3
+  });
+  assert.equal(jobs.length, 10);
+  assert.ok(jobs.some(job => job.locale === "en"));
+  assert.ok(jobs.every(job => job.locale !== "fr"));
+  assert.deepEqual(jobs.map(job => job.locale).sort(), v2.fanOutLocales("fr").slice().sort());
+  jobs.forEach(job => {
+    assert.equal(job.id, v2.translationJobId("u1", saved.revision, job.locale, saved.sourceHash));
+    assert.match(job.id, new RegExp(`^u1_${saved.revision}_${job.locale}_[a-f0-9]{1,16}$`));
+    assert.equal(job.sourceLocale, "fr");
+  });
+  const enJob = jobs.find(job => job.locale === "en");
+  const en = v2.translationLocalePatch(saved, enJob, {
+    text: "Amara loves Afrobeats and rooftops.",
+    engine: "gemini"
+  });
+  assert.equal(en.applied, true);
+  assert.equal(en.update["translations.en"].text, "Amara loves Afrobeats and rooftops.");
+  assert.ok(!("translations.fr" in en.update));
+  const deJob = jobs.find(job => job.locale === "de");
+  const de = v2.translationLocalePatch(saved, deJob, {text: "Amara mag Afrobeats.", engine: "gemini"});
+  const merged = v2.applyLocalePatches(saved, [en, de]);
+  assert.equal(merged.translations.fr.status, "source");
+  assert.equal(merged.translations.fr.text, valid.summary);
+  assert.equal(merged.translations.en.text, "Amara loves Afrobeats and rooftops.");
+  assert.equal(merged.translations.de.text, "Amara mag Afrobeats.");
+  const shownEn = v2.localeSummary(merged, "en");
+  assert.equal(shownEn.status, "translated");
+  assert.equal(shownEn.locale, "en");
+  assert.equal(shownEn.text, "Amara loves Afrobeats and rooftops.");
+  const shownFr = v2.localeSummary(merged, "fr");
+  assert.equal(shownFr.status, "source");
+  assert.equal(shownFr.text, valid.summary);
+  const pending = v2.localeSummary(saved, "en");
+  assert.equal(pending.status, "fallback");
+  assert.equal(pending.pending, true);
+  assert.equal(pending.text, valid.summary);
+});
+
+test("persistAnalysis merge:false is a new revision only; fan-out uses dotted locale patches", () => {
+  const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
+  assert.match(src, /persistAnalysis[\s\S]{0,900}\{merge: false\}/);
+  const persist = src.slice(src.indexOf("async function persistAnalysis"), src.indexOf("async function persistTranslationLocale"));
+  assert.match(persist, /stampSourceTranslation/);
+  assert.match(persist, /NEW source revision/);
+  const runFn = src.slice(src.indexOf("async function runTranslationJob"), src.indexOf("exports.processSmartViewTranslationJob"));
+  assert.doesNotMatch(runFn, /persistAnalysis\(/);
+  assert.match(runFn, /persistTranslationLocale\(/);
+  assert.match(src, /request\.data\?\.uiLanguage \|\| viewerData\.uiLanguage/);
+  assert.match(src, /data\.uiLanguage \|\| data\.preferredLanguage/);
+  assert.doesNotMatch(src, /viewerLocale = v2\.normalizeLocale\(request\.data\?\.uiLanguage \|\| data\.uiLanguage/);
 });
 
 test("owner-authored summary is not silently regenerated; profile change flags conflict", () => {
@@ -337,6 +428,8 @@ test("no Gemini on view: peopleV2 payload uses stored analysis only", () => {
 
 test("people card renderer: tabs, shrink tags, overlays restore draft helpers exist", () => {
   const client = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
+  assert.match(client, /SMARTsummary/);
+  assert.doesNotMatch(client, /"Smart Summary"/);
   assert.match(client, /renderPeopleCard/);
   assert.match(client, /captureChatState/);
   assert.match(client, /restoreChatState/);

@@ -100,8 +100,8 @@ function snapshotFromUser(data, volunteered) {
     publicPhotos: data.publicPhotos,
     galleryUrls: data.galleryUrls,
     publicGallery: data.publicGallery,
-    preferredLanguage: data.preferredLanguage || data.uiLanguage,
-    uiLanguage: data.uiLanguage,
+    preferredLanguage: data.uiLanguage || data.preferredLanguage,
+    uiLanguage: data.uiLanguage || data.preferredLanguage,
     identityVerified: data.identityVerified,
     floqrVerified: data.floqrVerified
   }, volunteered);
@@ -186,8 +186,11 @@ async function generateWithGemini(prompt, {uid, operation}) {
 }
 
 async function persistAnalysis(uid, doc, jobs) {
+  // Full-doc replace is a NEW source revision only (Gemini draft / owner save).
+  // Fan-out must never call this — persistTranslationLocale uses translations.{locale}.
+  const stamped = v2.stampSourceTranslation(doc);
   await analysisRef(uid).set({
-    ...doc,
+    ...stamped,
     updatedAt: FieldValue.serverTimestamp()
   }, {merge: false});
   if (jobs && jobs.length) await writeJobs(jobs);
@@ -238,6 +241,7 @@ async function draftAnalysis(uid, snap, existing) {
     doc.geminiUsage = generated.usage;
     doc.provenance = {...doc.provenance, engine: "gemini", model: generated.model};
   }
+  doc = v2.stampSourceTranslation(doc, now);
   const jobs = v2.enqueueTranslationJobs({
     uid,
     revision: doc.revision,
@@ -272,7 +276,14 @@ exports.getPeopleSmartView = onCall(CALL_OPTS, async request => {
     const volunteered = tools.volunteeredPublicDatapoints(data);
     volunteered.uid = subjectUid;
     volunteered.viewerUid = viewerUid;
-    volunteered.viewerLocale = v2.normalizeLocale(request.data?.uiLanguage || data.uiLanguage || "en");
+    let viewerData = data;
+    if (viewerUid !== subjectUid) {
+      const viewerSnap = await db.collection("users").doc(viewerUid).get();
+      viewerData = viewerSnap.exists ? (viewerSnap.data() || {}) : {};
+    }
+    volunteered.viewerLocale = v2.normalizeLocale(
+      request.data?.uiLanguage || viewerData.uiLanguage || viewerData.preferredLanguage || "en"
+    );
     volunteered.handle = String(data.floqrHandle || data.username || "").replace(/^@+/, "");
     volunteered.instagram = data.instagramHandle || data.instagram;
     volunteered.xHandle = data.xHandle || data.twitter;
@@ -287,7 +298,7 @@ exports.getPeopleSmartView = onCall(CALL_OPTS, async request => {
     volunteered.publicGallery = data.publicGallery;
     volunteered.photoUrl = v2.publicPageMedia(data).photoUrl;
     volunteered.verified = data.identityVerified === 1 || data.floqrVerified === 1;
-    volunteered.sourceLocale = v2.normalizeLocale(data.preferredLanguage || data.uiLanguage || "en");
+    volunteered.sourceLocale = v2.normalizeLocale(data.uiLanguage || data.preferredLanguage || "en");
     volunteered.bio = data.publicBio || data.bio || volunteered.bio;
     volunteered.minglHref = volunteered.handle
       ? `./?start=search&q=${encodeURIComponent("@" + volunteered.handle)}`
@@ -311,7 +322,7 @@ exports.saveSmartSummary = onCall(CALL_OPTS, async request => {
     const uid = await requireBotDee(request);
     const userSnap = await db.collection("users").doc(uid).get();
     const data = userSnap.data() || {};
-    const locale = v2.normalizeLocale(data.preferredLanguage || data.uiLanguage || request.data?.locale || "en");
+    const locale = v2.normalizeLocale(data.uiLanguage || data.preferredLanguage || request.data?.locale || "en");
     const check = v2.validateOwnerEdit({
       text: request.data?.summary,
       locale,

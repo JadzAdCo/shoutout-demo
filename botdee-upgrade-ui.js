@@ -237,7 +237,8 @@
     host.setAttribute("aria-busy", "true");
     if (!host.innerHTML.trim()) host.textContent = t("botdee.chatThinking", "BOT DEE is thinking…");
     try {
-      const data = await call("getPeopleSmartView", {});
+      const uiLanguage = global.FLOQRI18n?.getLanguage?.() || "en";
+      const data = await call("getPeopleSmartView", {uiLanguage});
       const views = Array.isArray(data.views) ? data.views : [];
       if (!views.length) {
         host.textContent = t("botdee.sv.mineEmpty", "Your SMARTview will appear here from your public FLOQR profile.");

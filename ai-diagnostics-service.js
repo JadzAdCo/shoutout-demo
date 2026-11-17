@@ -222,14 +222,20 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.031",
-      title: "s3.3.031 — SMARTview spelling + public-page media",
+      title: "s3.3.031 — SMARTsummary locale source + SMARTview public-page media",
       checks: [
+        {label:"Source locale is uiLanguage", file:"functions/botdee-smartview-v2-core.js", includes:["profile.uiLanguage || profile.preferredLanguage", "stampSourceTranslation", "fanOutLocales"]},
+        {label:"Gemini writes in source language", file:"functions/botdee-smartview-v2-core.js", includes:["FLOQR SMARTsummary in ${language}", "Do not write English unless the source language is English"]},
+        {label:"Viewer locale not subject locale", file:"functions/botdee-smartview-v2-functions.js", includes:["viewerData.uiLanguage", "stampSourceTranslation"]},
+        {label:"Chrome SMARTsummary", file:"floqr-i18n.js", includes:["botdee.sv.smartSummary\": \"SMARTsummary"]},
+        {label:"Help source fan-out", file:"botdee-help-repository.js", includes:["including English", "SMARTsummary"]},
         {label:"SMARTview chrome spelling", file:"floqr-i18n.js", includes:["SMARTview — Person", "Show mock SMARTviews"], notIncludes:["SmartView — Person"]},
         {label:"Public-page media helper", file:"functions/botdee-smartview-v2-core.js", includes:["function publicPageMedia(", "profileMediaSlots", "function peopleHeroPhoto("]},
         {label:"getPeopleSmartView copies slots", file:"functions/botdee-smartview-v2-functions.js", includes:["volunteered.profileMediaSlots = data.profileMediaSlots"]},
         {label:"Overlay plays videos", file:"botdee-smartview.js", includes:["<video src=", "overlayMediaList", "botdee.sv.videoIndex"]},
         {label:"Help public Profile Media", file:"botdee-help-repository.js", includes:["same hero as your FLOQR public profile", "8 photos + 2 videos"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-031-smartview-public-media"]}
+        {label:"Manual test locale", file:"ai-diagnostics-service.js", includes:["s3-3-031-smartsummary-locale-source"]},
+        {label:"Manual test media", file:"ai-diagnostics-service.js", includes:["s3-3-031-smartview-public-media"]}
       ]
     },
     {
@@ -3285,6 +3291,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-031-smartsummary-locale-source",
+      area:"BOT DEE",
+      feature:"SMARTsummary source locale + translation fan-out",
+      changed:"s3.3.031 — Patron default UI language is the SMARTsummary source. Gemini drafts in that language. Owner edit stores translations.B as source and queues every other locale, including English. English is canonical only when the patron’s default is EN. Brand copy is SMARTsummary (untranslated spelling).",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh botdee.html / patron-portal.html (asset ?v=s3.3.031). Sign in as Patron A. 2) Set default UI language to French (or any non-EN of the 11). Reload — chrome is language B. 3) Open My BOT DEE → View my SMARTview. SMARTsummary is in B (Gemini/background), not forced English. 4) Edit my SMARTsummary in B, save. Overlay labels read SMARTsummary. 5) In Firestore usercharacter_analysis/{uid}: sourceLocale=B, translations.B.status=source, smartViewTranslationJobs include locale en (id {uid}_{revision}_en_{hash16}). 6) Sign in as an English patron and open Patron A’s People SMARTview — SMARTsummary is English once the en job is done (pending shows B with a label). 7) Overlay/hide/dating-off still work. 8) With chrome English and profile French, Edit my SMARTsummary still shows the French source. 9) Mark Succeed/Failed.",
+      expected:"Source = Patron A’s UI language. Save in B updates all other locales including EN. English reader sees translations.en. Chrome says SMARTsummary in all 11 langs. No live Places/Yelp.",
+      troubleshoot:"Still English-only source → Functions not deployed from this SHA (saveSmartSummary / getPeopleSmartView / translation onWrite). French save missing en job → old enqueue skipped en; confirm sourceLocale is fr. English viewer still sees French after jobs done → getPeopleSmartView used subject uiLanguage; hard-refresh botdee-upgrade-ui.js passing viewer uiLanguage. Label still Smart Summary → cached floqr-i18n.js / botdee-smartview.js not s3.3.031."
+    },
     {
       id:"s3-3-031-smartview-public-media",
       area:"BOT DEE",

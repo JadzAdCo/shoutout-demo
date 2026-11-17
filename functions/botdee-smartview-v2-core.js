@@ -22,6 +22,10 @@ const DATING_SUBTABS = Object.freeze(["Preferences", "Discovery"]);
 const DEFAULT_PRIMARY = "Social";
 const DEFAULT_SOCIAL = "Music";
 const JOB_MAX_ATTEMPTS = 5;
+const LOCALE_NAMES = Object.freeze({
+  en: "English", de: "German", fr: "French", es: "Spanish", it: "Italian",
+  pt: "Portuguese", ru: "Russian", el: "Greek", pl: "Polish", nl: "Dutch", ar: "Arabic"
+});
 
 const SPORTS_HINTS = Object.freeze([
   "nba", "basketball", "formula 1", "f1", "soccer", "football", "nfl", "mlb",
@@ -183,8 +187,47 @@ function publicFieldsSnapshot(profile = {}, volunteered = null) {
     videos: pageMedia.videos,
     hero: pageMedia.hero,
     verified: profile.identityVerified === 1 || profile.floqrVerified === 1,
-    sourceLocale: normalizeLocale(profile.preferredLanguage || profile.uiLanguage || "en")
+    sourceLocale: normalizeLocale(profile.uiLanguage || profile.preferredLanguage || "en")
   };
+}
+
+function localeDisplayName(code) {
+  const locale = normalizeLocale(code);
+  return LOCALE_NAMES[locale] || locale;
+}
+
+/** Source SMARTsummary row stored at translations.{sourceLocale} (B). English is just another target when B ≠ en. */
+function sourceTranslationRow({text: summary, locale, revision, sourceHash, authoredBy, now}) {
+  return {
+    text: text(summary, SUMMARY_MAX),
+    revision: Number(revision) || 0,
+    sourceHash: String(sourceHash || ""),
+    status: "source",
+    engine: authoredBy || "gemini",
+    model: "",
+    generatedAtMs: now,
+    error: null
+  };
+}
+
+function stampSourceTranslation(doc, now = Date.now()) {
+  if (!doc || typeof doc !== "object") return doc;
+  const locale = normalizeLocale(doc.sourceLocale || "en");
+  const translations = {...(doc.translations || {})};
+  translations[locale] = sourceTranslationRow({
+    text: doc.sourceText,
+    locale,
+    revision: doc.revision,
+    sourceHash: doc.sourceHash,
+    authoredBy: doc.sourceAuthoredBy,
+    now
+  });
+  return {...doc, translations};
+}
+
+function fanOutLocales(sourceLocale) {
+  const source = normalizeLocale(sourceLocale);
+  return SUPPORTED_LOCALES.filter(locale => locale !== source);
 }
 
 function publicFieldsHash(snapshot) {
@@ -245,7 +288,7 @@ function validateOwnerEdit({text: raw, locale, previous}) {
 function emptyAnalysis(uid, snap, now = Date.now()) {
   const summary = draftSummaryFromPublicFields(snap);
   const sourceHash = sha256(summary);
-  return {
+  return stampSourceTranslation({
     schemaVersion: SCHEMA_VERSION,
     uid: String(uid || ""),
     revision: 1,
@@ -268,17 +311,18 @@ function emptyAnalysis(uid, snap, now = Date.now()) {
       datingOptIn: !!snap.datingOptIn,
       engine: "deterministic_public_fields"
     }
-  };
+  }, now);
 }
 
 function applyOwnerSave(doc, {summary, sourceLocale, editorUid, now = Date.now()}) {
   const prev = doc && typeof doc === "object" ? doc : emptyAnalysis(editorUid, {}, now);
   const nextRevision = Number(prev.revision || 0) + 1;
   const sourceHash = sha256(summary);
-  return {
+  const locale = normalizeLocale(sourceLocale, prev.sourceLocale || "en");
+  return stampSourceTranslation({
     ...prev,
     revision: nextRevision,
-    sourceLocale,
+    sourceLocale: locale,
     sourceAuthoredBy: "owner",
     sourceText: summary,
     sourceHash,
@@ -300,7 +344,7 @@ function applyOwnerSave(doc, {summary, sourceLocale, editorUid, now = Date.now()
       filteredPrivate: true,
       ownerEdited: true
     }
-  };
+  }, now);
 }
 
 function shouldRegenerate(doc, snap) {
@@ -324,26 +368,22 @@ function translationJobId(uid, revision, locale, sourceHash) {
 }
 
 function enqueueTranslationJobs({uid, revision, sourceHash, sourceLocale, now = Date.now()}) {
-  const jobs = [];
-  SUPPORTED_LOCALES.forEach(locale => {
-    if (locale === sourceLocale) return;
-    jobs.push({
-      id: translationJobId(uid, revision, locale, sourceHash),
-      uid: String(uid || ""),
-      revision: Number(revision) || 0,
-      sourceHash: String(sourceHash || ""),
-      sourceLocale,
-      locale,
-      status: "queued",
-      attempts: 0,
-      generation: String(sourceHash || ""),
-      createdAtMs: now,
-      updatedAtMs: now,
-      engine: null,
-      error: null
-    });
-  });
-  return jobs;
+  const source = normalizeLocale(sourceLocale);
+  return fanOutLocales(source).map(locale => ({
+    id: translationJobId(uid, revision, locale, sourceHash),
+    uid: String(uid || ""),
+    revision: Number(revision) || 0,
+    sourceHash: String(sourceHash || ""),
+    sourceLocale: source,
+    locale,
+    status: "queued",
+    attempts: 0,
+    generation: String(sourceHash || ""),
+    createdAtMs: now,
+    updatedAtMs: now,
+    engine: null,
+    error: null
+  }));
 }
 
 function applyTranslationResult(doc, job, {text: translated, engine, model, usage, now = Date.now(), error, status}) {
@@ -674,8 +714,11 @@ function translateStub(sourceText, sourceLocale, targetLocale) {
 }
 
 function geminiAnalysisPrompt(snap) {
+  const locale = normalizeLocale(snap?.sourceLocale || "en");
+  const language = localeDisplayName(locale);
   return [
-    "Write a concise third-person FLOQR Smart Summary from ONLY these public-within-FLOQR fields.",
+    `Write a concise third-person FLOQR SMARTsummary in ${language} (${locale}) from ONLY these public-within-FLOQR fields.`,
+    `The entire SMARTsummary must be written in ${language}. Do not write English unless the source language is English.`,
     "Do not invent ratings, relationships, trips, media, or sensitive attributes.",
     "Do not mention private location or accommodations.",
     "Preserve names, music genres, sports teams, handles, and place names.",
@@ -684,8 +727,10 @@ function geminiAnalysisPrompt(snap) {
 }
 
 function geminiTranslatePrompt(sourceText, sourceLocale, targetLocale) {
+  const from = normalizeLocale(sourceLocale);
+  const to = normalizeLocale(targetLocale);
   return [
-    `Translate this FLOQR Smart Summary from ${sourceLocale} to ${targetLocale}.`,
+    `Translate this FLOQR SMARTsummary from ${localeDisplayName(from)} (${from}) to ${localeDisplayName(to)} (${to}).`,
     "Preserve proper names, music genres, sports teams, @handles, place names, and dates.",
     "Do not translate @handles. Do not add facts.",
     sourceText
@@ -705,9 +750,14 @@ module.exports = {
   DEFAULT_PRIMARY,
   DEFAULT_SOCIAL,
   JOB_MAX_ATTEMPTS,
+  LOCALE_NAMES,
   sha256,
   text,
   normalizeLocale,
+  localeDisplayName,
+  sourceTranslationRow,
+  stampSourceTranslation,
+  fanOutLocales,
   sanitizeHandle,
   sanitizeHref,
   isVideoSlot,

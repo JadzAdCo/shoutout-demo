@@ -63,6 +63,7 @@ test("patron My BOT DEE shows real SMARTview; mocks stay on Master Admin", () =>
   assert.doesNotMatch(portal, /Research Library and SmartViews/);
   assert.match(upgrade, /function loadMySmartView\(/);
   assert.match(upgrade, /getPeopleSmartView/);
+  assert.match(upgrade, /call\("getPeopleSmartView", \{uiLanguage\}\)/);
   assert.match(upgrade, /botDeeLoadSmartViews[\s\S]*loadMySmartView/);
   assert.match(upgrade, /botDeeMasterLoadSmartViews[\s\S]*loadDemos\("botDeeMasterSmartViewDemo"\)/);
   assert.doesNotMatch(upgrade, /loadDemos\("botDeeSmartViewDemo"\)/);

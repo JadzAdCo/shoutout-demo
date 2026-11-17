@@ -6,11 +6,12 @@ Black Tiffany pack is illustration only. Production inherits the viewing patronâ
 
 ## Implemented
 
-- Inline People SmartView (`kind: patron`) in BOT DEE bubbles; compact photo + Smart Summary + Social/Dating/Dining/Future Travels.
+- Inline People SmartView (`kind: patron`) in BOT DEE bubbles; compact photo + SMARTsummary + Social/Dating/Dining/Future Travels.
+- Source locale is the patronâ€™s default UI language. Gemini drafts SMARTsummary in that language. Owner edits store `translations.{B}` as source and fan out to every other locale, including English.
 - Site Chrome tokens (`--accent`, `--hot`, `--text`, `--muted`, `--floqr-ink`). Theme change updates the card without dropping the chat draft.
 - `usercharacter_analysis/{uid}` + `smartViewTranslationJobs` + `botDeeSmartViewDiagnostics` (Functions-write).
-- Owner-only `saveSmartSummary` in default profile language; revision/hash stale-job guard; source fallback labeled while pending/failed.
-- Gemini drafts asynchronously after profile save; never on `getPeopleSmartView`. Owner-authored text is not overwritten.
+- Owner-only `saveSmartSummary` in default profile language (`uiLanguage`); revision/hash stale-job guard; source fallback labeled while pending/failed.
+- Gemini drafts asynchronously after profile save **in the source locale**; never on `getPeopleSmartView`. Owner-authored text is not overwritten. An English viewer reads `translations.en`.
 - Dating only with explicit opt-in. Public-within-FLOQR fields only. Blocks honored.
 - 11-language chrome (`botdee.sv.*`) + help ids. Master Admin SMARTviews subtab preserved (`#featuresBotDee-smartviews`).
 
