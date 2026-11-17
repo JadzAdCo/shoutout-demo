@@ -349,6 +349,41 @@ function retryOrDeadLetter(job, error, now = Date.now()) {
   };
 }
 
+/** Dotted-field patch so parallel locale jobs cannot replace sibling translations. */
+function translationLocalePatch(doc, job, payload) {
+  const applied = applyTranslationResult(doc, job, payload);
+  if (!applied.applied) return applied;
+  const locale = normalizeLocale(job.locale);
+  const row = applied.doc.translations[locale];
+  return {
+    applied: true,
+    reason: applied.reason,
+    locale,
+    row,
+    update: {
+      [`translations.${locale}`]: row,
+      updatedAtMs: applied.doc.updatedAtMs
+    }
+  };
+}
+
+function applyLocalePatches(doc, patches) {
+  const translations = {...(doc.translations || {})};
+  (patches || []).forEach(patch => {
+    if (!patch || !patch.applied || !patch.locale || !patch.row) return;
+    translations[patch.locale] = patch.row;
+  });
+  return {...doc, translations};
+}
+
+/** Run on create (no before) or when a job is re-queued with a higher attempt count. */
+function shouldProcessTranslationWrite(beforeData, afterData) {
+  if (!afterData || afterData.status !== "queued") return false;
+  if (!beforeData) return true;
+  if (beforeData.status !== "queued") return true;
+  return Number(afterData.attempts || 0) > Number(beforeData.attempts || 0);
+}
+
 function localeSummary(doc, viewerLocale) {
   const locale = normalizeLocale(viewerLocale, doc?.sourceLocale || "en");
   const source = {
@@ -418,7 +453,11 @@ function peopleV2Payload({
   }
   const localeRow = localeSummary(analysis, viewerLocale);
   const ownerMayEdit = String(viewerUid || "") === String(subjectUid || "");
-  const cats = analysis && analysis.categories ? analysis.categories : categoriesFromSnapshot(snap);
+  const datingVisible = !!snap.datingOptIn;
+  const cats = categoriesFromSnapshot(snap);
+  if (!datingVisible) {
+    cats.Dating = {Preferences: [], Discovery: []};
+  }
   const handles = [];
   if (snap.instagram) {
     handles.push({
@@ -434,7 +473,6 @@ function peopleV2Payload({
       href: `https://x.com/${encodeURIComponent(snap.xHandle)}`
     });
   }
-  const datingVisible = !!snap.datingOptIn;
   return {
     presentation: "peopleV2",
     subjectUid: String(subjectUid || ""),
@@ -608,6 +646,9 @@ module.exports = {
   enqueueTranslationJobs,
   applyTranslationResult,
   retryOrDeadLetter,
+  translationLocalePatch,
+  applyLocalePatches,
+  shouldProcessTranslationWrite,
   localeSummary,
   diagnosticEvent,
   usageFromGemini,

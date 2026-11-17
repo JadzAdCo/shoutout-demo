@@ -128,9 +128,7 @@
       : null;
   }
 
-  let activePeople = null;
-  let activeCard = null;
-  let activeChatState = null;
+  let overlaySession = null;
 
   function captureChatState() {
     const input = global.document?.getElementById("botDeeChatInput");
@@ -173,10 +171,29 @@
   }
 
   function tagsForPeople(people, primary, secondary) {
+    if (primary === "Dating" && !people?.datingVisible) return [];
     const group = people?.categories?.[primary];
     if (!group || typeof group !== "object") return [];
     const rows = group[secondary];
     return Array.isArray(rows) ? rows : [];
+  }
+
+  function currentOverlaySession() {
+    return overlaySession;
+  }
+
+  function rememberOverlaySession(session) {
+    overlaySession = session || null;
+    return overlaySession;
+  }
+
+  function advanceOverlayMedia(delta) {
+    const session = overlaySession;
+    if (!session) return null;
+    const photosList = Array.isArray(session.people?.media?.photos) ? session.people.media.photos : [];
+    const len = Math.max(photosList.length, 1);
+    session.mediaIndex = ((Number(session.mediaIndex) || 0) + Number(delta || 0) + len) % len;
+    return session;
   }
 
   function statusLabel(summary) {
@@ -348,7 +365,8 @@
       node.hidden = true;
     });
     doc.body.classList.remove("botdee-sv-overlay-open");
-    restoreChatState(state);
+    restoreChatState(state || overlaySession?.chatState);
+    overlaySession = null;
   }
 
   function trapFocus(overlay, event) {
@@ -366,144 +384,126 @@
     }
   }
 
-  function bindPeopleCard(card, payload) {
-    const people = peopleOf(payload);
-    if (!card || !people) return;
-    const doc = global.document;
-    let chatState = null;
-    let mediaType = "photos";
-    let mediaIndex = 0;
-
-    function openOverlay(kind) {
-      chatState = captureChatState();
-      activePeople = people;
-      activeCard = card;
-      activeChatState = chatState;
-      doc.body.classList.add("botdee-sv-overlay-open");
-      if (kind === "media") {
-        const overlay = ensureOverlay("botdeeSvMediaOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvMediaTitle">${esc(t("botdee.sv.mediaTitle", "Shared media"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
-          <div class="botdee-sv-switch" role="tablist">
-            <button type="button" data-sv-media="photos" aria-selected="true">${esc(t("botdee.sv.photos", "Photos"))}</button>
-            <button type="button" data-sv-media="videos" aria-selected="false">${esc(t("botdee.sv.videos", "Videos"))}</button>
-          </div>
-          <div class="botdee-sv-stage" data-sv-stage></div>
-          <p class="botdee-sv-foot" data-sv-media-foot></p>`);
-        overlay.setAttribute("aria-labelledby", "botdeeSvMediaTitle");
-        overlay.hidden = false;
-        mediaType = "photos";
-        mediaIndex = 0;
-        renderMedia(overlay);
-        overlay.querySelector("[data-sv-close]")?.focus();
-      } else if (kind === "summary") {
-        const overlay = ensureOverlay("botdeeSvSummaryOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvSummaryTitle">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
-          <div class="botdee-sv-long" data-sv-long></div>`);
-        overlay.setAttribute("aria-labelledby", "botdeeSvSummaryTitle");
-        overlay.hidden = false;
-        const long = overlay.querySelector("[data-sv-long]");
-        const status = people.summary?.pending
-          ? `<p class="botdee-sv-locale">${esc(t("botdee.sv.translationPending", "Translation pending. Showing the source language."))}</p>`
-          : "";
-        const edit = people.ownerMayEdit
-          ? `<p class="botdee-sv-owner-row"><button type="button" class="botdee-sv-action" data-sv-edit>${esc(t("botdee.sv.editSummary", "Edit my Smart Summary"))}</button></p>`
-          : "";
-        const conflict = people.conflictFlag
-          ? `<p class="botdee-sv-locale">${esc(t("botdee.sv.conflictReview", "Your public profile changed. Review this summary — it was not overwritten."))}</p>`
-          : "";
-        long.innerHTML = `${edit}${conflict}${status}<p>${esc(people.summary?.text || "")}</p>
-          <p class="botdee-sv-foot">${esc(t("botdee.sv.summaryFoot", "Drafted from public-within-FLOQR fields. Facts are not guaranteed. Hide or correct them in Profile visibility."))}</p>`;
-        overlay.querySelector("[data-sv-close]")?.focus();
-      } else if (kind === "edit" && people.ownerMayEdit) {
-        const overlay = ensureOverlay("botdeeSvEditOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvEditTitle">${esc(t("botdee.sv.editSummary", "Edit my Smart Summary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
-          <p class="botdee-sv-foot">${esc(t("botdee.sv.editHint", "Edit in your default profile language. Translations update in the background."))}</p>
-          <label class="botdee-sv-edit-label">${esc(t("botdee.sv.sourceLanguage", "Default profile language"))}
-            <input id="botdeeSvSourceLocale" type="text" maxlength="8" readonly/>
-          </label>
-          <label class="botdee-sv-edit-label">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}
-            <textarea id="botdeeSvSummaryEditor" rows="8" maxlength="1400"></textarea>
-          </label>
-          <button type="button" class="botdee-sv-action botdee-sv-action-main" data-sv-save>${esc(t("botdee.sv.saveSummary", "Save and queue translations"))}</button>
-          <p class="botdee-sv-foot" data-sv-edit-status role="status"></p>`);
-        overlay.setAttribute("aria-labelledby", "botdeeSvEditTitle");
-        overlay.hidden = false;
-        const localeInput = overlay.querySelector("#botdeeSvSourceLocale");
-        const editor = overlay.querySelector("#botdeeSvSummaryEditor");
-        if (localeInput) localeInput.value = people.summary?.sourceLocale || "en";
-        if (editor) editor.value = people.summary?.text || "";
-        editor?.focus();
-      }
-    }
-
-    function renderMedia(overlay) {
-      const photos = mediaType === "photos";
-      overlay.querySelectorAll("[data-sv-media]").forEach(btn => {
-        btn.setAttribute("aria-selected", btn.getAttribute("data-sv-media") === mediaType ? "true" : "false");
-      });
-      const stage = overlay.querySelector("[data-sv-stage]");
-      const foot = overlay.querySelector("[data-sv-media-foot]");
-      const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [];
-      const videosList = Array.isArray(people.media?.videos) ? people.media.videos : [];
-      if (!photos) {
-        if (stage) stage.innerHTML = "";
-        if (foot) foot.textContent = videosList.length
-          ? t("botdee.sv.videoCount", "Shared videos")
-          : t("botdee.sv.noVideos", "No publicly shared videos.");
-        return;
-      }
-      const item = photosList[mediaIndex] || photosList[0];
-      if (stage) {
-        const src = item && item.url ? resolveImageSrc(item.url) : "";
-        stage.innerHTML = src
-          ? `<button type="button" class="botdee-sv-arrow prev" data-sv-prev aria-label="${esc(t("botdee.sv.prev", "Previous photo"))}">‹</button>
-             <img src="${esc(src)}" alt="${esc(item.alt || people.displayName || "")}"/>
-             <button type="button" class="botdee-sv-arrow next" data-sv-next aria-label="${esc(t("botdee.sv.next", "Next photo"))}">›</button>`
-          : `<p class="botdee-sv-foot">${esc(t("botdee.sv.noPhotos", "No publicly shared photos."))}</p>`;
-      }
-      if (foot) foot.textContent = photosList.length
-        ? `${t("botdee.sv.photoCount", "Photo")} ${mediaIndex + 1} / ${photosList.length}`
-        : t("botdee.sv.noPhotos", "No publicly shared photos.");
-    }
-
-    card.addEventListener("click", event => {
-      const primaryBtn = event.target.closest("[data-sv-primary]");
-      if (primaryBtn && card.contains(primaryBtn)) {
-        const next = primaryBtn.getAttribute("data-sv-primary");
-        const first = (subtabsFor(next)[0] || {}).id || "Music";
-        paintPeopleTabs(card, people, next, first);
-        return;
-      }
-      const secondaryBtn = event.target.closest("[data-sv-secondary]");
-      if (secondaryBtn && card.contains(secondaryBtn)) {
-        paintPeopleTabs(card, people, card.dataset.primary || "Social", secondaryBtn.getAttribute("data-sv-secondary"));
-        return;
-      }
-      const open = event.target.closest("[data-sv-open]");
-      if (open && card.contains(open)) openOverlay(open.getAttribute("data-sv-open"));
+  function renderMediaFor(session, overlay) {
+    if (!session || !overlay) return;
+    const people = session.people || {};
+    const mediaType = session.mediaType || "photos";
+    const mediaIndex = Number(session.mediaIndex) || 0;
+    const photos = mediaType === "photos";
+    overlay.querySelectorAll("[data-sv-media]").forEach(btn => {
+      btn.setAttribute("aria-selected", btn.getAttribute("data-sv-media") === mediaType ? "true" : "false");
     });
+    const stage = overlay.querySelector("[data-sv-stage]");
+    const foot = overlay.querySelector("[data-sv-media-foot]");
+    const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [];
+    const videosList = Array.isArray(people.media?.videos) ? people.media.videos : [];
+    if (!photos) {
+      if (stage) stage.innerHTML = "";
+      if (foot) foot.textContent = videosList.length
+        ? t("botdee.sv.videoCount", "Shared videos")
+        : t("botdee.sv.noVideos", "No publicly shared videos.");
+      return;
+    }
+    const item = photosList[mediaIndex] || photosList[0];
+    if (stage) {
+      const src = item && item.url ? resolveImageSrc(item.url) : "";
+      stage.innerHTML = src
+        ? `<button type="button" class="botdee-sv-arrow prev" data-sv-prev aria-label="${esc(t("botdee.sv.prev", "Previous photo"))}">‹</button>
+           <img src="${esc(src)}" alt="${esc(item.alt || people.displayName || "")}"/>
+           <button type="button" class="botdee-sv-arrow next" data-sv-next aria-label="${esc(t("botdee.sv.next", "Next photo"))}">›</button>`
+        : `<p class="botdee-sv-foot">${esc(t("botdee.sv.noPhotos", "No publicly shared photos."))}</p>`;
+    }
+    if (foot) foot.textContent = photosList.length
+      ? `${t("botdee.sv.photoCount", "Photo")} ${mediaIndex + 1} / ${photosList.length}`
+      : t("botdee.sv.noPhotos", "No publicly shared photos.");
+  }
 
-    if (!doc || doc.__floqrSmartViewOverlayBound) return;
+  function showOverlay(session, kind) {
+    const doc = global.document;
+    if (!session || !doc) return;
+    rememberOverlaySession(session);
+    if (!session.chatState) session.chatState = captureChatState();
+    const people = session.people || {};
+    doc.body.classList.add("botdee-sv-overlay-open");
+    if (kind === "media") {
+      const overlay = ensureOverlay("botdeeSvMediaOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvMediaTitle">${esc(t("botdee.sv.mediaTitle", "Shared media"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
+        <div class="botdee-sv-switch" role="tablist">
+          <button type="button" data-sv-media="photos" aria-selected="true">${esc(t("botdee.sv.photos", "Photos"))}</button>
+          <button type="button" data-sv-media="videos" aria-selected="false">${esc(t("botdee.sv.videos", "Videos"))}</button>
+        </div>
+        <div class="botdee-sv-stage" data-sv-stage></div>
+        <p class="botdee-sv-foot" data-sv-media-foot></p>`);
+      overlay.setAttribute("aria-labelledby", "botdeeSvMediaTitle");
+      overlay.hidden = false;
+      session.mediaType = "photos";
+      session.mediaIndex = 0;
+      renderMediaFor(session, overlay);
+      overlay.querySelector("[data-sv-close]")?.focus();
+    } else if (kind === "summary") {
+      const overlay = ensureOverlay("botdeeSvSummaryOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvSummaryTitle">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
+        <div class="botdee-sv-long" data-sv-long></div>`);
+      overlay.setAttribute("aria-labelledby", "botdeeSvSummaryTitle");
+      overlay.hidden = false;
+      const long = overlay.querySelector("[data-sv-long]");
+      const status = people.summary?.pending
+        ? `<p class="botdee-sv-locale">${esc(t("botdee.sv.translationPending", "Translation pending. Showing the source language."))}</p>`
+        : "";
+      const edit = people.ownerMayEdit
+        ? `<p class="botdee-sv-owner-row"><button type="button" class="botdee-sv-action" data-sv-edit>${esc(t("botdee.sv.editSummary", "Edit my Smart Summary"))}</button></p>`
+        : "";
+      const conflict = people.conflictFlag
+        ? `<p class="botdee-sv-locale">${esc(t("botdee.sv.conflictReview", "Your public profile changed. Review this summary — it was not overwritten."))}</p>`
+        : "";
+      long.innerHTML = `${edit}${conflict}${status}<p>${esc(people.summary?.text || "")}</p>
+        <p class="botdee-sv-foot">${esc(t("botdee.sv.summaryFoot", "Drafted from public-within-FLOQR fields. Facts are not guaranteed. Hide or correct them in Profile visibility."))}</p>`;
+      overlay.querySelector("[data-sv-close]")?.focus();
+    } else if (kind === "edit" && people.ownerMayEdit) {
+      const overlay = ensureOverlay("botdeeSvEditOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvEditTitle">${esc(t("botdee.sv.editSummary", "Edit my Smart Summary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
+        <p class="botdee-sv-foot">${esc(t("botdee.sv.editHint", "Edit in your default profile language. Translations update in the background."))}</p>
+        <label class="botdee-sv-edit-label">${esc(t("botdee.sv.sourceLanguage", "Default profile language"))}
+          <input id="botdeeSvSourceLocale" type="text" maxlength="8" readonly/>
+        </label>
+        <label class="botdee-sv-edit-label">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}
+          <textarea id="botdeeSvSummaryEditor" rows="8" maxlength="1400"></textarea>
+        </label>
+        <button type="button" class="botdee-sv-action botdee-sv-action-main" data-sv-save>${esc(t("botdee.sv.saveSummary", "Save and queue translations"))}</button>
+        <p class="botdee-sv-foot" data-sv-edit-status role="status"></p>`);
+      overlay.setAttribute("aria-labelledby", "botdeeSvEditTitle");
+      overlay.hidden = false;
+      const localeInput = overlay.querySelector("#botdeeSvSourceLocale");
+      const editor = overlay.querySelector("#botdeeSvSummaryEditor");
+      if (localeInput) localeInput.value = people.summary?.sourceLocale || "en";
+      if (editor) editor.value = people.summary?.text || "";
+      editor?.focus();
+    }
+  }
+
+  function bindOverlayDocument(doc) {
+    if (!doc || typeof doc.addEventListener !== "function" || doc.__floqrSmartViewOverlayBound) return;
     doc.__floqrSmartViewOverlayBound = true;
     doc.addEventListener("click", event => {
       const overlay = event.target.closest(".botdee-sv-overlay");
       if (!overlay || overlay.hidden) return;
+      const session = currentOverlaySession();
+      if (!session) return;
       if (event.target.closest("[data-sv-close]")) {
-        closeSmartViewOverlays(activeChatState);
+        closeSmartViewOverlays(session.chatState);
         return;
       }
       if (event.target.closest("[data-sv-media]")) {
-        mediaType = event.target.closest("[data-sv-media]").getAttribute("data-sv-media") || "photos";
-        mediaIndex = 0;
-        renderMedia(overlay);
+        session.mediaType = event.target.closest("[data-sv-media]").getAttribute("data-sv-media") || "photos";
+        session.mediaIndex = 0;
+        renderMediaFor(session, overlay);
         return;
       }
       if (event.target.closest("[data-sv-prev]") || event.target.closest("[data-sv-next]")) {
-        const photosList = Array.isArray(activePeople?.media?.photos) ? activePeople.media.photos : [0];
         const delta = event.target.closest("[data-sv-next]") ? 1 : -1;
-        mediaIndex = (mediaIndex + delta + Math.max(photosList.length, 1)) % Math.max(photosList.length, 1);
-        renderMedia(overlay);
+        advanceOverlayMedia(delta);
+        renderMediaFor(session, overlay);
         return;
       }
       if (event.target.closest("[data-sv-edit]")) {
-        openOverlay("edit");
+        showOverlay(session, "edit");
         return;
       }
       if (event.target.closest("[data-sv-save]")) {
@@ -519,15 +519,15 @@
         const finish = (ok, message) => {
           if (status) status.textContent = message;
           if (ok) {
-            if (activePeople) {
-              activePeople.summary = activePeople.summary || {};
-              activePeople.summary.text = value;
-              activePeople.summary.status = "source";
-              activePeople.summary.pending = true;
+            if (session.people) {
+              session.people.summary = session.people.summary || {};
+              session.people.summary.text = value;
+              session.people.summary.status = "source";
+              session.people.summary.pending = true;
             }
-            const short = activeCard?.querySelector(".botdee-sv-summary-text");
+            const short = session.card?.querySelector(".botdee-sv-summary-text");
             if (short) short.textContent = value;
-            closeSmartViewOverlays(activeChatState);
+            closeSmartViewOverlays(session.chatState);
           }
         };
         if (!callable) {
@@ -542,19 +542,50 @@
       }
     });
     doc.addEventListener("keydown", event => {
+      const session = currentOverlaySession();
       const open = [...doc.querySelectorAll(".botdee-sv-overlay")].find(node => !node.hidden);
-      if (!open) return;
+      if (!open || !session) return;
       if (event.key === "Escape") {
         event.preventDefault();
-        closeSmartViewOverlays(chatState);
+        closeSmartViewOverlays(session.chatState);
         return;
       }
       trapFocus(open, event);
       if (open.id === "botdeeSvMediaOverlay" && (event.key === "ArrowRight" || event.key === "ArrowLeft")) {
-        const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [0];
         const delta = event.key === "ArrowRight" ? 1 : -1;
-        mediaIndex = (mediaIndex + delta + Math.max(photosList.length, 1)) % Math.max(photosList.length, 1);
-        renderMedia(open);
+        advanceOverlayMedia(delta);
+        renderMediaFor(session, open);
+      }
+    });
+  }
+
+  function bindPeopleCard(card, payload) {
+    const people = peopleOf(payload);
+    if (!card || !people) return;
+    bindOverlayDocument(global.document);
+    card.addEventListener("click", event => {
+      const primaryBtn = event.target.closest("[data-sv-primary]");
+      if (primaryBtn && card.contains(primaryBtn)) {
+        const next = primaryBtn.getAttribute("data-sv-primary");
+        const first = (subtabsFor(next)[0] || {}).id || "Music";
+        paintPeopleTabs(card, people, next, first);
+        return;
+      }
+      const secondaryBtn = event.target.closest("[data-sv-secondary]");
+      if (secondaryBtn && card.contains(secondaryBtn)) {
+        paintPeopleTabs(card, people, card.dataset.primary || "Social", secondaryBtn.getAttribute("data-sv-secondary"));
+        return;
+      }
+      const open = event.target.closest("[data-sv-open]");
+      if (open && card.contains(open)) {
+        rememberOverlaySession({
+          people,
+          card,
+          mediaType: "photos",
+          mediaIndex: 0,
+          chatState: captureChatState()
+        });
+        showOverlay(currentOverlaySession(), open.getAttribute("data-sv-open"));
       }
     });
   }
@@ -574,6 +605,7 @@
     });
   }
 
+  if (global.document) bindOverlayDocument(global.document);
   if (global.document && !global.__floqrSmartViewChromeBound) {
     global.__floqrSmartViewChromeBound = true;
     global.addEventListener("floqr-chrome-change", () => {
@@ -588,6 +620,10 @@
     resolveSameOriginHref,
     wireActionLinks,
     captureChatState,
-    restoreChatState
+    restoreChatState,
+    tagsForPeople,
+    currentOverlaySession,
+    rememberOverlaySession,
+    advanceOverlayMedia
   };
 })(window);
