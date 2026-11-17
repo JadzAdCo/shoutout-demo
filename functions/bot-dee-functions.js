@@ -464,7 +464,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     } else if (venueAttached && venueAttached.handled) {
       outcome = {
         reply: venueAttached.reply,
-        results: venueAttached.results || [],
+        results: [],
         media: venueAttached.media || [],
         provider: "floqr-venues",
         model: "placeSearch",

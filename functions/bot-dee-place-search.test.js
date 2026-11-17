@@ -100,6 +100,36 @@ test("venue cards open the club public page without cache-bust v=", () => {
   assert.doesNotMatch(result.href, /[?&]v=/);
 });
 
+test("unknown city or cuisine does not fall back to DC restaurants", () => {
+  const miami = tools.classifyPlaceSearchIntent("Sushi restaurants in Miami");
+  assert.equal(miami.intent, "dining");
+  assert.ok(miami.leftoverTokens.includes("miami"));
+  assert.equal(tools.scoreClubForPlace(KATA.id, KATA.data, miami), 0);
+  assert.equal(tools.rankPublicClubs([KATA, DECADES, NYC_CLUB], miami, 5).length, 0);
+
+  const ethiopian = tools.classifyPlaceSearchIntent("Ethiopian restaurants in Washington DC");
+  assert.equal(ethiopian.intent, "dining");
+  assert.ok(ethiopian.leftoverTokens.includes("ethiopian"));
+  assert.equal(tools.scoreClubForPlace(KATA.id, KATA.data, ethiopian), 0);
+
+  const vegan = tools.classifyPlaceSearchIntent("vegan restaurants in DC");
+  assert.equal(vegan.intent, "dining");
+  assert.ok(vegan.leftoverTokens.includes("vegan"));
+  assert.equal(tools.scoreClubForPlace(KATA.id, KATA.data, vegan), 0);
+
+  const anyDining = tools.classifyPlaceSearchIntent("restaurants in Washington DC");
+  assert.equal(anyDining.intent, "dining");
+  assert.equal(anyDining.leftoverTokens.length, 0);
+  assert.ok(tools.scoreClubForPlace(KATA.id, KATA.data, anyDining) >= 8);
+});
+
+test("venue search returns SMARTviews only, not duplicate result links", () => {
+  const session = fs.readFileSync(path.join(__dirname, "bot-dee-functions.js"), "utf8");
+  assert.match(session, /else if \(venueAttached && venueAttached\.handled\)[\s\S]*?results: \[\]/);
+  const attach = fs.readFileSync(path.join(__dirname, "bot-dee-tools.js"), "utf8");
+  assert.match(attach, /handled: true[\s\S]*?results: \[\][\s\S]*?smartViews: cards\.map\(clubSmartView\)/);
+});
+
 test("Gemini dining path is kind=club and does not pitch products", () => {
   const instruction = bot.systemInstruction("patron");
   assert.match(instruction, /kind=club/);

@@ -399,20 +399,43 @@ function expandSearchTokens(tokens) {
   return [...new Set(out.filter(Boolean))];
 }
 
+const GENERIC_DINING = new Set([
+  "restaurant", "restaurants", "dining", "eatery", "eateries", "cuisine",
+  "brunch", "dinner", "lunch", "breakfast", "cafe", "cafes", "bakery", "bistro"
+]);
+
 function cuisineTokensFrom(tokens) {
   const out = [];
   tokens.forEach(token => {
-    if (token === "restaurant" || token === "restaurants" || token === "dining") return;
+    if (GENERIC_DINING.has(token) || FOOD_GENERIC.has(token) || VENUE_CUES.has(token)) return;
     const aliases = CUISINE_ALIASES[token] || CUISINE_ALIASES[token.replace(/s$/, "")];
     if (aliases) {
       out.push(token, ...aliases);
+    } else if (DINING_CUES.has(token)) {
+      out.push(token);
     }
   });
   return [...new Set(out)];
 }
 
+function leftoverQueryTokens(rawTokens, needle, placeTokens, cuisineTokens) {
+  const known = new Set([
+    ...(placeTokens || []),
+    ...(cuisineTokens || []),
+    ...String(needle || "").split(/\s+/).filter(token => (placeTokens || []).some(place => place.includes(token)))
+  ]);
+  return (rawTokens || []).filter(token => {
+    if (!token || token.length < 3) return false;
+    if (PLACE_STOP.has(token) || GENERIC_DINING.has(token) || FOOD_GENERIC.has(token) || VENUE_CUES.has(token)) return false;
+    if (CUISINE_ALIASES[token] || CUISINE_ALIASES[token.replace(/s$/, "")]) return false;
+    if (known.has(token)) return false;
+    if ((placeTokens || []).some(place => place.includes(token))) return false;
+    return true;
+  });
+}
+
 function emptyPlaceIntent() {
-  return {intent: "none", needle: "", tokens: [], placeTokens: [], cuisineTokens: []};
+  return {intent: "none", needle: "", tokens: [], placeTokens: [], cuisineTokens: [], leftoverTokens: []};
 }
 
 function classifyPlaceSearchIntent(raw) {
@@ -431,12 +454,14 @@ function classifyPlaceSearchIntent(raw) {
   const tokens = expandSearchTokens(rawTokens);
   const placeTokens = extractPlaceTokens(needle);
   const cuisineTokens = cuisineTokensFrom(rawTokens);
+  const leftoverTokens = leftoverQueryTokens(rawTokens, needle, placeTokens, cuisineTokens);
   return {
     intent: diningHit ? "dining" : "venue",
     needle,
     tokens,
     placeTokens,
-    cuisineTokens
+    cuisineTokens,
+    leftoverTokens
   };
 }
 
@@ -466,6 +491,9 @@ function diningOverlap(hay, classified) {
   if (classified.cuisineTokens && classified.cuisineTokens.length) {
     return classified.cuisineTokens.some(token => hay.includes(token));
   }
+  if ((classified.leftoverTokens || []).length) {
+    return classified.leftoverTokens.every(token => hay.includes(token));
+  }
   return ["restaurant", "dining", "cuisine", "food", "eatery", "tapas", "brunch", "dinner"].some(token => hay.includes(token));
 }
 
@@ -481,6 +509,8 @@ function scoreClubForPlace(id, data, classified) {
   const hay = normalizeNeedle(clubHaystack(id, data));
   if (!hay) return 0;
   if (!hayHasPlace(hay, classified.placeTokens || [])) return 0;
+  const leftover = classified.leftoverTokens || [];
+  if (leftover.length && leftover.some(token => !hay.includes(token))) return 0;
   if (classified.intent === "dining" && !diningOverlap(hay, classified)) return 0;
   if (classified.intent === "venue" && !venueTypeOverlap(hay, data)) return 0;
   return scoreHay(hay, classified.needle, classified.tokens || []);
@@ -571,7 +601,7 @@ async function attachVenueSearch({query} = {}) {
     classified,
     reply,
     replyKey: found ? "botdee.place.found" : "botdee.place.none",
-    results: cards.map(clubToResult),
+    results: [],
     smartViews: cards.map(clubSmartView),
     media,
     venueSearch: {
