@@ -316,6 +316,272 @@ function scoreHay(hay, needle, tokens) {
   return points;
 }
 
+function listish(value) {
+  if (Array.isArray(value)) return value.filter(Boolean).map(item => String(item));
+  if (value == null || value === "") return [];
+  return String(value).split(/[,;/|]+/).map(item => item.trim()).filter(Boolean);
+}
+
+const PLACE_STOP = new Set([
+  "my", "the", "a", "an", "of", "for", "with", "to", "and", "or", "on", "at",
+  "in", "near", "around", "looking", "look", "show", "me", "some", "good", "best",
+  "where", "can", "i", "get", "find", "search", "please", "any", "are", "there",
+  "is", "what", "whats", "which", "who", "want", "wanna", "need", "recommend",
+  "recommendation", "recommendations", "spot", "spots", "place", "places",
+  "open", "now", "tonight", "today", "this", "that", "you", "got", "have"
+]);
+
+const DINING_CUES = new Set([
+  "sushi", "sashimi", "omakase", "nigiri", "ramen", "izakaya",
+  "japanese", "japan", "chinese", "korean", "thai", "indian", "italian",
+  "mexican", "spanish", "peruvian", "american", "fusion", "asian", "tapas",
+  "pizza", "taco", "tacos", "brunch", "dinner", "lunch", "breakfast",
+  "restaurant", "restaurants", "dining", "eatery", "eateries", "cuisine",
+  "steakhouse", "seafood", "cafe", "cafes", "bakery", "bistro"
+]);
+
+const FOOD_GENERIC = new Set(["food", "foods", "eat", "eats", "eating"]);
+
+const VENUE_CUES = new Set([
+  "club", "clubs", "lounge", "lounges", "nightlife", "nightclub", "nightclubs",
+  "venue", "venues", "bar", "bars", "disco", "discos"
+]);
+
+const CUISINE_ALIASES = Object.freeze({
+  sushi: ["sushi", "sashimi", "omakase", "nigiri", "japanese", "japan", "asian", "tapas"],
+  sashimi: ["sushi", "sashimi", "japanese"],
+  omakase: ["sushi", "omakase", "japanese"],
+  nigiri: ["sushi", "nigiri", "japanese"],
+  ramen: ["ramen", "japanese", "japan"],
+  japanese: ["japanese", "japan", "sushi", "ramen", "izakaya", "sashimi", "asian"],
+  japan: ["japanese", "japan", "sushi", "asian"],
+  asian: ["asian", "sushi", "japanese", "chinese", "korean", "thai", "fusion", "tapas"],
+  tapas: ["tapas", "asian"],
+  fusion: ["fusion", "asian"],
+  chinese: ["chinese", "asian"],
+  korean: ["korean", "asian"],
+  thai: ["thai", "asian"],
+  italian: ["italian", "pizza"],
+  mexican: ["mexican", "taco", "tacos"],
+  peruvian: ["peruvian", "lima"],
+  american: ["american"],
+  pizza: ["pizza", "italian"],
+  seafood: ["seafood"],
+  restaurant: ["restaurant", "restaurants", "dining"],
+  restaurants: ["restaurant", "restaurants", "dining"],
+  dining: ["dining", "restaurant", "restaurants"]
+});
+
+const PROFILE_DATAPOINT_ASK = /\b(my|public)\s+profile\b|\bprofile\s+(food|music|travel|hobbies|photos?)\b|\b(food|music|travel|hobbies)\s+(on|in)\s+(my|the)\s+(public\s+)?profile\b/i;
+
+function extractPlaceTokens(needle) {
+  const tokens = [];
+  if (/\bwashington(?:\s*,?\s*d\.?c\.?)?\b|\bdistrict of columbia\b/.test(needle)
+    || (/\bwashington\b/.test(needle) && /\bd\.?\s*c\.?\b/.test(needle))) {
+    tokens.push("washington", "dc");
+  } else if (/\bd\.?\s*c\.?\b/.test(needle) && !/\bdj\b/.test(needle)) {
+    tokens.push("dc", "washington");
+  }
+  if (/\bchinatown\b/.test(needle)) tokens.push("chinatown");
+  if (/\bdupont\b/.test(needle)) tokens.push("dupont");
+  if (/\bnew york\b|\bnyc\b|\bmanhattan\b/.test(needle)) tokens.push("new york", "nyc", "manhattan");
+  return [...new Set(tokens)];
+}
+
+function expandSearchTokens(tokens) {
+  const out = [];
+  tokens.forEach(token => {
+    out.push(token);
+    if (token.length > 4 && token.endsWith("s")) out.push(token.slice(0, -1));
+    const aliases = CUISINE_ALIASES[token] || CUISINE_ALIASES[token.replace(/s$/, "")];
+    if (aliases) aliases.forEach(alias => out.push(alias));
+  });
+  return [...new Set(out.filter(Boolean))];
+}
+
+function cuisineTokensFrom(tokens) {
+  const out = [];
+  tokens.forEach(token => {
+    if (token === "restaurant" || token === "restaurants" || token === "dining") return;
+    const aliases = CUISINE_ALIASES[token] || CUISINE_ALIASES[token.replace(/s$/, "")];
+    if (aliases) {
+      out.push(token, ...aliases);
+    }
+  });
+  return [...new Set(out)];
+}
+
+function emptyPlaceIntent() {
+  return {intent: "none", needle: "", tokens: [], placeTokens: [], cuisineTokens: []};
+}
+
+function classifyPlaceSearchIntent(raw) {
+  const people = require("./botdee-smartcard-core").classifyPeopleSearchIntent(raw);
+  if (people.intent === "self" || people.intent === "person" || people.intent === "empty") {
+    return emptyPlaceIntent();
+  }
+  if (PROFILE_DATAPOINT_ASK.test(String(raw || ""))) return emptyPlaceIntent();
+  const needle = normalizeNeedle(raw);
+  if (!needle || needle.length < 4) return emptyPlaceIntent();
+  const rawTokens = needle.split(/\s+/).filter(token => token.length > 1 && !PLACE_STOP.has(token));
+  const diningHit = rawTokens.some(token => DINING_CUES.has(token))
+    || (rawTokens.some(token => FOOD_GENERIC.has(token)) && extractPlaceTokens(needle).length);
+  const venueHit = rawTokens.some(token => VENUE_CUES.has(token));
+  if (!diningHit && !venueHit) return emptyPlaceIntent();
+  const tokens = expandSearchTokens(rawTokens);
+  const placeTokens = extractPlaceTokens(needle);
+  const cuisineTokens = cuisineTokensFrom(rawTokens);
+  return {
+    intent: diningHit ? "dining" : "venue",
+    needle,
+    tokens,
+    placeTokens,
+    cuisineTokens
+  };
+}
+
+function clubHaystack(id, data = {}) {
+  return [
+    id, data.locationId, data.locationName, data.brandName, data.name, data.displayName,
+    data.city, data.publicCity, data.state, data.region, data.country, data.neighborhood,
+    data.streetAddress, data.addressLine1, data.fullAddress, data.address, data.locationLabel,
+    data.description, data.publicBio, data.tagline, data.about, data.activityStatus,
+    data.cuisine, data.food, data.menu, data.type,
+    ...listish(data.cuisines),
+    ...listish(data.categories),
+    ...listish(data.amenities),
+    ...listish(data.genres),
+    ...listish(data.services),
+    ...listish(data.artists),
+    ...listish(data.djs)
+  ].filter(Boolean).join(" ");
+}
+
+function hayHasPlace(hay, placeTokens) {
+  if (!placeTokens.length) return true;
+  return placeTokens.some(token => hay.includes(token));
+}
+
+function diningOverlap(hay, classified) {
+  if (classified.cuisineTokens && classified.cuisineTokens.length) {
+    return classified.cuisineTokens.some(token => hay.includes(token));
+  }
+  return ["restaurant", "dining", "cuisine", "food", "eatery", "tapas", "brunch", "dinner"].some(token => hay.includes(token));
+}
+
+function venueTypeOverlap(hay, data = {}) {
+  const type = String(data.type || "").toLowerCase();
+  if (["club", "lounge", "bar", "restaurant", "nightclub", "venue"].includes(type)) return true;
+  return ["club", "lounge", "nightlife", "nightclub", "venue", "bar", "disco", "restaurant"].some(token => hay.includes(token));
+}
+
+function scoreClubForPlace(id, data, classified) {
+  if (!classified || classified.intent === "none") return 0;
+  if (!isClubPublic(data)) return 0;
+  const hay = normalizeNeedle(clubHaystack(id, data));
+  if (!hay) return 0;
+  if (!hayHasPlace(hay, classified.placeTokens || [])) return 0;
+  if (classified.intent === "dining" && !diningOverlap(hay, classified)) return 0;
+  if (classified.intent === "venue" && !venueTypeOverlap(hay, data)) return 0;
+  return scoreHay(hay, classified.needle, classified.tokens || []);
+}
+
+function rankPublicClubs(docs, classified, limit = 5) {
+  const scored = [];
+  (Array.isArray(docs) ? docs : []).forEach(doc => {
+    const id = doc.id;
+    const data = doc.data || {};
+    const score = scoreClubForPlace(id, data, classified);
+    if (score >= 8) scored.push({id, data, score});
+  });
+  scored.sort((a, b) => b.score - a.score || String(a.id).localeCompare(String(b.id)));
+  return scored.slice(0, Math.min(8, Math.max(1, Number(limit) || 5)));
+}
+
+function clubToResult(card) {
+  const blurb = [card.city, card.cuisine, card.bio].filter(Boolean).join(" · ").slice(0, 180);
+  return {
+    id: card.id,
+    sourceId: `club:${card.id}`,
+    kind: "venue",
+    label: card.displayName,
+    blurb,
+    href: card.profileHref
+  };
+}
+
+function clubSmartView(card) {
+  const cuisine = listish(card.cuisines && card.cuisines.length ? card.cuisines : card.cuisine).slice(0, 6);
+  return {
+    kind: "venue",
+    title: card.displayName,
+    summary: card.bio || [card.city, card.brandName].filter(Boolean).join(" · "),
+    images: (card.imageUrls || []).slice(0, 2).map(url => ({
+      url,
+      attribution: "FLOQR public page",
+      licenseStatus: "ok"
+    })),
+    floqrPublicData: {
+      cuisine,
+      cuisines: cuisine,
+      city: card.city,
+      country: card.country
+    },
+    canonicalFloqrPageId: card.id,
+    actions: [{
+      id: "open-public-page",
+      href: card.profileHref,
+      label: "Open FLOQR Public Page"
+    }],
+    sources: [{provider: "floqr", reuseRights: "club"}]
+  };
+}
+
+async function searchPublicClubs(classified, limit = 5) {
+  const snap = await db.collection("clubLocations").limit(PUBLIC_PROFILE_SCAN).get();
+  const docs = snap.docs.map(doc => ({id: doc.id, data: doc.data() || {}}));
+  return rankPublicClubs(docs, classified, limit);
+}
+
+async function attachVenueSearch({query} = {}) {
+  const classified = classifyPlaceSearchIntent(query);
+  if (classified.intent === "none") return {handled: false, classified};
+  let ranked = [];
+  try {
+    ranked = await searchPublicClubs(classified, 5);
+  } catch (error) {
+    console.warn("BOT DEE attachVenueSearch failed", error?.message || error);
+    return {handled: false, classified, error: String(error?.message || error).slice(0, 180)};
+  }
+  const cards = ranked.map(row => publicClubCard(row.id, row.data, row.score));
+  const names = cards.map(card => card.displayName).filter(Boolean);
+  const found = cards.length > 0;
+  const reply = found
+    ? (names.length ? `Here are FLOQR venues that match: ${names.join(", ")}.` : "Here are FLOQR venues that match.")
+    : "FLOQR doesn't list that kind of spot there yet. I only search onboarded venues — not a general restaurant guide.";
+  const media = cards.flatMap(card => (
+    (card.imageUrls || []).slice(0, 1).map((url, index) => ({
+      url,
+      alt: `${card.displayName} photo ${index + 1}`,
+      kind: "photo"
+    }))
+  )).slice(0, 8);
+  return {
+    handled: true,
+    classified,
+    reply,
+    replyKey: found ? "botdee.place.found" : "botdee.place.none",
+    results: cards.map(clubToResult),
+    smartViews: cards.map(clubSmartView),
+    media,
+    venueSearch: {
+      intent: classified.intent,
+      replyKey: found ? "botdee.place.found" : "botdee.place.none",
+      count: cards.length
+    }
+  };
+}
+
 function imageUrlsFromUser(data = {}) {
   const urls = [];
   const push = value => {
@@ -350,7 +616,7 @@ function imageUrlsFromClub(data = {}) {
     const url = text(value, 500);
     if (url && /^https?:\/\//i.test(url) && !urls.includes(url) && urls.length < 10) urls.push(url);
   };
-  push(data.coverPhotoUrl || data.coverImageUrl || data.mainPhotoUrl || data.logoUrl || data.brandLogoUrl);
+  push(data.coverPhotoUrl || data.coverImageUrl || data.mainPhotoUrl || data.mainMediaUrl || data.logoUrl || data.brandLogoUrl);
   (Array.isArray(data.publicGallery) ? data.publicGallery : []).forEach(item => {
     push(item?.url || item?.mediaUrl);
   });
@@ -670,16 +936,23 @@ function isClubPublic(data = {}) {
 function publicClubCard(id, data = {}, score) {
   const images = imageUrlsFromClub(data);
   const name = text(data.locationName || data.brandName || data.name || id, 140);
+  const cuisine = text(Array.isArray(data.cuisines) ? data.cuisines.join(" / ") : (data.cuisine || ""), 160);
+  const cuisines = listish(data.cuisines && data.cuisines.length ? data.cuisines : data.cuisine)
+    .slice(0, 8)
+    .map(item => text(item, 40));
   return {
     kind: "club",
     id,
     displayName: name,
     brandName: text(data.brandName || "", 120),
     bio: text(data.description || data.publicBio || data.tagline || data.about || "", 400),
-    city: text(data.city || "", 80),
+    city: text(data.city || data.publicCity || "", 80),
     country: text(data.country || "", 80),
+    cuisine,
+    cuisines,
+    categories: listish(data.categories).slice(0, 8).map(item => text(item, 40)),
     genres: Array.isArray(data.genres) ? data.genres.filter(Boolean).slice(0, 8).map(g => text(g, 40)) : [],
-    website: text(data.website || data.websiteUrl || "", 240),
+    website: text(data.website || data.websiteUrl || data.officialWebsite || "", 240),
     photoURL: images[0] || "",
     imageUrls: images,
     profileHref: `./club-profile.html?location=${encodeURIComponent(id)}`,
@@ -734,8 +1007,10 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   const viewerUid = sessionRequest.auth.uid;
   const scored = [];
   const seen = new Set();
-  const wantPeople = kind === "any" || kind === "user" || kind === "patron" || kind === "people";
-  const wantClubs = kind === "any" || kind === "club" || kind === "venue";
+  const place = classifyPlaceSearchIntent(rawQuery);
+  const diningOrVenue = place.intent === "dining" || place.intent === "venue";
+  const wantPeople = !diningOrVenue && (kind === "any" || kind === "user" || kind === "patron" || kind === "people");
+  const wantClubs = diningOrVenue || kind === "any" || kind === "club" || kind === "venue";
   let viewerData = null;
   try {
     const viewerSnap = await db.collection("users").doc(viewerUid).get();
@@ -817,14 +1092,14 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
       snap.docs.forEach(doc => {
         const data = doc.data() || {};
         if (!isClubPublic(data)) return;
-        const hay = [
-          doc.id, data.locationName, data.brandName, data.name, data.city, data.country,
-          data.description, data.publicBio, data.tagline,
-          ...(Array.isArray(data.genres) ? data.genres : []),
-          ...(Array.isArray(data.artists) ? data.artists : []),
-          ...(Array.isArray(data.djs) ? data.djs : [])
-        ].filter(Boolean).join(" ");
-        const points = scoreHay(hay, needle, clubTokens) + (normalizeNeedle(doc.id) === needle ? 20 : 0);
+        let points = 0;
+        if (diningOrVenue) {
+          points = scoreClubForPlace(doc.id, data, place);
+        } else {
+          const hay = clubHaystack(doc.id, data);
+          points = scoreHay(hay, needle, clubTokens);
+        }
+        if (normalizeNeedle(doc.id) === needle) points += 20;
         if (points >= 8) scored.push(publicClubCard(doc.id, data, points));
       });
     } catch (error) {
@@ -838,7 +1113,11 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
     return rest;
   });
   let note = "No public profiles matched. Ask the user to clarify the name or check spelling.";
-  if (profiles.length) {
+  if (diningOrVenue && !profiles.length) {
+    note = "No onboarded FLOQR venue matched this dining/place query. Say FLOQR does not list that kind of spot yet. Do not invent Google/Yelp restaurants. Do not look up patrons. Do not pitch ShoutOut, VIP reserV, or floqCast.";
+  } else if (diningOrVenue && profiles.length) {
+    note = "These are onboarded FLOQR venues (not patrons). Summarize name, city, cuisine, and point to the FLOQR public page. Never pitch ShoutOut, VIP reserV, or floqCast unless the user asked. Never print image URLs.";
+  } else if (profiles.length) {
     note = "Viewer-context public volunteered datapoints (not PII/PCI — never email, phone, PAN, GPS). sharedDatapoints = keys this patron opted to publish. datapoints = every filled value for those keys — use ALL of them. A missing key is opted out or empty, not “FLOQR doesn’t track that.” photoCount photos are shown by the FLOQR app — never print URLs, tokens, or storage paths.";
   } else if (selfQuery) {
     note = "Could not load the viewer's profile yet. Ask them to open My Profile.";
@@ -892,6 +1171,14 @@ module.exports = {
   createFloqCastRequest,
   createFloqCastCheckout,
   lookupPublicProfiles,
+  classifyPlaceSearchIntent,
+  clubHaystack,
+  scoreClubForPlace,
+  rankPublicClubs,
+  attachVenueSearch,
+  publicClubCard,
+  clubSmartView,
+  clubToResult,
   isClubPublic,
   isSelfProfileQuery,
   isFriendContextQuery,

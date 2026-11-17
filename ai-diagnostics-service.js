@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.034";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.034";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.035";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.035";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -220,6 +220,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.035",
+      title: "s3.3.035 — BOT DEE contextual FLOQR venue search",
+      checks: [
+        {label:"Place classifier", file:"functions/bot-dee-tools.js", includes:["function classifyPlaceSearchIntent(", "function scoreClubForPlace(", "function attachVenueSearch("]},
+        {label:"Club hay includes cuisine", file:"functions/bot-dee-tools.js", includes:["data.cuisine", "data.categories", "data.amenities"]},
+        {label:"Dining skips people", file:"functions/bot-dee-tools.js", includes:["diningOrVenue", "wantPeople = !diningOrVenue"]},
+        {label:"Session attaches venues first", file:"functions/bot-dee-functions.js", includes:["attachVenueSearch", "venueAttached.handled", "provider: \"floqr-venues\""]},
+        {label:"Gemini dining = kind club", file:"functions/bot-dee-core.js", includes:["kind=club", "Never look up patrons for food or restaurant queries"]},
+        {label:"Help", file:"botdee-help-repository.js", includes:["help-botdee-place-search", "sushi restaurants in Washington DC"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-035-botdee-place-search"]}
+      ]
+    },
     {
       version: "s3.3.034",
       title: "s3.3.034 — Version SMARTview card only (no six-phase dump)",
@@ -3340,6 +3353,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-035-botdee-place-search",
+      area:"BOT DEE",
+      feature:"Contextual FLOQR venue search (dining / clubs in a city)",
+      changed:"s3.3.035 — Sushi restaurants in Washington DC searches onboarded clubs (KATA) instead of patron photos + a VIP/ShoutOut dump. No Google/Yelp. Venue cards open club-profile.html?location= without ?v=.",
+      howToTest:"1) Hard-refresh botdee.html until botdee.html / bot-dee-chat.js are s3.3.035. Sign in with botDee. 2) Ask: Sushi restaurants in Washington DC. 3) Confirm venue card(s) for onboarded sushi (KATA DC) and a FLOQR Public Page link — not patron Profile Media tiles, not a ShoutOut/VIP pitch. 4) Ask Who is Lorna — people SMARTcard still works. 5) Ask clubs in Washington DC — nightlife venues, not a restaurant-guide refusal. 6) Mark Succeed/Failed.",
+      expected:"Dining/place asks return onboarded FLOQR venues. People search still answers Who is. No product dump on sushi. Functions executeBotSession deployed with this SHA.",
+      troubleshoot:"Still a product dump + people photos → executeBotSession not on this SHA (need [firebase-deploy] [firebase-deploy-botdee]). Cached chat JS → hard-refresh to s3.3.035. Empty sushi result → kata-washington-dc missing cuisine in clubLocations; re-run venue push. Who is broken → people attach still after venue; dining classifier should return none for Who is."
+    },
     {
       id:"s3-3-034-version-card-only",
       area:"BOT DEE",

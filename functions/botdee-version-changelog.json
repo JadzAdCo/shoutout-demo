@@ -1,5 +1,9 @@
 [
   {
+    "id": "s3.3.035",
+    "text": "s3.3.035: BOT DEE searches onboarded FLOQR venues for dining/place asks (sushi in DC → KATA), not patron photos or a product dump"
+  },
+  {
     "id": "s3.3.034",
     "text": "s3.3.034: Version SMARTview card only; live Operational/Degraded/Unavailable probe; real Gemini model id"
   },

@@ -75,6 +75,12 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-place-search": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-privacy-assistant": [
       "masterAdmin",
       "patron",

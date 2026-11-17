@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.034";  const packs = {
+  const VERSION = "s3.3.035";  const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
         title: "Расписание персонала",
@@ -31,6 +31,10 @@
       "help-botdee-smartcard-search": {
         title: "Спросить BOT DEE, кто это",
         body: "«Who am I?» открывает ваш SMARTview. «Who is …» и имя или @хендл ищут публичные профили. Один результат — SMARTview. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
+      },
+      "help-botdee-place-search": {
+        title: "Спросить BOT DEE про площадки FLOQR",
+        body: "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают публичную страницу клуба. Фото посетителей и питчи ShoutOut / VIP не показываются, если вы об этом не просили. Если площадки ещё нет — BOT DEE так и скажет."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard людей",
@@ -518,6 +522,10 @@
         title: "BOT DEE vragen wie iemand is",
         body: "“Who am I?” opent uw SMARTview. “Who is …” plus naam of @handle zoekt openbare profielen. Eén match opent SMARTview. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
       },
+      "help-botdee-place-search": {
+        title: "Vraag BOT DEE naar FLOQR-venues",
+        body: "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen de FLOQR-publiekspagina. Patronfoto’s en ShoutOut- / VIP-pitches blijven weg tenzij u daarnaar vroeg. Als er nog niets onboarded is, zegt BOT DEE dat."
+      },
       "help-botdee-smartcard": {
         title: "Mensen-SMARTcards",
         body: "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SMARTview te openen. Kaarten gebruiken hetzelfde openbare profiel en dezelfde SMARTsummary. Openen roept Gemini niet aan."
@@ -1003,6 +1011,10 @@
       "help-botdee-smartcard-search": {
         title: "Demander à BOT DEE qui est quelqu’un",
         body: "« Who am I ? » ouvre votre SMARTview. « Who is … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre SMARTview. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existence du compte."
+      },
+      "help-botdee-place-search": {
+        title: "Demander à BOT DEE des lieux FLOQR",
+        body: "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent la page publique FLOQR. Photos de patrons et pitches ShoutOut / VIP restent hors sujet sauf si vous les avez demandés. S’il n’y a encore rien, BOT DEE le dit."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards Personnes",
@@ -1490,6 +1502,10 @@
         title: "BOT DEE fragen, wer jemand ist",
         body: "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet SMARTview. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
       },
+      "help-botdee-place-search": {
+        title: "BOT DEE nach FLOQR-Locations fragen",
+        body: "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen die FLOQR-Public-Page. Patron-Fotos und ShoutOut-/VIP-Pitches bleiben weg, außer Sie haben danach gefragt. Ist noch nichts onboardet, sagt BOT DEE das."
+      },
       "help-botdee-smartcard": {
         title: "Personen-SMARTcards",
         body: "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SMARTview. Karten nutzen dasselbe öffentliche Profil und dieselbe SMARTsummary. Öffnen ruft Gemini nicht auf."
@@ -1975,6 +1991,10 @@
       "help-botdee-smartcard-search": {
         title: "Preguntar a BOT DEE quién es alguien",
         body: "«Who am I?» abre su SMARTview. «Who is …» más un nombre o @identificador busca perfiles públicos. Un resultado abre SMARTview. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
+      },
+      "help-botdee-place-search": {
+        title: "Preguntar a BOT DEE por locales FLOQR",
+        body: "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren la página pública FLOQR. Las fotos de patrons y los pitches de ShoutOut / VIP no aparecen salvo que los pida. Si aún no hay nada, BOT DEE lo dice."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards de personas",
@@ -2462,6 +2482,10 @@
         title: "Chiedere a BOT DEE chi è qualcuno",
         body: "“Who am I?” apre il tuo SMARTview. “Who is …” più nome o @handle cerca profili pubblici. Un risultato apre SMARTview. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
       },
+      "help-botdee-place-search": {
+        title: "Chiedere a BOT DEE i locali FLOQR",
+        body: "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono la pagina pubblica FLOQR. Foto dei patron e pitch ShoutOut / VIP restano fuori se non li hai chiesti. Se non c’è ancora nulla, BOT DEE lo dice."
+      },
       "help-botdee-smartcard": {
         title: "SMARTcard persone",
         body: "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SMARTview completo. Le schede usano lo stesso profilo pubblico e SMARTsummary. Aprire una scheda non chiama Gemini."
@@ -2947,6 +2971,10 @@
       "help-botdee-smartcard-search": {
         title: "Perguntar ao BOT DEE quem é alguém",
         body: "“Who am I?” abre o seu SMARTview. “Who is …” mais um nome ou @handle procura perfis públicos. Um resultado abre o SMARTview. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
+      },
+      "help-botdee-place-search": {
+        title: "Perguntar ao BOT DEE por locais FLOQR",
+        body: "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem a página pública FLOQR. Fotos de patrons e pitches de ShoutOut / VIP ficam de fora salvo se pedir. Se ainda não houver listing, o BOT DEE diz."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards de pessoas",
@@ -3434,6 +3462,10 @@
         title: "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
         body: "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει SMARTview. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
       },
+      "help-botdee-place-search": {
+        title: "Ρωτήστε τον BOT DEE για χώρους FLOQR",
+        body: "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν τη δημόσια σελίδα FLOQR. Φωτογραφίες patrons και pitches ShoutOut / VIP μένουν εκτός εκτός αν τα ζητήσατε. Αν δεν υπάρχει ακόμα, ο BOT DEE το λέει."
+      },
       "help-botdee-smartcard": {
         title: "SMARTcard ατόμων",
         body: "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SMARTview. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SMARTsummary. Το άνοιγμα δεν καλεί Gemini."
@@ -3920,6 +3952,10 @@
         title: "Zapytaj BOT DEE, kim ktoś jest",
         body: "„Who am I?” otwiera Twoje SMARTview. „Who is …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera SMARTview. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
       },
+      "help-botdee-place-search": {
+        title: "Zapytaj BOT DEE o lokale FLOQR",
+        body: "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają publiczną stronę FLOQR. Zdjęcia patronów i pitch ShoutOut / VIP zostają pominięte, chyba że o nie poprosisz. Jeśli nic jeszcze nie jest onboardowane, BOT DEE to powie."
+      },
       "help-botdee-smartcard": {
         title: "SMARTcard osób",
         body: "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SMARTview. Karty używają tego samego profilu i SMARTsummary. Otwarcie nie wywołuje Gemini."
@@ -4405,6 +4441,10 @@
       "help-botdee-smartcard-search": {
         title: "اسأل BOT DEE من هذا الشخص",
         body: "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح SMARTview. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
+      },
+      "help-botdee-place-search": {
+        title: "اسأل BOT DEE عن أماكن FLOQR",
+        body: "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح الصفحة العامة لـ FLOQR. صور الرواد وعروض ShoutOut / VIP لا تظهر إلا إذا طلبتها. إذا لم يُدرج المكان بعد، يقول BOT DEE ذلك."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard الأشخاص",
