@@ -778,10 +778,20 @@
       });
     };
     const unsubs = [];
-    unsubs.push(db.collection("usercharacter_analysis").doc(uid).onSnapshot(() => {
+    let sawReadable = false;
+    unsubs.push(db.collection("usercharacter_analysis").doc(uid).onSnapshot(snap => {
+      sawReadable = true;
+      if (!el.isConnected || el.__floqrLiveToken !== token) return;
+      if (!snap.exists) {
+        patchHostView(el, uid, null);
+        return;
+      }
       applyRefetch();
     }, () => {
-      /* permission-denied / unstamped / unpublished: keep the search-authorized card */
+      /* Initial deny (unstamped / mock) keeps the search-authorized card.
+         After a successful listen, hide/delete makes the listener error — refetch. */
+      if (!sawReadable) return;
+      applyRefetch();
     }));
     const viewerUid = currentViewerUid();
     if (viewerUid && viewerUid !== uid) {

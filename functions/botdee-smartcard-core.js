@@ -16,6 +16,8 @@ const PERSON_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|loo
 const PERSON_SUFFIX = /\s+(?:on floqr|on mingl|on here)\s*$/i;
 const STOP_AFTER = /^(working|on (?:duty|tonight)|the (?:dj|club)|playing|singing|available)\b/i;
 const GENERIC_PERSON = /^(this person|that person|them|him|her|someone|anybody|anyone)$/i;
+const VENUE_NEEDLE = /^(a |an |the )?(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?)\b/i;
+const OPERATIONAL = /\b(tonight|today|near me|on duty|available|playing|working)\b/i;
 
 function text(value, max = 160) {
   return String(value == null ? "" : value).replace(/\s+/g, " ").trim().slice(0, max);
@@ -35,16 +37,27 @@ function extractPersonNeedle(raw) {
   const needle = normalizeQuery(rest);
   if (!needle || needle.length < 2) return "";
   if (STOP_AFTER.test(needle) || GENERIC_PERSON.test(needle)) return "";
-  if (/^(a |an |the )?(dj|club|venue|event|shoutout|vip|table)\b/.test(needle)) return "";
+  if (VENUE_NEEDLE.test(needle) || OPERATIONAL.test(needle)) return "";
   return rest;
+}
+
+function isPersonNameNeedle(rest) {
+  const trimmed = String(rest || "").replace(/[?!]+$/g, "").trim();
+  if (!trimmed) return false;
+  if (/^@[\w.-]+$/.test(trimmed)) return true;
+  const needle = normalizeQuery(trimmed);
+  if (!needle || needle.length < 2) return false;
+  if (STOP_AFTER.test(needle) || GENERIC_PERSON.test(needle)) return false;
+  if (VENUE_NEEDLE.test(needle) || OPERATIONAL.test(needle)) return false;
+  const tokens = needle.split(" ").filter(Boolean);
+  if (!tokens.length || tokens.length > 4) return false;
+  return tokens.every(token => /^@?[\w.'-]+$/.test(token) && !/^(who|what|where|when|how|the|a|an)$/.test(token));
 }
 
 function isFindPersonPrompt(raw) {
   const match = text(raw, 200).match(/^(?:find|search for)\s+(.+)$/i);
   if (!match) return false;
-  const rest = match[1].replace(/[?!]+$/g, "").trim();
-  if (/^@[\w.-]+$/.test(rest)) return true;
-  return /^[A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*){0,4}$/.test(rest);
+  return isPersonNameNeedle(match[1]);
 }
 
 function isPeopleLookupPrompt(raw) {
