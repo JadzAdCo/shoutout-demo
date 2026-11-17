@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.027";  const packs = {
+  const VERSION = "s3.3.028";  const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
         title: "Расписание персонала",
@@ -19,6 +19,38 @@
 "help-botdee-page": {
         title: "BOT DEE",
         body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, FloqCAST, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, а после паузы может продолжить сохранённую историю. Пауза не удаляет чат. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите «Настройки» под полем чата для сохранённых чатов и воспоминаний. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат."
+      },
+      "help-botdee-smartview-troubleshoot": {
+        title: "Устранение неполадок SmartView",
+        body: "Пустая карточка: поля скрыты или вы в блоке. Ошибка сохранения: войдите — переводы на сервере. Ожидание или сбой: исходный язык с меткой. Правит только владелец. SMARTviews Master Admin — mock; Places и Yelp выключены. Тема следует Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "Проверить и исправить Smart Summary",
+        body: "Gemini составляет черновик только из публичных полей FLOQR — не при каждом просмотре. Неверный факт: скройте поле или правьте описание. Ваш текст не перезаписывается. Конфликт профиля просит проверку. Сообщите о неверной карточке в оверлее."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView и Site Chrome",
+        body: "People SmartView берёт Site Chrome FLOQR зрителя (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Второго темы нет. Смена chrome обновляет карточку, черновик чата сохраняется."
+      },
+      "help-botdee-smartview-categories": {
+        title: "Категории SmartView",
+        body: "Четыре вкладки: Социальное, Знакомства, Еда, Будущие поездки. Социальное открывается на Музыке, затем Nightlife, Спорт, События. Теги только из того, чем вы поделились — без повторных заголовков и выдуманных поездок или оценок."
+      },
+      "help-botdee-smartview-media": {
+        title: "Фото и видео SmartView",
+        body: "Компактная карточка показывает одно публичное фото. Нажмите для полноэкранного просмотра с вкладки Фото. Переключитесь на Видео, смахните или стрелки, затем X (или Escape) — тот же чат и черновик. Только медиа, публичные в FLOQR."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "Конфиденциальность SmartView",
+        body: "SmartView показывает только уже публичные в FLOQR поля. Это не веб-поиск. Знакомства только с явным согласием. Скройте поле в профиле — оно уйдёт. Заблокированные не видят карточку. Сообщите о неверном описании в оверлее."
+      },
+      "help-botdee-smartview-translation": {
+        title: "Перевод SmartView",
+        body: "Исходное описание остаётся на языке профиля. После сохранения FLOQR ставит перевод на каждый другой язык. Пока перевод ждёт или сбой, зрители видят исходный язык с пометкой — не устаревший перевод как актуальный."
+      },
+      "help-botdee-smartview-edit": {
+        title: "Изменить Smart Summary",
+        body: "Только вы правите Smart Summary на языке профиля. Сохранение сразу. Переводы идут в фоне. Gemini не перезаписывает ваш текст. Если публичный профиль изменился, FLOQR просит проверить, а не подменяет."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Аккаунт FloqR для Spatial Studio",
@@ -42,7 +74,7 @@
       },
       "help-botdee-smartview": {
         title: "SmartViews BOT DEE",
-        body: "SmartViews — компактные карточки заведений, событий и ресторанов. Карточка клуба открывает существующую публичную страницу FLOQR — это не второй профиль. Макеты помечены, пока провайдеры не одобрены."
+        body: "SmartViews — компактные карточки в чате BOT DEE. Карточка клуба открывает существующую публичную страницу FLOQR — не второй профиль. People SmartView показывает публичные поля FLOQR, Smart Summary, Социальное (сначала Музыка), Знакомства, Еду и будущие поездки. Макеты помечены. Нет живых Places или Yelp."
       },
       "help-botdee-memory": {
         title: "Сохранённые чаты BOT DEE",
@@ -414,6 +446,38 @@
         title: "BOT DEE",
         body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Als je bent ingelogd, bewaart BOT DEE deze chat als je vernieuwt of een andere telefoon opent, en na de pauze verdergaan met de opgeslagen geschiedenis. De pauze verwijdert de chat niet. Antwoorden gebruiken de classificatie van jouw account. Ingelogd ziet BOT DEE dezelfde openbaar gedeelde profieldatapoints als jij (muziek, eten, reizen, hobby’s en de rest van Privacy datapoint sharing) — nooit e-mail, telefoon, kaartgegevens of GPS. Tik op Instellingen onder het chatvak voor opgeslagen chats en herinneringen. Tik in de chat op een foto om die in een apart venster te openen. Sluit met X of Sluiten om de chat weer te zien."
       },
+      "help-botdee-smartview-troubleshoot": {
+        title: "SmartView-problemen",
+        body: "Lege kaart: velden verborgen of geblokkeerd. Opslaan mislukt: meld u aan — vertalingen staan op de server. Wachtend of mislukt: brontaal met label. Alleen de eigenaar bewerkt. Master Admin SMARTviews blijft de mock-catalogus; Places en Yelp blijven uit. Thema volgt Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "Smart Summary controleren en corrigeren",
+        body: "Gemini stelt alleen op uit openbare FLOQR-velden — niet bij elke weergave. Verkeerd feit: veld verbergen of samenvatting zelf bewerken. Uw tekst wordt niet overschreven. Profielconflicten vragen om controle. Meld een foute kaart in de overlay."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView en Site Chrome",
+        body: "People SmartView gebruikt de FLOQR Site Chrome van de kijker (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Geen tweede thema. Chrome wisselen werkt de kaart bij zonder het chatconcept te verliezen."
+      },
+      "help-botdee-smartview-categories": {
+        title: "SmartView-categorieën",
+        body: "Vier tabbladen: Sociaal, Daten, Dineren, Toekomstige reizen. Sociaal opent op Muziek, daarna Nightlife, Sport, Events. Tags zijn alleen wat u deelde — geen dubbele koppen, geen verzonnen reizen of scores. Toekomstige reizen alleen openbaar gemaakte bestemmingen."
+      },
+      "help-botdee-smartview-media": {
+        title: "SmartView-foto’s en video’s",
+        body: "De compacte kaart toont één openbare foto. Tik voor een full-screen viewer op Foto’s. Schakel naar Video’s, veeg of pijlen, dan X (of Escape) terug naar dezelfde chatscroll en concept. Alleen in FLOQR openbare media."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "SmartView-privacy",
+        body: "SmartView toont alleen velden die u al openbaar maakte in FLOQR. Geen webzoeken. Daten alleen met opt-in. Verberg een veld in Mijn profiel en het verdwijnt. Geblokkeerden zien de kaart niet. Meld een onjuiste samenvatting in de overlay."
+      },
+      "help-botdee-smartview-translation": {
+        title: "SmartView-vertaling",
+        body: "De bronsamenvatting blijft in de standaard profieltaal. Na opslaan zet FLOQR een vertaling klaar voor elke andere taal. Bij wachten of fout ziet de kijker de brontaal met label — nooit een verouderde vertaling als actueel."
+      },
+      "help-botdee-smartview-edit": {
+        title: "Uw Smart Summary bewerken",
+        body: "Alleen u bewerkt uw Smart Summary in de standaard profieltaal. Opslaan is direct. Vertalingen lopen op de achtergrond. Gemini overschrijft uw tekst niet. Als het openbare profiel wijzigt, vraagt FLOQR u te controleren in plaats van te vervangen."
+      },
       "help-floqr-oidc-floqmedia": {
         title: "FloqR-account voor Spatial Studio",
         body: "Spatial Studio op FloqMedia gebruikt uw bestaande FloqR-account. Er is geen FloqMedia-aanmelding. Gastconcepten blijven in de FloqMedia-browser tot u bevestigt ze aan dit FloqR-account te koppelen. FloqR geeft een eenmalige autorisatiecode (PKCE). Toegangstokens staan niet in het spatial-projectbestand."
@@ -436,7 +500,7 @@
       },
       "help-botdee-smartview": {
         title: "BOT DEE SmartViews",
-        body: "SmartViews zijn compacte kaarten voor venues, events en restaurants. Een clubkaart opent de bestaande FLOQR-openbare pagina — geen tweede profiel. Mockkaarten zijn gelabeld tot providers zijn goedgekeurd."
+        body: "SmartViews zijn compacte kaarten in de BOT DEE-chat. Een clubkaart opent de bestaande FLOQR Public Page — geen tweede profiel. People SmartView toont openbare FLOQR-velden, een Smart Summary, Sociaal (eerst Muziek), Daten, Dineren en Toekomstige reizen. Mocks blijven gelabeld. Geen live Places of Yelp."
       },
       "help-botdee-memory": {
         title: "Opgeslagen BOT DEE-chats",
@@ -808,6 +872,38 @@
         title: "BOT DEE",
         body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, et après la pause il peut reprendre l’historique enregistré. La pause ne supprime pas le chat. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez Réglages sous la zone de chat pour les discussions et souvenirs enregistrés. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat."
       },
+      "help-botdee-smartview-troubleshoot": {
+        title: "Dépannage SmartView",
+        body: "Carte vide : champs masqués ou blocage. Échec d’enregistrement : reconnectez-vous — les traductions sont sur le serveur. Traduction en attente ou en échec : langue source étiquetée. Seul le titulaire édite. SMARTviews Master Admin reste le catalogue mock ; Places et Yelp restent coupés. Le thème suit Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "Relire et corriger un Smart Summary",
+        body: "Gemini rédige uniquement à partir des champs publics dans FLOQR — jamais à chaque vue. Si un fait est faux, masquez le champ dans la visibilité du profil ou modifiez le résumé. Un texte rédigé par vous n’est pas écrasé. Un conflit de profil demande une relecture. Signalez une carte incorrecte depuis l’overlay."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView et Site Chrome",
+        body: "Le SmartView personne utilise le Site Chrome FLOQR du visiteur (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Pas de second thème. Changer le chrome met à jour la carte sans perdre le brouillon."
+      },
+      "help-botdee-smartview-categories": {
+        title: "Catégories SmartView",
+        body: "Quatre onglets : Social, Rencontre, Cuisine, Voyages à venir. Social s’ouvre sur Musique, puis Nightlife, Sports et Événements. Les tags sont uniquement ce que vous avez partagé — pas de titres en double ni de voyages ou notes inventés. Les voyages à venir n’affichent que les destinations publiques."
+      },
+      "help-botdee-smartview-media": {
+        title: "Photos et vidéos SmartView",
+        body: "La carte compacte montre une photo publique. Appuyez pour un viewer plein écran sur Photos. Passez à Vidéos, balayez ou utilisez les flèches, puis X (ou Échap) pour retrouver le chat et le brouillon. Seuls les médias publics dans FLOQR apparaissent."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "Confidentialité SmartView",
+        body: "SmartView n’affiche que les champs déjà publics dans FLOQR. Ce n’est pas une recherche web. La rencontre n’apparaît qu’avec opt-in. Masquez un champ dans Mon profil et il quitte SmartView. Les personnes bloquées ne voient pas la carte. Signalez un résumé incorrect depuis l’overlay."
+      },
+      "help-botdee-smartview-translation": {
+        title: "Traduction SmartView",
+        body: "Le résumé source reste dans la langue par défaut du profil. Après enregistrement, FLOQR met en file une traduction pour chaque autre langue. En attente ou en échec, les lecteurs voient la langue source clairement indiquée — jamais une traduction périmée comme actuelle."
+      },
+      "help-botdee-smartview-edit": {
+        title: "Modifier votre Smart Summary",
+        body: "Vous seul pouvez modifier votre Smart Summary, dans la langue par défaut du profil. L’enregistrement est immédiat. Les traductions partent en arrière-plan. Gemini n’écrase pas un texte que vous avez modifié. Si le profil public change, FLOQR vous demande de relire le résumé."
+      },
       "help-floqr-oidc-floqmedia": {
         title: "Compte FloqR pour Spatial Studio",
         body: "Spatial Studio sur FloqMedia utilise votre compte FloqR existant. Il n’y a pas d’inscription FloqMedia. Les brouillons invités restent dans le navigateur FloqMedia jusqu’à confirmation de rattachement à ce compte FloqR. FloqR émet un code d’autorisation unique (PKCE). Les jetons d’accès ne sont pas stockés dans le fichier de projet spatial."
@@ -830,7 +926,7 @@
       },
       "help-botdee-smartview": {
         title: "SmartViews BOT DEE",
-        body: "Les SmartViews sont des cartes compactes pour lieux, événements, restaurants. Une carte club ouvre la page publique FLOQR existante — ce n’est pas un second profil. Les maquettes sont indiquées tant que les fournisseurs ne sont pas approuvés."
+        body: "Les SmartViews sont des cartes compactes dans le chat BOT DEE. Une carte de club ouvre la page publique FLOQR existante — pas un second profil. People SmartView affiche les champs publics dans FLOQR, un Smart Summary, Social (Musique d’abord), Rencontre, Cuisine et Voyages à venir. Les maquettes restent marquées. Pas de Places ni Yelp en direct."
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE enregistrés",
@@ -1202,6 +1298,38 @@
         title: "BOT DEE",
         body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Wenn du angemeldet bist, behält BOT DEE diesen Chat beim Aktualisieren oder auf einem zweiten Handy, und nach der Pause den gespeicherten Verlauf fortsetzen. Die Pause löscht den Chat nicht. Antworten nutzen die Klassifizierung deines Kontos. Angemeldet sieht BOT DEE dieselben freiwillig öffentlichen Profildatenpunkte wie du (Musik, Essen, Reisen, Hobbys und der Rest von Privacy datapoint sharing) — niemals E-Mail, Telefon, Kartendaten oder GPS. Tippe unter dem Chatfeld auf Einstellungen für gespeicherte Chats und Erinnerungen. Tippe im Chat auf ein Foto, um es in einem eigenen Fenster zu öffnen. Schließen mit X oder Schließen, um den Chat wieder zu sehen."
       },
+      "help-botdee-smartview-troubleshoot": {
+        title: "SmartView-Fehlerbehebung",
+        body: "Leere Karte: Felder ausgeblendet oder blockiert. Speichern fehlgeschlagen: anmelden — Übersetzungen laufen auf dem Server. Ausstehend/Fehler: Quellsprache mit Label. Nur der Inhaber bearbeitet. Master-Admin-SMARTviews bleibt Mock; Places/Yelp aus. Theme folgt Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "Smart Summary prüfen und korrigieren",
+        body: "Gemini entwirft nur aus öffentlichen FLOQR-Feldern — nie bei jedem Öffnen. Falsche Fakten: Feld in der Profilsichtbarkeit ausblenden oder Summary selbst ändern. Ihr Text wird nicht überschrieben. Profilkonflikte verlangen Prüfung. Falsche Karten im Overlay melden."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView und Site Chrome",
+        body: "People SmartView nutzt das FLOQR Site Chrome des Betrachters (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Kein zweites Theme. Chrome-Wechsel aktualisiert die Karte, der Chat-Entwurf bleibt."
+      },
+      "help-botdee-smartview-categories": {
+        title: "SmartView-Kategorien",
+        body: "Vier Tabs: Social, Dating, Dining, Zukünftige Reisen. Social startet bei Musik, dann Nightlife, Sport, Events. Tags nur Geteiltes — keine doppelten Überschriften, keine erfundenen Reisen oder Bewertungen. Künftige Reisen nur öffentlich markierte Ziele."
+      },
+      "help-botdee-smartview-media": {
+        title: "SmartView-Fotos und Videos",
+        body: "Die Karte zeigt ein öffentliches Foto. Tippen öffnet den Vollbild-Viewer auf Fotos. Zu Videos wechseln, wischen oder Pfeile, dann X (oder Escape) zurück zum Chat und Entwurf. Nur in FLOQR öffentliche Medien."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "SmartView-Datenschutz",
+        body: "SmartView zeigt nur Felder, die in FLOQR schon öffentlich sind. Keine Websuche. Dating nur mit Opt-in. Blenden Sie ein Feld in Mein Profil aus, verschwindet es. Blockierte Personen sehen die Karte nicht. Falsche Summaries im Overlay melden."
+      },
+      "help-botdee-smartview-translation": {
+        title: "SmartView-Übersetzung",
+        body: "Die Quell-Summary bleibt in der Standard-Profilsprache. Nach dem Speichern reiht FLOQR eine Übersetzung für jede andere Sprache ein. Bei ausstehend oder Fehler sehen Betrachter die Quellsprache klar gekennzeichnet — nie eine veraltete Übersetzung als aktuell."
+      },
+      "help-botdee-smartview-edit": {
+        title: "Smart Summary bearbeiten",
+        body: "Nur Sie bearbeiten Ihre Smart Summary in der Standard-Profilsprache. Speichern ist sofort. Übersetzungen laufen im Hintergrund. Gemini überschreibt Ihren Text nicht. Wenn sich das öffentliche Profil ändert, prüft FLOQR mit Ihnen statt zu ersetzen."
+      },
       "help-floqr-oidc-floqmedia": {
         title: "FloqR-Konto für Spatial Studio",
         body: "Spatial Studio auf FloqMedia nutzt Ihr bestehendes FloqR-Konto. Es gibt keine FloqMedia-Anmeldung. Gastentwürfe bleiben im FloqMedia-Browser, bis Sie die Verknüpfung mit diesem FloqR-Konto bestätigen. FloqR stellt einen einmaligen Autorisierungscode (PKCE) aus. Zugriffstoken werden nicht in der Spatial-Projektdatei gespeichert."
@@ -1224,7 +1352,7 @@
       },
       "help-botdee-smartview": {
         title: "BOT DEE SmartViews",
-        body: "SmartViews sind kompakte Karten für Venues, Events, Restaurants. Eine Club-Karte öffnet die vorhandene FLOQR-Public-Page — kein zweites Profil. Mock-Karten sind gekennzeichnet, bis Anbieter genehmigt sind."
+        body: "SmartViews sind kompakte Karten im BOT-DEE-Chat. Clubkarten öffnen die bestehende FLOQR Public Page — kein zweites Profil. People SmartView zeigt öffentliche FLOQR-Felder, Smart Summary, Social (Musik zuerst), Dating, Dining und Zukünftige Reisen. Mocks bleiben gekennzeichnet. Kein Live-Places oder Yelp."
       },
       "help-botdee-memory": {
         title: "Gespeicherte BOT DEE-Chats",
@@ -1596,6 +1724,38 @@
         title: "BOT DEE",
         body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, y después de la pausa puede continuar el historial guardado. La pausa no borra el chat. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca Ajustes bajo el cuadro de chat para chats y recuerdos guardados. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat."
       },
+      "help-botdee-smartview-troubleshoot": {
+        title: "Solución de problemas de SmartView",
+        body: "Tarjeta vacía: campos ocultos o bloqueo. Fallo al guardar: inicie sesión — las traducciones van al servidor. Pendiente o error: idioma de origen etiquetado. Solo el titular edita. SMARTviews de Master Admin sigue siendo el catálogo mock; Places y Yelp apagados. El tema sigue Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "Revisar y corregir un Smart Summary",
+        body: "Gemini redacta solo con campos públicos en FLOQR — no en cada vista. Si un dato es falso, oculte el campo o edite el resumen. Su texto no se sobrescribe. Un conflicto de perfil pide revisión. Informe una tarjeta incorrecta desde la superposición."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView y Site Chrome",
+        body: "People SmartView usa el Site Chrome FLOQR del visitante (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). No hay un segundo tema. Cambiar el chrome actualiza la tarjeta sin perder el borrador."
+      },
+      "help-botdee-smartview-categories": {
+        title: "Categorías SmartView",
+        body: "Cuatro pestañas: Social, Citas, Gastronomía y Viajes futuros. Social abre en Música, luego Nightlife, Deportes y Eventos. Las etiquetas son solo lo compartido — sin títulos duplicados ni viajes o notas inventados. Viajes futuros solo destinos públicos."
+      },
+      "help-botdee-smartview-media": {
+        title: "Fotos y vídeos SmartView",
+        body: "La tarjeta compacta muestra una foto pública. Toque para el visor a pantalla completa en Fotos. Pase a Vídeos, deslice o use flechas, luego X (o Escape) vuelve al chat y al borrador. Solo medios públicos en FLOQR."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "Privacidad de SmartView",
+        body: "SmartView muestra solo campos ya públicos en FLOQR. No es búsqueda web. Citas solo con opt-in. Oculte un campo en Mi perfil y sale de SmartView. Quien esté bloqueado no ve la tarjeta. Informe un resumen incorrecto desde la superposición."
+      },
+      "help-botdee-smartview-translation": {
+        title: "Traducción de SmartView",
+        body: "El resumen de origen permanece en el idioma predeterminado. Tras guardar, FLOQR encola una traducción a cada otro idioma. Si está pendiente o falla, se muestra el idioma de origen etiquetado — nunca una traducción antigua como actual."
+      },
+      "help-botdee-smartview-edit": {
+        title: "Editar su Smart Summary",
+        body: "Solo usted edita su Smart Summary en el idioma predeterminado del perfil. El guardado es inmediato. Las traducciones van en segundo plano. Gemini no sobrescribe su texto. Si el perfil público cambia, FLOQR le pide revisar, no reemplazar."
+      },
       "help-floqr-oidc-floqmedia": {
         title: "Cuenta FloqR para Spatial Studio",
         body: "Spatial Studio en FloqMedia usa su cuenta FloqR existente. No hay registro FloqMedia. Los borradores de invitado quedan en el navegador FloqMedia hasta que confirme adjuntarlos a esta cuenta FloqR. FloqR emite un código de autorización de un solo uso (PKCE). Los tokens no se guardan en el archivo del proyecto espacial."
@@ -1618,7 +1778,7 @@
       },
       "help-botdee-smartview": {
         title: "SmartViews de BOT DEE",
-        body: "Las SmartViews son tarjetas compactas de locales, eventos y restaurantes. Una tarjeta de club abre la página pública FLOQR existente — no es un segundo perfil. Las maquetas se marcan hasta que los proveedores estén aprobados."
+        body: "Los SmartViews son tarjetas compactas en el chat de BOT DEE. Una tarjeta de club abre la página pública FLOQR existente — no un segundo perfil. People SmartView muestra campos públicos en FLOQR, Smart Summary, Social (Música primero), Citas, Gastronomía y Viajes futuros. Las maquetas siguen etiquetadas. No hay Places ni Yelp en vivo."
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE guardados",
@@ -1990,6 +2150,38 @@
         title: "BOT DEE",
         body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, FloqCAST, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Se hai effettuato l’accesso, BOT DEE conserva questa chat se aggiorni o apri un altro telefono, e dopo la pausa può riprendere la cronologia salvata. La pausa non cancella la chat. Le risposte usano la classificazione del tuo account. Se hai effettuato l’accesso, BOT DEE vede gli stessi datapoint pubblici volontari che vedi tu (musica, cibo, viaggi, hobby e il resto di Privacy datapoint sharing) — mai email, telefono, dati della carta o GPS. Tocca Impostazioni sotto la casella di chat per chat e memorie salvate. Tocca una foto in chat per aprirla in una finestra. Chiudi con X o Chiudi per tornare alla chat."
       },
+      "help-botdee-smartview-troubleshoot": {
+        title: "Risoluzione problemi SmartView",
+        body: "Scheda vuota: campi nascosti o blocco. Salvataggio fallito: accedi — le traduzioni stanno sul server. In attesa o errore: lingua di origine etichettata. Solo il titolare modifica. SMARTviews Master Admin resta il catalogo mock; Places e Yelp restano off. Il tema segue Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "Rivedi e correggi lo Smart Summary",
+        body: "Gemini bozza solo dai campi pubblici in FLOQR — non a ogni vista. Se un fatto è sbagliato, nascondi il campo o modifica il riassunto. Il tuo testo non viene sovrascritto. Un conflitto di profilo chiede revisione. Segnala una scheda errata dall’overlay."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView e Site Chrome",
+        body: "People SmartView usa il Site Chrome FLOQR di chi guarda (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Nessun secondo tema. Cambiare chrome aggiorna la scheda senza perdere la bozza chat."
+      },
+      "help-botdee-smartview-categories": {
+        title: "Categorie SmartView",
+        body: "Quattro schede: Social, Dating, Dining, Viaggi futuri. Social si apre su Musica, poi Nightlife, Sport, Eventi. I tag sono solo ciò che hai condiviso — niente titoli duplicati né viaggi o voti inventati. I viaggi futuri mostrano solo destinazioni pubbliche."
+      },
+      "help-botdee-smartview-media": {
+        title: "Foto e video SmartView",
+        body: "La scheda compatta mostra una foto pubblica. Tocca per il viewer a schermo intero su Foto. Passa a Video, scorri o frecce, poi X (o Escape) torna allo stesso chat e bozza. Solo i media pubblici in FLOQR."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "Privacy SmartView",
+        body: "SmartView mostra solo campi già pubblici in FLOQR. Non è ricerca web. Dating solo con opt-in. Nascondi un campo in Il mio profilo e sparisce. Chi è bloccato non vede la scheda. Segnala un riassunto errato dall’overlay."
+      },
+      "help-botdee-smartview-translation": {
+        title: "Traduzione SmartView",
+        body: "Il riassunto sorgente resta nella lingua predefinita. Dopo il salvataggio FLOQR mette in coda una traduzione per ogni altra lingua. In attesa o errore i visitatori vedono la lingua di origine etichettata — mai una traduzione vecchia come attuale."
+      },
+      "help-botdee-smartview-edit": {
+        title: "Modifica lo Smart Summary",
+        body: "Solo tu modifichi lo Smart Summary nella lingua predefinita del profilo. Il salvataggio è immediato. Le traduzioni partono in background. Gemini non sovrascrive il tuo testo. Se il profilo pubblico cambia, FLOQR chiede una revisione invece di sostituirlo."
+      },
       "help-floqr-oidc-floqmedia": {
         title: "Account FloqR per Spatial Studio",
         body: "Spatial Studio su FloqMedia usa il tuo account FloqR esistente. Non c’è registrazione FloqMedia. Le bozze ospite restano nel browser FloqMedia finché non confermi il collegamento a questo account FloqR. FloqR emette un codice di autorizzazione monouso (PKCE). I token non sono salvati nel file del progetto spaziale."
@@ -2011,8 +2203,8 @@
         body: "Salva luoghi e schede chieste a BOT DEE. Un Place ID Google non è una copia di foto o recensioni. Puoi aggiornare o eliminare. Le cache con licenza restano off finché il provider non è approvato."
       },
       "help-botdee-smartview": {
-        title: "SmartView BOT DEE",
-        body: "Le SmartView sono schede compatte per locali, eventi e ristoranti. Una scheda club apre la pagina pubblica FLOQR esistente — non è un secondo profilo. Le mock sono etichettate finché i provider non sono approvati."
+        title: "SmartViews BOT DEE",
+        body: "Le SmartViews sono schede compatte nella chat BOT DEE. Una scheda locale apre la FLOQR Public Page esistente — non un secondo profilo. People SmartView mostra campi pubblici in FLOQR, Smart Summary, Social (prima Musica), Dating, Dining e Viaggi futuri. I mock restano etichettati. Niente Places o Yelp live."
       },
       "help-botdee-memory": {
         title: "Chat BOT DEE salvate",
@@ -2384,6 +2576,38 @@
         title: "BOT DEE",
         body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, e depois da pausa pode continuar o histórico guardado. A pausa não apaga o chat. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque em Definições abaixo da caixa de chat para chats e memórias guardados. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat."
       },
+      "help-botdee-smartview-troubleshoot": {
+        title: "Resolução de problemas SmartView",
+        body: "Cartão vazio: campos ocultos ou bloqueio. Falha ao guardar: inicie sessão — as traduções ficam no servidor. Pendente ou falha: idioma de origem com etiqueta. Só o dono edita. SMARTviews Master Admin continua o catálogo mock; Places e Yelp desligados. O tema segue o Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "Rever e corrigir o Smart Summary",
+        body: "O Gemini redige só a partir de campos públicos no FLOQR — não em cada vista. Se um facto estiver errado, oculte o campo ou edite o resumo. O seu texto não é substituído. Um conflito de perfil pede revisão. Reporte um cartão errado na sobreposição."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView e Site Chrome",
+        body: "O People SmartView usa o Site Chrome FLOQR de quem vê (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Não há segundo tema. Mudar o chrome atualiza o cartão sem perder o rascunho."
+      },
+      "help-botdee-smartview-categories": {
+        title: "Categorias SmartView",
+        body: "Quatro separadores: Social, Dating, Dining e Viagens futuras. Social abre em Música, depois Nightlife, Desporto e Eventos. As etiquetas são só o que partilhou — sem títulos duplicados nem viagens ou notas inventadas. Viagens futuras só destinos públicos."
+      },
+      "help-botdee-smartview-media": {
+        title: "Fotos e vídeos SmartView",
+        body: "O cartão compacto mostra uma foto pública. Toque para o visualizador em ecrã inteiro em Fotos. Mude para Vídeos, deslize ou setas, depois X (ou Escape) regressa ao mesmo chat e rascunho. Só média públicos no FLOQR."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "Privacidade SmartView",
+        body: "O SmartView mostra só campos já públicos no FLOQR. Não é pesquisa web. Dating só com opt-in. Oculte um campo no perfil e sai do SmartView. Bloqueados não veem o cartão. Reporte um resumo errado na sobreposição."
+      },
+      "help-botdee-smartview-translation": {
+        title: "Tradução SmartView",
+        body: "O resumo de origem fica no idioma predefinido. Depois de guardar, o FLOQR mete na fila uma tradução para cada outro idioma. Pendente ou falhado, vê-se o idioma de origem com etiqueta — nunca uma tradução antiga como atual."
+      },
+      "help-botdee-smartview-edit": {
+        title: "Editar o Smart Summary",
+        body: "Só você edita o Smart Summary no idioma predefinido do perfil. A gravação é imediata. As traduções correm em segundo plano. O Gemini não substitui o seu texto. Se o perfil público mudar, o FLOQR pede revisão em vez de substituir."
+      },
       "help-floqr-oidc-floqmedia": {
         title: "Conta FloqR para Spatial Studio",
         body: "O Spatial Studio no FloqMedia usa a sua conta FloqR existente. Não há registo FloqMedia. Os rascunhos de convidado ficam no browser FloqMedia até confirmar a associação a esta conta FloqR. O FloqR emite um código de autorização único (PKCE). Os tokens não são guardados no ficheiro do projeto espacial."
@@ -2406,7 +2630,7 @@
       },
       "help-botdee-smartview": {
         title: "SmartViews BOT DEE",
-        body: "SmartViews são cartões compactos de locais, eventos e restaurantes. Um cartão de clube abre a página pública FLOQR existente — não é um segundo perfil. Os mocks são rotulados até os fornecedores serem aprovados."
+        body: "Os SmartViews são cartões compactos no chat BOT DEE. Um cartão de clube abre a página pública FLOQR existente — não um segundo perfil. O People SmartView mostra campos públicos no FLOQR, Smart Summary, Social (Música primeiro), Dating, Dining e Viagens futuras. Os mocks ficam etiquetados. Sem Places ou Yelp em direto."
       },
       "help-botdee-memory": {
         title: "Chats BOT DEE guardados",
@@ -2778,6 +3002,38 @@
         title: "BOT DEE",
         body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Αν έχετε συνδεθεί, ο BOT DEE κρατά αυτή τη συνομιλία αν ανανεώσετε ή ανοίξετε άλλο τηλέφωνο, και μετά την παύση μπορεί να συνεχίσει το αποθηκευμένο ιστορικό. Η παύση δεν διαγράφει τη συνομιλία. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Αν έχετε συνδεθεί, ο BOT DEE βλέπει τα ίδια δημόσια εθελοντικά datapoints προφίλ με εσάς (μουσική, φαγητό, ταξίδια, χόμπι και τα υπόλοιπα του Privacy datapoint sharing) — ποτέ email, τηλέφωνο, στοιχεία κάρτας ή GPS. Πατήστε Ρυθμίσεις κάτω από το πλαίσιο συνομιλίας για αποθηκευμένες συνομιλίες και μνήμες. Πατήστε μια φωτογραφία στη συνομιλία για να ανοίξει σε παράθυρο. Κλείστε με X ή Κλείσιμο για να δείτε πάλι τη συνομιλία."
       },
+      "help-botdee-smartview-troubleshoot": {
+        title: "Αντιμετώπιση SmartView",
+        body: "Κενή κάρτα: κρυμμένα πεδία ή αποκλεισμός. Αποτυχία αποθήκευσης: συνδεθείτε — οι μεταφράσεις είναι στον διακομιστή. Εκκρεμές/αποτυχία: γλώσσα πηγής με σήμανση. Μόνο ο κάτοχος επεξεργάζεται. Το SMARTviews Master Admin μένει mock. Places/Yelp κλειστά. Το θέμα ακολουθεί το Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "Έλεγχος και διόρθωση Smart Summary",
+        body: "Το Gemini συντάσσει μόνο από δημόσια πεδία FLOQR — όχι σε κάθε προβολή. Λάθος γεγονός: αποκρύψτε το πεδίο ή επεξεργαστείτε την περίληψη. Το κείμενό σας δεν αντικαθίσταται. Σύγκρουση προφίλ ζητά έλεγχο. Αναφέρετε λάθος κάρτα από την επικάλυψη."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView και Site Chrome",
+        body: "Το People SmartView χρησιμοποιεί το FLOQR Site Chrome του θεατή (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Δεν υπάρχει δεύτερο θέμα. Η αλλαγή chrome ενημερώνει την κάρτα χωρίς απώλεια προσχεδίου."
+      },
+      "help-botdee-smartview-categories": {
+        title: "Κατηγορίες SmartView",
+        body: "Τέσσερις καρτέλες: Κοινωνικά, Γνωριμίες, Εστίαση, Μελλοντικά ταξίδια. Τα Κοινωνικά ανοίγουν στη Μουσική, μετά Nightlife, Αθλητισμός, Εκδηλώσεις. Οι ετικέτες είναι μόνο όσα μοιραστήκατε — χωρίς διπλούς τίτλους ή επινοημένα ταξίδια."
+      },
+      "help-botdee-smartview-media": {
+        title: "Φωτογραφίες και βίντεο SmartView",
+        body: "Η συμπαγής κάρτα δείχνει μία δημόσια φωτογραφία. Πατήστε για πλήρη προβολή στις Φωτογραφίες. Αλλάξτε σε Βίντεο, σύρετε ή βέλη, μετά X (ή Escape) επιστρέφετε στην ίδια συνομιλία και προσχέδιο. Μόνο δημόσια μέσα στο FLOQR."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "Απόρρητο SmartView",
+        body: "Το SmartView δείχνει μόνο πεδία ήδη δημόσια στο FLOQR. Δεν είναι αναζήτηση ιστού. Γνωριμίες μόνο με opt-in. Απόκρυψη πεδίου στο προφίλ το αφαιρεί. Οι αποκλεισμένοι δεν βλέπουν την κάρτα. Αναφέρετε λάθος περίληψη από την επικάλυψη."
+      },
+      "help-botdee-smartview-translation": {
+        title: "Μετάφραση SmartView",
+        body: "Η πηγή μένει στην προεπιλεγμένη γλώσσα προφίλ. Μετά την αποθήκευση το FLOQR βάζει σε ουρά μετάφραση για κάθε άλλη γλώσσα. Σε εκκρεμότητα ή αποτυχία φαίνεται η γλώσσα πηγής με σήμανση — ποτέ παλιά μετάφραση ως τρέχουσα."
+      },
+      "help-botdee-smartview-edit": {
+        title: "Επεξεργασία Smart Summary",
+        body: "Μόνο εσείς επεξεργάζεστε το Smart Summary στην προεπιλεγμένη γλώσσα προφίλ. Η αποθήκευση είναι άμεση. Οι μεταφράσεις τρέχουν στο παρασκήνιο. Το Gemini δεν αντικαθιστά το κείμενό σας. Αν αλλάξει το δημόσιο προφίλ, το FLOQR ζητά έλεγχο αντί αντικατάστασης."
+      },
       "help-floqr-oidc-floqmedia": {
         title: "Λογαριασμός FloqR για Spatial Studio",
         body: "Το Spatial Studio στο FloqMedia χρησιμοποιεί τον υπάρχοντα λογαριασμό FloqR. Δεν υπάρχει εγγραφή FloqMedia. Τα προσχέδια επισκέπτη μένουν στο πρόγραμμα περιήγησης FloqMedia μέχρι να επιβεβαιώσετε τη σύνδεση σε αυτόν τον λογαριασμό FloqR. Το FloqR εκδίδει εφάπαξ κωδικό εξουσιοδότησης (PKCE). Τα διακριτικά πρόσβασης δεν αποθηκεύονται στο αρχείο χωρικού έργου."
@@ -2800,7 +3056,7 @@
       },
       "help-botdee-smartview": {
         title: "SmartViews BOT DEE",
-        body: "Τα SmartViews είναι συμπαγείς κάρτες για χώρους, εκδηλώσεις και εστιατόρια. Μια κάρτα club ανοίγει την υπάρχουσα δημόσια σελίδα FLOQR — όχι δεύτερο προφίλ. Τα mock επισημαίνονται μέχρι να εγκριθούν οι πάροχοι."
+        body: "Τα SmartViews είναι συμπαγείς κάρτες στη συνομιλία BOT DEE. Η κάρτα χώρου ανοίγει την υπάρχουσα δημόσια σελίδα FLOQR — όχι δεύτερο προφίλ. Το People SmartView δείχνει δημόσια πεδία FLOQR, Smart Summary, Κοινωνικά (πρώτα Μουσική), Γνωριμίες, Εστίαση και Μελλοντικά ταξίδια. Τα mock μένουν επισημασμένα. Χωρίς ζωντανά Places ή Yelp."
       },
       "help-botdee-memory": {
         title: "Αποθηκευμένες συνομιλίες BOT DEE",
@@ -3172,6 +3428,38 @@
         title: "BOT DEE",
         body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, FloqCAST, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, a po pauzie może wrócić do zapisanej historii. Pauza nie usuwa czatu. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij Ustawienia pod polem czatu, aby otworzyć zapisane czaty i wspomnienia. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu."
       },
+      "help-botdee-smartview-troubleshoot": {
+        title: "Rozwiązywanie problemów SmartView",
+        body: "Pusta karta: ukryte pola lub blokada. Zapis nieudany: zaloguj się — tłumaczenia są na serwerze. Oczekujące/błąd: język źródłowy z etykietą. Edytuje tylko właściciel. SMARTviews Master Admin to nadal mock; Places i Yelp wyłączone. Motyw idzie za Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "Przejrzyj i popraw Smart Summary",
+        body: "Gemini szkicuje tylko z publicznych pól FLOQR — nie przy każdym otwarciu. Błędny fakt: ukryj pole lub edytuj podsumowanie. Twój tekst nie jest nadpisywany. Konflikt profilu prosi o przegląd. Zgłoś błędną kartę z nakładki."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView i Site Chrome",
+        body: "People SmartView używa Site Chrome FLOQR oglądającego (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). Nie ma drugiego motywu. Zmiana chrome odświeża kartę bez utraty szkicu czatu."
+      },
+      "help-botdee-smartview-categories": {
+        title: "Kategorie SmartView",
+        body: "Cztery karty: Społeczność, Randki, Jedzenie, Przyszłe podróże. Społeczność otwiera się na Muzyce, potem Nightlife, Sport, Wydarzenia. Tagi to tylko to, co udostępniłeś — bez podwójnych nagłówków i wymyślonych podróży."
+      },
+      "help-botdee-smartview-media": {
+        title: "Zdjęcia i filmy SmartView",
+        body: "Zwarta karta pokazuje jedno publiczne zdjęcie. Dotknij, by otworzyć pełny widok na Zdjęciach. Przełącz na Filmy, przesuń lub strzałki, potem X (lub Escape) wraca do tego samego czatu i szkicu. Tylko media publiczne w FLOQR."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "Prywatność SmartView",
+        body: "SmartView pokazuje tylko pola już publiczne w FLOQR. To nie wyszukiwarka sieci. Randki tylko po opt-in. Ukryj pole w profilu — zniknie. Zablokowani nie widzą karty. Zgłoś błędne podsumowanie z nakładki."
+      },
+      "help-botdee-smartview-translation": {
+        title: "Tłumaczenie SmartView",
+        body: "Źródłowe podsumowanie zostaje w domyślnym języku profilu. Po zapisie FLOQR kolejuje tłumaczenie na każdy inny język. Gdy trwa lub zawiedzie, widać język źródłowy z etykietą — nigdy stare tłumaczenie jako aktualne."
+      },
+      "help-botdee-smartview-edit": {
+        title: "Edytuj Smart Summary",
+        body: "Tylko Ty edytujesz Smart Summary w domyślnym języku profilu. Zapis jest natychmiastowy. Tłumaczenia idą w tle. Gemini nie nadpisuje Twojego tekstu. Gdy profil publiczny się zmieni, FLOQR prosi o przegląd zamiast zastępować."
+      },
       "help-floqr-oidc-floqmedia": {
         title: "Konto FloqR dla Spatial Studio",
         body: "Spatial Studio na FloqMedia używa Twojego istniejącego konta FloqR. Nie ma rejestracji FloqMedia. Szkice gościa zostają w przeglądarce FloqMedia, dopóki nie potwierdzisz przypięcia do tego konta FloqR. FloqR wydaje jednorazowy kod autoryzacji (PKCE). Tokeny nie są zapisywane w pliku projektu przestrzennego."
@@ -3194,7 +3482,7 @@
       },
       "help-botdee-smartview": {
         title: "SmartViews BOT DEE",
-        body: "SmartViews to zwarte karty lokali, wydarzeń i restauracji. Karta klubu otwiera istniejącą publiczną stronę FLOQR — to nie drugi profil. Mocki są oznaczone, dopóki dostawcy nie zostaną zatwierdzeni."
+        body: "SmartViews to zwarte karty w czacie BOT DEE. Karta klubu otwiera istniejącą publiczną stronę FLOQR — nie drugi profil. People SmartView pokazuje publiczne pola FLOQR, Smart Summary, Społeczność (najpierw Muzyka), Randki, Jedzenie i przyszłe podróże. Mocki zostają oznaczone. Brak żywego Places ani Yelp."
       },
       "help-botdee-memory": {
         title: "Zapisane czaty BOT DEE",
@@ -3566,6 +3854,38 @@
         title: "BOT DEE",
         body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وFloqCAST وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. إذا سجّلت الدخول، يحتفظ BOT DEE بهذه المحادثة عند التحديث أو على هاتف آخر وبعد التوقف يمكنه متابعة السجل المحفوظ. التوقف لا يحذف المحادثة. تستخدم الإجابات تصنيف حسابك. بعد تسجيل الدخول يرى BOT DEE نفس نقاط البيانات العامة المتطوع بها التي تراها (الموسيقى والطعام والسفر والهوايات وبقية Privacy datapoint sharing) — لا بريد إلكتروني ولا هاتف ولا بيانات بطاقة ولا GPS. اضغط الإعدادات تحت صندوق الدردشة للمحادثات والذكريات المحفوظة. اضغط على صورة في المحادثة لفتحها في نافذة. أغلق بـ X أو إغلاق للعودة إلى المحادثة."
       },
+      "help-botdee-smartview-troubleshoot": {
+        title: "استكشاف أخطاء SmartView",
+        body: "بطاقة فارغة: الحقول مخفية أو أنت محظور. فشل الحفظ: سجّل الدخول — الترجمات على الخادم. انتظار أو فشل: لغة المصدر بوسم. التعديل للمالك فقط. SMARTviews في Master Admin ما زال كتالوج المحاكاة؛ Places وYelp متوقفان. السمة تتبع Site Chrome."
+      },
+      "help-botdee-smartview-review": {
+        title: "مراجعة وتصحيح Smart Summary",
+        body: "يصوغ Gemini من حقول FLOQR العامة فقط — ليس عند كل عرض. إن كان واقعًا خاطئًا أخفِ الحقل أو عدّل الملخص. لا يُستبدل نصك. تعارض الملف يطلب مراجعة. بلّغ عن بطاقة خاطئة من الطبقة."
+      },
+      "help-botdee-smartview-chrome": {
+        title: "SmartView وSite Chrome",
+        body: "يستخدم People SmartView Site Chrome الحالي للمشاهد (Nightlife وTraditional وBlack Tiffany وWhite/Black وPurple & White وBlack & Dark Green). لا إعداد سمة ثانٍ. تغيير الكروم يحدّث البطاقة دون فقدان مسودة الدردشة."
+      },
+      "help-botdee-smartview-categories": {
+        title: "فئات SmartView",
+        body: "أربع علامات: اجتماعي، مواعدة، طعام، رحلات قادمة. الاجتماعي يفتح على الموسيقى ثم Nightlife والرياضة والفعاليات. الوسوم فقط ما شاركته — بلا عناوين مكررة أو رحلات أو تقييمات مخترعة. الرحلات القادمة للوجهات العامة فقط."
+      },
+      "help-botdee-smartview-media": {
+        title: "صور وفيديو SmartView",
+        body: "تظهر البطاقة صورة عامة واحدة. اضغط لعارض ملء الشاشة على الصور. انتقل إلى الفيديو، اسحب أو الأسهم، ثم X (أو Escape) للعودة لنفس الدردشة والمسودة. تظهر فقط الوسائط العامة داخل FLOQR."
+      },
+      "help-botdee-smartview-privacy": {
+        title: "خصوصية SmartView",
+        body: "يعرض SmartView فقط الحقول التي جعلتها عامة داخل FLOQR. ليس بحثًا على الويب. المواعدة تظهر بموافقة صريحة فقط. إخفاء حقل في ملفي يزيله. المحظورون لا يرون البطاقة. بلّغ عن ملخص خاطئ من الطبقة."
+      },
+      "help-botdee-smartview-translation": {
+        title: "ترجمة SmartView",
+        body: "يبقى الملخص المصدر بلغة الملف الافتراضية. بعد الحفظ يضع FLOQR ترجمة لكل لغة أخرى في الانتظار. أثناء الانتظار أو الفشل تُعرض لغة المصدر بوسم واضح — لا ترجمة قديمة كأنها الحالية."
+      },
+      "help-botdee-smartview-edit": {
+        title: "تعديل Smart Summary",
+        body: "أنت وحدك تعدّل Smart Summary بلغة الملف الافتراضية. الحفظ فوري. تُترجم اللغات الأخرى في الخلفية. لا يستبدل Gemini نصك. إذا تغيّر الملف العام، يطلب FLOQR المراجعة بدل الاستبدال."
+      },
       "help-floqr-oidc-floqmedia": {
         title: "حساب FloqR لـ Spatial Studio",
         body: "يستخدم Spatial Studio على FloqMedia حساب FloqR الحالي. لا يوجد تسجيل FloqMedia. تبقى مسودات الضيف في متصفح FloqMedia حتى تؤكد إرفاقها بهذا الحساب. يصدر FloqR رمز تفويض لمرة واحدة (PKCE). لا تُخزَّن رموز الوصول في ملف المشروع المكاني."
@@ -3587,8 +3907,8 @@
         body: "احفظ الأماكن والبطاقات التي سألت BOT DEE عنها. معرّف Google Place ليس نسخة من صور أو مراجعات Google. يمكنك التحديث أو الحذف. تبقى ذاكرة التخزين المرخّصة متوقفة حتى اعتماد المزود."
       },
       "help-botdee-smartview": {
-        title: "SmartViews لـ BOT DEE",
-        body: "SmartViews بطاقات موجزة للأماكن والفعاليات والمطاعم. بطاقة النادي تفتح صفحة FLOQR العامة الحالية — وليست ملفًا ثانيًا. البطاقات التجريبية موسومة حتى اعتماد المزودين."
+        title: "SmartViews BOT DEE",
+        body: "SmartViews بطاقات مدمجة داخل دردشة BOT DEE. بطاقة النادي تفتح صفحة FLOQR العامة الحالية — ليست ملفًا ثانيًا. يعرض People SmartView الحقول العامة داخل FLOQR وSmart Summary والاجتماعي (الموسيقى أولًا) والمواعدة والطعام والرحلات القادمة. تبقى بطاقات المحاكاة موسومة. لا Places أو Yelp مباشر."
       },
       "help-botdee-memory": {
         title: "محادثات BOT DEE المحفوظة",

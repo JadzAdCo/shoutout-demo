@@ -1,0 +1,296 @@
+"use strict";
+
+const {test} = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
+const v2 = require("./botdee-smartview-v2-core");
+const smart = require("./botdee-smartview-core");
+
+function volunteered(over = {}) {
+  const {datapoints: dpOver, ...rest} = over;
+  return {
+    sharedDatapoints: ["music", "events", "travel", "food", "meet", "media", "hobbies", "location"],
+    datapoints: {
+      music: ["Afrobeats", "Amapiano"],
+      events: ["Concerts"],
+      nightlifeStyle: "Rooftop lounges",
+      food: ["Nigerian jollof", "sushi"],
+      travel: ["Miami"],
+      futureTravel: ["Mykonos"],
+      hobbies: ["NBA basketball", "fashion"],
+      location: {city: "Washington, DC"},
+      lookingToMeet: "Friends first",
+      photoCount: 1,
+      ...dpOver
+    },
+    bio: "Public-within-FLOQR bio",
+    ...rest
+  };
+}
+
+test("supported locales match FLOQR i18n registry (11 langs)", () => {
+  const src = fs.readFileSync(path.join(__dirname, "..", "floqr-i18n.js"), "utf8");
+  v2.SUPPORTED_LOCALES.forEach(code => {
+    assert.match(src, new RegExp(`code: "${code}"`));
+  });
+  assert.equal(v2.SUPPORTED_LOCALES.length, 11);
+  assert.ok(v2.SUPPORTED_LOCALES.includes("ar"));
+});
+
+test("Social default nested tab is Music; changing top-level picks default subtab", () => {
+  assert.equal(v2.DEFAULT_SECONDARY || v2.DEFAULT_SOCIAL, "Music");
+  const social = v2.selectTabs("Social");
+  assert.equal(social.primary, "Social");
+  assert.equal(social.secondary, "Music");
+  const dining = v2.selectTabs("Dining", "Sports");
+  assert.equal(dining.primary, "Dining");
+  assert.equal(dining.secondary, "Cuisines");
+  const travel = v2.selectTabs("Future Travels");
+  assert.equal(travel.secondary, "Upcoming");
+});
+
+test("nested tab renders tags only; missing categories collapse; no invented data", () => {
+  const snap = v2.publicFieldsSnapshot({displayName: "Amara J."}, volunteered({
+    datapoints: {music: ["Afrobeats"], events: [], food: [], travel: [], futureTravel: [], hobbies: []}
+  }));
+  const cats = v2.categoriesFromSnapshot(snap);
+  assert.deepEqual(cats.Social.Music, ["Afrobeats"]);
+  assert.deepEqual(cats.Social.Events, []);
+  assert.equal(v2.tagsFor(cats, "Social", "Music").length, 1);
+  assert.equal(v2.tagsFor(cats, "Social", "Nightlife").length, 1);
+  assert.match(v2.noteFor({categories: cats, primary: "Dating", datingVisible: false}), /opt-in/i);
+  assert.match(v2.noteFor({categories: cats, primary: "Dining", datingVisible: false}), /No information/);
+  const draft = v2.draftSummaryFromPublicFields(snap);
+  assert.doesNotMatch(draft, /4\.8|rating/i);
+  assert.doesNotMatch(draft, /Mykonos/);
+  assert.doesNotMatch(draft, /Paris/);
+});
+
+test("usercharacter_analysis schema, source-version matching, owner edit, stale translation guard", () => {
+  const snap = v2.publicFieldsSnapshot({displayName: "Amara", preferredLanguage: "en"}, volunteered());
+  const doc = v2.emptyAnalysis("u1", snap, 1);
+  assert.equal(doc.schemaVersion, v2.SCHEMA_VERSION);
+  assert.equal(doc.sourceAuthoredBy, "gemini");
+  const valid = v2.validateOwnerEdit({text: "Amara loves Afrobeats.", locale: "en", previous: doc});
+  assert.equal(valid.ok, true);
+  const saved = v2.applyOwnerSave(doc, {
+    summary: valid.summary,
+    sourceLocale: valid.sourceLocale,
+    editorUid: "u1",
+    now: 2
+  });
+  assert.equal(saved.revision, 2);
+  assert.equal(saved.sourceAuthoredBy, "owner");
+  assert.equal(saved.previousRevision.revision, 1);
+  const jobs = v2.enqueueTranslationJobs({
+    uid: "u1",
+    revision: saved.revision,
+    sourceHash: saved.sourceHash,
+    sourceLocale: saved.sourceLocale,
+    now: 3
+  });
+  assert.equal(jobs.length, 10);
+  assert.ok(jobs.every(job => job.locale !== "en"));
+  assert.ok(jobs.every(job => job.id === v2.translationJobId("u1", 2, job.locale)));
+  const stale = v2.applyTranslationResult(saved, {...jobs[0], revision: 1, sourceHash: "old"}, {
+    text: "stale french",
+    engine: "gemini"
+  });
+  assert.equal(stale.applied, false);
+  assert.equal(stale.reason, "stale_revision");
+  const ok = v2.applyTranslationResult(saved, jobs.find(j => j.locale === "fr"), {
+    text: "Amara aime l'Afrobeats.",
+    engine: "gemini",
+    usage: {totalTokens: 40, promptTokens: 20, candidatesTokens: 20}
+  });
+  assert.equal(ok.applied, true);
+  const shownFr = v2.localeSummary(ok.doc, "fr");
+  assert.equal(shownFr.status, "translated");
+  const shownDe = v2.localeSummary(ok.doc, "de");
+  assert.equal(shownDe.status, "fallback");
+  assert.equal(shownDe.pending, true);
+  assert.equal(shownDe.locale, "en");
+});
+
+test("owner-authored summary is not silently regenerated; profile change flags conflict", () => {
+  const snap = v2.publicFieldsSnapshot({displayName: "Amara"}, volunteered());
+  let doc = v2.emptyAnalysis("u1", snap, 1);
+  doc = v2.applyOwnerSave(doc, {summary: "Owner text.", sourceLocale: "en", editorUid: "u1", now: 2});
+  const nextSnap = v2.publicFieldsSnapshot({displayName: "Amara"}, volunteered({
+    datapoints: {music: ["Afrobeats", "Jazz"]}
+  }));
+  assert.equal(v2.shouldRegenerate(doc, nextSnap), false);
+  assert.equal(v2.shouldFlagConflict(doc, nextSnap), true);
+  assert.equal(v2.shouldRegenerate(null, snap), true);
+  const geminiDoc = v2.emptyAnalysis("u1", snap, 1);
+  assert.equal(v2.shouldRegenerate(geminiDoc, nextSnap), true);
+});
+
+test("moderation and length validation; HTML rejected", () => {
+  assert.equal(v2.validateOwnerEdit({text: "", locale: "en"}).ok, false);
+  assert.equal(v2.validateOwnerEdit({text: "<script>x</script>", locale: "en"}).ok, false);
+  assert.equal(v2.validateOwnerEdit({text: "x".repeat(v2.SUMMARY_MAX + 1), locale: "en"}).ok, false);
+  assert.equal(v2.validateOwnerEdit({text: "Hello @amaraj", locale: "fr"}).sourceLocale, "fr");
+});
+
+test("handles sanitized; javascript hrefs dropped", () => {
+  assert.equal(v2.sanitizeHandle("amaraj"), "amaraj");
+  assert.equal(v2.sanitizeHandle("@bad handle"), "");
+  assert.equal(v2.sanitizeHref("javascript:alert(1)"), "");
+  assert.equal(v2.sanitizeHref("./patron-portal.html?tab=profile"), "./patron-portal.html?tab=profile");
+});
+
+test("blocked or private viewer never gets peopleV2 payload or private fields", () => {
+  const snap = v2.publicFieldsSnapshot({displayName: "Hidden", email: "x@y.z"}, volunteered());
+  assert.equal(v2.peopleV2Payload({
+    subjectUid: "u2",
+    snap,
+    analysis: v2.emptyAnalysis("u2", snap),
+    viewerUid: "u1",
+    viewerBlocked: true,
+    viewerMaySee: true
+  }), null);
+  assert.equal(v2.peopleV2Payload({
+    subjectUid: "u2",
+    snap,
+    analysis: v2.emptyAnalysis("u2", snap),
+    viewerUid: "u1",
+    viewerMaySee: false
+  }), null);
+  const hiddenSnap = v2.publicFieldsSnapshot({displayName: "Hidden", email: "private@x"}, {
+    sharedDatapoints: [],
+    datapoints: {}
+  });
+  assert.equal(hiddenSnap.music.length, 0);
+  assert.equal(hiddenSnap.datingOptIn, false);
+  assert.equal(hiddenSnap.instagram, "");
+});
+
+test("non-owner cannot be marked ownerMayEdit; dating hidden without opt-in", () => {
+  const noMeet = v2.publicFieldsSnapshot({displayName: "Amara"}, {
+    sharedDatapoints: ["music"],
+    datapoints: {music: ["Afrobeats"], lookingToMeet: "secret"}
+  });
+  assert.equal(noMeet.datingOptIn, false);
+  assert.equal(noMeet.lookingToMeet, "");
+  const payload = v2.peopleV2Payload({
+    subjectUid: "u2",
+    snap: noMeet,
+    analysis: v2.emptyAnalysis("u2", noMeet),
+    viewerUid: "u1",
+    viewerMaySee: true,
+    viewerLocale: "en"
+  });
+  assert.equal(payload.ownerMayEdit, false);
+  assert.equal(payload.datingVisible, false);
+});
+
+test("translation retry then dead-letter; diagnostics omit summary text", () => {
+  let job = v2.enqueueTranslationJobs({
+    uid: "u1", revision: 2, sourceHash: "abc", sourceLocale: "en", now: 1
+  })[0];
+  for (let i = 0; i < v2.JOB_MAX_ATTEMPTS - 1; i += 1) {
+    job = v2.retryOrDeadLetter(job, "translator_outage", i + 2);
+    assert.equal(job.status, "queued");
+  }
+  job = v2.retryOrDeadLetter(job, "translator_outage", 99);
+  assert.equal(job.status, "dead_letter");
+  const event = v2.diagnosticEvent({
+    kind: "smartview_translate",
+    uid: "u1",
+    revision: 2,
+    locale: "fr",
+    usage: {totalTokens: 11},
+    jobStatus: "dead_letter",
+    error: "translator_outage"
+  });
+  assert.equal(event.summaryTextLogged, false);
+  assert.equal(event.totalTokens, 11);
+  assert.equal(event.costUnknown, false);
+  assert.ok(!JSON.stringify(event).includes("Amara"));
+});
+
+test("Gemini usage unknown when metadata missing; known counts once", () => {
+  assert.equal(v2.usageFromGemini({}).costUnknown, true);
+  const usage = v2.usageFromGemini({usageMetadata: {promptTokenCount: 10, candidatesTokenCount: 5, totalTokenCount: 15}});
+  assert.equal(usage.totalTokens, 15);
+  assert.equal(usage.costUnknown, false);
+});
+
+test("patronSmartView still validates; peopleV2 lives under floqrPublicData", () => {
+  const catalog = smart.mockCatalog();
+  catalog.forEach(row => assert.deepEqual(smart.validatePayload(row), []));
+  const patron = catalog.find(row => row.kind === "patron");
+  assert.ok(patron);
+  assert.equal(patron.publicWebResearch.enabled, false);
+  assert.equal(patron.floqrPublicData.peopleV2.presentation, "peopleV2");
+  assert.equal(patron.floqrPublicData.peopleV2.defaultSecondary, "Music");
+  assert.equal(patron.floqrPublicData.peopleV2.handles[0].handle, "@amaraj");
+  const hidden = smart.patronSmartView({
+    displayName: "Hidden",
+    volunteered: {datapoints: {food: ["Nigerian"]}},
+    viewerMaySee: false
+  });
+  assert.deepEqual(hidden.floqrPublicData, {});
+});
+
+test("no Gemini on view: peopleV2 payload uses stored analysis only", () => {
+  const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
+  assert.match(src, /getPeopleSmartView/);
+  assert.doesNotMatch(src, /generateContent[\s\S]{0,80}getPeopleSmartView/);
+  const fn = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-core.js"), "utf8");
+  assert.match(fn, /No Gemini on view/);
+});
+
+test("people card renderer: tabs, shrink tags, overlays restore draft helpers exist", () => {
+  const client = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
+  assert.match(client, /renderPeopleCard/);
+  assert.match(client, /captureChatState/);
+  assert.match(client, /restoreChatState/);
+  assert.match(client, /floqr-chrome-change/);
+  const css = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.css"), "utf8");
+  assert.match(css, /var\(--accent/);
+  assert.doesNotMatch(css, /#20d9d8/);
+  const html = fs.readFileSync(path.join(__dirname, "..", "botdee.html"), "utf8");
+  assert.match(html, /botdee-smartview\.js/);
+  assert.match(html, /botdee-smartview\.css/);
+});
+
+test("Master Admin SMARTviews subtab preserved", () => {
+  const master = fs.readFileSync(path.join(__dirname, "..", "master-admin.html"), "utf8");
+  assert.match(master, /data-botdee-page="smartviews"/);
+  assert.match(master, /id="botDeeMasterSmartViewDemo"/);
+  assert.match(master, /id="botDeeMasterLoadSmartViews"/);
+  const app = fs.readFileSync(path.join(__dirname, "..", "master-admin-app.js"), "utf8");
+  assert.match(app, /botDeeMasterSmartViewDemo/);
+  assert.match(app, /featuresBotDee\[-_:\]/);
+});
+
+test("BOT DEE Functions deploy tag includes People SmartView v2 callables", () => {
+  const wf = fs.readFileSync(path.join(__dirname, "..", ".github/workflows/functions-ci.yml"), "utf8");
+  ["getPeopleSmartView", "saveSmartSummary", "queuePeopleSmartViewAnalysis",
+    "processSmartViewTranslationJob", "onUserProfileSmartViewWrite", "onSmartViewTranslationJobCreated"]
+    .forEach(name => assert.match(wf, new RegExp(name)));
+});
+
+test("analysis and translation jobs are Functions-write", () => {
+  const rules = fs.readFileSync(path.join(__dirname, "..", "firestore.rules"), "utf8");
+  assert.match(rules, /match \/usercharacter_analysis\/\{uid\}[\s\S]*allow write: if false;/);
+  assert.match(rules, /match \/smartViewTranslationJobs\/\{jobId\}[\s\S]*allow write: if false;/);
+  assert.match(rules, /match \/botDeeSmartViewDiagnostics\/\{id\}[\s\S]*allow write: if false;/);
+});
+
+test("vm people card HTML has no duplicate Music heading and uses escaped text", () => {
+  const code = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
+  const sandbox = {window: {FLOQRI18n: {t: (k, f) => f}, FLOQRNav: null, location: {href: "https://example.test/x"}}, document: {}};
+  sandbox.global = sandbox.window;
+  vm.runInNewContext(code.replace("(window)", "(window)"), sandbox);
+  const payload = smart.mockCatalog().find(row => row.kind === "patron");
+  const html = sandbox.window.FLOQRBotDeeSmartView.renderCard(payload);
+  assert.match(html, /botdee-sv-people/);
+  assert.doesNotMatch(html, /<h3>\s*Music/i);
+  assert.match(html, /Afrobeats/);
+  assert.doesNotMatch(html, /<script>/);
+});

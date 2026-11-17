@@ -232,6 +232,22 @@
     byId("botDeeDeleteArchiveBtn")?.addEventListener("click", deleteArchive);
     byId("botDeeLoadSmartViews")?.addEventListener("click", () => loadDemos("botDeeSmartViewDemo"));
     byId("botDeeMasterLoadSmartViews")?.addEventListener("click", () => loadDemos("botDeeMasterSmartViewDemo"));
+    byId("botDeeEditSmartSummary")?.addEventListener("click", async () => {
+      const host = byId("botDeeSmartViewDemo");
+      if (!host || !global.FLOQRBotDeeSmartView) return;
+      host.setAttribute("aria-busy", "true");
+      setLine("botDeeUpgradeStatus", t("botdee.chatThinking", "BOT DEE is thinking…"));
+      try {
+        const data = await call("getPeopleSmartView", {});
+        global.FLOQRBotDeeSmartView.mount(host, data.views || []);
+        host.querySelector("[data-sv-open='summary']")?.click();
+        setLine("botDeeUpgradeStatus", "");
+      } catch (_) {
+        setLine("botDeeUpgradeStatus", t("botdee.sv.saveOffline", "Sign in to save. Translations are queued on the server, not in this browser."));
+      } finally {
+        host.removeAttribute("aria-busy");
+      }
+    });
     if (byId("botDeeConsentArchive") || byId("botDeeKnowsList")) loadConsent();
   }
 

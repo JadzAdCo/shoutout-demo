@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.027";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.027";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.028";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.028";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -220,6 +220,22 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.028",
+      title: "s3.3.028 — People SmartView v2 (Black Tiffany pack / Site Chrome)",
+      checks: [
+        {label:"People card renderer", file:"botdee-smartview.js", includes:["renderPeopleCard", "peopleV2", "captureChatState", "floqr-chrome-change"]},
+        {label:"Site Chrome tokens not hardcoded Tiffany", file:"botdee-smartview.css", includes:["var(--accent", "botdee-sv-people"], notIncludes:["#20d9d8"]},
+        {label:"Chat mounts SmartViews", file:"botdee.html", includes:["botdee-smartview.js", "botdee-smartview.css"]},
+        {label:"Owner edit on My BOT DEE", file:"patron-portal.html", includes:["botDeeEditSmartSummary", "botdee.sv.editSummary"]},
+        {label:"Master Admin SMARTviews host", file:"master-admin.html", includes:["data-botdee-page=\"smartviews\"", "botDeeMasterSmartViewDemo", "botDeeMasterLoadSmartViews"]},
+        {label:"Callables", file:"functions/index.js", includes:["getPeopleSmartView", "saveSmartSummary", "queuePeopleSmartViewAnalysis"]},
+        {label:"Collection key", file:"functions/botdee-smartview-v2-core.js", includes:["usercharacter_analysis", "smartViewTranslationJobs"]},
+        {label:"Amara mock asset", file:"functions/botdee-smartview-core.js", includes:["./images/smartview/amara-mock.png"]},
+        {label:"Help edit + translation", file:"botdee-help-repository.js", includes:["help-botdee-smartview-edit", "help-botdee-smartview-translation", "help-botdee-smartview-chrome"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-028-people-smartview-v2"]}
+      ]
+    },
     {
       version: "s3.3.023",
       title: "s3.3.023 — BOT DEE personalization + marked composer",
@@ -3231,6 +3247,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-028-people-smartview-v2",
+      area:"BOT DEE",
+      feature:"People SmartView v2 (inline card + owner edit)",
+      changed:"s3.3.028 — People SmartView renders inside the BOT DEE bubble (kind patron). Inherits Site Chrome; Black Tiffany is illustration only. Owner edits Smart Summary on My BOT DEE; translations queue on the server. Master Admin SMARTviews subtab unchanged. No live Places/Yelp. Functions/Pages pending Don.",
+      howToTest:"1) Hard-refresh botdee.html after Pages publish (do not test live until Don approves). Sign in with botDee access. 2) Ask BOT DEE about a patron / show mock SmartViews — People card is inside the bubble (no second header). 3) Tap photo → Photos overlay; Videos tab; X/Escape returns to the same scroll and unsent draft. 4) Tap Smart Summary overlay; same X restore. 5) Switch Site Chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green) — card tokens update, draft stays. 6) My Profile → Feature & Orders → My BOT DEE → Edit my Smart Summary — save queues translations (source shows immediately). 7) master-admin.html#featuresBotDee-smartviews — SMARTviews tab + Show mock SmartViews still paints cards; Open FLOQR Public Page has no ?v=. 8) Dating hidden without opt-in. 9) Mark Succeed/Failed.",
+      expected:"People card sits in chat. Overlays restore draft. Chrome follows Site Chrome. Owner-only edit. Mock venue catalog still labeled. No Places/Yelp. Master SMARTviews subtab still there.",
+      troubleshoot:"No people card → hard-refresh botdee-smartview.js + botdee.html; Functions getPeopleSmartView not deployed yet so live people lookups fall back to mock catalog. Broken Master tab → #featuresBotDee-smartviews / master-feature-services.js. Save does nothing → sign-in + botDee gate; translations are server-side (not localStorage). Hardcoded cyan → cached botdee-smartview.css still has #20d9d8."
+    },
     {
       id:"s3-3-023-botdee-personalization",
       area:"BOT DEE",

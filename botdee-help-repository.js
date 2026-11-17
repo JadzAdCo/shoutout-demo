@@ -426,11 +426,97 @@
     {
       id: "help-botdee-smartview",
       title: "BOT DEE SmartViews",
-      body: "SmartViews are compact cards for venues, events, restaurants, and more. A club card opens the existing FLOQR Public Page — it is not a second profile. Mock cards are labeled until providers are approved.",
-      searchPhrases: ["smartview", "smart view", "venue card", "restaurant card", "public page", "mock smartview"],
+      body: "SmartViews are compact cards inside BOT DEE chat. Venue cards open the existing FLOQR Public Page — not a second profile. People SmartView shows public-within-FLOQR fields, a Smart Summary, Social (Music first), Dating, Dining, and Future Travels. Mock cards stay labeled until providers are approved. There is no live Places or Yelp.",
+      searchPhrases: ["smartview", "smart view", "venue card", "restaurant card", "public page", "mock smartview", "people smartview", "person card"],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
         {label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})},
+        {label: "SMARTviews (Master Admin)", href: pageUrl("./master-admin.html") + "#featuresBotDee-smartviews"}
+      ],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#featuresBotDee"
+    },
+    {
+      id: "help-botdee-smartview-edit",
+      title: "Edit your Smart Summary",
+      body: "Only you can edit your Smart Summary, in your default profile language. Save is immediate. Translations to other FLOQR languages run in the background. Gemini will not overwrite text you edited unless you ask it to regenerate. If your public profile changes, FLOQR asks you to review the summary instead of replacing it.",
+      searchPhrases: ["edit smart summary", "edit my smartview", "owner authored summary", "regenerate summary"],
+      links: [{label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html#foBotDeePane"
+    },
+    {
+      id: "help-botdee-smartview-translation",
+      title: "How SmartView translation works",
+      body: "Your source summary stays in your default profile language. After you save, FLOQR queues a translation for every other supported language. While a translation is pending or failed, viewers see the source language with a clear label — never a stale translation presented as current.",
+      searchPhrases: ["smartview translation", "translation pending", "source language summary", "stale translation"],
+      links: [{label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html#foBotDeePane"
+    },
+    {
+      id: "help-botdee-smartview-privacy",
+      title: "SmartView privacy and visibility",
+      body: "SmartView shows only fields you already made public within FLOQR. It is not open-web search. Dating appears only with explicit opt-in. Hide a field in My Profile and it leaves SmartView. Blocked people cannot see your card. Report an incorrect summary from the summary overlay.",
+      searchPhrases: ["smartview privacy", "who can see smartview", "dating opt in", "hide smartview field"],
+      links: [
+        {label: "Profile visibility", href: pageUrl("./patron-portal.html", {tab: "profile"})},
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html")}
+      ],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html"
+    },
+    {
+      id: "help-botdee-smartview-media",
+      title: "SmartView photos and videos",
+      body: "The compact card shows one public photo. Tap it for a full-screen viewer that opens on Photos. Switch to Videos, swipe or use arrows, then X (or Escape) to return to the same chat scroll and unsent draft. Only media you marked public-within-FLOQR appears.",
+      searchPhrases: ["smartview photos", "smartview videos", "close overlay", "escape smartview"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-smartview-categories",
+      title: "SmartView categories",
+      body: "Four tabs: Social, Dating, Dining, and Future Travels. Social opens on Music, then Nightlife, Sports, and Events. Tags are only what you shared — no duplicate headings and no invented trips, ratings, or relationships. Future travel shows only destinations you marked public.",
+      searchPhrases: ["smartview categories", "social music tab", "dating dining travels", "future travels smartview"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-smartview-chrome",
+      title: "SmartView and Site Chrome",
+      body: "People SmartView uses the viewing patron’s existing FLOQR Site Chrome (Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green). There is no second theme setting. Changing chrome updates the card in place without losing your chat draft.",
+      searchPhrases: ["smartview chrome", "black tiffany smartview", "site chrome smartview", "theme smartview"],
+      links: [{label: "Appearance", href: pageUrl("./patron-portal.html", {tab: "profile"})}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-smartview-review",
+      title: "Review and correct a Smart Summary",
+      body: "Gemini drafts from public-within-FLOQR fields only — never on each view. If a fact is wrong, hide the source field in Profile visibility or edit the summary yourself. Owner-authored text is not overwritten. Profile changes that conflict with your summary ask for a review. Report an incorrect card from the summary overlay.",
+      searchPhrases: ["correct smart summary", "wrong smartview", "gemini overwrite", "review smart summary"],
+      links: [{label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "patron-portal.html#foBotDeePane"
+    },
+    {
+      id: "help-botdee-smartview-troubleshoot",
+      title: "SmartView troubleshooting",
+      body: "Empty card: the patron hid those fields or you are blocked. Save failed: sign in and retry — translations queue on the server, not this browser. Pending or failed translation shows the source language with a label. Edit is owner-only. Master Admin SMARTviews is still the mock catalog; live Places and Yelp stay off until counsel. Theme follows Site Chrome — there is no second SmartView theme.",
+      searchPhrases: ["smartview not showing", "smartview save failed", "empty smartview", "places yelp smartview"],
+      links: [
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
         {label: "SMARTviews (Master Admin)", href: pageUrl("./master-admin.html") + "#featuresBotDee-smartviews"}
       ],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],

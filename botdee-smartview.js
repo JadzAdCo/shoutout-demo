@@ -109,8 +109,147 @@
     return `<li><span class="botdee-sv-provider">${esc(row.provider)}</span> <span>${esc(value)}</span></li>`;
   }
 
+  const PRIMARY_META = [
+    {id: "Social", icon: "♧", key: "botdee.sv.social", label: "Social"},
+    {id: "Dating", icon: "♡", key: "botdee.sv.dating", label: "Dating"},
+    {id: "Dining", icon: "♜", key: "botdee.sv.dining", label: "Dining"},
+    {id: "Future Travels", icon: "✈", key: "botdee.sv.futureTravels", label: "Future Travels"}
+  ];
+  const SOCIAL_SUB = [
+    {id: "Music", key: "botdee.sv.music", label: "Music"},
+    {id: "Nightlife", key: "botdee.sv.nightlife", label: "Nightlife"},
+    {id: "Sports", key: "botdee.sv.sports", label: "Sports"},
+    {id: "Events", key: "botdee.sv.events", label: "Events"}
+  ];
+
+  function peopleOf(payload) {
+    return payload && payload.floqrPublicData && payload.floqrPublicData.peopleV2
+      ? payload.floqrPublicData.peopleV2
+      : null;
+  }
+
+  let activePeople = null;
+  let activeCard = null;
+  let activeChatState = null;
+
+  function captureChatState() {
+    const input = global.document?.getElementById("botDeeChatInput");
+    const log = global.document?.getElementById("botDeeTranscript");
+    return {
+      draft: input ? input.value : "",
+      scroll: log ? log.scrollTop : 0,
+      active: global.document?.activeElement || null
+    };
+  }
+
+  function restoreChatState(state) {
+    if (!state) return;
+    const input = global.document?.getElementById("botDeeChatInput");
+    const log = global.document?.getElementById("botDeeTranscript");
+    if (input && typeof state.draft === "string") input.value = state.draft;
+    if (log && Number.isFinite(state.scroll)) log.scrollTop = state.scroll;
+    try { state.active?.focus?.(); } catch (_) { /* ignore */ }
+  }
+
+  function subtabsFor(primary) {
+    if (primary === "Social") return SOCIAL_SUB;
+    if (primary === "Dating") {
+      return [
+        {id: "Preferences", key: "botdee.sv.preferences", label: "Preferences"},
+        {id: "Discovery", key: "botdee.sv.discovery", label: "Discovery"}
+      ];
+    }
+    if (primary === "Dining") {
+      return [
+        {id: "Cuisines", key: "botdee.sv.cuisines", label: "Cuisines"},
+        {id: "Experiences", key: "botdee.sv.experiences", label: "Experiences"}
+      ];
+    }
+    return [
+      {id: "Upcoming", key: "botdee.sv.upcoming", label: "Upcoming"},
+      {id: "Past", key: "botdee.sv.past", label: "Past"},
+      {id: "Interests", key: "botdee.sv.interests", label: "Interests"}
+    ];
+  }
+
+  function tagsForPeople(people, primary, secondary) {
+    const group = people?.categories?.[primary];
+    if (!group || typeof group !== "object") return [];
+    const rows = group[secondary];
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  function statusLabel(summary) {
+    if (!summary) return "";
+    if (summary.status === "translated") return "";
+    if (summary.failed) return t("botdee.sv.translationFailed", "Translation failed. Showing the source language.");
+    if (summary.pending) {
+      return t("botdee.sv.translationPending", "Translation pending. Showing the source language.")
+        + (summary.sourceLocale ? ` (${esc(summary.sourceLocale)})` : "");
+    }
+    return "";
+  }
+
+  function renderPeopleCard(payload) {
+    const people = peopleOf(payload);
+    if (!people) return "";
+    const mock = payload.sources && payload.sources.some(s => s.provider === "mock" || s.reuseRights === "unknown");
+    const primary = people.defaultPrimary || "Social";
+    const secondary = people.defaultSecondary || "Music";
+    const tags = tagsForPeople(people, primary, secondary);
+    const photo = people.photo && people.photo.url ? resolveImageSrc(people.photo.url) : "";
+    const count = people.photo && people.photo.count ? people.photo.count : (photo ? 1 : 0);
+    const handles = Array.isArray(people.handles) ? people.handles : [];
+    const profileHref = resolveSameOriginHref(people.profileHref || "./patron-portal.html?tab=profile");
+    const minglHref = resolveSameOriginHref(people.minglHref || "./?start=search");
+    const summaryText = people.summary?.text || "";
+    const localeNote = statusLabel(people.summary);
+    return `<article class="botdee-sv-people" data-kind="patron" data-primary="${esc(primary)}" data-secondary="${esc(secondary)}">
+      <div class="botdee-sv-people-head">
+        <strong>${esc(t("botdee.sv.person", "SmartView — Person"))}</strong>
+        ${people.verified ? `<span class="botdee-sv-verified">${esc(t("botdee.sv.verified", "Verified on FLOQR"))}</span>` : ""}
+      </div>
+      ${mock ? `<p class="botdee-sv-mock">${esc(t("botdee.smartviewMockBadge", "Mock / not live licensed data"))}</p>` : ""}
+      <div class="botdee-sv-identity">
+        <button type="button" class="botdee-sv-portrait" data-sv-open="media" ${photo ? "" : "hidden"} aria-label="${esc(t("botdee.sv.openMedia", "View shared photos and videos"))}">
+          ${photo ? `<img src="${esc(photo)}" alt="${esc(people.displayName || "")}"/>` : ""}
+          ${count ? `<span class="botdee-sv-counter">${esc(String(Math.min(1, count)))}/${esc(String(count))}</span>` : ""}
+        </button>
+        <div class="botdee-sv-identity-main">
+          <div class="botdee-sv-name">${esc(people.displayName || payload.title || "")}${people.verified ? " <span class=\"botdee-sv-tick\" aria-hidden=\"true\">◆</span>" : ""}</div>
+          <div class="botdee-sv-handles">${handles.map(row => {
+            const href = resolveSameOriginHref(row.href || "");
+            if (!href) return "";
+            return `<a href="${esc(href)}" rel="noopener noreferrer" target="_blank">${esc(row.handle || "")}</a>`;
+          }).join("")}${people.city ? `<span>${esc(people.city)}</span>` : ""}</div>
+          <button type="button" class="botdee-sv-summary-btn" data-sv-open="summary">
+            <span class="botdee-sv-summary-kicker">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}</span>
+            <p class="botdee-sv-summary-text">${esc(summaryText)}</p>
+            ${localeNote ? `<span class="botdee-sv-locale">${localeNote}</span>` : ""}
+            <span class="botdee-sv-more">${esc(t("botdee.sv.tapMore", "Tap for more information"))}</span>
+          </button>
+        </div>
+      </div>
+      <div class="botdee-sv-primary" role="tablist" aria-label="${esc(t("botdee.sv.categories", "SmartView categories"))}">${PRIMARY_META.map(tab => (
+        `<button type="button" class="botdee-sv-tab" role="tab" data-sv-primary="${esc(tab.id)}" aria-selected="${tab.id === primary ? "true" : "false"}"><span class="botdee-sv-tab-ico" aria-hidden="true">${tab.icon}</span> ${esc(t(tab.key, tab.label))}</button>`
+      )).join("")}</div>
+      <section class="botdee-sv-details">
+        <div class="botdee-sv-secondary" role="tablist" aria-label="${esc(t("botdee.sv.socialCategories", "Social categories"))}">${subtabsFor(primary).map(tab => (
+          `<button type="button" class="botdee-sv-tab" role="tab" data-sv-secondary="${esc(tab.id)}" aria-selected="${tab.id === secondary ? "true" : "false"}">${esc(t(tab.key, tab.label))}</button>`
+        )).join("")}</div>
+        <div class="botdee-sv-tags">${tags.map(tag => `<span class="botdee-sv-tag">${esc(tag)}</span>`).join("")}</div>
+        <p class="botdee-sv-note" ${people.datingVisible || primary !== "Dating" ? "hidden" : ""}>${esc(t("botdee.sv.datingHidden", "Dating details are visible only with the patron’s explicit opt-in. No dating preferences are inferred."))}</p>
+      </section>
+      <div class="botdee-sv-people-actions">
+        <a class="botdee-sv-action" href="${esc(profileHref)}">${esc(t("botdee.sv.viewProfile", "View Full Profile"))}</a>
+        <a class="botdee-sv-action botdee-sv-action-main" href="${esc(minglHref)}">${esc(t("botdee.sv.mingl", "Mingl"))}</a>
+      </div>
+    </article>`;
+  }
+
   function renderCard(payload) {
     if (!payload || typeof payload !== "object") return "";
+    if (peopleOf(payload)) return renderPeopleCard(payload);
     const mock = payload.sources && payload.sources.some(s => s.provider === "mock" || s.reuseRights === "unknown");
     const researchOff = payload.publicWebResearch && payload.publicWebResearch.enabled === false;
     const iframeOk = payload.floqrPublicData && payload.floqrPublicData.menuIframeAllowed === true;
@@ -154,12 +293,301 @@
     </article>`;
   }
 
+  function paintPeopleTabs(card, people, primary, secondary) {
+    card.dataset.primary = primary;
+    card.dataset.secondary = secondary;
+    card.querySelectorAll("[data-sv-primary]").forEach(btn => {
+      btn.setAttribute("aria-selected", btn.getAttribute("data-sv-primary") === primary ? "true" : "false");
+    });
+    const subHost = card.querySelector(".botdee-sv-secondary");
+    if (subHost) {
+      subHost.innerHTML = subtabsFor(primary).map(tab => (
+        `<button type="button" class="botdee-sv-tab" role="tab" data-sv-secondary="${esc(tab.id)}" aria-selected="${tab.id === secondary ? "true" : "false"}">${esc(t(tab.key, tab.label))}</button>`
+      )).join("");
+    }
+    const tags = tagsForPeople(people, primary, secondary);
+    const tagHost = card.querySelector(".botdee-sv-tags");
+    if (tagHost) {
+      tagHost.innerHTML = tags.map(tag => `<span class="botdee-sv-tag">${esc(tag)}</span>`).join("");
+      tagHost.classList.toggle("is-empty", !tags.length);
+    }
+    const note = card.querySelector(".botdee-sv-note");
+    if (note) {
+      const datingHidden = primary === "Dating" && !people.datingVisible;
+      const empty = !tags.length && !datingHidden;
+      note.hidden = !(datingHidden || empty);
+      if (datingHidden) {
+        note.textContent = t("botdee.sv.datingHidden", "Dating details are visible only with the patron’s explicit opt-in. No dating preferences are inferred.");
+      } else if (empty) {
+        note.textContent = t("botdee.sv.noShared", "No information has been shared for this category.");
+      }
+    }
+  }
+
+  function ensureOverlay(id, html) {
+    const doc = global.document;
+    if (!doc) return null;
+    let el = doc.getElementById(id);
+    if (!el) {
+      el = doc.createElement("div");
+      el.id = id;
+      el.className = "botdee-sv-overlay";
+      el.hidden = true;
+      el.setAttribute("role", "dialog");
+      el.setAttribute("aria-modal", "true");
+      el.innerHTML = html;
+      doc.body.appendChild(el);
+    }
+    return el;
+  }
+
+  function closeSmartViewOverlays(state) {
+    const doc = global.document;
+    if (!doc) return;
+    doc.querySelectorAll(".botdee-sv-overlay").forEach(node => {
+      node.hidden = true;
+    });
+    doc.body.classList.remove("botdee-sv-overlay-open");
+    restoreChatState(state);
+  }
+
+  function trapFocus(overlay, event) {
+    if (event.key !== "Tab" || overlay.hidden) return;
+    const focusable = [...overlay.querySelectorAll("button, [href], textarea, input, select")].filter(el => !el.disabled && el.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && global.document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && global.document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  function bindPeopleCard(card, payload) {
+    const people = peopleOf(payload);
+    if (!card || !people) return;
+    const doc = global.document;
+    let chatState = null;
+    let mediaType = "photos";
+    let mediaIndex = 0;
+
+    function openOverlay(kind) {
+      chatState = captureChatState();
+      activePeople = people;
+      activeCard = card;
+      activeChatState = chatState;
+      doc.body.classList.add("botdee-sv-overlay-open");
+      if (kind === "media") {
+        const overlay = ensureOverlay("botdeeSvMediaOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvMediaTitle">${esc(t("botdee.sv.mediaTitle", "Shared media"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
+          <div class="botdee-sv-switch" role="tablist">
+            <button type="button" data-sv-media="photos" aria-selected="true">${esc(t("botdee.sv.photos", "Photos"))}</button>
+            <button type="button" data-sv-media="videos" aria-selected="false">${esc(t("botdee.sv.videos", "Videos"))}</button>
+          </div>
+          <div class="botdee-sv-stage" data-sv-stage></div>
+          <p class="botdee-sv-foot" data-sv-media-foot></p>`);
+        overlay.setAttribute("aria-labelledby", "botdeeSvMediaTitle");
+        overlay.hidden = false;
+        mediaType = "photos";
+        mediaIndex = 0;
+        renderMedia(overlay);
+        overlay.querySelector("[data-sv-close]")?.focus();
+      } else if (kind === "summary") {
+        const overlay = ensureOverlay("botdeeSvSummaryOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvSummaryTitle">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
+          <div class="botdee-sv-long" data-sv-long></div>`);
+        overlay.setAttribute("aria-labelledby", "botdeeSvSummaryTitle");
+        overlay.hidden = false;
+        const long = overlay.querySelector("[data-sv-long]");
+        const status = people.summary?.pending
+          ? `<p class="botdee-sv-locale">${esc(t("botdee.sv.translationPending", "Translation pending. Showing the source language."))}</p>`
+          : "";
+        const edit = people.ownerMayEdit
+          ? `<p class="botdee-sv-owner-row"><button type="button" class="botdee-sv-action" data-sv-edit>${esc(t("botdee.sv.editSummary", "Edit my Smart Summary"))}</button></p>`
+          : "";
+        const conflict = people.conflictFlag
+          ? `<p class="botdee-sv-locale">${esc(t("botdee.sv.conflictReview", "Your public profile changed. Review this summary — it was not overwritten."))}</p>`
+          : "";
+        long.innerHTML = `${edit}${conflict}${status}<p>${esc(people.summary?.text || "")}</p>
+          <p class="botdee-sv-foot">${esc(t("botdee.sv.summaryFoot", "Drafted from public-within-FLOQR fields. Facts are not guaranteed. Hide or correct them in Profile visibility."))}</p>`;
+        overlay.querySelector("[data-sv-close]")?.focus();
+      } else if (kind === "edit" && people.ownerMayEdit) {
+        const overlay = ensureOverlay("botdeeSvEditOverlay", `<div class="botdee-sv-overlay-head"><h2 id="botdeeSvEditTitle">${esc(t("botdee.sv.editSummary", "Edit my Smart Summary"))}</h2><button type="button" class="botdee-sv-close" data-sv-close aria-label="${esc(t("botdee.sv.close", "Close"))}">×</button></div>
+          <p class="botdee-sv-foot">${esc(t("botdee.sv.editHint", "Edit in your default profile language. Translations update in the background."))}</p>
+          <label class="botdee-sv-edit-label">${esc(t("botdee.sv.sourceLanguage", "Default profile language"))}
+            <input id="botdeeSvSourceLocale" type="text" maxlength="8" readonly/>
+          </label>
+          <label class="botdee-sv-edit-label">${esc(t("botdee.sv.smartSummary", "Smart Summary"))}
+            <textarea id="botdeeSvSummaryEditor" rows="8" maxlength="1400"></textarea>
+          </label>
+          <button type="button" class="botdee-sv-action botdee-sv-action-main" data-sv-save>${esc(t("botdee.sv.saveSummary", "Save and queue translations"))}</button>
+          <p class="botdee-sv-foot" data-sv-edit-status role="status"></p>`);
+        overlay.setAttribute("aria-labelledby", "botdeeSvEditTitle");
+        overlay.hidden = false;
+        const localeInput = overlay.querySelector("#botdeeSvSourceLocale");
+        const editor = overlay.querySelector("#botdeeSvSummaryEditor");
+        if (localeInput) localeInput.value = people.summary?.sourceLocale || "en";
+        if (editor) editor.value = people.summary?.text || "";
+        editor?.focus();
+      }
+    }
+
+    function renderMedia(overlay) {
+      const photos = mediaType === "photos";
+      overlay.querySelectorAll("[data-sv-media]").forEach(btn => {
+        btn.setAttribute("aria-selected", btn.getAttribute("data-sv-media") === mediaType ? "true" : "false");
+      });
+      const stage = overlay.querySelector("[data-sv-stage]");
+      const foot = overlay.querySelector("[data-sv-media-foot]");
+      const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [];
+      const videosList = Array.isArray(people.media?.videos) ? people.media.videos : [];
+      if (!photos) {
+        if (stage) stage.innerHTML = "";
+        if (foot) foot.textContent = videosList.length
+          ? t("botdee.sv.videoCount", "Shared videos")
+          : t("botdee.sv.noVideos", "No publicly shared videos.");
+        return;
+      }
+      const item = photosList[mediaIndex] || photosList[0];
+      if (stage) {
+        const src = item && item.url ? resolveImageSrc(item.url) : "";
+        stage.innerHTML = src
+          ? `<button type="button" class="botdee-sv-arrow prev" data-sv-prev aria-label="${esc(t("botdee.sv.prev", "Previous photo"))}">‹</button>
+             <img src="${esc(src)}" alt="${esc(item.alt || people.displayName || "")}"/>
+             <button type="button" class="botdee-sv-arrow next" data-sv-next aria-label="${esc(t("botdee.sv.next", "Next photo"))}">›</button>`
+          : `<p class="botdee-sv-foot">${esc(t("botdee.sv.noPhotos", "No publicly shared photos."))}</p>`;
+      }
+      if (foot) foot.textContent = photosList.length
+        ? `${t("botdee.sv.photoCount", "Photo")} ${mediaIndex + 1} / ${photosList.length}`
+        : t("botdee.sv.noPhotos", "No publicly shared photos.");
+    }
+
+    card.addEventListener("click", event => {
+      const primaryBtn = event.target.closest("[data-sv-primary]");
+      if (primaryBtn && card.contains(primaryBtn)) {
+        const next = primaryBtn.getAttribute("data-sv-primary");
+        const first = (subtabsFor(next)[0] || {}).id || "Music";
+        paintPeopleTabs(card, people, next, first);
+        return;
+      }
+      const secondaryBtn = event.target.closest("[data-sv-secondary]");
+      if (secondaryBtn && card.contains(secondaryBtn)) {
+        paintPeopleTabs(card, people, card.dataset.primary || "Social", secondaryBtn.getAttribute("data-sv-secondary"));
+        return;
+      }
+      const open = event.target.closest("[data-sv-open]");
+      if (open && card.contains(open)) openOverlay(open.getAttribute("data-sv-open"));
+    });
+
+    if (!doc || doc.__floqrSmartViewOverlayBound) return;
+    doc.__floqrSmartViewOverlayBound = true;
+    doc.addEventListener("click", event => {
+      const overlay = event.target.closest(".botdee-sv-overlay");
+      if (!overlay || overlay.hidden) return;
+      if (event.target.closest("[data-sv-close]")) {
+        closeSmartViewOverlays(activeChatState);
+        return;
+      }
+      if (event.target.closest("[data-sv-media]")) {
+        mediaType = event.target.closest("[data-sv-media]").getAttribute("data-sv-media") || "photos";
+        mediaIndex = 0;
+        renderMedia(overlay);
+        return;
+      }
+      if (event.target.closest("[data-sv-prev]") || event.target.closest("[data-sv-next]")) {
+        const photosList = Array.isArray(activePeople?.media?.photos) ? activePeople.media.photos : [0];
+        const delta = event.target.closest("[data-sv-next]") ? 1 : -1;
+        mediaIndex = (mediaIndex + delta + Math.max(photosList.length, 1)) % Math.max(photosList.length, 1);
+        renderMedia(overlay);
+        return;
+      }
+      if (event.target.closest("[data-sv-edit]")) {
+        openOverlay("edit");
+        return;
+      }
+      if (event.target.closest("[data-sv-save]")) {
+        const editor = overlay.querySelector("#botdeeSvSummaryEditor");
+        const status = overlay.querySelector("[data-sv-edit-status]");
+        const value = String(editor?.value || "").trim();
+        if (!value) {
+          if (status) status.textContent = t("botdee.sv.summaryEmpty", "Summary cannot be empty.");
+          return;
+        }
+        if (status) status.textContent = t("botdee.sv.saving", "Saving…");
+        const callable = global.firebase?.app?.()?.functions?.("us-central1")?.httpsCallable?.("saveSmartSummary");
+        const finish = (ok, message) => {
+          if (status) status.textContent = message;
+          if (ok) {
+            if (activePeople) {
+              activePeople.summary = activePeople.summary || {};
+              activePeople.summary.text = value;
+              activePeople.summary.status = "source";
+              activePeople.summary.pending = true;
+            }
+            const short = activeCard?.querySelector(".botdee-sv-summary-text");
+            if (short) short.textContent = value;
+            closeSmartViewOverlays(activeChatState);
+          }
+        };
+        if (!callable) {
+          finish(false, t("botdee.sv.saveOffline", "Sign in to save. Translations are queued on the server, not in this browser."));
+          return;
+        }
+        callable({summary: value}).then(() => {
+          finish(true, t("botdee.sv.savedQueued", "Saved. Translations queued."));
+        }).catch(err => {
+          finish(false, err?.message || t("botdee.sv.saveFailed", "Could not save the summary."));
+        });
+      }
+    });
+    doc.addEventListener("keydown", event => {
+      const open = [...doc.querySelectorAll(".botdee-sv-overlay")].find(node => !node.hidden);
+      if (!open) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeSmartViewOverlays(chatState);
+        return;
+      }
+      trapFocus(open, event);
+      if (open.id === "botdeeSvMediaOverlay" && (event.key === "ArrowRight" || event.key === "ArrowLeft")) {
+        const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [0];
+        const delta = event.key === "ArrowRight" ? 1 : -1;
+        mediaIndex = (mediaIndex + delta + Math.max(photosList.length, 1)) % Math.max(photosList.length, 1);
+        renderMedia(open);
+      }
+    });
+  }
+
   function mount(el, views) {
     if (!el) return;
     const list = Array.isArray(views) ? views : [];
     el.innerHTML = list.map(renderCard).join("") || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SmartViews yet."))}</p>`;
     wireActionLinks(el);
+    const cards = el.querySelectorAll(".botdee-sv-people");
+    let index = 0;
+    list.forEach(payload => {
+      if (!peopleOf(payload)) return;
+      const card = cards[index];
+      index += 1;
+      if (card) bindPeopleCard(card, payload);
+    });
   }
 
-  global.FLOQRBotDeeSmartView = {renderCard, mount, resolveSameOriginHref, wireActionLinks};
+  if (global.document && !global.__floqrSmartViewChromeBound) {
+    global.__floqrSmartViewChromeBound = true;
+    global.addEventListener("floqr-chrome-change", () => {
+      /* Site Chrome tokens restyle in place — do not remount or drop drafts. */
+    });
+  }
+
+  global.FLOQRBotDeeSmartView = {
+    renderCard,
+    renderPeopleCard,
+    mount,
+    resolveSameOriginHref,
+    wireActionLinks,
+    captureChatState,
+    restoreChatState
+  };
 })(window);
