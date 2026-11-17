@@ -218,9 +218,22 @@
     }
   }
 
+  function isUnauthError(error) {
+    const code = String(error?.code || "").replace(/^functions\//, "");
+    return code === "unauthenticated";
+  }
+
+  function smartViewLoadCopy(error) {
+    if (isUnauthError(error)) {
+      return t("botdee.sv.saveOffline", "Sign in to save. Translations are queued on the server, not in this browser.");
+    }
+    return t("botdee.sv.loadError", "Your SMARTview could not load. Try again in a moment.");
+  }
+
   async function loadMySmartView(opts = {}) {
     const host = byId("botDeeSmartViewDemo");
     if (!host || !global.FLOQRBotDeeSmartView) return;
+    const hadCard = !!host.querySelector(".botdee-sv-people, .botdee-sv-card");
     host.setAttribute("aria-busy", "true");
     if (!host.innerHTML.trim()) host.textContent = t("botdee.chatThinking", "BOT DEE is thinking…");
     try {
@@ -232,8 +245,9 @@
       }
       global.FLOQRBotDeeSmartView.mount(host, views);
       if (opts.openSummary) host.querySelector("[data-sv-open='summary']")?.click();
-    } catch (_) {
-      host.textContent = t("botdee.sv.saveOffline", "Sign in to save. Translations are queued on the server, not in this browser.");
+    } catch (error) {
+      if (!hadCard) host.textContent = smartViewLoadCopy(error);
+      throw error;
     } finally {
       host.removeAttribute("aria-busy");
     }
@@ -244,7 +258,7 @@
   function bind() {
     stampChatLink();
     if (bound) {
-      if (byId("botDeeSmartViewDemo")) loadMySmartView();
+      if (byId("botDeeSmartViewDemo")) loadMySmartView().catch(() => {});
       if (byId("botDeeConsentArchive") || byId("botDeeKnowsList")) loadConsent();
       return;
     }
@@ -252,18 +266,18 @@
     byId("botDeeConsentSave")?.addEventListener("click", saveConsent);
     byId("botDeeExportBtn")?.addEventListener("click", exportData);
     byId("botDeeDeleteArchiveBtn")?.addEventListener("click", deleteArchive);
-    byId("botDeeLoadSmartViews")?.addEventListener("click", () => loadMySmartView());
+    byId("botDeeLoadSmartViews")?.addEventListener("click", () => loadMySmartView().catch(() => {}));
     byId("botDeeMasterLoadSmartViews")?.addEventListener("click", () => loadDemos("botDeeMasterSmartViewDemo"));
     byId("botDeeEditSmartSummary")?.addEventListener("click", async () => {
       setLine("botDeeUpgradeStatus", t("botdee.chatThinking", "BOT DEE is thinking…"));
       try {
         await loadMySmartView({openSummary: true});
         setLine("botDeeUpgradeStatus", "");
-      } catch (_) {
-        setLine("botDeeUpgradeStatus", t("botdee.sv.saveOffline", "Sign in to save. Translations are queued on the server, not in this browser."));
+      } catch (error) {
+        setLine("botDeeUpgradeStatus", smartViewLoadCopy(error));
       }
     });
-    if (byId("botDeeSmartViewDemo")) loadMySmartView();
+    if (byId("botDeeSmartViewDemo")) loadMySmartView().catch(() => {});
     if (byId("botDeeConsentArchive") || byId("botDeeKnowsList")) loadConsent();
   }
 
@@ -273,6 +287,7 @@
     loadKnows,
     loadDemos,
     loadMySmartView,
+    smartViewLoadCopy,
     applyUsageFlag
   };
 })(window);

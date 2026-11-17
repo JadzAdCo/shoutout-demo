@@ -53,9 +53,11 @@ test("patron My BOT DEE shows real SMARTview; mocks stay on Master Admin", () =>
   const portal = read("patron-portal.html");
   const upgrade = read("botdee-upgrade-ui.js");
   const master = read("master-admin.html");
+  const css = read("botdee-smartview.css");
   assert.match(portal, /data-i18n="botdee\.sv\.viewMine"/);
   assert.match(portal, /data-i18n="botdee\.sv\.editSummary"/);
   assert.match(portal, /class="[^"]*botdee-sv-bubble/);
+  assert.match(portal, /class="botdee-upgrade-actions botdee-sv-mine-actions"/);
   assert.doesNotMatch(portal, /Show mock SmartViews/);
   assert.doesNotMatch(portal, /botdee\.libraryRefresh/);
   assert.doesNotMatch(portal, /Research Library and SmartViews/);
@@ -64,7 +66,26 @@ test("patron My BOT DEE shows real SMARTview; mocks stay on Master Admin", () =>
   assert.match(upgrade, /botDeeLoadSmartViews[\s\S]*loadMySmartView/);
   assert.match(upgrade, /botDeeMasterLoadSmartViews[\s\S]*loadDemos\("botDeeMasterSmartViewDemo"\)/);
   assert.doesNotMatch(upgrade, /loadDemos\("botDeeSmartViewDemo"\)/);
+  assert.match(upgrade, /function smartViewLoadCopy\(/);
+  assert.match(upgrade, /botdee\.sv\.loadError/);
+  assert.match(upgrade, /throw error;/);
+  assert.match(css, /\.botdee-sv-mine-actions[\s\S]{0,120}flex-wrap:\s*nowrap/);
+  assert.doesNotMatch(css, /\.portal-botdee-panel \.botdee-upgrade-actions\{[\s\S]*?flex-wrap:\s*nowrap/);
   assert.match(master, /id="botDeeMasterLoadSmartViews"/);
   assert.match(master, /botdee\.libraryRefresh/);
   assert.match(master, /data-botdee-page="smartviews"/);
+});
+
+test("smartViewLoadCopy uses sign-in copy only for unauthenticated", () => {
+  const {createContext, runInContext} = require("vm");
+  const src = read("botdee-upgrade-ui.js");
+  const ctx = createContext({window: {}});
+  ctx.window = ctx;
+  runInContext(src, ctx);
+  const copy = ctx.FLOQRBotDeeUpgradeUi.smartViewLoadCopy;
+  assert.match(copy({code: "functions/unauthenticated"}), /Sign in to save/);
+  assert.match(copy({code: "unauthenticated"}), /Sign in to save/);
+  assert.match(copy({code: "unavailable"}), /could not load/);
+  assert.match(copy({code: "failed-precondition"}), /could not load/);
+  assert.match(copy(new Error("offline")), /could not load/);
 });
