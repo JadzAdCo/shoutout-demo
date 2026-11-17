@@ -78,6 +78,48 @@ function sanitizeHref(href) {
   }
 }
 
+function isVideoSlot(slot, index, url) {
+  const type = String(slot?.type || "").toLowerCase();
+  if (type === "video") return true;
+  if (type === "image") return false;
+  if (Number(index) >= 8) return true;
+  return /\.(mp4|webm|mov|m4v)(\?|$)/i.test(String(url || ""));
+}
+
+/** Same order as the FLOQR public profile page (`mediaSlotDefaults`): 8 photos then 2 videos. */
+function publicPageMedia(profile = {}) {
+  const photos = [];
+  const videos = [];
+  const ordered = [];
+  const seen = new Set();
+  const alt = text(profile.displayName || profile.publicName || "", 120);
+  const existing = Array.isArray(profile.profileMediaSlots) ? profile.profileMediaSlots : [];
+  const fallback = profile.photoURL || profile.profilePhotoUrl || profile.publicPhotoUrl
+    || profile.avatarUrl || profile.mainPhotoUrl || profile.photoUrl || "";
+  for (let i = 0; i < 10; i += 1) {
+    const previous = existing[i] || (i === 0 && fallback ? {url: fallback, type: "image"} : {});
+    const type = i < 8 ? "image" : "video";
+    const slot = {slot: i + 1, type, url: "", ...previous, type};
+    const url = sanitizeHref(slot.url || slot.mediaUrl);
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    const video = type === "video" || isVideoSlot(slot, i, url);
+    const row = {url, alt, kind: video ? "video" : "image"};
+    ordered.push(row);
+    if (video) videos.push(row);
+    else photos.push(row);
+  }
+  const hero = ordered[0] || null;
+  return {
+    photos,
+    videos,
+    ordered,
+    hero,
+    photoUrl: photos[0] ? photos[0].url : (hero && hero.kind === "image" ? hero.url : ""),
+    photoCount: photos.length
+  };
+}
+
 function defaultSubtab(primary) {
   if (primary === "Social") return DEFAULT_SOCIAL;
   if (primary === "Dating") return DATING_SUBTABS[0];
@@ -109,11 +151,10 @@ function publicFieldsSnapshot(profile = {}, volunteered = null) {
   const v = volunteered && typeof volunteered === "object" ? volunteered : {datapoints: {}, sharedDatapoints: []};
   const dp = v.datapoints && typeof v.datapoints === "object" ? v.datapoints : {};
   const shared = Array.isArray(v.sharedDatapoints) ? v.sharedDatapoints : [];
-  const mediaAllowed = shared.includes("media");
   const instagram = sanitizeHandle(profile.instagramHandle || profile.instagram);
   const xHandle = sanitizeHandle(profile.xHandle || profile.twitter || profile.x);
   const city = dp.location && dp.location.city ? text(dp.location.city, 80) : "";
-  const photos = mediaAllowed && Array.isArray(profile.publicPhotos) ? profile.publicPhotos : [];
+  const pageMedia = publicPageMedia(profile);
   return {
     displayName: text(profile.displayName || profile.publicName || "", 120),
     handle: text((profile.floqrHandle || profile.username || "").replace(/^@+/, ""), 80),
@@ -136,8 +177,11 @@ function publicFieldsSnapshot(profile = {}, volunteered = null) {
     lookingToMeet: shared.includes("meet") ? text(dp.lookingToMeet, 200) : "",
     datingOptIn: !!(shared.includes("meet") && dp.lookingToMeet),
     bio: text(v.bio || dp.bio || "", 400),
-    photoCount: mediaAllowed ? Number(dp.photoCount || photos.length || 0) : 0,
-    photoUrl: mediaAllowed ? text(profile.photoURL || profile.publicPhotoUrl || "", 500) : "",
+    photoCount: pageMedia.photoCount,
+    photoUrl: pageMedia.photoUrl,
+    photos: pageMedia.photos,
+    videos: pageMedia.videos,
+    hero: pageMedia.hero,
     verified: profile.identityVerified === 1 || profile.floqrVerified === 1,
     sourceLocale: normalizeLocale(profile.preferredLanguage || profile.uiLanguage || "en")
   };
@@ -146,6 +190,10 @@ function publicFieldsSnapshot(profile = {}, volunteered = null) {
 function publicFieldsHash(snapshot) {
   const copy = {...snapshot};
   delete copy.photoUrl;
+  delete copy.photos;
+  delete copy.videos;
+  delete copy.photoCount;
+  delete copy.hero;
   return sha256(JSON.stringify(copy));
 }
 
@@ -449,6 +497,22 @@ function usageFromGemini(response) {
   };
 }
 
+function peopleHeroPhoto(snap = {}) {
+  const photos = Array.isArray(snap.photos) ? snap.photos : [];
+  const videos = Array.isArray(snap.videos) ? snap.videos : [];
+  const hero = snap.hero && snap.hero.url
+    ? snap.hero
+    : (photos[0] || videos[0] || (snap.photoUrl ? {url: snap.photoUrl, kind: "image"} : null));
+  const count = Math.max(photos.length + videos.length, hero ? 1 : 0, Number(snap.photoCount) || 0);
+  if (!hero && !count) return null;
+  if (!hero) return {url: "", count, kind: "image"};
+  return {
+    url: hero.url,
+    count,
+    kind: hero.kind === "video" ? "video" : "image"
+  };
+}
+
 function peopleV2Payload({
   subjectUid,
   snap,
@@ -493,10 +557,14 @@ function peopleV2Payload({
     verified: snap.verified === true,
     city: snap.city || "",
     handles,
-    photo: snap.photoUrl ? {url: snap.photoUrl, count: Math.max(1, snap.photoCount || 1)} : (snap.photoCount ? {url: "", count: snap.photoCount} : null),
+    photo: peopleHeroPhoto(snap),
     media: {
-      photos: snap.photoUrl ? [{url: snap.photoUrl, alt: snap.displayName}] : [],
-      videos: []
+      photos: Array.isArray(snap.photos) && snap.photos.length
+        ? snap.photos.map(item => ({url: item.url, alt: item.alt || snap.displayName || ""}))
+        : (snap.photoUrl ? [{url: snap.photoUrl, alt: snap.displayName || ""}] : []),
+      videos: Array.isArray(snap.videos)
+        ? snap.videos.map(item => ({url: item.url, alt: item.alt || snap.displayName || ""}))
+        : []
     },
     summary: {
       text: localeRow.text,
@@ -642,6 +710,8 @@ module.exports = {
   normalizeLocale,
   sanitizeHandle,
   sanitizeHref,
+  isVideoSlot,
+  publicPageMedia,
   defaultSubtab,
   selectTabs,
   emptyCategories,
@@ -665,6 +735,7 @@ module.exports = {
   localeSummary,
   diagnosticEvent,
   usageFromGemini,
+  peopleHeroPhoto,
   peopleV2Payload,
   tagsFor,
   noteFor,

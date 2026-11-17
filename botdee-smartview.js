@@ -1,4 +1,4 @@
-/* BOT DEE SmartView renderer — typed payloads only, no innerHTML from model text. */
+/* BOT DEE SMARTview renderer — typed payloads only, no innerHTML from model text. */
 (function (global) {
   "use strict";
 
@@ -187,11 +187,20 @@
     return overlaySession;
   }
 
+  function overlayMediaList(session) {
+    const people = session?.people || {};
+    const media = people.media || {};
+    if ((session?.mediaType || "photos") === "videos") {
+      return Array.isArray(media.videos) ? media.videos : [];
+    }
+    return Array.isArray(media.photos) ? media.photos : [];
+  }
+
   function advanceOverlayMedia(delta) {
     const session = overlaySession;
     if (!session) return null;
-    const photosList = Array.isArray(session.people?.media?.photos) ? session.people.media.photos : [];
-    const len = Math.max(photosList.length, 1);
+    const list = overlayMediaList(session);
+    const len = Math.max(list.length, 1);
     session.mediaIndex = ((Number(session.mediaIndex) || 0) + Number(delta || 0) + len) % len;
     return session;
   }
@@ -214,8 +223,18 @@
     const primary = people.defaultPrimary || "Social";
     const secondary = people.defaultSecondary || "Music";
     const tags = tagsForPeople(people, primary, secondary);
-    const photo = people.photo && people.photo.url ? resolveImageSrc(people.photo.url) : "";
-    const count = people.photo && people.photo.count ? people.photo.count : (photo ? 1 : 0);
+    const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [];
+    const videosList = Array.isArray(people.media?.videos) ? people.media.videos : [];
+    const heroKind = people.photo?.kind === "video" ? "video" : "image";
+    const heroUrl = (people.photo && people.photo.url)
+      || (heroKind === "video" ? videosList[0]?.url : photosList[0]?.url)
+      || "";
+    const photo = heroKind !== "video" && heroUrl ? resolveImageSrc(heroUrl) : "";
+    const videoHero = (heroKind === "video" && heroUrl ? resolveImageSrc(heroUrl) : "")
+      || (!photo && videosList[0]?.url ? resolveImageSrc(videosList[0].url) : "");
+    const count = photosList.length + videosList.length
+      || (people.photo && people.photo.count)
+      || (photo || videoHero ? 1 : 0);
     const handles = Array.isArray(people.handles) ? people.handles : [];
     const profileHref = resolveSameOriginHref(people.profileHref || "./patron-portal.html?tab=profile");
     const minglHref = resolveSameOriginHref(people.minglHref || "./?start=search");
@@ -223,13 +242,13 @@
     const localeNote = statusLabel(people.summary);
     return `<article class="botdee-sv-people" data-kind="patron" data-primary="${esc(primary)}" data-secondary="${esc(secondary)}">
       <div class="botdee-sv-people-head">
-        <strong>${esc(t("botdee.sv.person", "SmartView — Person"))}</strong>
+        <strong>${esc(t("botdee.sv.person", "SMARTview — Person"))}</strong>
         ${people.verified ? `<span class="botdee-sv-verified">${esc(t("botdee.sv.verified", "Verified on FLOQR"))}</span>` : ""}
       </div>
       ${mock ? `<p class="botdee-sv-mock">${esc(t("botdee.smartviewMockBadge", "Mock / not live licensed data"))}</p>` : ""}
       <div class="botdee-sv-identity">
-        <button type="button" class="botdee-sv-portrait" data-sv-open="media" ${photo ? "" : "hidden"} aria-label="${esc(t("botdee.sv.openMedia", "View shared photos and videos"))}">
-          ${photo ? `<img src="${esc(photo)}" alt="${esc(people.displayName || "")}"/>` : ""}
+        <button type="button" class="botdee-sv-portrait" data-sv-open="media" ${photo || videoHero ? "" : "hidden"} aria-label="${esc(t("botdee.sv.openMedia", "View shared photos and videos"))}">
+          ${photo ? `<img src="${esc(photo)}" alt="${esc(people.displayName || "")}"/>` : (videoHero ? `<video src="${esc(videoHero)}" muted playsinline preload="metadata" aria-hidden="true"></video>` : "")}
           ${count ? `<span class="botdee-sv-counter">${esc(String(Math.min(1, count)))}/${esc(String(count))}</span>` : ""}
         </button>
         <div class="botdee-sv-identity-main">
@@ -247,7 +266,7 @@
           </button>
         </div>
       </div>
-      <div class="botdee-sv-primary" role="tablist" aria-label="${esc(t("botdee.sv.categories", "SmartView categories"))}">${PRIMARY_META.map(tab => (
+      <div class="botdee-sv-primary" role="tablist" aria-label="${esc(t("botdee.sv.categories", "SMARTview categories"))}">${PRIMARY_META.map(tab => (
         `<button type="button" class="botdee-sv-tab" role="tab" data-sv-primary="${esc(tab.id)}" aria-selected="${tab.id === primary ? "true" : "false"}"><span class="botdee-sv-tab-ico" aria-hidden="true">${tab.icon}</span> ${esc(t(tab.key, tab.label))}</button>`
       )).join("")}</div>
       <section class="botdee-sv-details">
@@ -388,34 +407,40 @@
     if (!session || !overlay) return;
     const people = session.people || {};
     const mediaType = session.mediaType || "photos";
-    const mediaIndex = Number(session.mediaIndex) || 0;
-    const photos = mediaType === "photos";
     overlay.querySelectorAll("[data-sv-media]").forEach(btn => {
       btn.setAttribute("aria-selected", btn.getAttribute("data-sv-media") === mediaType ? "true" : "false");
     });
     const stage = overlay.querySelector("[data-sv-stage]");
     const foot = overlay.querySelector("[data-sv-media-foot]");
-    const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [];
-    const videosList = Array.isArray(people.media?.videos) ? people.media.videos : [];
-    if (!photos) {
-      if (stage) stage.innerHTML = "";
-      if (foot) foot.textContent = videosList.length
-        ? t("botdee.sv.videoCount", "Shared videos")
-        : t("botdee.sv.noVideos", "No publicly shared videos.");
+    const list = overlayMediaList(session);
+    const emptyCopy = mediaType === "videos"
+      ? t("botdee.sv.noVideos", "No publicly shared videos.")
+      : t("botdee.sv.noPhotos", "No publicly shared photos.");
+    if (!list.length) {
+      if (stage) stage.innerHTML = `<p class="botdee-sv-foot">${esc(emptyCopy)}</p>`;
+      if (foot) foot.textContent = emptyCopy;
       return;
     }
-    const item = photosList[mediaIndex] || photosList[0];
+    const mediaIndex = Math.max(0, (Number(session.mediaIndex) || 0) % list.length);
+    session.mediaIndex = mediaIndex;
+    const item = list[mediaIndex];
+    const src = item && item.url ? resolveImageSrc(item.url) : "";
+    const prevLabel = mediaType === "videos" ? t("botdee.sv.prevVideo", "Previous video") : t("botdee.sv.prev", "Previous photo");
+    const nextLabel = mediaType === "videos" ? t("botdee.sv.nextVideo", "Next video") : t("botdee.sv.next", "Next photo");
+    const mediaTag = mediaType === "videos"
+      ? `<video src="${esc(src)}" controls playsinline preload="metadata" ${item.alt ? `aria-label="${esc(item.alt)}"` : ""}></video>`
+      : `<img src="${esc(src)}" alt="${esc(item.alt || people.displayName || "")}"/>`;
     if (stage) {
-      const src = item && item.url ? resolveImageSrc(item.url) : "";
       stage.innerHTML = src
-        ? `<button type="button" class="botdee-sv-arrow prev" data-sv-prev aria-label="${esc(t("botdee.sv.prev", "Previous photo"))}">‹</button>
-           <img src="${esc(src)}" alt="${esc(item.alt || people.displayName || "")}"/>
-           <button type="button" class="botdee-sv-arrow next" data-sv-next aria-label="${esc(t("botdee.sv.next", "Next photo"))}">›</button>`
-        : `<p class="botdee-sv-foot">${esc(t("botdee.sv.noPhotos", "No publicly shared photos."))}</p>`;
+        ? `<button type="button" class="botdee-sv-arrow prev" data-sv-prev aria-label="${esc(prevLabel)}">‹</button>
+           ${mediaTag}
+           <button type="button" class="botdee-sv-arrow next" data-sv-next aria-label="${esc(nextLabel)}">›</button>`
+        : `<p class="botdee-sv-foot">${esc(emptyCopy)}</p>`;
     }
-    if (foot) foot.textContent = photosList.length
-      ? `${t("botdee.sv.photoCount", "Photo")} ${mediaIndex + 1} / ${photosList.length}`
-      : t("botdee.sv.noPhotos", "No publicly shared photos.");
+    if (foot) {
+      const kicker = mediaType === "videos" ? t("botdee.sv.videoIndex", "Video") : t("botdee.sv.photoCount", "Photo");
+      foot.textContent = `${kicker} ${mediaIndex + 1} / ${list.length}`;
+    }
   }
 
   function showOverlay(session, kind) {
@@ -435,8 +460,8 @@
         <p class="botdee-sv-foot" data-sv-media-foot></p>`);
       overlay.setAttribute("aria-labelledby", "botdeeSvMediaTitle");
       overlay.hidden = false;
-      session.mediaType = "photos";
-      session.mediaIndex = 0;
+      if (session.mediaType !== "videos") session.mediaType = "photos";
+      if (!Number.isFinite(Number(session.mediaIndex))) session.mediaIndex = 0;
       renderMediaFor(session, overlay);
       overlay.querySelector("[data-sv-close]")?.focus();
     } else if (kind === "summary") {
@@ -578,10 +603,13 @@
       }
       const open = event.target.closest("[data-sv-open]");
       if (open && card.contains(open)) {
+        const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [];
+        const videosList = Array.isArray(people.media?.videos) ? people.media.videos : [];
+        const heroVideo = people.photo?.kind === "video" || (!photosList.length && videosList.length);
         rememberOverlaySession({
           people,
           card,
-          mediaType: "photos",
+          mediaType: heroVideo ? "videos" : "photos",
           mediaIndex: 0,
           chatState: captureChatState()
         });
@@ -593,7 +621,7 @@
   function mount(el, views) {
     if (!el) return;
     const list = Array.isArray(views) ? views : [];
-    el.innerHTML = list.map(renderCard).join("") || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SmartViews yet."))}</p>`;
+    el.innerHTML = list.map(renderCard).join("") || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SMARTviews yet."))}</p>`;
     wireActionLinks(el);
     const cards = el.querySelectorAll(".botdee-sv-people");
     let index = 0;

@@ -31,8 +31,14 @@ function plain(value, depth = 0) {
 }
 
 function photoOf(data = {}) {
-  const slot = Array.isArray(data.profileMediaSlots) ? data.profileMediaSlots.find(x => x?.url && x.type !== "video") : null;
-  return data.photoURL || data.profilePhotoUrl || data.mainPhotoUrl || data.avatarUrl || slot?.url || "";
+  const slots = Array.isArray(data.profileMediaSlots) ? data.profileMediaSlots : [];
+  const fallback = data.photoURL || data.profilePhotoUrl || data.publicPhotoUrl || data.avatarUrl || data.mainPhotoUrl || "";
+  for (let i = 0; i < 8; i += 1) {
+    const previous = slots[i] || (i === 0 && fallback ? {url: fallback, type: "image"} : {});
+    const url = String(previous.url || previous.mediaUrl || "").trim();
+    if (url && previous.type !== "video") return url;
+  }
+  return fallback;
 }
 
 /** Name + photo only: what anyone in a shared chat or roster may see. */
@@ -126,6 +132,7 @@ module.exports = {
   SCAN_LIMIT,
   isPrivateKey,
   plain,
+  photoOf,
   minimalCard,
   publicProfile,
   isPublic,

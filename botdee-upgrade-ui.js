@@ -1,4 +1,4 @@
-/* BOT DEE upgrade panels — consent, memories, mock SmartViews (Master Admin SMARTviews tab).
+/* BOT DEE upgrade panels — consent, memories, mock SMARTviews (Master Admin SMARTviews tab).
    Saved chats, memories, and "what BOT DEE knows of me" live on My Profile → Feature & Orders → My BOT DEE.
    Chat page has no Settings bubble / memory popout. First-use does not open an overlay. */
 (function (global) {
@@ -209,9 +209,9 @@
       try {
         const views = await loadMockViews();
         if (views.length) global.FLOQRBotDeeSmartView.mount(host, views);
-        else host.textContent = t("botdee.libraryEmpty", "No saved SmartViews yet.");
+        else host.textContent = t("botdee.libraryEmpty", "No saved SMARTviews yet.");
       } catch (__) {
-        host.textContent = t("botdee.libraryEmpty", "No saved SmartViews yet.");
+        host.textContent = t("botdee.libraryEmpty", "No saved SMARTviews yet.");
       }
     } finally {
       host.removeAttribute("aria-busy");

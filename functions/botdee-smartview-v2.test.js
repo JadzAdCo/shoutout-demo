@@ -329,8 +329,10 @@ test("no Gemini on view: peopleV2 payload uses stored analysis only", () => {
   const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
   assert.match(src, /getPeopleSmartView/);
   assert.doesNotMatch(src, /generateContent[\s\S]{0,80}getPeopleSmartView/);
+  assert.match(src, /volunteered\.profileMediaSlots = data\.profileMediaSlots/);
   const fn = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-core.js"), "utf8");
   assert.match(fn, /No Gemini on view/);
+  assert.match(fn, /function publicPageMedia\(/);
 });
 
 test("people card renderer: tabs, shrink tags, overlays restore draft helpers exist", () => {
@@ -409,6 +411,125 @@ test("analysis and translation jobs are Functions-write", () => {
   assert.match(rules, /match \/botDeeSmartViewDiagnostics\/\{id\}[\s\S]*allow write: if false;/);
 });
 
+test("public-page Profile Media is the SMARTview hero, gallery, and videos", () => {
+  const hero = "https://firebasestorage.googleapis.com/v0/b/demo.appspot.com/o/profileMedia%2Fhero.jpg?alt=media";
+  const extra = "https://firebasestorage.googleapis.com/v0/b/demo.appspot.com/o/profileMedia%2Ftwo.jpg?alt=media";
+  const clip = "https://firebasestorage.googleapis.com/v0/b/demo.appspot.com/o/profileMedia%2Fclip.mp4?alt=media";
+  const google = "https://lh3.googleusercontent.com/a/legacy-auth";
+  const media = v2.publicPageMedia({
+    displayName: "Don Papi",
+    photoURL: google,
+    profileMediaSlots: [
+      {slot: 1, type: "image", url: hero},
+      {slot: 2, type: "image", url: extra},
+      {}, {}, {}, {}, {}, {},
+      {slot: 9, type: "video", url: clip}
+    ]
+  });
+  assert.equal(media.photoUrl, hero);
+  assert.deepEqual(media.photos.map(row => row.url), [hero, extra]);
+  assert.deepEqual(media.videos.map(row => row.url), [clip]);
+  const snap = v2.publicFieldsSnapshot({
+    displayName: "Don Papi",
+    photoURL: google,
+    profileMediaSlots: [
+      {slot: 1, type: "image", url: hero},
+      {slot: 2, type: "image", url: extra},
+      {}, {}, {}, {}, {}, {},
+      {slot: 9, type: "video", url: clip}
+    ]
+  }, {sharedDatapoints: ["music"], datapoints: {music: ["Afrobeats"]}});
+  assert.equal(snap.photoUrl, hero);
+  assert.equal(snap.photos.length, 2);
+  assert.equal(snap.videos.length, 1);
+  const payload = v2.peopleV2Payload({
+    subjectUid: "don",
+    snap,
+    analysis: v2.emptyAnalysis("don", snap),
+    viewerUid: "don",
+    viewerMaySee: true
+  });
+  assert.equal(payload.photo.url, hero);
+  assert.equal(payload.photo.kind, "image");
+  assert.equal(payload.media.photos.length, 2);
+  assert.equal(payload.media.videos[0].url, clip);
+  const emptySlots = v2.publicPageMedia({displayName: "Don Papi", photoURL: google, profileMediaSlots: []});
+  assert.equal(emptySlots.photoUrl, google);
+  const extrasIgnored = v2.publicPageMedia({
+    displayName: "Don Papi",
+    profileMediaSlots: [{type: "image", url: hero}],
+    publicPhotos: ["https://example.test/extra-public.jpg"],
+    galleryUrls: ["https://example.test/extra-gallery.jpg"],
+    publicGallery: [{url: "https://example.test/extra-gallery-obj.jpg"}]
+  });
+  assert.deepEqual(extrasIgnored.photos.map(row => row.url), [hero]);
+  const emptySlot0 = v2.publicPageMedia({
+    displayName: "Don Papi",
+    photoURL: google,
+    profileMediaSlots: [{type: "image", url: ""}, {type: "image", url: extra}]
+  });
+  assert.equal(emptySlot0.hero.url, extra);
+  assert.equal(emptySlot0.photoUrl, extra);
+  assert.equal(emptySlot0.ordered.length, 1);
+  const videoOnly = v2.publicPageMedia({
+    displayName: "Don Papi",
+    profileMediaSlots: [{}, {}, {}, {}, {}, {}, {}, {}, {type: "video", url: clip}]
+  });
+  assert.equal(videoOnly.hero.url, clip);
+  assert.equal(videoOnly.hero.kind, "video");
+  const videoSnap = v2.publicFieldsSnapshot({
+    displayName: "Don Papi",
+    profileMediaSlots: [{}, {}, {}, {}, {}, {}, {}, {}, {type: "video", url: clip}]
+  }, {sharedDatapoints: ["music"], datapoints: {music: ["Afrobeats"]}});
+  const videoPayload = v2.peopleV2Payload({
+    subjectUid: "don",
+    snap: videoSnap,
+    analysis: v2.emptyAnalysis("don", videoSnap),
+    viewerUid: "don",
+    viewerMaySee: true
+  });
+  assert.equal(videoPayload.photo.url, clip);
+  assert.equal(videoPayload.photo.kind, "video");
+  const hidden = v2.peopleV2Payload({
+    subjectUid: "don",
+    snap,
+    analysis: v2.emptyAnalysis("don", snap),
+    viewerUid: "other",
+    viewerMaySee: false
+  });
+  assert.equal(hidden, null);
+});
+
+test("people-directory photoOf prefers public-page slot 0 over Auth photoURL", () => {
+  const people = require("./people-directory-core");
+  const hero = "https://example.test/public-hero.jpg";
+  assert.equal(people.photoOf({
+    photoURL: "https://lh3.googleusercontent.com/a/auth",
+    profileMediaSlots: [{type: "image", url: hero}]
+  }), hero);
+  assert.equal(people.photoOf({
+    photoURL: "https://lh3.googleusercontent.com/a/auth",
+    profileMediaSlots: []
+  }), "https://lh3.googleusercontent.com/a/auth");
+  assert.equal(people.photoOf({
+    photoURL: "https://lh3.googleusercontent.com/a/auth",
+    profileMediaSlots: [{type: "image", url: ""}, {type: "image", url: hero}]
+  }), hero);
+});
+
+test("chrome and help use SMARTview spelling, not SmartView", () => {
+  const i18n = fs.readFileSync(path.join(__dirname, "..", "floqr-i18n.js"), "utf8");
+  const help = fs.readFileSync(path.join(__dirname, "..", "floqr-i18n-help.js"), "utf8");
+  const repo = fs.readFileSync(path.join(__dirname, "..", "botdee-help-repository.js"), "utf8");
+  assert.match(i18n, /"botdee\.sv\.person": "SMARTview — Person"/);
+  assert.match(i18n, /"botdee\.sv\.videoIndex": "Video"/);
+  assert.doesNotMatch(i18n, /SmartView/);
+  assert.doesNotMatch(help, /SmartView/);
+  assert.doesNotMatch(repo, /SmartView/);
+  assert.match(repo, /same hero as your FLOQR public profile/);
+  assert.match(repo, /same Profile Media as your FLOQR public page/);
+});
+
 test("vm people card HTML has no duplicate Music heading and uses escaped text", () => {
   const code = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
   const sandbox = {window: {FLOQRI18n: {t: (k, f) => f}, FLOQRNav: null, location: {href: "https://example.test/x"}}, document: {}};
@@ -420,4 +541,67 @@ test("vm people card HTML has no duplicate Music heading and uses escaped text",
   assert.doesNotMatch(html, /<h3>\s*Music/i);
   assert.match(html, /Afrobeats/);
   assert.doesNotMatch(html, /<script>/);
+});
+
+test("SMARTview overlay pages videos and paints a video element", () => {
+  const code = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
+  assert.match(code, /<video src=/);
+  assert.match(code, /overlayMediaList/);
+  const sandbox = {
+    window: {
+      FLOQRI18n: {t: (k, f) => f},
+      FLOQRNav: null,
+      location: {href: "https://example.test/x"},
+      document: {},
+      addEventListener() {}
+    }
+  };
+  sandbox.global = sandbox.window;
+  vm.runInNewContext(code.replace("(window)", "(window)"), sandbox);
+  const api = sandbox.window.FLOQRBotDeeSmartView;
+  const session = {
+    people: {
+      displayName: "Don Papi",
+      media: {
+        photos: [{url: "https://example.test/hero.jpg"}],
+        videos: [{url: "https://example.test/one.mp4"}, {url: "https://example.test/two.mp4"}]
+      }
+    },
+    mediaType: "videos",
+    mediaIndex: 0
+  };
+  api.rememberOverlaySession(session);
+  const moved = api.advanceOverlayMedia(1);
+  assert.equal(moved.mediaType, "videos");
+  assert.equal(moved.mediaIndex, 1);
+  assert.equal(moved.people.media.videos[1].url, "https://example.test/two.mp4");
+  assert.match(code, /botdee\.sv\.videoIndex/);
+  assert.match(code, /if \(session\.mediaType !== "videos"\) session\.mediaType = "photos"/);
+  assert.doesNotMatch(code, /session\.mediaType = "photos";\s*session\.mediaIndex = 0/);
+});
+
+test("compact SMARTview paints a video hero when the first filled public slot is a video", () => {
+  const code = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
+  const sandbox = {window: {FLOQRI18n: {t: (k, f) => f}, FLOQRNav: null, location: {href: "https://example.test/x"}}, document: {}};
+  sandbox.global = sandbox.window;
+  vm.runInNewContext(code.replace("(window)", "(window)"), sandbox);
+  const html = sandbox.window.FLOQRBotDeeSmartView.renderCard({
+    kind: "patron",
+    floqrPublicData: {
+      peopleV2: {
+        displayName: "Don Papi",
+        photo: {url: "https://example.test/clip.mp4", count: 1, kind: "video"},
+        media: {photos: [], videos: [{url: "https://example.test/clip.mp4", alt: "Don Papi"}]},
+        summary: {text: "Public clip first."},
+        categories: {Social: {Music: ["Afrobeats"], Nightlife: [], Sports: [], Events: []}},
+        defaultPrimary: "Social",
+        defaultSecondary: "Music",
+        handles: [],
+        profileHref: "./patron-portal.html?tab=profile",
+        minglHref: "./?start=search"
+      }
+    }
+  });
+  assert.match(html, /<video src="https:\/\/example\.test\/clip\.mp4"/);
+  assert.doesNotMatch(html, /<img src="https:\/\/example\.test\/clip\.mp4"/);
 });
