@@ -325,9 +325,9 @@ function imageUrlsFromUser(data = {}) {
   const slots = Array.isArray(data.profileMediaSlots) ? data.profileMediaSlots : [];
   const fallback = data.photoURL || data.profilePhotoUrl || data.publicPhotoUrl || data.avatarUrl || data.mainPhotoUrl || "";
   for (let i = 0; i < 8; i += 1) {
-    const slot = slots[i] && typeof slots[i] === "object" ? slots[i] : {};
-    if (slot.type === "video") continue;
-    push(slot.url || slot.mediaUrl || (i === 0 ? fallback : ""));
+    const previous = slots[i] || (i === 0 && fallback ? {url: fallback, type: "image"} : {});
+    if (previous.type === "video") continue;
+    push(previous.url || previous.mediaUrl);
   }
   push(data.photoURL);
   push(data.profilePhotoUrl);

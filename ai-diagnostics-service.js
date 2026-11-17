@@ -225,9 +225,9 @@
       title: "s3.3.031 — SMARTview spelling + public-page media",
       checks: [
         {label:"SMARTview chrome spelling", file:"floqr-i18n.js", includes:["SMARTview — Person", "Show mock SMARTviews"], notIncludes:["SmartView — Person"]},
-        {label:"Public-page media helper", file:"functions/botdee-smartview-v2-core.js", includes:["function publicPageMedia(", "profileMediaSlots"]},
+        {label:"Public-page media helper", file:"functions/botdee-smartview-v2-core.js", includes:["function publicPageMedia(", "profileMediaSlots", "function peopleHeroPhoto("]},
         {label:"getPeopleSmartView copies slots", file:"functions/botdee-smartview-v2-functions.js", includes:["volunteered.profileMediaSlots = data.profileMediaSlots"]},
-        {label:"Overlay plays videos", file:"botdee-smartview.js", includes:["<video src=", "overlayMediaList"]},
+        {label:"Overlay plays videos", file:"botdee-smartview.js", includes:["<video src=", "overlayMediaList", "botdee.sv.videoIndex"]},
         {label:"Help public Profile Media", file:"botdee-help-repository.js", includes:["same hero as your FLOQR public profile", "8 photos + 2 videos"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-031-smartview-public-media"]}
       ]
@@ -3289,10 +3289,10 @@
       id:"s3-3-031-smartview-public-media",
       area:"BOT DEE",
       feature:"SMARTview spelling + public-page photos/videos",
-      changed:"s3.3.031 — Brand spelling is SMARTview app-wide. People card hero and Photos/Videos overlay use the same Profile Media as the FLOQR public page (8 photos + 2 videos in profileMediaSlots), not Google Auth photoURL alone.",
-      howToTest:"1) Hard-refresh after Pages publish — confirm floqr-i18n.js?v=s3.3.031. Sign in as Don Papi (or any patron with public Profile Media). 2) Feature & Orders → My BOT DEE → View my SMARTview. 3) Compact card main image is the same hero as Edit Profile → public preview (first Profile Media item), not a blank or a different Google avatar. 4) Tap the photo — Photos lists every public image; Videos plays public clips. 5) Chrome/help/Master Admin mock button read SMARTview / SMARTviews (not SmartView). 6) Functions must be deployed from origin/main or live getPeopleSmartView still returns photoURL-only. 7) Mark Succeed/Failed.",
+      changed:"s3.3.031 — Brand spelling is SMARTview app-wide. People card hero and Photos/Videos overlay use the same Profile Media as the FLOQR public page (8 photos + 2 videos in profileMediaSlots). Empty slot 0 is skipped when later slots are filled; first filled item is the hero, including video.",
+      howToTest:"1) Hard-refresh after Pages publish — confirm floqr-i18n.js?v=s3.3.031. Sign in as Don Papi (or any patron with public Profile Media). 2) Feature & Orders → My BOT DEE → View my SMARTview. 3) Compact card main image is the same hero as Edit Profile → public preview (first filled Profile Media item), not a blank or a different Google avatar. 4) Tap the portrait — overlay opens on Photos or Videos to match that hero, not always Photos. Videos footer reads Video 1 / N. 5) Chrome/help/Master Admin mock button read SMARTview / SMARTviews (not SmartView). 6) Functions must be deployed from origin/main or live getPeopleSmartView still returns photoURL-only. 7) Mark Succeed/Failed.",
       expected:"Don Papi (and every patron) SMARTview shows the FLOQR public-page hero plus that page’s photos and videos. Spelling is SMARTview everywhere a patron or admin reads it.",
-      troubleshoot:"Blank portrait after Pages refresh → Functions still on s3.3.030; deploy getPeopleSmartView from origin/main. Hero is Google avatar not public gallery → profileMediaSlots not copied; confirm public preview uses the gallery photo. Videos tab empty → slots 9–10 empty or callable not deployed. Still seeing SmartView → cached floqr-i18n.js / help; hard-refresh until ?v=s3.3.031."
+      troubleshoot:"Blank portrait after Pages refresh → Functions still on s3.3.030; deploy getPeopleSmartView from origin/main. Hero is Google avatar not public gallery → empty slot 0 was injecting Auth photoURL; confirm public preview uses the gallery photo. Overlay always on Photos → botdee-smartview.js still resetting mediaType; hard-refresh. Videos tab empty → slots 9–10 empty or callable not deployed. Still seeing SmartView → cached floqr-i18n.js / help; hard-refresh until ?v=s3.3.031."
     },
     {
       id:"s3-3-030-patron-smartview",

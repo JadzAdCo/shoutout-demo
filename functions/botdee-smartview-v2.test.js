@@ -450,10 +450,46 @@ test("public-page Profile Media is the SMARTview hero, gallery, and videos", () 
     viewerMaySee: true
   });
   assert.equal(payload.photo.url, hero);
+  assert.equal(payload.photo.kind, "image");
   assert.equal(payload.media.photos.length, 2);
   assert.equal(payload.media.videos[0].url, clip);
   const emptySlots = v2.publicPageMedia({displayName: "Don Papi", photoURL: google, profileMediaSlots: []});
   assert.equal(emptySlots.photoUrl, google);
+  const extrasIgnored = v2.publicPageMedia({
+    displayName: "Don Papi",
+    profileMediaSlots: [{type: "image", url: hero}],
+    publicPhotos: ["https://example.test/extra-public.jpg"],
+    galleryUrls: ["https://example.test/extra-gallery.jpg"],
+    publicGallery: [{url: "https://example.test/extra-gallery-obj.jpg"}]
+  });
+  assert.deepEqual(extrasIgnored.photos.map(row => row.url), [hero]);
+  const emptySlot0 = v2.publicPageMedia({
+    displayName: "Don Papi",
+    photoURL: google,
+    profileMediaSlots: [{type: "image", url: ""}, {type: "image", url: extra}]
+  });
+  assert.equal(emptySlot0.hero.url, extra);
+  assert.equal(emptySlot0.photoUrl, extra);
+  assert.equal(emptySlot0.ordered.length, 1);
+  const videoOnly = v2.publicPageMedia({
+    displayName: "Don Papi",
+    profileMediaSlots: [{}, {}, {}, {}, {}, {}, {}, {}, {type: "video", url: clip}]
+  });
+  assert.equal(videoOnly.hero.url, clip);
+  assert.equal(videoOnly.hero.kind, "video");
+  const videoSnap = v2.publicFieldsSnapshot({
+    displayName: "Don Papi",
+    profileMediaSlots: [{}, {}, {}, {}, {}, {}, {}, {}, {type: "video", url: clip}]
+  }, {sharedDatapoints: ["music"], datapoints: {music: ["Afrobeats"]}});
+  const videoPayload = v2.peopleV2Payload({
+    subjectUid: "don",
+    snap: videoSnap,
+    analysis: v2.emptyAnalysis("don", videoSnap),
+    viewerUid: "don",
+    viewerMaySee: true
+  });
+  assert.equal(videoPayload.photo.url, clip);
+  assert.equal(videoPayload.photo.kind, "video");
   const hidden = v2.peopleV2Payload({
     subjectUid: "don",
     snap,
@@ -475,6 +511,10 @@ test("people-directory photoOf prefers public-page slot 0 over Auth photoURL", (
     photoURL: "https://lh3.googleusercontent.com/a/auth",
     profileMediaSlots: []
   }), "https://lh3.googleusercontent.com/a/auth");
+  assert.equal(people.photoOf({
+    photoURL: "https://lh3.googleusercontent.com/a/auth",
+    profileMediaSlots: [{type: "image", url: ""}, {type: "image", url: hero}]
+  }), hero);
 });
 
 test("chrome and help use SMARTview spelling, not SmartView", () => {
@@ -482,6 +522,7 @@ test("chrome and help use SMARTview spelling, not SmartView", () => {
   const help = fs.readFileSync(path.join(__dirname, "..", "floqr-i18n-help.js"), "utf8");
   const repo = fs.readFileSync(path.join(__dirname, "..", "botdee-help-repository.js"), "utf8");
   assert.match(i18n, /"botdee\.sv\.person": "SMARTview — Person"/);
+  assert.match(i18n, /"botdee\.sv\.videoIndex": "Video"/);
   assert.doesNotMatch(i18n, /SmartView/);
   assert.doesNotMatch(help, /SmartView/);
   assert.doesNotMatch(repo, /SmartView/);
@@ -534,4 +575,33 @@ test("SMARTview overlay pages videos and paints a video element", () => {
   assert.equal(moved.mediaType, "videos");
   assert.equal(moved.mediaIndex, 1);
   assert.equal(moved.people.media.videos[1].url, "https://example.test/two.mp4");
+  assert.match(code, /botdee\.sv\.videoIndex/);
+  assert.match(code, /if \(session\.mediaType !== "videos"\) session\.mediaType = "photos"/);
+  assert.doesNotMatch(code, /session\.mediaType = "photos";\s*session\.mediaIndex = 0/);
+});
+
+test("compact SMARTview paints a video hero when the first filled public slot is a video", () => {
+  const code = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
+  const sandbox = {window: {FLOQRI18n: {t: (k, f) => f}, FLOQRNav: null, location: {href: "https://example.test/x"}}, document: {}};
+  sandbox.global = sandbox.window;
+  vm.runInNewContext(code.replace("(window)", "(window)"), sandbox);
+  const html = sandbox.window.FLOQRBotDeeSmartView.renderCard({
+    kind: "patron",
+    floqrPublicData: {
+      peopleV2: {
+        displayName: "Don Papi",
+        photo: {url: "https://example.test/clip.mp4", count: 1, kind: "video"},
+        media: {photos: [], videos: [{url: "https://example.test/clip.mp4", alt: "Don Papi"}]},
+        summary: {text: "Public clip first."},
+        categories: {Social: {Music: ["Afrobeats"], Nightlife: [], Sports: [], Events: []}},
+        defaultPrimary: "Social",
+        defaultSecondary: "Music",
+        handles: [],
+        profileHref: "./patron-portal.html?tab=profile",
+        minglHref: "./?start=search"
+      }
+    }
+  });
+  assert.match(html, /<video src="https:\/\/example\.test\/clip\.mp4"/);
+  assert.doesNotMatch(html, /<img src="https:\/\/example\.test\/clip\.mp4"/);
 });

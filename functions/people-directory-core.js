@@ -34,9 +34,9 @@ function photoOf(data = {}) {
   const slots = Array.isArray(data.profileMediaSlots) ? data.profileMediaSlots : [];
   const fallback = data.photoURL || data.profilePhotoUrl || data.publicPhotoUrl || data.avatarUrl || data.mainPhotoUrl || "";
   for (let i = 0; i < 8; i += 1) {
-    const slot = slots[i] && typeof slots[i] === "object" ? slots[i] : {};
-    const url = String(slot.url || slot.mediaUrl || (i === 0 ? fallback : "") || "").trim();
-    if (url && slot.type !== "video") return url;
+    const previous = slots[i] || (i === 0 && fallback ? {url: fallback, type: "image"} : {});
+    const url = String(previous.url || previous.mediaUrl || "").trim();
+    if (url && previous.type !== "video") return url;
   }
   return fallback;
 }

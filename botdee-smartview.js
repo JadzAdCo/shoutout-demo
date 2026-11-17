@@ -225,9 +225,13 @@
     const tags = tagsForPeople(people, primary, secondary);
     const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [];
     const videosList = Array.isArray(people.media?.videos) ? people.media.videos : [];
-    const heroUrl = (people.photo && people.photo.url) || photosList[0]?.url || "";
-    const photo = heroUrl ? resolveImageSrc(heroUrl) : "";
-    const videoHero = !photo && videosList[0]?.url ? resolveImageSrc(videosList[0].url) : "";
+    const heroKind = people.photo?.kind === "video" ? "video" : "image";
+    const heroUrl = (people.photo && people.photo.url)
+      || (heroKind === "video" ? videosList[0]?.url : photosList[0]?.url)
+      || "";
+    const photo = heroKind !== "video" && heroUrl ? resolveImageSrc(heroUrl) : "";
+    const videoHero = (heroKind === "video" && heroUrl ? resolveImageSrc(heroUrl) : "")
+      || (!photo && videosList[0]?.url ? resolveImageSrc(videosList[0].url) : "");
     const count = photosList.length + videosList.length
       || (people.photo && people.photo.count)
       || (photo || videoHero ? 1 : 0);
@@ -434,7 +438,7 @@
         : `<p class="botdee-sv-foot">${esc(emptyCopy)}</p>`;
     }
     if (foot) {
-      const kicker = mediaType === "videos" ? t("botdee.sv.videoCount", "Video") : t("botdee.sv.photoCount", "Photo");
+      const kicker = mediaType === "videos" ? t("botdee.sv.videoIndex", "Video") : t("botdee.sv.photoCount", "Photo");
       foot.textContent = `${kicker} ${mediaIndex + 1} / ${list.length}`;
     }
   }
@@ -456,8 +460,8 @@
         <p class="botdee-sv-foot" data-sv-media-foot></p>`);
       overlay.setAttribute("aria-labelledby", "botdeeSvMediaTitle");
       overlay.hidden = false;
-      session.mediaType = "photos";
-      session.mediaIndex = 0;
+      if (session.mediaType !== "videos") session.mediaType = "photos";
+      if (!Number.isFinite(Number(session.mediaIndex))) session.mediaIndex = 0;
       renderMediaFor(session, overlay);
       overlay.querySelector("[data-sv-close]")?.focus();
     } else if (kind === "summary") {
@@ -600,10 +604,12 @@
       const open = event.target.closest("[data-sv-open]");
       if (open && card.contains(open)) {
         const photosList = Array.isArray(people.media?.photos) ? people.media.photos : [];
+        const videosList = Array.isArray(people.media?.videos) ? people.media.videos : [];
+        const heroVideo = people.photo?.kind === "video" || (!photosList.length && videosList.length);
         rememberOverlaySession({
           people,
           card,
-          mediaType: photosList.length ? "photos" : "videos",
+          mediaType: heroVideo ? "videos" : "photos",
           mediaIndex: 0,
           chatState: captureChatState()
         });

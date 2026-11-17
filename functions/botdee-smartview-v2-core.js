@@ -90,38 +90,32 @@ function isVideoSlot(slot, index, url) {
 function publicPageMedia(profile = {}) {
   const photos = [];
   const videos = [];
+  const ordered = [];
   const seen = new Set();
   const alt = text(profile.displayName || profile.publicName || "", 120);
-  const push = (raw, video) => {
-    const url = sanitizeHref(raw);
-    if (!url || seen.has(url)) return;
-    seen.add(url);
-    const row = {url, alt};
-    if (video) videos.push(row);
-    else photos.push(row);
-  };
   const existing = Array.isArray(profile.profileMediaSlots) ? profile.profileMediaSlots : [];
   const fallback = profile.photoURL || profile.profilePhotoUrl || profile.publicPhotoUrl
     || profile.avatarUrl || profile.mainPhotoUrl || profile.photoUrl || "";
   for (let i = 0; i < 10; i += 1) {
-    const previous = existing[i] && typeof existing[i] === "object" ? existing[i] : {};
-    const url = previous.url || previous.mediaUrl || (i === 0 ? fallback : "");
-    if (!url) continue;
-    const typed = previous.type || (i < 8 ? "image" : "video");
-    push(url, isVideoSlot({...previous, type: typed}, i, url));
+    const previous = existing[i] || (i === 0 && fallback ? {url: fallback, type: "image"} : {});
+    const type = i < 8 ? "image" : "video";
+    const slot = {slot: i + 1, type, url: "", ...previous, type};
+    const url = sanitizeHref(slot.url || slot.mediaUrl);
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    const video = type === "video" || isVideoSlot(slot, i, url);
+    const row = {url, alt, kind: video ? "video" : "image"};
+    ordered.push(row);
+    if (video) videos.push(row);
+    else photos.push(row);
   }
-  const extras = []
-    .concat(Array.isArray(profile.publicPhotos) ? profile.publicPhotos : [])
-    .concat(Array.isArray(profile.galleryUrls) ? profile.galleryUrls : [])
-    .concat(Array.isArray(profile.publicGallery) ? profile.publicGallery : []);
-  extras.forEach(item => {
-    const url = typeof item === "string" ? item : (item?.url || item?.mediaUrl);
-    push(url, isVideoSlot(item, -1, url));
-  });
+  const hero = ordered[0] || null;
   return {
     photos,
     videos,
-    photoUrl: photos[0] ? photos[0].url : "",
+    ordered,
+    hero,
+    photoUrl: photos[0] ? photos[0].url : (hero && hero.kind === "image" ? hero.url : ""),
     photoCount: photos.length
   };
 }
@@ -187,6 +181,7 @@ function publicFieldsSnapshot(profile = {}, volunteered = null) {
     photoUrl: pageMedia.photoUrl,
     photos: pageMedia.photos,
     videos: pageMedia.videos,
+    hero: pageMedia.hero,
     verified: profile.identityVerified === 1 || profile.floqrVerified === 1,
     sourceLocale: normalizeLocale(profile.preferredLanguage || profile.uiLanguage || "en")
   };
@@ -198,6 +193,7 @@ function publicFieldsHash(snapshot) {
   delete copy.photos;
   delete copy.videos;
   delete copy.photoCount;
+  delete copy.hero;
   return sha256(JSON.stringify(copy));
 }
 
@@ -501,6 +497,22 @@ function usageFromGemini(response) {
   };
 }
 
+function peopleHeroPhoto(snap = {}) {
+  const photos = Array.isArray(snap.photos) ? snap.photos : [];
+  const videos = Array.isArray(snap.videos) ? snap.videos : [];
+  const hero = snap.hero && snap.hero.url
+    ? snap.hero
+    : (photos[0] || videos[0] || (snap.photoUrl ? {url: snap.photoUrl, kind: "image"} : null));
+  const count = Math.max(photos.length + videos.length, hero ? 1 : 0, Number(snap.photoCount) || 0);
+  if (!hero && !count) return null;
+  if (!hero) return {url: "", count, kind: "image"};
+  return {
+    url: hero.url,
+    count,
+    kind: hero.kind === "video" ? "video" : "image"
+  };
+}
+
 function peopleV2Payload({
   subjectUid,
   snap,
@@ -545,9 +557,7 @@ function peopleV2Payload({
     verified: snap.verified === true,
     city: snap.city || "",
     handles,
-    photo: (Array.isArray(snap.photos) && snap.photos[0]?.url)
-      ? {url: snap.photos[0].url, count: Math.max(1, snap.photos.length)}
-      : (snap.photoUrl ? {url: snap.photoUrl, count: Math.max(1, snap.photoCount || 1)} : (snap.photoCount ? {url: "", count: snap.photoCount} : null)),
+    photo: peopleHeroPhoto(snap),
     media: {
       photos: Array.isArray(snap.photos) && snap.photos.length
         ? snap.photos.map(item => ({url: item.url, alt: item.alt || snap.displayName || ""}))
@@ -725,6 +735,7 @@ module.exports = {
   localeSummary,
   diagnosticEvent,
   usageFromGemini,
+  peopleHeroPhoto,
   peopleV2Payload,
   tagsFor,
   noteFor,
