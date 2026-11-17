@@ -267,6 +267,59 @@ test("session reset hides pre-reset events without deleting them", () => {
     retrievalFromSeq: 0
   });
   assert.ok(idleStillRecalls.some(row => /Mykonos/.test(row.text)));
+  const clipped = bot.clipStoredTurns([{
+    role: "user",
+    text: "Nammos tonight?",
+    seq: 5,
+    atMs: NEXT_DAY
+  }]);
+  assert.equal(clipped[0].seq, 5);
+  assert.equal(clipped[0].atMs, NEXT_DAY);
+  const eventMiss = threads.assembleRetrievalTurns({
+    docTurns: [{role: "user", text: "Nammos tonight?", seq: 5, atMs: NEXT_DAY}],
+    events: [],
+    archiveTurns: [],
+    idleEnded: false,
+    archiveConsent: false,
+    sessionReset: false,
+    retrievalFromSeq: 5
+  });
+  assert.equal(eventMiss.length, 1);
+  assert.match(eventMiss[0].text, /Nammos tonight/);
+  const strippedLive = threads.assembleRetrievalTurns({
+    docTurns: [{role: "user", text: "Nammos tonight?"}],
+    events: [],
+    archiveTurns: [],
+    idleEnded: false,
+    archiveConsent: false,
+    sessionReset: false,
+    retrievalFromSeq: 5
+  });
+  assert.equal(strippedLive.length, 1, "post-reset live doc turns stay when seq was stripped");
+  const archiveWithSeq = threads.assembleRetrievalTurns({
+    docTurns: [],
+    events: [],
+    archiveTurns: [
+      {role: "user", text: "old Mykonos", seq: 3},
+      {role: "user", text: "Nammos tonight?", seq: 5}
+    ],
+    idleEnded: true,
+    archiveConsent: true,
+    sessionReset: false,
+    retrievalFromSeq: 5
+  });
+  assert.equal(archiveWithSeq.length, 1);
+  assert.match(archiveWithSeq[0].text, /Nammos tonight/);
+  const archiveNoSeq = threads.assembleRetrievalTurns({
+    docTurns: [],
+    events: [],
+    archiveTurns: [{role: "user", text: "old Mykonos"}],
+    idleEnded: true,
+    archiveConsent: true,
+    sessionReset: false,
+    retrievalFromSeq: 5
+  });
+  assert.deepEqual(archiveNoSeq, []);
   const saveSrc = read("functions/bot-dee-thread.js");
   const saveStart = saveSrc.indexOf("async function savePersonalization");
   const saveEnd = saveSrc.indexOf("async function loadSettings");

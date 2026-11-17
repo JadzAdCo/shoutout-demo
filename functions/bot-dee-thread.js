@@ -316,14 +316,23 @@ function assembleRetrievalTurns({
   const minSeq = Math.max(0, Math.floor(Number(retrievalFromSeq) || 0));
   const fromEvents = eventsToTurns(events, 12, minSeq);
   if (fromEvents.length) return fromEvents.map(row => ({role: row.role, text: row.text}));
-  const fromDoc = bot.clipStoredTurns(docTurns).filter(row => minSeq === 0 || (Number(row?.seq) || 0) >= minSeq);
+  const fromDoc = bot.clipStoredTurns(docTurns).filter(row => passesRetrievalCursor(row, minSeq, true));
   if (fromDoc.length) return fromDoc.map(row => ({role: row.role, text: row.text}));
   if (idleEnded && archiveConsent && Array.isArray(archiveTurns) && archiveTurns.length) {
     return bot.clipStoredTurns(archiveTurns)
-      .filter(row => minSeq === 0 || (Number(row?.seq) || 0) >= minSeq)
+      .filter(row => passesRetrievalCursor(row, minSeq, false))
       .map(row => ({role: row.role, text: row.text}));
   }
   return [];
+}
+
+/** Live doc turns after overlay skip are post-reset even if seq was stripped historically.
+ *  Archive without seq stays hidden once retrievalFromSeq is set. */
+function passesRetrievalCursor(row, minSeq, allowMissingSeq) {
+  if (!minSeq) return true;
+  const seq = Math.max(0, Math.floor(Number(row?.seq) || 0));
+  if (seq) return seq >= minSeq;
+  return !!allowMissingSeq;
 }
 
 async function loadEventHistory(uid, limit) {
@@ -358,7 +367,18 @@ async function loadArchiveHistory(uid, limit) {
   return snap.docs
     .map(doc => doc.data())
     .sort((a, b) => (Number(a.seq) || 0) - (Number(b.seq) || 0))
-    .map(row => ({role: row.role === "model" ? "model" : "user", text: String(row.sanitizedContent || row.text || "")}));
+    .map(row => {
+      const item = {
+        role: row.role === "model" ? "model" : "user",
+        text: String(row.sanitizedContent || row.text || "")
+      };
+      const seq = Math.max(0, Math.floor(Number(row.seq) || 0));
+      if (seq) item.seq = seq;
+      const atMs = Number(row.atMs) || 0;
+      if (atMs) item.atMs = atMs;
+      return item;
+    })
+    .filter(row => row.text);
 }
 
 async function loadAuthorizedMemories(uid, consent, nowMs) {

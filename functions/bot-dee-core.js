@@ -625,6 +625,10 @@ function clipStoredTurns(turns) {
     const text = clipStoredText(row?.text || row?.content || "", max);
     if (!role || !text) return;
     const item = {role, text};
+    const seq = Math.max(0, Math.floor(Number(row?.seq) || 0));
+    if (seq) item.seq = seq;
+    const atMs = Number(row?.atMs) || 0;
+    if (atMs) item.atMs = atMs;
     if (role === "model") {
       const media = clipStoredMedia(row.media);
       if (media.length) item.media = media;
