@@ -105,7 +105,8 @@ test("client renderer + CSS inherit Site Chrome; no Operational; People contract
   assert.doesNotMatch(css, /#00e3db/);
   assert.doesNotMatch(css, /#00ba75/);
   assert.match(chat, /isVersionSmartViewAlias|ensureVersionSmartViews/);
-  assert.doesNotMatch(js, /usercharacter_analysis/);
+  assert.match(js, /usercharacter_analysis/);
+  assert.match(js, /function renderCompactPeopleCard\(/);
   assert.doesNotMatch(read("functions/botdee-version-smartview.js"), /usercharacter_analysis/);
   assert.match(read("functions/botdee-smartview-v2-core.js"), /function publicPageMedia\(/);
 });

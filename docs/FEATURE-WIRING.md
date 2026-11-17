@@ -809,7 +809,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Security | Same `assertFeatureAccess(botDee)` as chat. Privileged block is omitted unless `resolveViewerRole` is `master`. Client cannot mint Master diagnostics. |
 | Observability | Manual Feature Test `s3-3-032-version-smartview`. |
 | Help | `help-botdee-version-smartview`, `help-botdee-version-smartview-status`, `help-botdee-version-smartview-tabs`. BOT DEE intent `help-botdee-version-smartview`. |
-| Deploy | **Do not merge or deploy until Don asks.** Pages + Functions both needed for backend stamp + README changelog on durable threads. |
+| Deploy | Pages + Functions both needed for live package stamp and What's New (bundled changelog). |
 
 ---
 
