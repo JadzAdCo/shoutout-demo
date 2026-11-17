@@ -93,7 +93,7 @@ test("usercharacter_analysis schema, source-version matching, owner edit, stale 
   });
   assert.equal(jobs.length, 10);
   assert.ok(jobs.every(job => job.locale !== "en"));
-  assert.ok(jobs.every(job => job.id === v2.translationJobId("u1", 2, job.locale)));
+  assert.ok(jobs.every(job => job.id === v2.translationJobId("u1", 2, job.locale, saved.sourceHash)));
   const stale = v2.applyTranslationResult(saved, {...jobs[0], revision: 1, sourceHash: "old"}, {
     text: "stale french",
     engine: "gemini"
@@ -221,12 +221,35 @@ test("translation job retries process on write, not only on create", () => {
   assert.equal(v2.shouldProcessTranslationWrite(queued, retried), true);
   assert.equal(v2.shouldProcessTranslationWrite(retried, {status: "done", attempts: retried.attempts}), false);
   assert.equal(v2.shouldProcessTranslationWrite({status: "failed", attempts: 1}, queued), true);
+  const regenerated = {...queued, sourceHash: "newhash", generation: "newhash", attempts: 0};
+  assert.equal(v2.shouldProcessTranslationWrite({...queued, sourceHash: "oldhash", generation: "oldhash"}, regenerated), true);
   const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
   assert.match(src, /onDocumentWritten\(\{\s*document: `\$\{v2\.JOBS_COLLECTION\}/);
   const runFn = src.slice(src.indexOf("async function runTranslationJob"), src.indexOf("exports.processSmartViewTranslationJob"));
   assert.doesNotMatch(runFn, /persistAnalysis\(/);
   assert.match(runFn, /persistTranslationLocale\(/);
   assert.match(src, /shouldProcessTranslationWrite/);
+});
+
+test("regenerated Gemini jobs get a new id and process even when attempts stay 0", () => {
+  const first = v2.enqueueTranslationJobs({
+    uid: "u1", revision: 1, sourceHash: "aaa111", sourceLocale: "en", now: 1
+  });
+  const second = v2.enqueueTranslationJobs({
+    uid: "u1", revision: 1, sourceHash: "bbb222", sourceLocale: "en", now: 2
+  });
+  const fr1 = first.find(j => j.locale === "fr");
+  const fr2 = second.find(j => j.locale === "fr");
+  assert.notEqual(fr1.id, fr2.id);
+  assert.match(fr1.id, /aaa111|aaa1/);
+  assert.equal(fr1.id, v2.translationJobId("u1", 1, "fr", "aaa111"));
+  assert.equal(fr2.id, v2.translationJobId("u1", 1, "fr", "bbb222"));
+  assert.equal(v2.shouldProcessTranslationWrite(fr1, fr2), true);
+  assert.equal(v2.jobStillMatchesGeneration(fr2, fr1), false);
+  assert.equal(v2.jobStillMatchesGeneration(fr1, fr1), true);
+  assert.equal(v2.shouldProcessTranslationWrite(fr1, {...fr1}), false);
+  const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
+  assert.match(src, /cancelJobIfStillThisGeneration/);
 });
 
 test("peopleV2 paints live public fields; hidden and dating-off tags do not stick", () => {

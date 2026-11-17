@@ -200,6 +200,15 @@ async function persistTranslationLocale(uid, job, payload) {
   });
 }
 
+async function cancelJobIfStillThisGeneration(job) {
+  const ref = jobRef(job.id);
+  const snap = await ref.get();
+  const live = snap.exists ? snap.data() : null;
+  if (!v2.jobStillMatchesGeneration(live, job)) return false;
+  await ref.set({status: "cancelled_stale", updatedAtMs: Date.now()}, {merge: true});
+  return true;
+}
+
 async function draftAnalysis(uid, snap, existing) {
   const now = Date.now();
   let doc = v2.emptyAnalysis(uid, snap, now);
@@ -368,7 +377,7 @@ async function runTranslationJob(job) {
   }
   const doc = analysisSnap.data();
   if (Number(job.revision) !== Number(doc.revision) || String(job.sourceHash) !== String(doc.sourceHash)) {
-    await jobRef(job.id).set({status: "cancelled_stale", updatedAtMs: Date.now()}, {merge: true});
+    await cancelJobIfStillThisGeneration(job);
     return {ok: false, reason: "stale_revision"};
   }
   const generated = await generateWithGemini(
@@ -384,9 +393,13 @@ async function runTranslationJob(job) {
         status: "failed",
         error: "translator_unconfigured"
       });
+      if (!applied.applied && applied.reason === "stale_revision") {
+        await cancelJobIfStillThisGeneration(job);
+        return {ok: false, reason: applied.reason};
+      }
       await jobRef(job.id).set({
-        status: applied.applied ? "failed" : (applied.reason === "stale_revision" ? "cancelled_stale" : "failed"),
-        error: applied.reason === "stale_revision" ? "stale_revision" : "translator_unconfigured",
+        status: "failed",
+        error: "translator_unconfigured",
         updatedAtMs: Date.now()
       }, {merge: true});
       return {ok: false, reason: applied.applied ? "unconfigured" : applied.reason};
@@ -400,7 +413,7 @@ async function runTranslationJob(job) {
         engine: "gemini"
       });
       if (!applied.applied && applied.reason === "stale_revision") {
-        await jobRef(job.id).set({status: "cancelled_stale", updatedAtMs: Date.now()}, {merge: true});
+        await cancelJobIfStillThisGeneration(job);
       }
     }
     return {ok: false, reason: next.status};
@@ -412,7 +425,7 @@ async function runTranslationJob(job) {
     usage: generated.usage
   });
   if (!applied.applied) {
-    await jobRef(job.id).set({status: "cancelled_stale", updatedAtMs: Date.now()}, {merge: true});
+    await cancelJobIfStillThisGeneration(job);
     return {ok: false, reason: applied.reason};
   }
   await jobRef(job.id).set({
