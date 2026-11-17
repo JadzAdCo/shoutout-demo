@@ -222,7 +222,7 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.031",
-      title: "s3.3.031 — SMARTsummary locale source + SMARTview public-page media",
+      title: "s3.3.031 — SMARTsummary locale source + SMARTview public-page media + People SMARTcard v6",
       checks: [
         {label:"Source locale is uiLanguage", file:"functions/botdee-smartview-v2-core.js", includes:["profile.uiLanguage || profile.preferredLanguage", "stampSourceTranslation", "fanOutLocales"]},
         {label:"Gemini writes in source language", file:"functions/botdee-smartview-v2-core.js", includes:["FLOQR SMARTsummary in ${language}", "Do not write English unless the source language is English"]},
@@ -235,7 +235,13 @@
         {label:"Overlay plays videos", file:"botdee-smartview.js", includes:["<video src=", "overlayMediaList", "botdee.sv.videoIndex"]},
         {label:"Help public Profile Media", file:"botdee-help-repository.js", includes:["same hero as your FLOQR public profile", "8 photos + 2 videos"]},
         {label:"Manual test locale", file:"ai-diagnostics-service.js", includes:["s3-3-031-smartsummary-locale-source"]},
-        {label:"Manual test media", file:"ai-diagnostics-service.js", includes:["s3-3-031-smartview-public-media"]}
+        {label:"Manual test media", file:"ai-diagnostics-service.js", includes:["s3-3-031-smartview-public-media"]},
+        {label:"Compact card renderer", file:"botdee-smartview.js", includes:["renderCompactPeopleCard", "peopleSmartCard", "usercharacter_analysis"]},
+        {label:"Site Chrome tokens on compact cards", file:"botdee-smartview.css", includes:[".botdee-sc-card", "var(--accent", "-webkit-line-clamp: 4"], notIncludes:["#20d9d8"]},
+        {label:"Search callable", file:"functions/index.js", includes:["searchPeopleSmartCards"]},
+        {label:"Chat attach", file:"functions/bot-dee-functions.js", includes:["attachPeopleSearch", "people-smartcard"]},
+        {label:"Help", file:"botdee-help-repository.js", includes:["help-botdee-smartcard", "help-botdee-smartcard-search", "help-botdee-smartcard-sync"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-032-people-smartcard-v6"]}
       ]
     },
     {
@@ -249,7 +255,8 @@
         {label:"Patron SMARTview not mocks", file:"patron-portal.html", includes:["botdee.sv.viewMine", "botdee-sv-bubble"], notIncludes:["Show mock SmartViews"]},
         {label:"loadMySmartView", file:"botdee-upgrade-ui.js", includes:["function loadMySmartView(", "getPeopleSmartView"], notIncludes:["loadDemos(\"botDeeSmartViewDemo\")"]},
         {label:"Master mock tab", file:"master-admin.html", includes:["botDeeMasterLoadSmartViews", "botdee.libraryRefresh"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-030-profile-select-text", "s3-3-030-patron-smartview"]}
+        {label:"People SMARTcard compact", file:"botdee-smartview.js", includes:["renderCompactPeopleCard", "peopleSmartCard", "userBlocks", "__floqrLiveToken"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-030-profile-select-text", "s3-3-030-patron-smartview", "s3-3-032-people-smartcard-v6"]}
       ]
     },
     {
@@ -3335,6 +3342,15 @@
       howToTest:"1) Hard-refresh Profile & Settings after Pages publish — confirm the page loads admin.css?v=s3.3.029 (not s3.3.028). Sign in. 2) Feature & Orders → My BOT DEE. 3) On iPhone: three 22px radios with Socially Cool / Professional / Balanced left-to-right on their own rows. Recap checkbox is a sentence, not a letter column. 4) On PC (~1280): same three options as chips, not giant circles. 5) First-use overlay on botdee.html uses the same 22px radios. 6) Mark Succeed/Failed.",
       expected:"Name field, then three readable demeanor choices, then recap checkbox. No letter-column Socially Cool on the right edge. Asset stamp is s3.3.029.",
       troubleshoot:"Still vertical letters or giant radios → iPhone still has admin.css?v=s3.3.028; hard-refresh until the HTML link is s3.3.029. Overlay still broken → cached bot-dee-chat.css on botdee.html. Native iOS radio still showing → appearance:none missing from admin.css."
+    },
+    {
+      id:"s3-3-032-people-smartcard-v6",
+      area:"BOT DEE",
+      feature:"People SMARTcard v6 (search routing + live SMARTsummary)",
+      changed:"s3.3.032 — Who am I? opens your SmartView. Who is <name> with one public match opens their SmartView. Several matches show compact SMARTcards (photo left, 4-line SMARTsummary right). Private / blocked / unpublished never listed. Cards and SmartView share one analysis record; owner edits update open cards. Site Chrome follows the viewer. Functions/Pages pending Don.",
+      howToTest:"1) Hard-refresh botdee.html after Pages publish (do not test live until Don approves). Sign in with botDee access. 2) Ask Who am I? — your SmartView appears in the chat (not a compact card). 3) Ask Who is <a unique public name> — one SmartView. 4) Ask a name that hits several public profiles — compact cards; tap one to open SmartView. 5) Ask Do you know this person? — generic no-result, no names. 6) Switch Site Chrome through Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green — cards restyle, chat draft stays. 7) Owner edits SMARTsummary on My BOT DEE — open cards update without a Gemini call on view. 8) Hide public profile or block the viewer — that card disappears. 9) Mark Succeed/Failed.",
+      expected:"Self and one-match open full SmartView. Many matches show compact cards that inherit Site Chrome. No leak of private/blocked accounts. SMARTsummary stays in sync. No Gemini when only viewing a card.",
+      troubleshoot:"Still prose-only answers → Functions executeBotSession / searchPeopleSmartCards not deployed, or cached bot-dee-chat.js. Compact cards look like Black Tiffany on every theme → cached botdee-smartview.css. Cards do not update after edit → publicWithinFloqr not stamped (Functions persistAnalysis) or Firestore rules not deployed. Private names appear → getPeopleSmartView still returning a stub; hard-refresh after this SHA."
     },
     {
       id:"s3-3-028-people-smartview-v2",

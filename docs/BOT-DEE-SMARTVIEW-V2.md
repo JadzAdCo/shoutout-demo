@@ -2,6 +2,8 @@
 
 Status: **implemented on this branch**. Pages + Functions **not deployed** until Don approves. Do not merge without Don.
 
+People **SMARTcard v6** sits on the same analysis record: compact chat cards for multi-match people search, live listeners, `publicWithinFloqr`, no Gemini on view. See `docs/FEATURE-WIRING.md` People SMARTcard v6.
+
 Black Tiffany pack is illustration only. Production inherits the viewing patron’s Site Chrome. Chat shell and recall are unchanged. No live Places/Yelp.
 
 ## Implemented

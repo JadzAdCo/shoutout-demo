@@ -12,6 +12,7 @@ const v2 = require("./botdee-smartview-v2-core");
 const smart = require("./botdee-smartview-core");
 const tools = require("./bot-dee-tools");
 const people = require("./people-directory-core");
+const cards = require("./botdee-smartcard-core");
 const geminiAccessLog = require("./gemini-api-access-log");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 
@@ -185,10 +186,10 @@ async function generateWithGemini(prompt, {uid, operation}) {
   }
 }
 
-async function persistAnalysis(uid, doc, jobs) {
+async function persistAnalysis(uid, doc, jobs, {isPublicProfile} = {}) {
   // Full-doc replace is a NEW source revision only (Gemini draft / owner save).
   // Fan-out must never call this — persistTranslationLocale uses translations.{locale}.
-  const stamped = v2.stampSourceTranslation(doc);
+  const stamped = cards.stampDiscoverable(v2.stampSourceTranslation(doc), isPublicProfile === true);
   await analysisRef(uid).set({
     ...stamped,
     updatedAt: FieldValue.serverTimestamp()
@@ -259,19 +260,17 @@ exports.getPeopleSmartView = onCall(CALL_OPTS, async request => {
     if (!subjectUid) throw new HttpsError("invalid-argument", "subjectUid required.");
     const blocked = await isBlocked(viewerUid, subjectUid);
     if (blocked) {
-      return {ok: true, blocked: true, views: []};
+      return {ok: true, blocked: true, views: [], geminiOnView: false};
     }
     const snapUser = await db.collection("users").doc(subjectUid).get();
-    if (!snapUser.exists) throw new HttpsError("not-found", "Profile not found.");
+    if (!snapUser.exists) {
+      return {ok: true, views: [], hidden: true, geminiOnView: false};
+    }
     const data = snapUser.data() || {};
     const isOwner = viewerUid === subjectUid;
     const viewerMaySee = isOwner || people.isPublic(data);
     if (!viewerMaySee) {
-      return {ok: true, views: [smart.patronSmartView({
-        displayName: data.displayName,
-        volunteered: tools.volunteeredPublicDatapoints(data),
-        viewerMaySee: false
-      })]};
+      return {ok: true, views: [], hidden: true, geminiOnView: false};
     }
     const volunteered = tools.volunteeredPublicDatapoints(data);
     volunteered.uid = subjectUid;
@@ -348,8 +347,9 @@ exports.saveSmartSummary = onCall(CALL_OPTS, async request => {
         editorUid: uid,
         now
       });
-      tx.set(ref, {...saved, updatedAt: FieldValue.serverTimestamp()});
-      return saved;
+      const stamped = cards.stampDiscoverable(saved, people.isPublic(data));
+      tx.set(ref, {...stamped, updatedAt: FieldValue.serverTimestamp()});
+      return stamped;
     });
     const jobs = v2.enqueueTranslationJobs({
       uid,
@@ -398,7 +398,7 @@ exports.queuePeopleSmartViewAnalysis = onCall(CALL_OPTS, async request => {
       return {ok: true, conflict: true, revision: existing.revision};
     }
     const drafted = await draftAnalysis(uid, snap, existing);
-    await persistAnalysis(uid, drafted.doc, drafted.jobs);
+    await persistAnalysis(uid, drafted.doc, drafted.jobs, {isPublicProfile: people.isPublic(data)});
     return {ok: true, revision: drafted.doc.revision, queued: (drafted.jobs || []).length};
   } catch (error) {
     throw asHttps(error);
@@ -509,15 +509,25 @@ exports.onUserProfileSmartViewWrite = onDocumentWritten({
   const snap = snapshotFromUser(data, volunteered);
   const existingSnap = await analysisRef(uid).get();
   const existing = existingSnap.exists ? existingSnap.data() : null;
+  const published = people.isPublic(data);
   if (!existing) {
     const drafted = await draftAnalysis(uid, snap, null);
-    await persistAnalysis(uid, drafted.doc, drafted.jobs);
+    await persistAnalysis(uid, drafted.doc, drafted.jobs, {isPublicProfile: published});
     return;
+  }
+  const nextFlag = published ? 1 : 0;
+  if (Number(existing.publicWithinFloqr) !== nextFlag) {
+    await analysisRef(uid).set({
+      publicWithinFloqr: nextFlag,
+      updatedAtMs: Date.now(),
+      updatedAt: FieldValue.serverTimestamp()
+    }, {merge: true});
   }
   if (v2.shouldFlagConflict(existing, snap)) {
     await analysisRef(uid).set({
       conflictFlag: true,
       publicFieldsHash: v2.publicFieldsHash(snap),
+      publicWithinFloqr: nextFlag,
       updatedAtMs: Date.now(),
       updatedAt: FieldValue.serverTimestamp()
     }, {merge: true});
@@ -525,7 +535,7 @@ exports.onUserProfileSmartViewWrite = onDocumentWritten({
   }
   if (v2.shouldRegenerate(existing, snap)) {
     const drafted = await draftAnalysis(uid, snap, existing);
-    await persistAnalysis(uid, drafted.doc, drafted.jobs);
+    await persistAnalysis(uid, drafted.doc, drafted.jobs, {isPublicProfile: published});
   }
 });
 

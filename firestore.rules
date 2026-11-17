@@ -23,6 +23,7 @@ rules_version = '2';
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
+// - s3.3.032: usercharacter_analysis signed-in read when publicWithinFloqr==1 and the pair is not blocked (People SMARTcard live listen)
 // - s3.3.021: botDeeThreads.hasUsedBotDee 0|1 is Functions-write (owner read on the thread doc; clients cannot set it)
 // - s3.3.020: BOT DEE upgrade collections (archive/memories/research/executions/legal gates/feedback/manifest)
 // - s3.3.006: botDeeThreads/{uid} + events owner-read, Functions-write (durable BOT DEE resume)
@@ -820,9 +821,26 @@ service cloud.firestore {
  allow write: if false;
  }
 
- // People SmartView v2 — Functions-write. Owner may read own analysis (translations + source).
+ // People SmartView v2 / SMARTcard v6 — Functions-write.
+ // Owner reads own analysis. Signed-in viewers may listen when publicWithinFloqr==1
+ // and the pair is not blocked (same sorted pair id as floqr-blocks.js).
+ function pairBlockId(a, b) {
+ return a < b ? a + "_" + b : b + "_" + a;
+ }
+ function pairIsBlocked(otherUid) {
+ let id = pairBlockId(request.auth.uid, otherUid);
+ return exists(/databases/$(database)/documents/userBlocks/$(id))
+ && get(/databases/$(database)/documents/userBlocks/$(id)).data.active != false;
+ }
  match /usercharacter_analysis/{uid} {
- allow read: if signedIn() && request.auth.uid == uid;
+ allow read: if signedIn() && (
+ request.auth.uid == uid
+ || isMasterAdmin()
+ || (
+ resource.data.publicWithinFloqr == 1
+ && !pairIsBlocked(uid)
+ )
+ );
  allow write: if false;
  }
  match /smartViewTranslationJobs/{jobId} {

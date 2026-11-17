@@ -216,6 +216,48 @@
     return "";
   }
 
+  function isCompactCard(payload) {
+    const people = peopleOf(payload);
+    return !!(people && people.presentation === "peopleSmartCard");
+  }
+
+  function subjectUidOf(payload) {
+    return peopleOf(payload)?.subjectUid || "";
+  }
+
+  function renderCompactPeopleCard(payload) {
+    const people = peopleOf(payload);
+    if (!people) return "";
+    const photo = people.photo && people.photo.url ? resolveImageSrc(people.photo.url) : "";
+    const handles = Array.isArray(people.handles) ? people.handles : [];
+    const summaryText = people.summary?.excerpt || people.summary?.text || "";
+    const localeNote = statusLabel(people.summary);
+    const name = people.displayName || payload.title || "";
+    const uid = people.subjectUid || "";
+    const photoAlt = photo
+      ? (name || t("botdee.sc.photoAlt", "Public profile photo"))
+      : t("botdee.sc.photoAlt", "Public profile photo");
+    return `<article class="botdee-sv-people botdee-sc-card" data-kind="patron" data-presentation="peopleSmartCard" data-subject-uid="${esc(uid)}" role="button" tabindex="0" aria-label="${esc(t("botdee.sc.openSMARTview", "Open SMARTview"))}">
+      <div class="botdee-sc-row">
+        <div class="botdee-sc-thumb" aria-hidden="${photo ? "false" : "true"}">
+          ${photo ? `<img src="${esc(photo)}" alt="${esc(photoAlt)}"/>` : `<span class="botdee-sc-thumb-empty" aria-hidden="true"></span>`}
+        </div>
+        <div class="botdee-sc-body">
+          <div class="botdee-sc-name">${esc(name)}${people.verified ? " <span class=\"botdee-sv-tick\" aria-hidden=\"true\">◆</span>" : ""}</div>
+          <div class="botdee-sv-handles">${handles.map(row => {
+            const href = resolveSameOriginHref(row.href || "");
+            const label = row.handle || "";
+            if (!label) return "";
+            if (!href) return `<span>${esc(label)}</span>`;
+            return `<a href="${esc(href)}" rel="noopener noreferrer" target="_blank">${esc(label)}</a>`;
+          }).join("")}${people.city ? `<span>${esc(people.city)}</span>` : ""}</div>
+          <p class="botdee-sc-summary">${esc(summaryText || t("botdee.sc.summaryPending", "No SMARTsummary is published yet."))}</p>
+          ${localeNote ? `<span class="botdee-sv-locale">${localeNote}</span>` : ""}
+        </div>
+      </div>
+    </article>`;
+  }
+
   function renderPeopleCard(payload) {
     const people = peopleOf(payload);
     if (!people) return "";
@@ -240,7 +282,8 @@
     const minglHref = resolveSameOriginHref(people.minglHref || "./?start=search");
     const summaryText = people.summary?.text || "";
     const localeNote = statusLabel(people.summary);
-    return `<article class="botdee-sv-people" data-kind="patron" data-primary="${esc(primary)}" data-secondary="${esc(secondary)}">
+    const uid = people.subjectUid || "";
+    return `<article class="botdee-sv-people" data-kind="patron" data-primary="${esc(primary)}" data-secondary="${esc(secondary)}" data-subject-uid="${esc(uid)}">
       <div class="botdee-sv-people-head">
         <strong>${esc(t("botdee.sv.person", "SMARTview — Person"))}</strong>
         ${people.verified ? `<span class="botdee-sv-verified">${esc(t("botdee.sv.verified", "Verified on FLOQR"))}</span>` : ""}
@@ -285,6 +328,7 @@
 
   function renderCard(payload) {
     if (!payload || typeof payload !== "object") return "";
+    if (isCompactCard(payload)) return renderCompactPeopleCard(payload);
     if (peopleOf(payload)) return renderPeopleCard(payload);
     const mock = payload.sources && payload.sources.some(s => s.provider === "mock" || s.reuseRights === "unknown");
     const researchOff = payload.publicWebResearch && payload.publicWebResearch.enabled === false;
@@ -634,10 +678,203 @@
     });
   }
 
-  function mount(el, views) {
+  const liveByHost = new WeakMap();
+
+  function stopLive(el) {
+    el.__floqrLiveToken = (Number(el.__floqrLiveToken) || 0) + 1;
+    const rows = liveByHost.get(el) || [];
+    rows.forEach(fn => {
+      try { fn(); } catch (_) { /* ignore */ }
+    });
+    liveByHost.set(el, []);
+  }
+
+  function functionsCallable(name) {
+    try {
+      return global.firebase?.app?.()?.functions?.("us-central1")?.httpsCallable?.(name) || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function viewerLanguage() {
+    return global.FLOQRI18n?.getLanguage?.() || global.FLOQRI18n?.language || "en";
+  }
+
+  function applyHostViews(el, nextViews, meta) {
+    const list = Array.isArray(nextViews) ? nextViews : [];
+    el.__floqrSmartViews = list;
+    mount(el, list, meta);
+  }
+
+  function patchHostView(el, uid, nextPayload) {
+    const current = Array.isArray(el.__floqrSmartViews) ? el.__floqrSmartViews.slice() : [];
+    const idx = current.findIndex(row => subjectUidOf(row) === uid);
+    if (!nextPayload) {
+      if (idx < 0) return;
+      current.splice(idx, 1);
+      el.__floqrSmartViews = current;
+      const gone = el.querySelector(`[data-subject-uid="${cssAttr(uid)}"]`);
+      if (gone) gone.remove();
+      return;
+    }
+    if (idx < 0) return;
+    current[idx] = nextPayload;
+    el.__floqrSmartViews = current;
+    const html = renderCard(nextPayload);
+    const wrap = el.ownerDocument.createElement("div");
+    wrap.innerHTML = html;
+    const nextCard = wrap.firstElementChild;
+    if (!nextCard) return;
+    const existing = el.querySelector(`[data-subject-uid="${cssAttr(uid)}"]`);
+    if (existing) existing.replaceWith(nextCard);
+    wireActionLinks(el);
+    if (isCompactCard(nextPayload)) bindCompactCard(nextCard, nextPayload, el);
+    else bindPeopleCard(nextCard, nextPayload);
+  }
+
+  function cssAttr(value) {
+    return String(value || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  }
+
+  function refetchSubject(uid) {
+    const callable = functionsCallable("getPeopleSmartView");
+    if (!callable || !uid) return Promise.resolve(null);
+    return callable({subjectUid: uid, uiLanguage: viewerLanguage()}).then(res => {
+      const data = res?.data || {};
+      if (data.blocked || data.hidden || !Array.isArray(data.views) || !data.views.length) return null;
+      return data.views[0];
+    }).catch(() => null);
+  }
+
+  function pairBlockDocId(a, b) {
+    return [String(a || ""), String(b || "")].filter(Boolean).sort().join("_");
+  }
+
+  function currentViewerUid() {
+    try {
+      return global.firebase?.auth?.()?.currentUser?.uid || "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function listenSubject(el, uid) {
+    const db = global.firebase?.firestore?.();
+    if (!db || !uid || /^mock[-_]/i.test(uid)) return () => {};
+    const token = el.__floqrLiveToken;
+    const applyRefetch = () => {
+      refetchSubject(uid).then(view => {
+        if (!el.isConnected || el.__floqrLiveToken !== token) return;
+        const current = Array.isArray(el.__floqrSmartViews) ? el.__floqrSmartViews : [];
+        const idx = current.findIndex(row => subjectUidOf(row) === uid);
+        if (idx < 0) return;
+        if (!view) {
+          patchHostView(el, uid, null);
+          return;
+        }
+        const keepCompact = isCompactCard(current[idx]);
+        patchHostView(el, uid, keepCompact ? asClientCompact(view) : view);
+      });
+    };
+    const unsubs = [];
+    let sawReadable = false;
+    unsubs.push(db.collection("usercharacter_analysis").doc(uid).onSnapshot(() => {
+      sawReadable = true;
+      applyRefetch();
+    }, () => {
+      /* Initial deny (unstamped / mock) keeps the search-authorized card.
+         After a successful listen, hide makes the listener error — refetch.
+         Missing analysis is readable for the owner; getPeopleSmartView decides. */
+      if (!sawReadable) return;
+      applyRefetch();
+    }));
+    const viewerUid = currentViewerUid();
+    if (viewerUid && viewerUid !== uid) {
+      unsubs.push(db.collection("userBlocks").doc(pairBlockDocId(viewerUid, uid)).onSnapshot(snap => {
+        if (!el.isConnected || el.__floqrLiveToken !== token) return;
+        if (snap.exists && snap.data()?.active !== false) patchHostView(el, uid, null);
+      }, () => {}));
+    }
+    return () => {
+      unsubs.forEach(fn => {
+        try { fn(); } catch (_) { /* ignore */ }
+      });
+    };
+  }
+
+  function asClientCompact(view) {
+    const people = peopleOf(view);
+    if (!people) return view;
+    return {
+      ...view,
+      floqrPublicData: {
+        ...view.floqrPublicData,
+        peopleV2: {
+          ...people,
+          presentation: "peopleSmartCard",
+          summary: {
+            ...(people.summary || {}),
+            excerpt: people.summary?.text || "",
+            clampLines: 4
+          }
+        }
+      }
+    };
+  }
+
+  function bindCompactCard(card, payload, host) {
+    if (!card || !payload) return;
+    const open = () => {
+      const uid = subjectUidOf(payload);
+      if (!uid) return;
+      refetchSubject(uid).then(view => {
+        if (!view || !host.isConnected) return;
+        applyHostViews(host, [view], {mode: "one"});
+      });
+    };
+    card.addEventListener("click", event => {
+      if (event.target.closest("a")) return;
+      event.preventDefault();
+      open();
+    });
+    card.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      open();
+    });
+  }
+
+  function bindMore(el, meta) {
+    if (!meta || !meta.hasMore) return;
+    const btn = el.querySelector("[data-sc-more]");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      const callable = functionsCallable("searchPeopleSmartCards");
+      if (!callable || !meta.query) return;
+      btn.disabled = true;
+      callable({query: meta.query, page: (Number(meta.page) || 1) + 1, uiLanguage: viewerLanguage()}).then(res => {
+        const data = res?.data || {};
+        const extra = Array.isArray(data.views) ? data.views : [];
+        const nextMeta = {...meta, ...(data.peopleSearch || {}), query: meta.query};
+        applyHostViews(el, (el.__floqrSmartViews || []).concat(extra), nextMeta);
+      }).catch(() => {
+        btn.disabled = false;
+      });
+    });
+  }
+
+  function mount(el, views, peopleSearch) {
     if (!el) return;
+    stopLive(el);
     const list = Array.isArray(views) ? views : [];
-    el.innerHTML = list.map(renderCard).join("") || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SMARTviews yet."))}</p>`;
+    el.__floqrSmartViews = list;
+    el.__floqrPeopleSearch = peopleSearch || el.__floqrPeopleSearch || null;
+    const meta = el.__floqrPeopleSearch || {};
+    const more = meta.hasMore
+      ? `<p class="botdee-sc-more"><button type="button" class="botdee-sv-action" data-sc-more>${esc(t("botdee.sc.moreResults", "Show more people"))}</button></p>`
+      : "";
+    el.innerHTML = list.map(renderCard).join("") + more || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SMARTviews yet."))}</p>`;
     wireActionLinks(el);
     const cards = el.querySelectorAll(".botdee-sv-people");
     let index = 0;
@@ -645,8 +882,17 @@
       if (!peopleOf(payload)) return;
       const card = cards[index];
       index += 1;
-      if (card) bindPeopleCard(card, payload);
+      if (!card) return;
+      if (isCompactCard(payload)) bindCompactCard(card, payload, el);
+      else bindPeopleCard(card, payload);
     });
+    bindMore(el, meta);
+    const unsubs = [];
+    list.forEach(payload => {
+      const uid = subjectUidOf(payload);
+      if (uid) unsubs.push(listenSubject(el, uid));
+    });
+    liveByHost.set(el, unsubs);
   }
 
   if (global.document) bindOverlayDocument(global.document);
@@ -660,6 +906,8 @@
   global.FLOQRBotDeeSmartView = {
     renderCard,
     renderPeopleCard,
+    renderCompactPeopleCard,
+    isCompactCard,
     mount,
     resolveSameOriginHref,
     wireActionLinks,

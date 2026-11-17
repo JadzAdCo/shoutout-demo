@@ -83,6 +83,13 @@ test("recommendation moderation is Master Admin controlled", () => {
   assert.doesNotMatch(block, /allow create, read, update, delete: if signedIn\(\);/);
 });
 
+test("usercharacter_analysis is Functions-write; signed-in publicWithinFloqr listen is gated", () => {
+  const block = blockFor("/usercharacter_analysis/{uid}");
+  assert.match(block, /allow write: if false;/);
+  assert.match(block, /publicWithinFloqr == 1/);
+  assert.match(rules, /function pairIsBlocked/);
+});
+
 test("shared template writes require Master Admin or FloqR Admin access", () => {
   const block = blockFor("/templates/{id}");
   assert.match(block, /allow write: if canManageCatalogTemplates\(\);/);

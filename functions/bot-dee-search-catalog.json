@@ -543,6 +543,67 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-smartcard",
+      "id": "help-botdee-smartcard",
+      "kind": "help",
+      "label": "People SMARTcards",
+      "blurb": "When more than one public FLOQR profile matches, BOT DEE shows compact People SMARTcards in the chat: square photo on the left, name, public handles, city, and a 4-line SMARTsummary on the right. Tap a card to open that person’s full SMARTview. Cards use the same public profile a",
+      "href": "./botdee.html",
+      "phrases": [
+        "people smartcards",
+        "when more than one public floqr profile matches bot dee shows compact people smartcards in the chat square photo on the left name public handles city and a 4-li",
+        "smartcard",
+        "smart card",
+        "people smartcard",
+        "who is",
+        "who am i",
+        "compact people card",
+        "select person smartview",
+        "open bot dee",
+        "my bot dee",
+        "help-botdee-smartcard"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-smartcard-search",
+      "id": "help-botdee-smartcard-search",
+      "kind": "help",
+      "label": "Ask BOT DEE who someone is",
+      "blurb": "Ask “Who am I?” to open your own SMARTview. Ask “Who is …” plus a name or @handle to look up public FLOQR profiles. One match opens SMARTview. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether",
+      "href": "./botdee.html",
+      "phrases": [
+        "ask bot dee who someone is",
+        "ask who am i to open your own smartview. ask who is plus a name or @handle to look up public floqr profiles. one match opens smartview. several matches show sma",
+        "who am i",
+        "who is",
+        "find person on floqr",
+        "do you know this person",
+        "people search bot dee",
+        "lookup public profile",
+        "open bot dee",
+        "help-botdee-smartcard-search"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-smartcard-sync",
+      "id": "help-botdee-smartcard-sync",
+      "kind": "help",
+      "label": "SMARTsummary stays in sync",
+      "blurb": "Edit your SMARTsummary in your default profile language. Save is immediate. Cards and SMARTview already showing you update from the same record. Translations to other FLOQR languages run in the background and never overwrite a newer edit. If you hide your public profile, block so",
+      "href": "./patron-portal.html?tab=feature-orders&sub=botdee",
+      "phrases": [
+        "smartsummary stays in sync",
+        "edit your smartsummary in your default profile language. save is immediate. cards and smartview already showing you update from the same record. translations to",
+        "smartsummary sync",
+        "card update live",
+        "edit summary translations",
+        "hide profile smartcard",
+        "gemini overwrite summary",
+        "my bot dee",
+        "help-botdee-smartcard-sync"
+      ]
+    },
+    {
       "sourceId": "help:help-botdee-smartview",
       "id": "help-botdee-smartview",
       "kind": "help",
@@ -3579,6 +3640,10 @@
         "smartview",
         "people smartview",
         "smart summary",
+        "smartcard",
+        "people smartcard",
+        "who am i",
+        "who is",
         "research library",
         "explain my recommendation",
         "privacy assistant",

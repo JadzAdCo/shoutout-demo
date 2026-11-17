@@ -14,6 +14,7 @@ const prefs = require("./botdee-personalization");
 const threads = require("./bot-dee-thread");
 const memory = require("./botdee-memory");
 const smart = require("./botdee-smartview-core");
+const peopleCards = require("./botdee-smartcard-functions");
 const execution = require("./botdee-execution");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 const {__botDeeHelpers} = require("./data-classification-functions");
@@ -392,8 +393,32 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       }
     }
     let outcome;
+    let peopleAttached = null;
+    try {
+      peopleAttached = await peopleCards.attachPeopleSearch({
+        query: userPrompt,
+        viewerUid: uid,
+        uiLanguage,
+        request,
+        page: request.data?.peoplePage
+      });
+    } catch (error) {
+      console.warn("BOT DEE people SMARTcard attach failed", error?.message || error);
+    }
     // Greetings / identity stay chat-like even when Gemini is down or mis-calls search.
-    if (
+    if (peopleAttached && peopleAttached.handled) {
+      outcome = {
+        reply: peopleAttached.reply,
+        results: [],
+        provider: "people-smartcard",
+        model: "peopleSearch",
+        toolRounds: 0,
+        uiLanguage,
+        smartViews: peopleAttached.smartViews || [],
+        peopleSearch: peopleAttached.peopleSearch,
+        geminiOnView: false
+      };
+    } else if (
       bot.isAckPrompt(userPrompt)
       || bot.isMoodPrompt(userPrompt)
       || bot.isChitchatPrompt(userPrompt)
@@ -433,7 +458,10 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       }
     }
     try {
-      if (/\b(smartview|smart view|research library|explain (?:my )?recommendation)\b/i.test(userPrompt)) {
+      if (
+        !outcome.smartViews
+        && /\b(smartview|smart view|research library|explain (?:my )?recommendation)\b/i.test(userPrompt)
+      ) {
         outcome.smartViews = smart.mockCatalog();
       }
     } catch (_) {}
