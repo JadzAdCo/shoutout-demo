@@ -179,7 +179,17 @@
         role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
         text: String(row?.text || "").replace(/\s+/g, " ").trim()
       }))
-      .filter(row => row.text && !/^(hey|hi|hello|howdy|yo|sup|hiya|hola)\b/i.test(row.text));
+      .filter(row => {
+        const q = row.text;
+        if (!q) return false;
+        if (/^(hey|hi|hello|howdy|yo|sup|hiya|hola)\b/i.test(q)) return false;
+        if (/i['’]ll pause here for now/i.test(q)) return false;
+        if (/^wassup\b/i.test(q)) return false;
+        if (/what's the move/i.test(q)) return false;
+        if (/how can i help/i.test(q)) return false;
+        if (/where (?:did |do )?we leave off|where we left off|we['’]?re were we/i.test(q)) return false;
+        return true;
+      });
     const last = rows.slice(-2);
     if (!last.length) return "";
     return last

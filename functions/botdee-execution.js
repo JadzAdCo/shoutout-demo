@@ -126,7 +126,8 @@ function applyReceipt(existing, nextState, result, nowMs) {
   };
 }
 
-function contextBudget({maxTurns, summaryTokens, memoryCount, toolReserve}) {
+function contextBudget(raw) {
+  const {maxTurns, summaryTokens, memoryCount, toolReserve} = raw && typeof raw === "object" ? raw : {};
   const turns = Math.max(1, Math.min(24, Number(maxTurns) || 12));
   return {
     maxTurns: turns,
@@ -150,6 +151,33 @@ function buildModelContext({turns, summary, memories, budget}) {
   };
 }
 
+const BOOKING_TOOLS = Object.freeze([
+  "createVipHold",
+  "recordVipConsent",
+  "createVipCheckout"
+]);
+
+/** Discussed vs booked: talking about VIP / a venue is not a confirmed reservation. */
+function reservationClaimFromContext({turns, executions}) {
+  const receipts = Array.isArray(executions) ? executions : [];
+  const confirmed = receipts.some(row => {
+    const name = String(row?.toolName || "");
+    if (!BOOKING_TOOLS.includes(name)) return false;
+    const state = String(row?.state || "").toLowerCase();
+    const code = String(row?.resultCode || "").toLowerCase();
+    return state === "succeeded" || code === "ok";
+  });
+  if (confirmed) return "confirmed";
+  const blob = (Array.isArray(turns) ? turns : [])
+    .map(row => String(row?.text || ""))
+    .join(" ")
+    .toLowerCase();
+  if (/\bvip\b|reserv|hold table|book me/.test(blob)) {
+    return "discussed";
+  }
+  return "none";
+}
+
 module.exports = {
   STATES,
   CONSEQUENTIAL_TOOLS,
@@ -164,5 +192,7 @@ module.exports = {
   checkpointDoc,
   applyReceipt,
   contextBudget,
-  buildModelContext
+  buildModelContext,
+  reservationClaimFromContext,
+  BOOKING_TOOLS
 };

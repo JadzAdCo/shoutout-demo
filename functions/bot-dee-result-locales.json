@@ -49,11 +49,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "BOT DEE Datenschutz und Sitzung",
-          "blurb": "Die fünfminütige Pause beendet den Live-Chat. Gespeicherter Verlauf unter Mein Profil → Funktionen & Bestellungen → My BOT DEE bleibt. Gäste bleiben flüchtig. Mingl-Chats werden hier nie kopiert. Enter sendet; Umschalt+Enter beginnt eine neue Zeile. Name und Ton stellst du unter "
+          "blurb": "Die fünfminütige Pause beendet die Live-Sitzung. Sie löscht nicht diesen angemeldeten Chat, Erinnerungen oder Workflows. Optionale Kopien unter Mein Profil → Funktionen & Bestellungen → My BOT DEE bleiben. Gäste bleiben flüchtig. Mingl-Chats werden hier nie kopiert. Enter sendet;"
         },
         "intent:help-botdee-privacy-session": {
           "label": "BOT DEE Datenschutz und Sitzung",
-          "blurb": "Die fünfminütige Pause beendet den Live-Chat. Gespeicherter Verlauf unter Mein Profil → Funktionen & Bestellungen → My BOT DEE bleibt. Gäste bleiben flüchtig. Mingl-Chats werden hier nie kopiert. Enter sendet; Umschalt+Enter beginnt eine neue Zeile. Name und Ton stellst du unter "
+          "blurb": "Die fünfminütige Pause beendet die Live-Sitzung. Sie löscht nicht diesen angemeldeten Chat, Erinnerungen oder Workflows. Optionale Kopien unter Mein Profil → Funktionen & Bestellungen → My BOT DEE bleiben. Gäste bleiben flüchtig. Mingl-Chats werden hier nie kopiert. Enter sendet;"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -903,11 +903,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "Confidentialité et session BOT DEE",
-          "blurb": "La pause de cinq minutes termine le chat BOT DEE en direct. Elle ne supprime pas l’historique enregistré dans Mon profil → Fonctions et commandes → My BOT DEE. Les invités restent éphémères. Les discussions Mingl ne sont jamais copiées ici. Entrée envoie ; Maj+Entrée commence une"
+          "blurb": "La pause de cinq minutes termine la session BOT DEE en direct. Elle ne supprime pas ce chat connecté, les souvenirs ni les workflows. Les copies dans Mon profil → Fonctions et commandes → My BOT DEE restent aussi. Les invités restent éphémères. Les discussions Mingl ne sont jamai"
         },
         "intent:help-botdee-privacy-session": {
           "label": "Confidentialité et session BOT DEE",
-          "blurb": "La pause de cinq minutes termine le chat BOT DEE en direct. Elle ne supprime pas l’historique enregistré dans Mon profil → Fonctions et commandes → My BOT DEE. Les invités restent éphémères. Les discussions Mingl ne sont jamais copiées ici. Entrée envoie ; Maj+Entrée commence une"
+          "blurb": "La pause de cinq minutes termine la session BOT DEE en direct. Elle ne supprime pas ce chat connecté, les souvenirs ni les workflows. Les copies dans Mon profil → Fonctions et commandes → My BOT DEE restent aussi. Les invités restent éphémères. Les discussions Mingl ne sont jamai"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -1757,11 +1757,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "Privacidad y sesión de BOT DEE",
-          "blurb": "La pausa de cinco minutos termina el chat en vivo. No borra el historial guardado en Mi perfil → Funciones y pedidos → My BOT DEE. Los invitados siguen siendo efímeros. Los chats de Mingl nunca se copian aquí. Intro envía; Mayús+Intro empieza una línea nueva. Nombre y tono se eli"
+          "blurb": "La pausa de cinco minutos termina la sesión en vivo. No borra este chat con sesión iniciada, los recuerdos ni los flujos. Las copias en Mi perfil → Funciones y pedidos → My BOT DEE también se quedan. Los invitados siguen siendo efímeros. Los chats de Mingl nunca se copian aquí. I"
         },
         "intent:help-botdee-privacy-session": {
           "label": "Privacidad y sesión de BOT DEE",
-          "blurb": "La pausa de cinco minutos termina el chat en vivo. No borra el historial guardado en Mi perfil → Funciones y pedidos → My BOT DEE. Los invitados siguen siendo efímeros. Los chats de Mingl nunca se copian aquí. Intro envía; Mayús+Intro empieza una línea nueva. Nombre y tono se eli"
+          "blurb": "La pausa de cinco minutos termina la sesión en vivo. No borra este chat con sesión iniciada, los recuerdos ni los flujos. Las copias en Mi perfil → Funciones y pedidos → My BOT DEE también se quedan. Los invitados siguen siendo efímeros. Los chats de Mingl nunca se copian aquí. I"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -2611,11 +2611,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "Privacy e sessione BOT DEE",
-          "blurb": "La pausa di cinque minuti termina la chat dal vivo. Non cancella la cronologia salvata in Il mio profilo → Funzioni e ordini → My BOT DEE. Gli ospiti restano effimeri. Le chat Mingl non vengono mai copiate qui. Invio invia; Maiusc+Invio inizia una nuova riga. Nome e tono sono in "
+          "blurb": "La pausa di cinque minuti termina la sessione dal vivo. Non cancella questa chat da connesso, i ricordi o i flussi. Restano anche le copie in Il mio profilo → Funzioni e ordini → My BOT DEE. Gli ospiti restano effimeri. Le chat Mingl non vengono mai copiate qui. Invio invia; Maiu"
         },
         "intent:help-botdee-privacy-session": {
           "label": "Privacy e sessione BOT DEE",
-          "blurb": "La pausa di cinque minuti termina la chat dal vivo. Non cancella la cronologia salvata in Il mio profilo → Funzioni e ordini → My BOT DEE. Gli ospiti restano effimeri. Le chat Mingl non vengono mai copiate qui. Invio invia; Maiusc+Invio inizia una nuova riga. Nome e tono sono in "
+          "blurb": "La pausa di cinque minuti termina la sessione dal vivo. Non cancella questa chat da connesso, i ricordi o i flussi. Restano anche le copie in Il mio profilo → Funzioni e ordini → My BOT DEE. Gli ospiti restano effimeri. Le chat Mingl non vengono mai copiate qui. Invio invia; Maiu"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -3465,11 +3465,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "Privacidade e sessão BOT DEE",
-          "blurb": "A pausa de cinco minutos termina o chat ao vivo. Não apaga o histórico guardado em O meu perfil → Funções e encomendas → My BOT DEE. Os convidados continuam efémeros. Os chats Mingl nunca são copiados para aqui. Enter envia; Shift+Enter começa uma nova linha. Nome e tom estão em "
+          "blurb": "A pausa de cinco minutos termina a sessão ao vivo. Não apaga este chat com sessão iniciada, memórias ou fluxos. As cópias em O meu perfil → Funções e encomendas → My BOT DEE também ficam. Os convidados continuam efémeros. Os chats Mingl nunca são copiados para aqui. Enter envia; "
         },
         "intent:help-botdee-privacy-session": {
           "label": "Privacidade e sessão BOT DEE",
-          "blurb": "A pausa de cinco minutos termina o chat ao vivo. Não apaga o histórico guardado em O meu perfil → Funções e encomendas → My BOT DEE. Os convidados continuam efémeros. Os chats Mingl nunca são copiados para aqui. Enter envia; Shift+Enter começa uma nova linha. Nome e tom estão em "
+          "blurb": "A pausa de cinco minutos termina a sessão ao vivo. Não apaga este chat com sessão iniciada, memórias ou fluxos. As cópias em O meu perfil → Funções e encomendas → My BOT DEE também ficam. Os convidados continuam efémeros. Os chats Mingl nunca são copiados para aqui. Enter envia; "
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -4319,11 +4319,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "Конфиденциальность и сессия BOT DEE",
-          "blurb": "Пауза в пять минут завершает живой чат BOT DEE. Она не удаляет историю, которую вы сохранили в «Мой профиль» → «Функции и заказы» → My BOT DEE. Гости остаются эфемерными. Чаты Mingl сюда не копируются. Enter отправляет сообщение; Shift+Enter начинает новую строку. Имя и тон задаю"
+          "blurb": "Пауза в пять минут завершает живую сессию BOT DEE. Она не удаляет этот чат для вошедшего пользователя, воспоминания или рабочие процессы. Копии в «Мой профиль» → «Функции и заказы» → My BOT DEE тоже остаются. Гости остаются эфемерными. Чаты Mingl сюда не копируются. Enter отправл"
         },
         "intent:help-botdee-privacy-session": {
           "label": "Конфиденциальность и сессия BOT DEE",
-          "blurb": "Пауза в пять минут завершает живой чат BOT DEE. Она не удаляет историю, которую вы сохранили в «Мой профиль» → «Функции и заказы» → My BOT DEE. Гости остаются эфемерными. Чаты Mingl сюда не копируются. Enter отправляет сообщение; Shift+Enter начинает новую строку. Имя и тон задаю"
+          "blurb": "Пауза в пять минут завершает живую сессию BOT DEE. Она не удаляет этот чат для вошедшего пользователя, воспоминания или рабочие процессы. Копии в «Мой профиль» → «Функции и заказы» → My BOT DEE тоже остаются. Гости остаются эфемерными. Чаты Mingl сюда не копируются. Enter отправл"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -5173,11 +5173,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "Απόρρητο και συνεδρία BOT DEE",
-          "blurb": "Η παύση των πέντε λεπτών τελειώνει τη ζωντανή συνομιλία. Δεν διαγράφει το ιστορικό στο Προφίλ μου → Λειτουργίες και παραγγελίες → My BOT DEE. Οι επισκέπτες μένουν προσωρινοί. Οι συνομιλίες Mingl δεν αντιγράφονται εδώ. Enter στέλνει· Shift+Enter ξεκινά νέα γραμμή. Όνομα και ύφος ε"
+          "blurb": "Η παύση των πέντε λεπτών τελειώνει τη ζωντανή συνεδρία. Δεν διαγράφει αυτή τη συνομιλία για συνδεδεμένους, τις μνήμες ή τις ροές. Οι προαιρετικές αντιγραφές στο Προφίλ μου → Λειτουργίες και παραγγελίες → My BOT DEE μένουν κι αυτές. Οι επισκέπτες μένουν προσωρινοί. Οι συνομιλίες M"
         },
         "intent:help-botdee-privacy-session": {
           "label": "Απόρρητο και συνεδρία BOT DEE",
-          "blurb": "Η παύση των πέντε λεπτών τελειώνει τη ζωντανή συνομιλία. Δεν διαγράφει το ιστορικό στο Προφίλ μου → Λειτουργίες και παραγγελίες → My BOT DEE. Οι επισκέπτες μένουν προσωρινοί. Οι συνομιλίες Mingl δεν αντιγράφονται εδώ. Enter στέλνει· Shift+Enter ξεκινά νέα γραμμή. Όνομα και ύφος ε"
+          "blurb": "Η παύση των πέντε λεπτών τελειώνει τη ζωντανή συνεδρία. Δεν διαγράφει αυτή τη συνομιλία για συνδεδεμένους, τις μνήμες ή τις ροές. Οι προαιρετικές αντιγραφές στο Προφίλ μου → Λειτουργίες και παραγγελίες → My BOT DEE μένουν κι αυτές. Οι επισκέπτες μένουν προσωρινοί. Οι συνομιλίες M"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -6027,11 +6027,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "Prywatność i sesja BOT DEE",
-          "blurb": "Pięciominutowa pauza kończy czat na żywo. Nie usuwa historii w Mój profil → Funkcje i zamówienia → My BOT DEE. Goście pozostają tymczasowi. Czaty Mingl nigdy nie są tu kopiowane. Enter wysyła; Shift+Enter zaczyna nową linię. Imię i ton ustawisz w Mój profil → My BOT DEE, nie przy"
+          "blurb": "Pięciominutowa pauza kończy sesję na żywo. Nie usuwa tego czatu dla zalogowanych, wspomnień ani przepływów. Zostają też kopie w Mój profil → Funkcje i zamówienia → My BOT DEE. Goście pozostają tymczasowi. Czaty Mingl nigdy nie są tu kopiowane. Enter wysyła; Shift+Enter zaczyna no"
         },
         "intent:help-botdee-privacy-session": {
           "label": "Prywatność i sesja BOT DEE",
-          "blurb": "Pięciominutowa pauza kończy czat na żywo. Nie usuwa historii w Mój profil → Funkcje i zamówienia → My BOT DEE. Goście pozostają tymczasowi. Czaty Mingl nigdy nie są tu kopiowane. Enter wysyła; Shift+Enter zaczyna nową linię. Imię i ton ustawisz w Mój profil → My BOT DEE, nie przy"
+          "blurb": "Pięciominutowa pauza kończy sesję na żywo. Nie usuwa tego czatu dla zalogowanych, wspomnień ani przepływów. Zostają też kopie w Mój profil → Funkcje i zamówienia → My BOT DEE. Goście pozostają tymczasowi. Czaty Mingl nigdy nie są tu kopiowane. Enter wysyła; Shift+Enter zaczyna no"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -6881,11 +6881,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "BOT DEE privacy en sessie",
-          "blurb": "De pauze van vijf minuten beëindigt de live BOT DEE-chat. Opgeslagen geschiedenis in Mijn profiel → Functies en bestellingen → My BOT DEE blijft. Gasten blijven tijdelijk. Mingl-chats worden hier nooit gekopieerd. Enter verstuurt; Shift+Enter begint een nieuwe regel. Naam en toon"
+          "blurb": "De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Ze verwijdert deze ingelogde chat, herinneringen of workflows niet. Optionele kopieën in Mijn profiel → Functies en bestellingen → My BOT DEE blijven ook. Gasten blijven tijdelijk. Mingl-chats worden hier nooit gekopieer"
         },
         "intent:help-botdee-privacy-session": {
           "label": "BOT DEE privacy en sessie",
-          "blurb": "De pauze van vijf minuten beëindigt de live BOT DEE-chat. Opgeslagen geschiedenis in Mijn profiel → Functies en bestellingen → My BOT DEE blijft. Gasten blijven tijdelijk. Mingl-chats worden hier nooit gekopieerd. Enter verstuurt; Shift+Enter begint een nieuwe regel. Naam en toon"
+          "blurb": "De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Ze verwijdert deze ingelogde chat, herinneringen of workflows niet. Optionele kopieën in Mijn profiel → Functies en bestellingen → My BOT DEE blijven ook. Gasten blijven tijdelijk. Mingl-chats worden hier nooit gekopieer"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -7735,11 +7735,11 @@
         },
         "help:help-botdee-privacy-session": {
           "label": "خصوصية وجلسة BOT DEE",
-          "blurb": "توقف الخمس دقائق ينهي محادثة BOT DEE المباشرة. لا يحذف السجل المحفوظ في ملفي → الميزات والطلبات → My BOT DEE. يبقى الضيوف مؤقتين. لا تُنسخ محادثات Mingl إلى هنا. Enter يرسل؛ Shift+Enter يبدأ سطرًا جديدًا. الاسم والأسلوب من ملفي → My BOT DEE، وليس زرًا في المحادثة."
+          "blurb": "توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. لا يحذف هذه المحادثة للمستخدم المسجّل أو الذكريات أو مسارات العمل. تبقى النسخ الاختيارية في ملفي → الميزات والطلبات → My BOT DEE أيضًا. يبقى الضيوف مؤقتين. لا تُنسخ محادثات Mingl إلى هنا. Enter يرسل؛ Shift+Enter يبدأ سطرًا جديدًا. الاس"
         },
         "intent:help-botdee-privacy-session": {
           "label": "خصوصية وجلسة BOT DEE",
-          "blurb": "توقف الخمس دقائق ينهي محادثة BOT DEE المباشرة. لا يحذف السجل المحفوظ في ملفي → الميزات والطلبات → My BOT DEE. يبقى الضيوف مؤقتين. لا تُنسخ محادثات Mingl إلى هنا. Enter يرسل؛ Shift+Enter يبدأ سطرًا جديدًا. الاسم والأسلوب من ملفي → My BOT DEE، وليس زرًا في المحادثة."
+          "blurb": "توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. لا يحذف هذه المحادثة للمستخدم المسجّل أو الذكريات أو مسارات العمل. تبقى النسخ الاختيارية في ملفي → الميزات والطلبات → My BOT DEE أيضًا. يبقى الضيوف مؤقتين. لا تُنسخ محادثات Mingl إلى هنا. Enter يرسل؛ Shift+Enter يبدأ سطرًا جديدًا. الاس"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",

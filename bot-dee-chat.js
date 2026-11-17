@@ -221,7 +221,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.026";  }
+    return "s3.3.027";  }
 
   function isVersionPrompt(raw) {
     const q = normalizeChat(raw);
@@ -353,7 +353,7 @@
   function privacyReply() {
     return t(
       "botdee.privacyReply",
-      "The five-minute pause ends this live chat. It does not delete history you opted to save in My Profile → Feature & Orders → My BOT DEE. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send; Shift+Enter starts a new line."
+      "The five-minute pause ends this live session. It does not delete this signed-in chat, memories, or workflows. Opt-in copies in My Profile → Feature & Orders → My BOT DEE stay too. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send; Shift+Enter starts a new line."
     );
   }
 
@@ -804,11 +804,15 @@
   function endConversation(reason) {
     clearIdleTimer();
     if (phase === "ended") return;
+    const recapTurns = history.slice();
     phase = "ended";
-    history.length = 0;
+    // Guests stay ephemeral. Signed-in durable retrieve is server-side; keep local
+    // turns so in-tab recap can skip the post-pause hello.
+    if (!durableEnabled) history.length = 0;
     if (reason !== "silent") {
       const reply = idleEndedReply();
       appendBubble("bot", reply);
+      if (durableEnabled) maybeRecap(recapTurns);
     }
   }
 
@@ -877,7 +881,7 @@
 
     const resuming = phase === "ended";
     if (resuming) {
-      // New conversation after idle / farewell — history already cleared.
+      // Lease ended (pause bubble). Durable retrieve is on the server; do not wipe it.
       phase = "fresh";
     }
 
@@ -1054,11 +1058,16 @@
           if (data.threadId) threadId = String(data.threadId);
           applyHasUsed(data);
           global.FLOQRBotDeePersonalization?.applyFromThread?.(data, true);
-          if (durableEnabled && data.status === "active" && Array.isArray(data.turns) && data.turns.length) {
+          if (durableEnabled && Array.isArray(data.turns) && data.turns.length) {
             restoreTurns(data.turns);
-            phase = "active";
-            setStatus("");
-            armIdleTimer(data.remainingMs);
+            if (data.status === "idle_ended") {
+              phase = "ended";
+              setStatus(t("botdee.sessionPaused", "Session paused. Continue chatting."));
+            } else {
+              phase = "active";
+              setStatus("");
+              armIdleTimer(data.remainingMs);
+            }
             maybeRecap(data.turns);
             global.FLOQRBotDeePersonalization?.maybeStartSetup?.();
             return;

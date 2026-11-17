@@ -34,6 +34,7 @@ function emptyState(settings) {
     consent: memory.normalizeConsent({}),
     archiveRetained: false,
     hasUsedBotDee: 0,
+    summary: "",
     personalization: prefs.normalizePersonalization({}),
     [prefs.LAST_USED_FIELD]: 0,
     [prefs.SESSION_RESET_FIELD]: 0
@@ -53,18 +54,20 @@ function snapshotToState(snap, uid, settings, nowMs) {
   }
   const data = snap.data() || {};
   const lastMessageAtMs = Number(data.lastMessageAtMs) || 0;
-  const idleEnded = bot.isThreadIdle(lastMessageAtMs, settings.conversationIdleSeconds, nowMs);
-  const turns = idleEnded ? [] : bot.clipStoredTurns(data.turns);
+  const clockIdle = bot.isThreadIdle(lastMessageAtMs, settings.conversationIdleSeconds, nowMs);
+  const farewellLease = String(data.status || "") === "idle_ended" && !lastMessageAtMs;
+  const idleEnded = clockIdle || farewellLease;
   const consent = memory.normalizeConsent(data.consent);
   const personalization = prefs.fromThread(data);
   const staleGeneration = prefs.needsSessionReset(data);
-  const liveTurns = staleGeneration || idleEnded ? [] : turns;
+  // Idle ends the session lease (pause UX) — it must not empty the retrieval cursor.
+  const retrievalTurns = staleGeneration ? [] : bot.clipStoredTurns(data.turns);
   return {
     durable: true,
-    status: staleGeneration ? "fresh" : (idleEnded ? "idle_ended" : (liveTurns.length ? "active" : "fresh")),
+    status: staleGeneration ? "fresh" : (idleEnded ? "idle_ended" : (retrievalTurns.length ? "active" : "fresh")),
     threadId,
-    turns: liveTurns,
-    history: liveTurns.map(row => ({role: row.role, text: row.text})),
+    turns: retrievalTurns,
+    history: retrievalTurns.map(row => ({role: row.role, text: row.text})),
     conversationEpoch: Math.max(1, Math.floor(Number(data.conversationEpoch) || 1)),
     lastMessageAtMs: staleGeneration ? 0 : lastMessageAtMs,
     remainingMs: staleGeneration
@@ -78,6 +81,7 @@ function snapshotToState(snap, uid, settings, nowMs) {
     archiveRetained: staleGeneration ? false : memory.consentAllows(consent, "archive"),
     hasUsedBotDee: staleGeneration ? 0 : memory.hasUsedFromThread(data),
     personalization,
+    summary: staleGeneration ? "" : String(data.summary || data.lastSummary || "").trim(),
     [prefs.LAST_USED_FIELD]: staleGeneration ? 0 : (Number(data[prefs.LAST_USED_FIELD]) || 0),
     [prefs.SESSION_RESET_FIELD]: staleGeneration ? 0 : prefs.sessionResetVersionOf(data)
   };
@@ -146,16 +150,21 @@ async function loadThreadState(uid, settings, nowMs) {
   return snapshotToState(snap, uid, idle, nowMs || Date.now());
 }
 
-/** Idle rotation uses when the patron sent the message, not when Gemini finished. */
+/** Idle rotation uses when the patron sent the message, not when Gemini finished.
+ *  Idle / farewell bump the lease epoch but keep the transcript cursor. */
 function nextTranscript(prev, settings, receivedAtMs) {
   const row = prev && typeof prev === "object" ? prev : {};
   const last = Number(row.lastMessageAtMs) || 0;
   let epoch = Math.max(1, Math.floor(Number(row.conversationEpoch) || 1));
   let turns = Array.isArray(row.turns) ? row.turns : [];
   const staleGeneration = prefs.needsSessionReset(row);
-  if (staleGeneration || bot.isThreadIdle(last, settings.conversationIdleSeconds, receivedAtMs)) {
-    epoch += (staleGeneration || last) ? 1 : 0;
+  const clockIdle = bot.isThreadIdle(last, settings.conversationIdleSeconds, receivedAtMs);
+  const farewellLease = String(row.status || "") === "idle_ended" && !last;
+  if (staleGeneration) {
+    epoch += last ? 1 : 0;
     turns = [];
+  } else if (clockIdle || farewellLease) {
+    epoch += 1;
   }
   return {epoch, turns};
 }
@@ -236,7 +245,7 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
   return {ok: true};
 }
 
-/** Farewell or client idle: next restore starts a fresh conversation. */
+/** Farewell or explicit idle: end the session lease. Do not wipe turns, events, memories, or workflows. */
 async function markIdleEnded(uid, settings, nowMs) {
   if (!settings?.durableThreads) return {ok: true, skipped: true};
   const ref = threadRef(uid);
@@ -252,12 +261,50 @@ async function markIdleEnded(uid, settings, nowMs) {
       conversationEpoch: epoch,
       lastMessageAtMs: 0,
       lastMessageAtIso: new Date(now).toISOString(),
-      turns: [],
       revision: Math.max(0, Math.floor(Number(prev.revision) || 0)) + 1,
       updatedAtMs: now
     }, {merge: true});
   });
   return {ok: true};
+}
+
+function eventsToTurns(rows, limit) {
+  const cap = Math.max(2, Math.min(24, Number(limit) || 12));
+  return (Array.isArray(rows) ? rows : [])
+    .slice()
+    .sort((a, b) => (Number(a.seq) || 0) - (Number(b.seq) || 0))
+    .map(row => ({
+      role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
+      text: String(row?.text || row?.sanitizedContent || ""),
+      seq: Math.max(0, Math.floor(Number(row?.seq) || 0)),
+      atMs: Number(row?.atMs) || 0
+    }))
+    .filter(row => row.text)
+    .slice(-cap)
+    .map(row => ({role: row.role, text: row.text, seq: row.seq, atMs: row.atMs}));
+}
+
+/** Last 12 events win over in-doc turns. Archive is fallback only when both are empty. */
+function assembleRetrievalTurns({docTurns, events, archiveTurns, idleEnded, archiveConsent}) {
+  const fromEvents = eventsToTurns(events, 12);
+  if (fromEvents.length) return fromEvents.map(row => ({role: row.role, text: row.text}));
+  const fromDoc = bot.clipStoredTurns(docTurns);
+  if (fromDoc.length) return fromDoc.map(row => ({role: row.role, text: row.text}));
+  if (idleEnded && archiveConsent && Array.isArray(archiveTurns) && archiveTurns.length) {
+    return bot.clipStoredTurns(archiveTurns).map(row => ({role: row.role, text: row.text}));
+  }
+  return [];
+}
+
+async function loadEventHistory(uid, limit) {
+  const ref = threadRef(uid);
+  if (!ref) return [];
+  const cap = Math.max(2, Math.min(24, Number(limit) || 12));
+  const snap = await ref.collection("events").orderBy("seq", "desc").limit(cap).get();
+  return eventsToTurns(snap.docs.map(doc => doc.data()), cap).map(row => ({
+    role: row.role,
+    text: row.text
+  }));
 }
 
 async function loadArchiveHistory(uid, limit) {
@@ -269,6 +316,27 @@ async function loadArchiveHistory(uid, limit) {
     .map(doc => doc.data())
     .sort((a, b) => (Number(a.seq) || 0) - (Number(b.seq) || 0))
     .map(row => ({role: row.role === "model" ? "model" : "user", text: String(row.sanitizedContent || row.text || "")}));
+}
+
+async function loadAuthorizedMemories(uid, consent, nowMs) {
+  if (!memory.consentAllows(consent, "memory")) return [];
+  const ref = threadRef(uid);
+  if (!ref) return [];
+  const snap = await ref.collection("memories").limit(50).get();
+  const rows = snap.docs.map(doc => doc.data());
+  return memory.authorizedMemories(rows, consent, nowMs || Date.now());
+}
+
+async function loadLatestSummary(uid) {
+  const ref = threadRef(uid);
+  if (!ref) return "";
+  try {
+    const snap = await ref.collection("summaries").orderBy("createdAtMs", "desc").limit(1).get();
+    const row = snap.docs[0]?.data() || {};
+    return String(row.text || row.summary || "").trim();
+  } catch (_) {
+    return "";
+  }
 }
 
 async function persistArchiveTurns(uid, consent, rows) {
@@ -444,6 +512,11 @@ module.exports = {
   persistModelTurn,
   persistArchiveTurns,
   loadArchiveHistory,
+  loadEventHistory,
+  loadAuthorizedMemories,
+  loadLatestSummary,
+  eventsToTurns,
+  assembleRetrievalTurns,
   writeExecutionReceipt,
   markIdleEnded,
   readHasUsedBotDee,

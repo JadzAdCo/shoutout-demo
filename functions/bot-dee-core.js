@@ -434,7 +434,7 @@ function isPrivacyPrompt(raw) {
 }
 
 function privacyReply() {
-  return "The five-minute pause ends this live chat. It does not delete history you opted to save in My Profile → Feature & Orders → My BOT DEE. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send; Shift+Enter starts a new line.";
+  return "The five-minute pause ends this live session. It does not delete this signed-in chat, memories, or workflows. Opt-in copies in My Profile → Feature & Orders → My BOT DEE stay too. Guests stay ephemeral. Mingl chats are never copied here. Press Enter to send; Shift+Enter starts a new line.";
 }
 
 /** Default idle pause (seconds) before BOT DEE ends the conversation. Master Admin can override. */
@@ -949,6 +949,7 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
+    "If they ask where you left off, recap the last two meaningful retrieved turns — skip a post-pause hello/Hey. Distinguish discussed vs booked: never claim a VIP reservation, hold, or payment is confirmed unless a tool result in this turn or a stored execution receipt says so. Talking about a venue or VIP tables is discussion, not a booking.",
     `Viewer classification role: ${role}.`,
     "Keep allowed brand names as-is when you may mention them: ShoutOut, BOT DEE, FloqR, FloqMedia, and any other brands in the allowed-features list only."
   ].join(" ");
@@ -961,6 +962,32 @@ function historyToContents(history, userPrompt) {
   });
   contents.push({role: "user", parts: [{text: userPrompt}]});
   return contents;
+}
+
+function contextToContents(modelContext, userPrompt) {
+  const ctx = modelContext && typeof modelContext === "object" ? modelContext : {};
+  const prefix = [];
+  const summary = String(ctx.summary || "").trim();
+  if (summary) {
+    prefix.push({role: "user", text: `[Earlier conversation summary]\n${summary}`});
+    prefix.push({role: "model", text: "I'll treat that as background only — not as a confirmed booking."});
+  }
+  const memories = Array.isArray(ctx.memories) ? ctx.memories : [];
+  const facts = memories
+    .map(row => String(row?.value || row?.text || (typeof row === "string" ? row : "")).trim())
+    .filter(Boolean)
+    .slice(0, 8);
+  if (facts.length) {
+    prefix.push({role: "user", text: `[Approved memories]\n${facts.join("; ")}`});
+    prefix.push({role: "model", text: "I'll use those approved facts when relevant."});
+  }
+  const turns = (Array.isArray(ctx.recentTurns) ? ctx.recentTurns : [])
+    .map(row => ({
+      role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
+      text: String(row?.text || "")
+    }))
+    .filter(row => row.text);
+  return historyToContents([...prefix, ...turns], userPrompt);
 }
 
 function extractText(response) {
@@ -1089,6 +1116,7 @@ module.exports = {
   runTool,
   systemInstruction,
   historyToContents,
+  contextToContents,
   extractText,
   formatSearchFallback,
   resultsForClient,

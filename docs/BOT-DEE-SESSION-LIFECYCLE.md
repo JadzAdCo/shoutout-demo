@@ -4,7 +4,7 @@ Master Admin idle (`conversationIdleSeconds`, default **300**) ends the **active
 
 | Store | Lifetime | Default |
 |---|---|---|
-| Active turns on `botDeeThreads/{uid}` | Cleared when idle / farewell | on for signed-in (`durableThreads`) |
+| Active turns on `botDeeThreads/{uid}` | Lease ends on idle / farewell (`idleEnded`); turns stay for retrieval | on for signed-in (`durableThreads`) |
 | Opt-in archive `botDeeThreads/{uid}/archive` | Survives idle until user deletes or revokes consent | **off** |
 | Memories `botDeeThreads/{uid}/memories` | User-controlled, TTL | **off** |
 | Guest tab history | Ephemeral | never persisted |
