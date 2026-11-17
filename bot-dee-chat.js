@@ -1138,8 +1138,10 @@
     history.length = 0;
     (Array.isArray(turns) ? turns : []).forEach(row => {
       const role = row?.role === "model" || row?.role === "assistant" ? "model" : "user";
-      const text = role === "model" ? displayReply(row?.text) : String(row?.text || "").trim();
+      const rawText = String(row?.text || "").trim();
       const media = role === "model" ? mergeMedia(row?.media, harvestMediaFromText(row?.text)) : [];
+      if (role === "model" && !rawText && !media.length) return;
+      const text = role === "model" ? displayReply(row?.text) : rawText;
       if (!text && !media.length) return;
       appendBubble(role === "user" ? "user" : "bot", text, null, media);
       if (text) pushHistory(role, text);

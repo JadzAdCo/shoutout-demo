@@ -426,7 +426,7 @@
     {
       id: "help-botdee-version-smartview",
       title: "Version SMARTview",
-      body: "In BOT DEE chat, type Ver, Vers, or Version (any capitalization, optional ?). The Version SMARTview card is the only answer — BOT DEE does not dump package, model, six-phase, or mock-integration text in the chat bubble. It shows the real FLOQR package stamp, whether this turn used an AI model, and service status. Numbers in design pictures are examples — live values come from the app. Site Chrome follows your Appearance theme.",
+      body: "In BOT DEE chat, type Ver, Vers, or Version (any capitalization, optional ?). The Version SMARTview card is the only answer — BOT DEE does not dump package, model, six-phase, or mock-integration text in the chat bubble. It shows the real FLOQR package stamp, the Gemini model id this deployment uses (the same model executeBotSession would call, even when this turn skipped generation), and a live service status from a probe of this request. Numbers in design pictures are examples — live values come from the app. Site Chrome follows your Appearance theme.",
       searchPhrases: [
         "version smartview", "ver command", "vers command", "version command",
         "bot dee version", "floqr version", "what version is bot dee"
@@ -438,8 +438,8 @@
     },
     {
       id: "help-botdee-version-smartview-status",
-      title: "Version SMARTview status is honest",
-      body: "Service status is Not checked until FLOQR actually probes the service. The card never shows Operational from a picture or a guess. AI model is Not used this turn on the Version command because that path does not call Gemini. Frontend and backend package stamps can differ; both are labeled. Master Admin may see extra diagnostics after Technical Details — patrons do not.",
+      title: "Version SMARTview status is a live probe",
+      body: "Service status is probed on this Version request: Functions and package reachable with Gemini configured → Operational; Functions and package up but Gemini not configured → Degraded; Functions not in this request → Unavailable. It is never a static Not checked label. AI model shows the configured Gemini model id for this deployment even when this turn did not generate. Frontend and backend package stamps can differ; both are labeled. Master Admin may see extra diagnostics after Technical Details — patrons do not.",
       searchPhrases: [
         "version operational", "not checked", "bot dee health", "service status smartview", "gemini version card"
       ],

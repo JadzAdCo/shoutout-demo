@@ -493,7 +493,11 @@ async function persistModelTurn(uid, settings, modelText, opts) {
   if (!ref) return {ok: false, error: "missing_uid"};
   const options = opts && typeof opts === "object" ? opts : {};
   const now = Number(options.nowMs) || Date.now();
-  const modelStored = bot.sanitizeBotReply(modelText);
+  const modelStored = bot.sanitizeBotReply(modelText, {allowEmpty: options.allowEmpty});
+  const mediaEarly = bot.clipStoredMedia(options.media);
+  if (options.allowEmpty && !String(modelStored || "").trim() && !mediaEarly.length) {
+    return {ok: true, skipped: true, reason: "empty_card_only"};
+  }
   let written = null;
   await db().runTransaction(async tx => {
     const snap = await tx.get(ref);

@@ -1,6 +1,6 @@
 # CURRENT PACKAGE: FLOQR ShoutOut s3.3.034 (stable)
 
-- s3.3.034: Version SMARTview card only on Ver / Vers / Version (no six-phase chat dump)
+- s3.3.034: Version SMARTview card only on Ver / Vers / Version (live Operational probe + real Gemini model id; no six-phase dump)
 - s3.3.033: BOT DEE Room SMARTview intent routing (confirmation card; group rooms not live)
 - s3.3.032: BOT DEE Version SMARTview (Ver / Vers / Version aliases, honest stamps); SMARTcard / SMARTview hero uses public Profile Media slots
 - s3.3.031: SMARTsummary source locale is patron UI language; fan-out includes English

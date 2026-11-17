@@ -69,6 +69,34 @@ function changelogItems(rootDir) {
   return changelogFromReadme(rootDir);
 }
 
+/** Probe this Version request. Never a static Not checked label.
+    Operational = Functions ran + package stamp readable + Gemini key bound.
+    Degraded = Functions + package, Gemini not configured.
+    Unavailable = Functions not in this request (or package stamp missing). */
+function probeVersionService(opts) {
+  const options = opts && typeof opts === "object" ? opts : {};
+  const nowMs = Number.isFinite(Number(options.now)) ? Number(options.now) : Date.now();
+  const functionsOk = options.functionsReachable === true;
+  const packageLabel = options.packageLabel === undefined
+    ? String(manifest.packageLabel() || "").trim()
+    : String(options.packageLabel || "").trim();
+  const packageOk = /^s3\./.test(packageLabel);
+  const geminiOk = options.geminiConfigured === true;
+  let status = "unavailable";
+  if (functionsOk && packageOk && geminiOk) status = "operational";
+  else if (functionsOk && packageOk) status = "degraded";
+  else if (functionsOk || packageOk) status = "degraded";
+  return {
+    status,
+    lastCheckAtIso: new Date(nowMs).toISOString(),
+    checks: {
+      functions: functionsOk,
+      package: packageOk,
+      gemini: geminiOk
+    }
+  };
+}
+
 function buildVersionSmartView(opts) {
   const options = opts && typeof opts === "object" ? opts : {};
   const nowMs = Number.isFinite(Number(options.now)) ? Number(options.now) : Date.now();
@@ -77,6 +105,12 @@ function buildVersionSmartView(opts) {
   const ver = manifest.packageVersion();
   const modelId = manifest.textModelId();
   const man = manifest.buildManifest({ generatedAtIso: iso });
+  const probe = probeVersionService({
+    now: nowMs,
+    packageLabel: pkg,
+    functionsReachable: options.functionsReachable === true,
+    geminiConfigured: options.geminiConfigured === true
+  });
   const payload = {
     schemaVersion: SCHEMA_VERSION,
     kind: KIND,
@@ -92,12 +126,13 @@ function buildVersionSmartView(opts) {
     model: {
       configuredId: modelId,
       sessionPath: options.sessionPath || "local-version",
-      sessionModel: null,
+      sessionModel: modelId,
       usedThisTurn: false
     },
     service: {
-      status: "not_checked",
-      lastCheckAtIso: null
+      status: probe.status,
+      lastCheckAtIso: probe.lastCheckAtIso,
+      checks: probe.checks
     },
     changelog: changelogItems(options.rootDir),
     environment: man.environment || "pr_not_production"
@@ -134,5 +169,6 @@ module.exports = {
   changelogFromBundle,
   changelogFromReadme,
   changelogItems,
+  probeVersionService,
   buildVersionSmartView
 };

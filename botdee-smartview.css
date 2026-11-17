@@ -450,6 +450,23 @@ body.botdee-sv-overlay-open { overflow: hidden; }
   border-radius: 50%;
   background: var(--muted, #a5b9ba);
 }
+.botdee-sv-version-pill[data-status="operational"] {
+  color: var(--accent, #00d4fe);
+  border-color: color-mix(in srgb, var(--accent, #00d4fe) 55%, transparent);
+}
+.botdee-sv-version-pill[data-status="operational"]::before {
+  background: var(--accent, #00d4fe);
+}
+.botdee-sv-version-pill[data-status="degraded"] {
+  color: var(--text, #e8f0f0);
+  border-color: color-mix(in srgb, var(--accent, #00d4fe) 40%, var(--muted, #a5b9ba));
+}
+.botdee-sv-version-pill[data-status="degraded"]::before {
+  background: color-mix(in srgb, var(--accent, #00d4fe) 55%, var(--muted, #a5b9ba));
+}
+.botdee-sv-version-pill[data-status="unavailable"]::before {
+  background: var(--muted, #a5b9ba);
+}
 .botdee-sv-version-rows {
   border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 28%, transparent);
   border-radius: 14px;

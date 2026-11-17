@@ -351,30 +351,52 @@
     return {...next, floqr};
   }
 
+  /** Packaged default — must match functions/bot-dee-core.js TEXT_MODEL when env is unset. */
+  const DEFAULT_TEXT_MODEL = "gemini-3.6-flash";
+
   function localVersionPayload() {
     const label = global.FLOQRNav?.appVersion ? String(global.FLOQRNav.appVersion) : "";
+    const nowIso = new Date().toISOString();
+    const packageOk = /^s3\./.test(label);
     return {
       schemaVersion: "floqr.botDeeVersionSmartView/1",
       kind: "botDeeVersion",
-      generatedAtIso: new Date().toISOString(),
+      generatedAtIso: nowIso,
       botDee: {packageLabel: label || null, packageVersion: label.replace(/^s/, "") || null},
       floqr: {backendPackage: null, frontendPackage: label || null},
-      model: {configuredId: null, sessionPath: "local-client", sessionModel: null, usedThisTurn: false},
-      service: {status: "not_checked", lastCheckAtIso: null},
+      model: {
+        configuredId: DEFAULT_TEXT_MODEL,
+        sessionPath: "local-client",
+        sessionModel: DEFAULT_TEXT_MODEL,
+        usedThisTurn: false
+      },
+      service: {
+        status: packageOk ? "degraded" : "unavailable",
+        lastCheckAtIso: nowIso,
+        checks: {functions: false, package: packageOk, gemini: false}
+      },
       changelog: []
     };
   }
 
+  function statusKey(payload) {
+    const status = String(payload?.service?.status || "unavailable");
+    if (status === "operational") return "operational";
+    if (status === "degraded") return "degraded";
+    return "unavailable";
+  }
+
   function statusCopy(payload) {
-    const status = String(payload?.service?.status || "not_checked");
-    if (status === "unavailable") return t("botdee.vs.statusUnavailable", "Unavailable");
-    return t("botdee.vs.statusNotChecked", "Not checked");
+    const key = statusKey(payload);
+    if (key === "operational") return t("botdee.vs.statusOperational", "Operational");
+    if (key === "degraded") return t("botdee.vs.statusDegraded", "Degraded");
+    return t("botdee.vs.statusUnavailable", "Unavailable");
   }
 
   function modelCopy(payload) {
     const model = payload?.model && typeof payload.model === "object" ? payload.model : {};
-    if (model.usedThisTurn && model.sessionModel) return esc(model.sessionModel);
-    if (model.usedThisTurn === false) return esc(t("botdee.vs.notUsedThisTurn", "Not used this turn"));
+    const id = String(model.sessionModel || model.configuredId || "").trim();
+    if (id) return esc(id);
     return esc(t("botdee.vs.unavailable", "Unavailable"));
   }
 
@@ -422,7 +444,7 @@
     const status = statusCopy(view);
     return `<article class="botdee-sv-version" data-kind="botDeeVersion" data-tab="overview">
       <h2 class="botdee-sv-version-title"><span class="botdee-sv-version-spark" aria-hidden="true">✦</span>${esc(t("botdee.vs.title", "BOT DEE — Version SMARTview"))}</h2>
-      <div class="botdee-sv-version-id"><div class="botdee-sv-version-robot" aria-hidden="true">🤖</div><div class="botdee-sv-version-id-copy"><strong>${esc(t("botdee.vs.identityName", "BOT DEE"))} ✓</strong><p class="botdee-sv-version-sub">${esc(t("botdee.vs.identitySub", "System & Version Information"))}</p></div><span class="botdee-sv-version-pill">${esc(status)}</span></div>
+      <div class="botdee-sv-version-id"><div class="botdee-sv-version-robot" aria-hidden="true">🤖</div><div class="botdee-sv-version-id-copy"><strong>${esc(t("botdee.vs.identityName", "BOT DEE"))} ✓</strong><p class="botdee-sv-version-sub">${esc(t("botdee.vs.identitySub", "System & Version Information"))}</p></div><span class="botdee-sv-version-pill" data-status="${esc(statusKey(view))}">${esc(status)}</span></div>
       <div class="botdee-sv-version-rows">
         <div class="botdee-sv-version-row"><span>${esc(t("botdee.vs.rowBotDee", "BOT DEE version"))}</span><strong>${esc(botLabel)}</strong></div>
         <div class="botdee-sv-version-row"><span>${esc(t("botdee.vs.rowFloqr", "FLOQR version"))}</span><strong>${esc(floqrShown)}</strong></div>
@@ -443,8 +465,8 @@
           ${esc(t("botdee.vs.techBuild", "Build identifier"))}: ${esc(botLabel)}<br/>
           ${esc(t("botdee.vs.frontendLabel", "FLOQR frontend"))}: ${esc(frontend || unavailable)}<br/>
           ${esc(t("botdee.vs.backendLabel", "FLOQR backend"))}: ${esc(backend || unavailable)}<br/>
-          ${esc(t("botdee.vs.configuredModel", "Configured: {id}", {id: view.model?.configuredId || t("botdee.vs.unavailable", "Unavailable")}))}<br/>
-          ${esc(t("botdee.vs.techCheck", "Last successful health check"))}: ${esc(t("botdee.vs.unavailable", "Unavailable"))}</p>
+          ${esc(t("botdee.vs.configuredModel", `Configured: ${view.model?.configuredId || unavailable}`, {id: view.model?.configuredId || unavailable}))}<br/>
+          ${esc(t("botdee.vs.techCheck", "Last successful health check"))}: ${esc(formatWhen(view.service?.lastCheckAtIso))}</p>
           ${privilegedHtml(view)}
         </div>
       </div>

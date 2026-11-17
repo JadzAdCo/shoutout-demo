@@ -225,6 +225,7 @@
       title: "s3.3.034 — Version SMARTview card only (no six-phase dump)",
       checks: [
         {label:"Alias reply is empty", file:"functions/bot-dee-core.js", includes:["isVersionSmartViewAlias(raw)) return \"\""], notIncludes:["describeForRole"]},
+        {label:"Live probe + Gemini id", file:"functions/botdee-version-smartview.js", includes:["function probeVersionService(", "status = \"operational\"", "textModelId()"]},
         {label:"Client alias has no bubble text", file:"bot-dee-chat.js", includes:["if (isVersionSmartViewAlias(text)) return \"\"", "versionCardOnly"]},
         {label:"People + Room cards stay", file:"botdee-smartview.js", includes:["function renderCompactPeopleCard(", "function renderRoomCard("]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-034-version-card-only"]}
@@ -246,7 +247,7 @@
       version: "s3.3.032",
       title: "s3.3.032 — Version SMARTview + SMARTcard public Profile Media hero",
       checks: [
-        {label:"Version SMARTview aliases", file:"functions/botdee-version-smartview.js", includes:["function isVersionSmartViewAlias(", "floqr.botDeeVersionSmartView/1", "status: \"not_checked\"", "changelogFromBundle"]},
+        {label:"Version SMARTview aliases", file:"functions/botdee-version-smartview.js", includes:["function isVersionSmartViewAlias(", "floqr.botDeeVersionSmartView/1", "function probeVersionService(", "changelogFromBundle"]},
         {label:"Bundled What's New", file:"functions/botdee-version-changelog.json", includes:["s3.3.032"]},
         {label:"localSession attaches card", file:"functions/bot-dee-functions.js", includes:["buildVersionSmartView", "smartViews: [versionView]"]},
         {label:"Client renderer", file:"botdee-smartview.js", includes:["function renderVersionCard(", "botdee.vs.title", "localVersionPayload"]},
@@ -3343,10 +3344,10 @@
       id:"s3-3-034-version-card-only",
       area:"BOT DEE",
       feature:"Version SMARTview card only (Ver / Vers / Version)",
-      changed:"s3.3.034 — Typing Ver, Vers, or Version shows only the Version SMARTview card. The six-phase chat dump (package stamp, gemini-3.6-flash, Part 1–6 implemented/tested/not-deployed, mock integrations list) is removed, not hidden or shortened. People and Room cards are unchanged.",
-      howToTest:"1) After Pages + Functions deploy (do not deploy until Don asks). Hard-refresh botdee.html — confirm bot-dee-chat.js?v=s3.3.034. Sign in with BOT DEE access, including Master Admin. 2) Type Ver, then Vers, then Version (try VERSION and Version?). Each paints one Version SMARTview. There is NO chat bubble text above the card — no package s3.3.033/s3.3.034 line, no gemini-3.6-flash, no Part 1–6, no mock integrations list. 3) Ask what is your version? — short package line plus the card is OK; still no six-phase dump. 4) Type a People query and a Room intent — those cards still open. 5) Mark Succeed/Failed.",
-      expected:"Ver / Vers / Version = card only. No six-phase dump. People and Room cards still work.",
-      troubleshoot:"Still seeing Part 1–6 / mock-only list → Functions executeBotSession not this SHA, or cached bot-dee-chat.js. Empty miss line “No answer yet” → displayReply treated empty as miss; confirm versionCardOnly path. People/Room broken → this change must not touch usercharacter_analysis or classifyRoomIntent."
+      changed:"s3.3.034 — Typing Ver, Vers, or Version shows only the Version SMARTview card. Six-phase dump removed. Service status is a this-request probe (Operational / Degraded / Unavailable). AI model shows the configured Gemini id (gemini-3.6-flash unless FLOQR_GEMINI_TEXT_MODEL overrides), never Not used this turn. People and Room cards are unchanged.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh botdee.html — confirm bot-dee-chat.js?v=s3.3.034. Sign in with BOT DEE access, including Master Admin. 2) Type Ver, then Vers, then Version (try VERSION and Version?). Each paints one Version SMARTview. There is NO chat bubble text above the card — no Part 1–6, no mock integrations list. 3) Service status is Operational, Degraded, or Unavailable from this request — never Not checked. AI model shows gemini-3.6-flash (or the live FLOQR_GEMINI_TEXT_MODEL id), never Not used this turn. 4) Ask what is your version? — short package line plus the card is OK; still no six-phase dump. 5) Type a People query and a Room intent — those cards still open. 6) Refresh the page after Ver — no “No answer yet” miss bubble. 7) Mark Succeed/Failed.",
+      expected:"Ver / Vers / Version = card only. Live Operational/Degraded/Unavailable. Real Gemini model id. No six-phase dump. People and Room cards still work.",
+      troubleshoot:"Still seeing Part 1–6 / mock-only list → Functions executeBotSession not this SHA, or cached bot-dee-chat.js. Empty miss line “No answer yet” → persistModelTurn allowEmpty or restoreTurns skip-empty missing. Not checked / Not used this turn → old botdee-smartview.js. People/Room broken → this change must not touch usercharacter_analysis or classifyRoomIntent."
     },
     {
       id:"s3-3-033-room-smartview-intent",

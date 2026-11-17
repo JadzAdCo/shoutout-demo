@@ -38,11 +38,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "В чате BOT DEE введите Ver, Vers или Version (регистр не важен, ? по желанию). Карточка Version SMARTview — единственный ответ: BOT DEE не сбрасывает в чат пакет, модель, six-phase или список mock-интеграций. На ней реальный штамп пакета FLOQR, использовалась ли модель ИИ в этом ходе, и статус службы. Цифры на дизайн-макетах — примеры; живые значения берутся из приложения. Site Chrome следует теме Appearance."
+        body: "В чате BOT DEE введите Ver, Vers или Version (регистр не важен, ? по желанию). Карточка Version SMARTview — единственный ответ: BOT DEE не сбрасывает в чат пакет, модель, six-phase или список mock-интеграций. На ней реальный штамп пакета FLOQR, id модели Gemini этого развёртывания (та же, что вызвал бы executeBotSession, даже если этот ход не генерировал) и живой статус службы по проверке этого запроса. Цифры на дизайн-макетах — примеры; живые значения берутся из приложения. Site Chrome следует теме Appearance."
       },
       "help-botdee-version-smartview-status": {
-        title: "Статус Version SMARTview честный",
-        body: "Состояние службы — Не проверено, пока FLOQR реально не опросит службу. Карточка никогда не показывает Operational с картинки или догадки. Модель ИИ — Не использовано в этом ходе, потому что команда Version не вызывает Gemini. Штампы фронтенда и бэкенда могут различаться; оба подписаны. Master Admin видит доп. диагностику в технических сведениях — гости нет."
+        title: "Статус Version SMARTview — живая проверка",
+        body: "Состояние службы проверяется на этом запросе Version: Functions и пакет доступны и Gemini настроен → Работает; Functions и пакет есть, Gemini не настроен → Ограничено; Functions нет в этом запросе → Недоступно. Никогда не статическая метка Не проверено. Модель ИИ показывает настроенный id Gemini этого развёртывания, даже если этот ход не генерировал. Штампы фронтенда и бэкенда могут различаться; оба подписаны. Master Admin видит доп. диагностику в технических сведениях — гости нет."
       },
       "help-botdee-version-smartview-tabs": {
         title: "Вкладки Version SMARTview",
@@ -524,11 +524,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Typ in de BOT DEE-chat Ver, Vers of Version (hoofdletters maken niet uit, ? optioneel). De Version SMARTview-kaart is het enige antwoord — BOT DEE dumpt geen package, model, six-phase of mock-integratietekst in de chatbubble. Die toont de echte FLOQR-packagestempel, of deze beurt een AI-model gebruikte, en de servicestatus. Cijfers op ontwerpbeelden zijn voorbeelden — live waarden komen uit de app. Site Chrome volgt je Appearance-thema."
+        body: "Typ in de BOT DEE-chat Ver, Vers of Version (hoofdletters maken niet uit, ? optioneel). De Version SMARTview-kaart is het enige antwoord — BOT DEE dumpt geen package, model, six-phase of mock-integratietekst in de chatbubble. Die toont de echte FLOQR-packagestempel, het Gemini-model-id van deze deployment (hetzelfde model dat executeBotSession zou aanroepen, ook als deze beurt niet genereerde) en een live servicestatus van een peiling van dit verzoek. Cijfers op ontwerpbeelden zijn voorbeelden — live waarden komen uit de app. Site Chrome volgt je Appearance-thema."
       },
       "help-botdee-version-smartview-status": {
-        title: "Version SMARTview-status is eerlijk",
-        body: "Servicestatus is Niet gecontroleerd tot FLOQR de dienst echt peilt. De kaart toont nooit Operational uit een plaatje of een gok. Het AI-model is Niet gebruikt deze beurt omdat het Version-commando Gemini niet aanroept. Frontend- en backendstempels kunnen verschillen; beide zijn gelabeld. Master Admin kan extra diagnostiek zien onder Technische details — patrons niet."
+        title: "Version SMARTview-status is een live peiling",
+        body: "Servicestatus wordt bij dit Version-verzoek gepeild: Functions en package bereikbaar met Gemini geconfigureerd → Operationeel; Functions en package oké maar Gemini niet geconfigureerd → Verminderd; Functions niet in dit verzoek → Niet beschikbaar. Nooit een statisch Niet gecontroleerd. Het AI-model toont het geconfigureerde Gemini-model-id van deze deployment ook als deze beurt niet genereerde. Frontend- en backendstempels kunnen verschillen; beide zijn gelabeld. Master Admin kan extra diagnostiek zien onder Technische details — patrons niet."
       },
       "help-botdee-version-smartview-tabs": {
         title: "Version SMARTview-tabbladen",
@@ -1010,11 +1010,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Dans le chat BOT DEE, saisissez Ver, Vers ou Version (casse indifférente, ? optionnel). La carte Version SMARTview est la seule réponse — BOT DEE ne déverse pas le package, le modèle, le six-phase ni les intégrations mock dans la bulle. Elle affiche le vrai tampon de package FLOQR, si ce tour a utilisé un modèle d’IA, et l’état du service. Les chiffres des visuels de design sont des exemples — les valeurs live viennent de l’app. Site Chrome suit votre thème Appearance."
+        body: "Dans le chat BOT DEE, saisissez Ver, Vers ou Version (casse indifférente, ? optionnel). La carte Version SMARTview est la seule réponse — BOT DEE ne déverse pas le package, le modèle, le six-phase ni les intégrations mock dans la bulle. Elle affiche le vrai tampon de package FLOQR, l’identifiant du modèle Gemini de ce déploiement (le même que executeBotSession, même si ce tour n’a pas généré), et un état de service issu d’une sonde de cette requête. Les chiffres des visuels de design sont des exemples — les valeurs live viennent de l’app. Site Chrome suit votre thème Appearance."
       },
       "help-botdee-version-smartview-status": {
-        title: "L’état Version SMARTview est honnête",
-        body: "L’état du service est Non vérifié tant que FLOQR n’a pas réellement sondé le service. La carte n’affiche jamais Operational d’après une image ou une supposition. Le modèle d’IA est Non utilisé ce tour car la commande Version n’appelle pas Gemini. Les tampons frontend et backend peuvent différer ; les deux sont étiquetés. Master Admin peut voir des diagnostics sous Détails techniques — pas les patrons."
+        title: "L’état Version SMARTview est une sonde live",
+        body: "L’état du service est sondé sur cette requête Version : Functions et package joignables avec Gemini configuré → Opérationnel ; Functions et package OK mais Gemini non configuré → Dégradé ; Functions absentes de cette requête → Indisponible. Jamais un libellé statique Non vérifié. Le modèle d’IA affiche l’identifiant Gemini configuré pour ce déploiement même si ce tour n’a pas généré. Les tampons frontend et backend peuvent différer ; les deux sont étiquetés. Master Admin peut voir des diagnostics sous Détails techniques — pas les patrons."
       },
       "help-botdee-version-smartview-tabs": {
         title: "Onglets Version SMARTview",
@@ -1496,11 +1496,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Im BOT DEE-Chat tippen Sie Ver, Vers oder Version (Groß/Klein egal, optional ?). Die Version-SMARTview-Karte ist die einzige Antwort — BOT DEE dumppt kein Package, Modell, Six-Phase oder Mock-Integrationen in die Chatblase. Sie zeigt den echten FLOQR-Package-Stempel, ob dieser Zug ein KI-Modell genutzt hat, und den Dienststatus. Zahlen in Designbildern sind Beispiele — Live-Werte kommen aus der App. Site Chrome folgt Ihrem Appearance-Thema."
+        body: "Im BOT DEE-Chat tippen Sie Ver, Vers oder Version (Groß/Klein egal, optional ?). Die Version-SMARTview-Karte ist die einzige Antwort — BOT DEE dumppt kein Package, Modell, Six-Phase oder Mock-Integrationen in die Chatblase. Sie zeigt den echten FLOQR-Package-Stempel, die Gemini-Modell-ID dieses Deployments (dasselbe Modell, das executeBotSession nutzen würde, auch wenn dieser Zug nicht generiert), und einen Live-Dienststatus aus einer Prüfung dieser Anfrage. Zahlen in Designbildern sind Beispiele — Live-Werte kommen aus der App. Site Chrome folgt Ihrem Appearance-Thema."
       },
       "help-botdee-version-smartview-status": {
-        title: "Version-SMARTview-Status ist ehrlich",
-        body: "Der Dienststatus ist Nicht geprüft, bis FLOQR den Dienst wirklich prüft. Die Karte zeigt nie Operational aus einem Bild oder einer Vermutung. Das KI-Modell ist In diesem Zug nicht verwendet, weil der Version-Befehl Gemini nicht aufruft. Frontend- und Backend-Stempel können sich unterscheiden; beide sind beschriftet. Master Admin sieht extra Diagnosen unter Technische Details — Gäste nicht."
+        title: "Version-SMARTview-Status ist eine Live-Prüfung",
+        body: "Der Dienststatus wird bei dieser Version-Anfrage geprüft: Functions und Package erreichbar und Gemini konfiguriert → Betriebsbereit; Functions und Package da, Gemini nicht konfiguriert → Eingeschränkt; Functions nicht in dieser Anfrage → Nicht verfügbar. Nie ein statisches Nicht geprüft. Das KI-Modell zeigt die konfigurierte Gemini-Modell-ID dieses Deployments, auch wenn dieser Zug nicht generiert. Frontend- und Backend-Stempel können sich unterscheiden; beide sind beschriftet. Master Admin sieht extra Diagnosen unter Technische Details — Gäste nicht."
       },
       "help-botdee-version-smartview-tabs": {
         title: "Version-SMARTview-Reiter",
@@ -1982,11 +1982,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "En el chat de BOT DEE, escriba Ver, Vers o Version (mayúsculas da igual, ? opcional). La tarjeta Version SMARTview es la única respuesta — BOT DEE no vuelca paquete, modelo, six-phase ni integraciones mock en la burbuja. Muestra el sello real del paquete FLOQR, si este turno usó un modelo de IA y el estado del servicio. Los números de las imágenes de diseño son ejemplos — los valores en vivo salen de la app. Site Chrome sigue su tema de Appearance."
+        body: "En el chat de BOT DEE, escriba Ver, Vers o Version (mayúsculas da igual, ? opcional). La tarjeta Version SMARTview es la única respuesta — BOT DEE no vuelca paquete, modelo, six-phase ni integraciones mock en la burbuja. Muestra el sello real del paquete FLOQR, el id del modelo Gemini de este despliegue (el mismo que usaría executeBotSession, aunque este turno no generara) y un estado de servicio de una sonda de esta petición. Los números de las imágenes de diseño son ejemplos — los valores en vivo salen de la app. Site Chrome sigue su tema de Appearance."
       },
       "help-botdee-version-smartview-status": {
-        title: "El estado de Version SMARTview es honesto",
-        body: "El estado del servicio es Sin comprobar hasta que FLOQR sondee de verdad el servicio. La tarjeta nunca muestra Operational por una imagen o una suposición. El modelo de IA es No usado en este turno porque el comando Version no llama a Gemini. Los sellos de frontend y backend pueden diferir; ambos se etiquetan. Master Admin puede ver diagnósticos extra en Detalles técnicos — los patrons no."
+        title: "El estado de Version SMARTview es una sonda en vivo",
+        body: "El estado del servicio se sondea en esta petición Version: Functions y paquete alcanzables con Gemini configurado → Operativo; Functions y paquete bien pero Gemini no configurado → Degradado; Functions no en esta petición → No disponible. Nunca una etiqueta estática Sin comprobar. El modelo de IA muestra el id de Gemini configurado de este despliegue aunque este turno no genere. Los sellos de frontend y backend pueden diferir; ambos se etiquetan. Master Admin puede ver diagnósticos extra en Detalles técnicos — los patrons no."
       },
       "help-botdee-version-smartview-tabs": {
         title: "Pestañas de Version SMARTview",
@@ -2468,11 +2468,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Nella chat BOT DEE, digita Ver, Vers o Version (maiuscole indifferenti, ? opzionale). La scheda Version SMARTview è l’unica risposta — BOT DEE non scarica package, modello, six-phase o integrazioni mock nella bolla. Mostra il vero timbro del package FLOQR, se questo turno ha usato un modello IA e lo stato del servizio. I numeri nelle immagini di design sono esempi — i valori live arrivano dall’app. Site Chrome segue il tema Appearance."
+        body: "Nella chat BOT DEE, digita Ver, Vers o Version (maiuscole indifferenti, ? opzionale). La scheda Version SMARTview è l’unica risposta — BOT DEE non scarica package, modello, six-phase o integrazioni mock nella bolla. Mostra il vero timbro del package FLOQR, l’id del modello Gemini di questo deployment (lo stesso che userebbe executeBotSession, anche se questo turno non ha generato) e uno stato del servizio da una sonda di questa richiesta. I numeri nelle immagini di design sono esempi — i valori live arrivano dall’app. Site Chrome segue il tema Appearance."
       },
       "help-botdee-version-smartview-status": {
-        title: "Lo stato Version SMARTview è onesto",
-        body: "Lo stato del servizio è Non verificato finché FLOQR non sonda davvero il servizio. La scheda non mostra mai Operational da un’immagine o da una stima. Il modello IA è Non usato in questo turno perché il comando Version non chiama Gemini. I timbri frontend e backend possono differire; entrambi sono etichettati. Master Admin può vedere diagnostica extra in Dettagli tecnici — i patron no."
+        title: "Lo stato Version SMARTview è una sonda live",
+        body: "Lo stato del servizio è sondato su questa richiesta Version: Functions e package raggiungibili con Gemini configurato → Operativo; Functions e package ok ma Gemini non configurato → Degradato; Functions assenti da questa richiesta → Non disponibile. Mai un’etichetta statica Non verificato. Il modello IA mostra l’id Gemini configurato di questo deployment anche se questo turno non ha generato. I timbri frontend e backend possono differire; entrambi sono etichettati. Master Admin può vedere diagnostica extra in Dettagli tecnici — i patron no."
       },
       "help-botdee-version-smartview-tabs": {
         title: "Schede Version SMARTview",
@@ -2954,11 +2954,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "No chat BOT DEE, digite Ver, Vers ou Version (maiúsculas não importam, ? opcional). O cartão Version SMARTview é a única resposta — BOT DEE não despeja package, modelo, six-phase nem integrações mock no balão. Mostra o carimbo real do pacote FLOQR, se esta vez usou um modelo de IA e o estado do serviço. Números nas imagens de design são exemplos — os valores ao vivo vêm do app. Site Chrome segue o tema Appearance."
+        body: "No chat BOT DEE, digite Ver, Vers ou Version (maiúsculas não importam, ? opcional). O cartão Version SMARTview é a única resposta — BOT DEE não despeja package, modelo, six-phase nem integrações mock no balão. Mostra o carimbo real do pacote FLOQR, o id do modelo Gemini deste deployment (o mesmo que executeBotSession usaria, mesmo quando esta vez não gerou) e um estado de serviço de uma sonda deste pedido. Números nas imagens de design são exemplos — os valores ao vivo vêm do app. Site Chrome segue o tema Appearance."
       },
       "help-botdee-version-smartview-status": {
-        title: "O estado do Version SMARTview é honesto",
-        body: "O estado do serviço é Não verificado até a FLOQR realmente sondar o serviço. O cartão nunca mostra Operational a partir de uma imagem ou palpite. O modelo de IA é Não usado nesta vez porque o comando Version não chama o Gemini. Os carimbos de frontend e backend podem diferir; ambos são rotulados. Master Admin pode ver diagnósticos extra em Detalhes técnicos — patrons não."
+        title: "O estado do Version SMARTview é uma sonda ao vivo",
+        body: "O estado do serviço é sondado neste pedido Version: Functions e pacote alcançáveis com Gemini configurado → Operacional; Functions e pacote ok mas Gemini não configurado → Degradado; Functions fora deste pedido → Indisponível. Nunca um rótulo estático Não verificado. O modelo de IA mostra o id Gemini configurado deste deployment mesmo quando esta vez não gerou. Os carimbos de frontend e backend podem diferir; ambos são rotulados. Master Admin pode ver diagnósticos extra em Detalhes técnicos — patrons não."
       },
       "help-botdee-version-smartview-tabs": {
         title: "Abas do Version SMARTview",
@@ -3440,11 +3440,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Στη συνομιλία BOT DEE πληκτρολογήστε Ver, Vers ή Version (κεφαλαία αδιάφορα, προαιρετικό ;). Η κάρτα Version SMARTview είναι η μόνη απάντηση — η BOT DEE δεν ρίχνει package, μοντέλο, six-phase ή mock integrations στη φυσαλίδα. Δείχνει την πραγματική σφραγίδα πακέτου FLOQR, αν αυτός ο γύρος χρησιμοποίησε μοντέλο ΤΝ και την κατάσταση υπηρεσίας. Οι αριθμοί στις εικόνες σχεδίασης είναι παραδείγματα — οι ζωντανές τιμές έρχονται από την εφαρμογή. Το Site Chrome ακολουθεί το θέμα Appearance."
+        body: "Στη συνομιλία BOT DEE πληκτρολογήστε Ver, Vers ή Version (κεφαλαία αδιάφορα, προαιρετικό ;). Η κάρτα Version SMARTview είναι η μόνη απάντηση — η BOT DEE δεν ρίχνει package, μοντέλο, six-phase ή mock integrations στη φυσαλίδα. Δείχνει την πραγματική σφραγίδα πακέτου FLOQR, το id μοντέλου Gemini αυτού του deployment (το ίδιο που θα καλούσε το executeBotSession, ακόμα κι αν αυτός ο γύρος δεν παρήγαγε) και ζωντανή κατάσταση υπηρεσίας από έλεγχο αυτού του αιτήματος. Οι αριθμοί στις εικόνες σχεδίασης είναι παραδείγματα — οι ζωντανές τιμές έρχονται από την εφαρμογή. Το Site Chrome ακολουθεί το θέμα Appearance."
       },
       "help-botdee-version-smartview-status": {
-        title: "Η κατάσταση Version SMARTview είναι ειλικρινής",
-        body: "Η κατάσταση υπηρεσίας είναι Δεν ελέγχθηκε μέχρι η FLOQR να ελέγξει πραγματικά την υπηρεσία. Η κάρτα δεν δείχνει ποτέ Operational από εικόνα ή εικασία. Το μοντέλο ΤΝ είναι Δεν χρησιμοποιήθηκε σε αυτόν τον γύρο γιατί η εντολή Version δεν καλεί Gemini. Τα σφραγίσματα frontend και backend μπορεί να διαφέρουν· και τα δύο έχουν ετικέτα. Ο Master Admin μπορεί να δει επιπλέον διάγνωση στις Τεχνικές λεπτομέρειες — οι patrons όχι."
+        title: "Η κατάσταση Version SMARTview είναι ζωντανός έλεγχος",
+        body: "Η κατάσταση υπηρεσίας ελέγχεται σε αυτό το αίτημα Version: Functions και πακέτο προσβάσιμα με ρυθμισμένο Gemini → Λειτουργικό; Functions και πακέτο εντάξει αλλά Gemini μη ρυθμισμένο → Υποβαθμισμένο; Functions εκτός αυτού του αιτήματος → Μη διαθέσιμο. Ποτέ στατική ετικέτα Δεν ελέγχθηκε. Το μοντέλο ΤΝ δείχνει το ρυθμισμένο id Gemini αυτού του deployment ακόμα κι αν αυτός ο γύρος δεν παρήγαγε. Τα σφραγίσματα frontend και backend μπορεί να διαφέρουν· και τα δύο έχουν ετικέτα. Ο Master Admin μπορεί να δει επιπλέον διάγνωση στις Τεχνικές λεπτομέρειες — οι patrons όχι."
       },
       "help-botdee-version-smartview-tabs": {
         title: "Καρτέλες Version SMARTview",
@@ -3926,11 +3926,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "W czacie BOT DEE wpisz Ver, Vers lub Version (wielkość liter nieważna, opcjonalny ?). Karta Version SMARTview jest jedyną odpowiedzią — BOT DEE nie zrzuca pakietu, modelu, six-phase ani mock-integracji do dymka. Pokazuje prawdziwy stempel pakietu FLOQR, czy ta tura użyła modelu AI i status usługi. Liczby na obrazach projektu to przykłady — żywe wartości pochodzą z aplikacji. Site Chrome idzie za motywem Appearance."
+        body: "W czacie BOT DEE wpisz Ver, Vers lub Version (wielkość liter nieważna, opcjonalny ?). Karta Version SMARTview jest jedyną odpowiedzią — BOT DEE nie zrzuca pakietu, modelu, six-phase ani mock-integracji do dymka. Pokazuje prawdziwy stempel pakietu FLOQR, id modelu Gemini tego wdrożenia (ten sam, którego użyłby executeBotSession, nawet gdy ta tura nie generowała) oraz żywy status usługi z sondy tego żądania. Liczby na obrazach projektu to przykłady — żywe wartości pochodzą z aplikacji. Site Chrome idzie za motywem Appearance."
       },
       "help-botdee-version-smartview-status": {
-        title: "Status Version SMARTview jest uczciwy",
-        body: "Status usługi to Nie sprawdzono, dopóki FLOQR naprawdę nie zbada usługi. Karta nigdy nie pokazuje Operational z obrazka ani zgadywania. Model AI to Nie użyto w tej turze, bo polecenie Version nie woła Gemini. Stemple frontendu i backendu mogą się różnić; oba są opisane. Master Admin może zobaczyć dodatkową diagnostykę w Szczegółach technicznych — patroni nie."
+        title: "Status Version SMARTview to żywa sonda",
+        body: "Status usługi jest sondowany przy tym żądaniu Version: Functions i pakiet osiągalne z skonfigurowanym Gemini → Działa; Functions i pakiet ok, ale Gemini nieskonfigurowane → Ograniczone; Functions poza tym żądaniem → Niedostępne. Nigdy statyczna etykieta Nie sprawdzono. Model AI pokazuje skonfigurowane id Gemini tego wdrożenia nawet gdy ta tura nie generowała. Stemple frontendu i backendu mogą się różnić; oba są opisane. Master Admin może zobaczyć dodatkową diagnostykę w Szczegółach technicznych — patroni nie."
       },
       "help-botdee-version-smartview-tabs": {
         title: "Karty Version SMARTview",
@@ -4412,11 +4412,11 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "في دردشة BOT DEE اكتب Ver أو Vers أو Version (حجم الأحرف لا يهم، ? اختياري). بطاقة Version SMARTview هي الإجابة الوحيدة — لا تُفرّغ BOT DEE نص الحزمة أو النموذج أو six-phase أو التكاملات الوهمية في فقاعة الدردشة. تعرض ختم حزمة FLOQR الحقيقي، وما إذا استخدم هذا الدور نموذجاً للذكاء الاصطناعي، وحالة الخدمة. الأرقام في صور التصميم أمثلة — القيم الحية تأتي من التطبيق. يتبع Site Chrome مظهر Appearance."
+        body: "في دردشة BOT DEE اكتب Ver أو Vers أو Version (حجم الأحرف لا يهم، ? اختياري). بطاقة Version SMARTview هي الإجابة الوحيدة — لا تُفرّغ BOT DEE نص الحزمة أو النموذج أو six-phase أو التكاملات الوهمية في فقاعة الدردشة. تعرض ختم حزمة FLOQR الحقيقي، ومعرّف نموذج Gemini لهذا النشر (نفس النموذج الذي يستدعيه executeBotSession حتى إن تخطّى هذا الدور التوليد)، وحالة خدمة حيّة من فحص هذا الطلب. الأرقام في صور التصميم أمثلة — القيم الحية تأتي من التطبيق. يتبع Site Chrome مظهر Appearance."
       },
       "help-botdee-version-smartview-status": {
-        title: "حالة Version SMARTview صادقة",
-        body: "حالة الخدمة «لم يُتحقق» حتى تفحص FLOQR الخدمة فعلاً. لا تعرض البطاقة Operational من صورة أو تخمين. نموذج الذكاء الاصطناعي «لم يُستخدم في هذه الجولة» لأن أمر Version لا يستدعي Gemini. يمكن أن يختلف ختم الواجهة عن الخلفية؛ كلاهما مُسمّى. قد يرى Master Admin تشخيصاً إضافياً تحت التفاصيل التقنية — الضيوف لا."
+        title: "حالة Version SMARTview فحص حي",
+        body: "تُفحص حالة الخدمة في طلب Version هذا: Functions والحزمة قابلان للوصول وGemini مضبوط → تشغيلي؛ Functions والحزمة جاهزان لكن Gemini غير مضبوط → متدهور؛ Functions ليست في هذا الطلب → غير متاح. ليست أبداً تسمية ثابتة «لم يُتحقق». يعرض نموذج الذكاء الاصطناعي معرّف Gemini المضبوط لهذا النشر حتى إن لم يولّد هذا الدور. يمكن أن يختلف ختم الواجهة عن الخلفية؛ كلاهما مُسمّى. قد يرى Master Admin تشخيصاً إضافياً تحت التفاصيل التقنية — الضيوف لا."
       },
       "help-botdee-version-smartview-tabs": {
         title: "علامات Version SMARTview",
