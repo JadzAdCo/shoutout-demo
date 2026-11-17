@@ -175,7 +175,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   };
 }
 
-function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined} = {}) {
+function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined, functionsReachable, geminiConfigured} = {}) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const isActive = !!active;
@@ -222,10 +222,12 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
   if (bot.isVersionPrompt(userPrompt)) {
     const versionView = require("./botdee-version-smartview").buildVersionSmartView({
       role,
-      sessionPath: "local-version"
+      sessionPath: "local-version",
+      functionsReachable: functionsReachable !== false,
+      geminiConfigured: geminiConfigured === true
     });
     return {
-      reply: bot.versionReply(role),
+      reply: bot.versionReply(role, userPrompt),
       results: [],
       provider: "local-version",
       model: "version",
@@ -470,7 +472,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       || bot.isPrivacyPrompt(userPrompt)
     ) {
       outcome = localSession(role, userPrompt, {
-        active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined
+        active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+        functionsReachable: true,
+        geminiConfigured: !!apiKey
       });
     } else if (apiKey) {
       try {
@@ -480,23 +484,31 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       } catch (error) {
         console.warn("BOT DEE Gemini failed; using contextualSearch fallback", error?.message || error);
         outcome = localSession(role, userPrompt, {
-          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined
+          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+          functionsReachable: true,
+          geminiConfigured: !!apiKey
         });
         outcome.geminiError = String(error?.message || error).slice(0, 180);
       }
     } else {
       outcome = localSession(role, userPrompt, {
-        active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined
+        active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+        functionsReachable: true,
+        geminiConfigured: false
       });
     }
-    outcome.reply = bot.sanitizeBotReply(outcome.reply);
+    const versionCardOnly = Array.isArray(outcome.smartViews)
+      && outcome.smartViews.some(row => row && row.kind === "botDeeVersion")
+      && !String(outcome.reply || "").trim();
+    outcome.reply = bot.sanitizeBotReply(outcome.reply, {allowEmpty: versionCardOnly});
 
     if (settings.durableThreads) {
       try {
         await threads.persistModelTurn(uid, settings, outcome.reply, {
           receivedAtMs,
           media: outcome.media,
-          consent
+          consent,
+          allowEmpty: versionCardOnly
         });
         if (bot.isFarewellPrompt(userPrompt)) {
           await threads.markIdleEnded(uid, settings);

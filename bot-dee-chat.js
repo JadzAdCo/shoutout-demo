@@ -221,7 +221,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.033";  }
+    return "s3.3.034";  }
 
   function isVersionSmartViewAlias(raw) {
     const q = String(raw || "")
@@ -346,7 +346,8 @@
     );
   }
 
-  function versionReply() {
+  function versionReply(text) {
+    if (isVersionSmartViewAlias(text)) return "";
     const label = packageLabel();
     const intro = t("botdee.vs.intro", "Here's the current version information for FLOQR and BOT DEE.");
     if (intro && intro !== "botdee.vs.intro") return intro;
@@ -932,7 +933,7 @@
 
   function localBotReply(text, {resuming}) {
     if (isIdentityPrompt(text)) return identityReply();
-    if (isVersionPrompt(text)) return versionReply();
+    if (isVersionPrompt(text)) return versionReply(text);
     if (isPrivacyPrompt(text)) return privacyReply();
     if (isHelpPrompt(text)) return helpReply();
     if (isAckPrompt(text)) return ackReply(text);
@@ -1030,12 +1031,17 @@
       const roomView = Array.isArray(data.smartViews)
         ? data.smartViews.find(row => row && row.kind === "botDeeRoom")
         : null;
-      const reply = peopleSearch?.replyKey
-        ? t(peopleSearch.replyKey, displayReply(data.reply))
-        : (data.replyKey || roomView?.replyKey)
-          ? t(data.replyKey || roomView.replyKey, displayReply(data.reply))
-          : displayReply(data.reply);
-      appendBubble("bot", reply, localizeResults(data.results), media, ensureVersionSmartViews(text, ensureRoomSmartViews(text, data.smartViews)), peopleSearch);
+      const views = ensureVersionSmartViews(text, ensureRoomSmartViews(text, data.smartViews));
+      const versionCardOnly = isVersionSmartViewAlias(text)
+        && views.some(row => row && row.kind === "botDeeVersion");
+      const reply = versionCardOnly
+        ? ""
+        : peopleSearch?.replyKey
+          ? t(peopleSearch.replyKey, displayReply(data.reply))
+          : (data.replyKey || roomView?.replyKey)
+            ? t(data.replyKey || roomView.replyKey, displayReply(data.reply))
+            : displayReply(data.reply);
+      appendBubble("bot", reply, localizeResults(data.results), media, views, peopleSearch);
       pushHistory("model", reply);
       if (data.threadId) threadId = String(data.threadId);
       if (data.durable === true) durableEnabled = true;
@@ -1132,8 +1138,10 @@
     history.length = 0;
     (Array.isArray(turns) ? turns : []).forEach(row => {
       const role = row?.role === "model" || row?.role === "assistant" ? "model" : "user";
-      const text = role === "model" ? displayReply(row?.text) : String(row?.text || "").trim();
+      const rawText = String(row?.text || "").trim();
       const media = role === "model" ? mergeMedia(row?.media, harvestMediaFromText(row?.text)) : [];
+      if (role === "model" && !rawText && !media.length) return;
+      const text = role === "model" ? displayReply(row?.text) : rawText;
       if (!text && !media.length) return;
       appendBubble(role === "user" ? "user" : "bot", text, null, media);
       if (text) pushHistory(role, text);

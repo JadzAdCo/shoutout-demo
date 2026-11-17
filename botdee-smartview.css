@@ -53,6 +53,7 @@
 /* People SmartView v2 — inherits viewer Site Chrome tokens; never hardcode a theme. */
 .botdee-bubble .botdee-sv-host,
 .botdee-sv-host .botdee-sv-people { margin: 0.35rem 0 0; }
+.botdee-bubble-tail + .botdee-sv-host { margin-top: 0; }
 .portal-botdee-panel .botdee-sv-bubble{
   margin-top:12px;
   min-height:4.5rem;
@@ -447,6 +448,23 @@ body.botdee-sv-overlay-open { overflow: hidden; }
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 50%;
+  background: var(--muted, #a5b9ba);
+}
+.botdee-sv-version-pill[data-status="operational"] {
+  color: var(--accent, #00d4fe);
+  border-color: color-mix(in srgb, var(--accent, #00d4fe) 55%, transparent);
+}
+.botdee-sv-version-pill[data-status="operational"]::before {
+  background: var(--accent, #00d4fe);
+}
+.botdee-sv-version-pill[data-status="degraded"] {
+  color: var(--text, #e8f0f0);
+  border-color: color-mix(in srgb, var(--accent, #00d4fe) 40%, var(--muted, #a5b9ba));
+}
+.botdee-sv-version-pill[data-status="degraded"]::before {
+  background: color-mix(in srgb, var(--accent, #00d4fe) 55%, var(--muted, #a5b9ba));
+}
+.botdee-sv-version-pill[data-status="unavailable"]::before {
   background: var(--muted, #a5b9ba);
 }
 .botdee-sv-version-rows {

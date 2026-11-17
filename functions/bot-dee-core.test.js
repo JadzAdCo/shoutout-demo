@@ -181,10 +181,16 @@ test("Version / package questions answer with FLOQR stamp", () => {
   assert.equal(bot.isVersionPrompt("tell me about the ShoutOut package"), false);
   assert.equal(bot.isVersionPrompt("what package for baller alert"), false);
 
-  const reply = bot.versionReply();
+  const reply = bot.versionReply("patron", "what is your version?");
   assert.match(reply, /BOT DEE/i);
   assert.match(reply, new RegExp(bot.PACKAGE_LABEL.replace(/\./g, "\\."), "i"));
   assert.doesNotMatch(reply, /Here is what I found/i);
+  assert.doesNotMatch(reply, /Part\s+[1-6]|six-phase|not-deployed|mock-only|gemini-3\.6-flash/i);
+
+  assert.equal(bot.versionReply("master", "Version"), "");
+  assert.equal(bot.versionReply("patron", "ver"), "");
+  assert.equal(bot.versionReply("master", "Vers?"), "");
+  assert.doesNotMatch(bot.versionReply("master", "what is deployed?"), /Part\s+[1-6]|six-phase|mock-only|gemini-3\.6-flash/i);
 
   assert.match(bot.systemInstruction("patron"), new RegExp(bot.PACKAGE_LABEL.replace(/\./g, "\\.")));
 
@@ -193,6 +199,10 @@ test("Version / package questions answer with FLOQR stamp", () => {
   assert.equal(local.provider, "local-version");
   assert.equal(local.results.length, 0);
   assert.match(local.reply, /package/i);
+  const alias = fns.__botDeeHelpers.localSession("master", "Version");
+  assert.equal(alias.reply, "");
+  assert.equal(alias.smartViews[0].kind, "botDeeVersion");
+  assert.doesNotMatch(alias.reply, /Part\s+[1-6]|implemented\/tested|Google Places|Ticketmaster/i);
 });
 
 test("Help questions answer locally like version (no search dump)", () => {
