@@ -117,7 +117,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Version-SMARTview-Reiter",
-          "blurb": "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet geprüfte FLOQR-Package-Hinweise aus der aktuellen README. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und "        },
+          "blurb": "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet geprüfte FLOQR-Package-Hinweise aus der aktuellen README. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und "
+        },
         "help:help-botdee-smartview-review": {
           "label": "SMARTsummary prüfen und korrigieren",
           "blurb": "Gemini entwirft nur aus öffentlichen FLOQR-Feldern — nie bei jedem Öffnen. Falsche Fakten: Feld in der Profilsichtbarkeit ausblenden oder Summary selbst ändern. Ihr Text wird nicht überschrieben. Profilkonflikte verlangen Prüfung. Falsche Karten im Overlay melden."
@@ -1090,7 +1091,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Onglets Version SMARTview",
-          "blurb": "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés liste les notes de package FLOQR vérifiées du README actuel. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte u"        },
+          "blurb": "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés liste les notes de package FLOQR vérifiées du README actuel. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte u"
+        },
         "help:help-botdee-smartview-review": {
           "label": "Relire et corriger un SMARTsummary",
           "blurb": "Gemini rédige uniquement à partir des champs publics dans FLOQR — jamais à chaque vue. Si un fait est faux, masquez le champ dans la visibilité du profil ou modifiez le résumé. Un texte rédigé par vous n’est pas écrasé. Un conflit de profil demande une relecture. Signalez une car"
@@ -2063,7 +2065,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Pestañas de Version SMARTview",
-          "blurb": "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista notas de paquete FLOQR verificadas del README actual. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su S"        },
+          "blurb": "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista notas de paquete FLOQR verificadas del README actual. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su S"
+        },
         "help:help-botdee-smartview-review": {
           "label": "Revisar y corregir un SMARTsummary",
           "blurb": "Gemini redacta solo con campos públicos en FLOQR — no en cada vista. Si un dato es falso, oculte el campo o edite el resumen. Su texto no se sobrescribe. Un conflicto de perfil pide revisión. Informe una tarjeta incorrecta desde la superposición."
@@ -3036,7 +3039,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Schede Version SMARTview",
-          "blurb": "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca note di package FLOQR verificate dal README attuale. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il "        },
+          "blurb": "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca note di package FLOQR verificate dal README attuale. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il "
+        },
         "help:help-botdee-smartview-review": {
           "label": "Rivedi e correggi lo SMARTsummary",
           "blurb": "Gemini bozza solo dai campi pubblici in FLOQR — non a ogni vista. Se un fatto è sbagliato, nascondi il campo o modifica il riassunto. Il tuo testo non viene sovrascritto. Un conflitto di profilo chiede revisione. Segnala una scheda errata dall’overlay."
@@ -4009,7 +4013,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Abas do Version SMARTview",
-          "blurb": "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista notas de pacote FLOQR verificadas do README atual. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site C"        },
+          "blurb": "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista notas de pacote FLOQR verificadas do README atual. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site C"
+        },
         "help:help-botdee-smartview-review": {
           "label": "Rever e corrigir o SMARTsummary",
           "blurb": "O Gemini redige só a partir de campos públicos no FLOQR — não em cada vista. Se um facto estiver errado, oculte o campo ou edite o resumo. O seu texto não é substituído. Um conflito de perfil pede revisão. Reporte um cartão errado na sobreposição."
@@ -4982,7 +4987,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Вкладки Version SMARTview",
-          "blurb": "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового — проверенные заметки пакета FLOQR из текущего README. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ва"        },
+          "blurb": "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового — проверенные заметки пакета FLOQR из текущего README. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ва"
+        },
         "help:help-botdee-smartview-review": {
           "label": "Проверить и исправить SMARTsummary",
           "blurb": "Gemini составляет черновик только из публичных полей FLOQR — не при каждом просмотре. Неверный факт: скройте поле или правьте описание. Ваш текст не перезаписывается. Конфликт профиля просит проверку. Сообщите о неверной карточке в оверлее."
@@ -5955,7 +5961,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Καρτέλες Version SMARTview",
-          "blurb": "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει επαληθευμένες σημειώσεις πακέτου FLOQR από το τρέχον README. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο π"        },
+          "blurb": "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει επαληθευμένες σημειώσεις πακέτου FLOQR από το τρέχον README. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο π"
+        },
         "help:help-botdee-smartview-review": {
           "label": "Έλεγχος και διόρθωση SMARTsummary",
           "blurb": "Το Gemini συντάσσει μόνο από δημόσια πεδία FLOQR — όχι σε κάθε προβολή. Λάθος γεγονός: αποκρύψτε το πεδίο ή επεξεργαστείτε την περίληψη. Το κείμενό σας δεν αντικαθίσταται. Σύγκρουση προφίλ ζητά έλεγχο. Αναφέρετε λάθος κάρτα από την επικάλυψη."
@@ -6928,7 +6935,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Karty Version SMARTview",
-          "blurb": "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje zweryfikowane notatki pakietu FLOQR z bieżącego README. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa"        },
+          "blurb": "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje zweryfikowane notatki pakietu FLOQR z bieżącego README. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa"
+        },
         "help:help-botdee-smartview-review": {
           "label": "Przejrzyj i popraw SMARTsummary",
           "blurb": "Gemini szkicuje tylko z publicznych pól FLOQR — nie przy każdym otwarciu. Błędny fakt: ukryj pole lub edytuj podsumowanie. Twój tekst nie jest nadpisywany. Konflikt profilu prosi o przegląd. Zgłoś błędną kartę z nakładki."
@@ -7901,7 +7909,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Version SMARTview-tabbladen",
-          "blurb": "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont geverifieerde FLOQR-packagenotities uit de huidige README. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaa"        },
+          "blurb": "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont geverifieerde FLOQR-packagenotities uit de huidige README. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaa"
+        },
         "help:help-botdee-smartview-review": {
           "label": "SMARTsummary controleren en corrigeren",
           "blurb": "Gemini stelt alleen op uit openbare FLOQR-velden — niet bij elke weergave. Verkeerd feit: veld verbergen of samenvatting zelf bewerken. Uw tekst wordt niet overschreven. Profielconflicten vragen om controle. Meld een foute kaart in de overlay."
@@ -8874,7 +8883,8 @@
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "علامات Version SMARTview",
-          "blurb": "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض ملاحظات حزمة FLOQR الموثّقة من README الحالي. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظه"        },
+          "blurb": "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض ملاحظات حزمة FLOQR الموثّقة من README الحالي. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظه"
+        },
         "help:help-botdee-smartview-review": {
           "label": "مراجعة وتصحيح SMARTsummary",
           "blurb": "يصوغ Gemini من حقول FLOQR العامة فقط — ليس عند كل عرض. إن كان واقعًا خاطئًا أخفِ الحقل أو عدّل الملخص. لا يُستبدل نصك. تعارض الملف يطلب مراجعة. بلّغ عن بطاقة خاطئة من الطبقة."
