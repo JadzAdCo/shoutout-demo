@@ -121,6 +121,19 @@ test("unknown city or cuisine does not fall back to DC restaurants", () => {
   assert.equal(anyDining.intent, "dining");
   assert.equal(anyDining.leftoverTokens.length, 0);
   assert.ok(tools.scoreClubForPlace(KATA.id, KATA.data, anyDining) >= 8);
+
+  const district = tools.classifyPlaceSearchIntent("Sushi restaurants in the District of Columbia");
+  assert.equal(district.intent, "dining");
+  assert.deepEqual(district.leftoverTokens, []);
+  assert.ok(district.placeTokens.includes("washington") || district.placeTokens.includes("dc"));
+  assert.equal(tools.rankPublicClubs([KATA, DECADES, NYC_CLUB], district, 5)[0]?.id, "kata-washington-dc");
+
+  const nycCity = tools.classifyPlaceSearchIntent("Sushi restaurants in New York City");
+  assert.equal(nycCity.intent, "dining");
+  assert.deepEqual(nycCity.leftoverTokens, []);
+  const nycRanked = tools.rankPublicClubs([KATA, DECADES, NYC_CLUB], nycCity, 5);
+  assert.equal(nycRanked.length, 1);
+  assert.equal(nycRanked[0].id, "demo-nyc");
 });
 
 test("venue search returns SMARTviews only, not duplicate result links", () => {

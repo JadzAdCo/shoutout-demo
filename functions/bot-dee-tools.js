@@ -328,7 +328,7 @@ const PLACE_STOP = new Set([
   "where", "can", "i", "get", "find", "search", "please", "any", "are", "there",
   "is", "what", "whats", "which", "who", "want", "wanna", "need", "recommend",
   "recommendation", "recommendations", "spot", "spots", "place", "places",
-  "open", "now", "tonight", "today", "this", "that", "you", "got", "have"
+  "city", "cities", "open", "now", "tonight", "today", "this", "that", "you", "got", "have"
 ]);
 
 const DINING_CUES = new Set([
@@ -374,18 +374,36 @@ const CUISINE_ALIASES = Object.freeze({
 
 const PROFILE_DATAPOINT_ASK = /\b(my|public)\s+profile\b|\bprofile\s+(food|music|travel|hobbies|photos?)\b|\b(food|music|travel|hobbies)\s+(on|in)\s+(my|the)\s+(public\s+)?profile\b/i;
 
-function extractPlaceTokens(needle) {
+function matchPlaces(needle) {
   const tokens = [];
-  if (/\bwashington(?:\s*,?\s*d\.?c\.?)?\b|\bdistrict of columbia\b/.test(needle)
-    || (/\bwashington\b/.test(needle) && /\bd\.?\s*c\.?\b/.test(needle))) {
+  const consumed = [];
+  const dcHit = /\bwashington(?:\s*,?\s*d\.?c\.?)?\b|\bdistrict of columbia\b/.test(needle)
+    || (/\bwashington\b/.test(needle) && /\bd\.?\s*c\.?\b/.test(needle))
+    || (/\bd\.?\s*c\.?\b/.test(needle) && !/\bdj\b/.test(needle));
+  if (dcHit) {
     tokens.push("washington", "dc");
-  } else if (/\bd\.?\s*c\.?\b/.test(needle) && !/\bdj\b/.test(needle)) {
-    tokens.push("dc", "washington");
+    consumed.push("washington", "dc", "district", "columbia", "d.c", "d.c.");
   }
-  if (/\bchinatown\b/.test(needle)) tokens.push("chinatown");
-  if (/\bdupont\b/.test(needle)) tokens.push("dupont");
-  if (/\bnew york\b|\bnyc\b|\bmanhattan\b/.test(needle)) tokens.push("new york", "nyc", "manhattan");
-  return [...new Set(tokens)];
+  if (/\bchinatown\b/.test(needle)) {
+    tokens.push("chinatown");
+    consumed.push("chinatown");
+  }
+  if (/\bdupont\b/.test(needle)) {
+    tokens.push("dupont");
+    consumed.push("dupont", "circle");
+  }
+  if (/\bnew york\b|\bnyc\b|\bmanhattan\b/.test(needle)) {
+    tokens.push("new york", "nyc", "manhattan");
+    consumed.push("new", "york", "nyc", "manhattan", "city");
+  }
+  return {
+    tokens: [...new Set(tokens)],
+    consumed: [...new Set(consumed)]
+  };
+}
+
+function extractPlaceTokens(needle) {
+  return matchPlaces(needle).tokens;
 }
 
 function expandSearchTokens(tokens) {
@@ -419,16 +437,13 @@ function cuisineTokensFrom(tokens) {
 }
 
 function leftoverQueryTokens(rawTokens, needle, placeTokens, cuisineTokens) {
-  const known = new Set([
-    ...(placeTokens || []),
-    ...(cuisineTokens || []),
-    ...String(needle || "").split(/\s+/).filter(token => (placeTokens || []).some(place => place.includes(token)))
-  ]);
+  const consumed = new Set(matchPlaces(needle).consumed);
+  const known = new Set([...(placeTokens || []), ...(cuisineTokens || []), ...consumed]);
   return (rawTokens || []).filter(token => {
     if (!token || token.length < 3) return false;
     if (PLACE_STOP.has(token) || GENERIC_DINING.has(token) || FOOD_GENERIC.has(token) || VENUE_CUES.has(token)) return false;
     if (CUISINE_ALIASES[token] || CUISINE_ALIASES[token.replace(/s$/, "")]) return false;
-    if (known.has(token)) return false;
+    if (known.has(token) || consumed.has(token.replace(/\./g, ""))) return false;
     if ((placeTokens || []).some(place => place.includes(token))) return false;
     return true;
   });
