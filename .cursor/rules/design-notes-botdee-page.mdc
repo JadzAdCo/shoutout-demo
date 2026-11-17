@@ -14,7 +14,7 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 | Piece | Role |
 |---|---|
 | Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `botDee` gate + classification → Gemini + `contextualSearch`); local `isHelpPrompt` / `isVersionPrompt` / `isPrivacyPrompt` |
-| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Chat-only** canvas (transcript + composer). Placeholder is **Ask BOT DEE…** — Enter / Shift+Enter live in Help (`help` / `privacy`). Name / demeanor / recap + saved chats/memories + approved facts → **My Profile → Feature & Orders → My BOT DEE** (`#foBotDeePane`, `#botDeePersonalizationPanel`). No Settings button on the chat. Mock SMARTviews → **Master Admin → Features Mgmt → BOT DEE** subtabs. |
+| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Chat-only** canvas (transcript + composer). Placeholder is **Ask BOT DEE…** — Enter / Shift+Enter live in Help (`help` / `privacy`). Name / demeanor / recap + saved chats/memories + approved facts → **My Profile → Feature & Orders → My BOT DEE** (`#foBotDeePane`, `#botDeePersonalizationPanel`). Demeanor radios are `.botdee-pref-demeanor-option` 44px rows (22px radios, horizontal labels) — never `overflow-wrap:anywhere` letter columns. No Settings button on the chat. Mock SMARTviews → **Master Admin → Features Mgmt → BOT DEE** subtabs. |
 | Modules | `botdee-page.js`, `botdee-access.js`, `botdee-help-repository.js`, `bot-dee-chat.js` / `.css`, `botdee-upgrade-ui.js`, `botdee-smartview.js` / `.css` |
 
 ## Routing

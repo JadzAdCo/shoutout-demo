@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./styles.css?v=s3.3.028"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.3.028"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.3.029"/>
   <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.028"/>
   <script>
     /* Paint Site chrome before CSS so the closed profile card matches the chosen theme. */
@@ -489,11 +489,13 @@
               <span data-i18n="botdee.callMe">What should I call you?</span>
               <input id="botDeePrefName" type="text" maxlength="40" autocomplete="nickname"/>
             </label>
-            <fieldset class="botdee-pref-field">
-              <legend data-i18n="botdee.demeanorAsk">What demeanor would you prefer: Socially Cool, Professional or Balanced?</legend>
-              <label><input type="radio" name="botDeePrefDemeanor" value="sociallyCool"/> <span data-i18n="botdee.demeanorCool">Socially Cool</span></label>
-              <label><input type="radio" name="botDeePrefDemeanor" value="professional"/> <span data-i18n="botdee.demeanorPro">Professional</span></label>
-              <label><input type="radio" name="botDeePrefDemeanor" value="balanced" checked/> <span data-i18n="botdee.demeanorBalanced">Balanced</span></label>
+            <fieldset class="botdee-pref-field botdee-pref-demeanor">
+              <legend id="botDeePrefDemeanorLegend" data-i18n="botdee.demeanorAsk">What demeanor would you prefer: Socially Cool, Professional or Balanced?</legend>
+              <div class="botdee-pref-demeanor-list" role="radiogroup" aria-labelledby="botDeePrefDemeanorLegend">
+                <label class="botdee-pref-demeanor-option"><input type="radio" name="botDeePrefDemeanor" value="sociallyCool"/> <span data-i18n="botdee.demeanorCool">Socially Cool</span></label>
+                <label class="botdee-pref-demeanor-option"><input type="radio" name="botDeePrefDemeanor" value="professional"/> <span data-i18n="botdee.demeanorPro">Professional</span></label>
+                <label class="botdee-pref-demeanor-option"><input type="radio" name="botDeePrefDemeanor" value="balanced" checked/> <span data-i18n="botdee.demeanorBalanced">Balanced</span></label>
+              </div>
             </fieldset>
             <label class="botdee-pref-check" for="botDeePrefRecap">
               <input id="botDeePrefRecap" type="checkbox" checked/>

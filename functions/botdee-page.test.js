@@ -37,6 +37,15 @@ test("BOT DEE header is title only — no ? bubble or Showing answers for…", (
   assert.match(read("bot-dee-chat.js"), /isProductCatalogGreeting/);
   assert.match(read("patron-portal.html"), /id="botDeePersonalizationPanel"/);
   assert.match(read("patron-portal.html"), /id="botDeePrefName"/);
+  assert.match(read("patron-portal.html"), /class="botdee-pref-demeanor-list"/);
+  assert.match(read("patron-portal.html"), /class="botdee-pref-demeanor-option"/);
+  assert.match(read("botdee.html"), /class="botdee-pref-demeanor-list"/);
+  assert.match(read("botdee.html"), /class="botdee-pref-demeanor-option"/);
+  assert.match(read("admin.css"), /\.portal-botdee-panel label\.botdee-pref-demeanor-option input\[type=radio\][^}]*max-width:22px/);
+  assert.match(read("admin.css"), /\.portal-botdee-panel label\.botdee-pref-demeanor-option\{[^}]*overflow-wrap:normal/);
+  assert.match(read("admin.css"), /\.portal-botdee-panel label\.botdee-pref-demeanor-option\{[^}]*writing-mode:horizontal-tb/);
+  assert.match(read("bot-dee-chat.css"), /\.botdee-pref-demeanor-option input\[type="radio"\][^}]*max-width: 22px/);
+  assert.match(read("bot-dee-chat.css"), /\.botdee-pref-demeanor-option span[^}]*overflow-wrap: break-word/);
   assert.match(read("patron-portal.html"), /botdee-personalization-ui\.js/);
   assert.match(read("bot-dee-chat.js"), /isVersionPrompt/);
   assert.match(read("bot-dee-chat.js"), /versionReply/);

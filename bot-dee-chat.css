@@ -749,6 +749,7 @@ html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
   gap: 8px;
   margin: 0 0 12px;
   font-size: 0.95rem;
+  min-width: 0;
 }
 
 .botdee-pref-field label,
@@ -766,6 +767,98 @@ html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
   color: inherit;
   padding: 8px 12px;
   font: inherit;
+}
+
+/* Phone: overflow-wrap:anywhere on label was stacking Socially Cool one letter per line. */
+.botdee-pref-demeanor {
+  display: block;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.botdee-pref-demeanor > legend {
+  display: block;
+  float: none;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 8px;
+  font-weight: 700;
+  overflow-wrap: break-word;
+  writing-mode: horizontal-tb;
+}
+
+.botdee-pref-demeanor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.botdee-pref-demeanor-option {
+  display: flex !important;
+  flex-direction: row !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 10px;
+  margin: 0;
+  min-height: 44px;
+  height: auto;
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: normal;
+  writing-mode: horizontal-tb;
+  white-space: normal;
+}
+
+.botdee-pref-demeanor-option input[type="radio"] {
+  -webkit-appearance: radio;
+  appearance: radio;
+  flex: 0 0 22px !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  margin: 0 !important;
+  align-self: center;
+  accent-color: #1597ff;
+}
+
+.botdee-pref-demeanor-option span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: break-word;
+  writing-mode: horizontal-tb;
+  white-space: normal;
+}
+
+.botdee-pref-check {
+  flex-direction: row;
+  overflow-wrap: normal;
+  writing-mode: horizontal-tb;
+}
+
+.botdee-pref-check input[type="checkbox"] {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  margin: 0;
+}
+
+@media (min-width: 720px) {
+  .botdee-pref-demeanor-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .botdee-pref-demeanor-option {
+    width: auto;
+    flex: 1 1 12rem !important;
+    max-width: 20rem;
+  }
 }
 
 .botdee-pref-actions {
