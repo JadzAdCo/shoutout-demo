@@ -93,7 +93,7 @@ test("usercharacter_analysis schema, source-version matching, owner edit, stale 
   });
   assert.equal(jobs.length, 10);
   assert.ok(jobs.every(job => job.locale !== "en"));
-  assert.ok(jobs.every(job => job.id === v2.translationJobId("u1", 2, job.locale)));
+  assert.ok(jobs.every(job => job.id === v2.translationJobId("u1", 2, job.locale, saved.sourceHash)));
   const stale = v2.applyTranslationResult(saved, {...jobs[0], revision: 1, sourceHash: "old"}, {
     text: "stale french",
     engine: "gemini"
@@ -187,6 +187,95 @@ test("non-owner cannot be marked ownerMayEdit; dating hidden without opt-in", ()
   assert.equal(payload.datingVisible, false);
 });
 
+test("parallel locale patches keep sibling translations; stale saveSmartSummary wins", () => {
+  const snap = v2.publicFieldsSnapshot({displayName: "Amara", preferredLanguage: "en"}, volunteered());
+  const doc = v2.emptyAnalysis("u1", snap, 1);
+  const jobs = v2.enqueueTranslationJobs({
+    uid: "u1", revision: doc.revision, sourceHash: doc.sourceHash, sourceLocale: "en", now: 2
+  });
+  const frJob = jobs.find(j => j.locale === "fr");
+  const deJob = jobs.find(j => j.locale === "de");
+  const fr = v2.translationLocalePatch(doc, frJob, {text: "Bonjour Amara", engine: "gemini"});
+  const de = v2.translationLocalePatch(doc, deJob, {text: "Hallo Amara", engine: "gemini"});
+  assert.equal(fr.applied, true);
+  assert.equal(de.applied, true);
+  assert.equal(fr.update["translations.fr"].text, "Bonjour Amara");
+  assert.equal(de.update["translations.de"].text, "Hallo Amara");
+  assert.ok(!("translations.de" in fr.update));
+  assert.ok(!("translations.fr" in de.update));
+  const merged = v2.applyLocalePatches(doc, [fr, de]);
+  assert.equal(merged.translations.fr.text, "Bonjour Amara");
+  assert.equal(merged.translations.de.text, "Hallo Amara");
+  const saved = v2.applyOwnerSave(doc, {summary: "Owner rewrite.", sourceLocale: "en", editorUid: "u1", now: 9});
+  const stale = v2.translationLocalePatch(saved, frJob, {text: "too late", engine: "gemini"});
+  assert.equal(stale.applied, false);
+  assert.equal(stale.reason, "stale_revision");
+});
+
+test("translation job retries process on write, not only on create", () => {
+  const queued = {status: "queued", attempts: 0};
+  assert.equal(v2.shouldProcessTranslationWrite(null, queued), true);
+  assert.equal(v2.shouldProcessTranslationWrite(queued, queued), false);
+  const retried = v2.retryOrDeadLetter(queued, "translator_outage", 2);
+  assert.equal(retried.status, "queued");
+  assert.equal(v2.shouldProcessTranslationWrite(queued, retried), true);
+  assert.equal(v2.shouldProcessTranslationWrite(retried, {status: "done", attempts: retried.attempts}), false);
+  assert.equal(v2.shouldProcessTranslationWrite({status: "failed", attempts: 1}, queued), true);
+  const regenerated = {...queued, sourceHash: "newhash", generation: "newhash", attempts: 0};
+  assert.equal(v2.shouldProcessTranslationWrite({...queued, sourceHash: "oldhash", generation: "oldhash"}, regenerated), true);
+  const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
+  assert.match(src, /onDocumentWritten\(\{\s*document: `\$\{v2\.JOBS_COLLECTION\}/);
+  const runFn = src.slice(src.indexOf("async function runTranslationJob"), src.indexOf("exports.processSmartViewTranslationJob"));
+  assert.doesNotMatch(runFn, /persistAnalysis\(/);
+  assert.match(runFn, /persistTranslationLocale\(/);
+  assert.match(src, /shouldProcessTranslationWrite/);
+});
+
+test("regenerated Gemini jobs get a new id and process even when attempts stay 0", () => {
+  const first = v2.enqueueTranslationJobs({
+    uid: "u1", revision: 1, sourceHash: "aaa111", sourceLocale: "en", now: 1
+  });
+  const second = v2.enqueueTranslationJobs({
+    uid: "u1", revision: 1, sourceHash: "bbb222", sourceLocale: "en", now: 2
+  });
+  const fr1 = first.find(j => j.locale === "fr");
+  const fr2 = second.find(j => j.locale === "fr");
+  assert.notEqual(fr1.id, fr2.id);
+  assert.match(fr1.id, /aaa111|aaa1/);
+  assert.equal(fr1.id, v2.translationJobId("u1", 1, "fr", "aaa111"));
+  assert.equal(fr2.id, v2.translationJobId("u1", 1, "fr", "bbb222"));
+  assert.equal(v2.shouldProcessTranslationWrite(fr1, fr2), true);
+  assert.equal(v2.jobStillMatchesGeneration(fr2, fr1), false);
+  assert.equal(v2.jobStillMatchesGeneration(fr1, fr1), true);
+  assert.equal(v2.shouldProcessTranslationWrite(fr1, {...fr1}), false);
+  const src = fs.readFileSync(path.join(__dirname, "botdee-smartview-v2-functions.js"), "utf8");
+  assert.match(src, /cancelJobIfStillThisGeneration/);
+});
+
+test("peopleV2 paints live public fields; hidden and dating-off tags do not stick", () => {
+  const publicSnap = v2.publicFieldsSnapshot({displayName: "Amara"}, volunteered());
+  const analysis = v2.emptyAnalysis("u1", publicSnap, 1);
+  analysis.categories.Dating.Preferences = ["stale secret"];
+  analysis.categories.Social.Music = ["stale Jazz"];
+  const hiddenSnap = v2.publicFieldsSnapshot({displayName: "Amara"}, {
+    sharedDatapoints: ["food"],
+    datapoints: {food: ["sushi"], lookingToMeet: "secret"}
+  });
+  const payload = v2.peopleV2Payload({
+    subjectUid: "u1",
+    snap: hiddenSnap,
+    analysis,
+    viewerUid: "u2",
+    viewerMaySee: true,
+    viewerLocale: "en"
+  });
+  assert.equal(payload.datingVisible, false);
+  assert.deepEqual(payload.categories.Dating.Preferences, []);
+  assert.deepEqual(payload.categories.Social.Music, []);
+  assert.deepEqual(payload.categories.Dining.Cuisines, ["sushi"]);
+  assert.equal(v2.tagsFor(payload.categories, "Dating", "Preferences").length, 0);
+});
+
 test("translation retry then dead-letter; diagnostics omit summary text", () => {
   let job = v2.enqueueTranslationJobs({
     uid: "u1", revision: 2, sourceHash: "abc", sourceLocale: "en", now: 1
@@ -250,12 +339,50 @@ test("people card renderer: tabs, shrink tags, overlays restore draft helpers ex
   assert.match(client, /captureChatState/);
   assert.match(client, /restoreChatState/);
   assert.match(client, /floqr-chrome-change/);
+  assert.match(client, /currentOverlaySession/);
+  assert.match(client, /rememberOverlaySession/);
+  assert.match(client, /bindOverlayDocument/);
+  assert.doesNotMatch(client, /activePeople = people/);
   const css = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.css"), "utf8");
   assert.match(css, /var\(--accent/);
   assert.doesNotMatch(css, /#20d9d8/);
   const html = fs.readFileSync(path.join(__dirname, "..", "botdee.html"), "utf8");
   assert.match(html, /botdee-smartview\.js/);
   assert.match(html, /botdee-smartview\.css/);
+});
+
+test("overlay handlers follow the current card session, not the first bind", () => {
+  const code = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.js"), "utf8");
+  const sandbox = {
+    window: {
+      FLOQRI18n: {t: (k, f) => f},
+      FLOQRNav: null,
+      location: {href: "https://example.test/x"},
+      document: {},
+      addEventListener() {}
+    }
+  };
+  sandbox.global = sandbox.window;
+  vm.runInNewContext(code.replace("(window)", "(window)"), sandbox);
+  const api = sandbox.window.FLOQRBotDeeSmartView;
+  const first = {people: {displayName: "First", media: {photos: [{url: "./one.png"}]}}, mediaIndex: 0, mediaType: "photos"};
+  const second = {people: {displayName: "Second", media: {photos: [{url: "./two-a.png"}, {url: "./two-b.png"}]}}, mediaIndex: 0, mediaType: "photos"};
+  api.rememberOverlaySession(first);
+  api.advanceOverlayMedia(1);
+  assert.equal(api.currentOverlaySession().people.displayName, "First");
+  api.rememberOverlaySession(second);
+  const moved = api.advanceOverlayMedia(1);
+  assert.equal(moved.people.displayName, "Second");
+  assert.equal(moved.mediaIndex, 1);
+  assert.equal(moved.people.media.photos[1].url, "./two-b.png");
+  assert.equal(api.tagsForPeople({
+    datingVisible: false,
+    categories: {Dating: {Preferences: ["secret"]}}
+  }, "Dating", "Preferences").length, 0);
+  assert.equal(api.tagsForPeople({
+    datingVisible: true,
+    categories: {Dating: {Preferences: ["Friends first"]}}
+  }, "Dating", "Preferences")[0], "Friends first");
 });
 
 test("Master Admin SMARTviews subtab preserved", () => {

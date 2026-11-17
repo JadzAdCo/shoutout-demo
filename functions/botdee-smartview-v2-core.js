@@ -270,8 +270,9 @@ function shouldFlagConflict(doc, snap) {
   return doc.publicFieldsHash !== publicFieldsHash(snap);
 }
 
-function translationJobId(uid, revision, locale) {
-  return `${String(uid || "").slice(0, 64)}_${Number(revision) || 0}_${normalizeLocale(locale)}`;
+function translationJobId(uid, revision, locale, sourceHash) {
+  const hash = String(sourceHash || "").replace(/[^a-f0-9]/gi, "").slice(0, 16) || "0";
+  return `${String(uid || "").slice(0, 64)}_${Number(revision) || 0}_${normalizeLocale(locale)}_${hash}`;
 }
 
 function enqueueTranslationJobs({uid, revision, sourceHash, sourceLocale, now = Date.now()}) {
@@ -279,7 +280,7 @@ function enqueueTranslationJobs({uid, revision, sourceHash, sourceLocale, now = 
   SUPPORTED_LOCALES.forEach(locale => {
     if (locale === sourceLocale) return;
     jobs.push({
-      id: translationJobId(uid, revision, locale),
+      id: translationJobId(uid, revision, locale, sourceHash),
       uid: String(uid || ""),
       revision: Number(revision) || 0,
       sourceHash: String(sourceHash || ""),
@@ -287,6 +288,7 @@ function enqueueTranslationJobs({uid, revision, sourceHash, sourceLocale, now = 
       locale,
       status: "queued",
       attempts: 0,
+      generation: String(sourceHash || ""),
       createdAtMs: now,
       updatedAtMs: now,
       engine: null,
@@ -347,6 +349,51 @@ function retryOrDeadLetter(job, error, now = Date.now()) {
     error: text(error, 180),
     updatedAtMs: now
   };
+}
+
+/** Dotted-field patch so parallel locale jobs cannot replace sibling translations. */
+function translationLocalePatch(doc, job, payload) {
+  const applied = applyTranslationResult(doc, job, payload);
+  if (!applied.applied) return applied;
+  const locale = normalizeLocale(job.locale);
+  const row = applied.doc.translations[locale];
+  return {
+    applied: true,
+    reason: applied.reason,
+    locale,
+    row,
+    update: {
+      [`translations.${locale}`]: row,
+      updatedAtMs: applied.doc.updatedAtMs
+    }
+  };
+}
+
+function applyLocalePatches(doc, patches) {
+  const translations = {...(doc.translations || {})};
+  (patches || []).forEach(patch => {
+    if (!patch || !patch.applied || !patch.locale || !patch.row) return;
+    translations[patch.locale] = patch.row;
+  });
+  return {...doc, translations};
+}
+
+/** Run on create, re-queue (attempts++), or a regenerated overwrite with a new sourceHash/revision. */
+function shouldProcessTranslationWrite(beforeData, afterData) {
+  if (!afterData || afterData.status !== "queued") return false;
+  if (!beforeData) return true;
+  if (beforeData.status !== "queued") return true;
+  if (String(beforeData.sourceHash || "") !== String(afterData.sourceHash || "")) return true;
+  if (Number(beforeData.revision || 0) !== Number(afterData.revision || 0)) return true;
+  if (String(beforeData.generation || "") !== String(afterData.generation || "")) return true;
+  return Number(afterData.attempts || 0) > Number(beforeData.attempts || 0);
+}
+
+function jobStillMatchesGeneration(live, job) {
+  if (!live) return true;
+  return String(live.sourceHash || "") === String(job.sourceHash || "")
+    && Number(live.revision || 0) === Number(job.revision || 0)
+    && String(live.generation || live.sourceHash || "") === String(job.generation || job.sourceHash || "");
 }
 
 function localeSummary(doc, viewerLocale) {
@@ -418,7 +465,11 @@ function peopleV2Payload({
   }
   const localeRow = localeSummary(analysis, viewerLocale);
   const ownerMayEdit = String(viewerUid || "") === String(subjectUid || "");
-  const cats = analysis && analysis.categories ? analysis.categories : categoriesFromSnapshot(snap);
+  const datingVisible = !!snap.datingOptIn;
+  const cats = categoriesFromSnapshot(snap);
+  if (!datingVisible) {
+    cats.Dating = {Preferences: [], Discovery: []};
+  }
   const handles = [];
   if (snap.instagram) {
     handles.push({
@@ -434,7 +485,6 @@ function peopleV2Payload({
       href: `https://x.com/${encodeURIComponent(snap.xHandle)}`
     });
   }
-  const datingVisible = !!snap.datingOptIn;
   return {
     presentation: "peopleV2",
     subjectUid: String(subjectUid || ""),
@@ -608,6 +658,10 @@ module.exports = {
   enqueueTranslationJobs,
   applyTranslationResult,
   retryOrDeadLetter,
+  translationLocalePatch,
+  applyLocalePatches,
+  shouldProcessTranslationWrite,
+  jobStillMatchesGeneration,
   localeSummary,
   diagnosticEvent,
   usageFromGemini,

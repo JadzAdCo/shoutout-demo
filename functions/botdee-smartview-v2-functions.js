@@ -5,7 +5,7 @@
 
 const admin = require("firebase-admin");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
-const {onDocumentWritten, onDocumentCreated} = require("firebase-functions/v2/firestore");
+const {onDocumentWritten} = require("firebase-functions/v2/firestore");
 const {defineSecret} = require("firebase-functions/params");
 const {GoogleGenAI} = require("@google/genai");
 const v2 = require("./botdee-smartview-v2-core");
@@ -185,6 +185,30 @@ async function persistAnalysis(uid, doc, jobs) {
   if (jobs && jobs.length) await writeJobs(jobs);
 }
 
+async function persistTranslationLocale(uid, job, payload) {
+  return db.runTransaction(async tx => {
+    const ref = analysisRef(uid);
+    const snap = await tx.get(ref);
+    if (!snap.exists) return {applied: false, reason: "missing_analysis"};
+    const patch = v2.translationLocalePatch(snap.data(), job, payload);
+    if (!patch.applied) return patch;
+    tx.update(ref, {
+      ...patch.update,
+      updatedAt: FieldValue.serverTimestamp()
+    });
+    return patch;
+  });
+}
+
+async function cancelJobIfStillThisGeneration(job) {
+  const ref = jobRef(job.id);
+  const snap = await ref.get();
+  const live = snap.exists ? snap.data() : null;
+  if (!v2.jobStillMatchesGeneration(live, job)) return false;
+  await ref.set({status: "cancelled_stale", updatedAtMs: Date.now()}, {merge: true});
+  return true;
+}
+
 async function draftAnalysis(uid, snap, existing) {
   const now = Date.now();
   let doc = v2.emptyAnalysis(uid, snap, now);
@@ -353,7 +377,7 @@ async function runTranslationJob(job) {
   }
   const doc = analysisSnap.data();
   if (Number(job.revision) !== Number(doc.revision) || String(job.sourceHash) !== String(doc.sourceHash)) {
-    await jobRef(job.id).set({status: "cancelled_stale", updatedAtMs: Date.now()}, {merge: true});
+    await cancelJobIfStillThisGeneration(job);
     return {ok: false, reason: "stale_revision"};
   }
   const generated = await generateWithGemini(
@@ -363,39 +387,47 @@ async function runTranslationJob(job) {
   if (!generated.ok) {
     if (generated.unconfigured) {
       const stub = v2.translateStub(doc.sourceText, doc.sourceLocale, job.locale);
-      const applied = v2.applyTranslationResult(doc, job, {
+      const applied = await persistTranslationLocale(job.uid, job, {
         text: stub.text,
         engine: stub.engine,
         status: "failed",
         error: "translator_unconfigured"
       });
-      await persistAnalysis(job.uid, applied.doc, []);
+      if (!applied.applied && applied.reason === "stale_revision") {
+        await cancelJobIfStillThisGeneration(job);
+        return {ok: false, reason: applied.reason};
+      }
       await jobRef(job.id).set({
         status: "failed",
         error: "translator_unconfigured",
         updatedAtMs: Date.now()
       }, {merge: true});
-      return {ok: false, reason: "unconfigured"};
+      return {ok: false, reason: applied.applied ? "unconfigured" : applied.reason};
     }
     const next = v2.retryOrDeadLetter(job, generated.error || "translate_failed");
     await jobRef(job.id).set({...next, updatedAt: FieldValue.serverTimestamp()}, {merge: true});
     if (next.status === "dead_letter") {
-      const applied = v2.applyTranslationResult(doc, job, {status: "failed", error: next.error, engine: "gemini"});
-      await persistAnalysis(job.uid, applied.doc, []);
+      const applied = await persistTranslationLocale(job.uid, job, {
+        status: "failed",
+        error: next.error,
+        engine: "gemini"
+      });
+      if (!applied.applied && applied.reason === "stale_revision") {
+        await cancelJobIfStillThisGeneration(job);
+      }
     }
     return {ok: false, reason: next.status};
   }
-  const applied = v2.applyTranslationResult(doc, job, {
+  const applied = await persistTranslationLocale(job.uid, job, {
     text: generated.text,
     engine: "gemini",
     model: generated.model,
     usage: generated.usage
   });
   if (!applied.applied) {
-    await jobRef(job.id).set({status: "cancelled_stale", updatedAtMs: Date.now()}, {merge: true});
+    await cancelJobIfStillThisGeneration(job);
     return {ok: false, reason: applied.reason};
   }
-  await persistAnalysis(job.uid, applied.doc, []);
   await jobRef(job.id).set({
     status: "done",
     engine: "gemini",
@@ -461,11 +493,16 @@ exports.onUserProfileSmartViewWrite = onDocumentWritten({
   }
 });
 
-exports.onSmartViewTranslationJobCreated = onDocumentCreated({
+// Export name kept for deploy continuity. Trigger is onWrite so retries that
+// re-queue the same doc (status stays queued, attempts++) actually run.
+exports.onSmartViewTranslationJobCreated = onDocumentWritten({
   document: `${v2.JOBS_COLLECTION}/{jobId}`,
   ...TRIGGER_OPTS
 }, async event => {
-  const data = event.data?.data();
-  if (!data || data.status !== "queued") return;
+  const after = event.data?.after;
+  if (!after?.exists) return;
+  const data = after.data();
+  const before = event.data?.before?.exists ? event.data.before.data() : null;
+  if (!v2.shouldProcessTranslationWrite(before, data)) return;
   await runTranslationJob({...data, id: event.params.jobId});
 });

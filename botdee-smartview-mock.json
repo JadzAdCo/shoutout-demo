@@ -466,8 +466,9 @@
               ],
               "Nightlife": [
                 "Rooftop lounges",
-                "VIP clubs",
-                "Beach clubs"
+                "Concerts",
+                "Game nights",
+                "Festivals"
               ],
               "Sports": [
                 "NBA",
@@ -486,9 +487,8 @@
             },
             "Dining": {
               "Cuisines": [
-                "African",
-                "Japanese",
-                "Mediterranean"
+                "Nigerian",
+                "Japanese"
               ],
               "Experiences": []
             },
