@@ -514,9 +514,161 @@
     });
   }
 
+  function isRoomPayload(payload) {
+    return !!(payload && typeof payload === "object" && payload.kind === "botDeeRoom");
+  }
+
+  function rememberRoomDecline(key) {
+    const token = String(key || "").slice(0, 80);
+    if (!token) return;
+    let rows = [];
+    try {
+      rows = JSON.parse(global.sessionStorage?.getItem("floqr.roomSmartView.declined") || "[]");
+    } catch (_) {
+      rows = [];
+    }
+    const next = [...new Set([].concat(rows, token).map(String))].slice(-24);
+    try {
+      global.sessionStorage?.setItem("floqr.roomSmartView.declined", JSON.stringify(next));
+    } catch (_) {}
+  }
+
+  function roomStatusCopy(payload) {
+    const life = String(payload?.lifecycle || "created");
+    if (life === "active") return t("botdee.rs.statusActive", "Active");
+    if (life === "closing") return t("botdee.rs.statusClosing", "Closing");
+    if (life === "closed") return t("botdee.rs.statusClosed", "Closed");
+    if (payload?.mode === "setup" || payload?.mode === "offer") return t("botdee.rs.statusSetup", "Setup");
+    return t("botdee.rs.statusCreated", "Created");
+  }
+
+  function renderRoomFacts(payload) {
+    const facts = payload?.sharePreview && Array.isArray(payload.sharePreview.facts)
+      ? payload.sharePreview.facts
+      : [];
+    if (!facts.length) {
+      return `<p class="botdee-sv-room-note">${esc(t("botdee.rs.shareEmpty", "No selected shareable facts from this message. Private chat is not copied."))}</p>`;
+    }
+    return `<ul class="botdee-sv-room-facts">${facts.map(fact => `<li>
+      <label><input type="checkbox" data-rs-fact="${esc(fact.id || "")}" ${fact.selected === false ? "" : "checked"}/> ${esc(fact.label || "")}${fact.tentative ? ` <small>${esc(t("botdee.rs.shareTentative", "tentative"))}</small>` : ""}</label>
+    </li>`).join("")}</ul>`;
+  }
+
+  function renderRoomNeedles(payload) {
+    const rows = Array.isArray(payload?.namedNeedles) ? payload.namedNeedles : [];
+    if (!rows.length) return "";
+    return `<p class="botdee-sv-room-note">${esc(t("botdee.rs.namedUnknown", "Named people are not looked up until they are eligible Mingl friends. FLOQR will not say whether a name has an account."))}</p>
+      <ul class="botdee-sv-room-needles">${rows.map(row => `<li>${esc(row.displayName || "")} · ${esc(t("botdee.rs.unresolved", "unresolved"))}</li>`).join("")}</ul>`;
+  }
+
+  function renderRoomCard(payload) {
+    const view = payload && typeof payload === "object" ? payload : {};
+    const count = Number(view.participantCount) || 0;
+    const cap = Number(view.participantCap) || 8;
+    const status = roomStatusCopy(view);
+    const confirmable = view.needsConfirmation && view.mode !== "command" && view.mode !== "deny";
+    const share = view.mode === "share_preview";
+    const denied = view.injectionDenied === true || view.mode === "deny";
+    return `<article class="botdee-sv-room" data-kind="botDeeRoom" data-rs-mode="${esc(view.mode || "")}" data-rs-decline="${esc(view.declineKey || "")}">
+      <h2 class="botdee-sv-room-title">${esc(t("botdee.rs.title", "Room SMARTview"))}</h2>
+      <div class="botdee-sv-room-head">
+        <div class="botdee-sv-room-thumb" aria-hidden="true">♣</div>
+        <div>
+          <strong>${esc(t("botdee.rs.roomName", "BOT DEE group session"))}</strong>
+          <div class="botdee-sv-room-sub">${esc(t("botdee.rs.subtitle", "Room SMARTview"))} · <span data-rs-status>${esc(status)}</span></div>
+        </div>
+      </div>
+      <div class="botdee-sv-room-stats">
+        <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.participants", "Participants"))}</span><b>${esc(String(count))} / ${esc(String(cap))}</b><small>${esc(t("botdee.rs.includingHost", "including host"))}</small></div>
+        <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.roomStatus", "Room status"))}</span><b data-rs-status-b>${esc(status)}</b><small>${esc(t("botdee.rs.notLiveNote", "Group rooms are not live yet"))}</small></div>
+      </div>
+      ${denied ? `<p class="botdee-sv-room-note">${esc(t("botdee.rs.injectionDenied", "I can’t use private BOT DEE history or host memory for that. Room SMARTview only uses what this group later confirms."))}</p>` : ""}
+      ${renderRoomNeedles(view)}
+      ${share ? `<div class="botdee-sv-room-share"><h3>${esc(t("botdee.rs.sharePreview", "Share preview"))}</h3>${renderRoomFacts(view)}<p class="botdee-sv-room-note">${esc(t("botdee.rs.privacyNote", "Private BOT DEE messages, other members’ profiles, and SMARTsummary are not included."))}</p></div>` : ""}
+      <div class="botdee-sv-room-rows">
+        <button type="button" class="botdee-sv-room-row" data-rs-panel="itinerary"><span>▦</span><div><b>${esc(t("botdee.rs.itinerary", "Shared Itinerary"))}</b><small>${esc(t("botdee.rs.itineraryEmpty", "No shared plans yet"))}</small></div><span>›</span></button>
+        <button type="button" class="botdee-sv-room-row" data-rs-panel="tab"><span>▣</span><div><b>${esc(t("botdee.rs.sharedTab", "Shared Tab (Opt-In)"))}</b><small>${esc(t("botdee.rs.tabConsent", "Consent required before any charge"))}</small></div><span>›</span></button>
+        <button type="button" class="botdee-sv-room-row" data-rs-panel="permissions"><span>⬡</span><div><b>${esc(t("botdee.rs.permissions", "Room Permissions"))}</b><small>${esc(t("botdee.rs.hostManaged", "Host managed"))}</small></div><span>›</span></button>
+      </div>
+      <div class="botdee-sv-room-panel" data-rs-panel-body hidden></div>
+      <div class="botdee-sv-room-controls">
+        <button type="button" class="botdee-sv-room-btn" data-rs-panel="invite" disabled>${esc(t("botdee.rs.invite", "Invite"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-panel="members">${esc(t("botdee.rs.members", "Members"))}</button>
+        <button type="button" class="botdee-sv-room-btn botdee-sv-room-danger" data-rs-end disabled>${esc(t("botdee.rs.endRoom", "End Room"))}</button>
+      </div>
+      ${confirmable ? `<div class="botdee-sv-room-confirm" data-rs-confirm-row>
+        <button type="button" class="botdee-sv-room-btn botdee-sv-room-main" data-rs-confirm>${esc(share ? t("botdee.rs.shareApprove", "Approve selected facts") : t("botdee.rs.confirm", "Confirm"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-decline>${esc(t("botdee.rs.notNow", "Not now"))}</button>
+      </div>` : ""}
+      <p class="botdee-sv-room-toast" data-rs-toast hidden></p>
+      <div class="botdee-sv-room-foot">
+        <span>${esc(t("botdee.rs.foot", "BOT DEE · Room SMARTview"))}</span>
+        <span>${esc(t("botdee.rs.neverCharge", "No charge without a later personal OK"))}</span>
+      </div>
+    </article>`;
+  }
+
+  function roomPanelCopy(name) {
+    if (name === "itinerary") {
+      return `<p>${esc(t("botdee.rs.itineraryEmpty", "No shared plans yet"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.privacyNote", "Private BOT DEE messages, other members’ profiles, and SMARTsummary are not included."))}</p>`;
+    }
+    if (name === "tab") {
+      return `<p>${esc(t("botdee.rs.tabConsent", "Consent required before any charge"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.neverCharge", "No charge without a later personal OK"))}</p>`;
+    }
+    if (name === "permissions") {
+      return `<p>${esc(t("botdee.rs.hostManaged", "Host managed"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.notLiveNote", "Group rooms are not live yet"))}</p>`;
+    }
+    if (name === "members") {
+      return `<p>${esc(t("botdee.rs.commandMembers", "There is no active Room SMARTview yet, so there is no member list to show."))}</p>`;
+    }
+    if (name === "invite") {
+      return `<p>${esc(t("botdee.rs.commandInvite", "Invite more people from Room SMARTview. Group rooms are not live yet — no invite is sent until that ships."))}</p>`;
+    }
+    return "";
+  }
+
+  function bindRoomCard(card) {
+    if (!card || card.dataset.rsBound === "1") return;
+    card.dataset.rsBound = "1";
+    const toast = card.querySelector("[data-rs-toast]");
+    const showToast = message => {
+      if (!toast) return;
+      toast.hidden = false;
+      toast.textContent = message;
+    };
+    const panel = card.querySelector("[data-rs-panel-body]");
+    card.querySelectorAll("[data-rs-panel]").forEach(btn => {
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        if (!panel) return;
+        const name = btn.getAttribute("data-rs-panel");
+        const html = roomPanelCopy(name);
+        const open = panel.getAttribute("data-open") === name;
+        panel.hidden = open;
+        panel.setAttribute("data-open", open ? "" : name);
+        panel.innerHTML = open ? "" : html;
+      });
+    });
+    card.querySelector("[data-rs-confirm]")?.addEventListener("click", event => {
+      event.preventDefault();
+      const share = card.getAttribute("data-rs-mode") === "share_preview";
+      showToast(share
+        ? t("botdee.rs.shareNotPublished", "Nothing was published. Selected facts stay in this preview. Group rooms are not live.")
+        : t("botdee.rs.confirmedNotLive", "Confirmed. Group rooms are not live yet — nothing was created, invited, or charged."));
+      card.querySelector("[data-rs-confirm-row]")?.setAttribute("hidden", "");
+    });
+    card.querySelector("[data-rs-decline]")?.addEventListener("click", event => {
+      event.preventDefault();
+      rememberRoomDecline(card.getAttribute("data-rs-decline"));
+      showToast(t("botdee.rs.declined", "OK — I won’t keep offering Room SMARTview for this."));
+      card.querySelector("[data-rs-confirm-row]")?.setAttribute("hidden", "");
+    });
+  }
+
   function renderCard(payload) {
     if (!payload || typeof payload !== "object") return "";
     if (isVersionPayload(payload)) return renderVersionCard(payload);
+    if (isRoomPayload(payload)) return renderRoomCard(payload);
     if (isCompactCard(payload)) return renderCompactPeopleCard(payload);
     if (peopleOf(payload)) return renderPeopleCard(payload);
     const mock = payload.sources && payload.sources.some(s => s.provider === "mock" || s.reuseRights === "unknown");
@@ -1066,6 +1218,7 @@
     el.innerHTML = list.map(renderCard).join("") + more || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SMARTviews yet."))}</p>`;
     wireActionLinks(el);
     el.querySelectorAll(".botdee-sv-version").forEach(card => bindVersionCard(card));
+    el.querySelectorAll(".botdee-sv-room").forEach(card => bindRoomCard(card));
     const cards = el.querySelectorAll(".botdee-sv-people");
     let index = 0;
     list.forEach(payload => {
@@ -1098,7 +1251,9 @@
     renderPeopleCard,
     renderCompactPeopleCard,
     renderVersionCard,
+    renderRoomCard,
     isVersionPayload,
+    isRoomPayload,
     localVersionPayload,
     peopleHeroMedia,
     isCompactCard,

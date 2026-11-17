@@ -753,7 +753,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Data | Classified: `botDeeThreads/archive\|memories\|research\|summaries\|executions`, `botDeeExecutions`, `botDeeFeedback`, `botDeeLegalGates`, `botDeeProviderSlots`, `botDeeCapabilityManifest`, `usercharacter_analysis/{uid}`, `smartViewTranslationJobs`, `botDeeSmartViewDiagnostics`. **`botDeeThreads/{uid}.hasUsedBotDee`** integer **0\|1** (never boolean): 0 = never used BOT DEE (first attempt / first-time Settings); 1 = has used. Functions-write on the existing thread/consent doc. Written `1` on first successful `persistUserTurn` / `executeBotSession` (and `markHasUsedBotDee` when durable threads are off). Fail-closed read → 0. **No stored IP.** Mingl `messages` never imported. Slots store `enabled` 0\|1, `secretName`, `legalEvidenceRef`, `expiresAtMs`, `billingAccountRef` — **never secret values**. |
 | Legal / slots | Master Admin → Features Mgmt → BOT DEE. `setBotDeeLegalGate` and `setBotDeeProviderSlot` need SOS2FA + `FLOQRReasonPrompt`. Runtime mock unless `enabled=1` **and** named Firebase secret present **and** `legalEvidenceRef` set **and** not expired. Even then adapters do not call vendors. Ticketmaster is two slots: Discovery vs Partner. |
 | Secrets | Accounts profile account `botDeeProviders` (`scripts/seed-accounts-profile.js`). Names: `BOTDEE_GOOGLE_PLACES_API_KEY`, `BOTDEE_GEMINI_GROUNDING_API_KEY`, `BOTDEE_YELP_API_KEY`, `BOTDEE_TICKETMASTER_DISCOVERY_API_KEY`, `BOTDEE_TICKETMASTER_PARTNER_API_KEY`, `BOTDEE_EVENTBRITE_API_KEY`. `readByCodeToday: false`. |
-| Help | `help-botdee-memory`, `help-botdee-smartview`, `help-botdee-smartview-edit`, `help-botdee-smartview-translation`, `help-botdee-smartview-privacy`, `help-botdee-smartview-media`, `help-botdee-smartview-categories`, `help-botdee-smartview-chrome`, `help-botdee-smartview-review`, `help-botdee-smartview-troubleshoot`, `help-botdee-version-smartview`, `help-botdee-version-smartview-status`, `help-botdee-version-smartview-tabs`, `help-botdee-research-library`, `help-botdee-explain`, `help-botdee-privacy-assistant`, `help-bot-dee-mgmt` |
+| Help | `help-botdee-memory`, `help-botdee-smartview`, `help-botdee-smartview-edit`, `help-botdee-smartview-translation`, `help-botdee-smartview-privacy`, `help-botdee-smartview-media`, `help-botdee-smartview-categories`, `help-botdee-smartview-chrome`, `help-botdee-smartview-review`, `help-botdee-smartview-troubleshoot`, `help-botdee-version-smartview`, `help-botdee-version-smartview-status`, `help-botdee-version-smartview-tabs`, `help-botdee-room-smartview`, `help-botdee-room-smartview-invite`, `help-botdee-room-smartview-join`, `help-botdee-room-smartview-end`, `help-botdee-room-smartview-tab`, `help-botdee-room-smartview-who-pays`, `help-botdee-room-smartview-kick`, `help-botdee-room-smartview-share`, `help-botdee-research-library`, `help-botdee-explain`, `help-botdee-privacy-assistant`, `help-bot-dee-mgmt` |
 | Gate | Feature key `botDee`. |
 | Docs | `docs/BOT-DEE-SIX-PHASE.md`, `docs/BOT-DEE-LEGAL-PROVIDER-GATE.md`, `docs/BOT-DEE-SMARTVIEW-V2.md` |
 
@@ -810,6 +810,24 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Observability | Manual Feature Test `s3-3-032-version-smartview`. |
 | Help | `help-botdee-version-smartview`, `help-botdee-version-smartview-status`, `help-botdee-version-smartview-tabs`. BOT DEE intent `help-botdee-version-smartview`. |
 | Deploy | Pages + Functions both needed for live package stamp and What's New (bundled changelog). |
+
+---
+
+## Room SMARTview intent routing (s3.3.033)
+
+**Purpose:** BOT DEE recognizes Room SMARTview intents (explicit / strong invite / contextual collaborate / existing-room commands) and opens an inline **Room SMARTview** confirmation card. Official name is **Room SMARTview** (never “Mingl Room SmartView”). Group rooms, Mingl invites, shared tab, and checkout are **not live** — Confirm does not create a room, send an invite, or charge. Distinct from Version SMARTview and People SMARTview.
+
+| Layer | Wiring |
+|---|---|
+| UI | Card in the BOT DEE bubble (`bot-dee-chat.js` → `FLOQRBotDeeSmartView.mount`). Setup / offer / share-preview / command / deny. Participants 0/8, itinerary / tab / permissions rows, Confirm and Not now. Composer, draft, and scroll stay. Site Chrome tokens only. |
+| Client | `botdee-room-smartview.js` (UMD, same file as Functions). `botdee-smartview.js` `renderRoomCard` / `bindRoomCard`. Chrome keys `botdee.rs.*`. Decline keys in `sessionStorage floqr.roomSmartView.declined` and `executeBotSession.roomSmartViewDeclined`. |
+| Backend | `functions/botdee-room-smartview.js` `classifyRoomIntent` / `buildRoomSession`. `executeBotSession` runs this **before** people SMARTcard search and Gemini so “Who is in this room?” and named invite phrases do not leak accounts. `localSession` attaches `kind: botDeeRoom`. Version aliases still win. |
+| Data | **No new Firestore docs.** Request-scoped payload. No stored IP. Private BOT DEE threads, other profiles, and SMARTsummary are never copied into the card. Named needles stay `eligibility: unresolved`. |
+| URL / contract | `botdee.html` satellite (`data-floqr-feature="botDee"`). Display boards never get `?v=`. Asset cache-bust `s3.3.033`. |
+| Security | Same `assertFeatureAccess(botDee)` as chat. Classifier cannot grant membership. Confirm does not call a create/invite/pay callable. Prompt-injection asking for host memory is denied. |
+| Observability | Manual Feature Test `s3-3-033-room-smartview-intent`. |
+| Help | `help-botdee-room-smartview`, `-invite`, `-join`, `-end`, `-tab`, `-who-pays`, `-kick`, `-share`. BOT DEE intent `help-botdee-room-smartview`. |
+| Deploy | Pages + Functions. Do not merge/deploy until Don asks. Shared-session/tab product stays unbuilt. |
 
 ---
 

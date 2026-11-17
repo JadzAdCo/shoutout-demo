@@ -1,0 +1,742 @@
+#!/usr/bin/env node
+"use strict";
+const fs = require("fs");
+const path = require("path");
+const root = path.resolve(__dirname, "..");
+
+const CHROME = {
+  en: {
+    "botdee.rs.title": "Room SMARTview",
+    "botdee.rs.roomName": "BOT DEE group session",
+    "botdee.rs.subtitle": "Room SMARTview",
+    "botdee.rs.participants": "Participants",
+    "botdee.rs.includingHost": "including host",
+    "botdee.rs.roomStatus": "Room status",
+    "botdee.rs.statusActive": "Active",
+    "botdee.rs.statusClosing": "Closing",
+    "botdee.rs.statusClosed": "Closed",
+    "botdee.rs.statusSetup": "Setup",
+    "botdee.rs.statusCreated": "Created",
+    "botdee.rs.notLiveNote": "Group rooms are not live yet",
+    "botdee.rs.namedUnknown": "Named people are not looked up until they are eligible Mingl friends. FLOQR will not say whether a name has an account.",
+    "botdee.rs.unresolved": "unresolved",
+    "botdee.rs.sharePreview": "Share preview",
+    "botdee.rs.shareEmpty": "No selected shareable facts from this message. Private chat is not copied.",
+    "botdee.rs.shareTentative": "tentative",
+    "botdee.rs.privacyNote": "Private BOT DEE messages, other members’ profiles, and SMARTsummary are not included.",
+    "botdee.rs.itinerary": "Shared Itinerary",
+    "botdee.rs.itineraryEmpty": "No shared plans yet",
+    "botdee.rs.sharedTab": "Shared Tab (Opt-In)",
+    "botdee.rs.tabConsent": "Consent required before any charge",
+    "botdee.rs.permissions": "Room Permissions",
+    "botdee.rs.hostManaged": "Host managed",
+    "botdee.rs.invite": "Invite",
+    "botdee.rs.members": "Members",
+    "botdee.rs.endRoom": "End Room",
+    "botdee.rs.confirm": "Confirm",
+    "botdee.rs.shareApprove": "Approve selected facts",
+    "botdee.rs.notNow": "Not now",
+    "botdee.rs.foot": "BOT DEE · Room SMARTview",
+    "botdee.rs.neverCharge": "No charge without a later personal OK",
+    "botdee.rs.shareNotPublished": "Nothing was published. Selected facts stay in this preview. Group rooms are not live.",
+    "botdee.rs.confirmedNotLive": "Confirmed. Group rooms are not live yet — nothing was created, invited, or charged.",
+    "botdee.rs.declined": "OK — I won’t keep offering Room SMARTview for this.",
+    "botdee.rs.injectionDenied": "I can’t use private BOT DEE history or host memory for that. Room SMARTview only uses what this group later confirms.",
+    "botdee.rs.setupIntro": "Here’s Room SMARTview setup. Confirm to continue — nothing is created until you say so. Your private BOT DEE chat stays private.",
+    "botdee.rs.reopenIntro": "You already have a Room SMARTview in this session. Opening it again — not a second room.",
+    "botdee.rs.shareIntro": "I can preview selected shareable facts only. Private BOT DEE messages and other people’s SMARTsummary stay out. Approve before anything is published.",
+    "botdee.rs.offerIntro": "Would you like to open Room SMARTview so friends can join this BOT DEE chat? Joining a room does not authorize a payment. Confirm or not now.",
+    "botdee.rs.commandInvite": "Invite more people from Room SMARTview. Group rooms are not live yet — no invite is sent until that ships.",
+    "botdee.rs.commandMembers": "There is no active Room SMARTview yet, so there is no member list to show.",
+    "botdee.rs.commandSummary": "There are no room-only decisions yet. Private BOT DEE history is not used as a room summary.",
+    "botdee.rs.commandWhoPays": "No one is charged from chat. A shared tab needs a later opt-in per person — it is not live.",
+    "botdee.rs.commandKick": "Only a verified host can remove someone, and only after confirm. There is no live room to change.",
+    "botdee.rs.commandLeave": "Leave applies only to a Room SMARTview you have joined. There is no active room.",
+    "botdee.rs.commandEnd": "Ending a room needs host confirmation and does not settle money. There is no live room to close.",
+    "botdee.rs.commandPrivate": "Do you want to leave Room SMARTview, or keep chatting privately here? Other people’s messages are not erased.",
+    "botdee.rs.noActiveRoom": "There is no active Room SMARTview in this chat."
+  }
+};
+
+CHROME.fr = {
+  "botdee.rs.title": "Room SMARTview",
+  "botdee.rs.roomName": "Session de groupe BOT DEE",
+  "botdee.rs.subtitle": "Room SMARTview",
+  "botdee.rs.participants": "Participants",
+  "botdee.rs.includingHost": "hôte inclus",
+  "botdee.rs.roomStatus": "État de la room",
+  "botdee.rs.statusActive": "Active",
+  "botdee.rs.statusClosing": "Fermeture",
+  "botdee.rs.statusClosed": "Fermée",
+  "botdee.rs.statusSetup": "Configuration",
+  "botdee.rs.statusCreated": "Créée",
+  "botdee.rs.notLiveNote": "Les rooms de groupe ne sont pas encore en ligne",
+  "botdee.rs.namedUnknown": "Les personnes nommées ne sont pas recherchées tant qu’elles ne sont pas des amis Mingl éligibles. FLOQR ne dira pas si un nom a un compte.",
+  "botdee.rs.unresolved": "non résolu",
+  "botdee.rs.sharePreview": "Aperçu du partage",
+  "botdee.rs.shareEmpty": "Aucun fait partageable sélectionné dans ce message. Le chat privé n’est pas copié.",
+  "botdee.rs.shareTentative": "provisoire",
+  "botdee.rs.privacyNote": "Les messages BOT DEE privés, les profils des autres et SMARTsummary ne sont pas inclus.",
+  "botdee.rs.itinerary": "Itinéraire partagé",
+  "botdee.rs.itineraryEmpty": "Pas encore de plans partagés",
+  "botdee.rs.sharedTab": "Addition partagée (opt-in)",
+  "botdee.rs.tabConsent": "Consentement requis avant tout paiement",
+  "botdee.rs.permissions": "Autorisations de la room",
+  "botdee.rs.hostManaged": "Géré par l’hôte",
+  "botdee.rs.invite": "Inviter",
+  "botdee.rs.members": "Membres",
+  "botdee.rs.endRoom": "Terminer la room",
+  "botdee.rs.confirm": "Confirmer",
+  "botdee.rs.shareApprove": "Approuver les faits sélectionnés",
+  "botdee.rs.notNow": "Pas maintenant",
+  "botdee.rs.foot": "BOT DEE · Room SMARTview",
+  "botdee.rs.neverCharge": "Aucun paiement sans un OK personnel plus tard",
+  "botdee.rs.shareNotPublished": "Rien n’a été publié. Les faits restent dans cet aperçu. Les rooms de groupe ne sont pas en ligne.",
+  "botdee.rs.confirmedNotLive": "Confirmé. Les rooms de groupe ne sont pas encore en ligne — rien n’a été créé, invité ni facturé.",
+  "botdee.rs.declined": "D’accord — je ne proposerai plus Room SMARTview pour ceci.",
+  "botdee.rs.injectionDenied": "Je ne peux pas utiliser l’historique BOT DEE privé ni la mémoire de l’hôte. Room SMARTview n’utilise que ce que ce groupe confirmera plus tard.",
+  "botdee.rs.setupIntro": "Voici la configuration Room SMARTview. Confirmez pour continuer — rien n’est créé tant que vous ne le dites pas. Votre chat BOT DEE privé reste privé.",
+  "botdee.rs.reopenIntro": "Vous avez déjà un Room SMARTview dans cette session. Réouverture — pas une deuxième room.",
+  "botdee.rs.shareIntro": "Je peux prévisualiser uniquement des faits partageables sélectionnés. Les messages BOT DEE privés et le SMARTsummary des autres restent dehors. Approuvez avant toute publication.",
+  "botdee.rs.offerIntro": "Voulez-vous ouvrir Room SMARTview pour que des amis rejoignent ce chat BOT DEE ? Rejoindre une room n’autorise pas un paiement. Confirmez ou pas maintenant.",
+  "botdee.rs.commandInvite": "Invitez d’autres personnes depuis Room SMARTview. Les rooms de groupe ne sont pas encore en ligne — aucune invitation n’est envoyée pour l’instant.",
+  "botdee.rs.commandMembers": "Il n’y a pas encore de Room SMARTview actif, donc pas de liste de membres.",
+  "botdee.rs.commandSummary": "Il n’y a pas encore de décisions de room. L’historique BOT DEE privé n’est pas utilisé comme résumé.",
+  "botdee.rs.commandWhoPays": "Personne n’est facturé depuis le chat. Une addition partagée demandera plus tard un opt-in par personne — ce n’est pas en ligne.",
+  "botdee.rs.commandKick": "Seul un hôte vérifié peut retirer quelqu’un, et seulement après confirmation. Il n’y a pas de room en ligne à modifier.",
+  "botdee.rs.commandLeave": "Quitter s’applique seulement à un Room SMARTview que vous avez rejoint. Il n’y a pas de room active.",
+  "botdee.rs.commandEnd": "Terminer une room exige la confirmation de l’hôte et ne règle pas d’argent. Il n’y a pas de room en ligne à fermer.",
+  "botdee.rs.commandPrivate": "Voulez-vous quitter Room SMARTview, ou continuer à discuter en privé ici ? Les messages des autres ne sont pas effacés.",
+  "botdee.rs.noActiveRoom": "Il n’y a pas de Room SMARTview actif dans ce chat."
+};
+
+function copyPack(src, map) {
+  const out = {};
+  Object.keys(CHROME.en).forEach(key => {
+    out[key] = map[key] || src[key] || CHROME.en[key];
+  });
+  return out;
+}
+
+CHROME.de = copyPack(CHROME.fr, {
+  "botdee.rs.roomName": "BOT DEE-Gruppensitzung",
+  "botdee.rs.participants": "Teilnehmer",
+  "botdee.rs.includingHost": "inkl. Host",
+  "botdee.rs.roomStatus": "Room-Status",
+  "botdee.rs.statusActive": "Aktiv",
+  "botdee.rs.statusClosing": "Wird geschlossen",
+  "botdee.rs.statusClosed": "Geschlossen",
+  "botdee.rs.statusSetup": "Einrichtung",
+  "botdee.rs.statusCreated": "Erstellt",
+  "botdee.rs.notLiveNote": "Gruppen-Rooms sind noch nicht live",
+  "botdee.rs.namedUnknown": "Genannte Personen werden nicht nachgeschlagen, bis sie berechtigte Mingl-Freunde sind. FLOQR sagt nicht, ob ein Name ein Konto hat.",
+  "botdee.rs.unresolved": "ungeklärt",
+  "botdee.rs.sharePreview": "Freigabevorschau",
+  "botdee.rs.shareEmpty": "Keine ausgewählten teilbaren Fakten aus dieser Nachricht. Privater Chat wird nicht kopiert.",
+  "botdee.rs.shareTentative": "vorläufig",
+  "botdee.rs.privacyNote": "Private BOT DEE-Nachrichten, Profile anderer und SMARTsummary sind nicht enthalten.",
+  "botdee.rs.itinerary": "Geteilte Route",
+  "botdee.rs.itineraryEmpty": "Noch keine geteilten Pläne",
+  "botdee.rs.sharedTab": "Geteilte Rechnung (Opt-in)",
+  "botdee.rs.tabConsent": "Zustimmung vor jeder Belastung nötig",
+  "botdee.rs.permissions": "Room-Berechtigungen",
+  "botdee.rs.hostManaged": "Vom Host verwaltet",
+  "botdee.rs.invite": "Einladen",
+  "botdee.rs.members": "Mitglieder",
+  "botdee.rs.endRoom": "Room beenden",
+  "botdee.rs.confirm": "Bestätigen",
+  "botdee.rs.shareApprove": "Ausgewählte Fakten bestätigen",
+  "botdee.rs.notNow": "Nicht jetzt",
+  "botdee.rs.neverCharge": "Keine Belastung ohne späteres persönliches OK",
+  "botdee.rs.shareNotPublished": "Nichts wurde veröffentlicht. Ausgewählte Fakten bleiben in dieser Vorschau. Gruppen-Rooms sind nicht live.",
+  "botdee.rs.confirmedNotLive": "Bestätigt. Gruppen-Rooms sind noch nicht live — nichts wurde erstellt, eingeladen oder belastet.",
+  "botdee.rs.declined": "OK — ich biete Room SMARTview dafür nicht weiter an.",
+  "botdee.rs.injectionDenied": "Ich kann dafür keine private BOT DEE-Historie oder Host-Erinnerung nutzen. Room SMARTview nutzt nur, was diese Gruppe später bestätigt.",
+  "botdee.rs.setupIntro": "Hier ist die Room-SMARTview-Einrichtung. Bestätigen Sie zum Fortfahren — es wird nichts erstellt, bis Sie es sagen. Ihr privater BOT DEE-Chat bleibt privat.",
+  "botdee.rs.reopenIntro": "Sie haben in dieser Sitzung bereits ein Room SMARTview. Erneutes Öffnen — kein zweiter Room.",
+  "botdee.rs.shareIntro": "Ich kann nur ausgewählte teilbare Fakten zeigen. Private BOT DEE-Nachrichten und fremde SMARTsummary bleiben draußen. Freigabe vor Veröffentlichung.",
+  "botdee.rs.offerIntro": "Möchten Sie Room SMARTview öffnen, damit Freunde diesem BOT DEE-Chat beitreten? Einem Room beizutreten autorisiert keine Zahlung. Bestätigen oder nicht jetzt.",
+  "botdee.rs.commandInvite": "Laden Sie weitere Personen aus Room SMARTview ein. Gruppen-Rooms sind noch nicht live — es wird keine Einladung gesendet.",
+  "botdee.rs.commandMembers": "Es gibt noch kein aktives Room SMARTview, daher keine Mitgliederliste.",
+  "botdee.rs.commandSummary": "Es gibt noch keine Room-Entscheidungen. Private BOT DEE-Historie wird nicht als Zusammenfassung genutzt.",
+  "botdee.rs.commandWhoPays": "Niemand wird aus dem Chat belastet. Eine geteilte Rechnung braucht später Opt-in pro Person — nicht live.",
+  "botdee.rs.commandKick": "Nur ein geprüfter Host kann jemanden entfernen, und nur nach Bestätigung. Es gibt keinen Live-Room zum Ändern.",
+  "botdee.rs.commandLeave": "Verlassen gilt nur für ein Room SMARTview, dem Sie beigetreten sind. Es gibt keinen aktiven Room.",
+  "botdee.rs.commandEnd": "Beenden braucht Host-Bestätigung und rechnet kein Geld ab. Es gibt keinen Live-Room zum Schließen.",
+  "botdee.rs.commandPrivate": "Möchten Sie Room SMARTview verlassen oder hier privat weiterchatten? Nachrichten anderer werden nicht gelöscht.",
+  "botdee.rs.noActiveRoom": "In diesem Chat gibt es kein aktives Room SMARTview."
+});
+
+CHROME.es = copyPack(CHROME.fr, {
+  "botdee.rs.roomName": "Sesión de grupo BOT DEE",
+  "botdee.rs.participants": "Participantes",
+  "botdee.rs.includingHost": "incluido el anfitrión",
+  "botdee.rs.roomStatus": "Estado de la room",
+  "botdee.rs.statusActive": "Activa",
+  "botdee.rs.statusClosing": "Cerrando",
+  "botdee.rs.statusClosed": "Cerrada",
+  "botdee.rs.statusSetup": "Configuración",
+  "botdee.rs.statusCreated": "Creada",
+  "botdee.rs.notLiveNote": "Las rooms de grupo aún no están en vivo",
+  "botdee.rs.namedUnknown": "Las personas nombradas no se buscan hasta que sean amigos Mingl elegibles. FLOQR no dirá si un nombre tiene cuenta.",
+  "botdee.rs.unresolved": "sin resolver",
+  "botdee.rs.sharePreview": "Vista previa para compartir",
+  "botdee.rs.shareEmpty": "No hay hechos compartibles seleccionados de este mensaje. El chat privado no se copia.",
+  "botdee.rs.shareTentative": "provisional",
+  "botdee.rs.privacyNote": "Los mensajes privados de BOT DEE, perfiles de otros y SMARTsummary no se incluyen.",
+  "botdee.rs.itinerary": "Itinerario compartido",
+  "botdee.rs.itineraryEmpty": "Aún no hay planes compartidos",
+  "botdee.rs.sharedTab": "Cuenta compartida (opt-in)",
+  "botdee.rs.tabConsent": "Se requiere consentimiento antes de cualquier cargo",
+  "botdee.rs.permissions": "Permisos de la room",
+  "botdee.rs.hostManaged": "Gestionado por el anfitrión",
+  "botdee.rs.invite": "Invitar",
+  "botdee.rs.members": "Miembros",
+  "botdee.rs.endRoom": "Terminar room",
+  "botdee.rs.confirm": "Confirmar",
+  "botdee.rs.shareApprove": "Aprobar hechos seleccionados",
+  "botdee.rs.notNow": "Ahora no",
+  "botdee.rs.neverCharge": "Ningún cargo sin un OK personal posterior",
+  "botdee.rs.shareNotPublished": "No se publicó nada. Los hechos quedan en esta vista previa. Las rooms de grupo no están en vivo.",
+  "botdee.rs.confirmedNotLive": "Confirmado. Las rooms de grupo aún no están en vivo: no se creó, invitó ni cobró nada.",
+  "botdee.rs.declined": "Vale — no seguiré ofreciendo Room SMARTview para esto.",
+  "botdee.rs.injectionDenied": "No puedo usar el historial privado de BOT DEE ni la memoria del anfitrión. Room SMARTview solo usa lo que este grupo confirme después.",
+  "botdee.rs.setupIntro": "Aquí está la configuración de Room SMARTview. Confirme para continuar: no se crea nada hasta que lo diga. Su chat privado de BOT DEE sigue privado.",
+  "botdee.rs.reopenIntro": "Ya tiene un Room SMARTview en esta sesión. Se abre de nuevo, no una segunda room.",
+  "botdee.rs.shareIntro": "Solo puedo previsualizar hechos compartibles seleccionados. Los mensajes privados de BOT DEE y el SMARTsummary de otros quedan fuera. Apruebe antes de publicar.",
+  "botdee.rs.offerIntro": "¿Quiere abrir Room SMARTview para que amigos se unan a este chat BOT DEE? Unirse a una room no autoriza un pago. Confirme o ahora no.",
+  "botdee.rs.commandInvite": "Invite a más personas desde Room SMARTview. Las rooms de grupo aún no están en vivo: no se envía ninguna invitación.",
+  "botdee.rs.commandMembers": "Aún no hay un Room SMARTview activo, así que no hay lista de miembros.",
+  "botdee.rs.commandSummary": "Aún no hay decisiones de room. El historial privado de BOT DEE no se usa como resumen.",
+  "botdee.rs.commandWhoPays": "Nadie se cobra desde el chat. Una cuenta compartida pedirá más tarde opt-in por persona; no está en vivo.",
+  "botdee.rs.commandKick": "Solo un anfitrión verificado puede quitar a alguien, y solo tras confirmar. No hay room en vivo que cambiar.",
+  "botdee.rs.commandLeave": "Salir solo aplica a un Room SMARTview al que se unió. No hay room activa.",
+  "botdee.rs.commandEnd": "Terminar una room necesita confirmación del anfitrión y no liquida dinero. No hay room en vivo que cerrar.",
+  "botdee.rs.commandPrivate": "¿Quiere salir de Room SMARTview o seguir hablando en privado aquí? Los mensajes de otros no se borran.",
+  "botdee.rs.noActiveRoom": "No hay un Room SMARTview activo en este chat."
+});
+
+CHROME.it = copyPack(CHROME.es, {
+  "botdee.rs.roomName": "Sessione di gruppo BOT DEE",
+  "botdee.rs.participants": "Partecipanti",
+  "botdee.rs.includingHost": "host incluso",
+  "botdee.rs.roomStatus": "Stato della room",
+  "botdee.rs.statusActive": "Attiva",
+  "botdee.rs.statusClosing": "Chiusura",
+  "botdee.rs.statusClosed": "Chiusa",
+  "botdee.rs.statusSetup": "Configurazione",
+  "botdee.rs.statusCreated": "Creata",
+  "botdee.rs.notLiveNote": "Le room di gruppo non sono ancora live",
+  "botdee.rs.namedUnknown": "Le persone nominate non vengono cercate finché non sono amici Mingl idonei. FLOQR non dirà se un nome ha un account.",
+  "botdee.rs.unresolved": "non risolto",
+  "botdee.rs.sharePreview": "Anteprima di condivisione",
+  "botdee.rs.shareEmpty": "Nessun fatto condivisibile selezionato da questo messaggio. La chat privata non viene copiata.",
+  "botdee.rs.shareTentative": "provvisorio",
+  "botdee.rs.privacyNote": "I messaggi BOT DEE privati, i profili altrui e SMARTsummary non sono inclusi.",
+  "botdee.rs.itinerary": "Itinerario condiviso",
+  "botdee.rs.itineraryEmpty": "Nessun piano condiviso ancora",
+  "botdee.rs.sharedTab": "Conto condiviso (opt-in)",
+  "botdee.rs.tabConsent": "Consenso richiesto prima di qualsiasi addebito",
+  "botdee.rs.permissions": "Permessi della room",
+  "botdee.rs.hostManaged": "Gestito dall’host",
+  "botdee.rs.invite": "Invita",
+  "botdee.rs.members": "Membri",
+  "botdee.rs.endRoom": "Termina room",
+  "botdee.rs.confirm": "Conferma",
+  "botdee.rs.shareApprove": "Approva i fatti selezionati",
+  "botdee.rs.notNow": "Non ora",
+  "botdee.rs.neverCharge": "Nessun addebito senza un OK personale successivo",
+  "botdee.rs.shareNotPublished": "Non è stato pubblicato nulla. I fatti restano in questa anteprima. Le room di gruppo non sono live.",
+  "botdee.rs.confirmedNotLive": "Confermato. Le room di gruppo non sono ancora live — nulla è stato creato, invitato o addebitato.",
+  "botdee.rs.declined": "OK — non continuerò a offrire Room SMARTview per questo.",
+  "botdee.rs.injectionDenied": "Non posso usare la cronologia BOT DEE privata né la memoria dell’host. Room SMARTview usa solo ciò che questo gruppo confermerà dopo.",
+  "botdee.rs.setupIntro": "Ecco la configurazione Room SMARTview. Conferma per continuare — non si crea nulla finché non lo dici. La chat BOT DEE privata resta privata.",
+  "botdee.rs.reopenIntro": "Hai già un Room SMARTview in questa sessione. Lo riapro — non una seconda room.",
+  "botdee.rs.shareIntro": "Posso mostrare solo fatti condivisibili selezionati. I messaggi BOT DEE privati e il SMARTsummary altrui restano fuori. Approva prima di pubblicare.",
+  "botdee.rs.offerIntro": "Vuoi aprire Room SMARTview così gli amici possono unirsi a questa chat BOT DEE? Unirsi a una room non autorizza un pagamento. Conferma o non ora.",
+  "botdee.rs.commandInvite": "Invita altre persone da Room SMARTview. Le room di gruppo non sono ancora live — nessun invito viene inviato.",
+  "botdee.rs.commandMembers": "Non c’è ancora un Room SMARTview attivo, quindi nessuna lista membri.",
+  "botdee.rs.commandSummary": "Non ci sono ancora decisioni della room. La cronologia BOT DEE privata non è usata come riepilogo.",
+  "botdee.rs.commandWhoPays": "Nessuno viene addebitato dalla chat. Un conto condiviso richiederà in seguito un opt-in per persona — non è live.",
+  "botdee.rs.commandKick": "Solo un host verificato può rimuovere qualcuno, e solo dopo conferma. Non c’è una room live da modificare.",
+  "botdee.rs.commandLeave": "Uscire vale solo per un Room SMARTview a cui ti sei unito. Non c’è una room attiva.",
+  "botdee.rs.commandEnd": "Terminare una room richiede conferma dell’host e non salda denaro. Non c’è una room live da chiudere.",
+  "botdee.rs.commandPrivate": "Vuoi lasciare Room SMARTview o continuare a chiacchierare in privato qui? I messaggi altrui non vengono cancellati.",
+  "botdee.rs.noActiveRoom": "Non c’è un Room SMARTview attivo in questa chat."
+});
+
+CHROME.pt = copyPack(CHROME.es, {
+  "botdee.rs.roomName": "Sessão de grupo BOT DEE",
+  "botdee.rs.participants": "Participantes",
+  "botdee.rs.includingHost": "incluindo o anfitrião",
+  "botdee.rs.roomStatus": "Estado da room",
+  "botdee.rs.statusActive": "Ativa",
+  "botdee.rs.statusClosing": "A encerrar",
+  "botdee.rs.statusClosed": "Encerrada",
+  "botdee.rs.statusSetup": "Configuração",
+  "botdee.rs.statusCreated": "Criada",
+  "botdee.rs.notLiveNote": "As rooms de grupo ainda não estão ativas",
+  "botdee.rs.namedUnknown": "Pessoas nomeadas não são procuradas até serem amigos Mingl elegíveis. A FLOQR não dirá se um nome tem conta.",
+  "botdee.rs.unresolved": "não resolvido",
+  "botdee.rs.sharePreview": "Pré-visualização de partilha",
+  "botdee.rs.shareEmpty": "Nenhum facto partilhável selecionado desta mensagem. O chat privado não é copiado.",
+  "botdee.rs.shareTentative": "provisório",
+  "botdee.rs.privacyNote": "Mensagens privadas do BOT DEE, perfis de outros e SMARTsummary não são incluídos.",
+  "botdee.rs.itinerary": "Itinerário partilhado",
+  "botdee.rs.itineraryEmpty": "Ainda sem planos partilhados",
+  "botdee.rs.sharedTab": "Conta partilhada (opt-in)",
+  "botdee.rs.tabConsent": "Consentimento necessário antes de qualquer cobrança",
+  "botdee.rs.permissions": "Permissões da room",
+  "botdee.rs.hostManaged": "Gerido pelo anfitrião",
+  "botdee.rs.invite": "Convidar",
+  "botdee.rs.members": "Membros",
+  "botdee.rs.endRoom": "Terminar room",
+  "botdee.rs.confirm": "Confirmar",
+  "botdee.rs.shareApprove": "Aprovar factos selecionados",
+  "botdee.rs.notNow": "Agora não",
+  "botdee.rs.neverCharge": "Nenhuma cobrança sem um OK pessoal posterior",
+  "botdee.rs.shareNotPublished": "Nada foi publicado. Os factos ficam nesta pré-visualização. As rooms de grupo não estão ativas.",
+  "botdee.rs.confirmedNotLive": "Confirmado. As rooms de grupo ainda não estão ativas — nada foi criado, convidado ou cobrado.",
+  "botdee.rs.declined": "OK — não vou continuar a oferecer Room SMARTview para isto.",
+  "botdee.rs.injectionDenied": "Não posso usar o histórico privado do BOT DEE nem a memória do anfitrião. O Room SMARTview só usa o que este grupo confirmar depois.",
+  "botdee.rs.setupIntro": "Aqui está a configuração do Room SMARTview. Confirme para continuar — nada é criado até você dizer. O seu chat privado BOT DEE permanece privado.",
+  "botdee.rs.reopenIntro": "Já tem um Room SMARTview nesta sessão. A reabrir — não é uma segunda room.",
+  "botdee.rs.shareIntro": "Só posso pré-visualizar factos partilháveis selecionados. Mensagens privadas do BOT DEE e SMARTsummary de outros ficam de fora. Aprove antes de publicar.",
+  "botdee.rs.offerIntro": "Quer abrir o Room SMARTview para amigos entrarem neste chat BOT DEE? Entrar numa room não autoriza um pagamento. Confirme ou agora não.",
+  "botdee.rs.commandInvite": "Convide mais pessoas a partir do Room SMARTview. As rooms de grupo ainda não estão ativas — nenhum convite é enviado.",
+  "botdee.rs.commandMembers": "Ainda não há Room SMARTview ativo, por isso não há lista de membros.",
+  "botdee.rs.commandSummary": "Ainda não há decisões da room. O histórico privado do BOT DEE não é usado como resumo.",
+  "botdee.rs.commandWhoPays": "Ninguém é cobrado a partir do chat. Uma conta partilhada pedirá mais tarde opt-in por pessoa — não está ativa.",
+  "botdee.rs.commandKick": "Só um anfitrião verificado pode remover alguém, e só após confirmar. Não há room ativa para alterar.",
+  "botdee.rs.commandLeave": "Sair aplica-se apenas a um Room SMARTview em que entrou. Não há room ativa.",
+  "botdee.rs.commandEnd": "Terminar uma room precisa da confirmação do anfitrião e não liquida dinheiro. Não há room ativa para fechar.",
+  "botdee.rs.commandPrivate": "Quer sair do Room SMARTview ou continuar a conversar em privado aqui? As mensagens de outras pessoas não são apagadas.",
+  "botdee.rs.noActiveRoom": "Não há Room SMARTview ativo neste chat."
+});
+
+CHROME.nl = copyPack(CHROME.de, {
+  "botdee.rs.roomName": "BOT DEE-groepsessie",
+  "botdee.rs.participants": "Deelnemers",
+  "botdee.rs.includingHost": "inclusief host",
+  "botdee.rs.roomStatus": "Roomstatus",
+  "botdee.rs.statusActive": "Actief",
+  "botdee.rs.statusClosing": "Afsluiten",
+  "botdee.rs.statusClosed": "Gesloten",
+  "botdee.rs.statusSetup": "Instellen",
+  "botdee.rs.statusCreated": "Aangemaakt",
+  "botdee.rs.notLiveNote": "Groepsrooms zijn nog niet live",
+  "botdee.rs.namedUnknown": "Genoemde personen worden niet opgezocht tot ze in aanmerking komende Mingl-vrienden zijn. FLOQR zegt niet of een naam een account heeft.",
+  "botdee.rs.unresolved": "onopgelost",
+  "botdee.rs.sharePreview": "Deelvoorbeeld",
+  "botdee.rs.shareEmpty": "Geen geselecteerde deelbare feiten uit dit bericht. Privéchat wordt niet gekopieerd.",
+  "botdee.rs.shareTentative": "voorlopig",
+  "botdee.rs.privacyNote": "Privé-BOT DEE-berichten, profielen van anderen en SMARTsummary zitten er niet in.",
+  "botdee.rs.itinerary": "Gedeelde itinerary",
+  "botdee.rs.itineraryEmpty": "Nog geen gedeelde plannen",
+  "botdee.rs.sharedTab": "Gedeelde rekening (opt-in)",
+  "botdee.rs.tabConsent": "Toestemming vereist vóór elke afschrijving",
+  "botdee.rs.permissions": "Roomrechten",
+  "botdee.rs.hostManaged": "Beheerd door de host",
+  "botdee.rs.invite": "Uitnodigen",
+  "botdee.rs.members": "Leden",
+  "botdee.rs.endRoom": "Room beëindigen",
+  "botdee.rs.confirm": "Bevestigen",
+  "botdee.rs.shareApprove": "Geselecteerde feiten goedkeuren",
+  "botdee.rs.notNow": "Niet nu",
+  "botdee.rs.neverCharge": "Geen afschrijving zonder later persoonlijk OK",
+  "botdee.rs.shareNotPublished": "Er is niets gepubliceerd. Feiten blijven in dit voorbeeld. Groepsrooms zijn niet live.",
+  "botdee.rs.confirmedNotLive": "Bevestigd. Groepsrooms zijn nog niet live — er is niets aangemaakt, uitgenodigd of afgerekend.",
+  "botdee.rs.declined": "OK — ik blijf Room SMARTview hiervoor niet aanbieden.",
+  "botdee.rs.injectionDenied": "Ik kan daarvoor geen privé-BOT DEE-geschiedenis of hostgeheugen gebruiken. Room SMARTview gebruikt alleen wat deze groep later bevestigt.",
+  "botdee.rs.setupIntro": "Hier is de Room SMARTview-setup. Bevestig om door te gaan — er wordt niets aangemaakt tot jij dat zegt. Je privé-BOT DEE-chat blijft privé.",
+  "botdee.rs.reopenIntro": "Je hebt in deze sessie al een Room SMARTview. Opnieuw openen — geen tweede room.",
+  "botdee.rs.shareIntro": "Ik kan alleen geselecteerde deelbare feiten tonen. Privé-BOT DEE-berichten en SMARTsummary van anderen blijven buiten. Keur goed vóór publicatie.",
+  "botdee.rs.offerIntro": "Wil je Room SMARTview openen zodat vrienden deze BOT DEE-chat kunnen joinen? Joinen van een room machtigt geen betaling. Bevestig of niet nu.",
+  "botdee.rs.commandInvite": "Nodig meer mensen uit via Room SMARTview. Groepsrooms zijn nog niet live — er wordt geen uitnodiging verstuurd.",
+  "botdee.rs.commandMembers": "Er is nog geen actieve Room SMARTview, dus geen ledenlijst.",
+  "botdee.rs.commandSummary": "Er zijn nog geen room-beslissingen. Privé-BOT DEE-geschiedenis wordt niet als samenvatting gebruikt.",
+  "botdee.rs.commandWhoPays": "Niemand wordt vanuit de chat belast. Een gedeelde rekening vraagt later opt-in per persoon — niet live.",
+  "botdee.rs.commandKick": "Alleen een geverifieerde host kan iemand verwijderen, en alleen na bevestiging. Er is geen live room om te wijzigen.",
+  "botdee.rs.commandLeave": "Verlaten geldt alleen voor een Room SMARTview die je hebt gejoined. Er is geen actieve room.",
+  "botdee.rs.commandEnd": "Een room beëindigen vereist hostbevestiging en rekent geen geld af. Er is geen live room om te sluiten.",
+  "botdee.rs.commandPrivate": "Wil je Room SMARTview verlaten of hier privé blijven chatten? Berichten van anderen worden niet gewist.",
+  "botdee.rs.noActiveRoom": "Er is geen actieve Room SMARTview in deze chat."
+});
+
+CHROME.ru = copyPack(CHROME.en, {
+  "botdee.rs.roomName": "Групповая сессия BOT DEE",
+  "botdee.rs.participants": "Участники",
+  "botdee.rs.includingHost": "включая хоста",
+  "botdee.rs.roomStatus": "Статус room",
+  "botdee.rs.statusActive": "Активна",
+  "botdee.rs.statusClosing": "Закрывается",
+  "botdee.rs.statusClosed": "Закрыта",
+  "botdee.rs.statusSetup": "Настройка",
+  "botdee.rs.statusCreated": "Создана",
+  "botdee.rs.notLiveNote": "Групповые room ещё не в эфире",
+  "botdee.rs.namedUnknown": "Упомянутые люди не ищутся, пока они не станут подходящими друзьями Mingl. FLOQR не скажет, есть ли у имени аккаунт.",
+  "botdee.rs.unresolved": "не выяснено",
+  "botdee.rs.sharePreview": "Предпросмотр публикации",
+  "botdee.rs.shareEmpty": "В этом сообщении нет выбранных фактов для публикации. Личный чат не копируется.",
+  "botdee.rs.shareTentative": "предварительно",
+  "botdee.rs.privacyNote": "Личные сообщения BOT DEE, чужие профили и SMARTsummary не включаются.",
+  "botdee.rs.itinerary": "Общий маршрут",
+  "botdee.rs.itineraryEmpty": "Пока нет общих планов",
+  "botdee.rs.sharedTab": "Общий счёт (opt-in)",
+  "botdee.rs.tabConsent": "Согласие нужно до любого списания",
+  "botdee.rs.permissions": "Права room",
+  "botdee.rs.hostManaged": "Управляет хост",
+  "botdee.rs.invite": "Пригласить",
+  "botdee.rs.members": "Участники",
+  "botdee.rs.endRoom": "Завершить room",
+  "botdee.rs.confirm": "Подтвердить",
+  "botdee.rs.shareApprove": "Одобрить выбранные факты",
+  "botdee.rs.notNow": "Не сейчас",
+  "botdee.rs.neverCharge": "Нет списания без личного OK позже",
+  "botdee.rs.shareNotPublished": "Ничего не опубликовано. Факты остаются в этом предпросмотре. Групповые room не в эфире.",
+  "botdee.rs.confirmedNotLive": "Подтверждено. Групповые room ещё не в эфире — ничего не создано, не приглашено и не списано.",
+  "botdee.rs.declined": "Хорошо — я больше не буду предлагать Room SMARTview для этого.",
+  "botdee.rs.injectionDenied": "Я не могу использовать личную историю BOT DEE или память хоста. Room SMARTview берёт только то, что группа подтвердит позже.",
+  "botdee.rs.setupIntro": "Это настройка Room SMARTview. Подтвердите, чтобы продолжить — ничего не создаётся, пока вы не скажете. Личный чат BOT DEE остаётся личным.",
+  "botdee.rs.reopenIntro": "В этой сессии уже есть Room SMARTview. Открываю снова — не вторую room.",
+  "botdee.rs.shareIntro": "Могу показать только выбранные факты для публикации. Личные сообщения BOT DEE и чужой SMARTsummary остаются вне. Одобрите до публикации.",
+  "botdee.rs.offerIntro": "Открыть Room SMARTview, чтобы друзья присоединились к этому чату BOT DEE? Вход в room не разрешает платёж. Подтвердите или не сейчас.",
+  "botdee.rs.commandInvite": "Приглашайте людей из Room SMARTview. Групповые room ещё не в эфире — приглашение не отправляется.",
+  "botdee.rs.commandMembers": "Пока нет активного Room SMARTview, поэтому нет списка участников.",
+  "botdee.rs.commandSummary": "Пока нет решений room. Личная история BOT DEE не используется как сводка.",
+  "botdee.rs.commandWhoPays": "Никто не списывается из чата. Общий счёт позже потребует opt-in каждого — это не в эфире.",
+  "botdee.rs.commandKick": "Только проверенный хост может удалить человека и только после подтверждения. Нет живой room для изменения.",
+  "botdee.rs.commandLeave": "Выход действует только для Room SMARTview, к которому вы присоединились. Нет активной room.",
+  "botdee.rs.commandEnd": "Завершение требует подтверждения хоста и не закрывает деньги. Нет живой room для закрытия.",
+  "botdee.rs.commandPrivate": "Хотите выйти из Room SMARTview или продолжить личный чат здесь? Чужие сообщения не стираются.",
+  "botdee.rs.noActiveRoom": "В этом чате нет активного Room SMARTview."
+});
+
+CHROME.el = copyPack(CHROME.en, {
+  "botdee.rs.roomName": "Ομαδική συνεδρία BOT DEE",
+  "botdee.rs.participants": "Συμμετέχοντες",
+  "botdee.rs.includingHost": "συμπεριλαμβανομένου του host",
+  "botdee.rs.roomStatus": "Κατάσταση room",
+  "botdee.rs.statusActive": "Ενεργή",
+  "botdee.rs.statusClosing": "Κλείνει",
+  "botdee.rs.statusClosed": "Κλειστή",
+  "botdee.rs.statusSetup": "Ρύθμιση",
+  "botdee.rs.statusCreated": "Δημιουργήθηκε",
+  "botdee.rs.notLiveNote": "Οι ομαδικές room δεν είναι ακόμα live",
+  "botdee.rs.namedUnknown": "Τα ονόματα δεν αναζητούνται μέχρι να είναι επιλέξιμοι φίλοι Mingl. Η FLOQR δεν θα πει αν ένα όνομα έχει λογαριασμό.",
+  "botdee.rs.unresolved": "άγνωστο",
+  "botdee.rs.sharePreview": "Προεπισκόπηση κοινοποίησης",
+  "botdee.rs.shareEmpty": "Δεν υπάρχουν επιλεγμένα κοινοποιήσιμα στοιχεία από αυτό το μήνυμα. Η ιδιωτική συνομιλία δεν αντιγράφεται.",
+  "botdee.rs.shareTentative": "προσωρινό",
+  "botdee.rs.privacyNote": "Ιδιωτικά μηνύματα BOT DEE, προφίλ άλλων και SMARTsummary δεν περιλαμβάνονται.",
+  "botdee.rs.itinerary": "Κοινό δρομολόγιο",
+  "botdee.rs.itineraryEmpty": "Δεν υπάρχουν ακόμα κοινά σχέδια",
+  "botdee.rs.sharedTab": "Κοινός λογαριασμός (opt-in)",
+  "botdee.rs.tabConsent": "Απαιτείται συναίνεση πριν από οποιαδήποτε χρέωση",
+  "botdee.rs.permissions": "Δικαιώματα room",
+  "botdee.rs.hostManaged": "Διαχείριση από τον host",
+  "botdee.rs.invite": "Πρόσκληση",
+  "botdee.rs.members": "Μέλη",
+  "botdee.rs.endRoom": "Τέλος room",
+  "botdee.rs.confirm": "Επιβεβαίωση",
+  "botdee.rs.shareApprove": "Έγκριση επιλεγμένων στοιχείων",
+  "botdee.rs.notNow": "Όχι τώρα",
+  "botdee.rs.neverCharge": "Καμία χρέωση χωρίς προσωπικό OK αργότερα",
+  "botdee.rs.shareNotPublished": "Δεν δημοσιεύτηκε τίποτα. Τα στοιχεία μένουν σε αυτή την προεπισκόπηση. Οι ομαδικές room δεν είναι live.",
+  "botdee.rs.confirmedNotLive": "Επιβεβαιώθηκε. Οι ομαδικές room δεν είναι ακόμα live — δεν δημιουργήθηκε, προσκλήθηκε ή χρεώθηκε τίποτα.",
+  "botdee.rs.declined": "Εντάξει — δεν θα συνεχίσω να προτείνω Room SMARTview γι’ αυτό.",
+  "botdee.rs.injectionDenied": "Δεν μπορώ να χρησιμοποιήσω ιδιωτικό ιστορικό BOT DEE ή μνήμη του host. Το Room SMARTview χρησιμοποιεί μόνο ό,τι επιβεβαιώσει αργότερα η ομάδα.",
+  "botdee.rs.setupIntro": "Αυτή είναι η ρύθμιση Room SMARTview. Επιβεβαιώστε για συνέχεια — τίποτα δεν δημιουργείται μέχρι να το πείτε. Η ιδιωτική συνομιλία BOT DEE μένει ιδιωτική.",
+  "botdee.rs.reopenIntro": "Έχετε ήδη Room SMARTview σε αυτή τη συνεδρία. Το ανοίγω ξανά — όχι δεύτερη room.",
+  "botdee.rs.shareIntro": "Μπορώ να δείξω μόνο επιλεγμένα κοινοποιήσιμα στοιχεία. Ιδιωτικά μηνύματα BOT DEE και SMARTsummary άλλων μένουν έξω. Εγκρίνετε πριν τη δημοσίευση.",
+  "botdee.rs.offerIntro": "Θέλετε να ανοίξετε Room SMARTview ώστε φίλοι να μπουν σε αυτή τη συνομιλία BOT DEE; Η είσοδος σε room δεν εγκρίνει πληρωμή. Επιβεβαιώστε ή όχι τώρα.",
+  "botdee.rs.commandInvite": "Προσκαλέστε περισσότερους από το Room SMARTview. Οι ομαδικές room δεν είναι ακόμα live — δεν στέλνεται πρόσκληση.",
+  "botdee.rs.commandMembers": "Δεν υπάρχει ακόμα ενεργό Room SMARTview, οπότε δεν υπάρχει λίστα μελών.",
+  "botdee.rs.commandSummary": "Δεν υπάρχουν ακόμα αποφάσεις room. Το ιδιωτικό ιστορικό BOT DEE δεν χρησιμοποιείται ως περίληψη.",
+  "botdee.rs.commandWhoPays": "Κανείς δεν χρεώνεται από τη συνομιλία. Ένας κοινός λογαριασμός θα ζητήσει αργότερα opt-in ανά άτομο — δεν είναι live.",
+  "botdee.rs.commandKick": "Μόνο επαληθευμένος host μπορεί να αφαιρέσει κάποιον, και μόνο μετά από επιβεβαίωση. Δεν υπάρχει live room για αλλαγή.",
+  "botdee.rs.commandLeave": "Η αποχώρηση ισχύει μόνο για Room SMARTview στο οποίο μπήκατε. Δεν υπάρχει ενεργή room.",
+  "botdee.rs.commandEnd": "Το τέλος room θέλει επιβεβαίωση host και δεν τακτοποιεί χρήματα. Δεν υπάρχει live room για κλείσιμο.",
+  "botdee.rs.commandPrivate": "Θέλετε να φύγετε από το Room SMARTview ή να συνεχίσετε ιδιωτικά εδώ; Τα μηνύματα άλλων δεν διαγράφονται.",
+  "botdee.rs.noActiveRoom": "Δεν υπάρχει ενεργό Room SMARTview σε αυτή τη συνομιλία."
+});
+
+CHROME.pl = copyPack(CHROME.en, {
+  "botdee.rs.roomName": "Sesja grupowa BOT DEE",
+  "botdee.rs.participants": "Uczestnicy",
+  "botdee.rs.includingHost": "w tym host",
+  "botdee.rs.roomStatus": "Status room",
+  "botdee.rs.statusActive": "Aktywna",
+  "botdee.rs.statusClosing": "Zamykanie",
+  "botdee.rs.statusClosed": "Zamknięta",
+  "botdee.rs.statusSetup": "Konfiguracja",
+  "botdee.rs.statusCreated": "Utworzona",
+  "botdee.rs.notLiveNote": "Roomy grupowe nie są jeszcze na żywo",
+  "botdee.rs.namedUnknown": "Wymienione osoby nie są wyszukiwane, dopóki nie będą uprawnionymi znajomymi Mingl. FLOQR nie powie, czy nazwa ma konto.",
+  "botdee.rs.unresolved": "nierozstrzygnięte",
+  "botdee.rs.sharePreview": "Podgląd udostępnienia",
+  "botdee.rs.shareEmpty": "Brak wybranych faktów do udostępnienia z tej wiadomości. Prywatny czat nie jest kopiowany.",
+  "botdee.rs.shareTentative": "wstępne",
+  "botdee.rs.privacyNote": "Prywatne wiadomości BOT DEE, profile innych i SMARTsummary nie są dołączane.",
+  "botdee.rs.itinerary": "Wspólny plan",
+  "botdee.rs.itineraryEmpty": "Nie ma jeszcze wspólnych planów",
+  "botdee.rs.sharedTab": "Wspólny rachunek (opt-in)",
+  "botdee.rs.tabConsent": "Zgoda wymagana przed każdą opłatą",
+  "botdee.rs.permissions": "Uprawnienia room",
+  "botdee.rs.hostManaged": "Zarządza host",
+  "botdee.rs.invite": "Zaproś",
+  "botdee.rs.members": "Członkowie",
+  "botdee.rs.endRoom": "Zakończ room",
+  "botdee.rs.confirm": "Potwierdź",
+  "botdee.rs.shareApprove": "Zatwierdź wybrane fakty",
+  "botdee.rs.notNow": "Nie teraz",
+  "botdee.rs.neverCharge": "Brak opłaty bez późniejszego osobistego OK",
+  "botdee.rs.shareNotPublished": "Nic nie opublikowano. Fakty zostają w tym podglądzie. Roomy grupowe nie są na żywo.",
+  "botdee.rs.confirmedNotLive": "Potwierdzono. Roomy grupowe nie są jeszcze na żywo — nic nie utworzono, nie zaproszono ani nie pobrano opłaty.",
+  "botdee.rs.declined": "OK — nie będę dalej proponować Room SMARTview w tej sprawie.",
+  "botdee.rs.injectionDenied": "Nie mogę użyć prywatnej historii BOT DEE ani pamięci hosta. Room SMARTview używa tylko tego, co grupa później potwierdzi.",
+  "botdee.rs.setupIntro": "Oto konfiguracja Room SMARTview. Potwierdź, aby kontynuować — nic nie powstaje, dopóki tego nie powiesz. Twój prywatny czat BOT DEE zostaje prywatny.",
+  "botdee.rs.reopenIntro": "Masz już Room SMARTview w tej sesji. Otwieram ponownie — nie drugi room.",
+  "botdee.rs.shareIntro": "Mogę pokazać tylko wybrane fakty do udostępnienia. Prywatne wiadomości BOT DEE i SMARTsummary innych zostają poza. Zatwierdź przed publikacją.",
+  "botdee.rs.offerIntro": "Chcesz otworzyć Room SMARTview, żeby znajomi dołączyli do tego czatu BOT DEE? Dołączenie do room nie zgadza się na płatność. Potwierdź albo nie teraz.",
+  "botdee.rs.commandInvite": "Zaproś więcej osób z Room SMARTview. Roomy grupowe nie są jeszcze na żywo — zaproszenie nie jest wysyłane.",
+  "botdee.rs.commandMembers": "Nie ma jeszcze aktywnego Room SMARTview, więc nie ma listy członków.",
+  "botdee.rs.commandSummary": "Nie ma jeszcze decyzji room. Prywatna historia BOT DEE nie jest używana jako podsumowanie.",
+  "botdee.rs.commandWhoPays": "Nikt nie jest obciążany z czatu. Wspólny rachunek później wymaga opt-in każdej osoby — to nie jest na żywo.",
+  "botdee.rs.commandKick": "Tylko zweryfikowany host może kogoś usunąć i tylko po potwierdzeniu. Nie ma live room do zmiany.",
+  "botdee.rs.commandLeave": "Wyjście dotyczy tylko Room SMARTview, do którego dołączyłeś. Nie ma aktywnego room.",
+  "botdee.rs.commandEnd": "Zakończenie wymaga potwierdzenia hosta i nie rozlicza pieniędzy. Nie ma live room do zamknięcia.",
+  "botdee.rs.commandPrivate": "Chcesz opuścić Room SMARTview, czy dalej rozmawiać tu prywatnie? Wiadomości innych nie są kasowane.",
+  "botdee.rs.noActiveRoom": "W tym czacie nie ma aktywnego Room SMARTview."
+});
+
+CHROME.ar = copyPack(CHROME.en, {
+  "botdee.rs.roomName": "جلسة مجموعة BOT DEE",
+  "botdee.rs.participants": "المشاركون",
+  "botdee.rs.includingHost": "بما في ذلك المضيف",
+  "botdee.rs.roomStatus": "حالة الـ room",
+  "botdee.rs.statusActive": "نشطة",
+  "botdee.rs.statusClosing": "تُغلق",
+  "botdee.rs.statusClosed": "مغلقة",
+  "botdee.rs.statusSetup": "إعداد",
+  "botdee.rs.statusCreated": "أُنشئت",
+  "botdee.rs.notLiveNote": "غرف المجموعة ليست مباشرة بعد",
+  "botdee.rs.namedUnknown": "لا يُبحث عن الأسماء حتى يصبحوا أصدقاء Mingl مؤهلين. لن تقول FLOQR إن كان للاسم حساب.",
+  "botdee.rs.unresolved": "غير محسوم",
+  "botdee.rs.sharePreview": "معاينة المشاركة",
+  "botdee.rs.shareEmpty": "لا حقائق قابلة للمشاركة مختارة من هذه الرسالة. لا تُنسخ الدردشة الخاصة.",
+  "botdee.rs.shareTentative": "مؤقت",
+  "botdee.rs.privacyNote": "رسائل BOT DEE الخاصة وملفات الآخرين وSMARTsummary غير مضمّنة.",
+  "botdee.rs.itinerary": "جدول مشترك",
+  "botdee.rs.itineraryEmpty": "لا خطط مشتركة بعد",
+  "botdee.rs.sharedTab": "فاتورة مشتركة (اشتراك اختياري)",
+  "botdee.rs.tabConsent": "يلزم الموافقة قبل أي تحصيل",
+  "botdee.rs.permissions": "صلاحيات الـ room",
+  "botdee.rs.hostManaged": "يديرها المضيف",
+  "botdee.rs.invite": "دعوة",
+  "botdee.rs.members": "الأعضاء",
+  "botdee.rs.endRoom": "إنهاء الـ room",
+  "botdee.rs.confirm": "تأكيد",
+  "botdee.rs.shareApprove": "اعتماد الحقائق المختارة",
+  "botdee.rs.notNow": "ليس الآن",
+  "botdee.rs.neverCharge": "لا تحصيل دون موافقة شخصية لاحقاً",
+  "botdee.rs.shareNotPublished": "لم يُنشر شيء. تبقى الحقائق في هذه المعاينة. غرف المجموعة ليست مباشرة.",
+  "botdee.rs.confirmedNotLive": "تم التأكيد. غرف المجموعة ليست مباشرة بعد — لم يُنشأ أو يُدعَ أو يُحصَّل شيء.",
+  "botdee.rs.declined": "حسناً — لن أواصل عرض Room SMARTview لهذا.",
+  "botdee.rs.injectionDenied": "لا يمكنني استخدام سجل BOT DEE الخاص أو ذاكرة المضيف. يستخدم Room SMARTview فقط ما تؤكده هذه المجموعة لاحقاً.",
+  "botdee.rs.setupIntro": "هذا إعداد Room SMARTview. أكّد للمتابعة — لا يُنشأ شيء حتى تقول ذلك. تبقى دردشة BOT DEE الخاصة خاصة.",
+  "botdee.rs.reopenIntro": "لديك Room SMARTview في هذه الجلسة. أفتحه مجدداً — ليست غرفة ثانية.",
+  "botdee.rs.shareIntro": "يمكنني عرض حقائق قابلة للمشاركة مختارة فقط. رسائل BOT DEE الخاصة وSMARTsummary للآخرين تبقى خارجاً. اعتمد قبل أي نشر.",
+  "botdee.rs.offerIntro": "هل تريد فتح Room SMARTview ليدخل الأصدقاء دردشة BOT DEE هذه؟ الانضمام إلى room لا يجيز دفعاً. أكّد أو ليس الآن.",
+  "botdee.rs.commandInvite": "ادعُ المزيد من Room SMARTview. غرف المجموعة ليست مباشرة بعد — لا تُرسل دعوة.",
+  "botdee.rs.commandMembers": "لا يوجد Room SMARTview نشط بعد، لذا لا قائمة أعضاء.",
+  "botdee.rs.commandSummary": "لا قرارات للـ room بعد. لا يُستخدم سجل BOT DEE الخاص كملخص.",
+  "botdee.rs.commandWhoPays": "لا يُحصَّل أحد من الدردشة. الفاتورة المشتركة ستطلب لاحقاً موافقة كل شخص — ليست مباشرة.",
+  "botdee.rs.commandKick": "المضيف الموثّق وحده يمكنه إزالة شخص وبعد التأكيد فقط. لا room مباشرة للتغيير.",
+  "botdee.rs.commandLeave": "المغادرة تنطبق فقط على Room SMARTview انضممت إليه. لا room نشطة.",
+  "botdee.rs.commandEnd": "إنهاء room يحتاج تأكيد المضيف ولا يسوّي مالاً. لا room مباشرة للإغلاق.",
+  "botdee.rs.commandPrivate": "هل تريد مغادرة Room SMARTview أم متابعة الدردشة الخاصة هنا؟ لا تُمسح رسائل الآخرين.",
+  "botdee.rs.noActiveRoom": "لا يوجد Room SMARTview نشط في هذه الدردشة."
+});
+
+const HELP_IDS = [
+  "help-botdee-room-smartview",
+  "help-botdee-room-smartview-invite",
+  "help-botdee-room-smartview-join",
+  "help-botdee-room-smartview-end",
+  "help-botdee-room-smartview-tab",
+  "help-botdee-room-smartview-who-pays",
+  "help-botdee-room-smartview-kick",
+  "help-botdee-room-smartview-share"
+];
+
+const HELP = {
+  "help-botdee-room-smartview": {
+    en: {title: "Room SMARTview", body: "In BOT DEE chat, say Open Room SMARTview or Start a group chat. A Room SMARTview card opens in the same bubble. Confirm before anything is created. Private BOT DEE messages stay private. Group rooms, invites, and a shared tab are not live yet — Confirm does not create a room, send an invite, or charge anyone. Site Chrome follows your Appearance theme."},
+    de: {title: "Room SMARTview", body: "Im BOT DEE-Chat sagen Sie Open Room SMARTview oder Start a group chat. Eine Room-SMARTview-Karte öffnet sich in derselben Blase. Bestätigen Sie, bevor etwas erstellt wird. Private BOT DEE-Nachrichten bleiben privat. Gruppen-Rooms, Einladungen und eine geteilte Rechnung sind noch nicht live — Bestätigen erstellt keinen Room, sendet keine Einladung und belastet niemanden. Site Chrome folgt Ihrem Appearance-Thema."},
+    fr: {title: "Room SMARTview", body: "Dans le chat BOT DEE, dites Open Room SMARTview ou Start a group chat. Une carte Room SMARTview s’ouvre dans la même bulle. Confirmez avant toute création. Les messages BOT DEE privés restent privés. Les rooms de groupe, invitations et addition partagée ne sont pas encore en ligne — Confirmer ne crée pas de room, n’envoie pas d’invitation et ne facture personne. Site Chrome suit votre thème Appearance."},
+    es: {title: "Room SMARTview", body: "En el chat de BOT DEE, diga Open Room SMARTview o Start a group chat. Se abre una tarjeta Room SMARTview en la misma burbuja. Confirme antes de crear nada. Los mensajes privados de BOT DEE siguen privados. Las rooms de grupo, invitaciones y cuenta compartida aún no están en vivo: Confirmar no crea una room, no envía invitación ni cobra. Site Chrome sigue su tema de Appearance."},
+    it: {title: "Room SMARTview", body: "Nella chat BOT DEE, di’ Open Room SMARTview o Start a group chat. Si apre una scheda Room SMARTview nella stessa bolla. Conferma prima di creare qualcosa. I messaggi BOT DEE privati restano privati. Room di gruppo, inviti e conto condiviso non sono ancora live — Conferma non crea una room, non invia un invito e non addebita nessuno. Site Chrome segue il tema Appearance."},
+    pt: {title: "Room SMARTview", body: "No chat BOT DEE, diga Open Room SMARTview ou Start a group chat. Um cartão Room SMARTview abre no mesmo balão. Confirme antes de criar qualquer coisa. As mensagens privadas do BOT DEE ficam privadas. Rooms de grupo, convites e conta partilhada ainda não estão ativos — Confirmar não cria room, não envia convite nem cobra. Site Chrome segue o tema Appearance."},
+    nl: {title: "Room SMARTview", body: "Zeg in de BOT DEE-chat Open Room SMARTview of Start a group chat. Er opent een Room SMARTview-kaart in dezelfde bubble. Bevestig voordat er iets wordt aangemaakt. Privé-BOT DEE-berichten blijven privé. Groepsrooms, uitnodigingen en een gedeelde rekening zijn nog niet live — Bevestigen maakt geen room, stuurt geen uitnodiging en belast niemand. Site Chrome volgt je Appearance-thema."},
+    ru: {title: "Room SMARTview", body: "В чате BOT DEE скажите Open Room SMARTview или Start a group chat. Карточка Room SMARTview откроется в том же пузыре. Подтвердите, прежде чем что-то создаётся. Личные сообщения BOT DEE остаются личными. Групповые room, приглашения и общий счёт ещё не в эфире — Подтвердить не создаёт room, не шлёт приглашение и никого не списывает. Site Chrome следует теме Appearance."},
+    el: {title: "Room SMARTview", body: "Στη συνομιλία BOT DEE πείτε Open Room SMARTview ή Start a group chat. Ανοίγει κάρτα Room SMARTview στην ίδια φυσαλίδα. Επιβεβαιώστε πριν δημιουργηθεί οτιδήποτε. Τα ιδιωτικά μηνύματα BOT DEE μένουν ιδιωτικά. Ομαδικές room, προσκλήσεις και κοινός λογαριασμός δεν είναι ακόμα live — η Επιβεβαίωση δεν δημιουργεί room, δεν στέλνει πρόσκληση και δεν χρεώνει κανέναν. Το Site Chrome ακολουθεί το θέμα Appearance."},
+    pl: {title: "Room SMARTview", body: "W czacie BOT DEE powiedz Open Room SMARTview lub Start a group chat. Karta Room SMARTview otworzy się w tej samej dymku. Potwierdź, zanim cokolwiek powstanie. Prywatne wiadomości BOT DEE zostają prywatne. Roomy grupowe, zaproszenia i wspólny rachunek nie są jeszcze na żywo — Potwierdź nie tworzy room, nie wysyła zaproszenia i nikogo nie obciąża. Site Chrome idzie za motywem Appearance."},
+    ar: {title: "Room SMARTview", body: "في دردشة BOT DEE قل Open Room SMARTview أو Start a group chat. تُفتح بطاقة Room SMARTview في نفس الفقاعة. أكّد قبل إنشاء أي شيء. رسائل BOT DEE الخاصة تبقى خاصة. غرف المجموعة والدعوات والفاتورة المشتركة ليست مباشرة بعد — التأكيد لا ينشئ room ولا يرسل دعوة ولا يحصّل أحداً. يتبع Site Chrome مظهر Appearance."}
+  },
+  "help-botdee-room-smartview-invite": {
+    en: {title: "Room SMARTview invite", body: "Invite others from Room SMARTview after you confirm. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Wrong-account, blocked, and non-friend invites will refuse when group rooms ship. Nothing is sent today; group rooms are not live."},
+    de: {title: "Room SMARTview-Einladung", body: "Laden Sie andere aus Room SMARTview ein, nachdem Sie bestätigt haben. Genannte Personen werden nicht allein durch den Namen nachgeschlagen — FLOQR sagt nicht, ob ein Konto existiert. Falsches Konto, Blockierte und Nicht-Freunde werden abgelehnt, wenn Gruppen-Rooms kommen. Heute wird nichts gesendet; Gruppen-Rooms sind nicht live."},
+    fr: {title: "Invitation Room SMARTview", body: "Invitez d’autres personnes depuis Room SMARTview après confirmation. Les personnes nommées ne sont pas recherchées juste parce que vous avez tapé un nom — FLOQR ne dira pas si un compte existe. Les invitations mauvais compte, bloquées et non-amis refuseront quand les rooms de groupe arriveront. Rien n’est envoyé aujourd’hui ; les rooms de groupe ne sont pas en ligne."},
+    es: {title: "Invitación Room SMARTview", body: "Invite a otros desde Room SMARTview después de confirmar. Las personas nombradas no se buscan solo por escribir un nombre: FLOQR no dirá si existe una cuenta. Invitaciones de cuenta incorrecta, bloqueadas y no amigas se rechazarán cuando lleguen las rooms de grupo. Hoy no se envía nada; las rooms de grupo no están en vivo."},
+    it: {title: "Invito Room SMARTview", body: "Invita altri da Room SMARTview dopo la conferma. Le persone nominate non vengono cercate solo perché hai digitato un nome — FLOQR non dirà se un account esiste. Inviti account sbagliato, bloccati e non amici saranno rifiutati quando arriveranno le room di gruppo. Oggi non viene inviato nulla; le room di gruppo non sono live."},
+    pt: {title: "Convite Room SMARTview", body: "Convide outros a partir do Room SMARTview depois de confirmar. Pessoas nomeadas não são procuradas só porque digitou um nome — a FLOQR não dirá se existe uma conta. Convites de conta errada, bloqueados e não amigos recusarão quando as rooms de grupo chegarem. Nada é enviado hoje; as rooms de grupo não estão ativas."},
+    nl: {title: "Room SMARTview-uitnodiging", body: "Nodig anderen uit via Room SMARTview na bevestiging. Genoemde personen worden niet opgezocht alleen omdat je een naam typte — FLOQR zegt niet of een account bestaat. Verkeerd account, geblokkeerd en niet-vrienden worden geweigerd wanneer groepsrooms komen. Vandaag wordt niets verstuurd; groepsrooms zijn niet live."},
+    ru: {title: "Приглашение Room SMARTview", body: "Приглашайте других из Room SMARTview после подтверждения. Имена не ищутся только потому, что вы их набрали — FLOQR не скажет, существует ли аккаунт. Неверный аккаунт, блок и не-друзья будут отказны, когда появятся групповые room. Сегодня ничего не отправляется; групповые room не в эфире."},
+    el: {title: "Πρόσκληση Room SMARTview", body: "Προσκαλέστε άλλους από το Room SMARTview μετά την επιβεβαίωση. Τα ονόματα δεν αναζητούνται μόνο επειδή τα πληκτρολογήσατε — η FLOQR δεν θα πει αν υπάρχει λογαριασμός. Λάθος λογαριασμός, αποκλεισμένοι και μη φίλοι θα απορρίπτονται όταν έρθουν οι ομαδικές room. Σήμερα δεν στέλνεται τίποτα· οι ομαδικές room δεν είναι live."},
+    pl: {title: "Zaproszenie Room SMARTview", body: "Zaproś innych z Room SMARTview po potwierdzeniu. Osoby nazwane nie są wyszukiwane tylko dlatego, że wpisano imię — FLOQR nie powie, czy konto istnieje. Złe konto, blokada i nie-znajomi odmówią, gdy pojawią się roomy grupowe. Dziś nic nie jest wysyłane; roomy grupowe nie są na żywo."},
+    ar: {title: "دعوة Room SMARTview", body: "ادعُ الآخرين من Room SMARTview بعد التأكيد. لا يُبحث عن الأسماء لمجرد كتابتها — لن تقول FLOQR إن كان الحساب موجوداً. دعوات الحساب الخطأ والمحظورين وغير الأصدقاء ستُرفض عندما تصل غرف المجموعة. لا يُرسل شيء اليوم؛ غرف المجموعة ليست مباشرة."}
+  },
+  "help-botdee-room-smartview-join": {
+    en: {title: "Join a Room SMARTview", body: "Joining a Room SMARTview is not the same as joining a shared tab or approving a payment. When rooms ship, you will sign in and accept a bound invite. Opening a link does not join you automatically."},
+    de: {title: "Einem Room SMARTview beitreten", body: "Einem Room SMARTview beizutreten ist nicht dasselbe wie einer geteilten Rechnung beizutreten oder eine Zahlung zu genehmigen. Wenn Rooms kommen, melden Sie sich an und nehmen eine gebundene Einladung an. Ein Link beitritt Sie nicht automatisch."},
+    fr: {title: "Rejoindre un Room SMARTview", body: "Rejoindre un Room SMARTview n’est pas la même chose que rejoindre une addition partagée ou approuver un paiement. Quand les rooms arriveront, vous vous connecterez et acceptez une invitation liée. Ouvrir un lien ne vous fait pas rejoindre automatiquement."},
+    es: {title: "Unirse a un Room SMARTview", body: "Unirse a un Room SMARTview no es lo mismo que unirse a una cuenta compartida o aprobar un pago. Cuando lleguen las rooms, iniciará sesión y aceptará una invitación vinculada. Abrir un enlace no le une automáticamente."},
+    it: {title: "Unirsi a un Room SMARTview", body: "Unirsi a un Room SMARTview non è come unirsi a un conto condiviso o approvare un pagamento. Quando arriveranno le room, accederai e accetterai un invito vincolato. Aprire un link non ti unisce automaticamente."},
+    pt: {title: "Entrar num Room SMARTview", body: "Entrar num Room SMARTview não é o mesmo que entrar numa conta partilhada ou aprovar um pagamento. Quando as rooms chegarem, iniciará sessão e aceitará um convite vinculado. Abrir um link não o junta automaticamente."},
+    nl: {title: "Deelnemen aan een Room SMARTview", body: "Deelnemen aan een Room SMARTview is niet hetzelfde als een gedeelde rekening joinen of een betaling goedkeuren. Wanneer rooms komen, log je in en accepteer je een gebonden uitnodiging. Een link openen laat je niet automatisch joinen."},
+    ru: {title: "Войти в Room SMARTview", body: "Вход в Room SMARTview — это не вход в общий счёт и не одобрение платежа. Когда появятся room, вы войдёте и примете привязанное приглашение. Открытие ссылки само по себе не присоединяет."},
+    el: {title: "Είσοδος σε Room SMARTview", body: "Η είσοδος σε Room SMARTview δεν είναι είσοδος σε κοινό λογαριασμό ούτε έγκριση πληρωμής. Όταν έρθουν οι room, θα συνδεθείτε και θα αποδεχτείτε δεσμευμένη πρόσκληση. Το άνοιγμα συνδέσμου δεν σας βάζει αυτόματα."},
+    pl: {title: "Dołącz do Room SMARTview", body: "Dołączenie do Room SMARTview to nie to samo co dołączenie do wspólnego rachunku ani zgoda na płatność. Gdy pojawią się roomy, zalogujesz się i przyjmiesz powiązane zaproszenie. Otwarcie linku samo Cię nie dodaje."},
+    ar: {title: "الانضمام إلى Room SMARTview", body: "الانضمام إلى Room SMARTview ليس الانضمام إلى فاتورة مشتركة ولا اعتماد دفعة. عندما تصل الغرف ستسجّل الدخول وتقبل دعوة مربوطة. فتح رابط لا يضمّك تلقائياً."}
+  },
+  "help-botdee-room-smartview-end": {
+    en: {title: "End Room SMARTview", body: "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats. There is no live room to close yet."},
+    de: {title: "Room SMARTview beenden", body: "Nur der Host kann einen Room beenden, und nur nach Bestätigung. Beenden belastet niemanden und löscht keine privaten Chats anderer. Es gibt noch keinen Live-Room zum Schließen."},
+    fr: {title: "Terminer Room SMARTview", body: "Seul l’hôte peut terminer une room, et seulement après confirmation. Terminer ne facture personne et n’efface pas les chats privés des autres. Il n’y a pas encore de room en ligne à fermer."},
+    es: {title: "Terminar Room SMARTview", body: "Solo el anfitrión puede terminar una room, y solo tras confirmar. Terminar no cobra a nadie ni borra chats privados de otros. Aún no hay room en vivo que cerrar."},
+    it: {title: "Termina Room SMARTview", body: "Solo l’host può terminare una room, e solo dopo conferma. Terminare non addebita nessuno e non cancella le chat private altrui. Non c’è ancora una room live da chiudere."},
+    pt: {title: "Terminar Room SMARTview", body: "Só o anfitrião pode terminar uma room, e só após confirmar. Terminar não cobra ninguém nem apaga chats privados de outros. Ainda não há room ativa para fechar."},
+    nl: {title: "Room SMARTview beëindigen", body: "Alleen de host kan een room beëindigen, en alleen na bevestiging. Beëindigen belast niemand en wist geen privéchats van anderen. Er is nog geen live room om te sluiten."},
+    ru: {title: "Завершить Room SMARTview", body: "Только хост может завершить room и только после подтверждения. Завершение никого не списывает и не стирает чужие личные чаты. Пока нет живой room для закрытия."},
+    el: {title: "Τέλος Room SMARTview", body: "Μόνο ο host μπορεί να τελειώσει μια room, και μόνο μετά από επιβεβαίωση. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Δεν υπάρχει ακόμα live room για κλείσιμο."},
+    pl: {title: "Zakończ Room SMARTview", body: "Tylko host może zakończyć room i tylko po potwierdzeniu. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nie ma jeszcze live room do zamknięcia."},
+    ar: {title: "إنهاء Room SMARTview", body: "المضيف وحده يمكنه إنهاء room وبعد التأكيد فقط. الإنهاء لا يحصّل أحداً ولا يمسح دردشات الآخرين الخاصة. لا توجد room مباشرة للإغلاق بعد."}
+  },
+  "help-botdee-room-smartview-tab": {
+    en: {title: "Room SMARTview shared tab", body: "A shared tab is a later opt-in. Joining the room does not join a tab. Joining a tab does not approve a payment. BOT DEE never takes card numbers. Split-the-bill talk is not a charge."},
+    de: {title: "Geteilte Rechnung in Room SMARTview", body: "Eine geteilte Rechnung ist späteres Opt-in. Dem Room beizutreten tritt keiner Rechnung bei. Einer Rechnung beizutreten genehmigt keine Zahlung. BOT DEE nimmt nie Kartennummern. Über die Rechnung teilen zu sprechen ist keine Belastung."},
+    fr: {title: "Addition partagée Room SMARTview", body: "Une addition partagée est un opt-in plus tard. Rejoindre la room ne rejoint pas une addition. Rejoindre une addition n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte. Parler de partager l’addition n’est pas une facturation."},
+    es: {title: "Cuenta compartida Room SMARTview", body: "Una cuenta compartida es un opt-in posterior. Unirse a la room no une a una cuenta. Unirse a una cuenta no aprueba un pago. BOT DEE nunca toma números de tarjeta. Hablar de dividir la cuenta no es un cargo."},
+    it: {title: "Conto condiviso Room SMARTview", body: "Un conto condiviso è un opt-in successivo. Unirsi alla room non unisce a un conto. Unirsi a un conto non approva un pagamento. BOT DEE non prende mai numeri di carta. Parlare di dividere il conto non è un addebito."},
+    pt: {title: "Conta partilhada Room SMARTview", body: "Uma conta partilhada é um opt-in posterior. Entrar na room não entra numa conta. Entrar numa conta não aprova um pagamento. O BOT DEE nunca pede números de cartão. Falar em dividir a conta não é uma cobrança."},
+    nl: {title: "Gedeelde rekening Room SMARTview", body: "Een gedeelde rekening is later opt-in. De room joinen is geen rekening joinen. Een rekening joinen keurt geen betaling goed. BOT DEE neemt nooit kaartnummers. Over de rekening splitsen praten is geen afschrijving."},
+    ru: {title: "Общий счёт Room SMARTview", body: "Общий счёт — это поздний opt-in. Вход в room не вход в счёт. Вход в счёт не одобряет платёж. BOT DEE никогда не берёт номера карт. Разговор о разделении счёта — не списание."},
+    el: {title: "Κοινός λογαριασμός Room SMARTview", body: "Ο κοινός λογαριασμός είναι μεταγενέστερο opt-in. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό. Η είσοδος σε λογαριασμό δεν εγκρίνει πληρωμή. Το BOT DEE δεν παίρνει ποτέ αριθμούς κάρτας. Η συζήτηση για μοίρασμα λογαριασμού δεν είναι χρέωση."},
+    pl: {title: "Wspólny rachunek Room SMARTview", body: "Wspólny rachunek to późniejszy opt-in. Dołączenie do room to nie dołączenie do rachunku. Dołączenie do rachunku nie zatwierdza płatności. BOT DEE nigdy nie bierze numerów kart. Rozmowa o podziale rachunku to nie opłata."},
+    ar: {title: "فاتورة Room SMARTview المشتركة", body: "الفاتورة المشتركة اشتراك لاحق. الانضمام إلى الـ room ليس انضماماً إلى فاتورة. الانضمام إلى فاتورة لا يعتمد دفعاً. BOT DEE لا يأخذ أرقام بطاقات أبداً. حديث تقسيم الفاتورة ليس تحصيلاً."}
+  },
+  "help-botdee-room-smartview-who-pays": {
+    en: {title: "Who is paying", body: "Ask Who’s paying in a Room SMARTview to see privacy-filtered opt-in status when tabs ship. Nobody is charged because someone said buy. Card last four stay on the payer’s own receipt."},
+    de: {title: "Wer zahlt", body: "Fragen Sie Who’s paying in einem Room SMARTview, um später den gefilterten Opt-in-Status zu sehen. Niemand wird belastet, weil jemand „kaufen“ gesagt hat. Die letzten vier der Karte bleiben auf der eigenen Quittung des Zahlers."},
+    fr: {title: "Qui paie", body: "Demandez Who’s paying dans un Room SMARTview pour voir plus tard le statut d’opt-in filtré. Personne n’est facturé parce que quelqu’un a dit acheter. Les quatre derniers de la carte restent sur le reçu du payeur."},
+    es: {title: "Quién paga", body: "Pregunte Who’s paying en un Room SMARTview para ver más adelante el estado de opt-in filtrado. Nadie se cobra porque alguien dijo comprar. Los cuatro últimos de la tarjeta quedan en el recibo del pagador."},
+    it: {title: "Chi paga", body: "Chiedi Who’s paying in un Room SMARTview per vedere in seguito lo stato opt-in filtrato. Nessuno viene addebitato perché qualcuno ha detto compra. Le ultime quattro della carta restano sulla ricevuta del pagatore."},
+    pt: {title: "Quem paga", body: "Pergunte Who’s paying num Room SMARTview para ver mais tarde o estado de opt-in filtrado. Ninguém é cobrado porque alguém disse comprar. Os últimos quatro do cartão ficam no recibo do pagador."},
+    nl: {title: "Wie betaalt", body: "Vraag Who’s paying in een Room SMARTview om later de gefilterde opt-in-status te zien. Niemand wordt belast omdat iemand koop zei. De laatste vier van de kaart blijven op het eigen receipt van de betaler."},
+    ru: {title: "Кто платит", body: "Спросите Who’s paying в Room SMARTview, чтобы позже увидеть отфильтрованный opt-in. Никого не списывают потому, что кто-то сказал купить. Последние четыре карты остаются на квитанции плательщика."},
+    el: {title: "Ποιος πληρώνει", body: "Ρωτήστε Who’s paying σε Room SMARTview για να δείτε αργότερα φιλτραρισμένη κατάσταση opt-in. Κανείς δεν χρεώνεται επειδή κάποιος είπε αγόρασε. Τα τελευταία τέσσερα της κάρτας μένουν στην απόδειξη του πληρωτή."},
+    pl: {title: "Kto płaci", body: "Zapytaj Who’s paying w Room SMARTview, by później zobaczyć odfiltrowany status opt-in. Nikt nie jest obciążany, bo ktoś powiedział kup. Ostatnie cztery karty zostają na paragonie płatnika."},
+    ar: {title: "من يدفع", body: "اسأل Who’s paying في Room SMARTview لرؤية حالة الاشتراك المصفاة لاحقاً. لا يُحصَّل أحد لأن شخصاً قال اشترِ. آخر أربعة أرقام للبطاقة تبقى في إيصال الدافع فقط."}
+  },
+  "help-botdee-room-smartview-kick": {
+    en: {title: "Remove someone from Room SMARTview", body: "Only a verified host can remove a member, and only after confirm. A model reply cannot kick anyone. There is no live room to change yet."},
+    de: {title: "Jemanden aus Room SMARTview entfernen", body: "Nur ein geprüfter Host kann ein Mitglied entfernen, und nur nach Bestätigung. Eine Modell-Antwort kann niemanden kicken. Es gibt noch keinen Live-Room zum Ändern."},
+    fr: {title: "Retirer quelqu’un de Room SMARTview", body: "Seul un hôte vérifié peut retirer un membre, et seulement après confirmation. Une réponse du modèle ne peut expulser personne. Il n’y a pas encore de room en ligne à modifier."},
+    es: {title: "Quitar a alguien de Room SMARTview", body: "Solo un anfitrión verificado puede quitar a un miembro, y solo tras confirmar. Una respuesta del modelo no puede expulsar a nadie. Aún no hay room en vivo que cambiar."},
+    it: {title: "Rimuovere qualcuno da Room SMARTview", body: "Solo un host verificato può rimuovere un membro, e solo dopo conferma. Una risposta del modello non può espellere nessuno. Non c’è ancora una room live da modificare."},
+    pt: {title: "Remover alguém do Room SMARTview", body: "Só um anfitrião verificado pode remover um membro, e só após confirmar. Uma resposta do modelo não pode expulsar ninguém. Ainda não há room ativa para alterar."},
+    nl: {title: "Iemand uit Room SMARTview verwijderen", body: "Alleen een geverifieerde host kan een lid verwijderen, en alleen na bevestiging. Een modelantwoord kan niemand kicken. Er is nog geen live room om te wijzigen."},
+    ru: {title: "Удалить из Room SMARTview", body: "Только проверенный хост может удалить участника и только после подтверждения. Ответ модели никого не исключает. Пока нет живой room для изменения."},
+    el: {title: "Αφαίρεση από Room SMARTview", body: "Μόνο επαληθευμένος host μπορεί να αφαιρέσει μέλος, και μόνο μετά από επιβεβαίωση. Απάντηση μοντέλου δεν μπορεί να διώξει κανέναν. Δεν υπάρχει ακόμα live room για αλλαγή."},
+    pl: {title: "Usuń kogoś z Room SMARTview", body: "Tylko zweryfikowany host może usunąć członka i tylko po potwierdzeniu. Odpowiedź modelu nikogo nie wyrzuca. Nie ma jeszcze live room do zmiany."},
+    ar: {title: "إزالة شخص من Room SMARTview", body: "المضيف الموثّق وحده يمكنه إزالة عضو وبعد التأكيد فقط. رد النموذج لا يطرد أحداً. لا توجد room مباشرة للتغيير بعد."}
+  },
+  "help-botdee-room-smartview-share": {
+    en: {title: "Share into Room SMARTview", body: "Share this conversation never copies your private BOT DEE thread. BOT DEE shows a preview of selected shareable facts from this message, marked tentative. You can edit or drop facts. Nothing is published until rooms are live and you approve."},
+    de: {title: "In Room SMARTview teilen", body: "Share this conversation kopiert nie Ihren privaten BOT DEE-Thread. BOT DEE zeigt eine Vorschau ausgewählter teilbarer Fakten aus dieser Nachricht, als vorläufig markiert. Sie können Fakten bearbeiten oder streichen. Nichts wird veröffentlicht, bis Rooms live sind und Sie zustimmen."},
+    fr: {title: "Partager dans Room SMARTview", body: "Share this conversation ne copie jamais votre fil BOT DEE privé. BOT DEE montre un aperçu de faits partageables sélectionnés de ce message, marqués provisoires. Vous pouvez modifier ou retirer des faits. Rien n’est publié tant que les rooms ne sont pas en ligne et que vous n’approuvez pas."},
+    es: {title: "Compartir en Room SMARTview", body: "Share this conversation nunca copia su hilo privado de BOT DEE. BOT DEE muestra una vista previa de hechos compartibles de este mensaje, marcados como provisionales. Puede editar o quitar hechos. Nada se publica hasta que las rooms estén en vivo y usted apruebe."},
+    it: {title: "Condividi in Room SMARTview", body: "Share this conversation non copia mai il tuo thread BOT DEE privato. BOT DEE mostra un’anteprima di fatti condivisibili da questo messaggio, contrassegnati come provvisori. Puoi modificare o togliere fatti. Nulla viene pubblicato finché le room non sono live e tu approvi."},
+    pt: {title: "Partilhar no Room SMARTview", body: "Share this conversation nunca copia o seu fio privado do BOT DEE. O BOT DEE mostra uma pré-visualização de factos partilháveis desta mensagem, marcados como provisórios. Pode editar ou retirar factos. Nada é publicado até as rooms estarem ativas e você aprovar."},
+    nl: {title: "Delen in Room SMARTview", body: "Share this conversation kopieert nooit je privé-BOT DEE-thread. BOT DEE toont een voorbeeld van geselecteerde deelbare feiten uit dit bericht, gemarkeerd als voorlopig. Je kunt feiten bewerken of weglaten. Niets wordt gepubliceerd tot rooms live zijn en jij goedkeurt."},
+    ru: {title: "Поделиться в Room SMARTview", body: "Share this conversation никогда не копирует ваш личный тред BOT DEE. BOT DEE показывает предпросмотр выбранных фактов из этого сообщения, помеченных как предварительные. Можно править или убрать факты. Ничего не публикуется, пока room не в эфире и вы не одобрите."},
+    el: {title: "Κοινοποίηση στο Room SMARTview", body: "Το Share this conversation δεν αντιγράφει ποτέ το ιδιωτικό νήμα BOT DEE. Το BOT DEE δείχνει προεπισκόπηση επιλεγμένων στοιχείων από αυτό το μήνυμα, ως προσωρινά. Μπορείτε να επεξεργαστείτε ή να αφαιρέσετε στοιχεία. Τίποτα δεν δημοσιεύεται μέχρι να είναι live οι room και να εγκρίνετε."},
+    pl: {title: "Udostępnij w Room SMARTview", body: "Share this conversation nigdy nie kopiuje Twojego prywatnego wątku BOT DEE. BOT DEE pokazuje podgląd wybranych faktów z tej wiadomości, oznaczonych jako wstępne. Możesz edytować lub odrzucić fakty. Nic nie jest publikowane, dopóki roomy nie będą na żywo i nie zatwierdzisz."},
+    ar: {title: "المشاركة في Room SMARTview", body: "Share this conversation لا ينسخ أبداً خيط BOT DEE الخاص. يعرض BOT DEE معاينة لحقائق قابلة للمشاركة من هذه الرسالة، وسمها مؤقت. يمكنك تعديل الحقائق أو حذفها. لا يُنشر شيء حتى تصبح الغرف مباشرة وتوافق."}
+  }
+};
+
+function packLines(map) {
+  return Object.entries(map).map(([key, value]) => `      ${JSON.stringify(key)}: ${JSON.stringify(value)},`).join("\n");
+}
+
+function helpBlock(lang) {
+  return HELP_IDS.map(id => {
+    const row = HELP[id][lang];
+    if (!row) throw new Error(`missing help ${id} ${lang}`);
+    return `      ${JSON.stringify(id)}: {\n        title: ${JSON.stringify(row.title)},\n        body: ${JSON.stringify(row.body)}\n      },`;
+  }).join("\n");
+}
+
+function injectChrome() {
+  const file = path.join(root, "floqr-i18n.js");
+  let src = fs.readFileSync(file, "utf8");
+  const langOrder = ["en", "fr", "de", "es", "nl", "ru", "it", "pt", "el", "pl", "ar"];
+  let count = 0;
+  src = src.replace(/("botdee\.vs\.deployedClaim":\s*"[^"]*",)/g, (full, _g, offset) => {
+    if (src.slice(offset, offset + 400).includes('"botdee.rs.title"')) return full;
+    const lang = langOrder[count];
+    count += 1;
+    if (!lang || !CHROME[lang]) throw new Error(`no chrome pack for slot ${count - 1}`);
+    if (Object.keys(CHROME[lang]).length !== Object.keys(CHROME.en).length) {
+      throw new Error(`chrome ${lang} key mismatch`);
+    }
+    return `${full}\n${packLines(CHROME[lang])}`;
+  });
+  if (count !== 11) throw new Error(`expected 11 chrome injections, got ${count}`);
+  fs.writeFileSync(file, src);
+  console.log("chrome keys injected", count, Object.keys(CHROME.en).length);
+}
+
+function injectHelpJs() {
+  const file = path.join(root, "floqr-i18n-help.js");
+  let src = fs.readFileSync(file, "utf8");
+  const langs = ["ru", "nl", "fr", "de", "es", "it", "pt", "el", "pl", "ar"];
+  let count = 0;
+  src = src.replace(/("help-botdee-version-smartview-tabs":\s*\{[\s\S]*?\n\s*\},)/g, (full, _g, offset) => {
+    if (src.slice(offset, offset + 400).includes("help-botdee-room-smartview")) return full;
+    const lang = langs[count];
+    count += 1;
+    if (!lang) throw new Error("extra help pack");
+    return `${full}\n${helpBlock(lang)}`;
+  });
+  if (count !== 10) throw new Error(`expected 10 help injections, got ${count}`);
+  fs.writeFileSync(file, src);
+  console.log("help packs injected", count);
+}
+
+function injectHelpEn() {
+  const file = path.join(root, "scripts/_help-en.json");
+  const json = JSON.parse(fs.readFileSync(file, "utf8"));
+  HELP_IDS.forEach(id => {
+    json[id] = {title: HELP[id].en.title, body: HELP[id].en.body};
+  });
+  fs.writeFileSync(file, `${JSON.stringify(json, null, 2)}\n`);
+  console.log("canonical help ids", HELP_IDS.join(", "));
+}
+
+injectChrome();
+injectHelpJs();
+injectHelpEn();
+console.log("chrome key count", Object.keys(CHROME.en).length);

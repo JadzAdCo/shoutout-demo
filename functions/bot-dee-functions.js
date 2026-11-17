@@ -175,7 +175,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   };
 }
 
-function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization} = {}) {
+function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined} = {}) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const isActive = !!active;
@@ -252,6 +252,22 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
       model: "help",
       toolRounds: 0,
       uiLanguage: lang
+    };
+  }
+  const room = require("./botdee-room-smartview").buildRoomSession(userPrompt, {
+    hasActiveRoom: false,
+    declinedKeys: Array.isArray(roomSmartViewDeclined) ? roomSmartViewDeclined : []
+  });
+  if (room.handled) {
+    return {
+      reply: room.reply,
+      results: [],
+      provider: room.provider,
+      model: room.model,
+      toolRounds: 0,
+      uiLanguage: lang,
+      smartViews: room.smartViews,
+      replyKey: room.replyKey
     };
   }
   const search = bot.localizeSearchPayload(bot.contextualSearch(userPrompt, role, allowed), lang, allowed);
@@ -398,20 +414,41 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       }
     }
     let outcome;
+    const roomDeclined = Array.isArray(request.data?.roomSmartViewDeclined)
+      ? request.data.roomSmartViewDeclined.map(value => String(value || "").slice(0, 80)).filter(Boolean).slice(0, 24)
+      : [];
+    const roomAttached = require("./botdee-room-smartview").buildRoomSession(userPrompt, {
+      hasActiveRoom: false,
+      declinedKeys: roomDeclined
+    });
     let peopleAttached = null;
-    try {
-      peopleAttached = await peopleCards.attachPeopleSearch({
-        query: userPrompt,
-        viewerUid: uid,
-        uiLanguage,
-        request,
-        page: request.data?.peoplePage
-      });
-    } catch (error) {
-      console.warn("BOT DEE people SMARTcard attach failed", error?.message || error);
+    if (!roomAttached.handled) {
+      try {
+        peopleAttached = await peopleCards.attachPeopleSearch({
+          query: userPrompt,
+          viewerUid: uid,
+          uiLanguage,
+          request,
+          page: request.data?.peoplePage
+        });
+      } catch (error) {
+        console.warn("BOT DEE people SMARTcard attach failed", error?.message || error);
+      }
     }
     // Greetings / identity stay chat-like even when Gemini is down or mis-calls search.
-    if (peopleAttached && peopleAttached.handled) {
+    if (roomAttached.handled) {
+      outcome = {
+        reply: roomAttached.reply,
+        results: [],
+        provider: roomAttached.provider,
+        model: roomAttached.model,
+        toolRounds: 0,
+        uiLanguage,
+        smartViews: roomAttached.smartViews || [],
+        replyKey: roomAttached.replyKey,
+        geminiOnView: false
+      };
+    } else if (peopleAttached && peopleAttached.handled) {
       outcome = {
         reply: peopleAttached.reply,
         results: [],
@@ -432,7 +469,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       || bot.isHelpPrompt(userPrompt)
       || bot.isPrivacyPrompt(userPrompt)
     ) {
-      outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization});
+      outcome = localSession(role, userPrompt, {
+        active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined
+      });
     } else if (apiKey) {
       try {
         outcome = await runGeminiSession({
@@ -440,11 +479,15 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         });
       } catch (error) {
         console.warn("BOT DEE Gemini failed; using contextualSearch fallback", error?.message || error);
-        outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization});
+        outcome = localSession(role, userPrompt, {
+          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined
+        });
         outcome.geminiError = String(error?.message || error).slice(0, 180);
       }
     } else {
-      outcome = localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization});
+      outcome = localSession(role, userPrompt, {
+        active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined
+      });
     }
     outcome.reply = bot.sanitizeBotReply(outcome.reply);
 
@@ -465,8 +508,11 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     try {
       const alreadyVersion = Array.isArray(outcome.smartViews)
         && outcome.smartViews.some(row => row && row.kind === "botDeeVersion");
+      const alreadyRoom = Array.isArray(outcome.smartViews)
+        && outcome.smartViews.some(row => row && row.kind === "botDeeRoom");
       if (
         !alreadyVersion
+        && !alreadyRoom
         && !outcome.smartViews
         && /\b(smartview|smart view|research library|explain (?:my )?recommendation)\b/i.test(userPrompt)
       ) {
@@ -502,7 +548,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       conversationIdleSeconds: settings.conversationIdleSeconds,
       consent,
       hasUsedBotDee: 1,
-      smartViews: Array.isArray(outcome.smartViews) ? outcome.smartViews : []
+      smartViews: Array.isArray(outcome.smartViews) ? outcome.smartViews : [],
+      replyKey: outcome.replyKey || ""
     };
   } catch (error) {
     throw asHttps(error);
