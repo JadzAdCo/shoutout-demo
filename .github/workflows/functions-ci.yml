@@ -133,6 +133,9 @@ jobs:
           openssl rand -base64 48 | firebase functions:secrets:set FLOQR_OIDC_JWT_SECRET --project shoutoutdemo-5b402 --non-interactive --data-file -
 
       - name: Recreate OIDC HTTP functions without plaintext secret env
+        # Only when this job will also deploy those two HTTP functions.
+        # A BOT DEE / crawl / SOS2FA subset must not delete them (s3.3.031).
+        if: contains(github.event.head_commit.message, '[firebase-deploy-spatial]')
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"

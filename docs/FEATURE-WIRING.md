@@ -773,7 +773,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Security | Callables require signed-in + `assertFeatureAccess(botDee)`. Blocks via `userBlocks`. Firestore write `if false` on analysis/jobs/diagnostics. Gemini + translation secrets stay in Functions. |
 | Observability | Diagnostics rows in `botDeeSmartViewDiagnostics` (usageMetadata token counts; `summaryTextLogged: false`). Manual Feature Tests `s3-3-028-people-smartview-v2`, `s3-3-031-smartview-public-media`. |
 | Help | Patron ids listed in the six-phase Help row. Mock vs live called out. Photos/videos help matches public-page Profile Media. |
-| Deploy | Pages stamp + **Functions deploy** required so `getPeopleSmartView` returns `profileMediaSlots`. Do not merge/deploy until Don tests and confirms. |
+| Deploy | Live **s3.3.031** Pages `1d468474` + BOT DEE Functions (`getPeopleSmartView`) from `[firebase-deploy-botdee]`. Hard-refresh until `floqr-i18n.js?v=s3.3.031`. |
 
 ---
 
