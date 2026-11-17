@@ -967,6 +967,26 @@ function historyToContents(history, userPrompt) {
 function contextToContents(modelContext, userPrompt) {
   const ctx = modelContext && typeof modelContext === "object" ? modelContext : {};
   const prefix = [];
+  const claim = String(ctx.reservationClaim || "").trim();
+  if (claim === "discussed") {
+    prefix.push({
+      role: "user",
+      text: "[Reservation status]\nVIP or table talk in this history is discussion only. There is no confirmed hold, reservation, or payment."
+    });
+    prefix.push({
+      role: "model",
+      text: "Understood — I will not claim a booking without a stored execution receipt."
+    });
+  } else if (claim === "confirmed") {
+    prefix.push({
+      role: "user",
+      text: "[Reservation status]\nA stored execution receipt confirms a VIP hold or checkout for this patron."
+    });
+    prefix.push({
+      role: "model",
+      text: "I'll recap that as booked only as far as the receipt shows."
+    });
+  }
   const summary = String(ctx.summary || "").trim();
   if (summary) {
     prefix.push({role: "user", text: `[Earlier conversation summary]\n${summary}`});

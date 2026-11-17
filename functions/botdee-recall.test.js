@@ -188,13 +188,101 @@ test("no confirmed booking without an execution record", () => {
   assert.match(bot.systemInstruction("patron"), /discussed vs booked/i);
   assert.match(bot.systemInstruction("patron"), /never claim a VIP reservation/i);
   assert.match(prefs.personalizationInstruction({remindWhereLeftOff: 1}), /retrieved turns/i);
+  const discussedCtx = execution.buildModelContext({turns, executions: []});
+  assert.equal(discussedCtx.reservationClaim, "discussed");
+  const discussedContents = bot.contextToContents(discussedCtx, "did we book it");
+  assert.match(JSON.stringify(discussedContents), /discussion only/);
+  assert.doesNotMatch(JSON.stringify(discussedContents), /confirms a VIP hold/);
+  const confirmedCtx = execution.buildModelContext({
+    turns,
+    executions: [{toolName: "createVipHold", state: "succeeded", resultCode: "ok"}]
+  });
+  assert.equal(confirmedCtx.reservationClaim, "confirmed");
+  const confirmedContents = bot.contextToContents(confirmedCtx, "did we book it");
+  assert.match(JSON.stringify(confirmedContents), /confirms a VIP hold/);
+  const fns = read("functions/bot-dee-functions.js");
+  assert.match(fns, /loadExecutionReceipts\(uid, 12\)/);
+  assert.match(fns, /executions/);
+});
+
+test("session reset hides pre-reset events without deleting them", () => {
+  const events = mykonosEvents();
+  assert.equal(threads.nextRetrievalFromSeq({}, 4), 5);
+  assert.equal(threads.nextRetrievalFromSeq(CURRENT, 4), 0);
+  const pending = threads.snapshotToState({
+    exists: true,
+    data: () => ({
+      uid: "uid-reset",
+      turns: mykonosTurns(),
+      lastMessageAtMs: YESTERDAY + 3_000,
+      conversationEpoch: 1,
+      eventCount: 4,
+      personalization: {botDeePersonalizationVersion: 1}
+    })
+  }, "uid-reset", SETTINGS, NEXT_DAY);
+  assert.equal(pending.sessionReset, true);
+  assert.deepEqual(pending.turns, []);
+  const hidden = threads.assembleRetrievalTurns({
+    docTurns: [],
+    events,
+    archiveTurns: [{role: "user", text: "Mykonos archive", seq: 3}],
+    idleEnded: true,
+    archiveConsent: true,
+    sessionReset: true,
+    retrievalFromSeq: 0
+  });
+  assert.deepEqual(hidden, []);
+  const afterSkip = threads.assembleRetrievalTurns({
+    docTurns: [],
+    events,
+    archiveTurns: [],
+    idleEnded: false,
+    archiveConsent: false,
+    sessionReset: false,
+    retrievalFromSeq: 5
+  });
+  assert.deepEqual(afterSkip, []);
+  const resumed = threads.assembleRetrievalTurns({
+    docTurns: [{role: "user", text: "Nammos tonight?", seq: 5}],
+    events: [
+      ...events,
+      {seq: 5, epoch: 2, role: "user", text: "Nammos tonight?", atMs: NEXT_DAY}
+    ],
+    archiveTurns: [],
+    idleEnded: false,
+    archiveConsent: false,
+    sessionReset: false,
+    retrievalFromSeq: 5
+  });
+  assert.equal(resumed.length, 1);
+  assert.match(resumed[0].text, /Nammos tonight/);
+  assert.doesNotMatch(JSON.stringify(resumed), /Cavo Paradiso/);
+  const idleStillRecalls = threads.assembleRetrievalTurns({
+    docTurns: [],
+    events,
+    archiveTurns: [],
+    idleEnded: true,
+    archiveConsent: false,
+    sessionReset: false,
+    retrievalFromSeq: 0
+  });
+  assert.ok(idleStillRecalls.some(row => /Mykonos/.test(row.text)));
+  const saveSrc = read("functions/bot-dee-thread.js");
+  const saveStart = saveSrc.indexOf("async function savePersonalization");
+  const saveEnd = saveSrc.indexOf("async function loadSettings");
+  assert.match(saveSrc.slice(saveStart, saveEnd), /retrievalFromSeq/);
+  assert.doesNotMatch(saveSrc.slice(saveStart, saveEnd), /events\.doc\([^)]+\)\.delete/);
+  assert.match(read("functions/bot-dee-functions.js"), /sessionReset/);
+  assert.match(read("functions/bot-dee-functions.js"), /retrievalFromSeq/);
 });
 
 test("Stage B: executeBotSession wires buildModelContext; memories require consent", () => {
   const fns = read("functions/bot-dee-functions.js");
   assert.match(fns, /loadEventHistory\(uid, 12\)/);
   assert.match(fns, /assembleRetrievalTurns/);
+  assert.match(fns, /loadExecutionReceipts/);
   assert.match(fns, /execution\.buildModelContext/);
+  assert.match(fns, /executions/);
   assert.match(fns, /contextToContents\(modelContext/);
   assert.match(fns, /consentAllows\(consent, "memory"\)/);
   assert.match(fns, /loadAuthorizedMemories/);

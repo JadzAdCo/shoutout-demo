@@ -36,6 +36,8 @@ function emptyState(settings) {
     hasUsedBotDee: 0,
     summary: "",
     personalization: prefs.normalizePersonalization({}),
+    retrievalFromSeq: 0,
+    sessionReset: false,
     [prefs.LAST_USED_FIELD]: 0,
     [prefs.SESSION_RESET_FIELD]: 0
   };
@@ -82,9 +84,20 @@ function snapshotToState(snap, uid, settings, nowMs) {
     hasUsedBotDee: staleGeneration ? 0 : memory.hasUsedFromThread(data),
     personalization,
     summary: staleGeneration ? "" : String(data.summary || data.lastSummary || "").trim(),
+    retrievalFromSeq: staleGeneration ? 0 : Math.max(0, Math.floor(Number(data.retrievalFromSeq) || 0)),
+    sessionReset: staleGeneration,
     [prefs.LAST_USED_FIELD]: staleGeneration ? 0 : (Number(data[prefs.LAST_USED_FIELD]) || 0),
     [prefs.SESSION_RESET_FIELD]: staleGeneration ? 0 : prefs.sessionResetVersionOf(data)
   };
+}
+
+/** Overlay skip hides events before this seq. Events stay on disk for diagnostics. */
+function nextRetrievalFromSeq(prev, eventCount) {
+  const row = prev && typeof prev === "object" ? prev : {};
+  if (prefs.needsSessionReset(row)) {
+    return Math.max(0, Math.floor(Number(eventCount) || 0)) + 1;
+  }
+  return Math.max(0, Math.floor(Number(row.retrievalFromSeq) || 0));
 }
 
 async function readHasUsedBotDee(uid) {
@@ -130,6 +143,8 @@ async function savePersonalization(uid, input, nowMs) {
       patch.turns = [];
       patch.lastMessageAtMs = 0;
       patch.conversationEpoch = Math.max(1, Math.floor(Number(prev.conversationEpoch) || 1)) + 1;
+      patch.retrievalFromSeq = nextRetrievalFromSeq(prev, prev.eventCount);
+      patch.summary = "";
     }
     tx.set(ref, patch, {merge: true});
   });
@@ -239,7 +254,8 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
       hasUsedBotDeeAtMs: now,
       updatedAtMs: now,
       [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs),
-      [prefs.SESSION_RESET_FIELD]: prefs.CURRENT_VERSION
+      [prefs.SESSION_RESET_FIELD]: prefs.CURRENT_VERSION,
+      retrievalFromSeq: nextRetrievalFromSeq(prev, prev.eventCount)
     }, {merge: true});
   });
   return {ok: true};
@@ -268,8 +284,9 @@ async function markIdleEnded(uid, settings, nowMs) {
   return {ok: true};
 }
 
-function eventsToTurns(rows, limit) {
+function eventsToTurns(rows, limit, minSeq) {
   const cap = Math.max(2, Math.min(24, Number(limit) || 12));
+  const min = Math.max(0, Math.floor(Number(minSeq) || 0));
   return (Array.isArray(rows) ? rows : [])
     .slice()
     .sort((a, b) => (Number(a.seq) || 0) - (Number(b.seq) || 0))
@@ -279,19 +296,32 @@ function eventsToTurns(rows, limit) {
       seq: Math.max(0, Math.floor(Number(row?.seq) || 0)),
       atMs: Number(row?.atMs) || 0
     }))
-    .filter(row => row.text)
+    .filter(row => row.text && (min === 0 || row.seq >= min))
     .slice(-cap)
     .map(row => ({role: row.role, text: row.text, seq: row.seq, atMs: row.atMs}));
 }
 
-/** Last 12 events win over in-doc turns. Archive is fallback only when both are empty. */
-function assembleRetrievalTurns({docTurns, events, archiveTurns, idleEnded, archiveConsent}) {
-  const fromEvents = eventsToTurns(events, 12);
+/** Last 12 events win over in-doc turns. Archive is fallback only when both are empty.
+ *  Session reset hides pre-reset events without deleting them. */
+function assembleRetrievalTurns({
+  docTurns,
+  events,
+  archiveTurns,
+  idleEnded,
+  archiveConsent,
+  sessionReset,
+  retrievalFromSeq
+}) {
+  if (sessionReset) return [];
+  const minSeq = Math.max(0, Math.floor(Number(retrievalFromSeq) || 0));
+  const fromEvents = eventsToTurns(events, 12, minSeq);
   if (fromEvents.length) return fromEvents.map(row => ({role: row.role, text: row.text}));
-  const fromDoc = bot.clipStoredTurns(docTurns);
+  const fromDoc = bot.clipStoredTurns(docTurns).filter(row => minSeq === 0 || (Number(row?.seq) || 0) >= minSeq);
   if (fromDoc.length) return fromDoc.map(row => ({role: row.role, text: row.text}));
   if (idleEnded && archiveConsent && Array.isArray(archiveTurns) && archiveTurns.length) {
-    return bot.clipStoredTurns(archiveTurns).map(row => ({role: row.role, text: row.text}));
+    return bot.clipStoredTurns(archiveTurns)
+      .filter(row => minSeq === 0 || (Number(row?.seq) || 0) >= minSeq)
+      .map(row => ({role: row.role, text: row.text}));
   }
   return [];
 }
@@ -301,10 +331,23 @@ async function loadEventHistory(uid, limit) {
   if (!ref) return [];
   const cap = Math.max(2, Math.min(24, Number(limit) || 12));
   const snap = await ref.collection("events").orderBy("seq", "desc").limit(cap).get();
-  return eventsToTurns(snap.docs.map(doc => doc.data()), cap).map(row => ({
-    role: row.role,
-    text: row.text
-  }));
+  return eventsToTurns(snap.docs.map(doc => doc.data()), cap);
+}
+
+async function loadExecutionReceipts(uid, limit) {
+  const owner = String(uid || "").trim();
+  if (!owner) return [];
+  const cap = Math.max(1, Math.min(24, Number(limit) || 12));
+  try {
+    const snap = await db().collection("botDeeExecutions")
+      .where("ownerUid", "==", owner)
+      .limit(cap)
+      .get();
+    return snap.docs.map(doc => doc.data() || {});
+  } catch (err) {
+    console.warn("BOT DEE execution load failed", err?.message || err);
+    return [];
+  }
 }
 
 async function loadArchiveHistory(uid, limit) {
@@ -405,7 +448,8 @@ async function persistUserTurn(uid, settings, userText, opts) {
       hasUsedBotDeeAtMs: now,
       updatedAtMs: now,
       [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs),
-      [prefs.SESSION_RESET_FIELD]: prefs.CURRENT_VERSION
+      [prefs.SESSION_RESET_FIELD]: prefs.CURRENT_VERSION,
+      retrievalFromSeq: nextRetrievalFromSeq(prev, prev.eventCount)
     }, {merge: true});
     written = {seq: userSeq, epoch, receivedAtMs, userStored};
   });
@@ -513,10 +557,12 @@ module.exports = {
   persistArchiveTurns,
   loadArchiveHistory,
   loadEventHistory,
+  loadExecutionReceipts,
   loadAuthorizedMemories,
   loadLatestSummary,
   eventsToTurns,
   assembleRetrievalTurns,
+  nextRetrievalFromSeq,
   writeExecutionReceipt,
   markIdleEnded,
   readHasUsedBotDee,

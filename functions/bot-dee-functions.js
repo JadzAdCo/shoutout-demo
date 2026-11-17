@@ -293,19 +293,23 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     let history = settings.durableThreads ? stored.history : clientHistory;
     let memories = [];
     let summary = "";
+    let executions = [];
+    const sessionReset = !!(stored.sessionReset || prefs.needsSessionReset(stored));
     if (settings.durableThreads) {
       let events = [];
       let archived = [];
-      try {
-        events = await threads.loadEventHistory(uid, 12);
-      } catch (err) {
-        console.warn("BOT DEE event load failed", err?.message || err);
-      }
-      if (!events.length && stored.idleEnded && memory.consentAllows(consent, "archive")) {
+      if (!sessionReset) {
         try {
-          archived = await threads.loadArchiveHistory(uid, 12);
+          events = await threads.loadEventHistory(uid, 12);
         } catch (err) {
-          console.warn("BOT DEE archive load failed", err?.message || err);
+          console.warn("BOT DEE event load failed", err?.message || err);
+        }
+        if (!events.length && stored.idleEnded && memory.consentAllows(consent, "archive")) {
+          try {
+            archived = await threads.loadArchiveHistory(uid, 12);
+          } catch (err) {
+            console.warn("BOT DEE archive load failed", err?.message || err);
+          }
         }
       }
       history = threads.assembleRetrievalTurns({
@@ -313,7 +317,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         events,
         archiveTurns: archived,
         idleEnded: stored.idleEnded,
-        archiveConsent: memory.consentAllows(consent, "archive")
+        archiveConsent: memory.consentAllows(consent, "archive"),
+        sessionReset,
+        retrievalFromSeq: stored.retrievalFromSeq
       });
       if (memory.consentAllows(consent, "memory")) {
         try {
@@ -322,16 +328,24 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
           console.warn("BOT DEE memory load failed", err?.message || err);
         }
       }
+      if (!sessionReset) {
+        try {
+          summary = stored.summary || await threads.loadLatestSummary(uid);
+        } catch (err) {
+          console.warn("BOT DEE summary load failed", err?.message || err);
+        }
+      }
       try {
-        summary = stored.summary || await threads.loadLatestSummary(uid);
+        executions = await threads.loadExecutionReceipts(uid, 12);
       } catch (err) {
-        console.warn("BOT DEE summary load failed", err?.message || err);
+        console.warn("BOT DEE execution load failed", err?.message || err);
       }
     }
     const modelContext = execution.buildModelContext({
       turns: history,
       summary,
-      memories: memory.consentAllows(consent, "memory") ? memories : []
+      memories: memory.consentAllows(consent, "memory") ? memories : [],
+      executions
     });
     history = modelContext.recentTurns;
     const active = bot.conversationIsActive(
@@ -570,7 +584,8 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
     const state = await threads.loadThreadState(uid, settings);
     let eventTurns = [];
     let archiveTurns = [];
-    if (!prefs.needsSessionReset(state)) {
+    const sessionReset = !!(state.sessionReset || prefs.needsSessionReset(state));
+    if (!sessionReset) {
       try {
         eventTurns = await threads.loadEventHistory(uid, 12);
       } catch (_) {}
@@ -585,7 +600,9 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       events: eventTurns,
       archiveTurns,
       idleEnded: state.idleEnded,
-      archiveConsent: state.archiveRetained
+      archiveConsent: state.archiveRetained,
+      sessionReset,
+      retrievalFromSeq: state.retrievalFromSeq
     });
     const profileFirstName = await readProfileFirstName(uid);
     return {

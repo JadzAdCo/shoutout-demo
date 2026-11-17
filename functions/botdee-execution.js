@@ -138,7 +138,7 @@ function contextBudget(raw) {
   };
 }
 
-function buildModelContext({turns, summary, memories, budget}) {
+function buildModelContext({turns, summary, memories, budget, executions}) {
   const cap = contextBudget(budget);
   const recent = Array.isArray(turns) ? turns.slice(-cap.maxTurns) : [];
   const mems = Array.isArray(memories) ? memories.slice(0, cap.memoryCount) : [];
@@ -147,7 +147,8 @@ function buildModelContext({turns, summary, memories, budget}) {
     recentTurns: recent,
     summary: summaryText,
     memories: mems,
-    budget: cap
+    budget: cap,
+    reservationClaim: reservationClaimFromContext({turns: recent, executions})
   };
 }
 

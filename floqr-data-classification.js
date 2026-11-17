@@ -239,6 +239,7 @@
     ["botDeeThreads", "personalization.remindWhereLeftOff", "ownMaster", 0, "0|1 recap last two meaningful turns on return; default 1 for this experience; Functions-write"],
     ["botDeeThreads", "personalization.botDeePersonalizationVersion", "ownMaster", 0, "Versioned first-use overlay marker; below current generation still asks name/tone"],
     ["botDeeThreads", "botDeeSessionResetVersion", "ownMaster", 0, "One-shot chat reset per generation; overlay skip does not wipe later turns"],
+    ["botDeeThreads", "retrievalFromSeq", "ownMaster", 0, "Transcript cursor after one-shot session reset; events with seq below this stay stored but are not retrieved or painted"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
   ];
