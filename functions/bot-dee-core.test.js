@@ -238,6 +238,7 @@ test("lookupPublicProfiles tool covers me + friends in description", () => {
   assert.match(String(decl.description), /friend|connection|Mingl/i);
   assert.match(bot.systemInstruction("patron"), /lookupPublicProfiles with query "me"/i);
   assert.match(bot.systemInstruction("patron"), /friend or connection/i);
+  assert.match(bot.systemInstruction("patron"), /kind=club/);
 });
 
 test("lookupPublicProfiles prompt and card cover opted-in public datapoints", () => {

@@ -423,8 +423,19 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       hasActiveRoom: false,
       declinedKeys: roomDeclined
     });
+    let venueAttached = null;
     let peopleAttached = null;
     if (!roomAttached.handled) {
+      try {
+        venueAttached = await require("./bot-dee-tools").attachVenueSearch({
+          query: userPrompt,
+          request
+        });
+      } catch (error) {
+        console.warn("BOT DEE venue search attach failed", error?.message || error);
+      }
+    }
+    if (!roomAttached.handled && !(venueAttached && venueAttached.handled)) {
       try {
         peopleAttached = await peopleCards.attachPeopleSearch({
           query: userPrompt,
@@ -448,6 +459,20 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         uiLanguage,
         smartViews: roomAttached.smartViews || [],
         replyKey: roomAttached.replyKey,
+        geminiOnView: false
+      };
+    } else if (venueAttached && venueAttached.handled) {
+      outcome = {
+        reply: venueAttached.reply,
+        results: [],
+        media: venueAttached.media || [],
+        provider: "floqr-venues",
+        model: "placeSearch",
+        toolRounds: 0,
+        uiLanguage,
+        smartViews: venueAttached.smartViews || [],
+        replyKey: venueAttached.replyKey,
+        venueSearch: venueAttached.venueSearch,
         geminiOnView: false
       };
     } else if (peopleAttached && peopleAttached.handled) {
@@ -561,7 +586,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       consent,
       hasUsedBotDee: 1,
       smartViews: Array.isArray(outcome.smartViews) ? outcome.smartViews : [],
-      replyKey: outcome.replyKey || ""
+      replyKey: outcome.replyKey || "",
+      peopleSearch: outcome.peopleSearch || null,
+      venueSearch: outcome.venueSearch || null
     };
   } catch (error) {
     throw asHttps(error);

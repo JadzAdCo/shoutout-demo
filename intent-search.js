@@ -177,6 +177,23 @@
   /* “I want to be able to…” / how-to help for patrons & service members */
   const HELP_INTENTS = [
     {
+      id: "help-botdee-place-search",
+      kind: "help",
+      label: "Ask BOT DEE for FLOQR venues",
+      blurb: "Ask sushi restaurants in Washington DC or clubs in DC. BOT DEE searches onboarded FLOQR venues only — not Google or Yelp — and opens the club public page.",
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
+      searchPhrases: [
+        "sushi restaurants", "sushi in washington dc", "restaurants in dc",
+        "clubs in washington dc", "japanese restaurant", "dining search", "find a club"
+      ],
+      patterns: [
+        /sushi\s+restaurants?/,
+        /restaurants?\s+in\s+(washington|dc)/,
+        /clubs?\s+in\s+(washington|dc)/,
+        /japanese\s+restaurant/
+      ]
+    },
+    {
       id: "help-botdee-version-smartview",
       kind: "help",
       label: "Version SMARTview",
@@ -1068,6 +1085,7 @@
     "ad-campaigns": ["patron"], mingl: ["patron"], rydr: ["patron"], bartr: ["patron"], shoutout: ["patron"],
     "football-intro": ["patron"], "tengo-muchos-dolares": ["patron"], shiloh: ["patron"], "classic-halloween": ["patron"], "black-card": ["patron"], "ballers-alert": ["patron"], floqcast: ["patron"], clubs: ["patron"],
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
+    "help-botdee-place-search": ["patron"],
     "help-botdee-version-smartview": ["patron"], "help-botdee-version-smartview-status": ["patron"], "help-botdee-version-smartview-tabs": ["patron"],
     "help-botdee-room-smartview": ["patron"], "help-botdee-room-smartview-invite": ["patron"], "help-botdee-room-smartview-join": ["patron"],
     "help-botdee-room-smartview-end": ["patron"], "help-botdee-room-smartview-tab": ["patron"], "help-botdee-room-smartview-who-pays": ["patron"],

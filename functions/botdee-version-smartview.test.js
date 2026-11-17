@@ -79,7 +79,7 @@ test("payload probes this request: Operational/Degraded/Unavailable, real Gemini
 test("What's New ships inside Functions (no repo-root README required)", () => {
   const bundled = vs.changelogFromBundle();
   assert.ok(bundled.length >= 1);
-  assert.equal(bundled[0].id, "s3.3.034");
+  assert.equal(bundled[0].id, "s3.3.035");
   const missingRoot = vs.buildVersionSmartView({
     role: "patron",
     rootDir: path.join(__dirname, "no-such-readme-dir")

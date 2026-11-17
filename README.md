@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.034 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.035 (stable)
 
+- s3.3.035: BOT DEE searches onboarded FLOQR venues for dining/place asks (sushi in DC), not patron photos or a product dump
 - s3.3.034: Version SMARTview card only on Ver / Vers / Version (live Operational probe + real Gemini model id; no six-phase dump)
 - s3.3.033: BOT DEE Room SMARTview intent routing (confirmation card; group rooms not live)
 - s3.3.032: BOT DEE Version SMARTview (Ver / Vers / Version aliases, honest stamps); SMARTcard / SMARTview hero uses public Profile Media slots
