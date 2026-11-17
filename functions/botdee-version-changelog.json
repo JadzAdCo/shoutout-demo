@@ -1,0 +1,34 @@
+[
+  {
+    "id": "s3.3.032",
+    "text": "s3.3.032: BOT DEE Version SMARTview (Ver / Vers / Version aliases, honest stamps)"
+  },
+  {
+    "id": "s3.3.031",
+    "text": "s3.3.031: SMARTview spelling + public-page Profile Media on People cards"
+  },
+  {
+    "id": "s3.3.030",
+    "text": "s3.3.030: Edit Profile iOS select text unclip + Account type help; My BOT DEE View my SMARTview (real patron card, mocks stay on Master Admin)"
+  },
+  {
+    "id": "s3.3.029",
+    "text": "s3.3.029: My BOT DEE iOS demeanor radios (custom 22px grid, cache-bust from s3.3.028)"
+  },
+  {
+    "id": "s3.3.028",
+    "text": "s3.3.028: People SMARTview v2 (inline patron card, owner edit, translation queue, Site Chrome)"
+  },
+  {
+    "id": "s3.3.027",
+    "text": "s3.3.027: BOT DEE recall after 300s pause — retrieve stored events, recap last two turns, discussed vs booked"
+  },
+  {
+    "id": "s3.3.026",
+    "text": "s3.3.026: BOT DEE first-use overlay + My BOT DEE prefs; sessions reset as new users; no Settings bar"
+  },
+  {
+    "id": "s3.3.025",
+    "text": "s3.3.025: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help"
+  }
+]

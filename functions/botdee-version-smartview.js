@@ -24,19 +24,12 @@ function isMasterRole(role) {
   return value === "master" || value === "masterAdmin" || value === "superAdmin";
 }
 
-function changelogFromReadme(rootDir) {
-  const file = path.join(rootDir || path.join(__dirname, ".."), "README.md");
-  let text = "";
-  try {
-    text = fs.readFileSync(file, "utf8");
-  } catch (_) {
-    return [];
-  }
+function parseChangelogText(text) {
   const items = [];
   const seen = new Set();
   const re = /^- (s3\.\d+\.\d+):\s*(.+)$/gm;
   let match;
-  while ((match = re.exec(text)) && items.length < 8) {
+  while ((match = re.exec(String(text || ""))) && items.length < 8) {
     const id = match[1];
     if (seen.has(id)) continue;
     seen.add(id);
@@ -46,6 +39,34 @@ function changelogFromReadme(rootDir) {
     });
   }
   return items;
+}
+
+function changelogFromBundle() {
+  try {
+    const rows = require("./botdee-version-changelog.json");
+    if (!Array.isArray(rows)) return [];
+    return rows.slice(0, 8).filter(row => row && row.id && row.text).map(row => ({
+      id: String(row.id),
+      text: String(row.text).slice(0, 280)
+    }));
+  } catch (_) {
+    return [];
+  }
+}
+
+function changelogFromReadme(rootDir) {
+  const file = path.join(rootDir || path.join(__dirname, ".."), "README.md");
+  try {
+    return parseChangelogText(fs.readFileSync(file, "utf8"));
+  } catch (_) {
+    return [];
+  }
+}
+
+function changelogItems(rootDir) {
+  const bundled = changelogFromBundle();
+  if (bundled.length) return bundled;
+  return changelogFromReadme(rootDir);
 }
 
 function buildVersionSmartView(opts) {
@@ -78,7 +99,7 @@ function buildVersionSmartView(opts) {
       status: "not_checked",
       lastCheckAtIso: null
     },
-    changelog: changelogFromReadme(options.rootDir),
+    changelog: changelogItems(options.rootDir),
     environment: man.environment || "pr_not_production"
   };
   if (isMasterRole(options.role)) {
@@ -109,6 +130,9 @@ module.exports = {
   KIND,
   isVersionSmartViewAlias,
   isMasterRole,
+  parseChangelogText,
+  changelogFromBundle,
   changelogFromReadme,
+  changelogItems,
   buildVersionSmartView
 };

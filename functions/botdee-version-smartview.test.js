@@ -45,8 +45,24 @@ test("payload is honest: not Operational, no fake rendering numbers, no privileg
   assert.doesNotMatch(blob, /v5\.4\.2/);
   assert.doesNotMatch(blob, /Gemini 2\.5 Pro/);
   assert.ok(Array.isArray(payload.changelog));
-  assert.ok(payload.changelog.length >= 1, "README package bullets");
+  assert.ok(payload.changelog.length >= 1, "bundled package bullets");
   assert.match(payload.changelog[0].id, /^s3\./);
+});
+
+test("What's New ships inside Functions (no repo-root README required)", () => {
+  const bundled = vs.changelogFromBundle();
+  assert.ok(bundled.length >= 1);
+  assert.equal(bundled[0].id, "s3.3.032");
+  const missingRoot = vs.buildVersionSmartView({
+    role: "patron",
+    rootDir: path.join(__dirname, "no-such-readme-dir")
+  });
+  assert.ok(missingRoot.changelog.length >= 1);
+  assert.equal(missingRoot.changelog[0].id, bundled[0].id);
+  const fromReadme = vs.changelogFromReadme(root);
+  assert.equal(bundled[0].id, fromReadme[0].id);
+  assert.doesNotMatch(read("functions/botdee-version-smartview.js"), /changelogFromReadme\(options\.rootDir\)/);
+  assert.match(read("functions/botdee-version-smartview.js"), /changelogItems\(/);
 });
 
 test("Master Admin privileged block is server-gated; patrons cannot mint it client-side", () => {
@@ -125,6 +141,9 @@ test("client mount paints Version SMARTview tabs without inventing health", () =
   assert.match(html, /data-vs-tab="help"/);
   assert.doesNotMatch(html, /Operational/);
   assert.match(html, /botdee\.vs\.notChecked|Not checked/);
+  const localHtml = api.renderCard(api.localVersionPayload());
+  assert.match(localHtml, /s3\.3\.032/);
+  assert.doesNotMatch(localHtml, /\/ Unavailable|\/ botdee\.vs\.unavailable/);
 });
 
 test("display URLs stay without ?v= and chrome keys are vs not sv/sc", () => {

@@ -406,12 +406,17 @@
 
   function renderVersionCard(payload) {
     const view = overlayFrontendPackage(payload);
-    const botLabel = view.botDee?.packageLabel || t("botdee.vs.unavailable", "Unavailable");
-    const backend = view.floqr?.backendPackage || t("botdee.vs.unavailable", "Unavailable");
-    const frontend = view.floqr?.frontendPackage || t("botdee.vs.unavailable", "Unavailable");
-    const floqrShown = frontend !== t("botdee.vs.unavailable", "Unavailable") && frontend !== backend
+    const unavailable = t("botdee.vs.unavailable", "Unavailable");
+    const botLabel = view.botDee?.packageLabel || unavailable;
+    const stamp = value => {
+      const s = String(value || "").trim();
+      return s && s !== unavailable ? s : "";
+    };
+    const backend = stamp(view.floqr?.backendPackage);
+    const frontend = stamp(view.floqr?.frontendPackage);
+    const floqrShown = frontend && backend && frontend !== backend
       ? `${frontend} / ${backend}`
-      : (frontend !== t("botdee.vs.unavailable", "Unavailable") ? frontend : backend);
+      : (frontend || backend || unavailable);
     const changelog = Array.isArray(view.changelog) ? view.changelog : [];
     const when = formatWhen(view.generatedAtIso);
     const status = statusCopy(view);
@@ -436,8 +441,8 @@
         <div class="botdee-sv-version-tech" data-vs-tech hidden>
           <p>          ${esc(t("botdee.vs.techEnv", "Deployment environment"))}: ${esc(view.environment || t("botdee.vs.unavailable", "Unavailable"))}<br/>
           ${esc(t("botdee.vs.techBuild", "Build identifier"))}: ${esc(botLabel)}<br/>
-          ${esc(t("botdee.vs.frontendLabel", "FLOQR frontend"))}: ${esc(frontend)}<br/>
-          ${esc(t("botdee.vs.backendLabel", "FLOQR backend"))}: ${esc(backend)}<br/>
+          ${esc(t("botdee.vs.frontendLabel", "FLOQR frontend"))}: ${esc(frontend || unavailable)}<br/>
+          ${esc(t("botdee.vs.backendLabel", "FLOQR backend"))}: ${esc(backend || unavailable)}<br/>
           ${esc(t("botdee.vs.configuredModel", "Configured: {id}", {id: view.model?.configuredId || t("botdee.vs.unavailable", "Unavailable")}))}<br/>
           ${esc(t("botdee.vs.techCheck", "Last successful health check"))}: ${esc(t("botdee.vs.unavailable", "Unavailable"))}</p>
           ${privilegedHtml(view)}
