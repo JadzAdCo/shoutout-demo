@@ -25,7 +25,7 @@
         body: "Пустая карточка: поля скрыты или вы в блоке. Ошибка сохранения: войдите — переводы на сервере. Ожидание или сбой: исходный язык с меткой. Правит только владелец. SMARTviews Master Admin — mock; Places и Yelp выключены. Тема следует Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "Проверить и исправить Smart Summary",
+        title: "Проверить и исправить SMARTsummary",
         body: "Gemini составляет черновик только из публичных полей FLOQR — не при каждом просмотре. Неверный факт: скройте поле или правьте описание. Ваш текст не перезаписывается. Конфликт профиля просит проверку. Сообщите о неверной карточке в оверлее."
       },
       "help-botdee-smartview-chrome": {
@@ -46,11 +46,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "Перевод SMARTview",
-        body: "Исходное описание остаётся на языке профиля. После сохранения FLOQR ставит перевод на каждый другой язык. Пока перевод ждёт или сбой, зрители видят исходный язык с пометкой — не устаревший перевод как актуальный."
+        body: "SMARTsummary хранится на языке профиля — это источник, даже если это не английский. После сохранения FLOQR ставит перевод на каждый другой язык, включая английский. Англоязычный зритель видит английский SMARTsummary, когда работа завершена. Пока перевод ждёт или сбой, зрители видят исходный язык с пометкой — не устаревший перевод как актуальный."
       },
       "help-botdee-smartview-edit": {
-        title: "Изменить Smart Summary",
-        body: "Только вы правите Smart Summary на языке профиля. Сохранение сразу. Переводы идут в фоне. Gemini не перезаписывает ваш текст. Если публичный профиль изменился, FLOQR просит проверить, а не подменяет."
+        title: "Изменить SMARTsummary",
+        body: "Только вы правите SMARTsummary на языке профиля. Сохранение сразу. Переводы идут в фоне. Gemini не перезаписывает ваш текст. Если публичный профиль изменился, FLOQR просит проверить, а не подменяет."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Аккаунт FloqR для Spatial Studio",
@@ -455,7 +455,7 @@
         body: "Lege kaart: velden verborgen of geblokkeerd. Opslaan mislukt: meld u aan — vertalingen staan op de server. Wachtend of mislukt: brontaal met label. Alleen de eigenaar bewerkt. Master Admin SMARTviews blijft de mock-catalogus; Places en Yelp blijven uit. Thema volgt Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "Smart Summary controleren en corrigeren",
+        title: "SMARTsummary controleren en corrigeren",
         body: "Gemini stelt alleen op uit openbare FLOQR-velden — niet bij elke weergave. Verkeerd feit: veld verbergen of samenvatting zelf bewerken. Uw tekst wordt niet overschreven. Profielconflicten vragen om controle. Meld een foute kaart in de overlay."
       },
       "help-botdee-smartview-chrome": {
@@ -476,11 +476,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "SMARTview-vertaling",
-        body: "De bronsamenvatting blijft in de standaard profieltaal. Na opslaan zet FLOQR een vertaling klaar voor elke andere taal. Bij wachten of fout ziet de kijker de brontaal met label — nooit een verouderde vertaling als actueel."
+        body: "Uw SMARTsummary wordt opgeslagen in de standaard profieltaal — dat is de bron, ook als het geen Engels is. Na opslaan zet FLOQR een vertaling klaar voor elke andere taal, inclusief Engels. Een Engelstalige kijker ziet de Engelse SMARTsummary zodra die job klaar is. Bij wachten of fout ziet de kijker de brontaal met label — nooit een verouderde vertaling als actueel."
       },
       "help-botdee-smartview-edit": {
-        title: "Uw Smart Summary bewerken",
-        body: "Alleen u bewerkt uw Smart Summary in de standaard profieltaal. Opslaan is direct. Vertalingen lopen op de achtergrond. Gemini overschrijft uw tekst niet. Als het openbare profiel wijzigt, vraagt FLOQR u te controleren in plaats van te vervangen."
+        title: "Uw SMARTsummary bewerken",
+        body: "Alleen u bewerkt uw SMARTsummary in de standaard profieltaal. Opslaan is direct. Vertalingen lopen op de achtergrond. Gemini overschrijft uw tekst niet. Als het openbare profiel wijzigt, vraagt FLOQR u te controleren in plaats van te vervangen."
       },
       "help-floqr-oidc-floqmedia": {
         title: "FloqR-account voor Spatial Studio",
@@ -885,7 +885,7 @@
         body: "Carte vide : champs masqués ou blocage. Échec d’enregistrement : reconnectez-vous — les traductions sont sur le serveur. Traduction en attente ou en échec : langue source étiquetée. Seul le titulaire édite. SMARTviews Master Admin reste le catalogue mock ; Places et Yelp restent coupés. Le thème suit Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "Relire et corriger un Smart Summary",
+        title: "Relire et corriger un SMARTsummary",
         body: "Gemini rédige uniquement à partir des champs publics dans FLOQR — jamais à chaque vue. Si un fait est faux, masquez le champ dans la visibilité du profil ou modifiez le résumé. Un texte rédigé par vous n’est pas écrasé. Un conflit de profil demande une relecture. Signalez une carte incorrecte depuis l’overlay."
       },
       "help-botdee-smartview-chrome": {
@@ -906,11 +906,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "Traduction SMARTview",
-        body: "Le résumé source reste dans la langue par défaut du profil. Après enregistrement, FLOQR met en file une traduction pour chaque autre langue. En attente ou en échec, les lecteurs voient la langue source clairement indiquée — jamais une traduction périmée comme actuelle."
+        body: "Votre SMARTsummary est enregistré dans la langue par défaut du profil — c’est la source, même si ce n’est pas l’anglais. Après enregistrement, FLOQR met en file une traduction vers chaque autre langue, y compris l’anglais. Un visiteur anglais voit le SMARTsummary en anglais une fois ce travail terminé. En attente ou en échec, les lecteurs voient la langue source clairement indiquée — jamais une traduction périmée comme actuelle."
       },
       "help-botdee-smartview-edit": {
-        title: "Modifier votre Smart Summary",
-        body: "Vous seul pouvez modifier votre Smart Summary, dans la langue par défaut du profil. L’enregistrement est immédiat. Les traductions partent en arrière-plan. Gemini n’écrase pas un texte que vous avez modifié. Si le profil public change, FLOQR vous demande de relire le résumé."
+        title: "Modifier votre SMARTsummary",
+        body: "Vous seul pouvez modifier votre SMARTsummary, dans la langue par défaut du profil. L’enregistrement est immédiat. Les traductions partent en arrière-plan. Gemini n’écrase pas un texte que vous avez modifié. Si le profil public change, FLOQR vous demande de relire le résumé."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Compte FloqR pour Spatial Studio",
@@ -1315,7 +1315,7 @@
         body: "Leere Karte: Felder ausgeblendet oder blockiert. Speichern fehlgeschlagen: anmelden — Übersetzungen laufen auf dem Server. Ausstehend/Fehler: Quellsprache mit Label. Nur der Inhaber bearbeitet. Master-Admin-SMARTviews bleibt Mock; Places/Yelp aus. Theme folgt Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "Smart Summary prüfen und korrigieren",
+        title: "SMARTsummary prüfen und korrigieren",
         body: "Gemini entwirft nur aus öffentlichen FLOQR-Feldern — nie bei jedem Öffnen. Falsche Fakten: Feld in der Profilsichtbarkeit ausblenden oder Summary selbst ändern. Ihr Text wird nicht überschrieben. Profilkonflikte verlangen Prüfung. Falsche Karten im Overlay melden."
       },
       "help-botdee-smartview-chrome": {
@@ -1336,11 +1336,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "SMARTview-Übersetzung",
-        body: "Die Quell-Summary bleibt in der Standard-Profilsprache. Nach dem Speichern reiht FLOQR eine Übersetzung für jede andere Sprache ein. Bei ausstehend oder Fehler sehen Betrachter die Quellsprache klar gekennzeichnet — nie eine veraltete Übersetzung als aktuell."
+        body: "Ihre SMARTsummary wird in der Standard-Profilsprache gespeichert — das ist die Quelle, auch wenn es nicht Englisch ist. Nach dem Speichern reiht FLOQR eine Übersetzung für jede andere Sprache ein, einschließlich Englisch. Ein englischsprachiger Betrachter sieht die englische SMARTsummary, sobald der Job fertig ist. Bei ausstehend oder Fehler sehen Betrachter die Quellsprache klar gekennzeichnet — nie eine veraltete Übersetzung als aktuell."
       },
       "help-botdee-smartview-edit": {
-        title: "Smart Summary bearbeiten",
-        body: "Nur Sie bearbeiten Ihre Smart Summary in der Standard-Profilsprache. Speichern ist sofort. Übersetzungen laufen im Hintergrund. Gemini überschreibt Ihren Text nicht. Wenn sich das öffentliche Profil ändert, prüft FLOQR mit Ihnen statt zu ersetzen."
+        title: "SMARTsummary bearbeiten",
+        body: "Nur Sie bearbeiten Ihre SMARTsummary in der Standard-Profilsprache. Speichern ist sofort. Übersetzungen laufen im Hintergrund. Gemini überschreibt Ihren Text nicht. Wenn sich das öffentliche Profil ändert, prüft FLOQR mit Ihnen statt zu ersetzen."
       },
       "help-floqr-oidc-floqmedia": {
         title: "FloqR-Konto für Spatial Studio",
@@ -1745,7 +1745,7 @@
         body: "Tarjeta vacía: campos ocultos o bloqueo. Fallo al guardar: inicie sesión — las traducciones van al servidor. Pendiente o error: idioma de origen etiquetado. Solo el titular edita. SMARTviews de Master Admin sigue siendo el catálogo mock; Places y Yelp apagados. El tema sigue Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "Revisar y corregir un Smart Summary",
+        title: "Revisar y corregir un SMARTsummary",
         body: "Gemini redacta solo con campos públicos en FLOQR — no en cada vista. Si un dato es falso, oculte el campo o edite el resumen. Su texto no se sobrescribe. Un conflicto de perfil pide revisión. Informe una tarjeta incorrecta desde la superposición."
       },
       "help-botdee-smartview-chrome": {
@@ -1766,11 +1766,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "Traducción de SMARTview",
-        body: "El resumen de origen permanece en el idioma predeterminado. Tras guardar, FLOQR encola una traducción a cada otro idioma. Si está pendiente o falla, se muestra el idioma de origen etiquetado — nunca una traducción antigua como actual."
+        body: "Su SMARTsummary se guarda en el idioma predeterminado del perfil — ese es el origen, aunque no sea inglés. Tras guardar, FLOQR encola una traducción a cada otro idioma, incluido el inglés. Un visitante en inglés ve el SMARTsummary en inglés cuando termina ese trabajo. Si está pendiente o falla, se muestra el idioma de origen etiquetado — nunca una traducción antigua como actual."
       },
       "help-botdee-smartview-edit": {
-        title: "Editar su Smart Summary",
-        body: "Solo usted edita su Smart Summary en el idioma predeterminado del perfil. El guardado es inmediato. Las traducciones van en segundo plano. Gemini no sobrescribe su texto. Si el perfil público cambia, FLOQR le pide revisar, no reemplazar."
+        title: "Editar su SMARTsummary",
+        body: "Solo usted edita su SMARTsummary en el idioma predeterminado del perfil. El guardado es inmediato. Las traducciones van en segundo plano. Gemini no sobrescribe su texto. Si el perfil público cambia, FLOQR le pide revisar, no reemplazar."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Cuenta FloqR para Spatial Studio",
@@ -2175,7 +2175,7 @@
         body: "Scheda vuota: campi nascosti o blocco. Salvataggio fallito: accedi — le traduzioni stanno sul server. In attesa o errore: lingua di origine etichettata. Solo il titolare modifica. SMARTviews Master Admin resta il catalogo mock; Places e Yelp restano off. Il tema segue Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "Rivedi e correggi lo Smart Summary",
+        title: "Rivedi e correggi lo SMARTsummary",
         body: "Gemini bozza solo dai campi pubblici in FLOQR — non a ogni vista. Se un fatto è sbagliato, nascondi il campo o modifica il riassunto. Il tuo testo non viene sovrascritto. Un conflitto di profilo chiede revisione. Segnala una scheda errata dall’overlay."
       },
       "help-botdee-smartview-chrome": {
@@ -2196,11 +2196,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "Traduzione SMARTview",
-        body: "Il riassunto sorgente resta nella lingua predefinita. Dopo il salvataggio FLOQR mette in coda una traduzione per ogni altra lingua. In attesa o errore i visitatori vedono la lingua di origine etichettata — mai una traduzione vecchia come attuale."
+        body: "Il tuo SMARTsummary è salvato nella lingua predefinita del profilo — quella è la fonte, anche se non è l’inglese. Dopo il salvataggio FLOQR mette in coda una traduzione per ogni altra lingua, incluso l’inglese. Un visitatore inglese vede lo SMARTsummary in inglese a lavoro finito. In attesa o errore i visitatori vedono la lingua di origine etichettata — mai una traduzione vecchia come attuale."
       },
       "help-botdee-smartview-edit": {
-        title: "Modifica lo Smart Summary",
-        body: "Solo tu modifichi lo Smart Summary nella lingua predefinita del profilo. Il salvataggio è immediato. Le traduzioni partono in background. Gemini non sovrascrive il tuo testo. Se il profilo pubblico cambia, FLOQR chiede una revisione invece di sostituirlo."
+        title: "Modifica lo SMARTsummary",
+        body: "Solo tu modifichi lo SMARTsummary nella lingua predefinita del profilo. Il salvataggio è immediato. Le traduzioni partono in background. Gemini non sovrascrive il tuo testo. Se il profilo pubblico cambia, FLOQR chiede una revisione invece di sostituirlo."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Account FloqR per Spatial Studio",
@@ -2605,7 +2605,7 @@
         body: "Cartão vazio: campos ocultos ou bloqueio. Falha ao guardar: inicie sessão — as traduções ficam no servidor. Pendente ou falha: idioma de origem com etiqueta. Só o dono edita. SMARTviews Master Admin continua o catálogo mock; Places e Yelp desligados. O tema segue o Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "Rever e corrigir o Smart Summary",
+        title: "Rever e corrigir o SMARTsummary",
         body: "O Gemini redige só a partir de campos públicos no FLOQR — não em cada vista. Se um facto estiver errado, oculte o campo ou edite o resumo. O seu texto não é substituído. Um conflito de perfil pede revisão. Reporte um cartão errado na sobreposição."
       },
       "help-botdee-smartview-chrome": {
@@ -2626,11 +2626,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "Tradução SMARTview",
-        body: "O resumo de origem fica no idioma predefinido. Depois de guardar, o FLOQR mete na fila uma tradução para cada outro idioma. Pendente ou falhado, vê-se o idioma de origem com etiqueta — nunca uma tradução antiga como atual."
+        body: "O seu SMARTsummary fica no idioma predefinido do perfil — essa é a origem, mesmo que não seja inglês. Depois de guardar, o FLOQR mete na fila uma tradução para cada outro idioma, incluindo inglês. Um visitante em inglês vê o SMARTsummary em inglês quando o trabalho termina. Pendente ou falhado, vê-se o idioma de origem com etiqueta — nunca uma tradução antiga como atual."
       },
       "help-botdee-smartview-edit": {
-        title: "Editar o Smart Summary",
-        body: "Só você edita o Smart Summary no idioma predefinido do perfil. A gravação é imediata. As traduções correm em segundo plano. O Gemini não substitui o seu texto. Se o perfil público mudar, o FLOQR pede revisão em vez de substituir."
+        title: "Editar o SMARTsummary",
+        body: "Só você edita o SMARTsummary no idioma predefinido do perfil. A gravação é imediata. As traduções correm em segundo plano. O Gemini não substitui o seu texto. Se o perfil público mudar, o FLOQR pede revisão em vez de substituir."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Conta FloqR para Spatial Studio",
@@ -3035,7 +3035,7 @@
         body: "Κενή κάρτα: κρυμμένα πεδία ή αποκλεισμός. Αποτυχία αποθήκευσης: συνδεθείτε — οι μεταφράσεις είναι στον διακομιστή. Εκκρεμές/αποτυχία: γλώσσα πηγής με σήμανση. Μόνο ο κάτοχος επεξεργάζεται. Το SMARTviews Master Admin μένει mock. Places/Yelp κλειστά. Το θέμα ακολουθεί το Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "Έλεγχος και διόρθωση Smart Summary",
+        title: "Έλεγχος και διόρθωση SMARTsummary",
         body: "Το Gemini συντάσσει μόνο από δημόσια πεδία FLOQR — όχι σε κάθε προβολή. Λάθος γεγονός: αποκρύψτε το πεδίο ή επεξεργαστείτε την περίληψη. Το κείμενό σας δεν αντικαθίσταται. Σύγκρουση προφίλ ζητά έλεγχο. Αναφέρετε λάθος κάρτα από την επικάλυψη."
       },
       "help-botdee-smartview-chrome": {
@@ -3056,11 +3056,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "Μετάφραση SMARTview",
-        body: "Η πηγή μένει στην προεπιλεγμένη γλώσσα προφίλ. Μετά την αποθήκευση το FLOQR βάζει σε ουρά μετάφραση για κάθε άλλη γλώσσα. Σε εκκρεμότητα ή αποτυχία φαίνεται η γλώσσα πηγής με σήμανση — ποτέ παλιά μετάφραση ως τρέχουσα."
+        body: "Το SMARTsummary αποθηκεύεται στην προεπιλεγμένη γλώσσα προφίλ — αυτή είναι η πηγή, ακόμη κι αν δεν είναι αγγλικά. Μετά την αποθήκευση το FLOQR βάζει σε ουρά μετάφραση για κάθε άλλη γλώσσα, συμπεριλαμβανομένων των Αγγλικών. Ένας αγγλόφωνος βλέπει το αγγλικό SMARTsummary όταν τελειώσει η εργασία. Σε εκκρεμότητα ή αποτυχία φαίνεται η γλώσσα πηγής με σήμανση — ποτέ παλιά μετάφραση ως τρέχουσα."
       },
       "help-botdee-smartview-edit": {
-        title: "Επεξεργασία Smart Summary",
-        body: "Μόνο εσείς επεξεργάζεστε το Smart Summary στην προεπιλεγμένη γλώσσα προφίλ. Η αποθήκευση είναι άμεση. Οι μεταφράσεις τρέχουν στο παρασκήνιο. Το Gemini δεν αντικαθιστά το κείμενό σας. Αν αλλάξει το δημόσιο προφίλ, το FLOQR ζητά έλεγχο αντί αντικατάστασης."
+        title: "Επεξεργασία SMARTsummary",
+        body: "Μόνο εσείς επεξεργάζεστε το SMARTsummary στην προεπιλεγμένη γλώσσα προφίλ. Η αποθήκευση είναι άμεση. Οι μεταφράσεις τρέχουν στο παρασκήνιο. Το Gemini δεν αντικαθιστά το κείμενό σας. Αν αλλάξει το δημόσιο προφίλ, το FLOQR ζητά έλεγχο αντί αντικατάστασης."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Λογαριασμός FloqR για Spatial Studio",
@@ -3465,7 +3465,7 @@
         body: "Pusta karta: ukryte pola lub blokada. Zapis nieudany: zaloguj się — tłumaczenia są na serwerze. Oczekujące/błąd: język źródłowy z etykietą. Edytuje tylko właściciel. SMARTviews Master Admin to nadal mock; Places i Yelp wyłączone. Motyw idzie za Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "Przejrzyj i popraw Smart Summary",
+        title: "Przejrzyj i popraw SMARTsummary",
         body: "Gemini szkicuje tylko z publicznych pól FLOQR — nie przy każdym otwarciu. Błędny fakt: ukryj pole lub edytuj podsumowanie. Twój tekst nie jest nadpisywany. Konflikt profilu prosi o przegląd. Zgłoś błędną kartę z nakładki."
       },
       "help-botdee-smartview-chrome": {
@@ -3486,11 +3486,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "Tłumaczenie SMARTview",
-        body: "Źródłowe podsumowanie zostaje w domyślnym języku profilu. Po zapisie FLOQR kolejuje tłumaczenie na każdy inny język. Gdy trwa lub zawiedzie, widać język źródłowy z etykietą — nigdy stare tłumaczenie jako aktualne."
+        body: "Twój SMARTsummary jest zapisany w domyślnym języku profilu — to źródło, nawet gdy to nie angielski. Po zapisie FLOQR kolejuje tłumaczenie na każdy inny język, w tym angielski. Angielski widz widzi angielski SMARTsummary po zakończeniu zadania. Gdy trwa lub zawiedzie, widać język źródłowy z etykietą — nigdy stare tłumaczenie jako aktualne."
       },
       "help-botdee-smartview-edit": {
-        title: "Edytuj Smart Summary",
-        body: "Tylko Ty edytujesz Smart Summary w domyślnym języku profilu. Zapis jest natychmiastowy. Tłumaczenia idą w tle. Gemini nie nadpisuje Twojego tekstu. Gdy profil publiczny się zmieni, FLOQR prosi o przegląd zamiast zastępować."
+        title: "Edytuj SMARTsummary",
+        body: "Tylko Ty edytujesz SMARTsummary w domyślnym języku profilu. Zapis jest natychmiastowy. Tłumaczenia idą w tle. Gemini nie nadpisuje Twojego tekstu. Gdy profil publiczny się zmieni, FLOQR prosi o przegląd zamiast zastępować."
       },
       "help-floqr-oidc-floqmedia": {
         title: "Konto FloqR dla Spatial Studio",
@@ -3895,7 +3895,7 @@
         body: "بطاقة فارغة: الحقول مخفية أو أنت محظور. فشل الحفظ: سجّل الدخول — الترجمات على الخادم. انتظار أو فشل: لغة المصدر بوسم. التعديل للمالك فقط. SMARTviews في Master Admin ما زال كتالوج المحاكاة؛ Places وYelp متوقفان. السمة تتبع Site Chrome."
       },
       "help-botdee-smartview-review": {
-        title: "مراجعة وتصحيح Smart Summary",
+        title: "مراجعة وتصحيح SMARTsummary",
         body: "يصوغ Gemini من حقول FLOQR العامة فقط — ليس عند كل عرض. إن كان واقعًا خاطئًا أخفِ الحقل أو عدّل الملخص. لا يُستبدل نصك. تعارض الملف يطلب مراجعة. بلّغ عن بطاقة خاطئة من الطبقة."
       },
       "help-botdee-smartview-chrome": {
@@ -3916,11 +3916,11 @@
       },
       "help-botdee-smartview-translation": {
         title: "ترجمة SMARTview",
-        body: "يبقى الملخص المصدر بلغة الملف الافتراضية. بعد الحفظ يضع FLOQR ترجمة لكل لغة أخرى في الانتظار. أثناء الانتظار أو الفشل تُعرض لغة المصدر بوسم واضح — لا ترجمة قديمة كأنها الحالية."
+        body: "يُحفظ SMARTsummary بلغة الملف الافتراضية — تلك هي المصدر حتى إن لم تكن الإنجليزية. بعد الحفظ يضع FLOQR ترجمة لكل لغة أخرى في الانتظار، بما فيها الإنجليزية. يرى المشاهد الإنجليزي SMARTsummary بالإنجليزية عند اكتمال المهمة. أثناء الانتظار أو الفشل تُعرض لغة المصدر بوسم واضح — لا ترجمة قديمة كأنها الحالية."
       },
       "help-botdee-smartview-edit": {
-        title: "تعديل Smart Summary",
-        body: "أنت وحدك تعدّل Smart Summary بلغة الملف الافتراضية. الحفظ فوري. تُترجم اللغات الأخرى في الخلفية. لا يستبدل Gemini نصك. إذا تغيّر الملف العام، يطلب FLOQR المراجعة بدل الاستبدال."
+        title: "تعديل SMARTsummary",
+        body: "أنت وحدك تعدّل SMARTsummary بلغة الملف الافتراضية. الحفظ فوري. تُترجم اللغات الأخرى في الخلفية. لا يستبدل Gemini نصك. إذا تغيّر الملف العام، يطلب FLOQR المراجعة بدل الاستبدال."
       },
       "help-floqr-oidc-floqmedia": {
         title: "حساب FloqR لـ Spatial Studio",

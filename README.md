@@ -1,5 +1,6 @@
 # CURRENT PACKAGE: FLOQR ShoutOut s3.3.031 (stable)
 
+- s3.3.031: SMARTsummary source locale is patron UI language; fan-out includes English
 - s3.3.031: SMARTview spelling + public-page Profile Media on People cards
 - s3.3.030: Edit Profile iOS select text unclip + Account type help; My BOT DEE View my SMARTview (real patron card, mocks stay on Master Admin)
 - s3.3.029: My BOT DEE iOS demeanor radios (custom 22px grid, cache-bust from s3.3.028)

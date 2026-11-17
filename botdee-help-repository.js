@@ -426,8 +426,8 @@
     {
       id: "help-botdee-smartview",
       title: "View my SMARTview",
-      body: "View my SMARTview shows your People card from public-within-FLOQR fields, using the same Profile Media as your FLOQR public page — not venue or restaurant mocks. Edit My SMART Summary changes the summary in your default profile language. Master Admin → Features → BOT DEE → SMARTviews is where labeled mock venue and restaurant cards live. There is no live Places or Yelp.",
-      searchPhrases: ["smartview", "smart view", "view my smartview", "venue card", "restaurant card", "public page", "mock smartview", "people smartview", "person card", "edit my smart summary"],
+      body: "View my SMARTview shows your People card from public-within-FLOQR fields, using the same Profile Media as your FLOQR public page — not venue or restaurant mocks. Edit my SMARTsummary changes the text in your default profile language. Save translates it to every other FLOQR language, including English. Master Admin → Features → BOT DEE → SMARTviews is where labeled mock venue and restaurant cards live. There is no live Places or Yelp.",
+      searchPhrases: ["smartview", "smart view", "view my smartview", "venue card", "restaurant card", "public page", "mock smartview", "people smartview", "person card", "edit my smart summary", "smartsummary", "edit my smartsummary"],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
         {label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})},
@@ -439,9 +439,9 @@
     },
     {
       id: "help-botdee-smartview-edit",
-      title: "Edit your Smart Summary",
-      body: "Only you can edit your Smart Summary, in your default profile language. Save is immediate. Translations to other FLOQR languages run in the background. Gemini will not overwrite text you edited unless you ask it to regenerate. If your public profile changes, FLOQR asks you to review the summary instead of replacing it.",
-      searchPhrases: ["edit smart summary", "edit my smartview", "owner authored summary", "regenerate summary"],
+      title: "Edit your SMARTsummary",
+      body: "Only you can edit your SMARTsummary, in your default profile language. That language is the source — English is the source only when your default is English. Save is immediate. FLOQR then translates SMARTsummary into every other supported language, including English. Gemini will not overwrite text you edited unless you ask it to regenerate. If your public profile changes, FLOQR asks you to review the summary instead of replacing it.",
+      searchPhrases: ["edit smart summary", "edit my smartview", "owner authored summary", "regenerate summary", "smartsummary", "edit smartsummary"],
       links: [{label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
@@ -450,8 +450,8 @@
     {
       id: "help-botdee-smartview-translation",
       title: "How SMARTview translation works",
-      body: "Your source summary stays in your default profile language. After you save, FLOQR queues a translation for every other supported language. While a translation is pending or failed, viewers see the source language with a clear label — never a stale translation presented as current.",
-      searchPhrases: ["smartview translation", "translation pending", "source language summary", "stale translation"],
+      body: "Your SMARTsummary is stored in your default profile language — that language is the source, even when it is not English. After you save, FLOQR queues a translation to every other supported language, including English. An English viewer sees the English SMARTsummary once that job finishes. While a translation is pending or failed, viewers see the source language with a clear label — never a stale translation presented as current.",
+      searchPhrases: ["smartview translation", "translation pending", "source language summary", "stale translation", "english translation", "smartsummary translation"],
       links: [{label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
@@ -502,9 +502,9 @@
     },
     {
       id: "help-botdee-smartview-review",
-      title: "Review and correct a Smart Summary",
-      body: "Gemini drafts from public-within-FLOQR fields only — never on each view. If a fact is wrong, hide the source field in Profile visibility or edit the summary yourself. Owner-authored text is not overwritten. Profile changes that conflict with your summary ask for a review. Report an incorrect card from the summary overlay.",
-      searchPhrases: ["correct smart summary", "wrong smartview", "gemini overwrite", "review smart summary"],
+      title: "Review and correct a SMARTsummary",
+      body: "Gemini drafts the SMARTsummary in your default profile language from public-within-FLOQR fields only — never on each view. If a fact is wrong, hide the source field in Profile visibility or edit the SMARTsummary yourself. Owner-authored text is not overwritten. Profile changes that conflict with your summary ask for a review. Report an incorrect card from the summary overlay.",
+      searchPhrases: ["correct smart summary", "wrong smartview", "gemini overwrite", "review smart summary", "smartsummary"],
       links: [{label: "My BOT DEE", href: pageUrl("./patron-portal.html", {tab: "feature-orders", sub: "botdee"})}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",

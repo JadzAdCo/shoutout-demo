@@ -22,6 +22,117 @@ const DATING_SUBTABS = Object.freeze(["Preferences", "Discovery"]);
 const DEFAULT_PRIMARY = "Social";
 const DEFAULT_SOCIAL = "Music";
 const JOB_MAX_ATTEMPTS = 5;
+const LOCALE_NAMES = Object.freeze({
+  en: "English", de: "German", fr: "French", es: "Spanish", it: "Italian",
+  pt: "Portuguese", ru: "Russian", el: "Greek", pl: "Polish", nl: "Dutch", ar: "Arabic"
+});
+const DRAFT_NAME_FALLBACK = Object.freeze({
+  en: "This patron", de: "Dieser Gast", fr: "Ce visiteur", es: "Este usuario",
+  it: "Questo ospite", pt: "Este utilizador", ru: "Этот гость", el: "Αυτός ο επισκέπτης",
+  pl: "Ten gość", nl: "Deze gast", ar: "هذا الضيف"
+});
+/** Deterministic SMARTsummary scaffolding in language B when Gemini is slow or unconfigured. Genre/place names stay as published. */
+const DRAFT_BITS = Object.freeze({
+  en: {
+    enjoys: x => `enjoys ${x}`,
+    goesOut: x => `goes out for ${x}`,
+    follows: x => `follows ${x}`,
+    food: x => `likes ${x} food`,
+    past: x => `has shared past travel in ${x}`,
+    future: x => `has an upcoming trip to ${x}`,
+    empty: name => `${name} has a FLOQR public-within-app profile.`
+  },
+  de: {
+    enjoys: x => `mag ${x}`,
+    goesOut: x => `geht aus für ${x}`,
+    follows: x => `folgt ${x}`,
+    food: x => `mag ${x}-Küche`,
+    past: x => `hat Reisen nach ${x} geteilt`,
+    future: x => `plant eine Reise nach ${x}`,
+    empty: name => `${name} hat ein öffentliches FLOQR-Profil.`
+  },
+  fr: {
+    enjoys: x => `aime ${x}`,
+    goesOut: x => `sort pour ${x}`,
+    follows: x => `suit ${x}`,
+    food: x => `aime la cuisine ${x}`,
+    past: x => `a partagé des voyages à ${x}`,
+    future: x => `prévoit un voyage à ${x}`,
+    empty: name => `${name} a un profil public FLOQR.`
+  },
+  es: {
+    enjoys: x => `disfruta ${x}`,
+    goesOut: x => `sale a ${x}`,
+    follows: x => `sigue ${x}`,
+    food: x => `le gusta la comida ${x}`,
+    past: x => `ha compartido viajes a ${x}`,
+    future: x => `tiene un viaje próximo a ${x}`,
+    empty: name => `${name} tiene un perfil público en FLOQR.`
+  },
+  it: {
+    enjoys: x => `ama ${x}`,
+    goesOut: x => `esce per ${x}`,
+    follows: x => `segue ${x}`,
+    food: x => `ama il cibo ${x}`,
+    past: x => `ha condiviso viaggi a ${x}`,
+    future: x => `ha un viaggio in programma a ${x}`,
+    empty: name => `${name} ha un profilo pubblico FLOQR.`
+  },
+  pt: {
+    enjoys: x => `gosta de ${x}`,
+    goesOut: x => `sai para ${x}`,
+    follows: x => `acompanha ${x}`,
+    food: x => `gosta de comida ${x}`,
+    past: x => `partilhou viagens para ${x}`,
+    future: x => `tem uma viagem próxima para ${x}`,
+    empty: name => `${name} tem um perfil público FLOQR.`
+  },
+  ru: {
+    enjoys: x => `любит ${x}`,
+    goesOut: x => `ходит на ${x}`,
+    follows: x => `следит за ${x}`,
+    food: x => `любит кухню ${x}`,
+    past: x => `делился поездками в ${x}`,
+    future: x => `планирует поездку в ${x}`,
+    empty: name => `У ${name} есть публичный профиль FLOQR.`
+  },
+  el: {
+    enjoys: x => `απολαμβάνει ${x}`,
+    goesOut: x => `βγαίνει για ${x}`,
+    follows: x => `ακολουθεί ${x}`,
+    food: x => `του αρέσει το φαγητό ${x}`,
+    past: x => `έχει μοιραστεί ταξίδια σε ${x}`,
+    future: x => `έχει επερχόμενο ταξίδι σε ${x}`,
+    empty: name => `Ο/Η ${name} έχει δημόσιο προφίλ FLOQR.`
+  },
+  pl: {
+    enjoys: x => `lubi ${x}`,
+    goesOut: x => `wychodzi na ${x}`,
+    follows: x => `śledzi ${x}`,
+    food: x => `lubi kuchnię ${x}`,
+    past: x => `dzielił się podróżami do ${x}`,
+    future: x => `planuje podróż do ${x}`,
+    empty: name => `${name} ma publiczny profil FLOQR.`
+  },
+  nl: {
+    enjoys: x => `houdt van ${x}`,
+    goesOut: x => `gaat uit voor ${x}`,
+    follows: x => `volgt ${x}`,
+    food: x => `houdt van ${x}-eten`,
+    past: x => `deelde reizen naar ${x}`,
+    future: x => `plant een reis naar ${x}`,
+    empty: name => `${name} heeft een openbaar FLOQR-profiel.`
+  },
+  ar: {
+    enjoys: x => `يحب ${x}`,
+    goesOut: x => `يخرج إلى ${x}`,
+    follows: x => `يتابع ${x}`,
+    food: x => `يحب طعام ${x}`,
+    past: x => `شارك رحلات إلى ${x}`,
+    future: x => `يخطط لرحلة إلى ${x}`,
+    empty: name => `لدى ${name} ملف FLOQR عام.`
+  }
+});
 
 const SPORTS_HINTS = Object.freeze([
   "nba", "basketball", "formula 1", "f1", "soccer", "football", "nfl", "mlb",
@@ -183,8 +294,47 @@ function publicFieldsSnapshot(profile = {}, volunteered = null) {
     videos: pageMedia.videos,
     hero: pageMedia.hero,
     verified: profile.identityVerified === 1 || profile.floqrVerified === 1,
-    sourceLocale: normalizeLocale(profile.preferredLanguage || profile.uiLanguage || "en")
+    sourceLocale: normalizeLocale(profile.uiLanguage || profile.preferredLanguage || "en")
   };
+}
+
+function localeDisplayName(code) {
+  const locale = normalizeLocale(code);
+  return LOCALE_NAMES[locale] || locale;
+}
+
+/** Source SMARTsummary row stored at translations.{sourceLocale} (B). English is just another target when B ≠ en. */
+function sourceTranslationRow({text: summary, locale, revision, sourceHash, authoredBy, now}) {
+  return {
+    text: text(summary, SUMMARY_MAX),
+    revision: Number(revision) || 0,
+    sourceHash: String(sourceHash || ""),
+    status: "source",
+    engine: authoredBy || "gemini",
+    model: "",
+    generatedAtMs: now,
+    error: null
+  };
+}
+
+function stampSourceTranslation(doc, now = Date.now()) {
+  if (!doc || typeof doc !== "object") return doc;
+  const locale = normalizeLocale(doc.sourceLocale || "en");
+  const translations = {...(doc.translations || {})};
+  translations[locale] = sourceTranslationRow({
+    text: doc.sourceText,
+    locale,
+    revision: doc.revision,
+    sourceHash: doc.sourceHash,
+    authoredBy: doc.sourceAuthoredBy,
+    now
+  });
+  return {...doc, translations};
+}
+
+function fanOutLocales(sourceLocale) {
+  const source = normalizeLocale(sourceLocale);
+  return SUPPORTED_LOCALES.filter(locale => locale !== source);
 }
 
 function publicFieldsHash(snapshot) {
@@ -213,22 +363,27 @@ function categoriesFromSnapshot(snap) {
   return cats;
 }
 
+function draftPhrases(locale) {
+  return DRAFT_BITS[normalizeLocale(locale)] || DRAFT_BITS.en;
+}
+
 function draftSummaryFromPublicFields(snap) {
-  const name = snap.displayName || "This patron";
+  const locale = normalizeLocale(snap?.sourceLocale || "en");
+  const phrases = draftPhrases(locale);
+  const name = snap.displayName || DRAFT_NAME_FALLBACK[locale] || DRAFT_NAME_FALLBACK.en;
   const bits = [];
-  if (snap.music.length) bits.push(`enjoys ${snap.music.slice(0, 6).join(", ")}`);
-  if (snap.nightlife.length) bits.push(`goes out for ${snap.nightlife.slice(0, 4).join(", ")}`);
-  if (snap.sports.length) bits.push(`follows ${snap.sports.slice(0, 4).join(", ")}`);
-  if (snap.cuisines.length) bits.push(`likes ${snap.cuisines.slice(0, 4).join(", ")} food`);
-  if (snap.pastTravel.length) bits.push(`has shared past travel in ${snap.pastTravel.slice(0, 4).join(", ")}`);
-  if (snap.futureTravel.length) bits.push(`has an upcoming trip to ${snap.futureTravel.slice(0, 3).join(", ")}`);
+  if (snap.music.length) bits.push(phrases.enjoys(snap.music.slice(0, 6).join(", ")));
+  if (snap.nightlife.length) bits.push(phrases.goesOut(snap.nightlife.slice(0, 4).join(", ")));
+  if (snap.sports.length) bits.push(phrases.follows(snap.sports.slice(0, 4).join(", ")));
+  if (snap.cuisines.length) bits.push(phrases.food(snap.cuisines.slice(0, 4).join(", ")));
+  if (snap.pastTravel.length) bits.push(phrases.past(snap.pastTravel.slice(0, 4).join(", ")));
+  if (snap.futureTravel.length) bits.push(phrases.future(snap.futureTravel.slice(0, 3).join(", ")));
   if (!bits.length) {
     const bio = text(snap.bio, 280);
-    if (bio) return text(`${name} ${bio.charAt(0).toLowerCase() === bio.charAt(0) ? bio : bio}`, SUMMARY_MAX);
-    return text(`${name} has a FLOQR public-within-app profile.`, SUMMARY_MAX);
+    if (bio) return text(`${name} ${bio}`, SUMMARY_MAX);
+    return text(phrases.empty(name), SUMMARY_MAX);
   }
-  const body = bits.join("; ");
-  return text(`${name} ${body}.`, SUMMARY_MAX);
+  return text(`${name} ${bits.join("; ")}.`, SUMMARY_MAX);
 }
 
 function validateOwnerEdit({text: raw, locale, previous}) {
@@ -242,10 +397,54 @@ function validateOwnerEdit({text: raw, locale, previous}) {
   return {ok: errors.length === 0, errors, summary: summary.slice(0, SUMMARY_MAX), sourceLocale};
 }
 
+function translationTextLocales(doc, submittedText) {
+  const needle = text(submittedText, SUMMARY_MAX);
+  if (!needle || !doc || !doc.translations) return [];
+  const source = normalizeLocale(doc.sourceLocale || "en");
+  return Object.keys(doc.translations).filter(loc => {
+    if (loc === source) return false;
+    const row = doc.translations[loc];
+    return row && (row.status === "ready" || row.status === "translated")
+      && text(row.text, SUMMARY_MAX) === needle;
+  });
+}
+
+/** Owner save source is current default language B. Never stamp a fan-out translation as source. */
+function resolveOwnerSaveLocale({previous, uiLanguage, requestLocale, submittedText}) {
+  const ui = normalizeLocale(uiLanguage);
+  const hits = translationTextLocales(previous, submittedText);
+  if (hits.length) {
+    return {ok: false, error: "translation_not_source", sourceLocale: ui, matches: hits};
+  }
+  const stored = previous && previous.sourceLocale ? normalizeLocale(previous.sourceLocale, ui) : ui;
+  if (stored !== ui && text(submittedText, SUMMARY_MAX) === text(previous?.sourceText, SUMMARY_MAX)) {
+    return {ok: false, error: "rewrite_in_new_language", sourceLocale: ui};
+  }
+  if (requestLocale) {
+    const requested = normalizeLocale(requestLocale);
+    if (requested !== ui) {
+      return {ok: false, error: "locale_mismatch", sourceLocale: ui};
+    }
+  }
+  return {ok: true, sourceLocale: ui};
+}
+
+/** Owner editor always edits language B (profile uiLanguage), never a viewer translation. */
+function ownerEditorFields(analysis, snap) {
+  const editLocale = normalizeLocale(snap?.sourceLocale || analysis?.sourceLocale || "en");
+  const storedLocale = normalizeLocale(analysis?.sourceLocale || editLocale);
+  const sourceText = text(analysis?.sourceText, SUMMARY_MAX);
+  return {
+    editLocale,
+    sourceText,
+    editText: storedLocale === editLocale ? sourceText : ""
+  };
+}
+
 function emptyAnalysis(uid, snap, now = Date.now()) {
   const summary = draftSummaryFromPublicFields(snap);
   const sourceHash = sha256(summary);
-  return {
+  return stampSourceTranslation({
     schemaVersion: SCHEMA_VERSION,
     uid: String(uid || ""),
     revision: 1,
@@ -268,17 +467,18 @@ function emptyAnalysis(uid, snap, now = Date.now()) {
       datingOptIn: !!snap.datingOptIn,
       engine: "deterministic_public_fields"
     }
-  };
+  }, now);
 }
 
 function applyOwnerSave(doc, {summary, sourceLocale, editorUid, now = Date.now()}) {
   const prev = doc && typeof doc === "object" ? doc : emptyAnalysis(editorUid, {}, now);
   const nextRevision = Number(prev.revision || 0) + 1;
   const sourceHash = sha256(summary);
-  return {
+  const locale = normalizeLocale(sourceLocale, prev.sourceLocale || "en");
+  return stampSourceTranslation({
     ...prev,
     revision: nextRevision,
-    sourceLocale,
+    sourceLocale: locale,
     sourceAuthoredBy: "owner",
     sourceText: summary,
     sourceHash,
@@ -300,7 +500,7 @@ function applyOwnerSave(doc, {summary, sourceLocale, editorUid, now = Date.now()
       filteredPrivate: true,
       ownerEdited: true
     }
-  };
+  }, now);
 }
 
 function shouldRegenerate(doc, snap) {
@@ -324,26 +524,22 @@ function translationJobId(uid, revision, locale, sourceHash) {
 }
 
 function enqueueTranslationJobs({uid, revision, sourceHash, sourceLocale, now = Date.now()}) {
-  const jobs = [];
-  SUPPORTED_LOCALES.forEach(locale => {
-    if (locale === sourceLocale) return;
-    jobs.push({
-      id: translationJobId(uid, revision, locale, sourceHash),
-      uid: String(uid || ""),
-      revision: Number(revision) || 0,
-      sourceHash: String(sourceHash || ""),
-      sourceLocale,
-      locale,
-      status: "queued",
-      attempts: 0,
-      generation: String(sourceHash || ""),
-      createdAtMs: now,
-      updatedAtMs: now,
-      engine: null,
-      error: null
-    });
-  });
-  return jobs;
+  const source = normalizeLocale(sourceLocale);
+  return fanOutLocales(source).map(locale => ({
+    id: translationJobId(uid, revision, locale, sourceHash),
+    uid: String(uid || ""),
+    revision: Number(revision) || 0,
+    sourceHash: String(sourceHash || ""),
+    sourceLocale: source,
+    locale,
+    status: "queued",
+    attempts: 0,
+    generation: String(sourceHash || ""),
+    createdAtMs: now,
+    updatedAtMs: now,
+    engine: null,
+    error: null
+  }));
 }
 
 function applyTranslationResult(doc, job, {text: translated, engine, model, usage, now = Date.now(), error, status}) {
@@ -529,6 +725,7 @@ function peopleV2Payload({
   }
   const localeRow = localeSummary(analysis, viewerLocale);
   const ownerMayEdit = String(viewerUid || "") === String(subjectUid || "");
+  const editor = ownerMayEdit ? ownerEditorFields(analysis, snap) : null;
   const datingVisible = !!snap.datingOptIn;
   const cats = categoriesFromSnapshot(snap);
   if (!datingVisible) {
@@ -575,7 +772,12 @@ function peopleV2Payload({
       pending: !!localeRow.pending,
       failed: !!localeRow.failed,
       pendingLocale: localeRow.pendingLocale || null,
-      ownerAuthored: analysis?.sourceAuthoredBy === "owner"
+      ownerAuthored: analysis?.sourceAuthoredBy === "owner",
+      ...(editor ? {
+        sourceText: editor.sourceText,
+        editLocale: editor.editLocale,
+        editText: editor.editText
+      } : {})
     },
     ownerMayEdit,
     conflictFlag: !!(ownerMayEdit && analysis?.conflictFlag),
@@ -674,8 +876,11 @@ function translateStub(sourceText, sourceLocale, targetLocale) {
 }
 
 function geminiAnalysisPrompt(snap) {
+  const locale = normalizeLocale(snap?.sourceLocale || "en");
+  const language = localeDisplayName(locale);
   return [
-    "Write a concise third-person FLOQR Smart Summary from ONLY these public-within-FLOQR fields.",
+    `Write a concise third-person FLOQR SMARTsummary in ${language} (${locale}) from ONLY these public-within-FLOQR fields.`,
+    `The entire SMARTsummary must be written in ${language}. Do not write English unless the source language is English.`,
     "Do not invent ratings, relationships, trips, media, or sensitive attributes.",
     "Do not mention private location or accommodations.",
     "Preserve names, music genres, sports teams, handles, and place names.",
@@ -684,8 +889,10 @@ function geminiAnalysisPrompt(snap) {
 }
 
 function geminiTranslatePrompt(sourceText, sourceLocale, targetLocale) {
+  const from = normalizeLocale(sourceLocale);
+  const to = normalizeLocale(targetLocale);
   return [
-    `Translate this FLOQR Smart Summary from ${sourceLocale} to ${targetLocale}.`,
+    `Translate this FLOQR SMARTsummary from ${localeDisplayName(from)} (${from}) to ${localeDisplayName(to)} (${to}).`,
     "Preserve proper names, music genres, sports teams, @handles, place names, and dates.",
     "Do not translate @handles. Do not add facts.",
     sourceText
@@ -705,9 +912,14 @@ module.exports = {
   DEFAULT_PRIMARY,
   DEFAULT_SOCIAL,
   JOB_MAX_ATTEMPTS,
+  LOCALE_NAMES,
   sha256,
   text,
   normalizeLocale,
+  localeDisplayName,
+  sourceTranslationRow,
+  stampSourceTranslation,
+  fanOutLocales,
   sanitizeHandle,
   sanitizeHref,
   isVideoSlot,
@@ -720,6 +932,9 @@ module.exports = {
   categoriesFromSnapshot,
   draftSummaryFromPublicFields,
   validateOwnerEdit,
+  translationTextLocales,
+  resolveOwnerSaveLocale,
+  ownerEditorFields,
   emptyAnalysis,
   applyOwnerSave,
   shouldRegenerate,
