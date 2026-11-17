@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.033";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.033";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.034";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.034";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -220,6 +220,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.034",
+      title: "s3.3.034 — Version SMARTview card only (no six-phase dump)",
+      checks: [
+        {label:"Alias reply is empty", file:"functions/bot-dee-core.js", includes:["isVersionSmartViewAlias(raw)) return \"\""], notIncludes:["describeForRole"]},
+        {label:"Client alias has no bubble text", file:"bot-dee-chat.js", includes:["if (isVersionSmartViewAlias(text)) return \"\"", "versionCardOnly"]},
+        {label:"People + Room cards stay", file:"botdee-smartview.js", includes:["function renderCompactPeopleCard(", "function renderRoomCard("]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-034-version-card-only"]}
+      ]
+    },
     {
       version: "s3.3.033",
       title: "s3.3.033 — Room SMARTview intent routing",
@@ -3329,6 +3339,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-034-version-card-only",
+      area:"BOT DEE",
+      feature:"Version SMARTview card only (Ver / Vers / Version)",
+      changed:"s3.3.034 — Typing Ver, Vers, or Version shows only the Version SMARTview card. The six-phase chat dump (package stamp, gemini-3.6-flash, Part 1–6 implemented/tested/not-deployed, mock integrations list) is removed, not hidden or shortened. People and Room cards are unchanged.",
+      howToTest:"1) After Pages + Functions deploy (do not deploy until Don asks). Hard-refresh botdee.html — confirm bot-dee-chat.js?v=s3.3.034. Sign in with BOT DEE access, including Master Admin. 2) Type Ver, then Vers, then Version (try VERSION and Version?). Each paints one Version SMARTview. There is NO chat bubble text above the card — no package s3.3.033/s3.3.034 line, no gemini-3.6-flash, no Part 1–6, no mock integrations list. 3) Ask what is your version? — short package line plus the card is OK; still no six-phase dump. 4) Type a People query and a Room intent — those cards still open. 5) Mark Succeed/Failed.",
+      expected:"Ver / Vers / Version = card only. No six-phase dump. People and Room cards still work.",
+      troubleshoot:"Still seeing Part 1–6 / mock-only list → Functions executeBotSession not this SHA, or cached bot-dee-chat.js. Empty miss line “No answer yet” → displayReply treated empty as miss; confirm versionCardOnly path. People/Room broken → this change must not touch usercharacter_analysis or classifyRoomIntent."
+    },
     {
       id:"s3-3-033-room-smartview-intent",
       area:"BOT DEE",

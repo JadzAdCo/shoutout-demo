@@ -225,7 +225,7 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
       sessionPath: "local-version"
     });
     return {
-      reply: bot.versionReply(role),
+      reply: bot.versionReply(role, userPrompt),
       results: [],
       provider: "local-version",
       model: "version",
@@ -489,7 +489,10 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined
       });
     }
-    outcome.reply = bot.sanitizeBotReply(outcome.reply);
+    const versionCardOnly = Array.isArray(outcome.smartViews)
+      && outcome.smartViews.some(row => row && row.kind === "botDeeVersion")
+      && !String(outcome.reply || "").trim();
+    outcome.reply = bot.sanitizeBotReply(outcome.reply, {allowEmpty: versionCardOnly});
 
     if (settings.durableThreads) {
       try {

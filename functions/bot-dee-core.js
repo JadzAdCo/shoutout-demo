@@ -677,7 +677,9 @@ function isProductCatalogGreeting(raw) {
     && /(?:what can i help|how can i help|i can help|let me know)/i.test(text);
 }
 
-function sanitizeBotReply(raw) {
+function sanitizeBotReply(raw, opts) {
+  const allowEmpty = !!(opts && opts.allowEmpty);
+  if (allowEmpty && !String(raw || "").trim()) return "";
   if (isSearchMissReply(raw)) return SEARCH_MISS_FALLBACK;
   if (isProductCatalogGreeting(raw)) return chitchatReply("patron", null, null);
   return clipModelText(stripBackendLinks(raw));
@@ -693,10 +695,10 @@ function identityReply() {
   return "I'm BOT DEE — say it like \"bot\" + \"dee\" (the letter D). I'm FLOQR's in-app helper.";
 }
 
-function versionReply(role) {
+function versionReply(role, raw) {
+  void role;
   try {
-    const described = require("./botdee-upgrade-manifest").describeForRole(role || "patron");
-    if (described?.reply) return described.reply;
+    if (require("./botdee-version-smartview").isVersionSmartViewAlias(raw)) return "";
   } catch (_) {}
   return `I'm BOT DEE on FLOQR package ${PACKAGE_LABEL} (release ${PACKAGE_VERSION}).`;
 }

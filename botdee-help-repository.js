@@ -426,7 +426,7 @@
     {
       id: "help-botdee-version-smartview",
       title: "Version SMARTview",
-      body: "In BOT DEE chat, type Ver, Vers, or Version (any capitalization, optional ?). A Version SMARTview card opens in the same bubble. It shows the real FLOQR package stamp, whether this turn used an AI model, and service status. Numbers in design pictures are examples — live values come from the app. Site Chrome follows your Appearance theme.",
+      body: "In BOT DEE chat, type Ver, Vers, or Version (any capitalization, optional ?). The Version SMARTview card is the only answer — BOT DEE does not dump package, model, six-phase, or mock-integration text in the chat bubble. It shows the real FLOQR package stamp, whether this turn used an AI model, and service status. Numbers in design pictures are examples — live values come from the app. Site Chrome follows your Appearance theme.",
       searchPhrases: [
         "version smartview", "ver command", "vers command", "version command",
         "bot dee version", "floqr version", "what version is bot dee"

@@ -52,7 +52,7 @@ test("payload is honest: not Operational, no fake rendering numbers, no privileg
 test("What's New ships inside Functions (no repo-root README required)", () => {
   const bundled = vs.changelogFromBundle();
   assert.ok(bundled.length >= 1);
-  assert.equal(bundled[0].id, "s3.3.033");
+  assert.equal(bundled[0].id, "s3.3.034");
   const missingRoot = vs.buildVersionSmartView({
     role: "patron",
     rootDir: path.join(__dirname, "no-such-readme-dir")
@@ -76,18 +76,27 @@ test("Master Admin privileged block is server-gated; patrons cannot mint it clie
 
 test("localSession attaches Version SMARTview for aliases and longer version questions", () => {
   const fns = require("./bot-dee-functions");
+  const dump = /Part\s+[1-6]|six-phase|implemented\/tested|not-deployed|mock-only|gemini-3\.6-flash|Google Places|Ticketmaster/;
   const alias = fns.__botDeeHelpers.localSession("patron", "Ver");
   assert.equal(alias.provider, "local-version");
   assert.equal(alias.smartViews[0].kind, "botDeeVersion");
   assert.equal(alias.smartViews[0].service.status, "not_checked");
+  assert.equal(alias.reply, "");
+  assert.doesNotMatch(String(alias.reply), dump);
   const longer = fns.__botDeeHelpers.localSession("patron", "what is your version?");
   assert.equal(longer.provider, "local-version");
   assert.equal(longer.smartViews[0].kind, "botDeeVersion");
+  assert.match(longer.reply, /package/i);
+  assert.doesNotMatch(longer.reply, dump);
   const history = fns.__botDeeHelpers.localSession("patron", "version history");
   assert.notEqual(history.provider, "local-version");
   assert.ok(!history.smartViews || !history.smartViews.length);
   const master = fns.__botDeeHelpers.localSession("master", "version");
   assert.ok(master.smartViews[0].privileged);
+  assert.equal(master.reply, "");
+  assert.doesNotMatch(String(master.reply), dump);
+  assert.doesNotMatch(read("functions/bot-dee-core.js"), /describeForRole/);
+  assert.match(read("bot-dee-chat.js"), /if \(isVersionSmartViewAlias\(text\)\) return ""/);
 });
 
 test("client renderer + CSS inherit Site Chrome; no Operational; People contract untouched", () => {
@@ -107,8 +116,10 @@ test("client renderer + CSS inherit Site Chrome; no Operational; People contract
   assert.match(chat, /isVersionSmartViewAlias|ensureVersionSmartViews/);
   assert.match(js, /usercharacter_analysis/);
   assert.match(js, /function renderCompactPeopleCard\(/);
+  assert.match(js, /function renderRoomCard\(/);
   assert.doesNotMatch(read("functions/botdee-version-smartview.js"), /usercharacter_analysis/);
   assert.match(read("functions/botdee-smartview-v2-core.js"), /function publicPageMedia\(/);
+  assert.match(read("functions/botdee-room-smartview.js"), /function classifyRoomIntent\(/);
 });
 
 test("client mount paints Version SMARTview tabs without inventing health", () => {
@@ -120,7 +131,7 @@ test("client mount paints Version SMARTview tabs without inventing health", () =
     },
     addEventListener() {},
     FLOQRI18n: {t: key => key},
-    FLOQRNav: {appVersion: "s3.3.032"},
+    FLOQRNav: {appVersion: "s3.3.034"},
     location: {href: "https://example.test/botdee.html", origin: "https://example.test"},
     URL
   });
@@ -130,11 +141,11 @@ test("client mount paints Version SMARTview tabs without inventing health", () =
   const api = ctx.FLOQRBotDeeSmartView;
   const html = api.renderCard({
     kind: "botDeeVersion",
-    botDee: {packageLabel: "s3.3.032"},
-    floqr: {backendPackage: "s3.3.032", frontendPackage: "s3.3.032"},
+    botDee: {packageLabel: "s3.3.034"},
+    floqr: {backendPackage: "s3.3.034", frontendPackage: "s3.3.034"},
     model: {configuredId: "gemini-3.6-flash", usedThisTurn: false, sessionPath: "local-version"},
     service: {status: "not_checked", lastCheckAtIso: null},
-    changelog: [{id: "s3.3.032", text: "s3.3.032: Version SMARTview"}]
+    changelog: [{id: "s3.3.034", text: "s3.3.034: Version SMARTview"}]
   });
   assert.match(html, /botdee-sv-version/);
   assert.match(html, /data-vs-tab="overview"/);
@@ -143,7 +154,7 @@ test("client mount paints Version SMARTview tabs without inventing health", () =
   assert.doesNotMatch(html, /Operational/);
   assert.match(html, /botdee\.vs\.notChecked|Not checked/);
   const localHtml = api.renderCard(api.localVersionPayload());
-  assert.match(localHtml, /s3\.3\.032/);
+  assert.match(localHtml, /s3\.3\.034/);
   assert.doesNotMatch(localHtml, /\/ Unavailable|\/ botdee\.vs\.unavailable/);
 });
 

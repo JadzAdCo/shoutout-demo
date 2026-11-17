@@ -53,6 +53,7 @@
 /* People SmartView v2 — inherits viewer Site Chrome tokens; never hardcode a theme. */
 .botdee-bubble .botdee-sv-host,
 .botdee-sv-host .botdee-sv-people { margin: 0.35rem 0 0; }
+.botdee-bubble-tail + .botdee-sv-host { margin-top: 0; }
 .portal-botdee-panel .botdee-sv-bubble{
   margin-top:12px;
   min-height:4.5rem;
