@@ -430,7 +430,8 @@
           ],
           "photo": {
             "url": "./images/smartview/amara-mock.png",
-            "count": 1
+            "count": 1,
+            "kind": "image"
           },
           "media": {
             "photos": [
