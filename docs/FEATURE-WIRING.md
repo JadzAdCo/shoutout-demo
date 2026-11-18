@@ -1013,7 +1013,7 @@ When adding a section, use this skeleton:
 
 ## Search category icon row (spots)
 
-Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** (BOT DEE feature key `botDee`). Hidden: Mingl / BartR / RydR.
+Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** (BOT DEE feature key `botDee`). Hidden: Mingl / BartR / RydR (Mingl is still a **text** `#minglBtnCard`, not a chrome photo tile). Stored Mingl SVG kit (not live): `images/chrome/mingl-svg/` — recommend Search icon `icons/mingl-orbit.svg`, FloqMedia lockup `logos/mingl-by-floqr.svg`. See that folder’s `FLOQR.md`. Resume `@mingl-icon$`.
 
 ## Chrome icon drafts (nightlife / traditional review)
 
@@ -1027,6 +1027,7 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **BOT DEE** | `build_botdee_only()` / `--botdee-only` → `botdee-nightlife.jpg` / `-traditional.jpg` / `-whiteblack.jpg`; Search tile `data-floqr-chrome-icon="botDee"` (`ICON_V` s3.2.13). Centered headphones bot ×1.30 (no turntable / signal tray); stacked thin-border `BOT` (white) / `DEE` (tiffany) ≈ ShoutOut type size. Legacy `streetbot-*` + `floqbot-*` still written. |
 | **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` (mirrors BOT DEE face) |
 | **VIP reserVIP** | `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`; actual `images/review/actual-icons/vip-reserv-actual.png` |
+| **Mingl SVG kit (stored, not live)** | `images/chrome/mingl-svg/` colorless `currentColor` vectors. Recommend Search tile `icons/mingl-orbit.svg` + FloqMedia logo `logos/mingl-by-floqr.svg`. Live Mingl still `images/mingl-chrome-logo.png`. Do not wire `ICON_PACK.mingl` until a chrome raster pass. `FLOQR.md` in that folder. |
 | **Layers** | bg → under-ring letters → ring → over-ring letters (Fl/d/reser+V under; T/IP over) |
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |
