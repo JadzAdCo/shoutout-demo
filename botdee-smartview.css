@@ -53,6 +53,15 @@
 /* People SmartView v2 — inherits viewer Site Chrome tokens; never hardcode a theme. */
 .botdee-bubble .botdee-sv-host,
 .botdee-sv-host .botdee-sv-people { margin: 0.35rem 0 0; }
+/* Chat transcript is the scroller. Do not clip People / Version / Room cards
+   inside the bubble — View Full Profile + Mingl must stay reachable. */
+.botdee-transcript .botdee-sv-host,
+.botdee-transcript .botdee-sv-people,
+.botdee-transcript .botdee-sv-version,
+.botdee-transcript .botdee-sv-room {
+  overflow: visible;
+  max-height: none;
+}
 .botdee-bubble-tail + .botdee-sv-host { margin-top: 0; }
 .portal-botdee-panel .botdee-sv-bubble{
   margin-top:12px;

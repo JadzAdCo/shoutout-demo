@@ -175,7 +175,7 @@ test("floating BOT DEE agent is not shown on template select", () => {
 
 test("BOT DEE page chrome is localized", () => {
   const html = read("botdee.html");
-  ["page.botdee.title", "botdee.prompt", "botdee.chatSend", "botdee.chatsPanelTitle", "botdee.chatsSavedHint"]
+  ["page.botdee.title", "botdee.prompt", "botdee.chatSend", "botdee.chatsPanelTitle", "botdee.chatsSavedHint", "botdee.chatsRenameTitle"]
     .forEach(key => assert.match(html, new RegExp(`data-i18n="${key.replace(/\./g, "\\.")}"`)));
   assert.doesNotMatch(html, /botdee\.helpIntro|botdee\.intentFallback|botdee\.hint|botdee\.placeholder|botdee\.scope/);
   assert.match(html, /data-i18n-placeholder="botdee\.chatPlaceholder"/);
@@ -222,10 +222,21 @@ test("BOT DEE history collapse is visual only and Back goes to Search", () => {
   assert.match(css, /min-width: 44px/);
   assert.match(css, /--botdee-kb/);
   assert.doesNotMatch(css, /\.botdee-shell,\s*\.botdee-chat-page \{\s*overflow: visible/);
+  assert.match(css, /\.page\.botdee-chat-page\.active/);
+  assert.match(css, /display: flex !important/);
+  assert.match(css, /\.botdee-transcript \{[\s\S]*overflow: auto/);
+  assert.match(css, /\.botdee-msg \{[\s\S]*flex: 0 0 auto/);
+  assert.match(css, /\.botdee-chats-rename/);
+  assert.match(css, /min-width: 44px/);
+  assert.match(html, /id="botDeeRenameDialog"/);
+  assert.match(html, /bot-dee-chat\.js\?v=s3\.3\.037/);
+  assert.match(chat, /renameBotDeeChat/);
+  assert.match(chat, /function openRenameDialog/);
+  assert.match(chat, /function scrollTranscriptToLatest/);
   assert.match(page, /searchHome/);
   assert.doesNotMatch(page, /stampCurrentVersion/);
   assert.match(nav, /pageName\(\) === "botdee\.html"/);
   assert.match(nav, /nav\.backToSearchArrow/);
-  ["botdee.chatsPlus", "botdee.chatsPanelTitle", "botdee.chatsNew", "botdee.chatsResume", "botdee.chatsEmptyGuest", "botdee.chatsSavedHint"]
+  ["botdee.chatsPlus", "botdee.chatsPanelTitle", "botdee.chatsNew", "botdee.chatsResume", "botdee.chatsEmptyGuest", "botdee.chatsSavedHint", "botdee.chatsRename", "botdee.chatsRenameTitle"]
     .forEach(key => assert.match(read("floqr-i18n.js"), new RegExp(`"${key.replace(/\./g, "\\.")}"`)));
 });

@@ -17,6 +17,7 @@ module.exports = {
   ...require("./data-classification-functions"),
   executeBotSession: require("./bot-dee-functions").executeBotSession,
   getBotDeeThread: require("./bot-dee-functions").getBotDeeThread,
+  renameBotDeeChat: require("./bot-dee-functions").renameBotDeeChat,
   saveBotDeePersonalization: require("./bot-dee-functions").saveBotDeePersonalization,
   setBotDeeSettings: require("./bot-dee-functions").setBotDeeSettings,
   getBotDeeCapabilityManifest: require("./botdee-upgrade-functions").getBotDeeCapabilityManifest,

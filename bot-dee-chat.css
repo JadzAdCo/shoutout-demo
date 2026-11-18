@@ -74,6 +74,17 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   overflow: hidden;
 }
 
+/* Beat styles.css `.page.active { display:block; min-height:100vh }`.
+   Without this, the transcript has no bounded height, .botdee-chat-page
+   overflow:hidden clips the People SMARTview, and neither the card nor
+   the transcript can scroll to View Full Profile / Mingl. */
+.page.botdee-chat-page.active {
+  display: flex !important;
+  flex-direction: column;
+  min-height: 0 !important;
+  overflow: hidden;
+}
+
 .botdee-chat-header {
   display: flex;
   flex-direction: column;
@@ -249,9 +260,19 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   -webkit-overflow-scrolling: touch;
 }
 
+.botdee-chats-item {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+}
+
 .botdee-chats-row {
   min-height: 44px;
-  width: 100%;
+  width: auto;
+  min-width: 0;
+  flex: 1 1 auto;
   padding: 8px 12px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -260,6 +281,24 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   font: inherit;
   font-weight: 700;
   text-align: start;
+  cursor: pointer;
+}
+
+.botdee-chats-rename {
+  flex: 0 0 44px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
   cursor: pointer;
 }
 
@@ -300,7 +339,8 @@ html[data-floqr-chrome="whiteBlack"] .botdee-chats-sheet {
   color: #0a0a0a;
 }
 
-html[data-floqr-chrome="whiteBlack"] .botdee-chats-row {
+html[data-floqr-chrome="whiteBlack"] .botdee-chats-row,
+html[data-floqr-chrome="whiteBlack"] .botdee-chats-rename {
   background: #f3f3f3;
   border-color: #d0d0d0;
   color: #0a0a0a;
@@ -349,8 +389,7 @@ html[data-floqr-chrome="whiteBlack"] .botdee-chats-handle {
   flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -358,6 +397,8 @@ html[data-floqr-chrome="whiteBlack"] .botdee-chats-handle {
   scroll-padding-bottom: 16px;
   padding: 10px 4px 6px;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .botdee-msg {
@@ -366,6 +407,9 @@ html[data-floqr-chrome="whiteBlack"] .botdee-chats-handle {
   gap: 8px;
   max-width: 100%;
   min-width: 0;
+  flex: 0 0 auto;
+  min-height: min-content;
+  overflow: visible;
 }
 
 .botdee-msg-bot {
@@ -401,6 +445,13 @@ html[data-floqr-chrome="whiteBlack"] .botdee-chats-handle {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
+  overflow: visible;
+}
+
+.botdee-bubble .botdee-sv-host {
+  overflow: visible;
+  max-height: none;
+  min-width: 0;
 }
 
 .botdee-bubble-user {
@@ -1093,6 +1144,10 @@ html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
 
 .botdee-choice {
   min-height: 44px;
+}
+
+.botdee-rename-dialog .botdee-pref-card {
+  width: min(100%, 380px);
 }
 
 @media (min-width: 601px) {

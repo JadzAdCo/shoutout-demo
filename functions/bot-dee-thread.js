@@ -38,9 +38,68 @@ function emptyState(settings) {
     personalization: prefs.normalizePersonalization({}),
     retrievalFromSeq: 0,
     sessionReset: false,
+    chatTitles: {},
     [prefs.LAST_USED_FIELD]: 0,
     [prefs.SESSION_RESET_FIELD]: 0
   };
+}
+
+const CHAT_TITLE_MAX = 80;
+const CHAT_ID_RE = /^(live|current|archive|epoch-\d{1,6})$/;
+
+function clipChatTitle(raw) {
+  return String(raw || "")
+    .replace(/[\u0000-\u001f\u007f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, CHAT_TITLE_MAX);
+}
+
+/** Display labels for + Chats rows. Never sent to Gemini. */
+function normalizeChatTitles(raw) {
+  const src = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  const out = {};
+  Object.keys(src).forEach(id => {
+    if (!CHAT_ID_RE.test(id)) return;
+    const row = src[id];
+    const title = clipChatTitle(typeof row === "string" ? row : row?.title);
+    if (!title) return;
+    out[id] = {
+      title,
+      updatedAtMs: Math.max(0, Math.floor(Number(row?.updatedAtMs) || 0))
+    };
+  });
+  return out;
+}
+
+async function renameChat(uid, chatId, title, nowMs) {
+  const id = String(chatId || "").trim();
+  if (!CHAT_ID_RE.test(id)) return {ok: false, error: "invalid_chat_id"};
+  const clipped = clipChatTitle(title);
+  if (!clipped) return {ok: false, error: "empty_title"};
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const now = Number(nowMs) || Date.now();
+  let titles = {};
+  await db().runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    const prev = snap.exists ? snap.data() || {} : {};
+    if (prev.uid && prev.uid !== uid) {
+      const err = new Error("owner_mismatch");
+      err.code = "permission-denied";
+      throw err;
+    }
+    titles = normalizeChatTitles(prev.chatTitles);
+    titles[id] = {title: clipped, updatedAtMs: now};
+    tx.set(ref, {
+      uid,
+      threadId: bot.threadIdForUid(uid),
+      chatTitles: titles,
+      updatedAtMs: now,
+      revision: Math.max(0, Math.floor(Number(prev.revision) || 0)) + 1
+    }, {merge: true});
+  });
+  return {ok: true, chatId: id, title: clipped, chatTitles: titles};
 }
 
 function snapshotToState(snap, uid, settings, nowMs) {
@@ -86,6 +145,7 @@ function snapshotToState(snap, uid, settings, nowMs) {
     summary: staleGeneration ? "" : String(data.summary || data.lastSummary || "").trim(),
     retrievalFromSeq: staleGeneration ? 0 : Math.max(0, Math.floor(Number(data.retrievalFromSeq) || 0)),
     sessionReset: staleGeneration,
+    chatTitles: staleGeneration ? {} : normalizeChatTitles(data.chatTitles),
     [prefs.LAST_USED_FIELD]: staleGeneration ? 0 : (Number(data[prefs.LAST_USED_FIELD]) || 0),
     [prefs.SESSION_RESET_FIELD]: staleGeneration ? 0 : prefs.sessionResetVersionOf(data)
   };
@@ -594,5 +654,10 @@ module.exports = {
   savePersonalization,
   snapshotToState,
   nextTranscript,
-  emptyState
+  emptyState,
+  clipChatTitle,
+  normalizeChatTitles,
+  renameChat,
+  CHAT_TITLE_MAX,
+  CHAT_ID_RE
 };

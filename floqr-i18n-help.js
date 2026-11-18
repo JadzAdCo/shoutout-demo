@@ -2,7 +2,8 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.036";  const packs = {
+  const VERSION = "s3.3.037";
+  const packs = {
     "ru": {
       "help-scheduling-schedule-for": {
         title: "Расписание персонала",

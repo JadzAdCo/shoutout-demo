@@ -365,6 +365,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         console.warn("BOT DEE execution load failed", err?.message || err);
       }
     }
+    // chatTitles are user-chosen + Chats labels only. Never put them in Gemini
+    // context (privilege-leak: a title must not carry Master Admin identity).
     const modelContext = execution.buildModelContext({
       turns: history,
       summary,
@@ -673,6 +675,7 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
         hasUsedBotDee,
         personalization: prefs.normalizePersonalization({}, {profileFirstName}),
         profileFirstName,
+        chatTitles: {},
         [prefs.LAST_USED_FIELD]: 0
       };
     }
@@ -715,9 +718,38 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       idleSeconds: settings.conversationIdleSeconds,
       personalization: prefs.normalizePersonalization(state.personalization, {profileFirstName}),
       profileFirstName,
+      chatTitles: state.chatTitles || {},
       [prefs.LAST_USED_FIELD]: Number(state[prefs.LAST_USED_FIELD]) || 0
     };
   } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.renameBotDeeChat = onCall(GET_THREAD_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "Sign in to rename a BOT DEE chat.");
+    }
+    await audit.assertFeatureAccess(request.auth, "botDee", request);
+    const uid = request.auth.uid;
+    const result = await threads.renameChat(uid, request.data?.chatId, request.data?.title);
+    if (!result.ok) {
+      if (result.error === "invalid_chat_id" || result.error === "empty_title") {
+        throw new HttpsError("invalid-argument", "Enter a chat title.");
+      }
+      throw new HttpsError("failed-precondition", "Could not rename that chat.");
+    }
+    return {
+      ok: true,
+      chatId: result.chatId,
+      title: result.title,
+      chatTitles: result.chatTitles
+    };
+  } catch (error) {
+    if (error?.code === "permission-denied") {
+      throw new HttpsError("permission-denied", "You can only rename your own chats.");
+    }
     throw asHttps(error);
   }
 });
