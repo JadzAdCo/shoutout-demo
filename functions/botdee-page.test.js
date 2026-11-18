@@ -232,7 +232,8 @@ test("BOT DEE history collapse is visual only and Back goes to Search", () => {
   assert.match(css, /\.botdee-chats-rename/);
   assert.match(css, /min-width: 44px/);
   assert.match(html, /id="botDeeRenameDialog"/);
-  assert.match(html, /bot-dee-chat\.js\?v=s3\.3\.037/);
+  const pkgStamp = `s${require("./package.json").version}`;
+  assert.ok(html.includes(`bot-dee-chat.js?v=${pkgStamp}`), pkgStamp);
   assert.match(chat, /renameBotDeeChat/);
   assert.match(chat, /function openRenameDialog/);
   assert.match(chat, /function scrollTranscriptToLatest/);

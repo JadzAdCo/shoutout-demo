@@ -410,6 +410,64 @@ function isVersionPrompt(raw) {
   return false;
 }
 
+/** Execute a ShoutOut from chat — not a how-to catalog dump.
+ *  "throw a shoutout" / "send a shoutout at Decades" → product tools.
+ *  "how do I throw a shoutout" stays search (how-to). */
+function isShoutOutExecutePrompt(raw) {
+  const q = normalize(raw);
+  // Venue + board copy can exceed 200 chars (composer 160 + venue). Cap at stored-message size.
+  if (!q || q.length > MAX_MESSAGE_CHARS) return false;
+  if (/\b(?:how|help|what is|where do i|instructions?|explain)\b/.test(q)) return false;
+  if (/\b(?:throw|send|post|compose|buy|pay for)\b.{0,48}\bshout\s*out/.test(q)) return true;
+  if (/^shout\s*out\b/.test(q) && /\b(?:for|at|to|please)\b/.test(q)) return true;
+  return false;
+}
+
+function shoutOutComposeHref(clubLocationId) {
+  const id = String(clubLocationId || "").trim();
+  return id
+    ? `./shoutout-search.html?from=botdee&location=${encodeURIComponent(id)}`
+    : "./shoutout-search.html?from=botdee";
+}
+
+/** Gemini/local fallback when the patron asked to throw a ShoutOut — one compose link, never 8 help cards. */
+function shoutOutExecuteFallback(lang, allowedFeatures) {
+  const code = normalizeUiLanguage(lang);
+  const allowed = allowedFeatureSet(allowedFeatures);
+  if (allowed && !allowed.has("shoutOut")) {
+    return {
+      reply: "ShoutOut isn't available on your account yet.",
+      results: [],
+      provider: "local-shoutout",
+      model: "listShoutOutTemplates"
+    };
+  }
+  const link = localizeActionLink({
+    label: "Open ShoutOut compose",
+    href: shoutOutComposeHref(""),
+    kind: "shoutout"
+  }, code);
+  return {
+    reply: "I can start a ShoutOut from chat once I have the club and the message. Which venue should it play on, and what should it say? You can also open compose to pick a template on your phone.",
+    results: [link],
+    provider: "local-shoutout",
+    model: "listShoutOutTemplates"
+  };
+}
+
+function hasShoutOutActionLink(links) {
+  return (Array.isArray(links) ? links : []).some(link => {
+    const kind = String(link?.kind || "").toLowerCase();
+    return kind === "checkout" || kind === "shoutout";
+  });
+}
+
+function omitContextualSearchForPrompt(userPrompt, allowedFeatures) {
+  if (!isShoutOutExecutePrompt(userPrompt)) return false;
+  const tools = toolDeclarations(allowedFeatures);
+  return tools.some(tool => tool.name === "listShoutOutTemplates");
+}
+
 /** Bare help / how-to-use-BOT-DEE — local reply like version; never dump search cards.
  *  Do NOT match “help with ShoutOut / VIP / …” product questions. */
 function isHelpPrompt(raw) {
@@ -856,13 +914,18 @@ async function runTool(name, args, session) {
   return tools.runProductTool(name, args, session.request);
 }
 
-function toolDeclarations(allowedFeatures) {
+function toolDeclarations(allowedFeatures, options) {
   const allowed = allowedFeatureSet(allowedFeatures);
-  if (!allowed) return TOOL_DEFS;
-  return TOOL_DEFS.filter(tool => {
-    const need = TOOL_FEATURE_KEY[tool.name];
-    return !need || allowed.has(need);
-  });
+  const defs = !allowed
+    ? TOOL_DEFS.slice()
+    : TOOL_DEFS.filter(tool => {
+      const need = TOOL_FEATURE_KEY[tool.name];
+      return !need || allowed.has(need);
+    });
+  if (options?.omitContextualSearch) {
+    return defs.filter(tool => tool.name !== "contextualSearch");
+  }
+  return defs;
 }
 
 function localePack(lang) {
@@ -1140,6 +1203,11 @@ module.exports = {
     }
   },
   isHelpPrompt,
+  isShoutOutExecutePrompt,
+  shoutOutComposeHref,
+  shoutOutExecuteFallback,
+  hasShoutOutActionLink,
+  omitContextualSearchForPrompt,
   isPrivacyPrompt,
   isAckPrompt,
   isFarewellPrompt,

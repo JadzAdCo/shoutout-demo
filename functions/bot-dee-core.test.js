@@ -50,6 +50,17 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.equal(bot.isMoodPrompt("Hey"), false);
   assert.equal(bot.isChitchatPrompt("thanks"), true);
   assert.equal(bot.isChitchatPrompt("throw a shoutout"), false);
+  assert.equal(bot.isShoutOutExecutePrompt("throw a shoutout"), true);
+  assert.equal(bot.isShoutOutExecutePrompt("send a shoutout at Decades"), true);
+  assert.equal(bot.isShoutOutExecutePrompt("how do I throw a shoutout"), false);
+  assert.equal(bot.isShoutOutExecutePrompt("help throwing a shoutout"), false);
+  const longBoard = "Happy birthday from the whole table — love you ".repeat(4).trim();
+  const longThrow = `throw a shoutout at Decades Nightclub, Washington, DC that says ${longBoard}`;
+  assert.ok(longThrow.length > 200);
+  assert.ok(longThrow.length <= bot.MAX_MESSAGE_CHARS);
+  assert.ok(longBoard.length >= 160);
+  assert.equal(bot.isShoutOutExecutePrompt(longThrow), true);
+  assert.equal(bot.omitContextualSearchForPrompt(longThrow, ["shoutOut", "botDee"]), true);
   assert.equal(bot.isChitchatPrompt("mail logging"), false);
 
   const heyHits = bot.contextualSearch("Hey", "master");
@@ -355,6 +366,55 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
   assert.ok(names.includes("startShoutOutCheckout"));
   assert.ok(names.includes("createVipCheckout"));
   assert.ok(names.includes("createFloqCastRequest"));
+  assert.equal(bot.omitContextualSearchForPrompt("throw a shoutout", ["shoutOut", "botDee"]), true);
+  assert.equal(bot.omitContextualSearchForPrompt("how do I throw a shoutout", ["shoutOut", "botDee"]), false);
+  assert.ok(!bot.toolDeclarations(["shoutOut", "botDee"], {omitContextualSearch: true})
+    .some(t => t.name === "contextualSearch"));
+  assert.ok(bot.toolDeclarations(["shoutOut", "botDee"], {omitContextualSearch: true})
+    .some(t => t.name === "listShoutOutTemplates"));
+  assert.match(src, /omitContextualSearchForPrompt/);
+  assert.match(src, /isShoutOutExecutePrompt\(userPrompt\)/);
+  const historyChunks = src.split("prefs.appendActionHistory(").slice(1);
+  assert.equal(historyChunks.length, 2);
+  historyChunks.forEach(chunk => {
+    const body = chunk.slice(0, chunk.indexOf("results:"));
+    assert.match(body, /actionLinks/);
+    assert.doesNotMatch(body, /resultCards|truncatedCards|resultsForClient|throwPack\.results/);
+  });
+});
+
+test("throw a shoutout does not dump stacked help cards", () => {
+  const allowed = ["shoutOut", "botDee", "passes"];
+  const helpers = require("./bot-dee-functions").__botDeeHelpers;
+  const local = helpers.localSession("patron", "throw a shoutout", {
+    uiLanguage: "en",
+    allowedFeatures: allowed
+  });
+  assert.equal(local.provider, "local-shoutout");
+  assert.equal(local.results.length, 1);
+  assert.equal(local.results[0].kind, "shoutout");
+  assert.match(local.results[0].href, /shoutout-search\.html\?from=botdee/);
+  assert.doesNotMatch(local.reply, /Here is what I found/i);
+  assert.ok(!local.results.some(row => /Baller's Alert|Black Card|Classic Halloween|Shiloh/i.test(row.label)));
+  const how = helpers.localSession("patron", "how do I throw a shoutout", {
+    uiLanguage: "en",
+    allowedFeatures: allowed
+  });
+  assert.equal(how.provider, "local-fallback");
+  assert.ok(how.results.length > 1);
+  const denied = bot.shoutOutExecuteFallback("en", ["botDee"]);
+  assert.match(denied.reply, /isn't available/i);
+  assert.equal(denied.results.length, 0);
+  const longBoard = "Happy birthday from the whole table — love you ".repeat(4).trim();
+  const longThrow = `throw a shoutout at Decades Nightclub, Washington, DC that says ${longBoard}`;
+  assert.ok(longThrow.length > 200);
+  const longLocal = helpers.localSession("patron", longThrow, {
+    uiLanguage: "en",
+    allowedFeatures: allowed
+  });
+  assert.equal(longLocal.provider, "local-shoutout");
+  assert.equal(longLocal.results.length, 1);
+  assert.doesNotMatch(longLocal.reply, /Here is what I found/i);
 });
 
 test("result cards localize to app language (no English ShoutOut label in German)", () => {

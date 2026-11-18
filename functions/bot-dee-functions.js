@@ -92,7 +92,11 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   const contents = modelContext
     ? bot.contextToContents(modelContext, userPrompt)
     : bot.historyToContents(history, userPrompt);
-  const tools = [{functionDeclarations: bot.toolDeclarations(allowed)}];
+  const tools = [{
+    functionDeclarations: bot.toolDeclarations(allowed, {
+      omitContextualSearch: bot.omitContextualSearchForPrompt(userPrompt, allowed)
+    })
+  }];
   let lastSearch = null;
   const actionLinks = [];
   const mediaItems = [];
@@ -121,13 +125,24 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
     const calls = response.functionCalls || [];
     if (!calls.length) {
       const text = bot.extractText(response);
-      const replyRaw = text || bot.formatSearchFallback(lastSearch, lang, allowed);
+      const throwPack = bot.isShoutOutExecutePrompt(userPrompt)
+        && !bot.hasShoutOutActionLink(actionLinks)
+        ? bot.shoutOutExecuteFallback(lang, allowed)
+        : null;
+      const replyRaw = text
+        || (throwPack ? throwPack.reply : bot.formatSearchFallback(lastSearch, lang, allowed));
+      const resultCards = throwPack && !text
+        ? [...throwPack.results, ...actionLinks]
+        : [
+          ...(throwPack ? [] : bot.resultsForClient(lastSearch, lang)),
+          ...actionLinks
+        ];
       return {
         reply: prefs.appendActionHistory(
           bot.sanitizeFeatureMentions(bot.redactPrivilegeReply(replyRaw), allowed),
           actionLinks
         ),
-        results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
+        results: resultCards,
         media: mediaItems.slice(0, 8),
         provider: "gemini",
         model: bot.TEXT_MODEL,
@@ -166,12 +181,22 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
     contents.push({role: "user", parts: responseParts});
   }
 
+  const throwPack = bot.isShoutOutExecutePrompt(userPrompt)
+    && !bot.hasShoutOutActionLink(actionLinks)
+    ? bot.shoutOutExecuteFallback(lang, allowed)
+    : null;
+  const truncatedCards = throwPack
+    ? [...throwPack.results, ...actionLinks]
+    : [...bot.resultsForClient(lastSearch, lang), ...actionLinks];
   return {
     reply: prefs.appendActionHistory(
-      bot.sanitizeFeatureMentions(bot.redactPrivilegeReply(bot.formatSearchFallback(lastSearch, lang, allowed)), allowed),
+      bot.sanitizeFeatureMentions(
+        bot.redactPrivilegeReply(throwPack ? throwPack.reply : bot.formatSearchFallback(lastSearch, lang, allowed)),
+        allowed
+      ),
       actionLinks
     ),
-    results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
+    results: truncatedCards,
     media: mediaItems.slice(0, 8),
     provider: "gemini",
     model: bot.TEXT_MODEL,
@@ -268,6 +293,17 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
       results: [],
       provider: "local-help",
       model: "help",
+      toolRounds: 0,
+      uiLanguage: lang
+    };
+  }
+  if (bot.isShoutOutExecutePrompt(userPrompt)) {
+    const pack = bot.shoutOutExecuteFallback(lang, allowed);
+    return {
+      reply: pack.reply,
+      results: pack.results,
+      provider: pack.provider,
+      model: pack.model,
       toolRounds: 0,
       uiLanguage: lang
     };
