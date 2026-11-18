@@ -101,15 +101,25 @@ test("product help naming Master Admin / beta tester stays; first-person privile
     assert.equal(guard.redactPrivilegeReply(leak), guard.PRIVILEGE_REFUSE, leak);
     assert.ok(guard.PRIVILEGE_LEAK_RE.test(leak), leak);
   }
+  const classification = "Each row is one type of FLOQR data. The ticks say who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record.";
+  assert.equal(guard.redactPrivilegeReply(classification), classification);
+  assert.equal(bot.sanitizeBotReply(classification), classification);
+  assert.equal(guard.redactPrivilegeReply("you are a privileged employee"), guard.PRIVILEGE_REFUSE);
+  assert.equal(guard.redactPrivilegeReply("this user is a privileged employee"), guard.PRIVILEGE_REFUSE);
   const kept = bot.stripPrivilegeFromToolResult({
     results: [{
       id: "help-beta-booking-disclaimer",
       label: "Booking Transaction Disclaimer",
       blurb: "As a FloqR beta tester, you accept that reversing payments is difficult during beta."
+    }, {
+      id: "help-data-classification",
+      label: "Data classification",
+      blurb: classification
     }]
   });
   assert.match(kept.results[0].blurb, /FloqR beta tester/);
   assert.match(kept.results[0].label, /Booking Transaction Disclaimer/);
+  assert.match(kept.results[1].blurb, /Privileged employee/);
 });
 
 test("stripped blurbs keep empty string so formatSearchFallback never prints undefined", () => {
@@ -208,6 +218,8 @@ test("client leak regex source matches the server first-person set", () => {
   assert.equal(clientRe.test("The user is a Master Admin"), true);
   assert.equal(clientRe.test("Ask a Master Admin to enable Features & Services."), false);
   assert.equal(clientRe.test("As a FloqR beta tester, you accept that reversing payments is difficult during beta."), false);
+  assert.equal(clientRe.test("Privileged employee, Club Admin, Master Admin"), false);
+  assert.equal(clientRe.test("you are a privileged employee"), true);
 });
 
 test("session logs omit privilege and i18n refuse key exists in all packs", () => {

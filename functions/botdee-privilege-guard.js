@@ -8,7 +8,7 @@ const PRIVILEGE_REFUSE = "I don't have account-security details.";
 const PRIVILEGE_KEY_RE = /^(?:isMasterAdmin|isSuperAdmin|superAdmin|masterAdmin|isClubAdmin|clubAdmin|clubAdminClubIds|isBetaTester|betaTester|betaFeatures|betaGrants|sos2fa|sos2faSession|sos2faSessionHash|claims|customClaims|tokenClaims|idTokenClaims|featureGates|featureServiceFlags|classificationRole|viewerRole|privileged)$/i;
 
 /** Product glossary roles. Only first-person / viewer identity around these is a leak. */
-const VIEWER_PRIVILEGE_ROLE = "(?:master(?:\\s|-)*admin|super(?:\\s|-)*admin|beta(?:\\s|-)*tester|club(?:\\s|-)*admin)";
+const VIEWER_PRIVILEGE_ROLE = "(?:master(?:\\s|-)*admin|super(?:\\s|-)*admin|beta(?:\\s|-)*tester|club(?:\\s|-)*admin|privileged(?:\\s|-)*employee)";
 
 /** Keep in sync with bot-dee-chat.js (test asserts identical join source). */
 const PRIVILEGE_LEAK_RE = new RegExp([
@@ -33,8 +33,7 @@ const PRIVILEGE_LEAK_RE = new RegExp([
   "\\bisBetaTester\\b",
   "\\bisClubAdmin\\b",
   "\\btokenClaims\\b",
-  "\\bcustomClaims\\b",
-  "\\bprivileged\\s+employee\\b"
+  "\\bcustomClaims\\b"
 ].join("|"), "i");
 
 const PRIVILEGE_ASK_TERM_RE = /master\s*-?\s*admin|super\s*-?\s*admin|sos\s*-?\s*2fa|sos2fa|beta\s*-?\s*tester|token\s+claims?|custom\s+claims?|ismasteradmin|feature\s*gates?/;

@@ -227,7 +227,7 @@
   }
 
   const PRIVILEGE_REFUSE_EN = "I don't have account-security details.";
-  const VIEWER_PRIVILEGE_ROLE = "(?:master(?:\\s|-)*admin|super(?:\\s|-)*admin|beta(?:\\s|-)*tester|club(?:\\s|-)*admin)";
+  const VIEWER_PRIVILEGE_ROLE = "(?:master(?:\\s|-)*admin|super(?:\\s|-)*admin|beta(?:\\s|-)*tester|club(?:\\s|-)*admin|privileged(?:\\s|-)*employee)";
   /** Keep in sync with functions/botdee-privilege-guard.js (test asserts identical join source). */
   const PRIVILEGE_LEAK_RE = new RegExp([
     `\\bi\\s+(?:can\\s+)?see\\s+you\\s+as\\b`,
@@ -249,8 +249,7 @@
     "\\bisBetaTester\\b",
     "\\bisClubAdmin\\b",
     "\\btokenClaims\\b",
-    "\\bcustomClaims\\b",
-    "\\bprivileged\\s+employee\\b"
+    "\\bcustomClaims\\b"
   ].join("|"), "i");
 
   function privilegeRefuseReply() {
