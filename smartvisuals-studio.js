@@ -29,6 +29,7 @@
   let filter = "";
   let typeFilter = "all";
   let selectedId = "";
+  let reviewSeq = 0;
 
   function byId(id) {
     return document.getElementById(id);
@@ -130,28 +131,31 @@
   async function renderReview() {
     const host = byId("svStudioReview");
     if (!host) return;
-    host.innerHTML = `<p class="sub small">${esc(t("sv.studioReviewHint", "Git-backed registry.json is the published source of truth. SOS2FA + reason required. Drafts stay off Search and Room SMARTview."))}</p>`;
+    const seq = ++reviewSeq;
+    const hint = `<p class="sub small">${esc(t("sv.studioReviewHint", "Git-backed registry.json is the published source of truth. SOS2FA + reason required. Drafts stay off Search and Room SMARTview."))}</p>`;
+    host.innerHTML = hint;
     try {
       const snap = await firebase.firestore().collection("smartVisualDrafts").limit(40).get();
+      if (seq !== reviewSeq) return;
       const rows = snap.docs.map(doc => ({id: doc.id, ...(doc.data() || {})}));
-      if (!rows.length) {
-        host.innerHTML += `<p class="sub small">${esc(t("sv.studioEmpty", "No assets match."))}</p>`;
-        return;
-      }
-      host.innerHTML += rows.map(row => {
-        const svg = String(row.svgXml || "");
-        const img = svg
-          ? `<img class="sv-studio-preview" src="${esc(svgPreviewSrc(svg))}" alt="${esc(row.name || row.id)}"/>`
-          : "";
-        return `<article class="sv-studio-draft" data-sv-draft="${esc(row.id)}">
+      const body = !rows.length
+        ? `<p class="sub small">${esc(t("sv.studioEmpty", "No assets match."))}</p>`
+        : rows.map(row => {
+          const svg = String(row.svgXml || "");
+          const img = svg
+            ? `<img class="sv-studio-preview" src="${esc(svgPreviewSrc(svg))}" alt="${esc(row.name || row.id)}"/>`
+            : "";
+          return `<article class="sv-studio-draft" data-sv-draft="${esc(row.id)}">
           <b>${esc(row.name || row.id)}</b>
           <small>${esc(row.approvalStatus || "review")} · ${esc(String(row.bytes || 0))} bytes · ${esc(row.type || "")}</small>
           ${img}
           <p class="sub small">${esc(row.license || "")}</p>
         </article>`;
-      }).join("");
+        }).join("");
+      host.innerHTML = hint + body;
     } catch (err) {
-      host.innerHTML += `<p class="status">${esc(err?.message || t("sv.studioDenied", "Publish denied."))}</p>`;
+      if (seq !== reviewSeq) return;
+      host.innerHTML = hint + `<p class="status">${esc(err?.message || t("sv.studioDenied", "Publish denied."))}</p>`;
     }
   }
 

@@ -1244,15 +1244,35 @@
     });
   }
 
+  function catalogReady() {
+    return !!(window.FLOQRSmartVisualsCatalog);
+  }
+
+  function scrollTranscriptAfterPaint(el) {
+    const chat = window.FLOQRBotDeeChat;
+    if (chat && typeof chat.scrollTranscriptToLatest === "function") {
+      chat.scrollTranscriptToLatest();
+      return;
+    }
+    const log = (el && el.closest && el.closest("#botDeeTranscript"))
+      || (typeof document !== "undefined" && document.getElementById("botDeeTranscript"));
+    if (!log || (el && log.contains && !log.contains(el))) return;
+    log.scrollTop = log.scrollHeight;
+  }
+
   function mount(el, views, peopleSearch) {
     if (!el) return;
     const list = Array.isArray(views) ? views : [];
-    const paint = () => paintHost(el, list, peopleSearch);
-    if (list.some(isRoomPayload) && window.FLOQRSmartVisuals?.ensureCatalog) {
-      window.FLOQRSmartVisuals.ensureCatalog().then(paint, paint);
+    const paint = (resync) => {
+      paintHost(el, list, peopleSearch);
+      if (resync) scrollTranscriptAfterPaint(el);
+    };
+    const needsCatalog = list.some(isRoomPayload) && window.FLOQRSmartVisuals?.ensureCatalog;
+    if (needsCatalog && !catalogReady()) {
+      window.FLOQRSmartVisuals.ensureCatalog().then(() => paint(true), () => paint(true));
       return;
     }
-    paint();
+    paint(false);
   }
 
   function paintHost(el, list, peopleSearch) {

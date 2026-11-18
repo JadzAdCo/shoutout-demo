@@ -2060,6 +2060,7 @@
     sendMessage,
     openPhotoViewer,
     closePhotoViewer,
+    scrollTranscriptToLatest,
     DEFAULT_IDLE_SECONDS,
     clampIdleSeconds
   };

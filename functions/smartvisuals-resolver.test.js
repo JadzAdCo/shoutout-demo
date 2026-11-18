@@ -193,7 +193,16 @@ test("BOT DEE loads visual catalog without a Search notification host", () => {
   assert.match(read("botdee.html"), /smartvisuals-view\.js\?v=/);
   assert.match(read("botdee.html"), /smartvisuals-resolver\.js\?v=/);
   assert.match(read("botdee-smartview.js"), /ensureCatalog/);
+  assert.match(read("botdee-smartview.js"), /catalogReady/);
+  assert.match(read("botdee-smartview.js"), /FLOQRSmartVisualsCatalog/);
+  assert.match(read("botdee-smartview.js"), /scrollTranscriptAfterPaint/);
+  const mountSrc = read("botdee-smartview.js");
+  const mountFn = mountSrc.slice(mountSrc.indexOf("function mount("), mountSrc.indexOf("function paintHost"));
+  assert.match(mountFn, /catalogReady\(\)/);
+  assert.doesNotMatch(mountFn, /ensureCatalog\(\)\.then\(paint/);
   assert.match(read("smartvisuals-studio.js"), /svgXml/);
+  assert.match(read("smartvisuals-studio.js"), /reviewSeq/);
+  assert.doesNotMatch(read("smartvisuals-studio.js"), /innerHTML \+=/);
 });
 
 test("T15 ads stay off and AdSense is not referenced in renderer", () => {
