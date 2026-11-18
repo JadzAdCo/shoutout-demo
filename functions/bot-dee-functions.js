@@ -703,6 +703,16 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       retrievalFromSeq: state.retrievalFromSeq
     });
     const profileFirstName = await readProfileFirstName(uid);
+    const chatTitles = threads.migrateChatTitles(state.chatTitles, {
+      live: retrievalTurns,
+      current: retrievalTurns,
+      archive: archiveTurns
+    });
+    if (threads.chatTitlesNeedWrite(state.chatTitles)) {
+      try {
+        await threads.persistChatTitles(uid, chatTitles);
+      } catch (_) {}
+    }
     return {
       ok: true,
       durable: true,
@@ -718,7 +728,7 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       idleSeconds: settings.conversationIdleSeconds,
       personalization: prefs.normalizePersonalization(state.personalization, {profileFirstName}),
       profileFirstName,
-      chatTitles: state.chatTitles || {},
+      chatTitles,
       [prefs.LAST_USED_FIELD]: Number(state[prefs.LAST_USED_FIELD]) || 0
     };
   } catch (error) {
@@ -733,7 +743,9 @@ exports.renameBotDeeChat = onCall(GET_THREAD_OPTS, async request => {
     }
     await audit.assertFeatureAccess(request.auth, "botDee", request);
     const uid = request.auth.uid;
-    const result = await threads.renameChat(uid, request.data?.chatId, request.data?.title);
+    const result = await threads.renameChat(uid, request.data?.chatId, request.data?.title, Date.now(), {
+      firstUserText: request.data?.firstUserText
+    });
     if (!result.ok) {
       if (result.error === "invalid_chat_id" || result.error === "empty_title") {
         throw new HttpsError("invalid-argument", "Enter a chat title.");

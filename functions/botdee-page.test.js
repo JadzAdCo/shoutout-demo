@@ -244,6 +244,10 @@ test("BOT DEE history collapse is visual only and Back goes to Search", () => {
     /addEventListener\("contextmenu"[\s\S]{0,280}(?<!dis)armRenameClickSwallow\(/,
     "right-click rename must not arm a leftover-click swallow"
   );
+  assert.match(chat, /function conversationIdFromTurns/);
+  assert.match(chat, /SWALLOW_CLICK_MS/);
+  assert.match(chat, /if \(!open\) \{\s*renameTarget = null;\s*disarmRenameClickSwallow\(\);/);
+  assert.match(chat, /if \(role === "model" && !rawText\) return ""/);
   assert.match(page, /searchHome/);
   assert.doesNotMatch(page, /stampCurrentVersion/);
   assert.match(nav, /pageName\(\) === "botdee\.html"/);

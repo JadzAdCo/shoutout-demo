@@ -45,7 +45,9 @@ function emptyState(settings) {
 }
 
 const CHAT_TITLE_MAX = 80;
-const CHAT_ID_RE = /^(live|current|archive|epoch-\d{1,6})$/;
+const STABLE_CHAT_ID_RE = /^c_[0-9a-f]{16}$/;
+const SLOT_CHAT_ID_RE = /^(live|current|archive)$/;
+const CHAT_ID_RE = STABLE_CHAT_ID_RE;
 
 function clipChatTitle(raw) {
   return String(raw || "")
@@ -55,26 +57,116 @@ function clipChatTitle(raw) {
     .slice(0, CHAT_TITLE_MAX);
 }
 
-/** Display labels for + Chats rows. Never sent to Gemini. */
+function fnv1a(str, seed) {
+  let h = (Number(seed) >>> 0) || 2166136261;
+  const s = String(str || "");
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h;
+}
+
+function normalizeFirstUserLine(raw) {
+  return String(raw || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 80);
+}
+
+/** Stable id from first user text so titles follow a slice across live/current/archive. */
+function conversationIdFromFirstUser(text) {
+  const line = normalizeFirstUserLine(text);
+  if (!line) return "";
+  const a = fnv1a(line, 2166136261).toString(16).padStart(8, "0");
+  const b = fnv1a(line, 0x811c9dc5 ^ 0x01000193).toString(16).padStart(8, "0");
+  return `c_${a}${b}`;
+}
+
+function firstUserTextFromTurns(turns) {
+  const row = (Array.isArray(turns) ? turns : []).find(
+    item => item && (item.role === "user" || item.role === "User") && String(item.text || "").trim()
+  );
+  return row ? String(row.text).trim() : "";
+}
+
+function conversationIdFromTurns(turns) {
+  return conversationIdFromFirstUser(firstUserTextFromTurns(turns));
+}
+
+function clipTitleRow(row) {
+  const title = clipChatTitle(typeof row === "string" ? row : row?.title);
+  if (!title) return null;
+  return {
+    title,
+    updatedAtMs: Math.max(0, Math.floor(Number(row?.updatedAtMs) || 0))
+  };
+}
+
+/** Display labels for + Chats rows. Never sent to Gemini. Keeps legacy slot keys until migrate. */
 function normalizeChatTitles(raw) {
   const src = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
   const out = {};
   Object.keys(src).forEach(id => {
-    if (!CHAT_ID_RE.test(id)) return;
-    const row = src[id];
-    const title = clipChatTitle(typeof row === "string" ? row : row?.title);
-    if (!title) return;
-    out[id] = {
-      title,
-      updatedAtMs: Math.max(0, Math.floor(Number(row?.updatedAtMs) || 0))
-    };
+    if (!STABLE_CHAT_ID_RE.test(id) && !SLOT_CHAT_ID_RE.test(id)) return;
+    const row = clipTitleRow(src[id]);
+    if (!row) return;
+    out[id] = row;
   });
   return out;
 }
 
-async function renameChat(uid, chatId, title, nowMs) {
-  const id = String(chatId || "").trim();
-  if (!CHAT_ID_RE.test(id)) return {ok: false, error: "invalid_chat_id"};
+function migrateChatTitles(raw, slices) {
+  const src = normalizeChatTitles(raw);
+  const map = slices && typeof slices === "object" ? slices : {};
+  const out = {};
+  Object.keys(src).forEach(id => {
+    if (STABLE_CHAT_ID_RE.test(id)) out[id] = src[id];
+  });
+  const slotSlices = {
+    live: map.live || map.current,
+    current: map.current,
+    archive: map.archive
+  };
+  ["live", "current", "archive"].forEach(slot => {
+    const row = src[slot];
+    if (!row) return;
+    const id = conversationIdFromTurns(slotSlices[slot]);
+    if (!id || out[id]) return;
+    out[id] = row;
+  });
+  return out;
+}
+
+function chatTitlesNeedWrite(raw) {
+  const src = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  return Object.keys(src).some(id => SLOT_CHAT_ID_RE.test(id));
+}
+
+async function persistChatTitles(uid, titles, nowMs) {
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const now = Number(nowMs) || Date.now();
+  const next = migrateChatTitles(titles, {});
+  await ref.set({
+    uid,
+    threadId: bot.threadIdForUid(uid),
+    chatTitles: next,
+    updatedAtMs: now
+  }, {merge: true});
+  return {ok: true, chatTitles: next};
+}
+
+async function renameChat(uid, chatId, title, nowMs, opts) {
+  const extra = opts && typeof opts === "object" && !Array.isArray(opts) ? opts : {};
+  const fromText = conversationIdFromFirstUser(extra.firstUserText);
+  let id = fromText || String(chatId || "").trim();
+  if (SLOT_CHAT_ID_RE.test(id)) {
+    if (!fromText) return {ok: false, error: "invalid_chat_id"};
+    id = fromText;
+  }
+  if (!STABLE_CHAT_ID_RE.test(id)) return {ok: false, error: "invalid_chat_id"};
   const clipped = clipChatTitle(title);
   if (!clipped) return {ok: false, error: "empty_title"};
   const ref = threadRef(uid);
@@ -89,7 +181,7 @@ async function renameChat(uid, chatId, title, nowMs) {
       err.code = "permission-denied";
       throw err;
     }
-    titles = normalizeChatTitles(prev.chatTitles);
+    titles = migrateChatTitles(prev.chatTitles, extra.slices || {});
     titles[id] = {title: clipped, updatedAtMs: now};
     tx.set(ref, {
       uid,
@@ -657,7 +749,15 @@ module.exports = {
   emptyState,
   clipChatTitle,
   normalizeChatTitles,
+  migrateChatTitles,
+  chatTitlesNeedWrite,
+  persistChatTitles,
+  conversationIdFromFirstUser,
+  conversationIdFromTurns,
+  firstUserTextFromTurns,
   renameChat,
   CHAT_TITLE_MAX,
-  CHAT_ID_RE
+  CHAT_ID_RE,
+  STABLE_CHAT_ID_RE,
+  SLOT_CHAT_ID_RE
 };

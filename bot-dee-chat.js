@@ -34,7 +34,9 @@
   let renameTarget = null;
   let renameDialogBound = false;
   let swallowRename = null;
+  let swallowRenameTimer = 0;
   const LONG_PRESS_MS = 520;
+  const SWALLOW_CLICK_MS = 800;
   const CHAT_TITLE_MAX = 80;
 
   const byId = id => document.getElementById(id);
@@ -1067,7 +1069,7 @@
       const versionCardOnly = isVersionSmartViewAlias(text)
         && views.some(row => row && row.kind === "botDeeVersion");
       const reply = versionCardOnly
-        ? modelBubbleText("model", "", media)
+        ? ""
         : peopleSearch?.replyKey
           ? t(peopleSearch.replyKey, displayReply(data.reply))
           : (data.replyKey || roomView?.replyKey)
@@ -1169,6 +1171,7 @@
   function modelBubbleText(role, raw, media) {
     const rawText = String(raw || "").trim();
     if (role === "model" && !rawText && !media.length) return "";
+    if (role === "model" && !rawText) return "";
     return role === "model" ? displayReply(raw) : rawText;
   }
 
@@ -1187,6 +1190,33 @@
   function firstUserLine(turns) {
     const row = cloneTurns(turns).find(item => item.role === "user" && item.text);
     return row ? row.text.replace(/\s+/g, " ").slice(0, 72) : "";
+  }
+
+  function fnv1a(str, seed) {
+    let h = (Number(seed) >>> 0) || 2166136261;
+    const s = String(str || "");
+    for (let i = 0; i < s.length; i += 1) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h;
+  }
+
+  function conversationIdFromFirstUser(text) {
+    const line = String(text || "").toLowerCase().replace(/\s+/g, " ").trim().slice(0, 80);
+    if (!line) return "";
+    const a = fnv1a(line, 2166136261).toString(16).padStart(8, "0");
+    const b = fnv1a(line, 0x811c9dc5 ^ 0x01000193).toString(16).padStart(8, "0");
+    return `c_${a}${b}`;
+  }
+
+  function firstUserText(turns) {
+    const row = cloneTurns(turns).find(item => item.role === "user" && item.text);
+    return row ? String(row.text).trim() : "";
+  }
+
+  function conversationIdFromTurns(turns) {
+    return conversationIdFromFirstUser(firstUserText(turns));
   }
 
   function clipChatTitle(raw) {
@@ -1208,7 +1238,21 @@
     chatTitles = {};
     Object.keys(src).forEach(id => {
       const title = clipChatTitle(typeof src[id] === "string" ? src[id] : src[id]?.title);
-      if (title) chatTitles[id] = {title, updatedAtMs: Number(src[id]?.updatedAtMs) || 0};
+      if (!title) return;
+      if (/^c_[0-9a-f]{16}$/.test(id)) {
+        chatTitles[id] = {title, updatedAtMs: Number(src[id]?.updatedAtMs) || 0};
+      }
+    });
+    const slots = {
+      live: visitLiveTurns.length ? visitLiveTurns : storedTurns,
+      current: storedTurns,
+      archive: storedArchiveTurns
+    };
+    ["live", "current", "archive"].forEach(slot => {
+      const title = clipChatTitle(typeof src[slot] === "string" ? src[slot] : src[slot]?.title);
+      const id = conversationIdFromTurns(slots[slot]);
+      if (!title || !id || chatTitles[id]) return;
+      chatTitles[id] = {title, updatedAtMs: Number(src[slot]?.updatedAtMs) || 0};
     });
   }
 
@@ -1368,7 +1412,7 @@
       return;
     }
     if (hint) hint.hidden = false;
-    const addRow = (label, meta, onClick, primary, chatId) => {
+    const addRow = (label, meta, onClick, primary, chatId, firstUserText) => {
       const row = document.createElement("div");
       row.className = "botdee-chats-item";
       const btn = document.createElement("button");
@@ -1388,7 +1432,8 @@
       row.appendChild(btn);
       if (chatId) {
         const renameLabel = titleForChat(chatId, meta || label);
-        bindChatLongPress(btn, chatId, renameLabel);
+        const seed = firstUserText || "";
+        bindChatLongPress(btn, chatId, renameLabel, seed);
         const rename = document.createElement("button");
         rename.type = "button";
         rename.className = "botdee-chats-rename";
@@ -1398,7 +1443,7 @@
         rename.addEventListener("click", event => {
           event.preventDefault();
           event.stopPropagation();
-          openRenameDialog(chatId, renameLabel);
+          openRenameDialog(chatId, renameLabel, seed);
         });
         row.appendChild(rename);
       }
@@ -1407,33 +1452,44 @@
     addRow(t("botdee.chatsNew", "New chat"), "", startNewChat, true);
     if (visitLiveTurns.length) {
       const snippet = firstUserLine(visitLiveTurns);
+      const liveId = conversationIdFromTurns(visitLiveTurns);
       addRow(
         t("botdee.chatsResume", "This session"),
-        titleForChat("live", snippet),
+        titleForChat(liveId, snippet),
         () => resumeSlice(visitLiveTurns),
         false,
-        "live"
+        liveId,
+        firstUserText(visitLiveTurns)
       );
     }
     const earlier = [];
-    if (storedTurns.length) earlier.push({slice: storedTurns, chatId: "current"});
+    if (storedTurns.length) earlier.push({slice: storedTurns, chatId: conversationIdFromTurns(storedTurns)});
     if (storedArchiveTurns.length && firstUserLine(storedArchiveTurns) !== firstUserLine(storedTurns)) {
-      earlier.push({slice: storedArchiveTurns, chatId: "archive"});
+      earlier.push({slice: storedArchiveTurns, chatId: conversationIdFromTurns(storedArchiveTurns)});
     }
     earlier.forEach((row, index) => {
       const when = formatChatWhen(storedLastMessageAtMs);
       const line = firstUserLine(row.slice);
       const fallback = [when, line].filter(Boolean).join(" · ") || t("botdee.chatsPanelTitle", "Chats");
       const title = titleForChat(row.chatId, fallback);
-      addRow(title, index === 0 && storedTurns.length && title === fallback ? "" : (title !== fallback ? fallback : ""), () => resumeSlice(row.slice), false, row.chatId);
+      addRow(title, index === 0 && storedTurns.length && title === fallback ? "" : (title !== fallback ? fallback : ""), () => resumeSlice(row.slice), false, row.chatId, firstUserText(row.slice));
     });
   }
 
   function armRenameClickSwallow(pointerId, btn) {
+    disarmRenameClickSwallow();
     swallowRename = {pointerId, btn};
+    swallowRenameTimer = global.setTimeout(() => {
+      swallowRenameTimer = 0;
+      swallowRename = null;
+    }, SWALLOW_CLICK_MS);
   }
 
   function disarmRenameClickSwallow() {
+    if (swallowRenameTimer) {
+      global.clearTimeout(swallowRenameTimer);
+      swallowRenameTimer = 0;
+    }
     swallowRename = null;
   }
 
@@ -1461,7 +1517,7 @@
     return true;
   }
 
-  function bindChatLongPress(btn, chatId, label) {
+  function bindChatLongPress(btn, chatId, label, firstUserText) {
     let timer = 0;
     const start = event => {
       if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -1470,7 +1526,7 @@
       timer = global.setTimeout(() => {
         timer = 0;
         armRenameClickSwallow(pointerId, btn);
-        openRenameDialog(chatId, label);
+        openRenameDialog(chatId, label, firstUserText);
       }, LONG_PRESS_MS);
     };
     const cancelTimer = () => {
@@ -1491,7 +1547,7 @@
       event.stopPropagation();
       cancelTimer();
       disarmRenameClickSwallow();
-      openRenameDialog(chatId, label);
+      openRenameDialog(chatId, label, firstUserText);
     });
   }
 
@@ -1500,11 +1556,14 @@
     if (!dialog) return;
     dialog.hidden = !open;
     dialog.setAttribute("aria-hidden", open ? "false" : "true");
-    if (!open) renameTarget = null;
+    if (!open) {
+      renameTarget = null;
+      disarmRenameClickSwallow();
+    }
   }
 
-  function openRenameDialog(chatId, currentLabel) {
-    renameTarget = {chatId, currentLabel};
+  function openRenameDialog(chatId, currentLabel, firstUserText) {
+    renameTarget = {chatId, currentLabel, firstUserText};
     const input = byId("botDeeRenameInput");
     const status = byId("botDeeRenameStatus");
     if (status) status.textContent = "";
@@ -1532,13 +1591,14 @@
       return;
     }
     const chatId = renameTarget.chatId;
+    const firstUserText = renameTarget.firstUserText;
     const fn = callable("renameBotDeeChat");
     if (!fn) {
       if (status) status.textContent = t("botdee.chatsRenameError", "Could not save that title. Try again.");
       return;
     }
     try {
-      const data = (await fn({chatId, title}))?.data || {};
+      const data = (await fn({chatId, title, firstUserText}))?.data || {};
       if (data.chatTitles) applyChatTitles(data.chatTitles);
       else {
         chatTitles[chatId] = {title: clipChatTitle(data.title) || title, updatedAtMs: Date.now()};
