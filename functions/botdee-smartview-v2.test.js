@@ -455,6 +455,7 @@ test("peopleV2 paints live public fields; hidden and dating-off tags do not stic
     viewerLocale: "en"
   });
   assert.equal(payload.datingVisible, false);
+  assert.equal(payload.lookingToMeet, "");
   assert.deepEqual(payload.categories.Dating.Preferences, []);
   assert.deepEqual(payload.categories.Social.Music, []);
   assert.deepEqual(payload.categories.Dining.Cuisines, ["sushi"]);
@@ -502,6 +503,9 @@ test("patronSmartView still validates; peopleV2 lives under floqrPublicData", ()
   assert.equal(patron.floqrPublicData.peopleV2.presentation, "peopleV2");
   assert.equal(patron.floqrPublicData.peopleV2.defaultSecondary, "Music");
   assert.equal(patron.floqrPublicData.peopleV2.handles[0].handle, "@amaraj");
+  assert.equal(patron.floqrPublicData.peopleV2.bio, "Public-within-FLOQR bio");
+  assert.equal(patron.floqrPublicData.peopleV2.city, "Washington, DC");
+  assert.equal(patron.floqrPublicData.peopleV2.lookingToMeet, "");
   const hidden = smart.patronSmartView({
     displayName: "Hidden",
     volunteered: {datapoints: {food: ["Nigerian"]}},
@@ -738,6 +742,18 @@ test("vm people card HTML has no duplicate Music heading and uses escaped text",
   assert.doesNotMatch(html, /<h3>\s*Music/i);
   assert.match(html, /Afrobeats/);
   assert.doesNotMatch(html, /<script>/);
+  const portraitAt = html.indexOf("botdee-sv-portrait");
+  const nameAt = html.indexOf("botdee-sv-name");
+  const summaryAt = html.indexOf("botdee-sv-summary-btn");
+  const factsAt = html.indexOf("botdee-sv-facts");
+  assert.ok(portraitAt > 0 && portraitAt < nameAt, "photo stacks above name");
+  assert.ok(nameAt < summaryAt, "name stacks above SMARTsummary");
+  assert.ok(summaryAt < factsAt, "facts sit below SMARTsummary");
+  assert.match(html, /botdee-sv-id/);
+  assert.match(html, /@amaraj/);
+  assert.match(html, /Washington, DC/);
+  assert.doesNotMatch(html, /botdee-sv-identity-main/);
+  assert.doesNotMatch(html, /Tap for more information/);
 });
 
 test("SMARTview overlay pages videos and paints a video element", () => {

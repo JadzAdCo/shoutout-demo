@@ -229,8 +229,10 @@ test("compact card HTML paints the public-page hero (photo or video)", () => {
     }
   });
   assert.match(photoHtml, /botdee-sc-thumb/);
+  assert.match(photoHtml, /botdee-sv-id/);
   assert.match(photoHtml, /lorna\.jpg/);
   assert.doesNotMatch(photoHtml, /botdee-sc-thumb-empty/);
+  assert.ok(photoHtml.indexOf("botdee-sc-thumb") < photoHtml.indexOf("botdee-sv-name"), "compact photo stacks above name");
   const videoHtml = api.renderCompactPeopleCard({
     title: "Lorna",
     floqrPublicData: {
