@@ -269,9 +269,11 @@ function venuePrefix(raw, message = "") {
 
 function extractTemplateHint(raw) {
   const folded = ` ${normalizeClubNeedle(raw)} `;
+  const verbs = "(?:throw|send|post|compose|buy|pay for)";
+  const board = "(?:shoutout|shout|board|template)";
   if (/\bclassic halloween\b/.test(folded)
-    || /\bhalloween (?:shout|board|template)\b/.test(folded)
-    || /\b(?:throw|send|post|buy|pay for) a halloween\b/.test(folded)) {
+    || new RegExp(`\\bhalloween ${board}\\b`).test(folded)
+    || new RegExp(`\\b${verbs}(?: a)? halloween\\b`).test(folded)) {
     return "classicHalloween";
   }
   const named = [
@@ -283,8 +285,8 @@ function extractTemplateHint(raw) {
     ["corporate", "corporate"]
   ];
   for (const [needle, id] of named) {
-    if (new RegExp(`\\b${needle} (?:shout|board|template)\\b`).test(folded)
-      || new RegExp(`\\b(?:throw|send|post) a ${needle}\\b`).test(folded)) {
+    if (new RegExp(`\\b${needle} ${board}\\b`).test(folded)
+      || new RegExp(`\\b${verbs}(?: a)? ${needle}\\b`).test(folded)) {
       return id;
     }
   }

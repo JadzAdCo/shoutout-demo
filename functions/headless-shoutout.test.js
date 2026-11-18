@@ -24,6 +24,14 @@ test("parseShoutOutExecute pulls club + message from chat", () => {
   assert.equal(halloween.clubQuery, "lima-twist-washington-dc");
   assert.equal(halloween.templateId, "classicHalloween");
   assert.equal(halloween.message, "BOO");
+  assert.equal(
+    headless.parseShoutOutExecute("throw halloween shoutout at Decades that says BOO").templateId,
+    "classicHalloween"
+  );
+  assert.equal(
+    headless.parseShoutOutExecute("compose a halloween shoutout at Aurelia that says BOO").templateId,
+    "classicHalloween"
+  );
 
   const incomplete = headless.parseShoutOutExecute("throw a shoutout");
   assert.equal(incomplete.clubQuery, "");
