@@ -227,7 +227,16 @@
   }
 
   const PRIVILEGE_REFUSE_EN = "I don't have account-security details.";
-  const PRIVILEGE_LEAK_RE = /master\s*-?\s*admin|super\s*-?\s*admin|sos\s*-?\s*2fa|sos2fa|beta\s*-?\s*tester|i can see you as|your login is\s+master|you(?:'re| are)\s+(?:a\s+)?(?:master|super\s*admin|club\s*admin)|can (?:open|access) master admin|token\s+claims?|classification\s+role/i;
+  const PRIVILEGE_LEAK_RE = new RegExp([
+    String.raw`\bi\s+(?:can\s+)?see\s+you\s+as\b`,
+    String.raw`\byour\s+login\s+is\s+(?:a\s+|an\s+)?(?:master|master(?:\s|-)*admin|super(?:\s|-)*admin)\b`,
+    String.raw`\byou(?:'re|\s+are|\s+were|\s+have\s+been)\s+(?:a\s+|an\s+)?(?:master(?:\s|-)*admin|super(?:\s|-)*admin|beta(?:\s|-)*tester|club(?:\s|-)*admin)\b`,
+    String.raw`\byou\s+(?:can|cannot|can't)\s+(?:open|access)\s+(?:the\s+)?master(?:\s|-)*admin\b`,
+    String.raw`\byour\s+(?:sos\s*-?\s*2fa|sos2fa)\b`,
+    String.raw`\byou\s+(?:have|use|enabled)\s+(?:sos\s*-?\s*2fa|sos2fa)\b`,
+    String.raw`\byour\s+(?:token\s+|custom\s+)?claims\b`,
+    String.raw`\byour\s+classification\s+role\b`
+  ].join("|"), "i");
 
   function privilegeRefuseReply() {
     return t("botdee.privilegeRefuse", PRIVILEGE_REFUSE_EN);

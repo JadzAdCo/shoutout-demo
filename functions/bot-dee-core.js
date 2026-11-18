@@ -1044,17 +1044,24 @@ function formatSearchFallback(search, lang, allowedFeatures) {
   const code = normalizeUiLanguage(lang || search?.uiLanguage);
   const pack = localePack(code);
   const rows = search?.results || [];
-  if (!rows.length) {
+  const shown = rows.slice(0, 5).map(row => {
+    const localized = localizeResultRow(row, code) || {};
+    const label = String(localized.label ?? "").trim();
+    if (!label) return null;
+    const blurb = String(localized.blurb ?? "").trim();
+    const href = String(localized.href ?? "").trim();
+    return {label, blurb, href};
+  }).filter(Boolean);
+  if (!shown.length) {
     const pitch = productPitchLabels(allowedFeatures).join(", ");
     return pack?.fallback?.noMatch
       || `I could not find a clear match for your account yet. Ask about ${pitch || "FLOQR"}, or scheduling.`;
   }
   const header = pack?.fallback?.foundHeader || "Here is what I found for your account:";
   const lines = [header];
-  rows.slice(0, 5).forEach((row, index) => {
-    const localized = localizeResultRow(row, code);
-    lines.push(`${index + 1}. ${localized.label} — ${localized.blurb}`);
-    if (localized.href) lines.push(`   Open: ${localized.href}`);
+  shown.forEach((item, index) => {
+    lines.push(item.blurb ? `${index + 1}. ${item.label} — ${item.blurb}` : `${index + 1}. ${item.label}`);
+    if (item.href) lines.push(`   Open: ${item.href}`);
   });
   return lines.join("\n");
 }
@@ -1065,8 +1072,8 @@ function resultsForClient(search, lang) {
     const localized = localizeResultRow(row, code);
     return {
       sourceId: localized.sourceId,
-      label: localized.label,
-      blurb: localized.blurb,
+      label: String(localized.label ?? ""),
+      blurb: String(localized.blurb ?? ""),
       href: localized.href,
       kind: localized.kind
     };

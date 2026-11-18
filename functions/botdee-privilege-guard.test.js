@@ -20,7 +20,7 @@ test("Gemini system instruction is identical for master vs patron and has no cla
   assert.doesNotMatch(master, /"role"\s*:\s*"master"|role=master/i);
   assert.doesNotMatch(master, /you are a Master Admin/i);
   assert.match(master, /I don't have account-security details/);
-  assert.match(master, /Never mention FLOQR privilege/i);
+  assert.match(master, /Never say whether this viewer holds Master Admin/i);
   assert.ok(guard.assertNoPrivilegeInPayload({systemInstruction: master.replace(guard.PRIVILEGE_SYSTEM_INSTRUCTION, "")}));
 });
 
@@ -66,6 +66,60 @@ test("reply filter catches Master Admin / SOS2FA leaks", () => {
   );
   assert.match(bot.sanitizeBotReply("You can throw a ShoutOut at Decades."), /ShoutOut/);
   assert.doesNotMatch(bot.sanitizeBotReply("You can throw a ShoutOut at Decades."), /Master Admin|SOS2FA/i);
+});
+
+test("product help naming Master Admin / beta tester stays; first-person privilege is refused", () => {
+  const help = [
+    "Ask a Master Admin to enable Features & Services.",
+    "Beta testers granted a test feature see a Beta pill on Search.",
+    "As a FloqR beta tester, you accept that reversing payments is difficult during beta.",
+    "Club ads are reviewed by Master Admin."
+  ].join(" ");
+  assert.equal(guard.redactPrivilegeReply(help), help);
+  assert.equal(bot.sanitizeBotReply(help), help);
+  assert.equal(
+    guard.redactPrivilegeReply("I can see you as Master Admin"),
+    guard.PRIVILEGE_REFUSE
+  );
+  assert.equal(
+    bot.sanitizeBotReply("I can see you as Master Admin"),
+    guard.PRIVILEGE_REFUSE
+  );
+  const kept = bot.stripPrivilegeFromToolResult({
+    results: [{
+      id: "help-beta-booking-disclaimer",
+      label: "Booking Transaction Disclaimer",
+      blurb: "As a FloqR beta tester, you accept that reversing payments is difficult during beta."
+    }]
+  });
+  assert.match(kept.results[0].blurb, /FloqR beta tester/);
+  assert.match(kept.results[0].label, /Booking Transaction Disclaimer/);
+});
+
+test("stripped blurbs keep empty string so formatSearchFallback never prints undefined", () => {
+  const stripped = bot.stripPrivilegeFromToolResult({
+    results: [{
+      label: "Booking Transaction Disclaimer",
+      blurb: "I can see you as Master Admin"
+    }]
+  });
+  assert.equal(stripped.results[0].label, "Booking Transaction Disclaimer");
+  assert.equal(stripped.results[0].blurb, "");
+  assert.ok(Object.prototype.hasOwnProperty.call(stripped.results[0], "blurb"));
+  const fallback = bot.formatSearchFallback(stripped, "en");
+  assert.doesNotMatch(fallback, /undefined/i);
+  assert.match(fallback, /Booking Transaction Disclaimer/);
+  assert.doesNotMatch(fallback, /I can see you as/i);
+  const missingBlurb = bot.formatSearchFallback({
+    results: [{label: "ShoutOut"}]
+  }, "en");
+  assert.doesNotMatch(missingBlurb, /undefined/);
+  assert.match(missingBlurb, /ShoutOut/);
+  const emptyLabel = bot.formatSearchFallback({
+    results: [{label: "", blurb: "leftover"}]
+  }, "en");
+  assert.doesNotMatch(emptyLabel, /undefined/);
+  assert.doesNotMatch(emptyLabel, /leftover/);
 });
 
 test("tool / contents payload strips classification role and privilege fields", () => {
