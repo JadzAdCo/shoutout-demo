@@ -1,6 +1,6 @@
 {
   "schemaVersion": "floqr.smartViewMock/export",
-  "updatedAt": "2026-11-17",
+  "updatedAt": "2026-11-18",
   "views": [
     {
       "schemaVersion": "floqr.smartView/1",
@@ -416,6 +416,8 @@
           "handle": "@amaraj",
           "verified": true,
           "city": "Washington, DC",
+          "bio": "Public-within-FLOQR bio",
+          "lookingToMeet": "",
           "handles": [
             {
               "network": "instagram",

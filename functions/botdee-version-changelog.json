@@ -1,5 +1,9 @@
 [
   {
+    "id": "s3.3.039",
+    "text": "s3.3.039: People card stacked layout (photo, name+handle, compact SMARTsummary)"
+  },
+  {
     "id": "s3.3.038",
     "text": "s3.3.038: BOT DEE throw a ShoutOut from chat (no stacked help dump)"
   },
@@ -9,7 +13,7 @@
   },
   {
     "id": "s3.3.036",
-    "text": "s3.3.036: BOT DEE history collapse (+ / − Chats nest, Back to Search, recall kept)"
+    "text": "s3.3.036: BOT DEE history collapse (+ / \u2212 Chats nest, Back to Search, recall kept)"
   },
   {
     "id": "s3.3.035",
@@ -45,7 +49,7 @@
   },
   {
     "id": "s3.3.027",
-    "text": "s3.3.027: BOT DEE recall after 300s pause — retrieve stored events, recap last two turns, discussed vs booked"
+    "text": "s3.3.027: BOT DEE recall after 300s pause \u2014 retrieve stored events, recap last two turns, discussed vs booked"
   },
   {
     "id": "s3.3.026",

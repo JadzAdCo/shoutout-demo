@@ -89,11 +89,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "Personen-SMARTcards",
-          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SMARTview. Karten nutzen dasselbe öffentliche Profil und diesel"
+          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: zuerst das Foto in voller Breite, dann Name und Handle, dann eine kompakte SMARTsummary ohne gepolsterte Box. Tippen öffnet die volle SMARTview — dasselbe Layout. Karten nutzen dass"
         },
         "intent:help-botdee-smartcard": {
           "label": "Personen-SMARTcards",
-          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SMARTview. Karten nutzen dasselbe öffentliche Profil und diesel"
+          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: zuerst das Foto in voller Breite, dann Name und Handle, dann eine kompakte SMARTsummary ohne gepolsterte Box. Tippen öffnet die volle SMARTview — dasselbe Layout. Karten nutzen dass"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -1127,11 +1127,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards Personnes",
-          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SMARTview complet. Les cartes utilisent le m"
+          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo pleine largeur d’abord, puis nom et identifiant, puis un SMARTsummary compact sans boîte remplie. Touchez une carte pour ouvrir le SMARTview complet — même empilemen"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcards Personnes",
-          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SMARTview complet. Les cartes utilisent le m"
+          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo pleine largeur d’abord, puis nom et identifiant, puis un SMARTsummary compact sans boîte remplie. Touchez une carte pour ouvrir le SMARTview complet — même empilemen"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -2165,11 +2165,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards de personas",
-          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SMARTview completo. Las tarjetas usan e"
+          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: primero la foto a todo el ancho, luego nombre y @identificador, luego un SMARTsummary compacto sin caja rellena. Toque una tarjeta para abrir el SMARTview completo — el mismo apilado."
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcards de personas",
-          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SMARTview completo. Las tarjetas usan e"
+          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: primero la foto a todo el ancho, luego nombre y @identificador, luego un SMARTsummary compacto sin caja rellena. Toque una tarjeta para abrir el SMARTview completo — el mismo apilado."
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -3203,11 +3203,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard persone",
-          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SMARTview completo. Le schede usano lo stesso profilo pubblico e SMART"
+          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: prima la foto a tutta larghezza, poi nome e handle, poi un SMARTsummary compatto senza riquadro imbottito. Tocca una scheda per aprire lo SMARTview completo — stesso impilamento. Le schede usa"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard persone",
-          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SMARTview completo. Le schede usano lo stesso profilo pubblico e SMART"
+          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: prima la foto a tutta larghezza, poi nome e handle, poi un SMARTsummary compatto senza riquadro imbottito. Tocca una scheda per aprire lo SMARTview completo — stesso impilamento. Le schede usa"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -4241,11 +4241,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards de pessoas",
-          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SMARTview completo. As cards usam o mesmo perfil público e SMARTsum"
+          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto em largura total primeiro, depois nome e handle, depois um SMARTsummary compacto sem caixa preenchida. Toque para abrir o SMARTview completo — o mesmo empilhamento. As cards us"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcards de pessoas",
-          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SMARTview completo. As cards usam o mesmo perfil público e SMARTsum"
+          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto em largura total primeiro, depois nome e handle, depois um SMARTsummary compacto sem caixa preenchida. Toque para abrir o SMARTview completo — o mesmo empilhamento. As cards us"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -5279,11 +5279,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard людей",
-          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SMARTview. Это тот же публичный профиль и SMARTsummary. О"
+          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: сначала фото на всю ширину, затем имя и хендл, затем сжатый SMARTsummary без пустой рамки. Нажмите карточку, чтобы открыть полный SMARTview — та же укладка. Это тот же публичный профи"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard людей",
-          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SMARTview. Это тот же публичный профиль и SMARTsummary. О"
+          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: сначала фото на всю ширину, затем имя и хендл, затем сжатый SMARTsummary без пустой рамки. Нажмите карточку, чтобы открыть полный SMARTview — та же укладка. Это тот же публичный профи"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -6317,11 +6317,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard ατόμων",
-          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SMARTview. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SM"
+          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: πρώτα φωτογραφία σε πλήρες πλάτος, μετά όνομα και handle, μετά συμπαγές SMARTsummary χωρίς γεμάτο πλαίσιο. Πατήστε για πλήρες SMARTview — ίδια στοίβαξη. Οι κάρτες χρησιμοποιούν "
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard ατόμων",
-          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SMARTview. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SM"
+          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: πρώτα φωτογραφία σε πλήρες πλάτος, μετά όνομα και handle, μετά συμπαγές SMARTsummary χωρίς γεμάτο πλαίσιο. Πατήστε για πλήρες SMARTview — ίδια στοίβαξη. Οι κάρτες χρησιμοποιούν "
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -7355,11 +7355,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard osób",
-          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SMARTview. Karty używają tego samego profilu i SMARTsummary. O"
+          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: najpierw zdjęcie na pełną szerokość, potem imię i handle, potem zwarty SMARTsummary bez wypełnionego pola. Dotknij, aby otworzyć pełny SMARTview — ten sam układ. Karty używają tego samego "
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard osób",
-          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SMARTview. Karty używają tego samego profilu i SMARTsummary. O"
+          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: najpierw zdjęcie na pełną szerokość, potem imię i handle, potem zwarty SMARTsummary bez wypełnionego pola. Dotknij, aby otworzyć pełny SMARTview — ten sam układ. Karty używają tego samego "
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -8393,11 +8393,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "Mensen-SMARTcards",
-          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SMARTview te openen. Kaarten gebruiken hetzelfde openbare profiel en "
+          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: eerst een foto over de volle breedte, dan naam en handle, dan een compacte SMARTsummary zonder opgevulde box. Tik om de volledige SMARTview te openen — dezelfde stapeling. Kaarten g"
         },
         "intent:help-botdee-smartcard": {
           "label": "Mensen-SMARTcards",
-          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SMARTview te openen. Kaarten gebruiken hetzelfde openbare profiel en "
+          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: eerst een foto over de volle breedte, dan naam en handle, dan een compacte SMARTsummary zonder opgevulde box. Tik om de volledige SMARTview te openen — dezelfde stapeling. Kaarten g"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -9431,11 +9431,11 @@
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard الأشخاص",
-          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SMARTview الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
+          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: الصورة بعرض كامل أولاً، ثم الاسم والمعرّف، ثم SMARTsummary مضغوط بلا صندوق مبطّن. اضغط لفتح SMARTview الكامل — نفس الترتيب. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard الأشخاص",
-          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SMARTview الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
+          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: الصورة بعرض كامل أولاً، ثم الاسم والمعرّف، ثم SMARTsummary مضغوط بلا صندوق مبطّن. اضغط لفتح SMARTview الكامل — نفس الترتيب. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
