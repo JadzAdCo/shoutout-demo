@@ -127,5 +127,9 @@ module.exports = {
   confirmAdIntakePayment: adFns.confirmAdIntakePayment,
   getAdInvoice: adFns.getAdInvoice,
   onAdInvoiceCreated: adFns.onAdInvoiceCreated,
-  expireAdCampaigns: adFns.expireAdCampaigns
+  expireAdCampaigns: adFns.expireAdCampaigns,
+  classifySmartVisual: require("./smartvisuals-functions").classifySmartVisual,
+  publishSmartVisualDraft: require("./smartvisuals-functions").publishSmartVisualDraft,
+  setSmartVisualOverride: require("./smartvisuals-functions").setSmartVisualOverride,
+  getSmartVisualAdPolicy: require("./smartvisuals-functions").getSmartVisualAdPolicy
 };

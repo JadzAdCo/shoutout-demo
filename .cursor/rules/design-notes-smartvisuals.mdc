@@ -1,0 +1,44 @@
+---
+description: SMARTvisuals — SMARTstencils, SMARTbackgrounds, SMARTnotification, Room SMARTview art, Master Admin Studio
+alwaysApply: false
+---
+
+# SMARTvisuals
+
+Resume: `@smartvisuals$` / `$smartvisuals$`. Official spellings (never translate): **SMARTvisuals**, **SMARTstencils**, **SMARTbackgrounds**, **SMARTview**, **SMARTnotification**. Protected brands: FloqR, Mingl, ShoutOut, BOT DEE / BOT-DEE, floqCast, VIP reserV.
+
+## What it is
+
+A **shared visual service**, not a Features & Services Search tile. Layers on `mingl` + `botDee`. Scenic art is **original SVG illustration**, not photography and not an official destination/Fashion Week/Burning Man mark.
+
+## Source of truth
+
+| Surface | Truth |
+|---|---|
+| Published assets | git `smartvisuals/registry.json` + `catalog.json` + SVG files (26 stencils, 34 backgrounds) |
+| Unpublished drafts | Firestore `smartVisualDrafts` (Master Admin read; Functions-write) |
+| Overrides / cache / ads / audit | `smartVisualOverrides`, `smartVisualSelections`, `smartVisualAdPolicy`, `smartVisualAuditLogs` |
+
+Default-deny: unpublished / unlicensed / unsanitized assets never resolve for patrons.
+
+## Resolver
+
+`smartvisuals-resolver.js` (root ≡ `functions/`). Deterministic tags + aliases. **Gemini off** (`geminiAllowed() === false`) — do not call a model on card view. Private chat `sourceKind: private-chat` → no public SMARTnotification. Prompt injection / remote URLs → ignore + neutral `bg-mingl-room` + `st-people`. Collision (Seattle LA) → same neutral. Cancun Trip → travel + `st-flight` + `bg-bali` (kit has no cancun.svg).
+
+## Surfaces
+
+1. **Search SMARTnotification** — `index.html` `#smartvisualNotificationHost`. Demo only: `?smartvisualInvite=cancun`. View Invitation / Not Now. No fabricated live rooms for all patrons.
+2. **Room SMARTview** — overlay + BOT DEE card hero from `authorizedTitle` only.
+3. **Master Admin SMARTvisual Studio** — `#smartvisualStudio`. SOS2FA + `FLOQRReasonPrompt` to submit drafts. Ads tab documents the empty labeled slot.
+
+Join Now uses `FLOQRNav` (no `?v=`). Display URLs unchanged.
+
+## Ads / headless
+
+Labeled slot below the card. AdSense **never loaded** until a separate policy review. Visual classification must **not** invoke headless partner tools.
+
+## FIX PROMPT
+
+```
+SMARTvisuals: git registry is published truth; Firestore drafts stay off patrons. Resolver deterministic, Gemini off on view. Search overlay only via ?smartvisualInvite=cancun. Cancun → bg-bali + st-flight. Private chat never classifies public art. Ads labeled and empty. Studio SOS2FA + reason. Resume @smartvisuals$.
+```

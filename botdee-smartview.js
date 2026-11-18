@@ -591,8 +591,23 @@
     const confirmable = view.needsConfirmation && view.mode !== "command" && view.mode !== "deny";
     const share = view.mode === "share_preview";
     const denied = view.injectionDenied === true || view.mode === "deny";
+    const visual = window.FLOQRSmartVisuals && view.authorizedTitle
+      ? window.FLOQRSmartVisuals.resolveVisual({
+        title: view.authorizedTitle,
+        description: view.authorizedDescription || "",
+        sourceKind: "authorized-room"
+      })
+      : (window.FLOQRSmartVisuals ? window.FLOQRSmartVisuals.resolveVisual({
+        title: "Mingl Room",
+        description: "",
+        sourceKind: "authorized-room"
+      }) : null);
+    const visualHero = visual ? `<div class="sv-hero botdee-sv-visual" data-sv-reason="${esc(visual.reasonCode || "neutral-fallback")}">
+        <img class="sv-bg" src="${esc(visual.backgroundUrl)}" alt="${esc(t("sv.scenicAlt", "Scenic illustration for this room. Not a photograph."))}"/>
+      </div>` : "";
     return `<article class="botdee-sv-room" data-kind="botDeeRoom" data-rs-mode="${esc(view.mode || "")}" data-rs-decline="${esc(view.declineKey || "")}">
       <h2 class="botdee-sv-room-title">${esc(t("botdee.rs.title", "Room SMARTview"))}</h2>
+      ${visualHero}
       <div class="botdee-sv-room-head">
         <div class="botdee-sv-room-thumb" aria-hidden="true">♣</div>
         <div>
