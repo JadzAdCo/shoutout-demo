@@ -257,17 +257,21 @@
     return rest;
   }
 
+  function foldPeopleNamePunct(value) {
+    return String(value || "").replace(/['’]/g, "'");
+  }
+
   function isPeopleNameNeedle(rest) {
-    const trimmed = String(rest || "").replace(/[?!]+$/g, "").trim();
+    const trimmed = foldPeopleNamePunct(String(rest || "").replace(/[?!]+$/g, "").trim());
     if (!trimmed) return false;
-    if (/^@[\w.-]+$/.test(trimmed)) return true;
+    if (/^@[\p{L}\p{M}0-9_.-]+$/u.test(trimmed)) return true;
     const needle = normalizePeopleQuery(trimmed);
     if (!needle || needle.length < 2) return false;
     if (PEOPLE_STOP_AFTER.test(needle) || PEOPLE_GENERIC.test(needle)) return false;
     if (PEOPLE_VENUE.test(needle) || PEOPLE_PRODUCT.test(needle) || PEOPLE_OPS.test(needle)) return false;
     const tokens = needle.split(" ").filter(Boolean);
     if (!tokens.length || tokens.length > 4) return false;
-    return tokens.every(token => /^@?[\w.'-]+$/.test(token)
+    return tokens.every(token => /^@?[\p{L}\p{M}0-9_.'-]+$/u.test(token)
       && !/^(my|mine|our|your|their|his|her|this|that|these|those|who|what|where|when|how|the|a|an)$/.test(token)
       && !/^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?|bottle|service|composer)$/.test(token));
   }

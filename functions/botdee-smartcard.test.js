@@ -93,6 +93,19 @@ test("tell me about / know-of require a person-name needle", () => {
   assert.equal(cards.isPersonNameNeedle("@DonBans"), true);
 });
 
+test("person-name needles accept accented names and curly apostrophes", () => {
+  const jose = cards.classifyPeopleSearchIntent("Who is José?");
+  assert.equal(jose.intent, "person");
+  assert.match(jose.needle, /José/i);
+  assert.equal(cards.classifyPeopleSearchIntent("tell me about María").intent, "person");
+  assert.equal(cards.classifyPeopleSearchIntent("Who is O'Brien?").intent, "person");
+  assert.equal(cards.classifyPeopleSearchIntent("Who is O’Brien?").intent, "person");
+  assert.equal(cards.classifyPeopleSearchIntent("don banyong’s profile").intent, "person");
+  assert.equal(cards.isPersonNameNeedle("José"), true);
+  assert.equal(cards.isPersonNameNeedle("O’Brien"), true);
+  assert.equal(cards.classifyPeopleSearchIntent("tell me about group reservations").intent, "none");
+});
+
 test("profile field-dump detector needs two SMARTview headings, not any bold + Location", () => {
   assert.equal(cards.looksLikeProfileFieldDump("The **Decades** club lists Location and Instagram in Club Admin."), false);
   assert.equal(cards.looksLikeProfileFieldDump("**Handle** @DonBans is public."), false);
@@ -338,6 +351,7 @@ test("chat client classifies the same know-of prompts as the server", () => {
   assert.match(chat, /if \(!classified \|\| classified\.intent === "none"\) return row;/);
   assert.match(chat, /isPeopleNameNeedle\(needle\)/);
   assert.match(chat, /isNamedPeopleProfileSuffix/);
+  assert.match(chat, /\\p\{L\}/);
   assert.doesNotMatch(chat, /Instagram\|Handle/);
   assert.doesNotMatch(chat, /display\.html\?location=[^"' ]+[?&]v=/);
 });
