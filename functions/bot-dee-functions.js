@@ -123,7 +123,10 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
       const text = bot.extractText(response);
       const replyRaw = text || bot.formatSearchFallback(lastSearch, lang, allowed);
       return {
-        reply: prefs.appendActionHistory(bot.sanitizeFeatureMentions(replyRaw, allowed), actionLinks),
+        reply: prefs.appendActionHistory(
+          bot.sanitizeFeatureMentions(bot.redactPrivilegeReply(replyRaw), allowed),
+          actionLinks
+        ),
         results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
         media: mediaItems.slice(0, 8),
         provider: "gemini",
@@ -155,14 +158,17 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
       bot.mediaFromToolResult(result).forEach(item => {
         if (!mediaItems.some(existing => existing.url === item.url)) mediaItems.push(item);
       });
-      responseParts.push(functionResponsePart(call, bot.stripMediaFromToolResult(result)));
+      responseParts.push(functionResponsePart(
+        call,
+        bot.stripPrivilegeFromToolResult(bot.stripMediaFromToolResult(result))
+      ));
     }
     contents.push({role: "user", parts: responseParts});
   }
 
   return {
     reply: prefs.appendActionHistory(
-      bot.sanitizeFeatureMentions(bot.formatSearchFallback(lastSearch, lang, allowed), allowed),
+      bot.sanitizeFeatureMentions(bot.redactPrivilegeReply(bot.formatSearchFallback(lastSearch, lang, allowed)), allowed),
       actionLinks
     ),
     results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
@@ -179,6 +185,16 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const isActive = !!active;
+  if (bot.isPrivilegeAskPrompt(userPrompt)) {
+    return {
+      reply: bot.privilegeRefuseReply(),
+      results: [],
+      provider: "local-privacy",
+      model: "privilege-guard",
+      toolRounds: 0,
+      uiLanguage: lang
+    };
+  }
   if (bot.isAckPrompt(userPrompt)) {
     return {
       reply: bot.ackReply(role, userPrompt),
@@ -272,7 +288,11 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
       replyKey: room.replyKey
     };
   }
-  const search = bot.localizeSearchPayload(bot.contextualSearch(userPrompt, role, allowed), lang, allowed);
+  const search = bot.localizeSearchPayload(
+    bot.contextualSearch(userPrompt, bot.geminiGroundingRole(role), allowed),
+    lang,
+    allowed
+  );
   return {
     reply: bot.sanitizeFeatureMentions(bot.formatSearchFallback(search, lang, allowed), allowed),
     results: bot.resultsForClient(search, lang),
@@ -470,7 +490,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         geminiOnView: false
       };
     } else if (
-      bot.isAckPrompt(userPrompt)
+      bot.isPrivilegeAskPrompt(userPrompt)
+      || bot.isAckPrompt(userPrompt)
       || bot.isMoodPrompt(userPrompt)
       || bot.isChitchatPrompt(userPrompt)
       || bot.isIdentityPrompt(userPrompt)
@@ -543,9 +564,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     console.info(JSON.stringify({
       event: "botdee.session",
       uid,
-      role,
       uiLanguage,
-      allowedFeatures,
       provider: outcome.provider,
       durable: !!settings.durableThreads,
       results: (outcome.results || []).length,

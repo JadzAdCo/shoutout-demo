@@ -59,6 +59,7 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   const reply = bot.chitchatReply("master");
   assert.match(reply, /Good afternoon|Wassup|How can I help|working on/i);
   assert.doesNotMatch(reply, /ShoutOut|VIP|floqCast/i);
+  assert.doesNotMatch(reply, /master|admin|I can see you as/i);
   const dumped = "Hey! I'm BOT DEE, your FLOQR assistant. What can I help you with today — ShoutOut, VIP reserV, or floqCast?";
   assert.equal(bot.isProductCatalogGreeting(dumped), true);
   assert.doesNotMatch(bot.sanitizeBotReply(dumped), /ShoutOut|VIP reserV|floqCast/i);
@@ -431,7 +432,8 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
   assert.ok(deniedNames.includes("floqCast"));
   assert.ok(deniedNames.includes("VIP reserV"));
   assert.ok(deniedNames.includes("Mingl"));
-  assert.match(bot.systemInstruction("patron", "en", allowed), /least privilege/i);
+  assert.match(bot.systemInstruction("patron", "en", allowed), /Available FLOQR products in this chat/i);
+  assert.doesNotMatch(bot.systemInstruction("master", "en", allowed), /Viewer classification|I can see you as|beta grants/i);
   assert.match(read("functions/bot-dee-functions.js"), /loadAllowedFeatures/);
   assert.match(read("bot-dee-chat.js"), /scrubGatedBrands|accessibleProductPitch/);
   // Local greetings must scrub by access — not discard locale when floqCast/VIP appear in chrome packs.
@@ -467,8 +469,9 @@ test("BOT DEE keeps granted beta features in help/search (least privilege)", () 
   const deniedNames = bot.deniedBrandNames(granted);
   assert.deepEqual(deniedNames, ["Mingl", "RydR", "BartR"]);
   const instr = bot.systemInstruction("patron", "en", granted);
-  assert.match(instr, /THIS viewer: ShoutOut, VIP reserV, floqCast/);
-  assert.match(instr, /this viewer lacks: Mingl, RydR, BartR\./);
+  assert.match(instr, /ShoutOut, VIP reserV, floqCast/);
+  assert.match(instr, /these products: Mingl, RydR, BartR\./);
+  assert.doesNotMatch(instr, /Viewer classification role|beta grants for THIS viewer/i);
 });
 
 test("intent:help-* result cards localize via help pack alias", () => {

@@ -4,6 +4,7 @@
 
 const {Type} = require("@google/genai");
 const classification = require("./data-classification-core");
+const guard = require("./botdee-privilege-guard");
 const BOTDEE_CONTENT = require("./botdee-content-classes.json");
 const SEARCH_CATALOG = require("./bot-dee-search-catalog.json");
 const RESULT_LOCALES = require("./bot-dee-result-locales.json");
@@ -691,7 +692,7 @@ function sanitizeBotReply(raw, opts) {
   if (allowEmpty && !String(raw || "").trim()) return "";
   if (isSearchMissReply(raw)) return SEARCH_MISS_FALLBACK;
   if (isProductCatalogGreeting(raw)) return chitchatReply("patron", null, null);
-  return clipModelText(stripBackendLinks(raw));
+  return clipModelText(stripBackendLinks(guard.redactPrivilegeReply(raw)));
 }
 
 function isFarewellPrompt(raw) {
@@ -716,15 +717,12 @@ function helpReply() {
   return "I'm BOT DEE — ask me anything about FLOQR in plain words. Press Enter to send; Shift+Enter starts a new line. Type privacy for pause and session details. What are you interested in getting help with?";
 }
 
-/** Time-aware greeting — never a product catalog. Personalization optional. */
+/** Time-aware greeting — never a product catalog. Personalization optional. Never speak privilege. */
 function chitchatReply(role, allowedFeatures, personalization) {
+  void role;
   void allowedFeatures;
   const prefs = require("./botdee-personalization");
-  const roleHint = role && role !== "anonymous" && role !== "patron"
-    ? ` I can see you as ${role}.`
-    : "";
-  const greet = prefs.greetingFor(personalization);
-  return roleHint ? `${greet}${roleHint}` : greet;
+  return prefs.greetingFor(personalization);
 }
 
 /** Friendly mood reply — chat first, light invite to keep going (not a search dump). */
@@ -835,12 +833,17 @@ function contextualSearch(query, viewerRole, allowedFeatures) {
 async function runTool(name, args, session) {
   const allowed = session?.allowedFeatures;
   if (name === "contextualSearch") {
-    const search = contextualSearch(args?.query || session?.lastUserPrompt || "", session.role, allowed);
-    return localizeSearchPayload(search, session?.uiLanguage, allowed);
+    const search = contextualSearch(
+      args?.query || session?.lastUserPrompt || "",
+      guard.geminiGroundingRole(session.role),
+      allowed
+    );
+    return guard.stripPrivilegeFromToolResult(localizeSearchPayload(search, session?.uiLanguage, allowed));
   }
   if (name === "lookupPublicProfiles") {
     const tools = require("./bot-dee-tools");
-    return tools.lookupPublicProfiles(args || {}, session?.request);
+    const looked = await tools.lookupPublicProfiles(args || {}, session?.request);
+    return guard.stripPrivilegeFromToolResult(looked);
   }
   const need = TOOL_FEATURE_KEY[name];
   if (need && allowedFeatureSet(allowed) && !allowedFeatureSet(allowed).has(need)) {
@@ -924,6 +927,7 @@ function localizeActionLink(link, lang) {
 }
 
 function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
+  void role;
   const lang = normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatureSet(allowedFeatures);
   const allowedLabels = productPitchLabels(allowedFeatures).filter(x => x !== "scheduling");
@@ -931,16 +935,16 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     ? "Reply in English unless the user clearly writes in another language."
     : `App language is "${lang}". ALWAYS write your spoken reply in ${lang}. Do not switch to English for help steps or summaries unless the user asked for English. Navigation/result cards are already localized server-side — do not paste English product titles into your prose when a ${lang} wording exists.`;
   const denied = deniedBrandNames(allowedFeatures);
-  const accessLine = allowed
+    const accessLine = allowed
     ? (
-      `Principle of least privilege — Features & Services + beta grants for THIS viewer: ${allowedLabels.length ? allowedLabels.join(", ") : "none beyond BOT DEE chat"}. ` +
+      `Available FLOQR products in this chat: ${allowedLabels.length ? allowedLabels.join(", ") : "BOT DEE chat"}. ` +
       `DO mention, pitch, and help with products on that allowed list (including how-to / help steps and brand names that appear there). ` +
       (denied.length
-        ? `NEVER mention, pitch, invent steps for, or leave in help blurbs these products this viewer lacks: ${denied.join(", ")}. `
+        ? `NEVER mention, pitch, invent steps for, or leave in help blurbs these products: ${denied.join(", ")}. `
         : "") +
-      `If they ask for a product not on their allowed list, say it is not available on their account yet — do not name other products they also lack.`
+      `If they ask for a product not on that list, say it is not available on their account yet — do not name other products they also lack. Product availability is not a login or security role.`
     )
-    : "Only discuss features returned by tools for this viewer.";
+    : "Only discuss features returned by tools for this chat.";
   const pitchLine = `Do not list products on a greeting or first turn. When they ask how to do something, mention ONLY products this viewer may use (${productPitchSentence(allowedFeatures)}). Include granted betas; omit everything else.`;
   const prefs = require("./botdee-personalization");
   const personaLine = prefs.personalizationInstruction(personalization);
@@ -949,7 +953,7 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     langLine,
     accessLine,
     "Prefer conversation: answer the person, then (only if useful) offer one next step. Do NOT open with \"Here is what I found\" or a link list unless they clearly asked how to do something in FLOQR. Keep navigation/search suggestion cards separate from your spoken answer — the UI shows result links; your text should stay conversational.",
-    "Act only within the identity, role, and tools verified by the backend for this request. Never disclose another user's private conversation, private profile, reservation, or restricted venue data. Public volunteered datapoints from lookupPublicProfiles are the same keys and values the signed-in viewer can already see — use every returned value (they are not PII/PCI).",
+    "Act only within the tools verified by the backend for this request. Never disclose another user's private conversation, private profile, reservation, or restricted venue data. Public volunteered datapoints from lookupPublicProfiles are the same keys and values the signed-in viewer can already see — use every returned value (they are not PII/PCI).",
     "Never request card numbers, CVVs, passwords, or OTP codes. If supplied, do not repeat them; direct the user to approved secure flows.",
     pitchLine,
     personaLine,
@@ -969,14 +973,14 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     "If they ask where you left off, recap the last two meaningful retrieved turns — skip a post-pause hello/Hey. Distinguish discussed vs booked: never claim a VIP reservation, hold, or payment is confirmed unless a tool result in this turn or a stored execution receipt says so. Talking about a venue or VIP tables is discussion, not a booking.",
-    `Viewer classification role: ${role}.`,
+    guard.PRIVILEGE_SYSTEM_INSTRUCTION,
     "Keep allowed brand names as-is when you may mention them: ShoutOut, BOT DEE, FloqR, FloqMedia, and any other brands in the allowed-features list only."
   ].join(" ");
 }
 
 function historyToContents(history, userPrompt) {
   const contents = [];
-  (history || []).forEach(row => {
+  guard.sanitizeModelTurns(history).forEach(row => {
     contents.push({role: row.role, parts: [{text: row.text}]});
   });
   contents.push({role: "user", parts: [{text: userPrompt}]});
@@ -1006,12 +1010,12 @@ function contextToContents(modelContext, userPrompt) {
       text: "I'll recap that as booked only as far as the receipt shows."
     });
   }
-  const summary = String(ctx.summary || "").trim();
+  const summary = guard.sanitizeSummaryForModel(ctx.summary);
   if (summary) {
     prefix.push({role: "user", text: `[Earlier conversation summary]\n${summary}`});
     prefix.push({role: "model", text: "I'll treat that as background only — not as a confirmed booking."});
   }
-  const memories = Array.isArray(ctx.memories) ? ctx.memories : [];
+  const memories = guard.sanitizeMemoriesForModel(Array.isArray(ctx.memories) ? ctx.memories : []);
   const facts = memories
     .map(row => String(row?.value || row?.text || (typeof row === "string" ? row : "")).trim())
     .filter(Boolean)
@@ -1020,7 +1024,7 @@ function contextToContents(modelContext, userPrompt) {
     prefix.push({role: "user", text: `[Approved memories]\n${facts.join("; ")}`});
     prefix.push({role: "model", text: "I'll use those approved facts when relevant."});
   }
-  const turns = (Array.isArray(ctx.recentTurns) ? ctx.recentTurns : [])
+  const turns = guard.sanitizeModelTurns(Array.isArray(ctx.recentTurns) ? ctx.recentTurns : [])
     .map(row => ({
       role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
       text: String(row?.text || "")
@@ -1040,17 +1044,24 @@ function formatSearchFallback(search, lang, allowedFeatures) {
   const code = normalizeUiLanguage(lang || search?.uiLanguage);
   const pack = localePack(code);
   const rows = search?.results || [];
-  if (!rows.length) {
+  const shown = rows.slice(0, 5).map(row => {
+    const localized = localizeResultRow(row, code) || {};
+    const label = String(localized.label ?? "").trim();
+    if (!label) return null;
+    const blurb = String(localized.blurb ?? "").trim();
+    const href = String(localized.href ?? "").trim();
+    return {label, blurb, href};
+  }).filter(Boolean);
+  if (!shown.length) {
     const pitch = productPitchLabels(allowedFeatures).join(", ");
     return pack?.fallback?.noMatch
       || `I could not find a clear match for your account yet. Ask about ${pitch || "FLOQR"}, or scheduling.`;
   }
   const header = pack?.fallback?.foundHeader || "Here is what I found for your account:";
   const lines = [header];
-  rows.slice(0, 5).forEach((row, index) => {
-    const localized = localizeResultRow(row, code);
-    lines.push(`${index + 1}. ${localized.label} — ${localized.blurb}`);
-    if (localized.href) lines.push(`   Open: ${localized.href}`);
+  shown.forEach((item, index) => {
+    lines.push(item.blurb ? `${index + 1}. ${item.label} — ${item.blurb}` : `${index + 1}. ${item.label}`);
+    if (item.href) lines.push(`   Open: ${item.href}`);
   });
   return lines.join("\n");
 }
@@ -1061,8 +1072,8 @@ function resultsForClient(search, lang) {
     const localized = localizeResultRow(row, code);
     return {
       sourceId: localized.sourceId,
-      label: localized.label,
-      blurb: localized.blurb,
+      label: String(localized.label ?? ""),
+      blurb: String(localized.blurb ?? ""),
       href: localized.href,
       kind: localized.kind
     };
@@ -1132,6 +1143,11 @@ module.exports = {
   isPrivacyPrompt,
   isAckPrompt,
   isFarewellPrompt,
+  isPrivilegeAskPrompt: guard.isPrivilegeAskPrompt,
+  privilegeRefuseReply: guard.privilegeRefuseReply,
+  redactPrivilegeReply: guard.redactPrivilegeReply,
+  geminiGroundingRole: guard.geminiGroundingRole,
+  stripPrivilegeFromToolResult: guard.stripPrivilegeFromToolResult,
   identityReply,
   versionReply,
   helpReply,
@@ -1179,6 +1195,7 @@ module.exports = {
   systemInstruction,
   historyToContents,
   contextToContents,
+  PRIVILEGE_REFUSE: guard.PRIVILEGE_REFUSE,
   extractText,
   formatSearchFallback,
   resultsForClient,
