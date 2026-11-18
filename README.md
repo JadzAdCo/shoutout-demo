@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.038 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.039 (stable)
 
+- s3.3.039: People card stacked layout (photo, name+handle, compact SMARTsummary)
 - s3.3.038: BOT DEE throw a ShoutOut from chat (no stacked help dump)
 - s3.3.037: BOT DEE SMARTview transcript scroll + rename saved chats
 - s3.3.036: BOT DEE history collapse (+ / − Chats nest, Back to Search, recall kept)

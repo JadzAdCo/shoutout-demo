@@ -767,6 +767,8 @@ function peopleV2Payload({
     handle: snap.handle ? `@${snap.handle}` : "",
     verified: snap.verified === true,
     city: snap.city || "",
+    bio: snap.bio || "",
+    lookingToMeet: datingVisible ? (snap.lookingToMeet || "") : "",
     handles,
     photo: peopleHeroPhoto(snap),
     media: {

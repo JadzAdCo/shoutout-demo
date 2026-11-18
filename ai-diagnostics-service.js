@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.038";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.038";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.039";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.039";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.039",
+      title: "s3.3.039 — People card stacked layout (photo / name+handle / compact SMARTsummary)",
+      checks: [
+        {label:"Stacked people renderer", file:"botdee-smartview.js", includes:["function peopleFactsHtml(", "botdee-sv-id", "peopleHandleHtml"]},
+        {label:"Full-width photo CSS", file:"botdee-smartview.css", includes:["clamp(132px, 38vw, 176px)", "botdee-sv-summary-btn", "min-height: 0", "botdee-sv-facts"]},
+        {label:"Payload bio + lookingToMeet", file:"functions/botdee-smartview-v2-core.js", includes:["bio: snap.bio || \"\"", "lookingToMeet: datingVisible"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-039-people-card-layout"]}
+      ]
+    },
     {
       version: "s3.3.038",
       title: "s3.3.038 — BOT DEE throw a ShoutOut (no stacked help dump)",
@@ -3393,6 +3403,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-039-people-card-layout",
+      area:"BOT DEE",
+      feature:"People card stacked layout (chat + SMARTview)",
+      changed:"s3.3.039 — Approved People card: (1) full-width photo, (2) name + handle, (3) compact SMARTsummary with no min-height padded box, then compacted Bio / Location / Looking to meet / Socials. Chat People cards and View my SMARTview match.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.039. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — card shows photo full width on top, Don Papi and @handle on the next row, SMARTsummary as inline text (not a tall empty box). 3) Open My Profile → Features & Orders → My BOT DEE → View my SMARTview — same stack. 4) Phone ~390 and desktop ~1280. Empty fields take no height. Display URLs have no ?v=. 5) Mark Succeed/Failed.",
+      expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
+      troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
+    },
     {
       id:"s3-3-038-botdee-throw-shoutout",
       area:"BOT DEE",

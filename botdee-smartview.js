@@ -242,11 +242,79 @@
     return {photosList, videosList, photo, video, count};
   }
 
+  function lookingToMeetOf(people) {
+    const direct = String(people?.lookingToMeet || "").trim();
+    if (direct) return people?.datingVisible === false ? "" : direct;
+    if (people?.datingVisible === false) return "";
+    const prefs = people?.categories?.Dating?.Preferences;
+    return Array.isArray(prefs) && prefs[0] ? String(prefs[0]).trim() : "";
+  }
+
+  function socialNetworkLabel(row) {
+    const network = String(row?.network || "").toLowerCase();
+    if (network === "instagram") return t("botdee.sv.instagram", "Instagram");
+    if (network === "x" || network === "twitter") return t("botdee.sv.xNetwork", "X");
+    return "";
+  }
+
+  /** Line 2 handle: FLOQR handle first, else first public social handle. */
+  function primaryHandleOf(people) {
+    const floqr = String(people?.handle || "").trim();
+    if (floqr) {
+      return {label: floqr.startsWith("@") ? floqr : `@${floqr.replace(/^@+/, "")}`, href: ""};
+    }
+    const handles = Array.isArray(people?.handles) ? people.handles : [];
+    const first = handles.find(row => row && String(row.handle || "").trim());
+    if (!first) return null;
+    return {label: String(first.handle).trim(), href: first.href || ""};
+  }
+
+  function peopleHandleHtml(people) {
+    const handle = primaryHandleOf(people);
+    if (!handle || !handle.label) return "";
+    const href = resolveSameOriginHref(handle.href || "");
+    if (!href) return `<span class="botdee-sv-handle">${esc(handle.label)}</span>`;
+    return `<a class="botdee-sv-handle" href="${esc(href)}" rel="noopener noreferrer" target="_blank">${esc(handle.label)}</a>`;
+  }
+
+  function peopleNameHtml(people, payload) {
+    const name = people.displayName || payload?.title || "";
+    return `${esc(name)}${people.verified ? " <span class=\"botdee-sv-tick\" aria-hidden=\"true\">◆</span>" : ""}`;
+  }
+
+  function peopleFactsHtml(people) {
+    const rows = [];
+    const bio = String(people?.bio || "").trim();
+    if (bio) {
+      rows.push(`<dt>${esc(t("botdee.sv.bio", "Bio"))}</dt><dd>${esc(bio)}</dd>`);
+    }
+    const city = String(people?.city || "").trim();
+    if (city) {
+      rows.push(`<dt>${esc(t("botdee.sv.location", "Location"))}</dt><dd>${esc(city)}</dd>`);
+    }
+    const meet = lookingToMeetOf(people);
+    if (meet) {
+      rows.push(`<dt>${esc(t("botdee.sv.lookingToMeet", "Looking to meet"))}</dt><dd>${esc(meet)}</dd>`);
+    }
+    const socials = (Array.isArray(people?.handles) ? people.handles : []).filter(row => row && String(row.handle || "").trim());
+    if (socials.length) {
+      const links = socials.map(row => {
+        const href = resolveSameOriginHref(row.href || "");
+        const network = socialNetworkLabel(row);
+        const label = network ? `${network} ${row.handle}` : row.handle;
+        if (!href) return `<span>${esc(label)}</span>`;
+        return `<a href="${esc(href)}" rel="noopener noreferrer" target="_blank">${esc(label)}</a>`;
+      }).join("");
+      rows.push(`<dt>${esc(t("botdee.sv.socials", "Socials"))}</dt><dd><div class="botdee-sv-socials">${links}</div></dd>`);
+    }
+    if (!rows.length) return "";
+    return `<dl class="botdee-sv-facts">${rows.join("")}</dl>`;
+  }
+
   function renderCompactPeopleCard(payload) {
     const people = peopleOf(payload);
     if (!people) return "";
     const hero = peopleHeroMedia(people);
-    const handles = Array.isArray(people.handles) ? people.handles : [];
     const summaryText = people.summary?.excerpt || people.summary?.text || "";
     const localeNote = statusLabel(people.summary);
     const name = people.displayName || payload.title || "";
@@ -260,18 +328,14 @@
         : `<span class="botdee-sc-thumb-empty" aria-hidden="true"></span>`);
     return `<article class="botdee-sv-people botdee-sc-card" data-kind="patron" data-presentation="peopleSmartCard" data-subject-uid="${esc(uid)}" role="button" tabindex="0" aria-label="${esc(t("botdee.sc.openSMARTview", "Open SMARTview"))}">
       <div class="botdee-sc-row">
-        <div class="botdee-sc-thumb" aria-hidden="${hasMedia ? "false" : "true"}">
+        <div class="botdee-sc-thumb botdee-sv-portrait" aria-hidden="${hasMedia ? "false" : "true"}">
           ${thumb}
         </div>
         <div class="botdee-sc-body">
-          <div class="botdee-sc-name">${esc(name)}${people.verified ? " <span class=\"botdee-sv-tick\" aria-hidden=\"true\">◆</span>" : ""}</div>
-          <div class="botdee-sv-handles">${handles.map(row => {
-            const href = resolveSameOriginHref(row.href || "");
-            const label = row.handle || "";
-            if (!label) return "";
-            if (!href) return `<span>${esc(label)}</span>`;
-            return `<a href="${esc(href)}" rel="noopener noreferrer" target="_blank">${esc(label)}</a>`;
-          }).join("")}${people.city ? `<span>${esc(people.city)}</span>` : ""}</div>
+          <div class="botdee-sv-id">
+            <div class="botdee-sc-name botdee-sv-name">${peopleNameHtml(people, payload)}</div>
+            ${peopleHandleHtml(people)}
+          </div>
           <p class="botdee-sc-summary">${esc(summaryText || t("botdee.sc.summaryPending", "No SMARTsummary is published yet."))}</p>
           ${localeNote ? `<span class="botdee-sv-locale">${localeNote}</span>` : ""}
         </div>
@@ -290,12 +354,12 @@
     const photo = hero.photo;
     const videoHero = hero.video;
     const count = hero.count;
-    const handles = Array.isArray(people.handles) ? people.handles : [];
     const profileHref = resolveSameOriginHref(people.profileHref || "./patron-portal.html?tab=profile");
     const minglHref = resolveSameOriginHref(people.minglHref || "./?start=search");
-    const summaryText = people.summary?.text || "";
+    const summaryText = people.summary?.text || people.summary?.excerpt || "";
     const localeNote = statusLabel(people.summary);
     const uid = people.subjectUid || "";
+    const hasMedia = !!(photo || videoHero);
     return `<article class="botdee-sv-people" data-kind="patron" data-primary="${esc(primary)}" data-secondary="${esc(secondary)}" data-subject-uid="${esc(uid)}">
       <div class="botdee-sv-people-head">
         <strong>${esc(t("botdee.sv.person", "SMARTview — Person"))}</strong>
@@ -303,25 +367,21 @@
       </div>
       ${mock ? `<p class="botdee-sv-mock">${esc(t("botdee.smartviewMockBadge", "Mock / not live licensed data"))}</p>` : ""}
       <div class="botdee-sv-identity">
-        <button type="button" class="botdee-sv-portrait" data-sv-open="media" ${photo || videoHero ? "" : "hidden"} aria-label="${esc(t("botdee.sv.openMedia", "View shared photos and videos"))}">
+        <button type="button" class="botdee-sv-portrait" data-sv-open="media" ${hasMedia ? "" : "hidden"} aria-label="${esc(t("botdee.sv.openMedia", "View shared photos and videos"))}">
           ${photo ? `<img src="${esc(photo)}" alt="${esc(people.displayName || "")}"/>` : (videoHero ? `<video src="${esc(videoHero)}" muted playsinline preload="metadata" aria-hidden="true"></video>` : "")}
           ${count ? `<span class="botdee-sv-counter">${esc(String(Math.min(1, count)))}/${esc(String(count))}</span>` : ""}
         </button>
-        <div class="botdee-sv-identity-main">
-          <div class="botdee-sv-name">${esc(people.displayName || payload.title || "")}${people.verified ? " <span class=\"botdee-sv-tick\" aria-hidden=\"true\">◆</span>" : ""}</div>
-          <div class="botdee-sv-handles">${handles.map(row => {
-            const href = resolveSameOriginHref(row.href || "");
-            if (!href) return "";
-            return `<a href="${esc(href)}" rel="noopener noreferrer" target="_blank">${esc(row.handle || "")}</a>`;
-          }).join("")}${people.city ? `<span>${esc(people.city)}</span>` : ""}</div>
-          <button type="button" class="botdee-sv-summary-btn" data-sv-open="summary">
-            <span class="botdee-sv-summary-kicker">${esc(t("botdee.sv.smartSummary", "SMARTsummary"))}</span>
-            <p class="botdee-sv-summary-text">${esc(summaryText)}</p>
-            ${localeNote ? `<span class="botdee-sv-locale">${localeNote}</span>` : ""}
-            <span class="botdee-sv-more">${esc(t("botdee.sv.tapMore", "Tap for more information"))}</span>
-          </button>
+        <div class="botdee-sv-id">
+          <div class="botdee-sv-name">${peopleNameHtml(people, payload)}</div>
+          ${peopleHandleHtml(people)}
         </div>
+        <button type="button" class="botdee-sv-summary-btn" data-sv-open="summary" aria-label="${esc(t("botdee.sv.smartSummary", "SMARTsummary"))}">
+          <span class="botdee-sv-summary-kicker">${esc(t("botdee.sv.smartSummary", "SMARTsummary"))}</span>
+          <span class="botdee-sv-summary-text">${esc(summaryText)}</span>
+          ${localeNote ? `<span class="botdee-sv-locale">${localeNote}</span>` : ""}
+        </button>
       </div>
+      ${peopleFactsHtml(people)}
       <div class="botdee-sv-primary" role="tablist" aria-label="${esc(t("botdee.sv.categories", "SMARTview categories"))}">${PRIMARY_META.map(tab => (
         `<button type="button" class="botdee-sv-tab" role="tab" data-sv-primary="${esc(tab.id)}" aria-selected="${tab.id === primary ? "true" : "false"}"><span class="botdee-sv-tab-ico" aria-hidden="true">${tab.icon}</span> ${esc(t(tab.key, tab.label))}</button>`
       )).join("")}</div>
