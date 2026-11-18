@@ -105,7 +105,7 @@
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
     ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
-    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1 + personalization + userbotdeelastUsedtime + chatTitles); Functions-write"],
+    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1 + personalization + userbotdeelastUsedtime + chatTitles); spoken replies privilege-stripped (no Master Admin / Super Admin / SOS2FA / claims / beta-tester / Club Admin status); redaction does not log leaked text; Functions-write"],
     ["botDeeThreads/events", "ownMaster", 1, "Append-only BOT DEE chat events for one uid thread; Functions-write"],
     ["botDeeThreads/archive", "ownMaster", 1, "Opt-in BOT DEE durable messages; survives idle pause; Functions-write; no IP"],
     ["botDeeThreads/memories", "ownMaster", 1, "User-controlled BOT DEE memories; Functions-write; opt-in"],

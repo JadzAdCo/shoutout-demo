@@ -103,6 +103,9 @@ test("BOT DEE page is a guarded satellite with chat only (no Quick intent search
   assert.match(page, /requireUsage/);
   assert.match(page, /botDeeChatInput/);
   assert.match(read("bot-dee-chat.js"), /executeBotSession/);
+  assert.match(read("bot-dee-chat.js"), /isPrivilegeAskPrompt/);
+  assert.match(read("bot-dee-chat.js"), /botdee\.privilegeRefuse/);
+  assert.doesNotMatch(read("bot-dee-chat.js"), /isMasterAdmin|role:\s*["']master["']/);
   assert.match(read("bot-dee-chat.js"), /getBotDeeThread/);
   assert.match(read("bot-dee-chat.js"), /Restoring your conversation/);
   assert.match(read("bot-dee-chat.js"), /durableEnabled/);

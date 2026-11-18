@@ -226,6 +226,30 @@
     return false;
   }
 
+  const PRIVILEGE_REFUSE_EN = "I don't have account-security details.";
+  const PRIVILEGE_LEAK_RE = /master\s*-?\s*admin|super\s*-?\s*admin|sos\s*-?\s*2fa|sos2fa|beta\s*-?\s*tester|i can see you as|your login is\s+master|you(?:'re| are)\s+(?:a\s+)?(?:master|super\s*admin|club\s*admin)|can (?:open|access) master admin|token\s+claims?|classification\s+role/i;
+
+  function privilegeRefuseReply() {
+    return t("botdee.privilegeRefuse", PRIVILEGE_REFUSE_EN);
+  }
+
+  function isPrivilegeAskPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 200) return false;
+    if (/^(?:who am i|about me|what do you know about me|tell me about me)\??$/.test(q)) return false;
+    if (/(?:am i|are we|is my (?:account|login)|do i have|what(?: s| is) my|can i open|can i access).{0,48}club\s*-?\s*admin/.test(q)) {
+      return true;
+    }
+    if (/(?:am i|are we|is my (?:account|login|user)|do i have|what(?: s| is) my|can i open|can i access|tell me if i(?: m| am))/.test(q)
+      && /master\s*-?\s*admin|super\s*-?\s*admin|sos\s*-?\s*2fa|sos2fa|beta\s*-?\s*tester|token\s+claims?|custom\s+claims?/.test(q)) {
+      return true;
+    }
+    if (/^(?:am i (?:a |the )?(?:master|super|admin|privileged)|what(?: s| is) my (?:privilege|access level|admin status)|what privileges? do i have)\??$/.test(q)) {
+      return true;
+    }
+    return false;
+  }
+
   function packageLabel() {
     try {
       const nav = global.FLOQRNav;
@@ -965,6 +989,7 @@
   }
 
   function localBotReply(text, {resuming}) {
+    if (isPrivilegeAskPrompt(text)) return privilegeRefuseReply();
     if (isIdentityPrompt(text)) return identityReply();
     if (isVersionPrompt(text)) return versionReply(text);
     if (isPrivacyPrompt(text)) return privacyReply();
@@ -1014,7 +1039,7 @@
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
-    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text) || isRoomSmartViewPrompt(text))) {
+    if (!durableEnabled && (isPrivilegeAskPrompt(text) || isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text) || isRoomSmartViewPrompt(text))) {
       const roomSession = !isVersionPrompt(text) && !isHelpPrompt(text) && !isPrivacyPrompt(text)
         ? buildLocalRoomSession(text)
         : null;
@@ -1172,6 +1197,9 @@
       || text === "No answer yet — try quick intent search."
     ) {
       return t("botdee.chatEmpty", "No answer yet — try asking another way.");
+    }
+    if (text === PRIVILEGE_REFUSE_EN || PRIVILEGE_LEAK_RE.test(text)) {
+      return privilegeRefuseReply();
     }
     if (isProductCatalogGreeting(text)) {
       const fromPrefs = global.FLOQRBotDeePersonalization?.greetingFor?.();
