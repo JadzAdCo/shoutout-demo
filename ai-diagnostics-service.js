@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.037";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.037";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.038";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.038";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.038",
+      title: "s3.3.038 — BOT DEE throw a ShoutOut (no stacked help dump)",
+      checks: [
+        {label:"Execute prompt omits search", file:"functions/bot-dee-core.js", includes:["isShoutOutExecutePrompt", "omitContextualSearchForPrompt", "shoutOutExecuteFallback"]},
+        {label:"Gemini throw omits contextualSearch", file:"functions/bot-dee-functions.js", includes:["omitContextualSearchForPrompt", "isShoutOutExecutePrompt(userPrompt)"]},
+        {label:"Privilege as-role required", file:"functions/botdee-privilege-guard.js", includes:["Require a privilege role after \"as\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-038-botdee-throw-shoutout"]}
+      ]
+    },
     {
       version: "s3.3.037",
       title: "s3.3.037 — BOT DEE SMARTview scroll + rename saved chats",
@@ -3373,6 +3383,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-038-botdee-throw-shoutout",
+      area:"BOT DEE",
+      feature:"Throw a ShoutOut from chat (no stacked help dump)",
+      changed:"s3.3.038 — 'throw a shoutout' was Gemini/search fallback: Here is what I found + 8 help cards (Throw a ShoutOut, Baller's Alert, Black Card…). Execute prompts now omit contextualSearch, ask for venue + message, and offer one compose link (shoutout-search.html?from=botdee). startShoutOutCheckout still needs clubLocationId + shoutout payload for a Stripe URL. Privilege filter no longer redacts 'I can see you as wanting to throw a ShoutOut'. Functions deploy required.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.038. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout. Expect a short ask for club + message and/or one Open ShoutOut compose link — NOT a stack of Baller's Alert / Black Card / Halloween help cards and NOT 'Here is what I found for your account'. 3) Name a venue (Aurelia / Decades) and a line of text — BOT DEE may return composeHref or a Stripe checkoutUrl (never a card number prompt). 4) Send how do I throw a shoutout — help/search cards are OK. 5) Mark Succeed/Failed.",
+      expected:"Execute throw = compose/checkout path. How-to = search cards. No privilege-refuse on a throw-help sentence.",
+      troubleshoot:"Still stacked help → executeBotSession not this SHA (Gemini failed → old local-fallback) or cached bot-dee-chat.js. Compose link 404 → shoutout-search.html on Pages. Checkout missing → Gemini has no templateId/text/screenFormatId; headless pay is not a stub without payload. Privilege refuse on throw copy → PRIVILEGE_LEAK_RE still matching 'I can see you as' without a role."
+    },
     {
       id:"s3-3-037-botdee-smartview-scroll-rename",
       area:"BOT DEE",

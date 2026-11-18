@@ -230,7 +230,7 @@
   const VIEWER_PRIVILEGE_ROLE = "(?:master(?:\\s|-)*admin|super(?:\\s|-)*admin|beta(?:\\s|-)*tester|club(?:\\s|-)*admin|privileged(?:\\s|-)*employee)";
   /** Keep in sync with functions/botdee-privilege-guard.js (test asserts identical join source). */
   const PRIVILEGE_LEAK_RE = new RegExp([
-    `\\bi\\s+(?:can\\s+)?see\\s+you\\s+as\\b`,
+    `\\bi\\s+(?:can\\s+)?see\\s+you\\s+as\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
     `\\byour\\s+login\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
     `\\byour\\s+role\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
     `\\byou(?:'re|\\s+are|\\s+were|\\s+have\\s+been)\\s+(?:a\\s+|an\\s+)?${VIEWER_PRIVILEGE_ROLE}\\b`,
@@ -286,7 +286,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.037";
+    return "s3.3.038";
   }
 
   function isVersionSmartViewAlias(raw) {
