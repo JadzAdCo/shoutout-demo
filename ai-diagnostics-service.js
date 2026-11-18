@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.039";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.039";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.040";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.040";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.040",
+      title: "s3.3.040 — People lookup matches display name, legal name, handle, what-about",
+      checks: [
+        {label:"What-about classifier", file:"functions/botdee-smartcard-core.js", includes:["WHAT_ABOUT", "foldNameChars"]},
+        {label:"Identity aliases", file:"functions/bot-dee-tools.js", includes:["function identityAliases", "function scoreIdentity", "data.firstName, data.lastName"]},
+        {label:"Viewer alias not skipped", file:"functions/botdee-smartcard-functions.js", includes:["allowPrivateSelf: isViewer", "viewerMatch"]},
+        {label:"Chat follow-up prefix", file:"bot-dee-chat.js", includes:["PEOPLE_WHAT_ABOUT", "foldPeopleNameChars"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-040-people-alias-match"]}
+      ]
+    },
     {
       version: "s3.3.039",
       title: "s3.3.039 — People card stacked layout (photo / name+handle / compact SMARTsummary)",
@@ -3403,6 +3414,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-040-people-alias-match",
+      area:"BOT DEE",
+      feature:"People lookup matches legal name, display name, handle, what-about",
+      changed:"s3.3.040 — Don Banyong / Don Papi / @DonBans all open the stacked People card. What about Don Papi no longer falls through to Gemini prose + photo grid. Accented names and curly apostrophes classify. Viewer looking themselves up by alias is not skipped.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.040. Sign in as Don (First Don, Last Banyong, Display Don Papi, @DonBans, public profile on). 2) Ask What do you know of Don Banyong — stacked People card (photo, Don Papi + @DonBans, SMARTsummary), not “No eligible public profile matched.” 3) Same thread: What about Don Papi — same People card, not Gemini markdown or a photo grid. 4) Ask Who is @DonBans and Who is DonBans — same card. 5) Ask how do I edit my profile and tell me about group reservations — help/Gemini, not a people card. 6) Mark Succeed/Failed.",
+      expected:"Legal name, display name, squeezed DonPapi, and handle with or without @ all paint the s3.3.039 stacked People card. Privilege fields stay off the payload. Display URLs have no ?v=.",
+      troubleshoot:"No match on Don Banyong → Functions executeBotSession / searchPeopleSmartCards not this SHA (identityAliases missing firstName+lastName) or publicProfileVisibility is not public. Gemini photo grid on What about Don Papi → cached bot-dee-chat.js without PEOPLE_WHAT_ABOUT, or attachPeopleSearch still skipped viewerUid. Accent/apostrophe miss → foldNameChars not deployed."
+    },
     {
       id:"s3-3-039-people-card-layout",
       area:"BOT DEE",

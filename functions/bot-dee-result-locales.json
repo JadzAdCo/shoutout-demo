@@ -81,11 +81,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "BOT DEE fragen, wer jemand ist",
-          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ oder „What do you know of …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlicht"
+          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“, „What do you know of …“ oder „What about …“ plus Vor- und Nachname, Anzeigename oder @Handle. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste und kein Fotogitter. Mehrere Treffer zeigen SMARTcards. Priva"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "BOT DEE fragen, wer jemand ist",
-          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ oder „What do you know of …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlicht"
+          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“, „What do you know of …“ oder „What about …“ plus Vor- und Nachname, Anzeigename oder @Handle. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste und kein Fotogitter. Mehrere Treffer zeigen SMARTcards. Priva"
         },
         "help:help-botdee-smartcard": {
           "label": "Personen-SMARTcards",
@@ -1119,11 +1119,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Demander à BOT DEE qui est quelqu’un",
-          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … » ou « What do you know of … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown. Plusieurs résultats montrent des SMARTcards. Les profils pr"
+          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … », « What do you know of … » ou « What about … » plus prénom et nom, nom d’affichage ou @identifiant. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown ni une grille de photos. Plusieurs résultats m"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Demander à BOT DEE qui est quelqu’un",
-          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … » ou « What do you know of … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown. Plusieurs résultats montrent des SMARTcards. Les profils pr"
+          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … », « What do you know of … » ou « What about … » plus prénom et nom, nom d’affichage ou @identifiant. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown ni une grille de photos. Plusieurs résultats m"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards Personnes",
@@ -2157,11 +2157,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Preguntar a BOT DEE quién es alguien",
-          "blurb": "«Who am I?» abre su SMARTview. «Who is …» o «What do you know of …» más un nombre o @identificador busca perfiles públicos. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados"
+          "blurb": "«Who am I?» abre su SMARTview. «Who is …», «What do you know of …» o «What about …» más nombre y apellido, nombre para mostrar o @identificador. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown ni una cuadrícula de fotos. Varios muestran SMARTcard"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Preguntar a BOT DEE quién es alguien",
-          "blurb": "«Who am I?» abre su SMARTview. «Who is …» o «What do you know of …» más un nombre o @identificador busca perfiles públicos. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados"
+          "blurb": "«Who am I?» abre su SMARTview. «Who is …», «What do you know of …» o «What about …» más nombre y apellido, nombre para mostrar o @identificador. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown ni una cuadrícula de fotos. Varios muestran SMARTcard"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards de personas",
@@ -3195,11 +3195,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Chiedere a BOT DEE chi è qualcuno",
-          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …” o “What do you know of …” più nome o @handle cerca profili pubblici. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non comp"
+          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …”, “What do you know of …” o “What about …” più nome e cognome, nome visualizzato o @handle. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown né una griglia di foto. Più risultati mostrano SMARTcard. Profil"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Chiedere a BOT DEE chi è qualcuno",
-          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …” o “What do you know of …” più nome o @handle cerca profili pubblici. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non comp"
+          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …”, “What do you know of …” o “What about …” più nome e cognome, nome visualizzato o @handle. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown né una griglia di foto. Più risultati mostrano SMARTcard. Profil"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard persone",
@@ -4233,11 +4233,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Perguntar ao BOT DEE quem é alguém",
-          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …” ou “What do you know of …” mais um nome ou @handle procura perfis públicos. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não apa"
+          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …”, “What do you know of …” ou “What about …” mais nome e apelido, nome de exibição ou @handle. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown nem uma grelha de fotos. Vários mostram SMARTcards. Perfis priva"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Perguntar ao BOT DEE quem é alguém",
-          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …” ou “What do you know of …” mais um nome ou @handle procura perfis públicos. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não apa"
+          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …”, “What do you know of …” ou “What about …” mais nome e apelido, nome de exibição ou @handle. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown nem uma grelha de fotos. Vários mostram SMARTcards. Perfis priva"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards de pessoas",
@@ -5271,11 +5271,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Спросить BOT DEE, кто это",
-          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …» или «What do you know of …» и имя или @хендл ищут публичные профили. Один результат — карточка People SMARTview в чате, не markdown-список. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT D"
+          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …», «What do you know of …» или «What about …» плюс имя и фамилия, display name или @хендл. Один результат — карточка People SMARTview в чате, не markdown и не сетка фото. Несколько — SMARTcard. Приватные, заблокированные и неопубликов"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Спросить BOT DEE, кто это",
-          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …» или «What do you know of …» и имя или @хендл ищут публичные профили. Один результат — карточка People SMARTview в чате, не markdown-список. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT D"
+          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …», «What do you know of …» или «What about …» плюс имя и фамилия, display name или @хендл. Один результат — карточка People SMARTview в чате, не markdown и не сетка фото. Несколько — SMARTcard. Приватные, заблокированные и неопубликов"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard людей",
@@ -6309,11 +6309,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
-          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» ή «What do you know of …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφ"
+          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …», «What do you know of …» ή «What about …» με όνομα και επώνυμο, εμφανιζόμενο όνομα ή @handle. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown ούτε πλέγμα φωτογραφιών. Πολλά δείχνουν SMARTcard."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
-          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» ή «What do you know of …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφ"
+          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …», «What do you know of …» ή «What about …» με όνομα και επώνυμο, εμφανιζόμενο όνομα ή @handle. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown ούτε πλέγμα φωτογραφιών. Πολλά δείχνουν SMARTcard."
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard ατόμων",
@@ -7347,11 +7347,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Zapytaj BOT DEE, kim ktoś jest",
-          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …” lub „What do you know of …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są lis"
+          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …”, „What do you know of …” lub „What about …” plus imię i nazwisko, nazwa wyświetlana lub @handle. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown ani siatkę zdjęć. Więcej wyników to SMARTcard. Prywatne, zablo"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Zapytaj BOT DEE, kim ktoś jest",
-          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …” lub „What do you know of …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są lis"
+          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …”, „What do you know of …” lub „What about …” plus imię i nazwisko, nazwa wyświetlana lub @handle. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown ani siatkę zdjęć. Więcej wyników to SMARTcard. Prywatne, zablo"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard osób",
@@ -8385,11 +8385,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "BOT DEE vragen wie iemand is",
-          "blurb": "“Who am I?” opent uw SMARTview. “Who is …” of “What do you know of …” plus naam of @handle zoekt openbare profielen. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoo"
+          "blurb": "“Who am I?” opent uw SMARTview. “Who is …”, “What do you know of …” of “What about …” plus voor- en achternaam, weergavenaam of @handle. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst of fotogrid. Meer matches tonen SMARTcards. Privé, geblokkeerd of ni"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "BOT DEE vragen wie iemand is",
-          "blurb": "“Who am I?” opent uw SMARTview. “Who is …” of “What do you know of …” plus naam of @handle zoekt openbare profielen. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoo"
+          "blurb": "“Who am I?” opent uw SMARTview. “Who is …”, “What do you know of …” of “What about …” plus voor- en achternaam, weergavenaam of @handle. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst of fotogrid. Meer matches tonen SMARTcards. Privé, geblokkeerd of ni"
         },
         "help:help-botdee-smartcard": {
           "label": "Mensen-SMARTcards",
@@ -9423,11 +9423,11 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "اسأل BOT DEE من هذا الشخص",
-          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا"
+          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» أو «What about …» مع الاسم الأول والأخير أو الاسم المعروض أو @معرّف. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown أو شبكة صور. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظو"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "اسأل BOT DEE من هذا الشخص",
-          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا"
+          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» أو «What about …» مع الاسم الأول والأخير أو الاسم المعروض أو @معرّف. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown أو شبكة صور. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظو"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard الأشخاص",
