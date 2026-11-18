@@ -28,7 +28,7 @@ test("who am I still routes to public display-name lookup, not privilege", () =>
   assert.equal(guard.isPrivilegeAskPrompt("who am I"), false);
   assert.equal(guard.isPrivilegeAskPrompt("about me"), false);
   assert.equal(guard.isPrivilegeAskPrompt("what do you know about me"), false);
-  assert.match(bot.systemInstruction("master"), /lookupPublicProfiles with query "me"/i);
+  assert.match(bot.systemInstruction("master"), /People SMARTview card/i);
   assert.match(bot.systemInstruction("master"), /display name|volunteered about-me/i);
 });
 

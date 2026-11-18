@@ -37,6 +37,7 @@ function amaraView() {
 test("v6 people-search intent: Who am I / Who is / generic person / unrelated", () => {
   assert.equal(cards.classifyPeopleSearchIntent("Who am I?").intent, "self");
   assert.equal(cards.classifyPeopleSearchIntent("what do you know about me").intent, "self");
+  assert.equal(cards.classifyPeopleSearchIntent("what do you know of me").intent, "self");
   const person = cards.classifyPeopleSearchIntent("Who is Amara J.?");
   assert.equal(person.intent, "person");
   assert.match(person.needle, /Amara/i);
@@ -51,6 +52,52 @@ test("v6 people-search intent: Who am I / Who is / generic person / unrelated", 
   assert.equal(cards.classifyPeopleSearchIntent("search for events tonight").intent, "none");
   assert.equal(cards.classifyPeopleSearchIntent("find events").intent, "none");
   assert.equal(cards.classifyPeopleSearchIntent("find my table").intent, "none");
+});
+
+test("what do you know of / tell me about name lookups become People cards, not products", () => {
+  const don = cards.classifyPeopleSearchIntent("What do you know of don banyong");
+  assert.equal(don.intent, "person");
+  assert.match(don.needle, /don banyong/i);
+  assert.equal(cards.canonicalPeopleLookupQuery(don), "Who is don banyong?");
+  const about = cards.classifyPeopleSearchIntent("what do you know about Don Banyong?");
+  assert.equal(about.intent, "person");
+  const tell = cards.classifyPeopleSearchIntent("tell me about don banyong");
+  assert.equal(tell.intent, "person");
+  const handle = cards.classifyPeopleSearchIntent("what can you tell me about @DonBans");
+  assert.equal(handle.intent, "person");
+  assert.match(handle.needle, /DonBans/i);
+  assert.equal(cards.classifyPeopleSearchIntent("what do you know about ShoutOut").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("what do you know of BOT DEE").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("tell me about FloqR").intent, "none");
+});
+
+test("profile help prompts are not people lookups", () => {
+  assert.equal(cards.classifyPeopleSearchIntent("how do I edit my profile").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("hide my profile").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("edit my public profile").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("where is my profile").intent, "none");
+  const named = cards.classifyPeopleSearchIntent("don banyong's profile");
+  assert.equal(named.intent, "person");
+  assert.match(named.needle, /don banyong/i);
+  const onNet = cards.classifyPeopleSearchIntent("Amara J on floqr");
+  assert.equal(onNet.intent, "person");
+});
+
+test("tell me about / know-of require a person-name needle", () => {
+  assert.equal(cards.classifyPeopleSearchIntent("tell me about group reservations").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("tell me about how to book VIP").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("describe the new composer").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("what do you know of bottle service").intent, "none");
+  assert.equal(cards.isPersonNameNeedle("group reservations"), false);
+  assert.equal(cards.isPersonNameNeedle("don banyong"), true);
+  assert.equal(cards.isPersonNameNeedle("@DonBans"), true);
+});
+
+test("profile field-dump detector needs two SMARTview headings, not any bold + Location", () => {
+  assert.equal(cards.looksLikeProfileFieldDump("The **Decades** club lists Location and Instagram in Club Admin."), false);
+  assert.equal(cards.looksLikeProfileFieldDump("**Handle** @DonBans is public."), false);
+  assert.equal(cards.looksLikeProfileFieldDump("**Bio**\nDon Papi\n**Location**\nWashington, DC"), true);
+  assert.equal(cards.looksLikeProfileFieldDump("Bio: Don Papi\nLocation: DC\nDetails: promoter"), true);
 });
 
 test("routing: self / one / many compact / none / error; no existence leak", () => {
@@ -85,6 +132,31 @@ test("routing: self / one / many compact / none / error; no existence leak", () 
   const err = cards.routePeopleSearch({error: true, matches: [view]});
   assert.equal(err.mode, "error");
   assert.equal(err.views.length, 0);
+});
+
+test("People card payload is public chrome only — no privilege / SOS2FA / claims", () => {
+  const view = amaraView();
+  const people = view.floqrPublicData.peopleV2;
+  assert.equal(people.presentation, "peopleV2");
+  assert.ok(people.displayName);
+  assert.ok(people.handle);
+  assert.ok("city" in people);
+  assert.ok(Array.isArray(people.handles));
+  assert.ok(people.summary && "text" in people.summary);
+  assert.equal(people.datingVisible, false);
+  assert.deepEqual(people.categories.Dating.Preferences, []);
+  assert.equal(cards.peopleCardHasPrivilegeField(view), false);
+  const blob = JSON.stringify(view);
+  assert.doesNotMatch(blob, /isMasterAdmin|sos2fa|tokenClaims|customClaims|superAdmin|classificationRole/i);
+  const leaked = {
+    ...view,
+    floqrPublicData: {
+      ...view.floqrPublicData,
+      isMasterAdmin: true,
+      tokenClaims: {masterAdmin: true}
+    }
+  };
+  assert.equal(cards.peopleCardHasPrivilegeField(leaked), true);
 });
 
 test("compact card is a projection of the same peopleV2 subject, not a second summary", () => {
@@ -250,6 +322,24 @@ test("executeBotSession attaches people search before Gemini and skips mock cata
   assert.match(src, /attachPeopleSearch/);
   assert.match(src, /people-smartcard/);
   assert.match(src, /!outcome\.smartViews/);
+  assert.match(src, /peopleSearch: outcome\.peopleSearch/);
+  assert.match(src, /classifyPeopleSearchIntent\(userPrompt\)/);
+  assert.match(src, /peopleIntent\.intent !== "none"/);
+});
+
+test("chat client classifies the same know-of prompts as the server", () => {
+  const chat = fs.readFileSync(path.join(__dirname, "..", "bot-dee-chat.js"), "utf8");
+  assert.match(chat, /function classifyPeopleSearchIntent/);
+  assert.match(chat, /PEOPLE_KNOW_OF/);
+  assert.match(chat, /ensurePeopleSmartViews/);
+  assert.match(chat, /searchPeopleSmartCards/);
+  assert.match(chat, /looksLikeProfileFieldDump/);
+  assert.match(chat, /if \(classified\.intent === "none"\) return session;/);
+  assert.match(chat, /if \(!classified \|\| classified\.intent === "none"\) return row;/);
+  assert.match(chat, /isPeopleNameNeedle\(needle\)/);
+  assert.match(chat, /isNamedPeopleProfileSuffix/);
+  assert.doesNotMatch(chat, /Instagram\|Handle/);
+  assert.doesNotMatch(chat, /display\.html\?location=[^"' ]+[?&]v=/);
 });
 
 test("index exports searchPeopleSmartCards; rules allow publicWithinFloqr listen", () => {

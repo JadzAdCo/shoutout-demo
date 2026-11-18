@@ -487,6 +487,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       declinedKeys: roomDeclined
     });
     let peopleAttached = null;
+    const peopleIntent = peopleCards.classifyPeopleSearchIntent(userPrompt);
     if (!roomAttached.handled) {
       try {
         peopleAttached = await peopleCards.attachPeopleSearch({
@@ -523,6 +524,25 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         uiLanguage,
         smartViews: peopleAttached.smartViews || [],
         peopleSearch: peopleAttached.peopleSearch,
+        geminiOnView: false
+      };
+    } else if (peopleIntent.intent !== "none") {
+      const peopleCore = require("./botdee-smartcard-core");
+      outcome = {
+        reply: peopleCore.fallbackReply("error"),
+        results: [],
+        provider: "people-smartcard",
+        model: "peopleSearch",
+        toolRounds: 0,
+        uiLanguage,
+        smartViews: [],
+        peopleSearch: {
+          schemaVersion: peopleCore.SCHEMA_VERSION,
+          mode: "error",
+          intent: peopleIntent.intent,
+          geminiOnView: false,
+          replyKey: peopleCore.replyKeyForMode("error")
+        },
         geminiOnView: false
       };
     } else if (
@@ -625,7 +645,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       consent,
       hasUsedBotDee: 1,
       smartViews: Array.isArray(outcome.smartViews) ? outcome.smartViews : [],
-      replyKey: outcome.replyKey || ""
+      peopleSearch: outcome.peopleSearch || null,
+      replyKey: outcome.replyKey || outcome.peopleSearch?.replyKey || "",
+      geminiOnView: outcome.geminiOnView === true
     };
   } catch (error) {
     throw asHttps(error);

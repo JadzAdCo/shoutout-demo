@@ -248,7 +248,8 @@ test("lookupPublicProfiles tool covers me + friends in description", () => {
   assert.ok(decl);
   assert.match(String(decl.description), /me|myself/i);
   assert.match(String(decl.description), /friend|connection|Mingl/i);
-  assert.match(bot.systemInstruction("patron"), /lookupPublicProfiles with query "me"/i);
+  assert.match(bot.systemInstruction("patron"), /People SMARTview card/i);
+  assert.match(bot.systemInstruction("patron"), /lookupPublicProfiles with that name/i);
   assert.match(bot.systemInstruction("patron"), /friend or connection/i);
 });
 
