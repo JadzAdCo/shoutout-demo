@@ -1067,7 +1067,7 @@
       const versionCardOnly = isVersionSmartViewAlias(text)
         && views.some(row => row && row.kind === "botDeeVersion");
       const reply = versionCardOnly
-        ? ""
+        ? modelBubbleText("model", "", media)
         : peopleSearch?.replyKey
           ? t(peopleSearch.replyKey, displayReply(data.reply))
           : (data.replyKey || roomView?.replyKey)
@@ -1166,6 +1166,12 @@
     return scrubGatedBrands(stripBackendLinks(text));
   }
 
+  function modelBubbleText(role, raw, media) {
+    const rawText = String(raw || "").trim();
+    if (role === "model" && !rawText && !media.length) return "";
+    return role === "model" ? displayReply(raw) : rawText;
+  }
+
   function cloneTurns(turns) {
     return (Array.isArray(turns) ? turns : [])
       .map(row => ({
@@ -1230,8 +1236,7 @@
     history.length = 0;
     cloneTurns(turns).forEach(row => {
       const media = row.role === "model" ? mergeMedia(row.media, harvestMediaFromText(row.text)) : [];
-      if (row.role === "model" && !row.text && !media.length) return;
-      const text = row.role === "model" ? displayReply(row.text) : row.text;
+      const text = modelBubbleText(row.role, row.text, media);
       if (!text && !media.length) return;
       appendBubble(row.role === "user" ? "user" : "bot", text, null, media);
       if (text) pushHistory(row.role, text);
