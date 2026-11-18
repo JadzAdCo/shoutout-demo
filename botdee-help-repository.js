@@ -646,8 +646,8 @@
     {
       id: "help-botdee-smartcard-search",
       title: "Ask BOT DEE who someone is",
-      body: "Ask “Who am I?” to open your own SMARTview. Ask “Who is …” plus a name or @handle to look up public FLOQR profiles. One match opens SMARTview. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether that account exists.",
-      searchPhrases: ["who am i", "who is", "find person on floqr", "do you know this person", "people search bot dee", "lookup public profile"],
+      body: "Ask “Who am I?” to open your own SMARTview. Ask “Who is …” or “What do you know of …” plus a name or @handle to look up public FLOQR profiles. One match opens a People SMARTview card in the chat — not a markdown list. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether that account exists.",
+      searchPhrases: ["who am i", "who is", "what do you know of", "tell me about", "find person on floqr", "do you know this person", "people search bot dee", "lookup public profile"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
