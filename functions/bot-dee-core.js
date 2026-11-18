@@ -620,6 +620,13 @@ function stripMediaFromToolResult(result) {
   return copy;
 }
 
+const CONVERSATION_ID_RE = /^cv_[0-9a-f]{32}$/;
+
+function clipConversationId(raw) {
+  const id = String(raw || "").trim();
+  return CONVERSATION_ID_RE.test(id) ? id : "";
+}
+
 function clipStoredTurns(turns) {
   const list = Array.isArray(turns) ? turns : [];
   const out = [];
@@ -633,6 +640,8 @@ function clipStoredTurns(turns) {
     if (seq) item.seq = seq;
     const atMs = Number(row?.atMs) || 0;
     if (atMs) item.atMs = atMs;
+    const conversationId = clipConversationId(row?.conversationId);
+    if (conversationId) item.conversationId = conversationId;
     if (role === "model") {
       const media = clipStoredMedia(row.media);
       if (media.length) item.media = media;
@@ -1145,6 +1154,8 @@ module.exports = {
   remainingIdleMs,
   clipStoredText,
   clipStoredTurns,
+  clipConversationId,
+  CONVERSATION_ID_RE,
   conversationIsActive,
   clipModelText,
   SEARCH_MISS_FALLBACK,

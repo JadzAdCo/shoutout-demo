@@ -250,7 +250,9 @@
     ["botDeeThreads", "personalization.botDeePersonalizationVersion", "ownMaster", 0, "Versioned first-use overlay marker; below current generation still asks name/tone"],
     ["botDeeThreads", "botDeeSessionResetVersion", "ownMaster", 0, "One-shot chat reset per generation; overlay skip does not wipe later turns"],
     ["botDeeThreads", "retrievalFromSeq", "ownMaster", 0, "Transcript cursor after one-shot session reset; events with seq below this stay stored but are not retrieved or painted"],
-    ["botDeeThreads", "chatTitles", "ownMaster", 1, "User-chosen display titles for + Chats rows keyed by stable conversation id (first user text); Functions-write; owner uid only; never sent to Gemini"],
+    ["botDeeThreads", "chatTitles", "ownMaster", 1, "User-chosen display titles for + Chats rows keyed by minted conversationId (cv_ uuid); Functions-write; owner uid only; never sent to Gemini"],
+    ["botDeeThreads", "currentConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the current slice; minted once; Functions-write"],
+    ["botDeeThreads", "archiveConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the previous slice after idle rotate; Functions-write"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
   ];
