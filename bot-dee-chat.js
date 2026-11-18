@@ -33,6 +33,8 @@
   let chatTitles = {};
   let renameTarget = null;
   let renameDialogBound = false;
+  let swallowRenameClick = false;
+  let swallowRenameUntil = 0;
   const LONG_PRESS_MS = 520;
   const CHAT_TITLE_MAX = 80;
 
@@ -878,12 +880,10 @@
     if (!log) return;
     const last = log.lastElementChild;
     const card = last?.querySelector(".botdee-sv-people, .botdee-sv-version, .botdee-sv-room");
-    if (card && card.scrollHeight > log.clientHeight * 0.85) {
-      try {
-        last.scrollIntoView({block: "start", inline: "nearest"});
-      } catch (_) {
-        log.scrollTop = last.offsetTop || 0;
-      }
+    if (last && card && card.scrollHeight > log.clientHeight * 0.85) {
+      const logBox = log.getBoundingClientRect();
+      const lastBox = last.getBoundingClientRect();
+      log.scrollTop += lastBox.top - logBox.top;
       return;
     }
     log.scrollTop = log.scrollHeight;
@@ -1377,7 +1377,10 @@
         span.textContent = meta;
         btn.appendChild(span);
       }
-      btn.addEventListener("click", onClick);
+      btn.addEventListener("click", event => {
+        if (renameClickShouldSwallow(event)) return;
+        onClick(event);
+      });
       row.appendChild(btn);
       if (chatId) {
         const renameLabel = titleForChat(chatId, meta || label);
@@ -1422,6 +1425,26 @@
     });
   }
 
+  function armRenameClickSwallow() {
+    swallowRenameClick = true;
+    swallowRenameUntil = Date.now() + 1200;
+  }
+
+  function renameClickShouldSwallow(event) {
+    if (!swallowRenameClick || Date.now() >= swallowRenameUntil) {
+      if (Date.now() >= swallowRenameUntil) swallowRenameClick = false;
+      return false;
+    }
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    swallowRenameClick = false;
+    swallowRenameUntil = 0;
+    return true;
+  }
+
   function bindChatLongPress(btn, chatId, label) {
     let timer = 0;
     const start = event => {
@@ -1429,6 +1452,7 @@
       clearTimeout(timer);
       timer = global.setTimeout(() => {
         timer = 0;
+        armRenameClickSwallow();
         openRenameDialog(chatId, label);
       }, LONG_PRESS_MS);
     };
@@ -1444,6 +1468,8 @@
     btn.addEventListener("pointerleave", cancel);
     btn.addEventListener("contextmenu", event => {
       event.preventDefault();
+      event.stopPropagation();
+      armRenameClickSwallow();
       openRenameDialog(chatId, label);
     });
   }
@@ -1510,6 +1536,7 @@
     byId("botDeeRenameSave")?.addEventListener("click", () => saveRename());
     byId("botDeeRenameCancel")?.addEventListener("click", () => setRenameOpen(false));
     byId("botDeeRenameDialog")?.addEventListener("click", event => {
+      if (renameClickShouldSwallow(event)) return;
       if (event.target === byId("botDeeRenameDialog")) setRenameOpen(false);
     });
     byId("botDeeRenameInput")?.addEventListener("keydown", event => {
@@ -1526,7 +1553,13 @@
     const toggle = byId("botDeeChatsToggle");
     const backdrop = byId("botDeeChatsBackdrop");
     toggle?.addEventListener("click", () => setChatsOpen(!chatsOpen));
-    backdrop?.addEventListener("click", () => setChatsOpen(false));
+    backdrop?.addEventListener("click", event => {
+      if (renameClickShouldSwallow(event)) return;
+      setChatsOpen(false);
+    });
+    document.addEventListener("click", event => {
+      renameClickShouldSwallow(event);
+    }, true);
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") {
         if (!byId("botDeeRenameDialog")?.hidden) {

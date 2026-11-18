@@ -233,6 +233,9 @@ test("BOT DEE history collapse is visual only and Back goes to Search", () => {
   assert.match(chat, /renameBotDeeChat/);
   assert.match(chat, /function openRenameDialog/);
   assert.match(chat, /function scrollTranscriptToLatest/);
+  assert.doesNotMatch(chat, /scrollIntoView/);
+  assert.match(chat, /function armRenameClickSwallow/);
+  assert.match(chat, /function renameClickShouldSwallow/);
   assert.match(page, /searchHome/);
   assert.doesNotMatch(page, /stampCurrentVersion/);
   assert.match(nav, /pageName\(\) === "botdee\.html"/);
