@@ -179,8 +179,9 @@ function isSvg(mime, fileName) {
 
 function stripDataUrl(raw) {
   const value = String(raw == null ? "" : raw).trim();
-  const match = value.match(/^data:[^;]+;base64,([\s\S]+)$/i);
-  return (match ? match[1] : value).replace(/\s+/g, "");
+  const idx = value.search(/base64,/i);
+  const packed = idx >= 0 ? value.slice(idx + 7) : value;
+  return packed.replace(/\s+/g, "");
 }
 
 function decodeBase64(dataBase64) {
@@ -255,8 +256,19 @@ function buildGeminiContents(upload) {
   }];
 }
 
+function looksLikeTrace(value) {
+  return Boolean(
+    value
+    && typeof value === "object"
+    && !Array.isArray(value)
+    && SCALE_SET.has(text(value.scale, 32).toLowerCase())
+    && Array.isArray(value.objects)
+  );
+}
+
 function extractJsonObject(raw) {
-  if (raw && typeof raw === "object" && !Array.isArray(raw)) return raw;
+  if (looksLikeTrace(raw)) return raw;
+  if (raw && typeof raw === "object") return null;
   const clean = String(raw || "").trim()
     .replace(/^```json\s*/i, "")
     .replace(/^```\s*/i, "")
@@ -312,9 +324,8 @@ function validateObject(raw) {
 
 function validateTrace(raw) {
   const parsed = extractJsonObject(raw);
-  if (!parsed || typeof parsed !== "object") return {ok: false, error: UNREADABLE_ERROR};
-  const scaleRaw = text(parsed.scale, 32).toLowerCase();
-  const scale = SCALE_SET.has(scaleRaw) ? scaleRaw : "estimated";
+  if (!looksLikeTrace(parsed)) return {ok: false, error: UNREADABLE_ERROR};
+  const scale = text(parsed.scale, 32).toLowerCase();
   let widthM = finiteOrNull(parsed.widthM);
   let depthM = finiteOrNull(parsed.depthM);
   if (widthM === undefined || depthM === undefined) return {ok: false, error: UNREADABLE_ERROR};
@@ -428,7 +439,7 @@ async function handlePlanTraceRequest(req, res, deps = {}) {
   }
 
   const tokens = tokenCounts(response);
-  const validated = validateTrace(extractModelText(response) || response);
+  const validated = validateTrace(extractModelText(response));
   if (!validated.ok) {
     await safeLog(deps.logAccess, {
       ok: false,

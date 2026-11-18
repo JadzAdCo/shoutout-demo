@@ -122,6 +122,14 @@ test("validateTrace keeps a known Gemini payload and drops non-finite objects", 
   assert.equal(cleaned.ok, true);
   assert.equal(cleaned.trace.objects.length, 1);
   assert.equal(cleaned.trace.objects[0].kind, "wall");
+
+  assert.equal(core.validateTrace("").ok, false);
+  assert.equal(core.validateTrace({}).ok, false);
+  assert.equal(core.validateTrace({spaceName: "Room", objects: []}).ok, false);
+  assert.equal(core.validateTrace({
+    candidates: [{content: {parts: []}}],
+    usageMetadata: {totalTokenCount: 0}
+  }).ok, false);
 });
 
 test("validateTrace caps the object list at 200", () => {
@@ -149,6 +157,14 @@ test("SVG is sent as prompt text; still image is inline data", () => {
   assert.match(svgContents[0].parts[0].text, /<svg/);
   assert.match(svgContents[0].parts[0].text, /south-west corner/);
   assert.equal(svgContents[0].parts[0].inlineData, undefined);
+
+  const charsetSvg = core.parseTraceUpload({
+    fileName: "room.svg",
+    mime: "image/svg+xml",
+    dataBase64: `data:image/svg+xml;charset=utf-8;base64,${SVG_B64}`
+  });
+  assert.equal(charsetSvg.ok, true);
+  assert.match(charsetSvg.svgText, /<svg/);
 
   const png = core.parseTraceUpload({fileName: "lobby.png", mime: "image/png", dataBase64: PNG_1X1});
   assert.equal(png.ok, true);
@@ -183,6 +199,28 @@ test("known image response becomes a trace with ok: true", async () => {
   assert.equal(logs[0].details.totalTokens, 18);
   assert.equal(logs[0].details.dataBase64, undefined);
   assert.equal(JSON.stringify(logs).includes(PNG_1X1), false);
+});
+
+test("empty Gemini output becomes ok: false, not an empty Room", async () => {
+  const logs = [];
+  const res = mockRes();
+  const result = await core.handlePlanTraceRequest(
+    mockReq({body: {fileName: "lobby.png", mime: "image/png", dataBase64: PNG_1X1}}),
+    res,
+    {
+      generateContent: async () => ({
+        text: "",
+        candidates: [{content: {parts: []}}],
+        usageMetadata: {totalTokenCount: 0}
+      }),
+      logAccess: async (entry) => logs.push(entry)
+    }
+  );
+  assert.equal(result.ok, false);
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.body, {ok: false, error: core.UNREADABLE_ERROR});
+  assert.equal(logs[0].ok, false);
+  assert.equal(logs[0].failureReason, "trace_invalid");
 });
 
 test("model failure becomes ok: false and a short error", async () => {
