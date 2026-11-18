@@ -295,13 +295,74 @@ async function createFloqCastCheckout(args, sessionRequest) {
   return {ok: true, tool: "createFloqCastCheckout", clubLocationId: clubLocationId || null, ...result};
 }
 
-function normalizeNeedle(value) {
+function foldNameChars(value) {
   return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u2018\u2019\u201B\u2032`´]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"');
+}
+
+function normalizeNeedle(value) {
+  return foldNameChars(value)
     .toLowerCase()
     .replace(/^@+/, "")
+    .replace(/['"]/g, "")
     .replace(/[^a-z0-9@\s._/-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function squeezeNeedle(value) {
+  return normalizeNeedle(value).replace(/\s+/g, "");
+}
+
+function identityAliases(data = {}) {
+  const handle = String(data.floqrHandle || data.username || data.minglHandle || "").replace(/^@+/, "").trim();
+  const first = String(data.firstName || "").trim();
+  const last = String(data.lastName || "").trim();
+  const legal = [first, last].filter(Boolean).join(" ");
+  const names = [
+    data.displayName, data.publicName, data.fullName, legal, handle
+  ].map(value => String(value || "").trim()).filter(Boolean);
+  const out = [];
+  const seen = new Set();
+  names.forEach(raw => {
+    const folded = normalizeNeedle(raw);
+    const squeezed = squeezeNeedle(raw);
+    [folded, squeezed].forEach(alias => {
+      if (!alias || seen.has(alias)) return;
+      seen.add(alias);
+      out.push(alias);
+    });
+  });
+  return out;
+}
+
+function scoreIdentity(data, needle, tokens) {
+  const n = normalizeNeedle(needle);
+  if (!n) return 0;
+  const squeezed = squeezeNeedle(needle);
+  const aliases = identityAliases(data);
+  let points = 0;
+  aliases.forEach(alias => {
+    if (alias === n || (squeezed && alias === squeezed)) {
+      points = Math.max(points, alias.length >= 4 || alias.includes(" ") ? 50 : 6);
+    } else if (n.length >= 4 && alias.includes(n)) {
+      points = Math.max(points, 24);
+    }
+  });
+  const hay = aliases.join(" ");
+  const hits = (Array.isArray(tokens) ? tokens : []).filter(token => token.length > 1 && hay.includes(token));
+  if (hits.length && hits.length === tokens.length) {
+    if (tokens.length >= 2) points = Math.max(points, 40);
+    else if (tokens[0] && tokens[0].length >= 4) points = Math.max(points, 12);
+  }
+  return points;
+}
+
+function scorePerson(data, needle, tokens) {
+  return Math.max(scoreIdentity(data, needle, tokens), scoreHay(userHaystack(data), needle, tokens));
 }
 
 function scoreHay(hay, needle, tokens) {
@@ -569,10 +630,10 @@ function isSelfQuery(needle, viewerData = {}) {
   if (myAsk && /\b(food|music|travel|hobby|hobbies|eat|drink|beverage|handle|bio|photo)\b/.test(n)) {
     if (!/\b(at|for)\b/.test(n)) return true;
   }
-  const handle = normalizeNeedle(viewerData.floqrHandle || viewerData.username || viewerData.minglHandle || "");
-  const name = normalizeNeedle(viewerData.displayName || viewerData.publicName || "");
-  if (handle && (n === handle || hasPhrase(n, handle))) return true;
-  if (name && name.length >= 4 && hasPhrase(n, name)) return true;
+  const aliases = identityAliases(viewerData);
+  const squeezed = squeezeNeedle(needle);
+  if (aliases.some(alias => alias === n || (squeezed && alias === squeezed))) return true;
+  if (aliases.some(alias => alias.length >= 4 && hasPhrase(n, alias))) return true;
   return false;
 }
 
@@ -689,8 +750,8 @@ function publicClubCard(id, data = {}, score) {
 
 function userHaystack(data = {}) {
   const parts = [
-    data.displayName, data.publicName, data.fullName, data.username,
-    data.floqrHandle, data.minglHandle, data.publicBio, data.bio, data.tagline, data.about,
+    data.displayName, data.publicName, data.fullName, data.firstName, data.lastName,
+    data.username, data.floqrHandle, data.minglHandle, data.publicBio, data.bio, data.tagline, data.about,
     data.headline, data.instagram, data.instagramHandle, data.website, data.publicWebsite,
     ...(Array.isArray(data.approvedRoles) ? data.approvedRoles : []),
     ...(Array.isArray(data.genres) ? data.genres : []),
@@ -773,7 +834,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         const data = doc.data() || {};
         // Connections: public profiles only — never private fields.
         if (!people.isPublic(data)) return;
-        const base = scoreHay(userHaystack(data), matchNeedle, tokens);
+        const base = scorePerson(data, matchNeedle, tokens);
         // Require a real name/handle match (threshold 8). No free pass for “friend” alone.
         if (base < 8) return;
         const points = base + (friendContext ? 12 : 6);
@@ -796,7 +857,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         if (doc.id === viewerUid || seen.has(doc.id)) return;
         const data = doc.data() || {};
         if (!people.isPublic(data)) return;
-        const base = scoreHay(userHaystack(data), matchNeedle, tokens);
+        const base = scorePerson(data, matchNeedle, tokens);
         // Must match the query first — connection boost must not invent hits.
         if (base < 8) return;
         const points = base + (connected.has(doc.id) ? 10 : 0);
@@ -903,6 +964,11 @@ module.exports = {
   publicMinglKeys,
   datapointAllowed,
   userHaystack,
+  identityAliases,
+  scoreIdentity,
+  scorePerson,
+  normalizeNeedle,
+  foldNameChars,
   isSelfQuery,
   unpublishedSelfCard,
   selfProfileCard,

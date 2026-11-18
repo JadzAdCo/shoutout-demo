@@ -81,19 +81,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "BOT DEE fragen, wer jemand ist",
-          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ oder „What do you know of …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlicht"
+          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“, „What do you know of …“ oder „What about …“ plus Vor- und Nachname, Anzeigename oder @Handle. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste und kein Fotogitter. Mehrere Treffer zeigen SMARTcards. Priva"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "BOT DEE fragen, wer jemand ist",
-          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ oder „What do you know of …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlicht"
+          "blurb": "„Who am I?“ öffnet Ihre SMARTview. „Who is …“, „What do you know of …“ oder „What about …“ plus Vor- und Nachname, Anzeigename oder @Handle. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste und kein Fotogitter. Mehrere Treffer zeigen SMARTcards. Priva"
         },
         "help:help-botdee-smartcard": {
           "label": "Personen-SMARTcards",
-          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SMARTview. Karten nutzen dasselbe öffentliche Profil und diesel"
+          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: zuerst das Foto in voller Breite, dann Name und Handle, dann eine kompakte SMARTsummary ohne gepolsterte Box. Tippen öffnet die volle SMARTview — dasselbe Layout. Karten nutzen dass"
         },
         "intent:help-botdee-smartcard": {
           "label": "Personen-SMARTcards",
-          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SMARTview. Karten nutzen dasselbe öffentliche Profil und diesel"
+          "blurb": "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: zuerst das Foto in voller Breite, dann Name und Handle, dann eine kompakte SMARTsummary ohne gepolsterte Box. Tippen öffnet die volle SMARTview — dasselbe Layout. Karten nutzen dass"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -1119,19 +1119,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Demander à BOT DEE qui est quelqu’un",
-          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … » ou « What do you know of … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown. Plusieurs résultats montrent des SMARTcards. Les profils pr"
+          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … », « What do you know of … » ou « What about … » plus prénom et nom, nom d’affichage ou @identifiant. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown ni une grille de photos. Plusieurs résultats m"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Demander à BOT DEE qui est quelqu’un",
-          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … » ou « What do you know of … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown. Plusieurs résultats montrent des SMARTcards. Les profils pr"
+          "blurb": "« Who am I ? » ouvre votre SMARTview. « Who is … », « What do you know of … » ou « What about … » plus prénom et nom, nom d’affichage ou @identifiant. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown ni une grille de photos. Plusieurs résultats m"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards Personnes",
-          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SMARTview complet. Les cartes utilisent le m"
+          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo pleine largeur d’abord, puis nom et identifiant, puis un SMARTsummary compact sans boîte remplie. Touchez une carte pour ouvrir le SMARTview complet — même empilemen"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcards Personnes",
-          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SMARTview complet. Les cartes utilisent le m"
+          "blurb": "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo pleine largeur d’abord, puis nom et identifiant, puis un SMARTsummary compact sans boîte remplie. Touchez une carte pour ouvrir le SMARTview complet — même empilemen"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -2157,19 +2157,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Preguntar a BOT DEE quién es alguien",
-          "blurb": "«Who am I?» abre su SMARTview. «Who is …» o «What do you know of …» más un nombre o @identificador busca perfiles públicos. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados"
+          "blurb": "«Who am I?» abre su SMARTview. «Who is …», «What do you know of …» o «What about …» más nombre y apellido, nombre para mostrar o @identificador. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown ni una cuadrícula de fotos. Varios muestran SMARTcard"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Preguntar a BOT DEE quién es alguien",
-          "blurb": "«Who am I?» abre su SMARTview. «Who is …» o «What do you know of …» más un nombre o @identificador busca perfiles públicos. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados"
+          "blurb": "«Who am I?» abre su SMARTview. «Who is …», «What do you know of …» o «What about …» más nombre y apellido, nombre para mostrar o @identificador. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown ni una cuadrícula de fotos. Varios muestran SMARTcard"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards de personas",
-          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SMARTview completo. Las tarjetas usan e"
+          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: primero la foto a todo el ancho, luego nombre y @identificador, luego un SMARTsummary compacto sin caja rellena. Toque una tarjeta para abrir el SMARTview completo — el mismo apilado."
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcards de personas",
-          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SMARTview completo. Las tarjetas usan e"
+          "blurb": "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: primero la foto a todo el ancho, luego nombre y @identificador, luego un SMARTsummary compacto sin caja rellena. Toque una tarjeta para abrir el SMARTview completo — el mismo apilado."
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -3195,19 +3195,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Chiedere a BOT DEE chi è qualcuno",
-          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …” o “What do you know of …” più nome o @handle cerca profili pubblici. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non comp"
+          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …”, “What do you know of …” o “What about …” più nome e cognome, nome visualizzato o @handle. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown né una griglia di foto. Più risultati mostrano SMARTcard. Profil"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Chiedere a BOT DEE chi è qualcuno",
-          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …” o “What do you know of …” più nome o @handle cerca profili pubblici. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non comp"
+          "blurb": "“Who am I?” apre il tuo SMARTview. “Who is …”, “What do you know of …” o “What about …” più nome e cognome, nome visualizzato o @handle. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown né una griglia di foto. Più risultati mostrano SMARTcard. Profil"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard persone",
-          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SMARTview completo. Le schede usano lo stesso profilo pubblico e SMART"
+          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: prima la foto a tutta larghezza, poi nome e handle, poi un SMARTsummary compatto senza riquadro imbottito. Tocca una scheda per aprire lo SMARTview completo — stesso impilamento. Le schede usa"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard persone",
-          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SMARTview completo. Le schede usano lo stesso profilo pubblico e SMART"
+          "blurb": "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: prima la foto a tutta larghezza, poi nome e handle, poi un SMARTsummary compatto senza riquadro imbottito. Tocca una scheda per aprire lo SMARTview completo — stesso impilamento. Le schede usa"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -4233,19 +4233,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Perguntar ao BOT DEE quem é alguém",
-          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …” ou “What do you know of …” mais um nome ou @handle procura perfis públicos. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não apa"
+          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …”, “What do you know of …” ou “What about …” mais nome e apelido, nome de exibição ou @handle. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown nem uma grelha de fotos. Vários mostram SMARTcards. Perfis priva"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Perguntar ao BOT DEE quem é alguém",
-          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …” ou “What do you know of …” mais um nome ou @handle procura perfis públicos. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não apa"
+          "blurb": "“Who am I?” abre o seu SMARTview. “Who is …”, “What do you know of …” ou “What about …” mais nome e apelido, nome de exibição ou @handle. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown nem uma grelha de fotos. Vários mostram SMARTcards. Perfis priva"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcards de pessoas",
-          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SMARTview completo. As cards usam o mesmo perfil público e SMARTsum"
+          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto em largura total primeiro, depois nome e handle, depois um SMARTsummary compacto sem caixa preenchida. Toque para abrir o SMARTview completo — o mesmo empilhamento. As cards us"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcards de pessoas",
-          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SMARTview completo. As cards usam o mesmo perfil público e SMARTsum"
+          "blurb": "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto em largura total primeiro, depois nome e handle, depois um SMARTsummary compacto sem caixa preenchida. Toque para abrir o SMARTview completo — o mesmo empilhamento. As cards us"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -5271,19 +5271,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Спросить BOT DEE, кто это",
-          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …» или «What do you know of …» и имя или @хендл ищут публичные профили. Один результат — карточка People SMARTview в чате, не markdown-список. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT D"
+          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …», «What do you know of …» или «What about …» плюс имя и фамилия, display name или @хендл. Один результат — карточка People SMARTview в чате, не markdown и не сетка фото. Несколько — SMARTcard. Приватные, заблокированные и неопубликов"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Спросить BOT DEE, кто это",
-          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …» или «What do you know of …» и имя или @хендл ищут публичные профили. Один результат — карточка People SMARTview в чате, не markdown-список. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT D"
+          "blurb": "«Who am I?» открывает ваш SMARTview. «Who is …», «What do you know of …» или «What about …» плюс имя и фамилия, display name или @хендл. Один результат — карточка People SMARTview в чате, не markdown и не сетка фото. Несколько — SMARTcard. Приватные, заблокированные и неопубликов"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard людей",
-          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SMARTview. Это тот же публичный профиль и SMARTsummary. О"
+          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: сначала фото на всю ширину, затем имя и хендл, затем сжатый SMARTsummary без пустой рамки. Нажмите карточку, чтобы открыть полный SMARTview — та же укладка. Это тот же публичный профи"
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard людей",
-          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SMARTview. Это тот же публичный профиль и SMARTsummary. О"
+          "blurb": "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: сначала фото на всю ширину, затем имя и хендл, затем сжатый SMARTsummary без пустой рамки. Нажмите карточку, чтобы открыть полный SMARTview — та же укладка. Это тот же публичный профи"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -6309,19 +6309,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
-          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» ή «What do you know of …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφ"
+          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …», «What do you know of …» ή «What about …» με όνομα και επώνυμο, εμφανιζόμενο όνομα ή @handle. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown ούτε πλέγμα φωτογραφιών. Πολλά δείχνουν SMARTcard."
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
-          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» ή «What do you know of …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφ"
+          "blurb": "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …», «What do you know of …» ή «What about …» με όνομα και επώνυμο, εμφανιζόμενο όνομα ή @handle. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown ούτε πλέγμα φωτογραφιών. Πολλά δείχνουν SMARTcard."
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard ατόμων",
-          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SMARTview. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SM"
+          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: πρώτα φωτογραφία σε πλήρες πλάτος, μετά όνομα και handle, μετά συμπαγές SMARTsummary χωρίς γεμάτο πλαίσιο. Πατήστε για πλήρες SMARTview — ίδια στοίβαξη. Οι κάρτες χρησιμοποιούν "
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard ατόμων",
-          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SMARTview. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SM"
+          "blurb": "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: πρώτα φωτογραφία σε πλήρες πλάτος, μετά όνομα και handle, μετά συμπαγές SMARTsummary χωρίς γεμάτο πλαίσιο. Πατήστε για πλήρες SMARTview — ίδια στοίβαξη. Οι κάρτες χρησιμοποιούν "
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -7347,19 +7347,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "Zapytaj BOT DEE, kim ktoś jest",
-          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …” lub „What do you know of …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są lis"
+          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …”, „What do you know of …” lub „What about …” plus imię i nazwisko, nazwa wyświetlana lub @handle. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown ani siatkę zdjęć. Więcej wyników to SMARTcard. Prywatne, zablo"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "Zapytaj BOT DEE, kim ktoś jest",
-          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …” lub „What do you know of …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są lis"
+          "blurb": "„Who am I?” otwiera Twoje SMARTview. „Who is …”, „What do you know of …” lub „What about …” plus imię i nazwisko, nazwa wyświetlana lub @handle. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown ani siatkę zdjęć. Więcej wyników to SMARTcard. Prywatne, zablo"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard osób",
-          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SMARTview. Karty używają tego samego profilu i SMARTsummary. O"
+          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: najpierw zdjęcie na pełną szerokość, potem imię i handle, potem zwarty SMARTsummary bez wypełnionego pola. Dotknij, aby otworzyć pełny SMARTview — ten sam układ. Karty używają tego samego "
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard osób",
-          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SMARTview. Karty używają tego samego profilu i SMARTsummary. O"
+          "blurb": "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: najpierw zdjęcie na pełną szerokość, potem imię i handle, potem zwarty SMARTsummary bez wypełnionego pola. Dotknij, aby otworzyć pełny SMARTview — ten sam układ. Karty używają tego samego "
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -8385,19 +8385,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "BOT DEE vragen wie iemand is",
-          "blurb": "“Who am I?” opent uw SMARTview. “Who is …” of “What do you know of …” plus naam of @handle zoekt openbare profielen. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoo"
+          "blurb": "“Who am I?” opent uw SMARTview. “Who is …”, “What do you know of …” of “What about …” plus voor- en achternaam, weergavenaam of @handle. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst of fotogrid. Meer matches tonen SMARTcards. Privé, geblokkeerd of ni"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "BOT DEE vragen wie iemand is",
-          "blurb": "“Who am I?” opent uw SMARTview. “Who is …” of “What do you know of …” plus naam of @handle zoekt openbare profielen. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoo"
+          "blurb": "“Who am I?” opent uw SMARTview. “Who is …”, “What do you know of …” of “What about …” plus voor- en achternaam, weergavenaam of @handle. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst of fotogrid. Meer matches tonen SMARTcards. Privé, geblokkeerd of ni"
         },
         "help:help-botdee-smartcard": {
           "label": "Mensen-SMARTcards",
-          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SMARTview te openen. Kaarten gebruiken hetzelfde openbare profiel en "
+          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: eerst een foto over de volle breedte, dan naam en handle, dan een compacte SMARTsummary zonder opgevulde box. Tik om de volledige SMARTview te openen — dezelfde stapeling. Kaarten g"
         },
         "intent:help-botdee-smartcard": {
           "label": "Mensen-SMARTcards",
-          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SMARTview te openen. Kaarten gebruiken hetzelfde openbare profiel en "
+          "blurb": "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: eerst een foto over de volle breedte, dan naam en handle, dan een compacte SMARTsummary zonder opgevulde box. Tik om de volledige SMARTview te openen — dezelfde stapeling. Kaarten g"
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",
@@ -9423,19 +9423,19 @@
         },
         "help:help-botdee-smartcard-search": {
           "label": "اسأل BOT DEE من هذا الشخص",
-          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا"
+          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» أو «What about …» مع الاسم الأول والأخير أو الاسم المعروض أو @معرّف. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown أو شبكة صور. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظو"
         },
         "intent:help-botdee-smartcard-search": {
           "label": "اسأل BOT DEE من هذا الشخص",
-          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا"
+          "blurb": "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» أو «What about …» مع الاسم الأول والأخير أو الاسم المعروض أو @معرّف. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown أو شبكة صور. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظو"
         },
         "help:help-botdee-smartcard": {
           "label": "SMARTcard الأشخاص",
-          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SMARTview الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
+          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: الصورة بعرض كامل أولاً، ثم الاسم والمعرّف، ثم SMARTsummary مضغوط بلا صندوق مبطّن. اضغط لفتح SMARTview الكامل — نفس الترتيب. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
         },
         "intent:help-botdee-smartcard": {
           "label": "SMARTcard الأشخاص",
-          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SMARTview الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
+          "blurb": "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: الصورة بعرض كامل أولاً، ثم الاسم والمعرّف، ثم SMARTsummary مضغوط بلا صندوق مبطّن. اضغط لفتح SMARTview الكامل — نفس الترتيب. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
         },
         "help:help-botdee-version-smartview": {
           "label": "Version SMARTview",

@@ -669,7 +669,7 @@
     {
       id: "help-botdee-smartcard",
       title: "People SMARTcards",
-      body: "When more than one public FLOQR profile matches, BOT DEE shows compact People SMARTcards in the chat: square photo on the left, name, public handles, city, and a 4-line SMARTsummary on the right. Tap a card to open that person’s full SMARTview. Cards use the same public profile and SMARTsummary as SMARTview — not a second stored summary. Opening a card does not call Gemini.",
+      body: "When more than one public FLOQR profile matches, BOT DEE shows compact People SMARTcards in the chat: full-width photo first, then name and handle, then a compact SMARTsummary with no padded box. Tap a card to open that person’s full SMARTview — same stacked layout. Cards use the same public profile and SMARTsummary as SMARTview — not a second stored summary. Opening a card does not call Gemini.",
       searchPhrases: ["smartcard", "smart card", "people smartcard", "who is", "who am i", "compact people card", "select person smartview"],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html")},
@@ -682,8 +682,8 @@
     {
       id: "help-botdee-smartcard-search",
       title: "Ask BOT DEE who someone is",
-      body: "Ask “Who am I?” to open your own SMARTview. Ask “Who is …” or “What do you know of …” plus a name or @handle to look up public FLOQR profiles. One match opens a People SMARTview card in the chat — not a markdown list. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether that account exists.",
-      searchPhrases: ["who am i", "who is", "what do you know of", "tell me about", "find person on floqr", "do you know this person", "people search bot dee", "lookup public profile"],
+      body: "Ask “Who am I?” to open your own SMARTview. Ask “Who is …”, “What do you know of …”, or “What about …” plus a first and last name, display name, or @handle. One match opens a People SMARTview card in the chat — not a markdown list or photo dump. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether that account exists.",
+      searchPhrases: ["who am i", "who is", "what do you know of", "what about", "tell me about", "display name", "find person on floqr", "do you know this person", "people search bot dee", "lookup public profile"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",

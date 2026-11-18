@@ -71,6 +71,33 @@ test("what do you know of / tell me about name lookups become People cards, not 
   assert.equal(cards.classifyPeopleSearchIntent("tell me about FloqR").intent, "none");
 });
 
+test("what about / how about follow-ups keep People intent for aliases", () => {
+  const papi = cards.classifyPeopleSearchIntent("What about Don Papi");
+  assert.equal(papi.intent, "person");
+  assert.match(papi.needle, /Don Papi/i);
+  const legal = cards.classifyPeopleSearchIntent("what about Don Banyong?");
+  assert.equal(legal.intent, "person");
+  const handle = cards.classifyPeopleSearchIntent("how about @DonBans");
+  assert.equal(handle.intent, "person");
+  const follow = cards.classifyPeopleSearchIntent("and what about DonPapi");
+  assert.equal(follow.intent, "person");
+  assert.equal(cards.classifyPeopleSearchIntent("what about VIP").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("what about group reservations").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("how about you").intent, "none");
+});
+
+test("accented names and curly apostrophes still classify as people lookups", () => {
+  assert.equal(cards.isPersonNameNeedle("José"), true);
+  assert.equal(cards.isPersonNameNeedle("O’Brien"), true);
+  const jose = cards.classifyPeopleSearchIntent("Who’s José");
+  assert.equal(jose.intent, "person");
+  assert.match(jose.needle, /Jos/i);
+  const obrien = cards.classifyPeopleSearchIntent("What do you know of O’Brien");
+  assert.equal(obrien.intent, "person");
+  const curlyProfile = cards.classifyPeopleSearchIntent("José’s profile");
+  assert.equal(curlyProfile.intent, "person");
+});
+
 test("profile help prompts are not people lookups", () => {
   assert.equal(cards.classifyPeopleSearchIntent("how do I edit my profile").intent, "none");
   assert.equal(cards.classifyPeopleSearchIntent("hide my profile").intent, "none");
@@ -229,8 +256,10 @@ test("compact card HTML paints the public-page hero (photo or video)", () => {
     }
   });
   assert.match(photoHtml, /botdee-sc-thumb/);
+  assert.match(photoHtml, /botdee-sv-id/);
   assert.match(photoHtml, /lorna\.jpg/);
   assert.doesNotMatch(photoHtml, /botdee-sc-thumb-empty/);
+  assert.ok(photoHtml.indexOf("botdee-sc-thumb") < photoHtml.indexOf("botdee-sv-name"), "compact photo stacks above name");
   const videoHtml = api.renderCompactPeopleCard({
     title: "Lorna",
     floqrPublicData: {
@@ -315,6 +344,9 @@ test("private/blocked getPeopleSmartView path returns empty views (no name leak)
   assert.match(cardSrc, /geminiOnView: false/);
   assert.doesNotMatch(cardSrc, /generateContent/);
   assert.doesNotMatch(cardSrc, /GoogleGenAI/);
+  assert.doesNotMatch(cardSrc, /if \(row\.id === viewerUid\) continue;/);
+  assert.match(cardSrc, /allowPrivateSelf: isViewer/);
+  assert.match(cardSrc, /viewerMatch/);
 });
 
 test("executeBotSession attaches people search before Gemini and skips mock catalog", () => {
@@ -331,6 +363,8 @@ test("chat client classifies the same know-of prompts as the server", () => {
   const chat = fs.readFileSync(path.join(__dirname, "..", "bot-dee-chat.js"), "utf8");
   assert.match(chat, /function classifyPeopleSearchIntent/);
   assert.match(chat, /PEOPLE_KNOW_OF/);
+  assert.match(chat, /PEOPLE_WHAT_ABOUT/);
+  assert.match(chat, /foldPeopleNameChars/);
   assert.match(chat, /ensurePeopleSmartViews/);
   assert.match(chat, /searchPeopleSmartCards/);
   assert.match(chat, /looksLikeProfileFieldDump/);
