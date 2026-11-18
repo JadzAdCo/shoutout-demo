@@ -33,8 +33,10 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.036";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.036";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.037";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.037";
+  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -220,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.037",
+      title: "s3.3.037 — BOT DEE SMARTview scroll + rename saved chats",
+      checks: [
+        {label:"Chat page stays flex", file:"bot-dee-chat.css", includes:[".page.botdee-chat-page.active", "display: flex !important", "overflow: auto"]},
+        {label:"Rename UI", file:"botdee.html", includes:["id=\"botDeeRenameDialog\"", "bot-dee-chat.js?v=s3.3.037"]},
+        {label:"Rename callable", file:"functions/bot-dee-functions.js", includes:["exports.renameBotDeeChat", "Never put them in Gemini"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-037-botdee-smartview-scroll-rename"]}
+      ]
+    },
     {
       version: "s3.3.036",
       title: "s3.3.036 — BOT DEE history collapse + Back to Search",
@@ -3361,6 +3373,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-037-botdee-smartview-scroll-rename",
+      area:"BOT DEE",
+      feature:"SMARTview card scroll + rename saved chats",
+      changed:"s3.3.037 — People SMARTview in chat can scroll to View Full Profile and Mingl on phone and desktop. Cause was .page.active{display:block} clipping the transcript. Chats rows get a 44×44 ⋯ (or long-press) to rename; title persists on botDeeThreads.chatTitles; Gemini never sees titles. + / − collapse unchanged.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / bot-dee-chat.css / botdee-smartview.css ?v=s3.3.037. Sign in with BOT DEE access. 2) Ask Who am I? — People SMARTview appears. Scroll the transcript (or the card) until View Full Profile and Mingl are visible. Composer stays pinned. Phone ~390 and desktop ~1280. 3) Tap + — Chats sheet. Each saved row has ⋯ (44×44). Tap ⋯ or long-press the row, type a title, Save. List shows the new title, not only the first-message snippet. 4) Refresh — renamed title still there (after Functions deploy of renameBotDeeChat). 5) + still opens/closes with − / Esc. Display URLs have no ?v=. 6) Mark Succeed/Failed.",
+      expected:"Tall SMARTview is fully reachable by scrolling. Composer stays on screen. Chats can be renamed. History + / − still works. No stacked help dump under the card.",
+      troubleshoot:"Still clipped → cached bot-dee-chat.css before .page.botdee-chat-page.active flex !important, or botdee.html still on s3.3.036. Composer gone → overflow:visible on .botdee-shell (must stay hidden). Rename fails → Functions deploy renameBotDeeChat; owner uid only. Title in Gemini replies → chatTitles leaked into executeBotSession (must not)."
+    },
     {
       id:"s3-3-036-botdee-history-collapse",
       area:"BOT DEE",

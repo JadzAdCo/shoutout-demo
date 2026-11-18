@@ -30,6 +30,17 @@
   let storedLastMessageAtMs = 0;
   let visitLiveTurns = [];
   let chatsUiBound = false;
+  let chatTitles = {};
+  let liveConversationId = "";
+  let storedConversationId = "";
+  let archiveConversationId = "";
+  let renameTarget = null;
+  let renameDialogBound = false;
+  let swallowRename = null;
+  let swallowRenameTimer = 0;
+  const LONG_PRESS_MS = 520;
+  const SWALLOW_CLICK_MS = 800;
+  const CHAT_TITLE_MAX = 80;
 
   const byId = id => document.getElementById(id);
   const t = (key, fallback) => {
@@ -228,7 +239,8 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.036";  }
+    return "s3.3.037";
+  }
 
   function isVersionSmartViewAlias(raw) {
     const q = String(raw || "")
@@ -864,6 +876,20 @@
     }
     row.appendChild(article);
     log.appendChild(row);
+    scrollTranscriptToLatest();
+  }
+
+  function scrollTranscriptToLatest() {
+    const log = byId("botDeeTranscript");
+    if (!log) return;
+    const last = log.lastElementChild;
+    const card = last?.querySelector(".botdee-sv-people, .botdee-sv-version, .botdee-sv-room");
+    if (last && card && card.scrollHeight > log.clientHeight * 0.85) {
+      const logBox = log.getBoundingClientRect();
+      const lastBox = last.getBoundingClientRect();
+      log.scrollTop += lastBox.top - logBox.top;
+      return;
+    }
     log.scrollTop = log.scrollHeight;
   }
 
@@ -975,11 +1001,14 @@
     if (resuming) {
       // Lease ended (pause bubble). Durable retrieve is on the server; do not wipe it.
       phase = "fresh";
+      liveConversationId = mintConversationId();
+    } else if (!liveConversationId) {
+      liveConversationId = storedConversationId || mintConversationId();
     }
 
     appendBubble("user", text);
     pushHistory("user", text);
-    visitLiveTurns.push({role: "user", text});
+    visitLiveTurns.push({role: "user", text, conversationId: liveConversationId});
     setChatsOpen(false);
     renderChatsList();
 
@@ -996,7 +1025,7 @@
       const roomViews = roomSession ? ensureRoomSmartViews(text, roomSession.smartViews || []) : [];
       appendBubble("bot", reply, [], [], versionViews.concat(roomViews));
       pushHistory("model", reply);
-      visitLiveTurns.push({role: "model", text: reply});
+      visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
       setStatus("");
       if (isFarewellPrompt(text)) {
         endConversation("silent");
@@ -1032,6 +1061,7 @@
         message: text,
         history: history.slice(0, -1).map(row => ({role: row.role, text: row.text})),
         threadId: threadId || undefined,
+        conversationId: liveConversationId || undefined,
         uiLanguage: currentUiLanguage(),
         roomSmartViewDeclined: loadRoomDeclined()
       };
@@ -1054,7 +1084,13 @@
             : displayReply(data.reply);
       appendBubble("bot", reply, localizeResults(data.results), media, views, peopleSearch);
       pushHistory("model", reply);
-      if (reply) visitLiveTurns.push({role: "model", text: reply});
+      if (reply) visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
+      if (data.conversationId && /^cv_[0-9a-f]{32}$/.test(String(data.conversationId))) {
+        liveConversationId = String(data.conversationId);
+        visitLiveTurns.forEach(row => {
+          if (row && !row.conversationId) row.conversationId = liveConversationId;
+        });
+      }
       if (data.threadId) threadId = String(data.threadId);
       if (data.durable === true) durableEnabled = true;
       if (data.durable === false) durableEnabled = false;
@@ -1145,21 +1181,130 @@
     return scrubGatedBrands(stripBackendLinks(text));
   }
 
+  function modelBubbleText(role, raw, media) {
+    const rawText = String(raw || "").trim();
+    if (role === "model" && !rawText && !media.length) return "";
+    if (role === "model" && !rawText) return "";
+    return role === "model" ? displayReply(raw) : rawText;
+  }
+
   function cloneTurns(turns) {
     return (Array.isArray(turns) ? turns : [])
-      .map(row => ({
-        role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
-        text: String(row?.text || "").trim(),
-        media: Array.isArray(row?.media) ? row.media : undefined,
-        seq: row?.seq,
-        atMs: row?.atMs
-      }))
+      .map(row => {
+        const item = {
+          role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
+          text: String(row?.text || "").trim(),
+          media: Array.isArray(row?.media) ? row.media : undefined,
+          seq: row?.seq,
+          atMs: row?.atMs
+        };
+        const conversationId = clipConversationId(row?.conversationId);
+        if (conversationId) item.conversationId = conversationId;
+        return item;
+      })
       .filter(row => row.text || (row.media && row.media.length));
   }
 
   function firstUserLine(turns) {
     const row = cloneTurns(turns).find(item => item.role === "user" && item.text);
     return row ? row.text.replace(/\s+/g, " ").slice(0, 72) : "";
+  }
+
+  function clipConversationId(raw) {
+    const id = String(raw || "").trim();
+    return /^cv_[0-9a-f]{32}$/.test(id) ? id : "";
+  }
+
+  function mintConversationId() {
+    try {
+      const bytes = new Uint8Array(16);
+      (global.crypto || crypto).getRandomValues(bytes);
+      return `cv_${Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("")}`;
+    } catch (_) {
+      const hex = `${Date.now().toString(16).padStart(12, "0")}${Math.random().toString(16).slice(2)}0000000000000000`;
+      return `cv_${hex.slice(0, 32)}`;
+    }
+  }
+
+  function fnv1a(str, seed) {
+    let h = (Number(seed) >>> 0) || 2166136261;
+    const s = String(str || "");
+    for (let i = 0; i < s.length; i += 1) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h;
+  }
+
+  function conversationIdFromFirstUser(text) {
+    const line = String(text || "").toLowerCase().replace(/\s+/g, " ").trim().slice(0, 80);
+    if (!line) return "";
+    const a = fnv1a(line, 2166136261).toString(16).padStart(8, "0");
+    const b = fnv1a(line, 0x811c9dc5 ^ 0x01000193).toString(16).padStart(8, "0");
+    return `c_${a}${b}`;
+  }
+
+  function firstUserText(turns) {
+    const row = cloneTurns(turns).find(item => item.role === "user" && item.text);
+    return row ? String(row.text).trim() : "";
+  }
+
+  function conversationIdFromTurns(turns) {
+    const list = cloneTurns(turns);
+    for (let i = 0; i < list.length; i += 1) {
+      const id = clipConversationId(list[i].conversationId);
+      if (id) return id;
+    }
+    return "";
+  }
+
+  function clipChatTitle(raw) {
+    return String(raw || "")
+      .replace(/[\u0000-\u001f\u007f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, CHAT_TITLE_MAX);
+  }
+
+  function titleForChat(chatId, fallback) {
+    const row = chatTitles && chatTitles[chatId];
+    const stored = clipChatTitle(typeof row === "string" ? row : row?.title);
+    return stored || fallback || "";
+  }
+
+  function applyChatTitles(raw) {
+    const src = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+    chatTitles = {};
+    Object.keys(src).forEach(id => {
+      const title = clipChatTitle(typeof src[id] === "string" ? src[id] : src[id]?.title);
+      if (!title) return;
+      if (/^cv_[0-9a-f]{32}$/.test(id) || /^c_[0-9a-f]{16}$/.test(id)) {
+        chatTitles[id] = {title, updatedAtMs: Number(src[id]?.updatedAtMs) || 0};
+      }
+    });
+    const currentId = storedConversationId || conversationIdFromTurns(storedTurns);
+    const archivedId = archiveConversationId || conversationIdFromTurns(storedArchiveTurns);
+    const liveId = liveConversationId || conversationIdFromTurns(visitLiveTurns) || currentId;
+    const slotIds = {live: liveId, current: currentId, archive: archivedId};
+    ["live", "current", "archive"].forEach(slot => {
+      const title = clipChatTitle(typeof src[slot] === "string" ? src[slot] : src[slot]?.title);
+      const id = slotIds[slot];
+      if (!title || !id || chatTitles[id]) return;
+      chatTitles[id] = {title, updatedAtMs: Number(src[slot]?.updatedAtMs) || 0};
+    });
+    const hashTargets = [
+      [currentId, storedTurns],
+      [archivedId, storedArchiveTurns],
+      [liveId, visitLiveTurns]
+    ];
+    hashTargets.forEach(([id, turns]) => {
+      if (!id || chatTitles[id]) return;
+      const hashed = conversationIdFromFirstUser(firstUserText(turns));
+      const row = hashed && src[hashed];
+      const title = clipChatTitle(typeof row === "string" ? row : row?.title);
+      if (!title) return;
+      chatTitles[id] = {title, updatedAtMs: Number(row?.updatedAtMs) || 0};
+    });
   }
 
   function formatChatWhen(ms) {
@@ -1186,8 +1331,7 @@
     history.length = 0;
     cloneTurns(turns).forEach(row => {
       const media = row.role === "model" ? mergeMedia(row.media, harvestMediaFromText(row.text)) : [];
-      if (row.role === "model" && !row.text && !media.length) return;
-      const text = row.role === "model" ? displayReply(row.text) : row.text;
+      const text = modelBubbleText(row.role, row.text, media);
       if (!text && !media.length) return;
       appendBubble(row.role === "user" ? "user" : "bot", text, null, media);
       if (text) pushHistory(row.role, text);
@@ -1206,6 +1350,19 @@
     storedTurns = turns.length ? turns : archive;
     storedArchiveTurns = archive;
     storedLastMessageAtMs = Number(data.lastMessageAtMs) || 0;
+    storedConversationId = clipConversationId(data.currentConversationId) || conversationIdFromTurns(storedTurns);
+    archiveConversationId = clipConversationId(data.archiveConversationId) || conversationIdFromTurns(storedArchiveTurns);
+    if (storedConversationId) {
+      storedTurns.forEach(row => {
+        if (row && !row.conversationId) row.conversationId = storedConversationId;
+      });
+    }
+    if (archiveConversationId) {
+      storedArchiveTurns.forEach(row => {
+        if (row && !row.conversationId) row.conversationId = archiveConversationId;
+      });
+    }
+    applyChatTitles(data.chatTitles);
     const recall = storedTurns.length ? storedTurns : archive;
     // Visual collapse only — keep last turns in client history so Send still
     // ships BOT DEE context. Server retrieve is unchanged.
@@ -1286,6 +1443,7 @@
     setChatsOpen(false);
     phase = "fresh";
     setStatus("");
+    liveConversationId = mintConversationId();
     welcome();
     byId("botDeeChatInput")?.focus();
   }
@@ -1293,6 +1451,7 @@
   function resumeSlice(turns) {
     const rows = cloneTurns(turns);
     if (!rows.length) return;
+    liveConversationId = conversationIdFromTurns(rows) || liveConversationId;
     restoreTurns(rows);
     setChatsOpen(false);
     phase = "active";
@@ -1318,7 +1477,9 @@
       return;
     }
     if (hint) hint.hidden = false;
-    const addRow = (label, meta, onClick, primary) => {
+    const addRow = (label, meta, onClick, primary, chatId) => {
+      const row = document.createElement("div");
+      row.className = "botdee-chats-item";
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = primary ? "botdee-chats-row botdee-chats-row-primary" : "botdee-chats-row";
@@ -1329,27 +1490,211 @@
         span.textContent = meta;
         btn.appendChild(span);
       }
-      btn.addEventListener("click", onClick);
-      list.appendChild(btn);
+      btn.addEventListener("click", event => {
+        if (renameClickShouldSwallow(event, btn)) return;
+        onClick(event);
+      });
+      row.appendChild(btn);
+      if (chatId) {
+        const renameLabel = titleForChat(chatId, meta || label);
+        bindChatLongPress(btn, chatId, renameLabel);
+        const rename = document.createElement("button");
+        rename.type = "button";
+        rename.className = "botdee-chats-rename";
+        rename.setAttribute("aria-label", t("botdee.chatsRenameAria", "Rename chat"));
+        rename.title = t("botdee.chatsRename", "Rename");
+        rename.textContent = "⋯";
+        rename.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openRenameDialog(chatId, renameLabel);
+        });
+        row.appendChild(rename);
+      }
+      list.appendChild(row);
     };
     addRow(t("botdee.chatsNew", "New chat"), "", startNewChat, true);
     if (visitLiveTurns.length) {
+      const snippet = firstUserLine(visitLiveTurns);
+      const liveId = conversationIdFromTurns(visitLiveTurns) || liveConversationId;
       addRow(
         t("botdee.chatsResume", "This session"),
-        firstUserLine(visitLiveTurns),
-        () => resumeSlice(visitLiveTurns)
+        titleForChat(liveId, snippet),
+        () => resumeSlice(visitLiveTurns),
+        false,
+        liveId
       );
     }
     const earlier = [];
-    if (storedTurns.length) earlier.push(storedTurns);
-    if (storedArchiveTurns.length && firstUserLine(storedArchiveTurns) !== firstUserLine(storedTurns)) {
-      earlier.push(storedArchiveTurns);
+    if (storedTurns.length) {
+      earlier.push({
+        slice: storedTurns,
+        chatId: conversationIdFromTurns(storedTurns) || storedConversationId
+      });
     }
-    earlier.forEach((slice, index) => {
+    if (storedArchiveTurns.length && firstUserLine(storedArchiveTurns) !== firstUserLine(storedTurns)) {
+      earlier.push({
+        slice: storedArchiveTurns,
+        chatId: conversationIdFromTurns(storedArchiveTurns) || archiveConversationId
+      });
+    }
+    earlier.forEach((row, index) => {
       const when = formatChatWhen(storedLastMessageAtMs);
-      const line = firstUserLine(slice);
-      const title = [when, line].filter(Boolean).join(" · ") || t("botdee.chatsPanelTitle", "Chats");
-      addRow(title, index === 0 && storedTurns.length ? "" : "", () => resumeSlice(slice));
+      const line = firstUserLine(row.slice);
+      const fallback = [when, line].filter(Boolean).join(" · ") || t("botdee.chatsPanelTitle", "Chats");
+      const title = titleForChat(row.chatId, fallback);
+      addRow(title, index === 0 && storedTurns.length && title === fallback ? "" : (title !== fallback ? fallback : ""), () => resumeSlice(row.slice), false, row.chatId);
+    });
+  }
+
+  function armRenameClickSwallow(pointerId, btn) {
+    disarmRenameClickSwallow();
+    swallowRename = {pointerId, btn};
+    swallowRenameTimer = global.setTimeout(() => {
+      swallowRenameTimer = 0;
+      swallowRename = null;
+    }, SWALLOW_CLICK_MS);
+  }
+
+  function disarmRenameClickSwallow() {
+    if (swallowRenameTimer) {
+      global.clearTimeout(swallowRenameTimer);
+      swallowRenameTimer = 0;
+    }
+    swallowRename = null;
+  }
+
+  function leftoverRenameClick(event, btn) {
+    if (!swallowRename) return false;
+    const armedBtn = swallowRename.btn;
+    const target = event?.target;
+    if (btn && armedBtn === btn) return true;
+    if (armedBtn && target && (target === armedBtn || armedBtn.contains(target))) return true;
+    const samePointer = swallowRename.pointerId != null && event?.pointerId === swallowRename.pointerId;
+    const dialog = byId("botDeeRenameDialog");
+    const chatsBackdrop = byId("botDeeChatsBackdrop");
+    if (target !== dialog && target !== chatsBackdrop) return false;
+    return samePointer || event?.pointerId == null;
+  }
+
+  function renameClickShouldSwallow(event, btn) {
+    if (!leftoverRenameClick(event, btn)) return false;
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    disarmRenameClickSwallow();
+    return true;
+  }
+
+  function bindChatLongPress(btn, chatId, label) {
+    let timer = 0;
+    const start = event => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      clearTimeout(timer);
+      const pointerId = event.pointerId;
+      timer = global.setTimeout(() => {
+        timer = 0;
+        armRenameClickSwallow(pointerId, btn);
+        openRenameDialog(chatId, label);
+      }, LONG_PRESS_MS);
+    };
+    const cancelTimer = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = 0;
+      }
+    };
+    btn.addEventListener("pointerdown", start);
+    btn.addEventListener("pointerup", cancelTimer);
+    btn.addEventListener("pointercancel", () => {
+      cancelTimer();
+      disarmRenameClickSwallow();
+    });
+    btn.addEventListener("pointerleave", cancelTimer);
+    btn.addEventListener("contextmenu", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      cancelTimer();
+      disarmRenameClickSwallow();
+      openRenameDialog(chatId, label);
+    });
+  }
+
+  function setRenameOpen(open) {
+    const dialog = byId("botDeeRenameDialog");
+    if (!dialog) return;
+    dialog.hidden = !open;
+    dialog.setAttribute("aria-hidden", open ? "false" : "true");
+    if (!open) {
+      renameTarget = null;
+      disarmRenameClickSwallow();
+    }
+  }
+
+  function openRenameDialog(chatId, currentLabel) {
+    renameTarget = {chatId, currentLabel};
+    const input = byId("botDeeRenameInput");
+    const status = byId("botDeeRenameStatus");
+    if (status) status.textContent = "";
+    if (input) {
+      input.value = titleForChat(chatId, clipChatTitle(currentLabel));
+    }
+    setRenameOpen(true);
+    global.setTimeout(() => {
+      input?.focus();
+      input?.select();
+    }, 30);
+  }
+
+  async function saveRename() {
+    const status = byId("botDeeRenameStatus");
+    const input = byId("botDeeRenameInput");
+    const title = clipChatTitle(input?.value);
+    if (!renameTarget?.chatId) {
+      setRenameOpen(false);
+      return;
+    }
+    if (!title) {
+      if (status) status.textContent = t("botdee.chatsRenameError", "Could not save that title. Try again.");
+      input?.focus();
+      return;
+    }
+    const chatId = renameTarget.chatId;
+    const fn = callable("renameBotDeeChat");
+    if (!fn) {
+      if (status) status.textContent = t("botdee.chatsRenameError", "Could not save that title. Try again.");
+      return;
+    }
+    try {
+      const data = (await fn({chatId, title, conversationId: chatId}))?.data || {};
+      if (data.chatTitles) applyChatTitles(data.chatTitles);
+      else {
+        chatTitles[chatId] = {title: clipChatTitle(data.title) || title, updatedAtMs: Date.now()};
+      }
+      setRenameOpen(false);
+      renderChatsList();
+    } catch (error) {
+      console.warn("BOT DEE rename failed", error?.message || error);
+      if (status) status.textContent = t("botdee.chatsRenameError", "Could not save that title. Try again.");
+    }
+  }
+
+  function bindRenameDialog() {
+    if (renameDialogBound) return;
+    renameDialogBound = true;
+    byId("botDeeRenameSave")?.addEventListener("click", () => saveRename());
+    byId("botDeeRenameCancel")?.addEventListener("click", () => setRenameOpen(false));
+    byId("botDeeRenameDialog")?.addEventListener("click", event => {
+      if (renameClickShouldSwallow(event)) return;
+      if (event.target === byId("botDeeRenameDialog")) setRenameOpen(false);
+    });
+    byId("botDeeRenameInput")?.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        saveRename();
+      }
     });
   }
 
@@ -1359,13 +1704,27 @@
     const toggle = byId("botDeeChatsToggle");
     const backdrop = byId("botDeeChatsBackdrop");
     toggle?.addEventListener("click", () => setChatsOpen(!chatsOpen));
-    backdrop?.addEventListener("click", () => setChatsOpen(false));
+    backdrop?.addEventListener("click", event => {
+      if (renameClickShouldSwallow(event)) return;
+      setChatsOpen(false);
+    });
+    document.addEventListener("click", event => {
+      renameClickShouldSwallow(event);
+    }, true);
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape" && chatsOpen) {
-        event.preventDefault();
-        setChatsOpen(false);
+      if (event.key === "Escape") {
+        if (!byId("botDeeRenameDialog")?.hidden) {
+          event.preventDefault();
+          setRenameOpen(false);
+          return;
+        }
+        if (chatsOpen) {
+          event.preventDefault();
+          setChatsOpen(false);
+        }
       }
     });
+    bindRenameDialog();
     renderChatsList();
   }
 
@@ -1386,6 +1745,7 @@
           durableEnabled = data.durable === true;
           if (data.idleSeconds) idleSeconds = clampIdleSeconds(data.idleSeconds);
           if (data.threadId) threadId = String(data.threadId);
+          applyChatTitles(data.chatTitles);
           applyHasUsed(data);
           global.FLOQRBotDeePersonalization?.applyFromThread?.(data, true);
           if (durableEnabled && (

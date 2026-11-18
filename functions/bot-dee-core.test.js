@@ -508,6 +508,9 @@ test("durable thread helpers isolate uid and idle window", () => {
     Array.from({length: 20}, (_, i) => ({role: i % 2 ? "model" : "user", text: `t${i}`}))
   );
   assert.equal(clipped.length, bot.MAX_HISTORY);
+  const cid = `cv_${"ab".repeat(16)}`;
+  const withId = bot.clipStoredTurns([{role: "user", text: "hi", conversationId: cid}]);
+  assert.equal(withId[0].conversationId, cid);
   const listed = bot.clipModelText("Here is what I found:\n1. ShoutOut — throw one\n2. VIP reserV — book");
   const userList = bot.clipStoredText("line one\n\nline two", bot.MAX_MESSAGE_CHARS);
   assert.match(userList, /line one\n\nline two/);

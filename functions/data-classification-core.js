@@ -105,7 +105,7 @@
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
     ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
-    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1 + personalization + userbotdeelastUsedtime); Functions-write"],
+    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1 + personalization + userbotdeelastUsedtime + chatTitles); Functions-write"],
     ["botDeeThreads/events", "ownMaster", 1, "Append-only BOT DEE chat events for one uid thread; Functions-write"],
     ["botDeeThreads/archive", "ownMaster", 1, "Opt-in BOT DEE durable messages; survives idle pause; Functions-write; no IP"],
     ["botDeeThreads/memories", "ownMaster", 1, "User-controlled BOT DEE memories; Functions-write; opt-in"],
@@ -250,6 +250,9 @@
     ["botDeeThreads", "personalization.botDeePersonalizationVersion", "ownMaster", 0, "Versioned first-use overlay marker; below current generation still asks name/tone"],
     ["botDeeThreads", "botDeeSessionResetVersion", "ownMaster", 0, "One-shot chat reset per generation; overlay skip does not wipe later turns"],
     ["botDeeThreads", "retrievalFromSeq", "ownMaster", 0, "Transcript cursor after one-shot session reset; events with seq below this stay stored but are not retrieved or painted"],
+    ["botDeeThreads", "chatTitles", "ownMaster", 1, "User-chosen display titles for + Chats rows keyed by minted conversationId (cv_ uuid); Functions-write; owner uid only; never sent to Gemini"],
+    ["botDeeThreads", "currentConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the current slice; minted once; Functions-write"],
+    ["botDeeThreads", "archiveConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the previous slice after idle rotate; Functions-write"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
   ];

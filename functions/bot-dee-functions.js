@@ -365,6 +365,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         console.warn("BOT DEE execution load failed", err?.message || err);
       }
     }
+    // chatTitles are user-chosen + Chats labels only. Never put them in Gemini
+    // context (privilege-leak: a title must not carry Master Admin identity).
     const modelContext = execution.buildModelContext({
       turns: history,
       summary,
@@ -398,12 +400,17 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     });
 
     const apiKey = geminiKey();
+    let persistedConversationId = "";
     if (settings.durableThreads) {
       try {
-        await threads.persistUserTurn(uid, settings, storedUserText, {
+        const persistedUser = await threads.persistUserTurn(uid, settings, storedUserText, {
           receivedAtMs,
-          consent
+          consent,
+          conversationId: request.data?.conversationId
         });
+        if (persistedUser && persistedUser.conversationId) {
+          persistedConversationId = persistedUser.conversationId;
+        }
       } catch (err) {
         console.warn("BOT DEE persist user failed", err?.message || err);
         throw new HttpsError("unavailable", "BOT DEE could not save that message. Try again.");
@@ -508,7 +515,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
           receivedAtMs,
           media: outcome.media,
           consent,
-          allowEmpty: versionCardOnly
+          allowEmpty: versionCardOnly,
+          conversationId: persistedConversationId
         });
         if (bot.isFarewellPrompt(userPrompt)) {
           await threads.markIdleEnded(uid, settings);
@@ -557,6 +565,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       toolRounds: outcome.toolRounds || 0,
       durable: !!settings.durableThreads,
       threadId: coercedThreadId || bot.threadIdForUid(uid),
+      conversationId: persistedConversationId,
       conversationIdleSeconds: settings.conversationIdleSeconds,
       consent,
       hasUsedBotDee: 1,
@@ -673,6 +682,7 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
         hasUsedBotDee,
         personalization: prefs.normalizePersonalization({}, {profileFirstName}),
         profileFirstName,
+        chatTitles: {},
         [prefs.LAST_USED_FIELD]: 0
       };
     }
@@ -700,6 +710,34 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       retrievalFromSeq: state.retrievalFromSeq
     });
     const profileFirstName = await readProfileFirstName(uid);
+    const currentConversationId = threads.clipConversationId(state.currentConversationId)
+      || threads.conversationIdFromTurns(retrievalTurns);
+    const archiveConversationId = threads.clipConversationId(state.archiveConversationId)
+      || threads.conversationIdFromTurns(archiveTurns);
+    if (currentConversationId) {
+      retrievalTurns.forEach(row => {
+        if (row && !row.conversationId) row.conversationId = currentConversationId;
+      });
+    }
+    if (archiveConversationId) {
+      archiveTurns.forEach(row => {
+        if (row && !row.conversationId) row.conversationId = archiveConversationId;
+      });
+    }
+    const titleSlices = {
+      currentConversationId,
+      archiveConversationId,
+      liveConversationId: currentConversationId,
+      currentTurns: retrievalTurns,
+      archiveTurns
+    };
+    let chatTitles = threads.migrateChatTitles(state.chatTitles, titleSlices);
+    if (threads.chatTitlesNeedWrite(state.chatTitles)) {
+      try {
+        const saved = await threads.persistChatTitles(uid, state.chatTitles, Date.now(), titleSlices);
+        if (saved && saved.chatTitles) chatTitles = saved.chatTitles;
+      } catch (_) {}
+    }
     return {
       ok: true,
       durable: true,
@@ -710,14 +748,47 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       consent: state.consent,
       hasUsedBotDee: state.hasUsedBotDee === 1 ? 1 : 0,
       conversationEpoch: state.conversationEpoch,
+      currentConversationId,
+      archiveConversationId,
       lastMessageAtMs: state.lastMessageAtMs,
       remainingMs: state.remainingMs,
       idleSeconds: settings.conversationIdleSeconds,
       personalization: prefs.normalizePersonalization(state.personalization, {profileFirstName}),
       profileFirstName,
+      chatTitles,
       [prefs.LAST_USED_FIELD]: Number(state[prefs.LAST_USED_FIELD]) || 0
     };
   } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.renameBotDeeChat = onCall(GET_THREAD_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "Sign in to rename a BOT DEE chat.");
+    }
+    await audit.assertFeatureAccess(request.auth, "botDee", request);
+    const uid = request.auth.uid;
+    const result = await threads.renameChat(uid, request.data?.chatId, request.data?.title, Date.now(), {
+      conversationId: request.data?.conversationId
+    });
+    if (!result.ok) {
+      if (result.error === "invalid_chat_id" || result.error === "empty_title") {
+        throw new HttpsError("invalid-argument", "Enter a chat title.");
+      }
+      throw new HttpsError("failed-precondition", "Could not rename that chat.");
+    }
+    return {
+      ok: true,
+      chatId: result.chatId,
+      title: result.title,
+      chatTitles: result.chatTitles
+    };
+  } catch (error) {
+    if (error?.code === "permission-denied") {
+      throw new HttpsError("permission-denied", "You can only rename your own chats.");
+    }
     throw asHttps(error);
   }
 });
