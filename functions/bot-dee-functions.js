@@ -140,7 +140,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
       return {
         reply: prefs.appendActionHistory(
           bot.sanitizeFeatureMentions(bot.redactPrivilegeReply(replyRaw), allowed),
-          resultCards
+          actionLinks
         ),
         results: resultCards,
         media: mediaItems.slice(0, 8),
@@ -194,7 +194,7 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
         bot.redactPrivilegeReply(throwPack ? throwPack.reply : bot.formatSearchFallback(lastSearch, lang, allowed)),
         allowed
       ),
-      truncatedCards
+      actionLinks
     ),
     results: truncatedCards,
     media: mediaItems.slice(0, 8),

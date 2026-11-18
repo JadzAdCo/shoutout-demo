@@ -82,6 +82,10 @@ test("product help naming Master Admin / beta tester stays; first-person privile
     guard.PRIVILEGE_REFUSE
   );
   assert.equal(
+    guard.redactPrivilegeReply("I can see you as the Master Admin"),
+    guard.PRIVILEGE_REFUSE
+  );
+  assert.equal(
     guard.redactPrivilegeReply("I can see you as wanting to throw a ShoutOut at Decades."),
     "I can see you as wanting to throw a ShoutOut at Decades."
   );
@@ -91,6 +95,10 @@ test("product help naming Master Admin / beta tester stays; first-person privile
   );
   assert.equal(
     bot.sanitizeBotReply("I can see you as Master Admin"),
+    guard.PRIVILEGE_REFUSE
+  );
+  assert.equal(
+    bot.sanitizeBotReply("I can see you as the Master Admin"),
     guard.PRIVILEGE_REFUSE
   );
   for (const leak of [
@@ -229,7 +237,9 @@ test("client leak regex source matches the server first-person set", () => {
   assert.equal(clientRe.test("Privileged employee, Club Admin, Master Admin"), false);
   assert.equal(clientRe.test("you are a privileged employee"), true);
   assert.equal(clientRe.test("I can see you as Master Admin"), true);
+  assert.equal(clientRe.test("I can see you as the Master Admin"), true);
   assert.equal(clientRe.test("I can see you as wanting to throw a ShoutOut"), false);
+  assert.equal(clientRe.test("I can see you as ready to send a ShoutOut."), false);
 });
 
 test("session logs omit privilege and i18n refuse key exists in all packs", () => {
