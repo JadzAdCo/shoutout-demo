@@ -215,6 +215,7 @@ jobs:
             add_fns \
               executeBotSession \
               getBotDeeThread \
+              renameBotDeeChat \
               saveBotDeePersonalization \
               setBotDeeSettings \
               getBotDeeAccess \
@@ -261,6 +262,7 @@ jobs:
             for f in \
               executeBotSession \
               getBotDeeThread \
+              renameBotDeeChat \
               getBotDeeAccess \
               getBotDeeCapabilityManifest \
               getBotDeeConsent \
