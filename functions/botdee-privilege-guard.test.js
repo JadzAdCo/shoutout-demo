@@ -85,6 +85,22 @@ test("product help naming Master Admin / beta tester stays; first-person privile
     bot.sanitizeBotReply("I can see you as Master Admin"),
     guard.PRIVILEGE_REFUSE
   );
+  for (const leak of [
+    "You have Master Admin access",
+    "Your role is Master Admin",
+    "The user is a Master Admin",
+    "user is a Super Admin",
+    "this user is a beta tester",
+    "the viewer is a Club Admin",
+    "You may open Master Admin",
+    "your club-admin status is on",
+    "viewer classification: master",
+    "isMasterAdmin: true",
+    "tokenClaims include masterAdmin"
+  ]) {
+    assert.equal(guard.redactPrivilegeReply(leak), guard.PRIVILEGE_REFUSE, leak);
+    assert.ok(guard.PRIVILEGE_LEAK_RE.test(leak), leak);
+  }
   const kept = bot.stripPrivilegeFromToolResult({
     results: [{
       id: "help-beta-booking-disclaimer",
@@ -167,11 +183,31 @@ test("client chat does not send viewer role and filters privilege replies", () =
   assert.match(chat, /isPrivilegeAskPrompt/);
   assert.match(chat, /botdee\.privilegeRefuse/);
   assert.match(chat, /PRIVILEGE_REFUSE_EN/);
-  assert.doesNotMatch(chat, /isMasterAdmin|viewerRole|role:\s*["']master["']/);
+  assert.doesNotMatch(chat, /viewerRole|role:\s*["']master["']/);
   const payload = chat.match(/message:\s*text,\s*history:[\s\S]*?uiLanguage:\s*currentUiLanguage\(\)/);
   assert.ok(payload);
   assert.doesNotMatch(payload[0], /isMasterAdmin|viewerRole|["']master["']/);
   assert.match(payload[0], /uiLanguage/);
+});
+
+test("client leak regex source matches the server first-person set", () => {
+  function leakJoinSource(text) {
+    const role = text.match(/VIEWER_PRIVILEGE_ROLE = ("(?:\\.|[^"\\])*")/);
+    const start = text.indexOf("PRIVILEGE_LEAK_RE = new RegExp([");
+    const end = text.indexOf("].join(\"|\")", start);
+    assert.ok(role, "VIEWER_PRIVILEGE_ROLE");
+    assert.ok(start >= 0 && end > start, "PRIVILEGE_LEAK_RE array");
+    const inner = text.slice(start + "PRIVILEGE_LEAK_RE = new RegExp([".length, end);
+    return Function(`"use strict"; const VIEWER_PRIVILEGE_ROLE = ${role[1]}; return [${inner}].join("|");`)();
+  }
+  const chat = read("bot-dee-chat.js");
+  const server = read("functions/botdee-privilege-guard.js");
+  assert.equal(leakJoinSource(chat), leakJoinSource(server));
+  const clientRe = new RegExp(leakJoinSource(chat), "i");
+  assert.equal(clientRe.test("You have Master Admin access"), true);
+  assert.equal(clientRe.test("The user is a Master Admin"), true);
+  assert.equal(clientRe.test("Ask a Master Admin to enable Features & Services."), false);
+  assert.equal(clientRe.test("As a FloqR beta tester, you accept that reversing payments is difficult during beta."), false);
 });
 
 test("session logs omit privilege and i18n refuse key exists in all packs", () => {

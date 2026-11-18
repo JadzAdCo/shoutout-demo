@@ -227,15 +227,30 @@
   }
 
   const PRIVILEGE_REFUSE_EN = "I don't have account-security details.";
+  const VIEWER_PRIVILEGE_ROLE = "(?:master(?:\\s|-)*admin|super(?:\\s|-)*admin|beta(?:\\s|-)*tester|club(?:\\s|-)*admin)";
+  /** Keep in sync with functions/botdee-privilege-guard.js (test asserts identical join source). */
   const PRIVILEGE_LEAK_RE = new RegExp([
-    String.raw`\bi\s+(?:can\s+)?see\s+you\s+as\b`,
-    String.raw`\byour\s+login\s+is\s+(?:a\s+|an\s+)?(?:master|master(?:\s|-)*admin|super(?:\s|-)*admin)\b`,
-    String.raw`\byou(?:'re|\s+are|\s+were|\s+have\s+been)\s+(?:a\s+|an\s+)?(?:master(?:\s|-)*admin|super(?:\s|-)*admin|beta(?:\s|-)*tester|club(?:\s|-)*admin)\b`,
-    String.raw`\byou\s+(?:can|cannot|can't)\s+(?:open|access)\s+(?:the\s+)?master(?:\s|-)*admin\b`,
-    String.raw`\byour\s+(?:sos\s*-?\s*2fa|sos2fa)\b`,
-    String.raw`\byou\s+(?:have|use|enabled)\s+(?:sos\s*-?\s*2fa|sos2fa)\b`,
-    String.raw`\byour\s+(?:token\s+|custom\s+)?claims\b`,
-    String.raw`\byour\s+classification\s+role\b`
+    `\\bi\\s+(?:can\\s+)?see\\s+you\\s+as\\b`,
+    `\\byour\\s+login\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+    `\\byour\\s+role\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+    `\\byou(?:'re|\\s+are|\\s+were|\\s+have\\s+been)\\s+(?:a\\s+|an\\s+)?${VIEWER_PRIVILEGE_ROLE}\\b`,
+    `\\byou\\s+(?:have|use|enabled)\\s+(?:a\\s+|an\\s+)?(?:${VIEWER_PRIVILEGE_ROLE}|sos\\s*-?\\s*2fa|sos2fa)\\b`,
+    `\\byou\\s+(?:can|cannot|can't|may|may\\s+not)\\s+(?:open|access)\\s+(?:the\\s+)?master(?:\\s|-)*admin\\b`,
+    `\\bwhether\\s+you\\s+can\\s+open\\s+master(?:\\s|-)*admin\\b`,
+    `\\byour\\s+(?:sos\\s*-?\\s*2fa|sos2fa)\\b`,
+    `\\byour\\s+(?:token\\s+|id\\s+token\\s+|custom\\s+)?claims\\b`,
+    `\\byour\\s+classification\\s+role\\b`,
+    `\\byour\\s+club[- ]admin\\s+status\\b`,
+    `\\bviewer\\s+classification\\b`,
+    `\\b(?:this\\s+user|this\\s+account|the\\s+viewer|the\\s+signed[-\\s]?in\\s+user|the\\s+user|viewer)\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+    `\\buser\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+    "\\bisMasterAdmin\\b",
+    "\\bisSuperAdmin\\b",
+    "\\bisBetaTester\\b",
+    "\\bisClubAdmin\\b",
+    "\\btokenClaims\\b",
+    "\\bcustomClaims\\b",
+    "\\bprivileged\\s+employee\\b"
   ].join("|"), "i");
 
   function privilegeRefuseReply() {

@@ -10,33 +10,32 @@ const PRIVILEGE_KEY_RE = /^(?:isMasterAdmin|isSuperAdmin|superAdmin|masterAdmin|
 /** Product glossary roles. Only first-person / viewer identity around these is a leak. */
 const VIEWER_PRIVILEGE_ROLE = "(?:master(?:\\s|-)*admin|super(?:\\s|-)*admin|beta(?:\\s|-)*tester|club(?:\\s|-)*admin)";
 
-const PRIVILEGE_LEAK_RE = new RegExp(
-  [
-    // Spoken first-person / this-viewer privilege — not "Master Admin" / "beta tester" as product jobs.
-    `\\bi\\s+(?:can\\s+)?see\\s+you\\s+as\\b`,
-    `\\byour\\s+login\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
-    `\\byou(?:'re|\\s+are|\\s+were|\\s+have\\s+been)\\s+(?:a\\s+|an\\s+)?${VIEWER_PRIVILEGE_ROLE}\\b`,
-    `\\byou\\s+(?:can|cannot|can't|may|may\\s+not)\\s+(?:open|access)\\s+(?:the\\s+)?master(?:\\s|-)*admin\\b`,
-    `\\bwhether\\s+you\\s+can\\s+open\\s+master(?:\\s|-)*admin\\b`,
-    `\\byour\\s+(?:sos\\s*-?\\s*2fa|sos2fa)\\b`,
-    `\\byou\\s+(?:have|use|enabled)\\s+(?:sos\\s*-?\\s*2fa|sos2fa)\\b`,
-    `\\byour\\s+(?:token\\s+|id\\s+token\\s+|custom\\s+)?claims\\b`,
-    `\\byour\\s+classification\\s+role\\b`,
-    `\\byour\\s+club[- ]admin\\s+status\\b`,
-    `\\bviewer\\s+classification\\b`,
-    `\\b(?:this\\s+user|this\\s+account|the\\s+viewer|the\\s+signed[-\\s]?in\\s+user|viewer)\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
-    `\\buser\\s+is\\s+${VIEWER_PRIVILEGE_ROLE}\\b`,
-    // Field dumps in spoken / JSON-in-text — not product copy.
-    "\\bisMasterAdmin\\b",
-    "\\bisSuperAdmin\\b",
-    "\\bisBetaTester\\b",
-    "\\bisClubAdmin\\b",
-    "\\btokenClaims\\b",
-    "\\bcustomClaims\\b",
-    "\\bprivileged\\s+employee\\b"
-  ].join("|"),
-  "i"
-);
+/** Keep in sync with bot-dee-chat.js (test asserts identical join source). */
+const PRIVILEGE_LEAK_RE = new RegExp([
+  // Spoken first-person / this-viewer privilege — not "Master Admin" / "beta tester" as product jobs.
+  `\\bi\\s+(?:can\\s+)?see\\s+you\\s+as\\b`,
+  `\\byour\\s+login\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+  `\\byour\\s+role\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+  `\\byou(?:'re|\\s+are|\\s+were|\\s+have\\s+been)\\s+(?:a\\s+|an\\s+)?${VIEWER_PRIVILEGE_ROLE}\\b`,
+  `\\byou\\s+(?:have|use|enabled)\\s+(?:a\\s+|an\\s+)?(?:${VIEWER_PRIVILEGE_ROLE}|sos\\s*-?\\s*2fa|sos2fa)\\b`,
+  `\\byou\\s+(?:can|cannot|can't|may|may\\s+not)\\s+(?:open|access)\\s+(?:the\\s+)?master(?:\\s|-)*admin\\b`,
+  `\\bwhether\\s+you\\s+can\\s+open\\s+master(?:\\s|-)*admin\\b`,
+  `\\byour\\s+(?:sos\\s*-?\\s*2fa|sos2fa)\\b`,
+  `\\byour\\s+(?:token\\s+|id\\s+token\\s+|custom\\s+)?claims\\b`,
+  `\\byour\\s+classification\\s+role\\b`,
+  `\\byour\\s+club[- ]admin\\s+status\\b`,
+  `\\bviewer\\s+classification\\b`,
+  `\\b(?:this\\s+user|this\\s+account|the\\s+viewer|the\\s+signed[-\\s]?in\\s+user|the\\s+user|viewer)\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+  `\\buser\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+  // Field dumps in spoken / JSON-in-text — not product copy.
+  "\\bisMasterAdmin\\b",
+  "\\bisSuperAdmin\\b",
+  "\\bisBetaTester\\b",
+  "\\bisClubAdmin\\b",
+  "\\btokenClaims\\b",
+  "\\bcustomClaims\\b",
+  "\\bprivileged\\s+employee\\b"
+].join("|"), "i");
 
 const PRIVILEGE_ASK_TERM_RE = /master\s*-?\s*admin|super\s*-?\s*admin|sos\s*-?\s*2fa|sos2fa|beta\s*-?\s*tester|token\s+claims?|custom\s+claims?|ismasteradmin|feature\s*gates?/;
 
@@ -182,6 +181,8 @@ function assertNoPrivilegeInPayload(payload) {
 module.exports = {
   PRIVILEGE_REFUSE,
   PRIVILEGE_SYSTEM_INSTRUCTION,
+  VIEWER_PRIVILEGE_ROLE,
+  PRIVILEGE_LEAK_RE,
   isPrivilegeAskPrompt,
   privilegeRefuseReply,
   textHasPrivilegeLeak,
