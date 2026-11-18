@@ -1,5 +1,9 @@
 [
   {
+    "id": "s3.3.041",
+    "text": "s3.3.041: BOT DEE + FloqR headless ShoutOut (club + message → Stripe or pending)"
+  },
+  {
     "id": "s3.3.040",
     "text": "s3.3.040: People lookup matches legal name, display name, handle, what-about"
   },

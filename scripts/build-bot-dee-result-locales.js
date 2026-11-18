@@ -111,6 +111,7 @@ function buildLocales(root = ROOT) {
       paySecurely: tIn(lang, "botdee.link.paySecurely"),
       floqcastPreview: tIn(lang, "botdee.link.floqcastPreview"),
       shoutoutCompose: tIn(lang, "botdee.link.shoutoutCompose"),
+      shoutoutPending: tIn(lang, "botdee.link.shoutoutPending"),
       vipTerms: tIn(lang, "botdee.link.vipTerms")
     };
     const fallback = {

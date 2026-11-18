@@ -157,7 +157,7 @@
     ["shoutoutComplianceLogs", "master", 1, "ShoutOut compliance logs"],
     ["shoutoutComplianceMeta", "master", 0, "ShoutOut compliance settings"],
     ["shoutoutRecommendations", "internal", 0, "ShoutOut suggestions"],
-    ["shoutouts", "ownClubStaff", 1, "ShoutOut requests (board text shows on the venue display)"],
+    ["shoutouts", "ownClubStaff", 1, "ShoutOut requests (board text shows on the venue display); Functions-write for paid Stripe fulfill and headless pending submit"],
     ["smartVisualAdPolicy", "master", 0, "SMARTvisuals labeled-ad slot policy (AdSense off until separate approval)"],
     ["smartVisualAuditLogs", "master", 1, "SMARTvisual Studio publish/override/sanitizer denials (actor email; Functions-write)"],
     ["smartVisualDrafts", "master", 1, "Unpublished SMARTstencil/SMARTbackground drafts; patrons never read"],

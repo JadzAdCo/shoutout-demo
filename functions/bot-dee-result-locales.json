@@ -31,6 +31,22 @@
   "byLang": {
     "de": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "Mingl Room SMARTnotification",
+          "blurb": "Auf der Suche kann eine kompakte Mingl-Room-Einladung erscheinen. Einladung ansehen öffnet Room SMARTview. Nicht jetzt blendet sie für diese Sitzung aus. Die Grafik ist SMARTbackground-Illustration mit SMARTstencils — kein Foto, kein offizielles Zeichen. Namen und RSVP kommen nur"
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "Mingl Room SMARTnotification",
+          "blurb": "Auf der Suche kann eine kompakte Mingl-Room-Einladung erscheinen. Einladung ansehen öffnet Room SMARTview. Nicht jetzt blendet sie für diese Sitzung aus. Die Grafik ist SMARTbackground-Illustration mit SMARTstencils — kein Foto, kein offizielles Zeichen. Namen und RSVP kommen nur"
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview mit SMARTvisuals",
+          "blurb": "Room SMARTview zeigt die Mingl-Einladung: Zeit, RSVP oder Live, Jetzt beitreten. SMARTstencils und SMARTbackgrounds folgen dem freigegebenen Titel — Cancun Trip nutzt Reisekunst, kein echtes Foto, keine Partnerschaft. Privater BOT-DEE-Chat wählt keine Grafik. Gruppenräume sind ni"
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview mit SMARTvisuals",
+          "blurb": "Room SMARTview zeigt die Mingl-Einladung: Zeit, RSVP oder Live, Jetzt beitreten. SMARTstencils und SMARTbackgrounds folgen dem freigegebenen Titel — Cancun Trip nutzt Reisekunst, kein echtes Foto, keine Partnerschaft. Privater BOT-DEE-Chat wählt keine Grafik. Gruppenräume sind ni"
+        },
         "help:help-scheduling-schedule-for": {
           "label": "Mitarbeiterplanung",
           "blurb": "Plane Schichten und Bookings und benachrichtige jede Person per Inbox, Email, SMS oder WhatsApp. Unter „Planen für“ wählst du, wessen Kalender du bearbeitest: „Mein DJ-Plan“ ist dein eigener Kalender, „Club“ zeigt die Clubs, die du verwaltest, und „Promo-Firma“ die Firmen, für di"
@@ -1060,6 +1076,7 @@
         "paySecurely": "Sicher bezahlen",
         "floqcastPreview": "FloqCAST-Vorschau öffnen",
         "shoutoutCompose": "ShoutOut-Composer öffnen",
+        "shoutoutPending": "In Meine ShoutOuts öffnen",
         "vipTerms": "VIP-Bedingungen fortsetzen"
       },
       "fallback": {
@@ -1069,6 +1086,22 @@
     },
     "fr": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "Une invitation Mingl Room compacte peut s’afficher dans la Recherche. Voir l’invitation ouvre Room SMARTview. Pas maintenant la masque pour cette session. L’art est une illustration SMARTbackground avec SMARTstencils — pas une photo ni une marque officielle. Les noms et RSVP vien"
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "Une invitation Mingl Room compacte peut s’afficher dans la Recherche. Voir l’invitation ouvre Room SMARTview. Pas maintenant la masque pour cette session. L’art est une illustration SMARTbackground avec SMARTstencils — pas une photo ni une marque officielle. Les noms et RSVP vien"
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview et SMARTvisuals",
+          "blurb": "Room SMARTview montre l’invitation Mingl : horaire, RSVP ou statut live, et Rejoindre. SMARTstencils et SMARTbackgrounds suivent le titre autorisé — Cancun Trip utilise un art voyage, pas une photo réelle ni un partenariat officiel. Le chat BOT DEE privé ne choisit jamais l’art. "
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview et SMARTvisuals",
+          "blurb": "Room SMARTview montre l’invitation Mingl : horaire, RSVP ou statut live, et Rejoindre. SMARTstencils et SMARTbackgrounds suivent le titre autorisé — Cancun Trip utilise un art voyage, pas une photo réelle ni un partenariat officiel. Le chat BOT DEE privé ne choisit jamais l’art. "
+        },
         "help:help-scheduling-schedule-for": {
           "label": "Planification du personnel",
           "blurb": "Planifiez des shifts et des bookings, puis prévenez chaque personne par Inbox, Email, SMS ou WhatsApp. Sous « Planning pour », choisissez le calendrier sur lequel vous travaillez : « Mon planning DJ » est votre propre calendrier, « Club » liste les clubs que vous gérez et « Socié"
@@ -2098,6 +2131,7 @@
         "paySecurely": "Payer en toute sécurité",
         "floqcastPreview": "Ouvrir l’aperçu FloqCAST",
         "shoutoutCompose": "Ouvrir la composition ShoutOut",
+        "shoutoutPending": "Ouvrir dans Mes ShoutOuts",
         "vipTerms": "Continuer les conditions VIP"
       },
       "fallback": {
@@ -2107,6 +2141,22 @@
     },
     "es": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "SMARTnotification de Mingl Room",
+          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Los anuncios, si se a"
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "SMARTnotification de Mingl Room",
+          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Los anuncios, si se a"
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview con SMARTvisuals",
+          "blurb": "Room SMARTview muestra la invitación Mingl: horario, RSVP o en vivo, y Unirse. SMARTstencils y SMARTbackgrounds siguen el título autorizado — Cancun Trip usa arte de viaje, no foto real ni alianza oficial. El chat privado de BOT DEE no elige el arte. Las rooms de grupo no están e"
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview con SMARTvisuals",
+          "blurb": "Room SMARTview muestra la invitación Mingl: horario, RSVP o en vivo, y Unirse. SMARTstencils y SMARTbackgrounds siguen el título autorizado — Cancun Trip usa arte de viaje, no foto real ni alianza oficial. El chat privado de BOT DEE no elige el arte. Las rooms de grupo no están e"
+        },
         "help:help-scheduling-schedule-for": {
           "label": "Planificación del personal",
           "blurb": "Planifica turnos y contrataciones y avisa a cada persona por Inbox, Email, SMS o WhatsApp. En «Horario de», elige el calendario con el que trabajas: «Mi horario de DJ» es tu propio calendario, «Club» muestra los clubs que administras y «Empresa de promoción» las empresas para las"
@@ -3136,6 +3186,7 @@
         "paySecurely": "Pagar de forma segura",
         "floqcastPreview": "Abrir vista previa de FloqCAST",
         "shoutoutCompose": "Abrir el compositor de ShoutOut",
+        "shoutoutPending": "Abrir en Mis ShoutOuts",
         "vipTerms": "Continuar con los términos VIP"
       },
       "fallback": {
@@ -3145,6 +3196,22 @@
     },
     "it": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Gli ad"
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Gli ad"
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview con SMARTvisuals",
+          "blurb": "Room SMARTview mostra l’invito Mingl: orario, RSVP o live, e Entra ora. SMARTstencils e SMARTbackgrounds seguono il titolo autorizzato — Cancun Trip usa arte di viaggio, non una foto reale né una partnership. La chat privata BOT DEE non sceglie l’arte. Le room di gruppo non sono "
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview con SMARTvisuals",
+          "blurb": "Room SMARTview mostra l’invito Mingl: orario, RSVP o live, e Entra ora. SMARTstencils e SMARTbackgrounds seguono il titolo autorizzato — Cancun Trip usa arte di viaggio, non una foto reale né una partnership. La chat privata BOT DEE non sceglie l’arte. Le room di gruppo non sono "
+        },
         "help:help-scheduling-schedule-for": {
           "label": "Pianificazione del personale",
           "blurb": "Pianifica turni e ingaggi, poi avvisa ogni persona tramite Inbox, Email, SMS o WhatsApp. In «Turni per» scegli il calendario su cui lavori: «Il mio calendario DJ» è il tuo calendario, «Club» elenca i club che gestisci e «Società di promozione» le società per cui fai promozione. O"
@@ -4174,6 +4241,7 @@
         "paySecurely": "Paga in sicurezza",
         "floqcastPreview": "Apri anteprima FloqCAST",
         "shoutoutCompose": "Apri il composer ShoutOut",
+        "shoutoutPending": "Apri in I miei ShoutOuts",
         "vipTerms": "Continua i Termini VIP"
       },
       "fallback": {
@@ -4183,6 +4251,22 @@
     },
     "pt": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Anúncios, se aprovados, fic"
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Anúncios, se aprovados, fic"
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview com SMARTvisuals",
+          "blurb": "O Room SMARTview mostra o convite Mingl: horário, RSVP ou direto, e Entrar agora. SMARTstencils e SMARTbackgrounds seguem o título autorizado — Cancun Trip usa arte de viagem, não foto real nem parceria oficial. O chat privado BOT DEE não escolhe a arte. Rooms de grupo ainda não "
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview com SMARTvisuals",
+          "blurb": "O Room SMARTview mostra o convite Mingl: horário, RSVP ou direto, e Entrar agora. SMARTstencils e SMARTbackgrounds seguem o título autorizado — Cancun Trip usa arte de viagem, não foto real nem parceria oficial. O chat privado BOT DEE não escolhe a arte. Rooms de grupo ainda não "
+        },
         "help:help-scheduling-schedule-for": {
           "label": "Agendamento de pessoal",
           "blurb": "Planeje turnos e contratações e avise cada pessoa por Inbox, Email, SMS ou WhatsApp. Em «Escala de», escolha em qual agenda você está trabalhando: «Minha agenda de DJ» é a sua própria agenda, «Clube» lista os clubes que você administra e «Empresa de promoção» as empresas para as "
@@ -5212,6 +5296,7 @@
         "paySecurely": "Pagar com segurança",
         "floqcastPreview": "Abrir prévia do FloqCAST",
         "shoutoutCompose": "Abrir o compositor de ShoutOut",
+        "shoutoutPending": "Abrir em Meus ShoutOuts",
         "vipTerms": "Continuar os Termos VIP"
       },
       "fallback": {
@@ -5221,6 +5306,22 @@
     },
     "ru": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Реклама"
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Реклама"
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview и SMARTvisuals",
+          "blurb": "Room SMARTview показывает приглашение Mingl: время, RSVP или эфир и «Присоединиться». SMARTstencils и SMARTbackgrounds следуют разрешённому названию — Cancun Trip даёт travel-иллюстрацию, не фото и не партнёрство. Личный чат BOT DEE не выбирает картинку. Групповые room ещё не в э"
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview и SMARTvisuals",
+          "blurb": "Room SMARTview показывает приглашение Mingl: время, RSVP или эфир и «Присоединиться». SMARTstencils и SMARTbackgrounds следуют разрешённому названию — Cancun Trip даёт travel-иллюстрацию, не фото и не партнёрство. Личный чат BOT DEE не выбирает картинку. Групповые room ещё не в э"
+        },
         "help:help-scheduling-schedule-for": {
           "label": "Расписание персонала",
           "blurb": "Планируйте смены и букинги и уведомляйте каждого через Inbox, Email, SMS или WhatsApp. В разделе «Расписание для» выберите, с чьим календарём вы работаете: «Моё расписание DJ» — ваш собственный календарь, «Клуб» — клубы, которыми вы управляете, «Промо-компания» — компании, для ко"
@@ -6250,6 +6351,7 @@
         "paySecurely": "Оплатить безопасно",
         "floqcastPreview": "Открыть превью FloqCAST",
         "shoutoutCompose": "Открыть композитор ShoutOut",
+        "shoutoutPending": "Открыть в Мои ShoutOuts",
         "vipTerms": "Продолжить условия VIP"
       },
       "fallback": {
@@ -6259,6 +6361,22 @@
     },
     "el": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "Στην Αναζήτηση μπορεί να εμφανιστεί συμπαγής πρόσκληση Mingl Room. Η προβολή ανοίγει το Room SMARTview. Όχι τώρα την κρύβει σε αυτή τη συνεδρία. Η εικόνα είναι εικονογράφηση SMARTbackground με SMARTstencils — όχι φωτογραφία ούτε επίσημο σήμα. Ονόματα και RSVP μόνο από την εγγραφή"
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "Στην Αναζήτηση μπορεί να εμφανιστεί συμπαγής πρόσκληση Mingl Room. Η προβολή ανοίγει το Room SMARTview. Όχι τώρα την κρύβει σε αυτή τη συνεδρία. Η εικόνα είναι εικονογράφηση SMARTbackground με SMARTstencils — όχι φωτογραφία ούτε επίσημο σήμα. Ονόματα και RSVP μόνο από την εγγραφή"
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview με SMARTvisuals",
+          "blurb": "Το Room SMARTview δείχνει την πρόσκληση Mingl: ώρα, RSVP ή ζωντανά, και Συμμετοχή τώρα. SMARTstencils και SMARTbackgrounds ακολουθούν τον εγκεκριμένο τίτλο — το Cancun Trip χρησιμοποιεί ταξιδιωτική τέχνη, όχι πραγματική φωτογραφία ούτε επίσημη συνεργασία. Η ιδιωτική συνομιλία BOT"
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview με SMARTvisuals",
+          "blurb": "Το Room SMARTview δείχνει την πρόσκληση Mingl: ώρα, RSVP ή ζωντανά, και Συμμετοχή τώρα. SMARTstencils και SMARTbackgrounds ακολουθούν τον εγκεκριμένο τίτλο — το Cancun Trip χρησιμοποιεί ταξιδιωτική τέχνη, όχι πραγματική φωτογραφία ούτε επίσημη συνεργασία. Η ιδιωτική συνομιλία BOT"
+        },
         "help:help-scheduling-schedule-for": {
           "label": "Προγραμματισμός προσωπικού",
           "blurb": "Σχεδιάστε βάρδιες και κρατήσεις και ειδοποιήστε κάθε άτομο μέσω Inbox, Email, SMS ή WhatsApp. Στο «Πρόγραμμα για» επιλέξτε σε ποιο ημερολόγιο δουλεύετε: «Το πρόγραμμά μου ως DJ» είναι το δικό σας ημερολόγιο, το «Club» δείχνει τα clubs που διαχειρίζεστε και η «Εταιρεία προώθησης» "
@@ -7288,6 +7406,7 @@
         "paySecurely": "Πληρώστε με ασφάλεια",
         "floqcastPreview": "Άνοιγμα προεπισκόπησης FloqCAST",
         "shoutoutCompose": "Άνοιγμα σύνθεσης ShoutOut",
+        "shoutoutPending": "Άνοιγμα στα ShoutOuts μου",
         "vipTerms": "Συνέχεια όρων VIP"
       },
       "fallback": {
@@ -7297,6 +7416,22 @@
     },
     "pl": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Reklamy, jeśli kiedyś"
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "SMARTnotification Mingl Room",
+          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Reklamy, jeśli kiedyś"
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview ze SMARTvisuals",
+          "blurb": "Room SMARTview pokazuje zaproszenie Mingl: czas, RSVP lub na żywo i Dołącz teraz. SMARTstencils i SMARTbackgrounds idą za zatwierdzonym tytułem — Cancun Trip to sztuka podróży, nie zdjęcie i nie partnerstwo. Prywatny czat BOT DEE nie dobiera grafiki. Pokoje grupowe nie są live; D"
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview ze SMARTvisuals",
+          "blurb": "Room SMARTview pokazuje zaproszenie Mingl: czas, RSVP lub na żywo i Dołącz teraz. SMARTstencils i SMARTbackgrounds idą za zatwierdzonym tytułem — Cancun Trip to sztuka podróży, nie zdjęcie i nie partnerstwo. Prywatny czat BOT DEE nie dobiera grafiki. Pokoje grupowe nie są live; D"
+        },
         "help:help-scheduling-schedule-for": {
           "label": "Planowanie personelu",
           "blurb": "Planuj zmiany i bookingi, a potem powiadamiaj każdą osobę przez Inbox, Email, SMS lub WhatsApp. W sekcji „Grafik dla” wybierz, czyim kalendarzem się zajmujesz: „Mój grafik DJ” to twój własny kalendarz, „Klub” pokazuje kluby, którymi zarządzasz, a „Firma promocyjna” firmy, dla któ"
@@ -8326,6 +8461,7 @@
         "paySecurely": "Zapłać bezpiecznie",
         "floqcastPreview": "Otwórz podgląd FloqCAST",
         "shoutoutCompose": "Otwórz kompozytor ShoutOut",
+        "shoutoutPending": "Otwórz w Moje ShoutOuts",
         "vipTerms": "Kontynuuj warunki VIP"
       },
       "fallback": {
@@ -8335,6 +8471,22 @@
     },
     "nl": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "Mingl Room SMARTnotification",
+          "blurb": "Op Zoeken kan een compacte Mingl Room-uitnodiging verschijnen. Uitnodiging bekijken opent Room SMARTview. Niet nu verbergt hem deze sessie. De art is SMARTbackground-illustratie met SMARTstencils — geen foto en geen officieel merkteken. Namen en RSVP komen alleen uit het room-rec"
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "Mingl Room SMARTnotification",
+          "blurb": "Op Zoeken kan een compacte Mingl Room-uitnodiging verschijnen. Uitnodiging bekijken opent Room SMARTview. Niet nu verbergt hem deze sessie. De art is SMARTbackground-illustratie met SMARTstencils — geen foto en geen officieel merkteken. Namen en RSVP komen alleen uit het room-rec"
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview met SMARTvisuals",
+          "blurb": "Room SMARTview toont de Mingl-uitnodiging: tijd, RSVP of live, en Nu deelnemen. SMARTstencils en SMARTbackgrounds volgen de goedgekeurde titel — Cancun Trip gebruikt reisart, geen echte foto of officieel partnerschap. Privé BOT DEE-chat kiest geen art. Groepsrooms zijn niet live;"
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview met SMARTvisuals",
+          "blurb": "Room SMARTview toont de Mingl-uitnodiging: tijd, RSVP of live, en Nu deelnemen. SMARTstencils en SMARTbackgrounds volgen de goedgekeurde titel — Cancun Trip gebruikt reisart, geen echte foto of officieel partnerschap. Privé BOT DEE-chat kiest geen art. Groepsrooms zijn niet live;"
+        },
         "help:help-scheduling-schedule-for": {
           "label": "Personeelsplanning",
           "blurb": "Plan diensten en boekingen en laat iedereen het weten via Inbox, Email, SMS of WhatsApp. Kies onder 'Planning voor' aan welke agenda je werkt: 'Mijn DJ-planning' is je eigen agenda, 'Club' toont de clubs die je beheert en 'Promotiebedrijf' de bedrijven waarvoor je promoot. Elke a"
@@ -9364,6 +9516,7 @@
         "paySecurely": "Veilig betalen",
         "floqcastPreview": "FloqCAST-voorbeeld openen",
         "shoutoutCompose": "ShoutOut-composer openen",
+        "shoutoutPending": "Openen in Mijn ShoutOuts",
         "vipTerms": "VIP-voorwaarden voortzetten"
       },
       "fallback": {
@@ -9373,6 +9526,22 @@
     },
     "ar": {
       "results": {
+        "help:help-smartvisuals-notification": {
+          "label": "SMARTnotification لـ Mingl Room",
+          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. الإعلانات إن وُافق عليها تبقى أسفل البطاقة بوسم Ad."
+        },
+        "intent:help-smartvisuals-notification": {
+          "label": "SMARTnotification لـ Mingl Room",
+          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. الإعلانات إن وُافق عليها تبقى أسفل البطاقة بوسم Ad."
+        },
+        "help:help-smartvisuals-room": {
+          "label": "Room SMARTview مع SMARTvisuals",
+          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. موضع Ad "
+        },
+        "intent:help-smartvisuals-room": {
+          "label": "Room SMARTview مع SMARTvisuals",
+          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. موضع Ad "
+        },
         "help:help-scheduling-schedule-for": {
           "label": "جداول الموظفين",
           "blurb": "خطّط المناوبات والحجوزات ثم أبلغ كل شخص عبر Inbox أو Email أو SMS أو WhatsApp. من «الجدول لـ» اختر التقويم الذي تعمل عليه: «جدولي كـ DJ» هو تقويمك الخاص، و«نادٍ» يعرض النوادي التي تديرها، و«شركة ترويج» يعرض الشركات التي تروّج لها. لكل تقويم اشتراكه الخاص بـ 20 دولارًا شهريًا. تظه"
@@ -10402,6 +10571,7 @@
         "paySecurely": "ادفع بأمان",
         "floqcastPreview": "فتح معاينة FloqCAST",
         "shoutoutCompose": "فتح مؤلف ShoutOut",
+        "shoutoutPending": "فتح في ShoutOuts الخاصة بي",
         "vipTerms": "متابعة شروط VIP"
       },
       "fallback": {

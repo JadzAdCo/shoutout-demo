@@ -827,6 +827,7 @@
       body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates.",
       searchPhrases: [
         "choose a shoutout venue", "shoutout venue", "nearest shoutout", "throw a shoutout",
+        "throw shoutout from chat", "headless shoutout",
         "search shoutout club", "display sizes", "patron custom shoutout", "choose location for shoutout"
       ],
       links: [

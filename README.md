@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.040 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.041 (stable)
 
+- s3.3.041: BOT DEE + FloqR headless ShoutOut (club + message → Stripe or pending)
 - s3.3.040: People lookup matches legal name, display name, handle, what-about
 - s3.3.039: People card stacked layout (photo, name+handle, compact SMARTsummary)
 - s3.3.038: BOT DEE throw a ShoutOut from chat (no stacked help dump)
