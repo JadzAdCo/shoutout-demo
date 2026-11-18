@@ -33,8 +33,7 @@
   let chatTitles = {};
   let renameTarget = null;
   let renameDialogBound = false;
-  let swallowRenameClick = false;
-  let swallowRenameUntil = 0;
+  let swallowRename = null;
   const LONG_PRESS_MS = 520;
   const CHAT_TITLE_MAX = 80;
 
@@ -1378,7 +1377,7 @@
         btn.appendChild(span);
       }
       btn.addEventListener("click", event => {
-        if (renameClickShouldSwallow(event)) return;
+        if (renameClickShouldSwallow(event, btn)) return;
         onClick(event);
       });
       row.appendChild(btn);
@@ -1425,23 +1424,35 @@
     });
   }
 
-  function armRenameClickSwallow() {
-    swallowRenameClick = true;
-    swallowRenameUntil = Date.now() + 1200;
+  function armRenameClickSwallow(pointerId, btn) {
+    swallowRename = {pointerId, btn};
   }
 
-  function renameClickShouldSwallow(event) {
-    if (!swallowRenameClick || Date.now() >= swallowRenameUntil) {
-      if (Date.now() >= swallowRenameUntil) swallowRenameClick = false;
-      return false;
-    }
+  function disarmRenameClickSwallow() {
+    swallowRename = null;
+  }
+
+  function leftoverRenameClick(event, btn) {
+    if (!swallowRename) return false;
+    const armedBtn = swallowRename.btn;
+    const target = event?.target;
+    if (btn && armedBtn === btn) return true;
+    if (armedBtn && target && (target === armedBtn || armedBtn.contains(target))) return true;
+    const samePointer = swallowRename.pointerId != null && event?.pointerId === swallowRename.pointerId;
+    const dialog = byId("botDeeRenameDialog");
+    const chatsBackdrop = byId("botDeeChatsBackdrop");
+    if (target !== dialog && target !== chatsBackdrop) return false;
+    return samePointer || event?.pointerId == null;
+  }
+
+  function renameClickShouldSwallow(event, btn) {
+    if (!leftoverRenameClick(event, btn)) return false;
     if (event) {
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
     }
-    swallowRenameClick = false;
-    swallowRenameUntil = 0;
+    disarmRenameClickSwallow();
     return true;
   }
 
@@ -1450,26 +1461,31 @@
     const start = event => {
       if (event.pointerType === "mouse" && event.button !== 0) return;
       clearTimeout(timer);
+      const pointerId = event.pointerId;
       timer = global.setTimeout(() => {
         timer = 0;
-        armRenameClickSwallow();
+        armRenameClickSwallow(pointerId, btn);
         openRenameDialog(chatId, label);
       }, LONG_PRESS_MS);
     };
-    const cancel = () => {
+    const cancelTimer = () => {
       if (timer) {
         clearTimeout(timer);
         timer = 0;
       }
     };
     btn.addEventListener("pointerdown", start);
-    btn.addEventListener("pointerup", cancel);
-    btn.addEventListener("pointercancel", cancel);
-    btn.addEventListener("pointerleave", cancel);
+    btn.addEventListener("pointerup", cancelTimer);
+    btn.addEventListener("pointercancel", () => {
+      cancelTimer();
+      disarmRenameClickSwallow();
+    });
+    btn.addEventListener("pointerleave", cancelTimer);
     btn.addEventListener("contextmenu", event => {
       event.preventDefault();
       event.stopPropagation();
-      armRenameClickSwallow();
+      cancelTimer();
+      disarmRenameClickSwallow();
       openRenameDialog(chatId, label);
     });
   }
