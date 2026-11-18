@@ -233,7 +233,7 @@
   const PEOPLE_KNOW_OF = /^(?:what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
   const PEOPLE_PROFILE_OF = /^(?:what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|look up|lookup)\s+/i;
   const PEOPLE_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|lookup|find|search for|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
-  const PEOPLE_SUFFIX = /\s+(?:on floqr|on mingl|on here|(?:'s)?\s*(?:public )?profile)\s*$/i;
+  const PEOPLE_SUFFIX = /\s+(?:on floqr|on mingl|on here|(?:['’]s)?\s*(?:public )?profile)\s*$/i;
   const PEOPLE_STOP_AFTER = /^(working|on (?:duty|tonight)|the (?:dj|club)|playing|singing|available)\b/i;
   const PEOPLE_GENERIC = /^(this person|that person|them|him|her|someone|anybody|anyone)$/i;
   const PEOPLE_VENUE = /^(a |an |the )?(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?)\b/i;
@@ -269,7 +269,44 @@
     if (!tokens.length || tokens.length > 4) return false;
     return tokens.every(token => /^@?[\w.'-]+$/.test(token)
       && !/^(my|mine|our|your|their|his|her|this|that|these|those|who|what|where|when|how|the|a|an)$/.test(token)
-      && !/^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?)$/.test(token));
+      && !/^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?|bottle|service|composer)$/.test(token));
+  }
+
+  function remainderAfterPeoplePrefix(raw) {
+    return String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200)
+      .replace(PEOPLE_WHO_IS, "")
+      .replace(PEOPLE_DO_YOU_KNOW, "")
+      .replace(PEOPLE_KNOW_OF, "")
+      .replace(PEOPLE_PROFILE_OF, "")
+      .replace(PEOPLE_SUFFIX, "")
+      .trim();
+  }
+
+  function isNamedPeopleProfileSuffix(raw) {
+    const match = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200)
+      .match(/^(.+?)(?:['’]s)?\s+(?:public )?profile\s*$/i);
+    if (!match) return false;
+    return isPeopleNameNeedle(match[1].replace(/['’]s$/i, "").trim());
+  }
+
+  function isNamedPeopleNetworkSuffix(raw) {
+    const match = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200)
+      .match(/^(.+?)\s+(?:on floqr|on mingl|on here)\s*$/i);
+    if (!match) return false;
+    return isPeopleNameNeedle(match[1]);
+  }
+
+  function isPeopleLookupPrompt(raw) {
+    const original = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200);
+    if (PEOPLE_WHO_IS.test(original) || PEOPLE_DO_YOU_KNOW.test(original)
+      || PEOPLE_KNOW_OF.test(original) || PEOPLE_PROFILE_OF.test(original)) {
+      const rest = remainderAfterPeoplePrefix(original);
+      return isPeopleNameNeedle(rest) || PEOPLE_GENERIC.test(normalizePeopleQuery(rest));
+    }
+    const findMatch = original.match(/^(?:find|search for)\s+(.+)$/i);
+    return (findMatch && isPeopleNameNeedle(findMatch[1]))
+      || isNamedPeopleProfileSuffix(original)
+      || isNamedPeopleNetworkSuffix(original);
   }
 
   function classifyPeopleSearchIntent(raw) {
@@ -279,19 +316,10 @@
     if (PEOPLE_SELF_QUERY.test(n) || /^(what do you know (?:about|of) me|tell me about my (?:public )?profile|what can you tell me about me)$/.test(n)) {
       return {intent: "self", needle: "me", self: true};
     }
-    const findMatch = original.match(/^(?:find|search for)\s+(.+)$/i);
-    const lookup = PEOPLE_WHO_IS.test(original)
-      || PEOPLE_DO_YOU_KNOW.test(original)
-      || PEOPLE_KNOW_OF.test(original)
-      || PEOPLE_PROFILE_OF.test(original)
-      || (findMatch && isPeopleNameNeedle(findMatch[1]))
-      || PEOPLE_SUFFIX.test(original);
-    if (!lookup) return {intent: "none", needle: "", self: false};
+    if (!isPeopleLookupPrompt(original)) return {intent: "none", needle: "", self: false};
     const needle = extractPeopleNeedle(raw);
-    if (needle) return {intent: "person", needle, self: false};
-    const rest = normalizePeopleQuery(
-      original.replace(PEOPLE_WHO_IS, "").replace(PEOPLE_DO_YOU_KNOW, "").replace(PEOPLE_KNOW_OF, "").replace(PEOPLE_PROFILE_OF, "").replace(PEOPLE_SUFFIX, "")
-    );
+    if (needle && isPeopleNameNeedle(needle)) return {intent: "person", needle, self: false};
+    const rest = normalizePeopleQuery(remainderAfterPeoplePrefix(original));
     if (PEOPLE_GENERIC.test(rest)) return {intent: "empty", needle: "", self: false};
     return {intent: "none", needle: "", self: false};
   }
@@ -312,13 +340,18 @@
   }
 
   function looksLikeProfileFieldDump(raw) {
-    const text = String(raw || "");
-    if (!text.trim()) return false;
-    if (/\*\*[^*]{2,48}\*\*/.test(text)
-      && /\b(Bio|Location|Details|Looking to Meet|Social Handles|Instagram|Handle)\b/i.test(text)) {
-      return true;
+    const blob = String(raw || "");
+    if (!blob.trim()) return false;
+    const headings = ["Bio", "Location", "Details", "Looking to Meet", "Social Handles"];
+    let hits = 0;
+    for (const heading of headings) {
+      const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (new RegExp(`\\*\\*\\s*${escaped}\\s*\\*\\*`, "i").test(blob)
+        || new RegExp(`(?:^|\\n)\\s*(?:\\*\\*)?${escaped}(?:\\*\\*)?\\s*:`, "im").test(blob)) {
+        hits += 1;
+      }
     }
-    return /(?:^|\n)\s*(?:\*\*)?(?:Bio|Location|Details|Looking to Meet|Social Handles)(?:\*\*)?\s*:/im.test(text);
+    return hits >= 2;
   }
 
   function peopleSearchAlreadyHandled(data) {
@@ -331,9 +364,10 @@
 
   function stripPeopleFieldDump(session, classified) {
     const row = session && typeof session === "object" ? session : {};
+    if (!classified || classified.intent === "none") return row;
     const cardsOn = hasPeopleSmartView(row.smartViews);
     const dump = looksLikeProfileFieldDump(row.reply);
-    const helpDump = Array.isArray(row.results) && row.results.length && classified && classified.intent !== "none";
+    const helpDump = Array.isArray(row.results) && row.results.length;
     if (!dump && !helpDump) return row;
     const key = row.peopleSearch?.replyKey
       || (cardsOn ? "botdee.sc.oneResult" : "botdee.sc.none");
@@ -347,7 +381,7 @@
   async function ensurePeopleSmartViews(text, data) {
     const classified = classifyPeopleSearchIntent(text);
     const session = data && typeof data === "object" ? data : {};
-    if (classified.intent === "none") return stripPeopleFieldDump(session, classified);
+    if (classified.intent === "none") return session;
     if (peopleSearchAlreadyHandled(session)) return stripPeopleFieldDump(session, classified);
     const searchFn = callable("searchPeopleSmartCards");
     if (searchFn) {

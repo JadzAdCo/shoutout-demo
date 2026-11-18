@@ -71,6 +71,35 @@ test("what do you know of / tell me about name lookups become People cards, not 
   assert.equal(cards.classifyPeopleSearchIntent("tell me about FloqR").intent, "none");
 });
 
+test("profile help prompts are not people lookups", () => {
+  assert.equal(cards.classifyPeopleSearchIntent("how do I edit my profile").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("hide my profile").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("edit my public profile").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("where is my profile").intent, "none");
+  const named = cards.classifyPeopleSearchIntent("don banyong's profile");
+  assert.equal(named.intent, "person");
+  assert.match(named.needle, /don banyong/i);
+  const onNet = cards.classifyPeopleSearchIntent("Amara J on floqr");
+  assert.equal(onNet.intent, "person");
+});
+
+test("tell me about / know-of require a person-name needle", () => {
+  assert.equal(cards.classifyPeopleSearchIntent("tell me about group reservations").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("tell me about how to book VIP").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("describe the new composer").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("what do you know of bottle service").intent, "none");
+  assert.equal(cards.isPersonNameNeedle("group reservations"), false);
+  assert.equal(cards.isPersonNameNeedle("don banyong"), true);
+  assert.equal(cards.isPersonNameNeedle("@DonBans"), true);
+});
+
+test("profile field-dump detector needs two SMARTview headings, not any bold + Location", () => {
+  assert.equal(cards.looksLikeProfileFieldDump("The **Decades** club lists Location and Instagram in Club Admin."), false);
+  assert.equal(cards.looksLikeProfileFieldDump("**Handle** @DonBans is public."), false);
+  assert.equal(cards.looksLikeProfileFieldDump("**Bio**\nDon Papi\n**Location**\nWashington, DC"), true);
+  assert.equal(cards.looksLikeProfileFieldDump("Bio: Don Papi\nLocation: DC\nDetails: promoter"), true);
+});
+
 test("routing: self / one / many compact / none / error; no existence leak", () => {
   const view = amaraView();
   const self = cards.routePeopleSearch({self: view});
@@ -305,6 +334,11 @@ test("chat client classifies the same know-of prompts as the server", () => {
   assert.match(chat, /ensurePeopleSmartViews/);
   assert.match(chat, /searchPeopleSmartCards/);
   assert.match(chat, /looksLikeProfileFieldDump/);
+  assert.match(chat, /if \(classified\.intent === "none"\) return session;/);
+  assert.match(chat, /if \(!classified \|\| classified\.intent === "none"\) return row;/);
+  assert.match(chat, /isPeopleNameNeedle\(needle\)/);
+  assert.match(chat, /isNamedPeopleProfileSuffix/);
+  assert.doesNotMatch(chat, /Instagram\|Handle/);
   assert.doesNotMatch(chat, /display\.html\?location=[^"' ]+[?&]v=/);
 });
 

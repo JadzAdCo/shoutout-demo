@@ -14,7 +14,7 @@ const DO_YOU_KNOW = /^(?:do you know|did you meet)\s+/i;
 const KNOW_OF = /^(?:what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
 const PROFILE_OF = /^(?:what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|look up|lookup)\s+/i;
 const PERSON_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|lookup|find|search for|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
-const PERSON_SUFFIX = /\s+(?:on floqr|on mingl|on here|(?:'s)?\s*(?:public )?profile)\s*$/i;
+const PERSON_SUFFIX = /\s+(?:on floqr|on mingl|on here|(?:['’]s)?\s*(?:public )?profile)\s*$/i;
 const STOP_AFTER = /^(working|on (?:duty|tonight)|the (?:dj|club)|playing|singing|available)\b/i;
 const GENERIC_PERSON = /^(this person|that person|them|him|her|someone|anybody|anyone)$/i;
 const VENUE_NEEDLE = /^(a |an |the )?(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?)\b/i;
@@ -55,7 +55,7 @@ function isPersonNameNeedle(rest) {
   if (!tokens.length || tokens.length > 4) return false;
   return tokens.every(token => /^@?[\w.'-]+$/.test(token)
     && !/^(my|mine|our|your|their|his|her|this|that|these|those|who|what|where|when|how|the|a|an)$/.test(token)
-    && !/^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?)$/.test(token));
+    && !/^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?|bottle|service|composer)$/.test(token));
 }
 
 function isFindPersonPrompt(raw) {
@@ -64,14 +64,37 @@ function isFindPersonPrompt(raw) {
   return isPersonNameNeedle(match[1]);
 }
 
+function remainderAfterLookupPrefix(raw) {
+  return text(raw, 200)
+    .replace(WHO_IS, "")
+    .replace(DO_YOU_KNOW, "")
+    .replace(KNOW_OF, "")
+    .replace(PROFILE_OF, "")
+    .replace(PERSON_SUFFIX, "")
+    .trim();
+}
+
+function isNamedProfileSuffix(raw) {
+  const match = text(raw, 200).match(/^(.+?)(?:['’]s)?\s+(?:public )?profile\s*$/i);
+  if (!match) return false;
+  return isPersonNameNeedle(match[1].replace(/['’]s$/i, "").trim());
+}
+
+function isNamedNetworkSuffix(raw) {
+  const match = text(raw, 200).match(/^(.+?)\s+(?:on floqr|on mingl|on here)\s*$/i);
+  if (!match) return false;
+  return isPersonNameNeedle(match[1]);
+}
+
 function isPeopleLookupPrompt(raw) {
   const original = text(raw, 200);
-  return WHO_IS.test(original)
-    || DO_YOU_KNOW.test(original)
-    || KNOW_OF.test(original)
-    || PROFILE_OF.test(original)
-    || isFindPersonPrompt(original)
-    || PERSON_SUFFIX.test(original);
+  if (WHO_IS.test(original) || DO_YOU_KNOW.test(original) || KNOW_OF.test(original) || PROFILE_OF.test(original)) {
+    const rest = remainderAfterLookupPrefix(original);
+    return isPersonNameNeedle(rest) || GENERIC_PERSON.test(normalizeQuery(rest));
+  }
+  return isFindPersonPrompt(original)
+    || isNamedProfileSuffix(original)
+    || isNamedNetworkSuffix(original);
 }
 
 function classifyPeopleSearchIntent(raw) {
@@ -83,12 +106,25 @@ function classifyPeopleSearchIntent(raw) {
   const original = text(raw, 200);
   if (!isPeopleLookupPrompt(original)) return {intent: "none", needle: "", self: false};
   const needle = extractPersonNeedle(raw);
-  if (needle) return {intent: "person", needle, self: false};
-  const rest = normalizeQuery(
-    original.replace(WHO_IS, "").replace(DO_YOU_KNOW, "").replace(KNOW_OF, "").replace(PROFILE_OF, "").replace(PERSON_SUFFIX, "")
-  );
+  if (needle && isPersonNameNeedle(needle)) return {intent: "person", needle, self: false};
+  const rest = normalizeQuery(remainderAfterLookupPrefix(original));
   if (GENERIC_PERSON.test(rest)) return {intent: "empty", needle: "", self: false};
   return {intent: "none", needle: "", self: false};
+}
+
+function looksLikeProfileFieldDump(raw) {
+  const blob = String(raw || "");
+  if (!blob.trim()) return false;
+  const headings = ["Bio", "Location", "Details", "Looking to Meet", "Social Handles"];
+  let hits = 0;
+  for (const heading of headings) {
+    const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if (new RegExp(`\\*\\*\\s*${escaped}\\s*\\*\\*`, "i").test(blob)
+      || new RegExp(`(?:^|\\n)\\s*(?:\\*\\*)?${escaped}(?:\\*\\*)?\\s*:`, "im").test(blob)) {
+      hits += 1;
+    }
+  }
+  return hits >= 2;
 }
 
 function canonicalPeopleLookupQuery(classified) {
@@ -316,6 +352,8 @@ module.exports = {
   SCHEMA_VERSION,
   classifyPeopleSearchIntent,
   extractPersonNeedle,
+  isPersonNameNeedle,
+  looksLikeProfileFieldDump,
   canonicalPeopleLookupQuery,
   peopleCardHasPrivilegeField,
   PEOPLE_CARD_PRIVILEGE_KEYS,
