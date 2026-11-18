@@ -482,5 +482,13 @@
   "help-botdee-room-smartview-share": {
     "title": "Share into Room SMARTview",
     "body": "Share this conversation never copies your private BOT DEE thread. BOT DEE shows a preview of selected shareable facts from this message, marked tentative. You can edit or drop facts. Nothing is published until rooms are live and you approve."
+  },
+  "help-smartvisuals-notification": {
+    "title": "Mingl Room SMARTnotification",
+    "body": "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come only from the room record. Ads, if ever approved, sit below the card and stay labeled Ad."
+  },
+  "help-smartvisuals-room": {
+    "title": "Room SMARTview with SMARTvisuals",
+    "body": "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used to pick art. Group rooms are not live yet, so Join Now does not create a room or charge. A labeled Ad slot may sit below; it is empty until separately approved."
   }
 }

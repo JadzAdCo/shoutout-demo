@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.2.40-floqr-admin-and-club-owned-tags
+// FLOQR FIRESTORE RULES VERSION: s3.3.040-smartvisuals
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.2.40-floqr-admin-and-club-owned-tags
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.2.28-club-owned-template-tags
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.2.38-floqr-admin-templates
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.1.39-board-render-fields
@@ -720,6 +721,28 @@ service cloud.firestore {
  }
 
  match /featureServiceAuditHead/{docId} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ // SMARTvisuals — git-backed registry.json is the published source of truth.
+ // Firestore holds unpublished drafts, overrides, selection cache, ad policy, and audit.
+ match /smartVisualDrafts/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+ match /smartVisualOverrides/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+ match /smartVisualSelections/{id} {
+ allow read, write: if false;
+ }
+ match /smartVisualAdPolicy/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+ match /smartVisualAuditLogs/{id} {
  allow read: if isMasterAdmin();
  allow write: if false;
  }

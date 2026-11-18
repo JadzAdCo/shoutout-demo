@@ -636,6 +636,18 @@
     </li>`).join("")}</ul>`;
   }
 
+  function roomVisual(view) {
+    const api = window.FLOQRSmartVisuals;
+    if (!api || typeof api.resolveVisual !== "function") return null;
+    const title = String(view && view.authorizedTitle || "").trim();
+    const description = String(view && view.authorizedDescription || "").trim();
+    return api.resolveVisual({
+      title: title || "Mingl Room",
+      description,
+      sourceKind: "authorized-room"
+    });
+  }
+
   function renderRoomNeedles(payload) {
     const rows = Array.isArray(payload?.namedNeedles) ? payload.namedNeedles : [];
     if (!rows.length) return "";
@@ -651,8 +663,13 @@
     const confirmable = view.needsConfirmation && view.mode !== "command" && view.mode !== "deny";
     const share = view.mode === "share_preview";
     const denied = view.injectionDenied === true || view.mode === "deny";
+    const visual = roomVisual(view);
+    const visualHero = visual ? `<div class="sv-hero botdee-sv-visual" data-sv-reason="${esc(visual.reasonCode || "neutral-fallback")}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}">
+        <img class="sv-bg" src="${esc(visual.backgroundUrl)}" alt="${esc(t("sv.scenicAlt", "Scenic illustration for this room. Not a photograph."))}"/>
+      </div>` : "";
     return `<article class="botdee-sv-room" data-kind="botDeeRoom" data-rs-mode="${esc(view.mode || "")}" data-rs-decline="${esc(view.declineKey || "")}">
       <h2 class="botdee-sv-room-title">${esc(t("botdee.rs.title", "Room SMARTview"))}</h2>
+      ${visualHero}
       <div class="botdee-sv-room-head">
         <div class="botdee-sv-room-thumb" aria-hidden="true">♣</div>
         <div>
@@ -1287,10 +1304,39 @@
     });
   }
 
+  function catalogReady() {
+    return !!(window.FLOQRSmartVisualsCatalog);
+  }
+
+  function scrollTranscriptAfterPaint(el) {
+    const chat = window.FLOQRBotDeeChat;
+    if (chat && typeof chat.scrollTranscriptToLatest === "function") {
+      chat.scrollTranscriptToLatest();
+      return;
+    }
+    const log = (el && el.closest && el.closest("#botDeeTranscript"))
+      || (typeof document !== "undefined" && document.getElementById("botDeeTranscript"));
+    if (!log || (el && log.contains && !log.contains(el))) return;
+    log.scrollTop = log.scrollHeight;
+  }
+
   function mount(el, views, peopleSearch) {
     if (!el) return;
-    stopLive(el);
     const list = Array.isArray(views) ? views : [];
+    const paint = (resync) => {
+      paintHost(el, list, peopleSearch);
+      if (resync) scrollTranscriptAfterPaint(el);
+    };
+    const needsCatalog = list.some(isRoomPayload) && window.FLOQRSmartVisuals?.ensureCatalog;
+    if (needsCatalog && !catalogReady()) {
+      window.FLOQRSmartVisuals.ensureCatalog().then(() => paint(true), () => paint(true));
+      return;
+    }
+    paint(false);
+  }
+
+  function paintHost(el, list, peopleSearch) {
+    stopLive(el);
     el.__floqrSmartViews = list;
     el.__floqrPeopleSearch = peopleSearch || el.__floqrPeopleSearch || null;
     const meta = el.__floqrPeopleSearch || {};

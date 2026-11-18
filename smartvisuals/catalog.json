@@ -1,0 +1,1269 @@
+{
+  "schemaVersion": "floqr.smartVisuals/1",
+  "revision": 1,
+  "taxonomy": {
+    "categories": [
+      "art",
+      "beach",
+      "city",
+      "dining",
+      "event",
+      "fashion",
+      "hotel",
+      "media",
+      "meeting",
+      "nightclub",
+      "people",
+      "planning",
+      "restaurant",
+      "service",
+      "shopping",
+      "shoutout",
+      "sports",
+      "travel"
+    ],
+    "placeAliases": {
+      "cancun": {
+        "placeId": "cancun",
+        "backgroundId": "bg-bali",
+        "stencilId": "st-flight",
+        "tags": [
+          "travel",
+          "beach",
+          "destination:cancun"
+        ]
+      },
+      "cancún": {
+        "placeId": "cancun",
+        "backgroundId": "bg-bali",
+        "stencilId": "st-flight",
+        "tags": [
+          "travel",
+          "beach",
+          "destination:cancun"
+        ]
+      },
+      "san dego": {
+        "placeId": "san-diego",
+        "backgroundId": "bg-san-diego",
+        "stencilId": "st-location",
+        "tags": [
+          "city",
+          "destination:san-diego"
+        ]
+      },
+      "san diego": {
+        "placeId": "san-diego",
+        "backgroundId": "bg-san-diego",
+        "stencilId": "st-location",
+        "tags": [
+          "city",
+          "destination:san-diego"
+        ]
+      },
+      "burningman": {
+        "placeId": "burning-man",
+        "backgroundId": "bg-burning-man",
+        "stencilId": "st-celebration",
+        "tags": [
+          "event",
+          "festival"
+        ],
+        "officialAffiliation": false
+      },
+      "burning man": {
+        "placeId": "burning-man",
+        "backgroundId": "bg-burning-man",
+        "stencilId": "st-celebration",
+        "tags": [
+          "event",
+          "festival"
+        ],
+        "officialAffiliation": false
+      }
+    },
+    "collisionRule": "two-or-more-distinct-placeIds-without-travel-connector → ambiguous → neutral",
+    "confidenceThreshold": 0.78,
+    "typoThreshold": 0.86,
+    "geminiOnView": false,
+    "defaultDenyUnapproved": true,
+    "neutral": {
+      "backgroundId": "bg-mingl-room",
+      "stencilId": "st-people",
+      "reasonCode": "neutral-fallback"
+    }
+  },
+  "assets": [
+    {
+      "id": "bg-milan",
+      "type": "background",
+      "name": "Milan",
+      "category": "fashion",
+      "tags": [
+        "milan",
+        "fashion"
+      ],
+      "placeId": "milan",
+      "aliases": [
+        "milan"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/milan.svg",
+      "checksum": "ccfb7e65af9298b7d3dd8e62dbc6aa121cfe51276d59604f5869c3a6c2fd0f65",
+      "pairedStencilId": "fashion",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-paris",
+      "type": "background",
+      "name": "Paris",
+      "category": "fashion",
+      "tags": [
+        "paris",
+        "fashion"
+      ],
+      "placeId": "paris",
+      "aliases": [
+        "paris"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/paris.svg",
+      "checksum": "500ab545fed7208bfe2a46eb98b4398e27b940a8635ed7b95a1cc70e553c0202",
+      "pairedStencilId": "fashion",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-london",
+      "type": "background",
+      "name": "London",
+      "category": "city",
+      "tags": [
+        "london",
+        "city"
+      ],
+      "placeId": "london",
+      "aliases": [
+        "london"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/london.svg",
+      "checksum": "611fc46f21f63038ab223a976d6976cec3584a1b0febba6ee304cad8d77e1782",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-ibiza",
+      "type": "background",
+      "name": "Ibiza",
+      "category": "nightclub",
+      "tags": [
+        "ibiza",
+        "nightclub",
+        "beach"
+      ],
+      "placeId": "ibiza",
+      "aliases": [],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/ibiza.svg",
+      "checksum": "8fffb3912a5f40f48fbf26798859859fab55350401b36d13bd7c6ed14950f95e",
+      "pairedStencilId": "nightclub",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-mykonos",
+      "type": "background",
+      "name": "Mykonos",
+      "category": "beach",
+      "tags": [
+        "mykonos",
+        "beach"
+      ],
+      "placeId": "mykonos",
+      "aliases": [
+        "mykonos"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/mykonos.svg",
+      "checksum": "010773dc67272da5a95a1d9e2c5a4d597785c456d86644dff74391f494b28192",
+      "pairedStencilId": "beach",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-ischia",
+      "type": "background",
+      "name": "Ischia",
+      "category": "beach",
+      "tags": [
+        "ischia",
+        "beach"
+      ],
+      "placeId": "ischia",
+      "aliases": [
+        "ischia"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/ischia.svg",
+      "checksum": "1f395cfefa9033f469c847d8d5820bc24f4c55d0faa2abe7121cef7ee8292020",
+      "pairedStencilId": "beach",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-barcelona",
+      "type": "background",
+      "name": "Barcelona",
+      "category": "city",
+      "tags": [
+        "barcelona",
+        "city"
+      ],
+      "placeId": "barcelona",
+      "aliases": [
+        "barcelona"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/barcelona.svg",
+      "checksum": "51d251133758b929870222797c471a45b53ea5127ac106bb0e3606e9df45af86",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-madrid",
+      "type": "background",
+      "name": "Madrid",
+      "category": "city",
+      "tags": [
+        "madrid",
+        "city"
+      ],
+      "placeId": "madrid",
+      "aliases": [
+        "madrid"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/madrid.svg",
+      "checksum": "48c8f1a4fe3f52eee875ee72fbc90e26ca5b5eeb39d6256acb2247859f09fff1",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-washington-dc",
+      "type": "background",
+      "name": "Washington, DC",
+      "category": "city",
+      "tags": [
+        "washington-dc",
+        "city"
+      ],
+      "placeId": "washington-dc",
+      "aliases": [
+        "washington, dc"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/washington-dc.svg",
+      "checksum": "abb40024a9c1e6ac85b604e5b66d97c36ee7e047349c2317ba3072d04f2a32f7",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-new-york",
+      "type": "background",
+      "name": "New York",
+      "category": "city",
+      "tags": [
+        "new-york",
+        "city"
+      ],
+      "placeId": "new-york",
+      "aliases": [
+        "new york"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/new-york.svg",
+      "checksum": "78cbc6ebae007fd3bd2f97070a31b0c0269140407b72f804320cc954512d54a5",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-atlanta",
+      "type": "background",
+      "name": "Atlanta",
+      "category": "city",
+      "tags": [
+        "atlanta",
+        "city"
+      ],
+      "placeId": "atlanta",
+      "aliases": [
+        "atlanta"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/atlanta.svg",
+      "checksum": "69eb62b8bca94354f029acb91281f11ade4c44b68912c9d476ac58fcd812c084",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-lisbon",
+      "type": "background",
+      "name": "Lisbon",
+      "category": "city",
+      "tags": [
+        "lisbon",
+        "city"
+      ],
+      "placeId": "lisbon",
+      "aliases": [
+        "lisbon"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/lisbon.svg",
+      "checksum": "3fdc872591e98f448c661f488122ad31b676179e3fb72961c95cd0be9f0660c6",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-bali",
+      "type": "background",
+      "name": "Bali",
+      "category": "beach",
+      "tags": [
+        "bali",
+        "beach",
+        "tropical",
+        "travel"
+      ],
+      "placeId": "bali",
+      "aliases": [
+        "cancun",
+        "caribbean"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/bali.svg",
+      "checksum": "26dd32c792d99efd2b0524cd57cc77fc54b63c46f5845bd823f5864ee886fab4",
+      "pairedStencilId": "beach",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-thailand",
+      "type": "background",
+      "name": "Thailand",
+      "category": "beach",
+      "tags": [
+        "thailand",
+        "beach",
+        "tropical",
+        "travel"
+      ],
+      "placeId": "thailand",
+      "aliases": [],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/thailand.svg",
+      "checksum": "eb4ff8cd00b04a574765b02d59fa4c7a318f61172e899a6fa452da64b2d5ce86",
+      "pairedStencilId": "beach",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-los-angeles",
+      "type": "background",
+      "name": "Los Angeles",
+      "category": "city",
+      "tags": [
+        "los-angeles",
+        "city"
+      ],
+      "placeId": "los-angeles",
+      "aliases": [
+        "los angeles"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/los-angeles.svg",
+      "checksum": "189c8c6e1108f7a82d7277cc8346f82e6e4bd6d285f903d4fc8bc10bc50db37d",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-seattle",
+      "type": "background",
+      "name": "Seattle",
+      "category": "city",
+      "tags": [
+        "seattle",
+        "city"
+      ],
+      "placeId": "seattle",
+      "aliases": [
+        "seattle"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/seattle.svg",
+      "checksum": "8d9ffb9b81a27420d79493f84c380f39ef6d52b163249229dd595558fa5c50f6",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-san-diego",
+      "type": "background",
+      "name": "San Diego",
+      "category": "beach",
+      "tags": [
+        "san-diego",
+        "beach"
+      ],
+      "placeId": "san-diego",
+      "aliases": [
+        "san diego"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/san-diego.svg",
+      "checksum": "8d19edbfce5e2960ae117d45df0d34458efc8d6a6892756f31ba23a84c3d58d3",
+      "pairedStencilId": "beach",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-burning-man",
+      "type": "background",
+      "name": "Burning Man",
+      "category": "event",
+      "tags": [
+        "burning-man",
+        "festival",
+        "event"
+      ],
+      "placeId": "burning-man",
+      "aliases": [
+        "burningman"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/burning-man.svg",
+      "checksum": "dd037041f817eda2215cd245a681434bae2a3238d60f3834ef7d74a5665652da",
+      "pairedStencilId": "location",
+      "officialAffiliation": false
+    },
+    {
+      "id": "bg-miami",
+      "type": "background",
+      "name": "Miami",
+      "category": "beach",
+      "tags": [
+        "miami",
+        "beach",
+        "city"
+      ],
+      "placeId": "miami",
+      "aliases": [],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/miami.svg",
+      "checksum": "2f94a93142d848634626a8269c87d52710975659f917fc8ca4f837686bf6410f",
+      "pairedStencilId": "beach",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-milan-fashion-week",
+      "type": "background",
+      "name": "Milan Fashion Week",
+      "category": "fashion",
+      "tags": [
+        "milan",
+        "fashion",
+        "event",
+        "runway"
+      ],
+      "placeId": "milan",
+      "aliases": [
+        "mfw"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/milan-fashion-week.svg",
+      "checksum": "2b1ed2e2610dc0a6f9759105a700c5bde62a92ce9d5806b96e451b1702588007",
+      "pairedStencilId": "fashion",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-paris-fashion-week",
+      "type": "background",
+      "name": "Paris Fashion Week",
+      "category": "fashion",
+      "tags": [
+        "paris",
+        "fashion",
+        "event",
+        "runway"
+      ],
+      "placeId": "paris",
+      "aliases": [
+        "pfw",
+        "paris fashion week"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/paris-fashion-week.svg",
+      "checksum": "943c2f998825911e33b6d14fd84a0b378b6c4bff6418a55c32c7ff3a85de1348",
+      "pairedStencilId": "fashion",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-new-york-fashion-week",
+      "type": "background",
+      "name": "New York Fashion Week",
+      "category": "fashion",
+      "tags": [
+        "new-york",
+        "fashion",
+        "event",
+        "runway"
+      ],
+      "placeId": "new-york",
+      "aliases": [
+        "nyfw"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/new-york-fashion-week.svg",
+      "checksum": "ca8e28ff6f189794162321dfdacbd4c0f95af63e92139de11aa84edd87733be6",
+      "pairedStencilId": "fashion",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-london-fashion-week",
+      "type": "background",
+      "name": "London Fashion Week",
+      "category": "fashion",
+      "tags": [
+        "london",
+        "fashion",
+        "event",
+        "runway"
+      ],
+      "placeId": "london",
+      "aliases": [
+        "lfw"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/london-fashion-week.svg",
+      "checksum": "54478c6a574eb0b0567f915e902be42a1a4f864abbeff8d6c2f8b78b3d4eaa9e",
+      "pairedStencilId": "fashion",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-flight",
+      "type": "background",
+      "name": "Flights",
+      "category": "travel",
+      "tags": [
+        "flight",
+        "travel",
+        "airplane"
+      ],
+      "placeId": null,
+      "aliases": [
+        "plane",
+        "airport"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/flight.svg",
+      "checksum": "7fcd4f513664eded9738959de42af1e620cc1d12eb6ff78624e6dab3245f418a",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-train",
+      "type": "background",
+      "name": "Trains",
+      "category": "travel",
+      "tags": [
+        "train",
+        "travel"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/train.svg",
+      "checksum": "63dd3f78181f265a9b5e6a0e678bf2f785a2c4ca3b7c8a4ac69864b6e345856d",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-road-trip",
+      "type": "background",
+      "name": "Road Trips",
+      "category": "travel",
+      "tags": [
+        "road-trip",
+        "travel",
+        "car"
+      ],
+      "placeId": null,
+      "aliases": [
+        "roadtrip",
+        "drive"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/road-trip.svg",
+      "checksum": "8424415f748c1c32c413476b1069679578761edef4ef9edf2e0c488b39b37edb",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-cruise",
+      "type": "background",
+      "name": "Cruises",
+      "category": "travel",
+      "tags": [
+        "cruise",
+        "travel"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/cruise.svg",
+      "checksum": "b141ae66b736cb28a5c7ac6d505a823a499bfca51eb6b6b6d6af68ce7174c8fb",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-vip-nightlife",
+      "type": "background",
+      "name": "VIP Nightlife",
+      "category": "nightclub",
+      "tags": [
+        "vip",
+        "nightlife",
+        "nightclub"
+      ],
+      "placeId": null,
+      "aliases": [
+        "vip reserv"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/vip-nightlife.svg",
+      "checksum": "18d1b464acdc7fd0fed9a72df9745bb131b680bbf2aefe500dd796fc6e2e5a9e",
+      "pairedStencilId": "nightclub",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-dining",
+      "type": "background",
+      "name": "Dining",
+      "category": "restaurant",
+      "tags": [
+        "dining",
+        "restaurant"
+      ],
+      "placeId": null,
+      "aliases": [
+        "dinner",
+        "food"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/dining.svg",
+      "checksum": "14fa1e55f88aa5f4cbac3771128f6ab8241912e16ba17742dda6218b866507c1",
+      "pairedStencilId": "restaurant",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-concert",
+      "type": "background",
+      "name": "Concert",
+      "category": "event",
+      "tags": [
+        "concert",
+        "event",
+        "music"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/concert.svg",
+      "checksum": "646729a0647b4221b217bbe4da941eeecebbee70f0e1eb1ce205d165aba64ac7",
+      "pairedStencilId": "location",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-sports-event",
+      "type": "background",
+      "name": "Sports",
+      "category": "sports",
+      "tags": [
+        "sports",
+        "event"
+      ],
+      "placeId": null,
+      "aliases": [
+        "game"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/sports-event.svg",
+      "checksum": "36e3802825cba5ac41fed7ce6f02e82561568c22e0b8bd153cb73f13265e1d3d",
+      "pairedStencilId": "sports",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-hotel-stay",
+      "type": "background",
+      "name": "Hotel Stay",
+      "category": "hotel",
+      "tags": [
+        "hotel",
+        "stay"
+      ],
+      "placeId": null,
+      "aliases": [
+        "lodging"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/hotel-stay.svg",
+      "checksum": "49632ec623427566218c8b75c4ca4655773a4638c11a05c2c608b674031c12de",
+      "pairedStencilId": "hotel",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-shoutout",
+      "type": "background",
+      "name": "ShoutOut",
+      "category": "shoutout",
+      "tags": [
+        "shoutout"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/shoutout.svg",
+      "checksum": "58358a6973b399d62665df8e56d39616f485fb7f4591fa7f91da2a8965d76f49",
+      "pairedStencilId": "shoutout",
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-mingl-room",
+      "type": "background",
+      "name": "Mingl Room",
+      "category": "people",
+      "tags": [
+        "mingl",
+        "people",
+        "room",
+        "neutral"
+      ],
+      "placeId": null,
+      "aliases": [
+        "group chat"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/backgrounds/mingl-room.svg",
+      "checksum": "a1f1b78b740aee4bdea8966557e11fa509990524d93cc7a9e9eb20286c15da25",
+      "pairedStencilId": "people",
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-flight",
+      "type": "stencil",
+      "name": "Flight",
+      "category": "travel",
+      "tags": [
+        "flight",
+        "travel",
+        "airplane",
+        "trip"
+      ],
+      "placeId": null,
+      "aliases": [
+        "plane",
+        "airplane",
+        "airport"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/flight.svg",
+      "checksum": "09235394d609dc686a8be8f037b859f463c3446116127b93b524d969d712465c",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-train",
+      "type": "stencil",
+      "name": "Train",
+      "category": "travel",
+      "tags": [
+        "train",
+        "travel",
+        "rail"
+      ],
+      "placeId": null,
+      "aliases": [
+        "railway"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/train.svg",
+      "checksum": "e0c996e6ac808aed8492634a0987a4d1f79e4ec750a50b389a84b3f1ca60c696",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-hotel",
+      "type": "stencil",
+      "name": "Hotel",
+      "category": "hotel",
+      "tags": [
+        "hotel",
+        "stay"
+      ],
+      "placeId": null,
+      "aliases": [
+        "lodging"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/hotel.svg",
+      "checksum": "667d0b05a2814191a4f3950a2868d594e590bfb044fca68baacc2b782ca96722",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-beach",
+      "type": "stencil",
+      "name": "Beach",
+      "category": "beach",
+      "tags": [
+        "beach",
+        "travel",
+        "tropical"
+      ],
+      "placeId": null,
+      "aliases": [
+        "shore",
+        "coast"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/beach.svg",
+      "checksum": "91c89b3bf5d10991ccf3868e30ed64f1e3e9843a1be947bf5c1ba7addc0fca30",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-restaurant",
+      "type": "stencil",
+      "name": "Dining",
+      "category": "dining",
+      "tags": [
+        "dining",
+        "restaurant",
+        "dinner"
+      ],
+      "placeId": null,
+      "aliases": [
+        "food",
+        "eat"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/restaurant.svg",
+      "checksum": "ca088a76b4c9fcb3386d4ae8e78e937012f44f0abf62a86ad9399996914e4222",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-nightclub",
+      "type": "stencil",
+      "name": "Nightclub",
+      "category": "nightclub",
+      "tags": [
+        "nightclub",
+        "club",
+        "nightlife"
+      ],
+      "placeId": null,
+      "aliases": [
+        "club",
+        "vip"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/nightclub.svg",
+      "checksum": "468efa11835cb0ac75943c42a929c1f4f762f13fd82a0b9d5eb759e9c936f235",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-music",
+      "type": "stencil",
+      "name": "Music",
+      "category": "event",
+      "tags": [
+        "music",
+        "concert"
+      ],
+      "placeId": null,
+      "aliases": [
+        "dj"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/music.svg",
+      "checksum": "a8d524e6480d28c48e4e0424e558ff5dd9273a7732196bbbab7850f573975f97",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-ticket",
+      "type": "stencil",
+      "name": "Ticket",
+      "category": "event",
+      "tags": [
+        "ticket",
+        "event"
+      ],
+      "placeId": null,
+      "aliases": [
+        "tickets"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/ticket.svg",
+      "checksum": "117f314292afcf9b9c65c3a53867527e3630b4f64cde023a6324076b8b91d6df",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-calendar",
+      "type": "stencil",
+      "name": "Calendar",
+      "category": "planning",
+      "tags": [
+        "calendar",
+        "planning",
+        "schedule"
+      ],
+      "placeId": null,
+      "aliases": [
+        "date"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/calendar.svg",
+      "checksum": "20a494c6125e3ee05a4d6b875c7ef96c376a83b40cfa4a88c303d3f5ec3d82e3",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-people",
+      "type": "stencil",
+      "name": "People",
+      "category": "people",
+      "tags": [
+        "people",
+        "mingl",
+        "room"
+      ],
+      "placeId": null,
+      "aliases": [
+        "group",
+        "friends"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/people.svg",
+      "checksum": "84df778bd2c3e50d811e76f6b4a5f82599dc68ac863927318e7474fb5ac54cd9",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-reservation",
+      "type": "stencil",
+      "name": "Reservation",
+      "category": "planning",
+      "tags": [
+        "reservation",
+        "planning"
+      ],
+      "placeId": null,
+      "aliases": [
+        "rsvp",
+        "book"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/reservation.svg",
+      "checksum": "c40b141c3f30fc56bc714fe8b5737d748979230ead2e78ab016ecaeab48ac307",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-sports",
+      "type": "stencil",
+      "name": "Sports",
+      "category": "sports",
+      "tags": [
+        "sports",
+        "game"
+      ],
+      "placeId": null,
+      "aliases": [
+        "match"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/sports.svg",
+      "checksum": "a9eae3c82960c9c82b54606b788d11ccd1f03740794d22f6ae2d52a6998874b8",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-fashion",
+      "type": "stencil",
+      "name": "Fashion",
+      "category": "fashion",
+      "tags": [
+        "fashion",
+        "runway",
+        "event"
+      ],
+      "placeId": null,
+      "aliases": [
+        "runway",
+        "couture"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/fashion.svg",
+      "checksum": "968b40923767f3a305b98e1e030cf4db7792af1b4cca4e520456b8f9576ccfcc",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-shopping",
+      "type": "stencil",
+      "name": "Shopping",
+      "category": "shopping",
+      "tags": [
+        "shopping"
+      ],
+      "placeId": null,
+      "aliases": [
+        "retail"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/shopping.svg",
+      "checksum": "837faa5feaf2af9c375f810837fbb76f4d15accf4d8b7752e0c87e7035c83d84",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-camera",
+      "type": "stencil",
+      "name": "Camera",
+      "category": "media",
+      "tags": [
+        "camera",
+        "photo"
+      ],
+      "placeId": null,
+      "aliases": [
+        "photos"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/camera.svg",
+      "checksum": "d31995af7cb45e156df45528daaa2e2f0d74a219ade9bff3d7337dbe4274301b",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-car",
+      "type": "stencil",
+      "name": "Car",
+      "category": "travel",
+      "tags": [
+        "car",
+        "road-trip",
+        "travel"
+      ],
+      "placeId": null,
+      "aliases": [
+        "drive",
+        "roadtrip"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/car.svg",
+      "checksum": "c2e99d0e984291d5432a9c45c6ca360148e147e45b923140170b37ac67ba8754",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-cruise",
+      "type": "stencil",
+      "name": "Cruise",
+      "category": "travel",
+      "tags": [
+        "cruise",
+        "travel"
+      ],
+      "placeId": null,
+      "aliases": [
+        "ship"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/cruise.svg",
+      "checksum": "06dd9929f2414ebcf5ef18c2058c5cbe247e07e7e508fa0ef71838e76281304a",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-celebration",
+      "type": "stencil",
+      "name": "Celebration",
+      "category": "event",
+      "tags": [
+        "celebration",
+        "festival"
+      ],
+      "placeId": null,
+      "aliases": [
+        "party",
+        "festival"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/celebration.svg",
+      "checksum": "95afa86f27489ef11ecf981a27d3861d4b2ecf2e1f514255d072b9752d0f2c86",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-meeting",
+      "type": "stencil",
+      "name": "Meeting",
+      "category": "meeting",
+      "tags": [
+        "meeting",
+        "planning"
+      ],
+      "placeId": null,
+      "aliases": [
+        "work",
+        "office"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/meeting.svg",
+      "checksum": "357b5148950d77aa3a7dbab3dc80764c424c15d9ca506a8627b9f52f34d99c75",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-shoutout",
+      "type": "stencil",
+      "name": "ShoutOut",
+      "category": "shoutout",
+      "tags": [
+        "shoutout"
+      ],
+      "placeId": null,
+      "aliases": [
+        "shout out"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/shoutout.svg",
+      "checksum": "972fc681801153125f8392152bb64d4e971b6e8811bac70ab9430f2fd1ab8e15",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-ai",
+      "type": "stencil",
+      "name": "BOT DEE",
+      "category": "service",
+      "tags": [
+        "botdee",
+        "ai"
+      ],
+      "placeId": null,
+      "aliases": [
+        "bot-dee",
+        "floqai"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/ai.svg",
+      "checksum": "ce59c4fb9008db98298551ba79606827cfe3091181af016ff76a106335d87023",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-payments",
+      "type": "stencil",
+      "name": "Payments",
+      "category": "service",
+      "tags": [
+        "payments"
+      ],
+      "placeId": null,
+      "aliases": [
+        "pay"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/payments.svg",
+      "checksum": "721e769cb0c0cf3d365ee64ae507a5f541069d9a04255263f3b86969242cc34c",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-route",
+      "type": "stencil",
+      "name": "Route",
+      "category": "travel",
+      "tags": [
+        "route",
+        "travel",
+        "itinerary"
+      ],
+      "placeId": null,
+      "aliases": [
+        "itinerary",
+        "map"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/route.svg",
+      "checksum": "1c3a0c6bc46e86288e87ef7e0e66aacd8ca63f96e304c3f6bf3ae0f443bba79a",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-fireworks",
+      "type": "stencil",
+      "name": "Fireworks",
+      "category": "event",
+      "tags": [
+        "fireworks",
+        "celebration"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/fireworks.svg",
+      "checksum": "ed910fc77131cb0b6a00a59388507b666627c0a8d0e207cb0aa94dc01f6a97fd",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-art",
+      "type": "stencil",
+      "name": "Art",
+      "category": "art",
+      "tags": [
+        "art"
+      ],
+      "placeId": null,
+      "aliases": [
+        "gallery"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/art.svg",
+      "checksum": "33409eff28838283d1c95131c75f278c26b6de1a9c5285aeb1d32d9853f726d2",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-location",
+      "type": "stencil",
+      "name": "Location",
+      "category": "city",
+      "tags": [
+        "location",
+        "city",
+        "place"
+      ],
+      "placeId": null,
+      "aliases": [
+        "place",
+        "destination"
+      ],
+      "approvalStatus": "published",
+      "path": "smartvisuals/stencils/location.svg",
+      "checksum": "0f91cf438aa383f632cd5ee430dbcc07fd5486d45f4d1dd000249f6602fd34b1",
+      "pairedStencilId": null,
+      "officialAffiliation": null
+    }
+  ]
+}

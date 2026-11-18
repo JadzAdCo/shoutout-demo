@@ -8,7 +8,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-11-15 |
+| Last registry touch | 2026-11-18 |
 
 ---
 
@@ -839,6 +839,28 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Observability | Manual Feature Test `s3-3-033-room-smartview-intent`. |
 | Help | `help-botdee-room-smartview`, `-invite`, `-join`, `-end`, `-tab`, `-who-pays`, `-kick`, `-share`. BOT DEE intent `help-botdee-room-smartview`. |
 | Deploy | Pages + Functions. Do not merge/deploy until Don asks. Shared-session/tab product stays unbuilt. |
+
+---
+
+## SMARTvisuals (stencils + backgrounds)
+
+**Purpose:** Shared FLOQR visual service for **SMARTnotification**, **Room SMARTview**, and later SMARTviews. Packaged **SMARTstencils** (26) and **SMARTbackgrounds** (34) are original illustrations — not photographs and not official destination marks. Resolver is deterministic; Gemini is **off** on card view. Ads are a reserved labeled slot; **AdSense is never loaded**. Not a Features & Services Search tile (layers on `mingl` + `botDee`). Official spellings: SMARTvisuals, SMARTstencils, SMARTbackgrounds, SMARTview, SMARTnotification.
+
+**Verified (not the kit proposal):** published source of truth is git-backed `smartvisuals/registry.json` + `smartvisuals/catalog.json`. Firestore holds unpublished drafts, authorized overrides, a title-hash selection cache (no titles stored), ad policy, and audit. Live Mingl group rooms remain **not live** (`ROOMS_LIVE=false`). Search overlay is **demo-only** via `?smartvisualInvite=cancun` / `#smartvisual-cancun` / Studio preview — it does not fabricate live patrons.
+
+| Layer | Wiring |
+|---|---|
+| UI | Search `#smartvisualNotificationHost` on `index.html` (compact Mingl Room Invitation). Room overlay `#smartvisualRoomHost`. BOT DEE Room SMARTview scenic hero from `authorizedTitle` / `authorizedDescription` on the request-scoped payload (current utterance only). Master Admin tab `#smartvisualStudio` (Library / Create / Tagging / Review / Diagnostics / Ads). |
+| Client | `smartvisuals-resolver.js` (UMD, byte-identical to Functions). `smartvisuals-view.js` / `.css` — `ensureCatalog()` fetches `./smartvisuals/catalog.json` on every page that loads the module (Search and `botdee.html`), not only when `#smartvisualNotificationHost` exists. `botdee.html` also preloads the catalog. `smartvisuals-studio.js` / `.css` Review reads `smartVisualDrafts.svgXml` via `<img src="data:image/svg+xml">`. Join Now → `FLOQRNav.pageUrl("./mingl-chat.html", {from:"smartvisual"})` (no `?v=`). |
+| Backend | `classifySmartVisual`, `publishSmartVisualDraft` (SOS2FA + `FLOQRReasonPrompt` ≥8 + SVG sanitizer; persists `svgXml` + `svgChecksumSha256` on the draft), `setSmartVisualOverride`, `getSmartVisualAdPolicy` (`adsEnabled: false`). `functions/smartvisuals-svg-sanitize.js`. Gemini `geminiAllowed() === false`. |
+| Data | Published: `smartvisuals/{stencils,backgrounds}/*.svg`, `registry.json`, `catalog.json`. Firestore Functions-write: `smartVisualDrafts` (includes sanitized `svgXml` for Review), `smartVisualOverrides`, `smartVisualSelections` (hash → IDs), `smartVisualAdPolicy`, `smartVisualAuditLogs`. Classification rows in `data-classification-core.js`. No stored client IP. Private BOT DEE chat `sourceKind: private-chat` → `publicNotification: false`. |
+| URL / contract | Demo Search: `./?start=search&smartvisualInvite=cancun`. Display boards never get `?v=`. Package stamp `s3.3.040`. |
+| Security | Default-deny unpublished assets. Prompt-injection / remote URLs in titles → `prompt-injection-ignored` + neutral art. Override of draft IDs rejected. Studio publish needs Master Admin SOS2FA. Rules: drafts/overrides/audit/adPolicy Master Admin read, write false; selections none. |
+| Observability | Manual Feature Tests `s3-3-038-smartvisuals-search-notification`, `s3-3-038-smartvisuals-studio`. Diagnostics package checks. |
+| Help | `help-smartvisuals-notification`, `help-smartvisuals-room` (patron, 11 langs), `help-smartvisuals-studio` (masterAdmin English). BOT DEE intents on the first two. |
+| Deploy | **PR only.** No Functions deploy, no Pages publish, no AdSense until Don asks. |
+
+Resume: `@smartvisuals$` / `$smartvisuals$`. Rule: `.cursor/rules/design-notes-smartvisuals.mdc`. Architecture: `docs/FLOQR-TECHNICAL-BIBLE.md` §2.3.
 
 ---
 

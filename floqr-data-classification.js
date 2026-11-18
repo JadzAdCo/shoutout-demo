@@ -158,6 +158,11 @@
     ["shoutoutComplianceMeta", "master", 0, "ShoutOut compliance settings"],
     ["shoutoutRecommendations", "internal", 0, "ShoutOut suggestions"],
     ["shoutouts", "ownClubStaff", 1, "ShoutOut requests (board text shows on the venue display)"],
+    ["smartVisualAdPolicy", "master", 0, "SMARTvisuals labeled-ad slot policy (AdSense off until separate approval)"],
+    ["smartVisualAuditLogs", "master", 1, "SMARTvisual Studio publish/override/sanitizer denials (actor email; Functions-write)"],
+    ["smartVisualDrafts", "master", 1, "Unpublished SMARTstencil/SMARTbackground drafts; patrons never read"],
+    ["smartVisualOverrides", "master", 0, "Authorized host/admin SMARTvisual asset overrides (Functions-write)"],
+    ["smartVisualSelections", "secret", 0, "Cached classification hash → approved asset IDs (Functions-write; no titles stored)"],
     ["sos2faChallenges", "secret", 1, "SOS2FA sign-in challenges"],
     ["sos2faRecoveryAttempts", "secret", 0, "SOS2FA recovery code attempts"],
     ["sos2faSessions", "secret", 0, "SOS2FA unlocked sessions"],
@@ -254,7 +259,9 @@
     ["botDeeThreads", "currentConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the current slice; minted once; Functions-write"],
     ["botDeeThreads", "archiveConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the previous slice after idle rotate; Functions-write"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
-    ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
+    ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"],
+    ["smartVisualDrafts", "svgXml", "master", 0, "Sanitized unpublished SVG markup for Studio Review; patrons never read"],
+    ["smartVisualDrafts", "svgChecksumSha256", "master", 0, "SHA-256 of the sanitized draft SVG"]
   ];
 
   const CATALOG = ROWS.map(presetRow);

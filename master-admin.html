@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="./styles.css?v=s3.3.040"/>
   <link rel="stylesheet" href="./admin.css?v=s3.3.040"/>
   <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.040"/>
+  <link rel="stylesheet" href="./smartvisuals-view.css?v=s3.3.040"/>
+  <link rel="stylesheet" href="./smartvisuals-studio.css?v=s3.3.040"/>
   <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.040"/>
   <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.040"/>  <script>    try{
       var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
@@ -132,6 +134,7 @@
             <button class="admin-subtab" data-panel="featuresAuditTrail" type="button" data-i18n="master.featuresAuditTrail">Audit Trail</button>
           </div>
         </div>
+        <button class="admin-tab" data-panel="smartvisualStudio" type="button" data-i18n="master.smartvisualStudio">SMARTvisual Studio</button>
         <div class="admin-tab-group" data-tab-group="diagnostics">
           <button class="admin-tab admin-tab-parent" data-group="diagnostics" type="button" aria-expanded="false" data-i18n="master.diagnostics">Diagnostics</button>
           <div class="admin-subtabs hidden" id="diagnosticsSubtabs" role="group" aria-label="Diagnostics pages">
@@ -1677,6 +1680,86 @@
         </div>
       </section>
 
+      <section id="smartvisualStudio" class="admin-panel-section">
+        <div class="card">
+          <h2 class="brand-mixed-case"
+            data-floqr-help-id="help-smartvisuals-studio"
+            data-floqr-help-title="SMARTvisual Studio"
+            data-floqr-help-search="smartvisuals|smartstencils|smartbackgrounds|smartview invitation|asset registry"
+            data-floqr-help-body="SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads stay a separate labeled slot and are off."
+            data-i18n="master.smartvisualStudio">SMARTvisual Studio</h2>
+          <p class="sub small" data-i18n="master.smartvisualStudioIntro">Approved SMARTstencils and SMARTbackgrounds. Drafts never reach patrons until an audited publish. Scenic art is illustration, not photography.</p>
+          <div class="sv-studio-tabs" role="tablist" aria-label="SMARTvisual Studio">
+            <button type="button" class="admin-subtab active" role="tab" aria-selected="true" data-sv-studio-page="library" data-i18n="master.smartvisualLibrary">Library</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-sv-studio-page="create" data-i18n="master.smartvisualCreate">Create / Edit</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-sv-studio-page="tagging" data-i18n="master.smartvisualTagging">Tagging &amp; Resolver</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-sv-studio-page="review" data-i18n="master.smartvisualReview">Review / Publish</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-sv-studio-page="diagnostics" data-i18n="master.smartvisualDiagnostics">Usage &amp; Diagnostics</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-sv-studio-page="ads" data-i18n="master.smartvisualAds">Ads / Placement</button>
+          </div>
+        </div>
+        <div class="sv-studio-layout">
+          <div>
+            <div class="card" data-sv-studio-panel="library">
+              <h3 data-i18n="master.smartvisualLibrary">Library</h3>
+              <p id="svStudioCount" class="sub small"></p>
+              <p class="button-row">
+                <input id="svStudioSearch" type="search" data-i18n-placeholder="master.smartvisualSearch" placeholder="Search name, tag, place"/>
+                <select id="svStudioTypeFilter" aria-label="Type">
+                  <option value="all">All</option>
+                  <option value="background">SMARTbackgrounds</option>
+                  <option value="stencil">SMARTstencils</option>
+                </select>
+                <button type="button" class="buttonlike" id="svStudioOpenSearchDemo" data-i18n="sv.previewNotify">Preview in Search SMARTnotification</button>
+              </p>
+              <div id="svStudioLibrary" class="sv-studio-grid"></div>
+            </div>
+            <div class="card" data-sv-studio-panel="create" hidden>
+              <h3 data-i18n="master.smartvisualCreate">Create / Edit</h3>
+              <form id="svStudioCreateForm">
+                <label>Name * <input id="svStudioName" required maxlength="80"/></label>
+                <label>Description <textarea id="svStudioDesc" rows="2" maxlength="400"></textarea></label>
+                <label>Type
+                  <select id="svStudioType">
+                    <option value="stencil">SMARTstencil</option>
+                    <option value="background">SMARTbackground</option>
+                  </select>
+                </label>
+                <label>Tags <input id="svStudioTags" placeholder="travel, beach"/></label>
+                <label>Rights / source * <input id="svStudioLicense" required maxlength="240" placeholder="Original FLOQR illustration"/></label>
+                <label>SVG upload <input id="svStudioSvg" type="file" accept="image/svg+xml,.svg"/></label>
+                <p class="sub small" data-i18n="sv.studioSvgHint">SVG is sanitized. Scripts, foreignObject, event handlers, and external hrefs are rejected. Preview uses img, never inline untrusted SVG.</p>
+                <button type="submit" class="primary" data-i18n="sv.studioSubmit">Submit for review</button>
+                <p id="svStudioCreateStatus" class="status" aria-live="polite"></p>
+              </form>
+            </div>
+            <div class="card" data-sv-studio-panel="tagging" hidden>
+              <h3 data-i18n="master.smartvisualTagging">Tagging &amp; Resolver</h3>
+              <p class="sub small" data-i18n="sv.studioTagHint">Synthetic titles only. The resolver never reads private chat. Gemini is not called on card view.</p>
+              <div id="svStudioExamples"></div>
+            </div>
+            <div class="card" data-sv-studio-panel="review" hidden>
+              <h3 data-i18n="master.smartvisualReview">Review / Publish</h3>
+              <p class="sub small" data-i18n="sv.studioReviewHint">Git-backed registry.json is the published source of truth. SOS2FA + reason required. Drafts stay off Search and Room SMARTview.</p>
+              <div id="svStudioReview"></div>
+            </div>
+            <div class="card" data-sv-studio-panel="diagnostics" hidden>
+              <h3 data-i18n="master.smartvisualDiagnostics">Usage &amp; Diagnostics</h3>
+              <div id="svStudioDiagnostics"></div>
+            </div>
+            <div class="card" data-sv-studio-panel="ads" hidden>
+              <h3 data-i18n="master.smartvisualAds">Ads / Placement</h3>
+              <p data-i18n="sv.adPolicyBody">Independent labeled slot below Room SMARTview. AdSense is not loaded. No fill, no consent prompt, and no targeting from room or BOT DEE content until a separate approval.</p>
+            </div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="sv.studioDetail">Asset detail / live preview</h3>
+            <div id="svStudioDetail"></div>
+            <div id="svStudioLivePreview" hidden></div>
+          </div>
+        </div>
+      </section>
+
             <section id="aiCrawling" class="admin-panel-section">
         <!-- Design notes: .cursor/rules/design-notes-ai-discovery-crawl.mdc -->
         <div class="card ai-crawl-workspace">
@@ -2276,6 +2359,9 @@
 <script src="./floqr-feature-services.js?v=s3.3.040"></script>
 <script src="./floqr-reason-prompt.js?v=s3.3.040"></script>
 <script src="./botdee-smartview.js?v=s3.3.040"></script>
+<script src="./smartvisuals-resolver.js?v=s3.3.040"></script>
+<script src="./smartvisuals-view.js?v=s3.3.040"></script>
+<script src="./smartvisuals-studio.js?v=s3.3.040"></script>
 <script src="./botdee-upgrade-ui.js?v=s3.3.040"></script>
 <script src="./master-feature-services.js?v=s3.3.040"></script>
 <script src="./master-demo-employees.js?v=s3.3.040"></script>

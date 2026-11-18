@@ -456,6 +456,19 @@
     "help-sinema-virtual-set": [
       "patron"
     ],
+    "help-smartvisuals-notification": [
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-smartvisuals-room": [
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-smartvisuals-studio": [
+      "masterAdmin"
+    ],
     "help-soccer-jersey": [
       "patron"
     ],
@@ -716,6 +729,12 @@
       "patron"
     ],
     "help-shoutout": [
+      "patron"
+    ],
+    "help-smartvisuals-notification": [
+      "patron"
+    ],
+    "help-smartvisuals-room": [
       "patron"
     ],
     "help-soccer-jersey": [
