@@ -592,6 +592,15 @@ function replyFor(classified) {
   return {key: pair[0], text: pair[1]};
 }
 
+function authorizedFromUtterance(raw, classified) {
+  if (classified && classified.injection) {
+    return {authorizedTitle: "", authorizedDescription: ""};
+  }
+  const cleaned = text(String(raw || "").replace(/https?:\/\/\S+/gi, " ").replace(/\s+/g, " "), 120);
+  if (!cleaned) return {authorizedTitle: "", authorizedDescription: ""};
+  return {authorizedTitle: cleaned, authorizedDescription: cleaned};
+}
+
 function buildRoomSmartView(opts) {
   const options = opts && typeof opts === "object" ? opts : {};
   const classified = options.classified || classifyRoomIntent(options.utterance, options);
@@ -599,6 +608,7 @@ function buildRoomSmartView(opts) {
   const copy = replyFor(classified);
   const mode = classified.route === "none" ? "none" : classified.route;
   const lifecycle = classified.route === "reopen" && classified.hasActiveRoom ? "active" : "created";
+  const authorized = authorizedFromUtterance(options.utterance, classified);
   return {
     schemaVersion: SCHEMA_VERSION,
     kind: KIND,
@@ -615,6 +625,8 @@ function buildRoomSmartView(opts) {
     needsConfirmation: classified.needsConfirmation === true,
     injectionDenied: classified.injection === true,
     namedNeedles: Array.isArray(classified.namedNeedles) ? classified.namedNeedles : [],
+    authorizedTitle: authorized.authorizedTitle,
+    authorizedDescription: authorized.authorizedDescription,
     sharePreview: {
       facts: Array.isArray(classified.shareFacts) ? classified.shareFacts : [],
       includesPrivateThread: false,

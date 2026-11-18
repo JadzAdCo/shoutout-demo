@@ -171,8 +171,29 @@ test("T09 publish path requires SOS2FA helper and sanitizer (no client write)", 
   assert.match(src, /assertAdmin\(request, "smartvisual\.publish"\)/);
   assert.match(src, /sanitizeSvg/);
   assert.match(src, /REASON_MIN = 8/);
+  assert.match(src, /svgXml/);
+  assert.match(src, /svgChecksumSha256/);
   assert.match(read("firestore.rules"), /match \/smartVisualDrafts\/\{id\}/);
   assert.match(read("firestore.rules"), /allow write: if false/);
+});
+
+test("sanitizeSvg returns the sanitized SVG text so drafts can persist it", () => {
+  const xml = '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="10"/></svg>';
+  const out = sanitizeSvg(xml);
+  assert.equal(out.ok, true);
+  assert.equal(out.svg, xml);
+  assert.ok(out.bytes > 0);
+});
+
+test("BOT DEE loads visual catalog without a Search notification host", () => {
+  const view = read("smartvisuals-view.js");
+  const afterAssign = view.slice(view.lastIndexOf("root.FLOQRSmartVisuals ="));
+  assert.match(afterAssign, /ensureCatalog\(\)/);
+  assert.match(read("botdee.html"), /smartvisuals\/catalog\.json/);
+  assert.match(read("botdee.html"), /smartvisuals-view\.js\?v=/);
+  assert.match(read("botdee.html"), /smartvisuals-resolver\.js\?v=/);
+  assert.match(read("botdee-smartview.js"), /ensureCatalog/);
+  assert.match(read("smartvisuals-studio.js"), /svgXml/);
 });
 
 test("T15 ads stay off and AdSense is not referenced in renderer", () => {

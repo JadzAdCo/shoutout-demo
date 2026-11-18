@@ -576,6 +576,18 @@
     </li>`).join("")}</ul>`;
   }
 
+  function roomVisual(view) {
+    const api = window.FLOQRSmartVisuals;
+    if (!api || typeof api.resolveVisual !== "function") return null;
+    const title = String(view && view.authorizedTitle || "").trim();
+    const description = String(view && view.authorizedDescription || "").trim();
+    return api.resolveVisual({
+      title: title || "Mingl Room",
+      description,
+      sourceKind: "authorized-room"
+    });
+  }
+
   function renderRoomNeedles(payload) {
     const rows = Array.isArray(payload?.namedNeedles) ? payload.namedNeedles : [];
     if (!rows.length) return "";
@@ -591,18 +603,8 @@
     const confirmable = view.needsConfirmation && view.mode !== "command" && view.mode !== "deny";
     const share = view.mode === "share_preview";
     const denied = view.injectionDenied === true || view.mode === "deny";
-    const visual = window.FLOQRSmartVisuals && view.authorizedTitle
-      ? window.FLOQRSmartVisuals.resolveVisual({
-        title: view.authorizedTitle,
-        description: view.authorizedDescription || "",
-        sourceKind: "authorized-room"
-      })
-      : (window.FLOQRSmartVisuals ? window.FLOQRSmartVisuals.resolveVisual({
-        title: "Mingl Room",
-        description: "",
-        sourceKind: "authorized-room"
-      }) : null);
-    const visualHero = visual ? `<div class="sv-hero botdee-sv-visual" data-sv-reason="${esc(visual.reasonCode || "neutral-fallback")}">
+    const visual = roomVisual(view);
+    const visualHero = visual ? `<div class="sv-hero botdee-sv-visual" data-sv-reason="${esc(visual.reasonCode || "neutral-fallback")}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}">
         <img class="sv-bg" src="${esc(visual.backgroundUrl)}" alt="${esc(t("sv.scenicAlt", "Scenic illustration for this room. Not a photograph."))}"/>
       </div>` : "";
     return `<article class="botdee-sv-room" data-kind="botDeeRoom" data-rs-mode="${esc(view.mode || "")}" data-rs-decline="${esc(view.declineKey || "")}">
@@ -1244,8 +1246,17 @@
 
   function mount(el, views, peopleSearch) {
     if (!el) return;
-    stopLive(el);
     const list = Array.isArray(views) ? views : [];
+    const paint = () => paintHost(el, list, peopleSearch);
+    if (list.some(isRoomPayload) && window.FLOQRSmartVisuals?.ensureCatalog) {
+      window.FLOQRSmartVisuals.ensureCatalog().then(paint, paint);
+      return;
+    }
+    paint();
+  }
+
+  function paintHost(el, list, peopleSearch) {
+    stopLive(el);
     el.__floqrSmartViews = list;
     el.__floqrPeopleSearch = peopleSearch || el.__floqrPeopleSearch || null;
     const meta = el.__floqrPeopleSearch || {};

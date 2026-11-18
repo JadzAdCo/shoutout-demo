@@ -3,6 +3,7 @@
    Visual classification never invokes headless tools or AdSense. No deploy until Don asks. */
 
 const admin = require("firebase-admin");
+const crypto = require("crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 const resolver = require("./smartvisuals-resolver");
@@ -90,6 +91,8 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
   }
   const id = text(request.data?.id, 80) || `draft_${Date.now()}`;
   const expectedRev = Number(request.data?.revision || 0);
+  const svgXml = String(sanit.svg || "");
+  const svgChecksumSha256 = crypto.createHash("sha256").update(svgXml, "utf8").digest("hex");
   const ref = db.collection(COLLECTIONS.drafts).doc(id);
   await db.runTransaction(async tx => {
     const snap = await tx.get(ref);
@@ -106,6 +109,9 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
       license,
       approvalStatus: "review",
       bytes: sanit.bytes,
+      svgXml,
+      svgChecksumSha256,
+      contentType: "image/svg+xml",
       revision: current + 1,
       updatedByEmail: email,
       sos2faSessionId: sessionId,
@@ -113,7 +119,7 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
       updatedAt: FieldValue.serverTimestamp()
     }, {merge: true});
   });
-  return {ok: true, id, status: "review"};
+  return {ok: true, id, status: "review", bytes: sanit.bytes, svgChecksumSha256};
 });
 
 exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {

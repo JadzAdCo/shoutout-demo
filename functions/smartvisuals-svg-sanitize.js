@@ -25,7 +25,7 @@ function sanitizeSvg(raw, opts) {
   if (FILTER.test(text) && options.allowFilter !== true) return {ok: false, reason: "filter"};
   if (ENTITY.test(text)) return {ok: false, reason: "entity"};
   if (/<\?xml-stylesheet/i.test(text)) return {ok: false, reason: "stylesheet"};
-  return {ok: true, bytes, reason: "ok"};
+  return {ok: true, bytes, reason: "ok", svg: text};
 }
 
 module.exports = {sanitizeSvg, MAX_BYTES};

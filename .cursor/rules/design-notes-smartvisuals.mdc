@@ -16,7 +16,7 @@ A **shared visual service**, not a Features & Services Search tile. Layers on `m
 | Surface | Truth |
 |---|---|
 | Published assets | git `smartvisuals/registry.json` + `catalog.json` + SVG files (26 stencils, 34 backgrounds) |
-| Unpublished drafts | Firestore `smartVisualDrafts` (Master Admin read; Functions-write) |
+| Unpublished drafts | Firestore `smartVisualDrafts` (Master Admin read; Functions-write; sanitized `svgXml` + checksum so Review can preview) |
 | Overrides / cache / ads / audit | `smartVisualOverrides`, `smartVisualSelections`, `smartVisualAdPolicy`, `smartVisualAuditLogs` |
 
 Default-deny: unpublished / unlicensed / unsanitized assets never resolve for patrons.
@@ -28,7 +28,7 @@ Default-deny: unpublished / unlicensed / unsanitized assets never resolve for pa
 ## Surfaces
 
 1. **Search SMARTnotification** — `index.html` `#smartvisualNotificationHost`. Demo only: `?smartvisualInvite=cancun`. View Invitation / Not Now. No fabricated live rooms for all patrons.
-2. **Room SMARTview** — overlay + BOT DEE card hero from `authorizedTitle` only.
+2. **Room SMARTview** — overlay + BOT DEE card hero from `authorizedTitle` / `authorizedDescription` on the request payload (current utterance; never private thread). `botdee.html` loads `smartvisuals/catalog.json` via `ensureCatalog()`.
 3. **Master Admin SMARTvisual Studio** — `#smartvisualStudio`. SOS2FA + `FLOQRReasonPrompt` to submit drafts. Ads tab documents the empty labeled slot.
 
 Join Now uses `FLOQRNav` (no `?v=`). Display URLs unchanged.

@@ -358,6 +358,9 @@
     bootSearch
   };
 
+  /* Catalog is required on BOT DEE Room SMARTview as well as Search.
+     Fetch immediately — do not wait for #smartvisualNotificationHost. */
+  ensureCatalog();
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootSearch);
   } else {

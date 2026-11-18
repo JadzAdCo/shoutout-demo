@@ -259,7 +259,9 @@
     ["botDeeThreads", "currentConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the current slice; minted once; Functions-write"],
     ["botDeeThreads", "archiveConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the previous slice after idle rotate; Functions-write"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
-    ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
+    ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"],
+    ["smartVisualDrafts", "svgXml", "master", 0, "Sanitized unpublished SVG markup for Studio Review; patrons never read"],
+    ["smartVisualDrafts", "svgChecksumSha256", "master", 0, "SHA-256 of the sanitized draft SVG"]
   ];
 
   const CATALOG = ROWS.map(presetRow);
