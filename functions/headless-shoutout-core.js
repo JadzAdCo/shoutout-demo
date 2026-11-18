@@ -153,7 +153,8 @@ function pickTemplate(venue = {}, requested = "") {
   if (!id) id = DEFAULT_TEMPLATE_ID;
   const meta = HEADLESS_TEXT_TEMPLATES[id] || HEADLESS_TEXT_TEMPLATES[DEFAULT_TEMPLATE_ID];
   const venueIds = Array.isArray(venue.templates) ? venue.templates.map(String) : null;
-  if (venueIds && venueIds.length && id !== DEFAULT_TEMPLATE_ID && !venueIds.includes(id)) {
+  const keepExplicit = !!explicit && !!HEADLESS_TEXT_TEMPLATES[id];
+  if (venueIds && venueIds.length && id !== DEFAULT_TEMPLATE_ID && !venueIds.includes(id) && !keepExplicit) {
     id = DEFAULT_TEMPLATE_ID;
   }
   const chosen = HEADLESS_TEXT_TEMPLATES[id] || meta;
@@ -235,12 +236,10 @@ function extractColonMessage(raw) {
 }
 
 function extractAliasClub(raw) {
-  const folded = normalizeClubNeedle(raw);
-  if (!folded) return "";
+  const folded = ` ${normalizeClubNeedle(raw)} `;
+  if (folded === "  ") return "";
   for (const needle of ALIAS_NEEDLES) {
-    if (folded === needle || folded.includes(` ${needle} `) || folded.startsWith(`${needle} `) || folded.endsWith(` ${needle}`) || folded.includes(needle)) {
-      return CLUB_NAME_ALIASES[needle];
-    }
+    if (folded.includes(` ${needle} `)) return CLUB_NAME_ALIASES[needle];
   }
   return "";
 }
@@ -256,19 +255,39 @@ function extractAtClub(raw) {
     .trim();
 }
 
+function venuePrefix(raw, message = "") {
+  const source = String(raw || "");
+  const copy = String(message || "").trim();
+  if (copy) {
+    const idx = source.toLowerCase().lastIndexOf(copy.toLowerCase());
+    if (idx > 0) return source.slice(0, idx);
+  }
+  const cut = source.search(/\b(?:that says|saying|that reads|message(?: is)?|text(?: is)?|board(?: that)? says)\b/i);
+  if (cut > 0) return source.slice(0, cut);
+  return source;
+}
+
 function extractTemplateHint(raw) {
   const folded = ` ${normalizeClubNeedle(raw)} `;
-  if (/\b(happy birthday|bday)\b/.test(folded) && !/\b(birthday (?:board|template|shout))\b/.test(folded)) {
-    // Board copy, not a template pick.
-  } else if (/\bbirthday (?:board|template)\b/.test(folded)) {
-    return "birthday";
+  if (/\bclassic halloween\b/.test(folded)
+    || /\bhalloween (?:shout|board|template)\b/.test(folded)
+    || /\b(?:throw|send|post|buy|pay for) a halloween\b/.test(folded)) {
+    return "classicHalloween";
   }
-  const ordered = Object.keys(TEMPLATE_ALIASES).sort((a, b) => b.length - a.length);
-  for (const needle of ordered) {
-    if (needle === "birthday" || needle === "classic" || needle === "classic board") continue;
-    if (folded.includes(` ${needle} `)) return TEMPLATE_ALIASES[needle];
+  const named = [
+    ["birthday", "birthday"],
+    ["neon", "neon"],
+    ["gold", "gold"],
+    ["vip", "vip"],
+    ["graduation", "graduation"],
+    ["corporate", "corporate"]
+  ];
+  for (const [needle, id] of named) {
+    if (new RegExp(`\\b${needle} (?:shout|board|template)\\b`).test(folded)
+      || new RegExp(`\\b(?:throw|send|post) a ${needle}\\b`).test(folded)) {
+      return id;
+    }
   }
-  if (/\bhalloween\b/.test(folded)) return "classicHalloween";
   return "";
 }
 
@@ -283,13 +302,15 @@ function extractScreenHint(raw) {
 function parseShoutOutExecute(raw) {
   const source = String(raw || "").trim();
   const message = extractQuotedMessage(source) || extractSaysMessage(source) || extractColonMessage(source);
-  const aliasClub = extractAliasClub(source);
-  const atClub = extractAtClub(source);
+  const prefix = venuePrefix(source, message);
+  const atPhrase = extractAtClub(prefix);
+  const atClub = extractAliasClub(atPhrase) || atPhrase;
+  const aliasClub = extractAliasClub(prefix);
   return {
-    clubQuery: aliasClub || atClub,
+    clubQuery: atClub || aliasClub,
     message,
-    templateId: extractTemplateHint(source),
-    screenFormatId: extractScreenHint(source)
+    templateId: extractTemplateHint(prefix),
+    screenFormatId: extractScreenHint(prefix)
   };
 }
 

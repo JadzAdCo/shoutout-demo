@@ -427,7 +427,6 @@ function isShoutOutExecutePrompt(raw) {
   if (/\b(?:how|help|what is|where do i|instructions?|explain)\b/.test(q)) return false;
   if (/\b(?:throw|send|post|compose|buy|pay for)\b.{0,48}\bshout\s*out/.test(q)) return true;
   if (/^shout\s*out\b/.test(q) && /\b(?:for|at|to|please)\b/.test(q)) return true;
-  if (/\b(?:decades|aurelia|lima twist|shoko)\b/.test(q) && /\b(?:that says|saying|that reads)\b/.test(q)) return true;
   return false;
 }
 

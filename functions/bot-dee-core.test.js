@@ -60,7 +60,7 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.ok(longThrow.length <= bot.MAX_MESSAGE_CHARS);
   assert.ok(longBoard.length >= 160);
   assert.equal(bot.isShoutOutExecutePrompt(longThrow), true);
-  assert.equal(bot.isShoutOutExecutePrompt("at Decades that says Happy birthday Maya"), true);
+  assert.equal(bot.isShoutOutExecutePrompt("at Decades that says Happy birthday Maya"), false);
   assert.equal(bot.omitContextualSearchForPrompt(longThrow, ["shoutOut", "botDee"]), true);
   assert.equal(bot.isChitchatPrompt("mail logging"), false);
 

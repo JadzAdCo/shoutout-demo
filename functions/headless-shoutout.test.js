@@ -28,6 +28,20 @@ test("parseShoutOutExecute pulls club + message from chat", () => {
   const incomplete = headless.parseShoutOutExecute("throw a shoutout");
   assert.equal(incomplete.clubQuery, "");
   assert.equal(incomplete.message, "");
+
+  const copyClub = headless.parseShoutOutExecute(
+    "throw a shoutout at Decades that says see you at Aurelia tonight"
+  );
+  assert.equal(copyClub.clubQuery, "decades-washington-dc");
+  assert.equal(copyClub.message, "see you at Aurelia tonight");
+  assert.equal(copyClub.templateId, "");
+
+  const halloweenCopy = headless.parseShoutOutExecute(
+    "throw a shoutout at Decades that says Happy Halloween"
+  );
+  assert.equal(halloweenCopy.clubQuery, "decades-washington-dc");
+  assert.equal(halloweenCopy.templateId, "");
+  assert.equal(halloweenCopy.message, "Happy Halloween");
 });
 
 test("composeShoutOutPayload defaults Traditional board and venue LED", () => {
@@ -60,6 +74,15 @@ test("composeShoutOutPayload defaults Traditional board and venue LED", () => {
   assert.equal(paid.ok, true);
   assert.equal(paid.priceCents, 1500);
   assert.equal(paid.templateId, "classicHalloween");
+
+  const halloweenCopy = headless.composeShoutOutPayload({
+    venue,
+    userPrompt: "throw a shoutout at Decades that says Happy Halloween"
+  });
+  assert.equal(halloweenCopy.ok, true);
+  assert.equal(halloweenCopy.clubLocationId, "decades-washington-dc");
+  assert.equal(halloweenCopy.templateId, "blackwhite");
+  assert.equal(halloweenCopy.priceCents, 0);
 });
 
 test("composer-only templates stay on composeHref", () => {
@@ -88,6 +111,8 @@ test("startShoutOutCheckout and FloqR callable accept flat club + message", () =
   assert.match(tools, /composeShoutOutPayload/);
   assert.match(tools, /submitFreeHeadlessShoutOut/);
   assert.match(tools, /args\?\.mainText \|\| args\?\.message/);
+  assert.match(tools, /does not submit as a free board/);
+  assert.doesNotMatch(tools, /existing\.priceCents \|\| payload\.priceCents/);
   assert.doesNotMatch(tools, /needs clubLocationId and shoutout payload/);
 
   const commerce = read("functions/commerce-functions.js");

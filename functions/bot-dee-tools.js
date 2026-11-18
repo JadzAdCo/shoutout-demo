@@ -160,6 +160,10 @@ async function listShoutOutTemplates(args, sessionRequest) {
 async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth} = {}) {
   const uid = text(auth?.uid, 120);
   if (!uid) throw new HttpsError("unauthenticated", "Sign in required.");
+  const templateId = text(shoutout?.template || shoutout?.templateId, 80);
+  if (headless.isComposerOnlyTemplate(templateId) || Math.max(0, Math.round(Number(shoutout?.priceCents || 0))) > 0) {
+    throw new HttpsError("failed-precondition", "This ShoutOut template does not submit as a free board.");
+  }
   const email = text(auth?.token?.email || shoutout.submittedBy, 200).toLowerCase();
   const referenceNumber = headless.newReferenceNumber();
   const locationName = text(shoutout.locationName || venue?.locationName || clubLocationId, 160);
@@ -259,24 +263,13 @@ async function startShoutOutCheckout(args, sessionRequest) {
   await featureGates.assertClubFeature(clubLocationId, "shoutOut");
   const snap = await db.collection("clubLocations").doc(clubLocationId).get();
   const venue = snap.exists ? {id: clubLocationId, ...(snap.data() || {})} : {id: clubLocationId};
-  const composed = existing && text(existing.template || existing.templateId, 80) && text(existing.mainText, 400) && text(existing.screenFormatId, 40)
-    ? {
-      ok: true,
-      clubLocationId,
-      templateId: text(existing.template || existing.templateId, 80),
-      screenFormatId: text(existing.screenFormatId, 40),
-      priceCents: Math.max(0, Math.round(Number(existing.priceCents || payload.priceCents || args?.priceCents || 0))),
-      shoutout: existing,
-      composeHref: headless.shoutOutComposeHref(clubLocationId)
-    }
-    : headless.composeShoutOutPayload({
-      clubLocationId,
-      venue,
-      message,
-      templateId,
-      screenFormatId,
-      userPrompt
-    });
+  const composed = headless.composeShoutOutPayload({
+    clubLocationId,
+    venue,
+    message,
+    templateId,
+    screenFormatId
+  });
   if (!composed.ok) {
     return {
       ok: false,
