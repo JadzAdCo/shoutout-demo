@@ -50,6 +50,7 @@ module.exports = {
   ...require("./vip-pos-functions"),
   ...require("./floqr-oidc-functions"),
   ...require("./spatial-grant-functions"),
+  floqmediaPlanTrace: require("./floqmedia-plan-trace-functions").floqmediaPlanTrace,
   ...require("./sinema-functions"),
   listMyPasses: require("./passes-functions").listMyPasses,
   listClubPasses: require("./passes-functions").listClubPasses,

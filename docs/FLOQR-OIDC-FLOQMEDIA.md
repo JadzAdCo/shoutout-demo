@@ -51,3 +51,15 @@ HMAC secret: Firebase Secret Manager `FLOQR_OIDC_JWT_SECRET` (`defineSecret` on 
 `Authorization: Bearer <id_token>`
 
 Body is a grant **reference** only (`projectId`, destination, permissions, `pinRevisionId`). `editableUntil` is always `null` on the grant. Files stay on FloqMedia.
+
+## Plan trace (guest import)
+
+Spatial Studio posts a PDF, SVG, or still image from `/start`. Guests are allowed. FloqR does not store the file, the trace, a project, or a grant.
+
+`POST https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/floqmediaPlanTrace`
+
+```json
+{ "fileName": "lobby.png", "mime": "image/png", "dataBase64": "..." }
+```
+
+CORS origins: `https://studio.floqmedia.com`, `https://www.floqmedia.com`, `https://floqmedia.com`, `http://localhost:3000`, `http://127.0.0.1:3000`, `http://studio.localhost:3000`. Deploy with `[firebase-deploy-spatial]`. Gemini secret is `GEMINI_API_KEY` (same as SmartView / BOT DEE). The prompt is floor-plan only. Access log operation `spatial-plan-trace` records success/failure, model, and token counts — never `dataBase64` or the SVG.

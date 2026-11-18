@@ -224,6 +224,16 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.039",
+      title: "s3.3.039 — Spatial Studio plan trace HTTP (floqmediaPlanTrace)",
+      checks: [
+        {label:"Plan trace HTTP export", file:"functions/floqmedia-plan-trace-functions.js", includes:["exports.floqmediaPlanTrace", "defineSecret(\"GEMINI_API_KEY\")", "GoogleGenAI"]},
+        {label:"Floor-plan prompt + CORS list", file:"functions/floqmedia-plan-trace-core.js", includes:["studio.localhost:3000", "PLAN_TRACE_PROMPT", "spatial-plan-trace"]},
+        {label:"Index + spatial deploy tag", file:"functions/index.js", includes:["floqmediaPlanTrace"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-039-floqmedia-plan-trace"]}
+      ]
+    },
+    {
+      version: "s3.3.039",
       title: "s3.3.039 — People card stacked layout (photo / name+handle / compact SMARTsummary)",
       checks: [
         {label:"Stacked people renderer", file:"botdee-smartview.js", includes:["function peopleFactsHtml(", "botdee-sv-id", "peopleHandleHtml"]},
@@ -3581,6 +3591,15 @@
       howToTest:"1) Hard-refresh floqr-oidc-authorize.html from Spatial Studio (live github.io URL with client_id + PKCE query). 2) Signed out → Search general sign-in (returnTo), not a second signup. 3) Signed in as Don Papi → Continue greys to Sending you to Spatial Studio… then redirects to FloqMedia callback with code=. A failure must show a sentence in the card (not a one-word internal). 4) Master Admin → Features Mgmt → Si-nema: Enable Feature 1, Enable Beta Feature 1, Save, reason ≥8. Hard-refresh Search — the approved Si-nema clapper chrome icon sits on today's Search row with a Beta pill (same size as FloqCAST, not hidden). 5) Open sinema.html — satellite shell, same approved Si-nema hero, no FloqR parent logo. 6) Confirm VIP reserV floor map and ShoutOut composer still load. 7) Mark Succeed/Failed. Do not deploy firestore.rules.",
       expected:"Continue is busy while issueFloqrOidcAuthCode runs, then FloqMedia receives the auth code. After Enable Feature=1, Master Admin Search shows the approved Si-nema clapper icon with a Beta pill on the same row as the other chrome tiles. VIP/ShoutOut unchanged. Token HMAC uses Secret Manager FLOQR_OIDC_JWT_SECRET.",
       troubleshoot:"Continue still does nothing → hard-refresh floqr-oidc-authorize.js; status must not stay blank. Status says not live → Functions CI [firebase-deploy-spatial] not finished. Redirect then FloqMedia token fails → CI Ensure FLOQR_OIDC_JWT_SECRET / [firebase-deploy-spatial]. redirect_uri_denied → FloqMedia must send https://studio.floqmedia.com/auth/callback. Si-nema Save says Unknown feature → [firebase-deploy-features] for setFeatureServiceFlags. Google-only card → missing floqr-session-shell.js."
+    },
+    {
+      id:"s3-3-039-floqmedia-plan-trace",
+      area:"Si-nema / identity",
+      feature:"Spatial Studio plan trace (floqmediaPlanTrace)",
+      changed:"HTTP floqmediaPlanTrace traces a guest PDF/SVG/image into a Spatial Studio proposal. Same Gemini engine as SmartView/BOT DEE, floor-plan prompt only. No FloqR session. CORS is the Spatial Studio origin list. FloqR does not store the drawing. Deploy with [firebase-deploy-spatial].",
+      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a [firebase-deploy-spatial] commit. 2) On Spatial Studio /start (studio.floqmedia.com or localhost:3000), import a still image or PDF that is not a Spatial Studio SVG/project. 3) The proposal card appears; Open this plan saves locally in the browser only. 4) A 13 MB file is refused. 5) Mark Succeed/Failed. Do not deploy firestore.rules.",
+      expected:"A readable plan returns {ok:true, trace} with meters or null sizes + estimated/inferred. Failures return a short error. No spatialGrantRefs or project row is written on FloqR.",
+      troubleshoot:"CORS error → origin is not studio.floqmedia.com / www / apex / localhost:3000 / 127.0.0.1:3000 / studio.localhost:3000. 404 → Functions CI did not include floqmediaPlanTrace. Unreadable → GEMINI_API_KEY not bound on that function; check Application Logging category gemini operation spatial-plan-trace. Do not retarget Display 1."
     },
     {
       id:"s3-3-020-ai-crawl-workspace",
