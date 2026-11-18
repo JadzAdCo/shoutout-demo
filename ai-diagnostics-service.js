@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.034";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.034";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.035";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.035";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -221,6 +221,16 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.035",
+      title: "s3.3.035 — Native select value vertically centered",
+      checks: [
+        {label:"Select height matches line-height", file:"styles.css", includes:["select:not([multiple])", "height:48px", "line-height:48px", "padding:0 40px 0 16px"], notIncludes:["padding:12px 40px 12px 16px"]},
+        {label:"Chrome schemes use background-color on selects", file:"styles.css", includes:["html[data-floqr-chrome=\"blackTiffany\"]", "background-color:rgba(0,0,0,.55)"], notIncludes:["background:rgba(0,0,0,.55)"]},
+        {label:"Profile/pickup selects keep 48px", file:"styles.css", includes:[".profile-grid > label > select{min-height:48px;height:48px", ".pickup-address-grid select{min-height:48px;height:48px"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-035-select-value-center"]}
+      ]
+    },
+    {
       version: "s3.3.034",
       title: "s3.3.034 — Version SMARTview card only (no six-phase dump)",
       checks: [
@@ -290,7 +300,7 @@
       version: "s3.3.030",
       title: "s3.3.030 — Profile select text + patron SMARTview",
       checks: [
-        {label:"Select unclip CSS", file:"styles.css", includes:["select:not([multiple])", "-webkit-appearance:none", "padding:12px 40px 12px 16px", "height:auto"]},
+        {label:"Select unclip CSS", file:"styles.css", includes:["select:not([multiple])", "-webkit-appearance:none", "min-height:48px", "padding:0 40px 0 16px"]},
         {label:"Help-attach skips form controls", file:"help-attach.js", includes:["function isFormControl(", "if (isFormControl(node)) return;"]},
         {label:"Account type help on label", file:"patron-portal.html", includes:["help-profile-account-type", "editAccountType", "portal.accountType.personal"]},
         {label:"Account type help id", file:"botdee-help-repository.js", includes:["help-profile-account-type"]},
@@ -3340,6 +3350,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-035-select-value-center",
+      area:"Chrome",
+      feature:"Dropdown selected value centered (all Site chrome)",
+      changed:"s3.3.035 — Native <select> selected text is vertically centered. Cause was appearance:none + line-height:1.35 + padding:12px + height:auto (Chromium top-aligns the value so extra leading sat below the glyphs). Chrome scheme background: shorthand also wiped the custom chevron. Now height/line-height 48px, padding-block 0, background-color on every Appearance scheme.",
+      howToTest:"1) Hard-refresh until styles.css?v=s3.3.035. 2) Master Admin → Features / Svc → BOT DEE → Version & Legal Gates: Provider pill shows Google Places/Maps centered (not sitting high). Fill slot select too. 3) Club Admin any filter dropdown (scheduling status, screen format). 4) My Profile → Edit Profile: Account type, Country, Language. 5) Search create-profile Country if unsigned-in form is open. 6) Switch Appearance through Nightlife, Traditional, Black Tiffany, White/Black, Purple & White, Black & Dark Green — selected value stays centered and the chevron stays on the right. 7) Mark Succeed/Failed.",
+      expected:"Closed select values sit in the vertical middle of the pill on every page that uses styles.css. Option list still readable. No Datron-style glyph clip. Xibo display.html?location= URLs unchanged.",
+      troubleshoot:"Text still high → cached styles.css?v=s3.3.034; confirm master-admin.html / admin.html / patron-portal.html / index.html link s3.3.035. Chevron missing on a chrome → that scheme still uses background: shorthand on select. iOS clip (Patron→Datron) → height must stay 48px with padding-block 0 (do not restore 44px+15px padding)."
+    },
     {
       id:"s3-3-034-version-card-only",
       area:"BOT DEE",

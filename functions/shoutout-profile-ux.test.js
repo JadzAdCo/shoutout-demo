@@ -101,14 +101,18 @@ test("Account type ? sits on the label row and select options stay in the contro
   assert.match(read("botdee-help-repository.js"), /id:\s*"help-profile-account-type"/);
 });
 
-test("native selects keep glyph room instead of clipping Patron to Datron", () => {
+test("native selects keep glyph room and center the selected value", () => {
   const css = read("styles.css");
   assert.match(css, /select:not\(\[multiple\]\)\{/);
   assert.match(css, /-webkit-appearance:none/);
-  assert.match(css, /min-height:44px/);
-  assert.match(css, /height:auto/);
-  assert.match(css, /padding:12px 40px 12px 16px/);
+  assert.match(css, /min-height:48px/);
+  assert.match(css, /height:48px/);
+  assert.match(css, /padding:0 40px 0 16px/);
+  assert.match(css, /line-height:48px/);
   assert.match(css, /background-image:url\("data:image\/svg\+xml/);
-  assert.match(css, /\.profile-grid > label > select\{min-height:44px;height:auto/);
-  assert.doesNotMatch(css, /\.profile-grid > label > select\{min-height:44px;height:44px/);
+  assert.match(css, /\.profile-grid > label > select\{min-height:48px;height:48px/);
+  assert.doesNotMatch(css, /select:not\(\[multiple\]\)\{[^}]*height:auto/);
+  assert.doesNotMatch(css, /select:not\(\[multiple\]\)\{[^}]*line-height:1\.35/);
+  assert.doesNotMatch(css, /\n  background:rgba\(0,0,0,\.55\);/);
+  assert.match(css, /html\[data-floqr-chrome="blackTiffany"\] select,[\s\S]*?background-color:rgba\(0,0,0,\.55\)/);
 });

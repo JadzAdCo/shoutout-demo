@@ -71,7 +71,8 @@ Unit-first height and structured taxi pickup. Profile country wins; if empty, IP
 | Splash | `index.html` early-paint script; `styles.css` `html.floqr-shoutout-direct`; `patron-app.js` `showAdSplash` |
 | Editor | `patron-app.js` `resetPageScroll` + `focusFirstEditorInput({preventScroll})` |
 | Handle help | `index.html` / `patron-portal.html` `.label-inline-row` + `help-floqr-handle`; `help-attach.js` `hydrateInlineHelpButtons` |
-| iOS select text (s3.3.030) | `styles.css` `select:not([multiple])` uses `appearance:none`, `height:auto`, 12/40 padding, custom chevron (chrome `background` shorthands cannot restore the clip). Fixes iPhone clipping (Patron→Datron, Public→Dublic). |
+| iOS select text (s3.3.030) | `styles.css` `select:not([multiple])` uses `appearance:none` + custom chevron. s3.3.030 used `height:auto` + 12/40 padding to stop iPhone clipping (Patron→Datron). |
+| Select value centering (s3.3.035) | Same global rule: `height`/`line-height` **48px**, `padding: 0 40px 0 16px` (no block padding). Chromium top-aligns `appearance:none` values, so `line-height:1.35` made the selected text sit high. Site chrome form fills use `background-color` (not `background` shorthand) so the chevron survives. Applies to Search, Club Admin, Master Admin, patron satellites, feature landings — any page on `styles.css`. Xibo Display URLs stay `display.html?location=` / `display2.html?location=` (no `?v=`). |
 | Account type | `#editAccountType` Personal (default patron) / Business (`IsBusinessAccount=1` → business name + Ad Campaigns tab). `?` is `help-profile-account-type` on `.label-inline-row`. `help-attach.js` never mounts help onto INPUT/SELECT (that emptied the Account type bubble). |
 | Tests | `functions/shoutout-profile-ux.test.js`, `functions/feature-landing.test.js` |
 
