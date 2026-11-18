@@ -7,16 +7,18 @@ const v2 = require("./botdee-smartview-v2-core");
 
 const PAGE_SIZE = 4;
 const SCHEMA_VERSION = "floqr.peopleSmartCard/6";
-const SELF_QUERY = /^(me|myself|my profile|my account|my info|my information|about me|who am i|what(?:'s| is| do you) know about (?:me|myself)|tell me about (?:me|myself)|describe (?:me|myself))$/i;
+const SELF_QUERY = /^(me|myself|my profile|my account|my info|my information|about me|who am i|what(?:'s| is| do you) know (?:about|of) (?:me|myself)|tell me about (?:me|myself)|describe (?:me|myself)|what can you tell me about (?:me|myself))$/i;
 
 const WHO_IS = /^(?:who(?:'s| is| s))\s+/i;
 const DO_YOU_KNOW = /^(?:do you know|did you meet)\s+/i;
+const KNOW_OF = /^(?:what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
 const PROFILE_OF = /^(?:what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|look up|lookup)\s+/i;
-const PERSON_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|lookup|find|search for|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for))\s+/i;
-const PERSON_SUFFIX = /\s+(?:on floqr|on mingl|on here)\s*$/i;
+const PERSON_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|lookup|find|search for|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
+const PERSON_SUFFIX = /\s+(?:on floqr|on mingl|on here|(?:'s)?\s*(?:public )?profile)\s*$/i;
 const STOP_AFTER = /^(working|on (?:duty|tonight)|the (?:dj|club)|playing|singing|available)\b/i;
 const GENERIC_PERSON = /^(this person|that person|them|him|her|someone|anybody|anyone)$/i;
 const VENUE_NEEDLE = /^(a |an |the )?(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?)\b/i;
+const PRODUCT_NEEDLE = /^(?:a |an |the )?(?:bot\s*dee|botdee|floq\s*ai|floqai|floqr|shout\s*outs?|mingl|floq\s*casts?|bartr|bart\s*r|rydr|vip(?:\s*reserv)?)\s*$/i;
 const OPERATIONAL = /\b(tonight|today|near me|on duty|available|playing|working)\b/i;
 
 function text(value, max = 160) {
@@ -33,11 +35,11 @@ function extractPersonNeedle(raw) {
   if (!n) return "";
   if (SELF_QUERY.test(n)) return "";
   let rest = original.replace(PERSON_PREFIX, "").replace(PERSON_SUFFIX, "").trim();
-  rest = rest.replace(/^[@]+/, "").replace(/["“”']/g, "").trim();
+  rest = rest.replace(/^[@]+/, "").replace(/["“”']/g, "").replace(/[?!.,]+$/g, "").trim();
   const needle = normalizeQuery(rest);
   if (!needle || needle.length < 2) return "";
   if (STOP_AFTER.test(needle) || GENERIC_PERSON.test(needle)) return "";
-  if (VENUE_NEEDLE.test(needle) || OPERATIONAL.test(needle)) return "";
+  if (VENUE_NEEDLE.test(needle) || PRODUCT_NEEDLE.test(needle) || OPERATIONAL.test(needle)) return "";
   return rest;
 }
 
@@ -48,7 +50,7 @@ function isPersonNameNeedle(rest) {
   const needle = normalizeQuery(trimmed);
   if (!needle || needle.length < 2) return false;
   if (STOP_AFTER.test(needle) || GENERIC_PERSON.test(needle)) return false;
-  if (VENUE_NEEDLE.test(needle) || OPERATIONAL.test(needle)) return false;
+  if (VENUE_NEEDLE.test(needle) || PRODUCT_NEEDLE.test(needle) || OPERATIONAL.test(needle)) return false;
   const tokens = needle.split(" ").filter(Boolean);
   if (!tokens.length || tokens.length > 4) return false;
   return tokens.every(token => /^@?[\w.'-]+$/.test(token)
@@ -66,6 +68,7 @@ function isPeopleLookupPrompt(raw) {
   const original = text(raw, 200);
   return WHO_IS.test(original)
     || DO_YOU_KNOW.test(original)
+    || KNOW_OF.test(original)
     || PROFILE_OF.test(original)
     || isFindPersonPrompt(original)
     || PERSON_SUFFIX.test(original);
@@ -74,7 +77,7 @@ function isPeopleLookupPrompt(raw) {
 function classifyPeopleSearchIntent(raw) {
   const n = normalizeQuery(raw);
   if (!n || n.length < 2) return {intent: "none", needle: "", self: false};
-  if (SELF_QUERY.test(n) || /^(what do you know about me|tell me about my (?:public )?profile)$/.test(n)) {
+  if (SELF_QUERY.test(n) || /^(what do you know (?:about|of) me|tell me about my (?:public )?profile|what can you tell me about me)$/.test(n)) {
     return {intent: "self", needle: "me", self: true};
   }
   const original = text(raw, 200);
@@ -82,10 +85,37 @@ function classifyPeopleSearchIntent(raw) {
   const needle = extractPersonNeedle(raw);
   if (needle) return {intent: "person", needle, self: false};
   const rest = normalizeQuery(
-    original.replace(WHO_IS, "").replace(DO_YOU_KNOW, "").replace(PROFILE_OF, "").replace(PERSON_SUFFIX, "")
+    original.replace(WHO_IS, "").replace(DO_YOU_KNOW, "").replace(KNOW_OF, "").replace(PROFILE_OF, "").replace(PERSON_SUFFIX, "")
   );
   if (GENERIC_PERSON.test(rest)) return {intent: "empty", needle: "", self: false};
   return {intent: "none", needle: "", self: false};
+}
+
+function canonicalPeopleLookupQuery(classified) {
+  if (!classified || classified.intent === "none") return "";
+  if (classified.intent === "self") return "Who am I?";
+  if (classified.intent === "empty") return "Who is this person?";
+  const needle = text(classified.needle, 120).replace(/[?!.,]+$/g, "").trim();
+  if (!needle) return "Who is this person?";
+  return `Who is ${needle}?`;
+}
+
+const PEOPLE_CARD_PRIVILEGE_KEYS = Object.freeze([
+  "isMasterAdmin", "isSuperAdmin", "superAdmin", "masterAdmin", "isClubAdmin",
+  "clubAdmin", "clubAdminClubIds", "isBetaTester", "betaTester", "betaFeatures",
+  "betaGrants", "sos2fa", "sos2faSession", "sos2faSessionHash", "claims",
+  "customClaims", "tokenClaims", "idTokenClaims", "featureGates",
+  "featureServiceFlags", "classificationRole", "viewerRole", "privileged", "role"
+]);
+
+function peopleCardHasPrivilegeField(value, depth = 0) {
+  if (depth > 8 || value == null) return false;
+  if (typeof value !== "object") return false;
+  if (Array.isArray(value)) return value.some(item => peopleCardHasPrivilegeField(item, depth + 1));
+  return Object.keys(value).some(key => (
+    PEOPLE_CARD_PRIVILEGE_KEYS.some(name => name.toLowerCase() === String(key).toLowerCase())
+    || peopleCardHasPrivilegeField(value[key], depth + 1)
+  ));
 }
 
 function editorialProvenance(analysis, snap) {
@@ -286,6 +316,9 @@ module.exports = {
   SCHEMA_VERSION,
   classifyPeopleSearchIntent,
   extractPersonNeedle,
+  canonicalPeopleLookupQuery,
+  peopleCardHasPrivilegeField,
+  PEOPLE_CARD_PRIVILEGE_KEYS,
   editorialProvenance,
   stampDiscoverable,
   compactPeopleV2,

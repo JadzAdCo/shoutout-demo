@@ -33,7 +33,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.037";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.038";
   const PREVIEW_LINKS_PACKAGE = "s3.3.037";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
@@ -223,11 +223,21 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.038",
+      title: "s3.3.038 — People lookup paints a People SMARTview card in chat",
+      checks: [
+        {label:"Know-of classifier", file:"functions/botdee-smartcard-core.js", includes:["KNOW_OF", "canonicalPeopleLookupQuery", "peopleCardHasPrivilegeField"]},
+        {label:"Session returns peopleSearch", file:"functions/bot-dee-functions.js", includes:["peopleSearch: outcome.peopleSearch", "classifyPeopleSearchIntent(userPrompt)"]},
+        {label:"Chat mounts People card", file:"bot-dee-chat.js", includes:["ensurePeopleSmartViews", "searchPeopleSmartCards", "looksLikeProfileFieldDump"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-038-people-lookup-chat-card"]}
+      ]
+    },
+    {
       version: "s3.3.037",
       title: "s3.3.037 — BOT DEE SMARTview scroll + rename saved chats",
       checks: [
         {label:"Chat page stays flex", file:"bot-dee-chat.css", includes:[".page.botdee-chat-page.active", "display: flex !important", "overflow: auto"]},
-        {label:"Rename UI", file:"botdee.html", includes:["id=\"botDeeRenameDialog\"", "bot-dee-chat.js?v=s3.3.037"]},
+        {label:"Rename UI", file:"botdee.html", includes:["id=\"botDeeRenameDialog\"", "bot-dee-chat.js?v="]},
         {label:"Rename callable", file:"functions/bot-dee-functions.js", includes:["exports.renameBotDeeChat", "Never put them in Gemini"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-037-botdee-smartview-scroll-rename"]}
       ]
@@ -3373,6 +3383,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-038-people-lookup-chat-card",
+      area:"BOT DEE",
+      feature:"People lookup → People SMARTview card in chat",
+      changed:"s3.3.038 — “What do you know of don banyong” (and tell me about / who is) opens a People SMARTview card in the transcript. Gemini markdown **Bio** / Location / Details dumps are skipped. No match is a short sentence. Several matches are compact cards. Master Admin / SOS2FA / claims never appear on the card. Functions + Pages pending Don.",
+      howToTest:"1) After Pages + Functions deploy (or local static + deployed searchPeopleSmartCards). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee.html ?v=s3.3.038. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — a People SMARTview card (name, handle, bio/SMARTsummary, location, socials) appears in the bubble. No **Bio** markdown. 3) Ask Who am I? — your card still appears. 4) Ask a name with no public match — short “No eligible public profile matched.” not a help dump. 5) Mark Succeed/Failed.",
+      expected:"Don Banyong lookup shows the People card chrome (Don Papi / @DonBans public fields), not asterisks. Privilege fields are absent. Xibo Display URLs have no ?v=.",
+      troubleshoot:"Still markdown → Functions executeBotSession not on this SHA (classifier still misses know-of) and searchPeopleSmartCards fallback failed; hard-refresh bot-dee-chat.js s3.3.038. Card missing → public profile unpublished or blocked; Who is don banyong should still hit the directory. Help dump → people results were not cleared; confirm ensurePeopleSmartViews."
+    },
     {
       id:"s3-3-037-botdee-smartview-scroll-rename",
       area:"BOT DEE",

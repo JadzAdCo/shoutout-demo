@@ -10,6 +10,7 @@ const smart = require("./botdee-smartview-core");
 const tools = require("./bot-dee-tools");
 const people = require("./people-directory-core");
 const cards = require("./botdee-smartcard-core");
+const guard = require("./botdee-privilege-guard");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -61,6 +62,12 @@ async function writeDiagnostic(event) {
   } catch (error) {
     console.warn("SMARTcard diagnostic write failed", error?.message || error);
   }
+}
+
+function sanitizePeopleViews(views) {
+  return (Array.isArray(views) ? views : [])
+    .map(view => guard.stripPrivilegeFromToolResult(view))
+    .filter(view => view && !cards.peopleCardHasPrivilegeField(view));
 }
 
 function viewerLocaleOf(request, viewerData) {
@@ -128,7 +135,7 @@ async function runPeopleSearch({query, page, uiLanguage, viewerUid, request}) {
       classified,
       routed,
       peopleSearch: {...meta, latencyMs: Date.now() - started},
-      smartViews: routed.views,
+      smartViews: sanitizePeopleViews(routed.views),
       reply: cards.fallbackReply(routed.mode)
     };
   }
@@ -196,7 +203,7 @@ async function runPeopleSearch({query, page, uiLanguage, viewerUid, request}) {
       ...meta,
       latencyMs: Date.now() - started
     },
-    smartViews: routed.views,
+    smartViews: sanitizePeopleViews(routed.views),
     reply: cards.fallbackReply(routed.mode)
   };
 }
@@ -221,6 +228,8 @@ async function attachPeopleSearch({query, viewerUid, uiLanguage, request, page})
 exports.attachPeopleSearch = attachPeopleSearch;
 exports.loadAuthorizedPeopleView = loadAuthorizedPeopleView;
 exports.runPeopleSearch = runPeopleSearch;
+exports.classifyPeopleSearchIntent = cards.classifyPeopleSearchIntent;
+exports.canonicalPeopleLookupQuery = cards.canonicalPeopleLookupQuery;
 
 exports.searchPeopleSmartCards = onCall(CALL_OPTS, async request => {
   try {

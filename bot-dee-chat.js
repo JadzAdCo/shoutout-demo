@@ -226,6 +226,167 @@
     return false;
   }
 
+  /** Keep in sync with functions/botdee-smartcard-core.js classifyPeopleSearchIntent. */
+  const PEOPLE_SELF_QUERY = /^(me|myself|my profile|my account|my info|my information|about me|who am i|what(?:'s| is| do you) know (?:about|of) (?:me|myself)|tell me about (?:me|myself)|describe (?:me|myself)|what can you tell me about (?:me|myself))$/i;
+  const PEOPLE_WHO_IS = /^(?:who(?:'s| is| s))\s+/i;
+  const PEOPLE_DO_YOU_KNOW = /^(?:do you know|did you meet)\s+/i;
+  const PEOPLE_KNOW_OF = /^(?:what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
+  const PEOPLE_PROFILE_OF = /^(?:what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|look up|lookup)\s+/i;
+  const PEOPLE_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|lookup|find|search for|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
+  const PEOPLE_SUFFIX = /\s+(?:on floqr|on mingl|on here|(?:'s)?\s*(?:public )?profile)\s*$/i;
+  const PEOPLE_STOP_AFTER = /^(working|on (?:duty|tonight)|the (?:dj|club)|playing|singing|available)\b/i;
+  const PEOPLE_GENERIC = /^(this person|that person|them|him|her|someone|anybody|anyone)$/i;
+  const PEOPLE_VENUE = /^(a |an |the )?(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?)\b/i;
+  const PEOPLE_PRODUCT = /^(?:a |an |the )?(?:bot\s*dee|botdee|floq\s*ai|floqai|floqr|shout\s*outs?|mingl|floq\s*casts?|bartr|bart\s*r|rydr|vip(?:\s*reserv)?)\s*$/i;
+  const PEOPLE_OPS = /\b(tonight|today|near me|on duty|available|playing|working)\b/i;
+
+  function normalizePeopleQuery(raw) {
+    return String(raw || "").replace(/\s+/g, " ").trim().toLowerCase().replace(/[?!.,]+/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  function extractPeopleNeedle(raw) {
+    const original = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200);
+    const n = normalizePeopleQuery(original);
+    if (!n || PEOPLE_SELF_QUERY.test(n)) return "";
+    let rest = original.replace(PEOPLE_PREFIX, "").replace(PEOPLE_SUFFIX, "").trim();
+    rest = rest.replace(/^[@]+/, "").replace(/["“”']/g, "").replace(/[?!.,]+$/g, "").trim();
+    const needle = normalizePeopleQuery(rest);
+    if (!needle || needle.length < 2) return "";
+    if (PEOPLE_STOP_AFTER.test(needle) || PEOPLE_GENERIC.test(needle)) return "";
+    if (PEOPLE_VENUE.test(needle) || PEOPLE_PRODUCT.test(needle) || PEOPLE_OPS.test(needle)) return "";
+    return rest;
+  }
+
+  function isPeopleNameNeedle(rest) {
+    const trimmed = String(rest || "").replace(/[?!]+$/g, "").trim();
+    if (!trimmed) return false;
+    if (/^@[\w.-]+$/.test(trimmed)) return true;
+    const needle = normalizePeopleQuery(trimmed);
+    if (!needle || needle.length < 2) return false;
+    if (PEOPLE_STOP_AFTER.test(needle) || PEOPLE_GENERIC.test(needle)) return false;
+    if (PEOPLE_VENUE.test(needle) || PEOPLE_PRODUCT.test(needle) || PEOPLE_OPS.test(needle)) return false;
+    const tokens = needle.split(" ").filter(Boolean);
+    if (!tokens.length || tokens.length > 4) return false;
+    return tokens.every(token => /^@?[\w.'-]+$/.test(token)
+      && !/^(my|mine|our|your|their|his|her|this|that|these|those|who|what|where|when|how|the|a|an)$/.test(token)
+      && !/^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?)$/.test(token));
+  }
+
+  function classifyPeopleSearchIntent(raw) {
+    const original = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200);
+    const n = normalizePeopleQuery(original);
+    if (!n || n.length < 2) return {intent: "none", needle: "", self: false};
+    if (PEOPLE_SELF_QUERY.test(n) || /^(what do you know (?:about|of) me|tell me about my (?:public )?profile|what can you tell me about me)$/.test(n)) {
+      return {intent: "self", needle: "me", self: true};
+    }
+    const findMatch = original.match(/^(?:find|search for)\s+(.+)$/i);
+    const lookup = PEOPLE_WHO_IS.test(original)
+      || PEOPLE_DO_YOU_KNOW.test(original)
+      || PEOPLE_KNOW_OF.test(original)
+      || PEOPLE_PROFILE_OF.test(original)
+      || (findMatch && isPeopleNameNeedle(findMatch[1]))
+      || PEOPLE_SUFFIX.test(original);
+    if (!lookup) return {intent: "none", needle: "", self: false};
+    const needle = extractPeopleNeedle(raw);
+    if (needle) return {intent: "person", needle, self: false};
+    const rest = normalizePeopleQuery(
+      original.replace(PEOPLE_WHO_IS, "").replace(PEOPLE_DO_YOU_KNOW, "").replace(PEOPLE_KNOW_OF, "").replace(PEOPLE_PROFILE_OF, "").replace(PEOPLE_SUFFIX, "")
+    );
+    if (PEOPLE_GENERIC.test(rest)) return {intent: "empty", needle: "", self: false};
+    return {intent: "none", needle: "", self: false};
+  }
+
+  function canonicalPeopleLookupQuery(classified) {
+    if (!classified || classified.intent === "none") return "";
+    if (classified.intent === "self") return "Who am I?";
+    if (classified.intent === "empty") return "Who is this person?";
+    const needle = String(classified.needle || "").replace(/[?!.,]+$/g, "").trim();
+    if (!needle) return "Who is this person?";
+    return `Who is ${needle}?`;
+  }
+
+  function hasPeopleSmartView(views) {
+    return (Array.isArray(views) ? views : []).some(row => (
+      row && (row.kind === "patron" || row.floqrPublicData?.peopleV2)
+    ));
+  }
+
+  function looksLikeProfileFieldDump(raw) {
+    const text = String(raw || "");
+    if (!text.trim()) return false;
+    if (/\*\*[^*]{2,48}\*\*/.test(text)
+      && /\b(Bio|Location|Details|Looking to Meet|Social Handles|Instagram|Handle)\b/i.test(text)) {
+      return true;
+    }
+    return /(?:^|\n)\s*(?:\*\*)?(?:Bio|Location|Details|Looking to Meet|Social Handles)(?:\*\*)?\s*:/im.test(text);
+  }
+
+  function peopleSearchAlreadyHandled(data) {
+    const provider = String(data?.provider || "");
+    const search = data?.peopleSearch;
+    if (provider === "people-smartcard") return true;
+    if (search && search.intent && search.intent !== "none") return true;
+    return false;
+  }
+
+  function stripPeopleFieldDump(session, classified) {
+    const row = session && typeof session === "object" ? session : {};
+    const cardsOn = hasPeopleSmartView(row.smartViews);
+    const dump = looksLikeProfileFieldDump(row.reply);
+    const helpDump = Array.isArray(row.results) && row.results.length && classified && classified.intent !== "none";
+    if (!dump && !helpDump) return row;
+    const key = row.peopleSearch?.replyKey
+      || (cardsOn ? "botdee.sc.oneResult" : "botdee.sc.none");
+    return {
+      ...row,
+      reply: t(key, cardsOn ? "Here is their SMARTview." : "No eligible public profile matched."),
+      results: []
+    };
+  }
+
+  async function ensurePeopleSmartViews(text, data) {
+    const classified = classifyPeopleSearchIntent(text);
+    const session = data && typeof data === "object" ? data : {};
+    if (classified.intent === "none") return stripPeopleFieldDump(session, classified);
+    if (peopleSearchAlreadyHandled(session)) return stripPeopleFieldDump(session, classified);
+    const searchFn = callable("searchPeopleSmartCards");
+    if (searchFn) {
+      try {
+        const looked = (await searchFn({
+          query: canonicalPeopleLookupQuery(classified) || text,
+          uiLanguage: currentUiLanguage()
+        }))?.data || {};
+        return stripPeopleFieldDump({
+          ...session,
+          reply: looked.reply || "",
+          results: [],
+          media: [],
+          smartViews: Array.isArray(looked.views) ? looked.views : [],
+          peopleSearch: looked.peopleSearch || {
+            mode: "none",
+            intent: classified.intent,
+            geminiOnView: false,
+            replyKey: "botdee.sc.none"
+          },
+          provider: "people-smartcard"
+        }, classified);
+      } catch (_) {}
+    }
+    return stripPeopleFieldDump({
+      ...session,
+      reply: looksLikeProfileFieldDump(session.reply)
+        ? t("botdee.sc.none", "No eligible public profile matched.")
+        : session.reply,
+      results: classified.intent !== "none" ? [] : session.results,
+      peopleSearch: session.peopleSearch || {
+        mode: "none",
+        intent: classified.intent,
+        geminiOnView: false,
+        replyKey: "botdee.sc.none"
+      }
+    }, classified);
+  }
+
   const PRIVILEGE_REFUSE_EN = "I don't have account-security details.";
   const VIEWER_PRIVILEGE_ROLE = "(?:master(?:\\s|-)*admin|super(?:\\s|-)*admin|beta(?:\\s|-)*tester|club(?:\\s|-)*admin|privileged(?:\\s|-)*employee)";
   /** Keep in sync with functions/botdee-privilege-guard.js (test asserts identical join source). */
@@ -1062,7 +1223,7 @@
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
-    if (!durableEnabled && (isPrivilegeAskPrompt(text) || isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text) || isRoomSmartViewPrompt(text))) {
+    if (!durableEnabled && classifyPeopleSearchIntent(text).intent === "none" && (isPrivilegeAskPrompt(text) || isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text) || isRoomSmartViewPrompt(text))) {
       const roomSession = !isVersionPrompt(text) && !isHelpPrompt(text) && !isPrivacyPrompt(text)
         ? buildLocalRoomSession(text)
         : null;
@@ -1113,8 +1274,9 @@
         uiLanguage: currentUiLanguage(),
         roomSmartViewDeclined: loadRoomDeclined()
       };
-      const data = (await fn(payload))?.data || {};
-      applyHasUsed(data, 1);
+      const rawData = (await fn(payload))?.data || {};
+      applyHasUsed(rawData, 1);
+      const data = await ensurePeopleSmartViews(text, rawData);
       const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
       const peopleSearch = data.peopleSearch || null;
       const roomView = Array.isArray(data.smartViews)
@@ -1123,14 +1285,17 @@
       const views = ensureVersionSmartViews(text, ensureRoomSmartViews(text, data.smartViews));
       const versionCardOnly = isVersionSmartViewAlias(text)
         && views.some(row => row && row.kind === "botDeeVersion");
+      const peopleCard = hasPeopleSmartView(views);
       const reply = versionCardOnly
         ? ""
         : peopleSearch?.replyKey
           ? t(peopleSearch.replyKey, displayReply(data.reply))
           : (data.replyKey || roomView?.replyKey)
             ? t(data.replyKey || roomView.replyKey, displayReply(data.reply))
-            : displayReply(data.reply);
-      appendBubble("bot", reply, localizeResults(data.results), media, views, peopleSearch);
+            : (peopleCard && looksLikeProfileFieldDump(data.reply)
+              ? t("botdee.sc.oneResult", "Here is their SMARTview.")
+              : displayReply(data.reply));
+      appendBubble("bot", reply, localizeResults(peopleCard ? [] : data.results), media, views, peopleSearch);
       pushHistory("model", reply);
       if (reply) visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
       if (data.conversationId && /^cv_[0-9a-f]{32}$/.test(String(data.conversationId))) {

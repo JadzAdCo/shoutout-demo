@@ -31,7 +31,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Спросить BOT DEE, кто это",
-        body: "«Who am I?» открывает ваш SMARTview. «Who is …» и имя или @хендл ищут публичные профили. Один результат — SMARTview. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
+        body: "«Who am I?» открывает ваш SMARTview. «Who is …» или «What do you know of …» и имя или @хендл ищут публичные профили. Один результат — карточка People SMARTview в чате, не markdown-список. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard людей",
@@ -517,7 +517,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "BOT DEE vragen wie iemand is",
-        body: "“Who am I?” opent uw SMARTview. “Who is …” plus naam of @handle zoekt openbare profielen. Eén match opent SMARTview. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
+        body: "“Who am I?” opent uw SMARTview. “Who is …” of “What do you know of …” plus naam of @handle zoekt openbare profielen. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
       },
       "help-botdee-smartcard": {
         title: "Mensen-SMARTcards",
@@ -1003,7 +1003,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Demander à BOT DEE qui est quelqu’un",
-        body: "« Who am I ? » ouvre votre SMARTview. « Who is … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre SMARTview. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existence du compte."
+        body: "« Who am I ? » ouvre votre SMARTview. « Who is … » ou « What do you know of … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existence du compte."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards Personnes",
@@ -1489,7 +1489,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "BOT DEE fragen, wer jemand ist",
-        body: "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet SMARTview. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
+        body: "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ oder „What do you know of …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
       },
       "help-botdee-smartcard": {
         title: "Personen-SMARTcards",
@@ -1975,7 +1975,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Preguntar a BOT DEE quién es alguien",
-        body: "«Who am I?» abre su SMARTview. «Who is …» más un nombre o @identificador busca perfiles públicos. Un resultado abre SMARTview. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
+        body: "«Who am I?» abre su SMARTview. «Who is …» o «What do you know of …» más un nombre o @identificador busca perfiles públicos. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards de personas",
@@ -2461,7 +2461,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Chiedere a BOT DEE chi è qualcuno",
-        body: "“Who am I?” apre il tuo SMARTview. “Who is …” più nome o @handle cerca profili pubblici. Un risultato apre SMARTview. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
+        body: "“Who am I?” apre il tuo SMARTview. “Who is …” o “What do you know of …” più nome o @handle cerca profili pubblici. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard persone",
@@ -2947,7 +2947,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Perguntar ao BOT DEE quem é alguém",
-        body: "“Who am I?” abre o seu SMARTview. “Who is …” mais um nome ou @handle procura perfis públicos. Um resultado abre o SMARTview. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
+        body: "“Who am I?” abre o seu SMARTview. “Who is …” ou “What do you know of …” mais um nome ou @handle procura perfis públicos. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards de pessoas",
@@ -3433,7 +3433,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
-        body: "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει SMARTview. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
+        body: "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» ή «What do you know of …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard ατόμων",
@@ -3919,7 +3919,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Zapytaj BOT DEE, kim ktoś jest",
-        body: "„Who am I?” otwiera Twoje SMARTview. „Who is …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera SMARTview. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
+        body: "„Who am I?” otwiera Twoje SMARTview. „Who is …” lub „What do you know of …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard osób",
@@ -4405,7 +4405,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "اسأل BOT DEE من هذا الشخص",
-        body: "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح SMARTview. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
+        body: "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard الأشخاص",
