@@ -43,6 +43,7 @@ function parseChangelogText(text) {
 
 function changelogFromBundle() {
   try {
+    // Live What's New head is functions/botdee-version-changelog.json (s3.3.035+).
     const rows = require("./botdee-version-changelog.json");
     if (!Array.isArray(rows)) return [];
     return rows.slice(0, 8).filter(row => row && row.id && row.text).map(row => ({
