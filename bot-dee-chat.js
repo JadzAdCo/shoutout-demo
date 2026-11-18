@@ -23,6 +23,13 @@
   let threadId = "";
   let restoreStarted = false;
   let restoreInFlight = false;
+  let chatsOpen = false;
+  let signedInForChats = false;
+  let storedTurns = [];
+  let storedArchiveTurns = [];
+  let storedLastMessageAtMs = 0;
+  let visitLiveTurns = [];
+  let chatsUiBound = false;
 
   const byId = id => document.getElementById(id);
   const t = (key, fallback) => {
@@ -221,7 +228,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.035";  }
+    return "s3.3.036";  }
 
   function isVersionSmartViewAlias(raw) {
     const q = String(raw || "")
@@ -972,6 +979,9 @@
 
     appendBubble("user", text);
     pushHistory("user", text);
+    visitLiveTurns.push({role: "user", text});
+    setChatsOpen(false);
+    renderChatsList();
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
@@ -986,6 +996,7 @@
       const roomViews = roomSession ? ensureRoomSmartViews(text, roomSession.smartViews || []) : [];
       appendBubble("bot", reply, [], [], versionViews.concat(roomViews));
       pushHistory("model", reply);
+      visitLiveTurns.push({role: "model", text: reply});
       setStatus("");
       if (isFarewellPrompt(text)) {
         endConversation("silent");
@@ -1043,6 +1054,7 @@
             : displayReply(data.reply);
       appendBubble("bot", reply, localizeResults(data.results), media, views, peopleSearch);
       pushHistory("model", reply);
+      if (reply) visitLiveTurns.push({role: "model", text: reply});
       if (data.threadId) threadId = String(data.threadId);
       if (data.durable === true) durableEnabled = true;
       if (data.durable === false) durableEnabled = false;
@@ -1085,6 +1097,7 @@
       if (form?.getAttribute("aria-busy") === "true") return;
       form?.requestSubmit ? form.requestSubmit() : form?.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     });
+    input?.addEventListener("focus", () => setChatsOpen(false));
   }
 
   function welcome() {
@@ -1132,20 +1145,228 @@
     return scrubGatedBrands(stripBackendLinks(text));
   }
 
+  function cloneTurns(turns) {
+    return (Array.isArray(turns) ? turns : [])
+      .map(row => ({
+        role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
+        text: String(row?.text || "").trim(),
+        media: Array.isArray(row?.media) ? row.media : undefined,
+        seq: row?.seq,
+        atMs: row?.atMs
+      }))
+      .filter(row => row.text || (row.media && row.media.length));
+  }
+
+  function firstUserLine(turns) {
+    const row = cloneTurns(turns).find(item => item.role === "user" && item.text);
+    return row ? row.text.replace(/\s+/g, " ").slice(0, 72) : "";
+  }
+
+  function formatChatWhen(ms) {
+    const at = Number(ms) || 0;
+    if (!at) return "";
+    try {
+      return new Date(at).toLocaleString(undefined, {month: "short", day: "numeric"});
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function hydrateHistory(turns) {
+    history.length = 0;
+    cloneTurns(turns).forEach(row => {
+      const text = row.role === "model" ? displayReply(row.text) : row.text;
+      if (text) pushHistory(row.role, text);
+    });
+  }
+
   function restoreTurns(turns) {
     const log = byId("botDeeTranscript");
     if (log) log.innerHTML = "";
     history.length = 0;
-    (Array.isArray(turns) ? turns : []).forEach(row => {
-      const role = row?.role === "model" || row?.role === "assistant" ? "model" : "user";
-      const rawText = String(row?.text || "").trim();
-      const media = role === "model" ? mergeMedia(row?.media, harvestMediaFromText(row?.text)) : [];
-      if (role === "model" && !rawText && !media.length) return;
-      const text = role === "model" ? displayReply(row?.text) : rawText;
+    cloneTurns(turns).forEach(row => {
+      const media = row.role === "model" ? mergeMedia(row.media, harvestMediaFromText(row.text)) : [];
+      if (row.role === "model" && !row.text && !media.length) return;
+      const text = row.role === "model" ? displayReply(row.text) : row.text;
       if (!text && !media.length) return;
-      appendBubble(role === "user" ? "user" : "bot", text, null, media);
-      if (text) pushHistory(role, text);
+      appendBubble(row.role === "user" ? "user" : "bot", text, null, media);
+      if (text) pushHistory(row.role, text);
     });
+  }
+
+  function recapStatusLine(turns) {
+    const prefs = global.FLOQRBotDeePersonalization;
+    if (!prefs || prefs.get?.().remindWhereLeftOff === 0) return "";
+    return String(prefs.recapFromTurns?.(turns) || "").trim();
+  }
+
+  function landCollapsed(data) {
+    const turns = cloneTurns(data.turns);
+    const archive = cloneTurns(data.archiveTurns);
+    storedTurns = turns.length ? turns : archive;
+    storedArchiveTurns = archive;
+    storedLastMessageAtMs = Number(data.lastMessageAtMs) || 0;
+    const recall = storedTurns.length ? storedTurns : archive;
+    // Visual collapse only — keep last turns in client history so Send still
+    // ships BOT DEE context. Server retrieve is unchanged.
+    if (recall.length) hydrateHistory(recall);
+    welcome();
+    if (data.status === "idle_ended" && recall.length) {
+      phase = "ended";
+      clearIdleTimer();
+      const recap = recapStatusLine(recall);
+      const paused = t("botdee.sessionPaused", "Session paused. Continue chatting.");
+      setStatus(recap ? `${paused} ${recap}` : paused);
+    } else {
+      phase = "fresh";
+      setStatus("");
+      armIdleTimer(data.remainingMs);
+    }
+    renderChatsList();
+  }
+
+  function pinComposerToViewport() {
+    const apply = () => {
+      try {
+        const vv = global.visualViewport;
+        if (!vv) {
+          document.documentElement.style.setProperty("--botdee-kb", "0px");
+          return;
+        }
+        const occluded = Math.max(0, (global.innerHeight || 0) - vv.height - (vv.offsetTop || 0));
+        document.documentElement.style.setProperty("--botdee-kb", `${Math.round(occluded)}px`);
+      } catch (_) {}
+    };
+    apply();
+    try {
+      global.visualViewport?.addEventListener("resize", apply);
+      global.visualViewport?.addEventListener("scroll", apply);
+    } catch (_) {}
+    global.addEventListener("resize", apply);
+  }
+
+  function storedChatCount() {
+    let n = storedTurns.length ? 1 : 0;
+    if (storedArchiveTurns.length && firstUserLine(storedArchiveTurns) !== firstUserLine(storedTurns)) n += 1;
+    if (visitLiveTurns.length) n += 1;
+    return n;
+  }
+
+  function updateChatsBadge() {
+    const badge = byId("botDeeChatsBadge");
+    const count = storedChatCount();
+    if (!badge) return;
+    if (!count) {
+      badge.hidden = true;
+      badge.textContent = "";
+      return;
+    }
+    badge.hidden = false;
+    badge.textContent = count > 9 ? "9+" : String(count);
+  }
+
+  function setChatsOpen(open) {
+    chatsOpen = !!open;
+    const toggle = byId("botDeeChatsToggle");
+    const panel = byId("botDeeChatsPanel");
+    const backdrop = byId("botDeeChatsBackdrop");
+    const mark = toggle?.querySelector(".botdee-chats-toggle-mark");
+    if (toggle) {
+      toggle.setAttribute("aria-expanded", chatsOpen ? "true" : "false");
+      if (mark) mark.textContent = chatsOpen ? "−" : "+";
+    }
+    if (panel) panel.hidden = !chatsOpen;
+    if (backdrop) backdrop.hidden = !chatsOpen;
+    if (chatsOpen) renderChatsList();
+  }
+
+  function startNewChat() {
+    const log = byId("botDeeTranscript");
+    if (log) log.innerHTML = "";
+    setChatsOpen(false);
+    phase = "fresh";
+    setStatus("");
+    welcome();
+    byId("botDeeChatInput")?.focus();
+  }
+
+  function resumeSlice(turns) {
+    const rows = cloneTurns(turns);
+    if (!rows.length) return;
+    restoreTurns(rows);
+    setChatsOpen(false);
+    phase = "active";
+    setStatus("");
+    armIdleTimer();
+    const log = byId("botDeeTranscript");
+    if (log) log.scrollTop = log.scrollHeight;
+    byId("botDeeChatInput")?.focus();
+  }
+
+  function renderChatsList() {
+    const list = byId("botDeeChatsList");
+    const hint = byId("botDeeChatsHint");
+    if (!list) return;
+    list.innerHTML = "";
+    updateChatsBadge();
+    if (!signedInForChats) {
+      if (hint) hint.hidden = true;
+      const empty = document.createElement("p");
+      empty.className = "botdee-chats-empty";
+      empty.textContent = t("botdee.chatsEmptyGuest", "Chats save when you are signed in.");
+      list.appendChild(empty);
+      return;
+    }
+    if (hint) hint.hidden = false;
+    const addRow = (label, meta, onClick, primary) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = primary ? "botdee-chats-row botdee-chats-row-primary" : "botdee-chats-row";
+      btn.textContent = label;
+      if (meta) {
+        const span = document.createElement("span");
+        span.className = "botdee-chats-row-meta";
+        span.textContent = meta;
+        btn.appendChild(span);
+      }
+      btn.addEventListener("click", onClick);
+      list.appendChild(btn);
+    };
+    addRow(t("botdee.chatsNew", "New chat"), "", startNewChat, true);
+    if (visitLiveTurns.length) {
+      addRow(
+        t("botdee.chatsResume", "This session"),
+        firstUserLine(visitLiveTurns),
+        () => resumeSlice(visitLiveTurns)
+      );
+    }
+    const earlier = [];
+    if (storedTurns.length) earlier.push(storedTurns);
+    if (storedArchiveTurns.length && firstUserLine(storedArchiveTurns) !== firstUserLine(storedTurns)) {
+      earlier.push(storedArchiveTurns);
+    }
+    earlier.forEach((slice, index) => {
+      const when = formatChatWhen(storedLastMessageAtMs);
+      const line = firstUserLine(slice);
+      const title = [when, line].filter(Boolean).join(" · ") || t("botdee.chatsPanelTitle", "Chats");
+      addRow(title, index === 0 && storedTurns.length ? "" : "", () => resumeSlice(slice));
+    });
+  }
+
+  function bindChatsUi() {
+    if (chatsUiBound) return;
+    chatsUiBound = true;
+    const toggle = byId("botDeeChatsToggle");
+    const backdrop = byId("botDeeChatsBackdrop");
+    toggle?.addEventListener("click", () => setChatsOpen(!chatsOpen));
+    backdrop?.addEventListener("click", () => setChatsOpen(false));
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && chatsOpen) {
+        event.preventDefault();
+        setChatsOpen(false);
+      }
+    });
+    renderChatsList();
   }
 
   async function restoreOrWelcome() {
@@ -1157,6 +1378,7 @@
     try {
       await loadIdleSettings();
       const user = await waitForAuthUser(8000);
+      signedInForChats = !!user;
       const getThread = callable("getBotDeeThread");
       if (user && getThread) {
         try {
@@ -1166,26 +1388,11 @@
           if (data.threadId) threadId = String(data.threadId);
           applyHasUsed(data);
           global.FLOQRBotDeePersonalization?.applyFromThread?.(data, true);
-          if (durableEnabled && Array.isArray(data.turns) && data.turns.length) {
-            restoreTurns(data.turns);
-            if (data.status === "idle_ended") {
-              phase = "ended";
-              setStatus(t("botdee.sessionPaused", "Session paused. Continue chatting."));
-            } else {
-              phase = "active";
-              setStatus("");
-              armIdleTimer(data.remainingMs);
-            }
-            maybeRecap(data.turns);
-            global.FLOQRBotDeePersonalization?.maybeStartSetup?.();
-            return;
-          }
-          if (durableEnabled && data.status === "idle_ended" && Array.isArray(data.archiveTurns) && data.archiveTurns.length) {
-            restoreTurns(data.archiveTurns);
-            phase = "ended";
-            setStatus(t("botdee.sessionPaused", "Session paused. Continue chatting."));
-            maybeRecap(data.archiveTurns);
-            global.FLOQRBotDeePersonalization?.maybeStartSetup?.();
+          if (durableEnabled && (
+            (Array.isArray(data.turns) && data.turns.length)
+            || (data.status === "idle_ended" && Array.isArray(data.archiveTurns) && data.archiveTurns.length)
+          )) {
+            landCollapsed(data);
             return;
           }
         } catch (error) {
@@ -1197,6 +1404,7 @@
       }
       setStatus("");
       welcome();
+      renderChatsList();
       if (phase === "fresh" || phase === "active") armIdleTimer();
     } finally {
       restoreInFlight = false;
@@ -1206,15 +1414,15 @@
   }
 
   function maybeRecap(turns) {
-    const prefs = global.FLOQRBotDeePersonalization;
-    if (!prefs || prefs.get?.().remindWhereLeftOff === 0) return;
-    const recap = prefs.recapFromTurns?.(turns);
+    const recap = recapStatusLine(turns);
     if (!recap) return;
     appendBubble("bot", `${t("botdee.recapLead", "Last time:")} ${recap}`);
   }
 
   function bind(opts = {}) {
     bindForm();
+    bindChatsUi();
+    pinComposerToViewport();
     global.FLOQRBotDeePersonalization?.bind?.();
     const q = opts.q || new URL(location.href).searchParams.get("q");
     if (q) {

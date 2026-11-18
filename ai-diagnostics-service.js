@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.035";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.035";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.036";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.036";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -220,6 +220,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.036",
+      title: "s3.3.036 — BOT DEE history collapse + Back to Search",
+      checks: [
+        {label:"Header + chats toggle", file:"botdee.html", includes:["id=\"botDeeChatsToggle\"", "id=\"botDeeChatsPanel\"", "data-i18n=\"nav.backToSearchArrow\""]},
+        {label:"Collapse is visual only", file:"bot-dee-chat.js", includes:["function landCollapsed", "hydrateHistory(recall)", "Visual collapse only"]},
+        {label:"Composer pin + 44px +", file:"bot-dee-chat.css", includes:[".botdee-chats-toggle", "min-width: 44px", "--botdee-kb"]},
+        {label:"Search exit no ?v=", file:"botdee-page.js", includes:["searchHome"], notIncludes:["stampCurrentVersion"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-036-botdee-history-collapse"]}
+      ]
+    },
     {
       version: "s3.3.035",
       title: "s3.3.035 — Native select value vertically centered",
@@ -3350,6 +3361,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-036-botdee-history-collapse",
+      area:"BOT DEE",
+      feature:"Saved chats behind + / − · Back to Search",
+      changed:"s3.3.036 — BOT DEE lands on a blank canvas (welcome or one-line pause status). Header + (44×44, top right) opens Chats; the same control becomes − to retract (Esc/backdrop too). History stays stored and is still sent as BOT DEE context on Send. Back is ← Back to Search with no ?v=. One thread per account; + lists this session and earlier slices. Pages-only.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee.html / bot-dee-chat.js / bot-dee-chat.css ?v=s3.3.036. Sign in with BOT DEE access (account that already has a long saved thread). 2) Land: input is on screen, last 12 turns are NOT painted, + is top right. Optional status may say Session paused. Continue chatting. 3) Tap + — control becomes −, Chats list shows New chat and earlier rows. Tap − / Esc / backdrop — panel retracts. 4) Resume one earlier row — transcript paints that slice; composer stays pinned. New chat — welcome only; Send still answers with prior context (do not wipe Firestore). 5) ← Back to Search opens index Search with no v= in the address. 6) Phone ~390 and desktop ~1280. 7) Mark Succeed/Failed.",
+      expected:"Collapsed + on land. Open − and list. Retract. Input pinned. Back to Search. Recall still works. Xibo Display URLs unchanged (no ?v=).",
+      troubleshoot:"Still painting a wall of bubbles → cached bot-dee-chat.js before landCollapsed. + missing → cached botdee.html. Back still says < Back → cached floqr-nav.js / botdee-page.js. Send forgot the old chat → confirm executeBotSession still loads events; do not delete botDeeThreads. Composer below the fold on phone → --botdee-kb / overflow hidden on .botdee-shell."
+    },
     {
       id:"s3-3-035-select-value-center",
       area:"Chrome",

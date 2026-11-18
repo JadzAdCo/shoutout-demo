@@ -29,6 +29,9 @@ test("BOT DEE header is title only — no ? bubble or Showing answers for…", (
   const html = read("botdee.html");
   assert.match(html, /botdee-chat-header-main/);
   assert.match(html, /botdee-title-row feature-landing-title-row/);
+  assert.match(html, /id="botDeeChatsToggle"/);
+  assert.match(html, /id="botDeeChatsPanel"/);
+  assert.match(html, /data-i18n="nav\.backToSearchArrow"/);
   assert.match(html, /floqr-page-title"[^>]*data-i18n="page\.botdee\.title"/);
   assert.doesNotMatch(html, /id="botDeePrefsOpen"|botdee-prefs-row/);
   assert.match(html, /id="botDeePersonalizationDialog"/);
@@ -172,7 +175,7 @@ test("floating BOT DEE agent is not shown on template select", () => {
 
 test("BOT DEE page chrome is localized", () => {
   const html = read("botdee.html");
-  ["page.botdee.title", "botdee.prompt", "botdee.chatSend"]
+  ["page.botdee.title", "botdee.prompt", "botdee.chatSend", "botdee.chatsPanelTitle", "botdee.chatsSavedHint"]
     .forEach(key => assert.match(html, new RegExp(`data-i18n="${key.replace(/\./g, "\\.")}"`)));
   assert.doesNotMatch(html, /botdee\.helpIntro|botdee\.intentFallback|botdee\.hint|botdee\.placeholder|botdee\.scope/);
   assert.match(html, /data-i18n-placeholder="botdee\.chatPlaceholder"/);
@@ -186,6 +189,9 @@ test("BOT DEE page chrome is localized", () => {
   assert.match(read("floqr-i18n.js"), /"botdee\.chatWelcome"/);
   assert.match(read("floqr-i18n.js"), /"botdee\.chatHelp"/);
   assert.match(read("floqr-i18n.js"), /"botdee\.chatRestoring"/);
+  assert.match(read("floqr-i18n.js"), /"botdee\.chatsPlus"/);
+  assert.match(read("floqr-i18n.js"), /"botdee\.chatsNew"/);
+  assert.match(helpRepo, /The \+ at the top right opens saved chats/);
   assert.match(helpRepo, /refresh or open another phone/);
   assert.doesNotMatch(read("floqr-i18n-help.js"), /FloqAi/);
   // Patron-facing chrome + help title/body values never say FloqAi (legacy search aliases OK).
@@ -196,4 +202,30 @@ test("BOT DEE page chrome is localized", () => {
   assert.match(read("botdee-search.js"), /Hi, I am BOT DEE/);
   assert.doesNotMatch(read("botdee-search.js"), /Hi, I am FloqAi/);
   assert.doesNotMatch(read("floqr-auth-gate.js"), /floqai-search\.html/);
+});
+
+test("BOT DEE history collapse is visual only and Back goes to Search", () => {
+  const html = read("botdee.html");
+  const chat = read("bot-dee-chat.js");
+  const css = read("bot-dee-chat.css");
+  const page = read("botdee-page.js");
+  const nav = read("floqr-nav.js");
+  assert.match(html, /botDeeChatsToggle/);
+  assert.match(html, /botdee-chats-toggle-mark"[^>]*>\+/);
+  assert.match(chat, /function landCollapsed/);
+  assert.match(chat, /Visual collapse only/);
+  assert.match(chat, /hydrateHistory\(recall\)/);
+  assert.match(chat, /setChatsOpen\(false\)/);
+  assert.match(chat, /mark\.textContent = chatsOpen \? "−" : "\+"/);
+  assert.match(chat, /history: history\.slice/);
+  assert.match(css, /\.botdee-chats-toggle/);
+  assert.match(css, /min-width: 44px/);
+  assert.match(css, /--botdee-kb/);
+  assert.doesNotMatch(css, /\.botdee-shell,\s*\.botdee-chat-page \{\s*overflow: visible/);
+  assert.match(page, /searchHome/);
+  assert.doesNotMatch(page, /stampCurrentVersion/);
+  assert.match(nav, /pageName\(\) === "botdee\.html"/);
+  assert.match(nav, /nav\.backToSearchArrow/);
+  ["botdee.chatsPlus", "botdee.chatsPanelTitle", "botdee.chatsNew", "botdee.chatsResume", "botdee.chatsEmptyGuest", "botdee.chatsSavedHint"]
+    .forEach(key => assert.match(read("floqr-i18n.js"), new RegExp(`"${key.replace(/\./g, "\\.")}"`)));
 });

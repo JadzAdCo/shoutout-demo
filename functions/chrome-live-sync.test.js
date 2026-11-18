@@ -141,6 +141,18 @@ test("Back from My Profile to Search follows href instead of history.back", () =
   assert.equal(history.backs, 0);
 });
 
+test("BOT DEE Back is Back to Search via searchHome, never history.back", () => {
+  const { nav, history } = loadNavAt("https://x/shoutout-demo/botdee.html?from=portal");
+  const anchor = makeAnchor("https://x/shoutout-demo/?start=search");
+  const result = nav.applyGlobalBack(anchor);
+  assert.equal(result.href, "./?start=search");
+  assert.match(anchor.textContent, /Back to Search/);
+  assert.equal(anchor.dataset.from, "search");
+  const event = anchor.fire();
+  assert.equal(event.preventDefaultCount, 0);
+  assert.equal(history.backs, 0);
+});
+
 test("same-document Back on Search still uses history.back", () => {
   const { nav, history } = loadNavAt("https://x/shoutout-demo/index.html?start=search");
   const anchor = makeAnchor("https://x/shoutout-demo/index.html?start=search");

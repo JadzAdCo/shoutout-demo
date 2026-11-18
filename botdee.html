@@ -23,14 +23,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./styles.css?v=s3.3.035"/>
-  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.3.035"/>
-  <link rel="stylesheet" href="./botdee-search.css?v=s3.3.035"/>
-  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.035"/>
-  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.035"/></head>
+  <link rel="stylesheet" href="./styles.css?v=s3.3.036"/>
+  <link rel="stylesheet" href="./floqr-feature-landing.css?v=s3.3.036"/>
+  <link rel="stylesheet" href="./botdee-search.css?v=s3.3.036"/>
+  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.036"/>
+  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.036"/></head>
 <body class="botdee-standalone botdee-page" data-floqr-feature="botDee">
 <main class="botdee-standalone-main botdee-shell">
-  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=search">&lt; Back</a>
+  <a id="floqrGlobalBack" class="global-back-btn buttonlike" data-from="search" href="./?start=search" data-i18n="nav.backToSearchArrow">← Back to Search</a>
 
   <section id="botDeeChatPage" class="page botdee-chat-page active" aria-label="BOT DEE chat">
     <header class="botdee-chat-header">
@@ -38,6 +38,19 @@
         <img data-floqr-chrome-icon="botDee" src="./images/chrome/botdee-nightlife.jpg" alt="" class="botdee-chat-icon" width="56" height="56"/>
         <div class="botdee-title-row feature-landing-title-row">
           <h1 class="botdee-chat-title floqr-page-title" data-i18n="page.botdee.title">BOT DEE</h1>
+        </div>
+        <button id="botDeeChatsToggle" class="botdee-chats-toggle" type="button" aria-expanded="false" aria-controls="botDeeChatsPanel" data-i18n-aria="botdee.chatsPlus" aria-label="Saved chats">
+          <span class="botdee-chats-toggle-mark" aria-hidden="true">+</span>
+          <span id="botDeeChatsBadge" class="botdee-chats-badge" hidden></span>
+        </button>
+      </div>
+      <div id="botDeeChatsBackdrop" class="botdee-chats-backdrop" hidden></div>
+      <div id="botDeeChatsPanel" class="botdee-chats-panel" hidden role="dialog" aria-modal="true" aria-labelledby="botDeeChatsTitle">
+        <div class="botdee-chats-sheet">
+          <div class="botdee-chats-handle" aria-hidden="true"></div>
+          <h2 id="botDeeChatsTitle" class="botdee-chats-title" data-i18n="botdee.chatsPanelTitle">Chats</h2>
+          <p id="botDeeChatsHint" class="sub small botdee-chats-hint" data-i18n="botdee.chatsSavedHint">Saved chats stay on your account. Opening + does not delete them.</p>
+          <div id="botDeeChatsList" class="botdee-chats-list"></div>
         </div>
       </div>
     </header>
@@ -87,25 +100,25 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./firebase-config.js?v=s3.3.035"></script>
-<script src="./floqr-app-check.js?v=s3.3.035"></script>
-<script src="./floqr-session-shell.js?v=s3.3.035"></script>
-<script src="./floqr-nav.js?v=s3.3.035"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.035"></script>
-<script src="./floqr-i18n.js?v=s3.3.035"></script>
-<script src="./floqr-place-i18n.js?v=s3.3.035"></script>
-<script src="./botdee-help-repository.js?v=s3.3.035"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.035"></script>
-<script src="./floqr-venue-query.js?v=s3.3.035"></script>
-<script src="./floqr-data-classification.js?v=s3.3.035"></script>
-<script src="./botdee-access.js?v=s3.3.035"></script>
-<script src="./feature-gates.js?v=s3.3.035"></script>
-<script src="./floqr-feature-services.js?v=s3.3.035"></script>
-<script src="./helper-popouts.js?v=s3.3.035"></script>
-<script src="./botdee-personalization-ui.js?v=s3.3.035"></script>
-<script src="./botdee-room-smartview.js?v=s3.3.035"></script>
-<script src="./botdee-smartview.js?v=s3.3.035"></script>
-<script src="./bot-dee-chat.js?v=s3.3.035"></script>
-<script src="./botdee-page.js?v=s3.3.035"></script>
+<script src="./firebase-config.js?v=s3.3.036"></script>
+<script src="./floqr-app-check.js?v=s3.3.036"></script>
+<script src="./floqr-session-shell.js?v=s3.3.036"></script>
+<script src="./floqr-nav.js?v=s3.3.036"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.036"></script>
+<script src="./floqr-i18n.js?v=s3.3.036"></script>
+<script src="./floqr-place-i18n.js?v=s3.3.036"></script>
+<script src="./botdee-help-repository.js?v=s3.3.036"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.036"></script>
+<script src="./floqr-venue-query.js?v=s3.3.036"></script>
+<script src="./floqr-data-classification.js?v=s3.3.036"></script>
+<script src="./botdee-access.js?v=s3.3.036"></script>
+<script src="./feature-gates.js?v=s3.3.036"></script>
+<script src="./floqr-feature-services.js?v=s3.3.036"></script>
+<script src="./helper-popouts.js?v=s3.3.036"></script>
+<script src="./botdee-personalization-ui.js?v=s3.3.036"></script>
+<script src="./botdee-room-smartview.js?v=s3.3.036"></script>
+<script src="./botdee-smartview.js?v=s3.3.036"></script>
+<script src="./bot-dee-chat.js?v=s3.3.036"></script>
+<script src="./botdee-page.js?v=s3.3.036"></script>
 </body>
 </html>

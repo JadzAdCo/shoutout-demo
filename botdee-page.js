@@ -4,12 +4,6 @@
   "use strict";
   const byId = id => document.getElementById(id);
   const nav = () => window.FLOQRNav;
-  const href = (path, params) => {
-    const stamped = nav()?.stampCurrentVersion?.(path, params);
-    if (stamped) return stamped;
-    const qs = new URLSearchParams(params).toString();
-    return qs ? `${path}?${qs}` : path;
-  };
   const access = () => window.FLOQRBotDeeAccess;
 
   function ensureFirebase() {
@@ -26,7 +20,7 @@
     access()?.requireUsage?.();
     nav()?.applyGlobalBack?.("floqrGlobalBack");
     window.FLOQRChromeScheme?.applyDocument?.();
-    window.showShoutoutLanding = () => { location.href = href("./", {start: "search"}); };
+    window.showShoutoutLanding = () => { location.href = nav()?.searchHome?.() || "./?start=search"; };
     window.FLOQRBotDeeChat?.bind({});
     const q = new URL(location.href).searchParams.get("q");
     if (q) {

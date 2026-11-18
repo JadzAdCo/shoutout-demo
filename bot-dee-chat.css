@@ -55,8 +55,9 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   height: 100dvh;
   max-width: 720px;
   margin: 0 auto;
-  padding: 10px 14px 20px;
+  padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px) + var(--botdee-kb, 0px));
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .botdee-shell > .global-back-btn {
@@ -70,6 +71,7 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   flex: 1 1 auto;
   min-height: 0;
   gap: 8px;
+  overflow: hidden;
 }
 
 .botdee-chat-header {
@@ -80,6 +82,8 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   flex: 0 0 auto;
   width: 100%;
   min-width: 0;
+  position: relative;
+  z-index: 40;
 }
 
 /* Icon + title. Name / demeanor / recap live in My Profile → My BOT DEE, not on this canvas. */
@@ -122,6 +126,190 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   text-overflow: ellipsis;
 }
 
+.botdee-chats-toggle {
+  position: relative;
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font: inherit;
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0, 212, 254, 0.18);
+}
+
+.botdee-chats-toggle:focus-visible {
+  outline: 2px solid var(--floqr-tiffany, #00d4fe);
+  outline-offset: 2px;
+}
+
+.botdee-chats-toggle[aria-expanded="true"] {
+  background: rgba(0, 212, 254, 0.16);
+  border-color: rgba(0, 212, 254, 0.5);
+}
+
+.botdee-chats-toggle-mark {
+  display: block;
+  pointer-events: none;
+}
+
+.botdee-chats-badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--floqr-tiffany, #00d4fe);
+  color: #041018;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+}
+
+.botdee-chats-badge[hidden] {
+  display: none !important;
+}
+
+.botdee-chats-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: transparent;
+}
+
+.botdee-chats-backdrop[hidden] {
+  display: none !important;
+}
+
+.botdee-chats-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  width: min(360px, calc(100vw - 28px));
+  max-height: 60vh;
+  box-sizing: border-box;
+}
+
+.botdee-chats-panel[hidden] {
+  display: none !important;
+}
+
+.botdee-chats-sheet {
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 12px 12px 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: color-mix(in srgb, #0b0b0b 82%, transparent);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.38);
+}
+
+.botdee-chats-handle {
+  display: none;
+  width: 44px;
+  height: 5px;
+  margin: 0 auto 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.botdee-chats-title {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.botdee-chats-hint {
+  margin: 0 0 10px;
+  opacity: 0.8;
+}
+
+.botdee-chats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.botdee-chats-row {
+  min-height: 44px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: start;
+  cursor: pointer;
+}
+
+.botdee-chats-row-primary {
+  background: linear-gradient(135deg, var(--hot, #ff2eb8), var(--accent, #00c8ff));
+  border-color: transparent;
+  color: #fff;
+}
+
+.botdee-chats-row-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.botdee-chats-empty {
+  margin: 0;
+  opacity: 0.85;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-chats-toggle {
+  background: #fff;
+  border-color: #111;
+  color: #0a0a0a;
+  box-shadow: none;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-chats-toggle[aria-expanded="true"] {
+  background: rgba(0, 212, 254, 0.12);
+  border-color: #00d4fe;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-chats-sheet {
+  background: #fff;
+  border-color: #d0d0d0;
+  color: #0a0a0a;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-chats-row {
+  background: #f3f3f3;
+  border-color: #d0d0d0;
+  color: #0a0a0a;
+}
+
+html[data-floqr-chrome="whiteBlack"] .botdee-chats-handle {
+  background: #bbb;
+}
+
 /* Full-width under the title row — never squeeze into a 1-char column on mobile. */
 .botdee-scope-note {
   margin: 0;
@@ -135,9 +323,7 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
 }
 
 .botdee-chat-header,
-.botdee-chat-header-main,
-.botdee-shell,
-.botdee-chat-page {
+.botdee-chat-header-main {
   overflow: visible;
 }
 
@@ -163,7 +349,6 @@ html[data-floqr-chrome="blackDarkGreen"] body.botdee-page {
   flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
-  max-height: none;
   overflow-x: hidden;
   overflow-y: auto;
   display: flex;
@@ -919,10 +1104,31 @@ html[data-floqr-chrome="whiteBlack"] .botdee-intent-fallback {
   }
 }
 
-@media (max-width: 560px) {
-  .botdee-transcript {
-    max-height: none;
+@media (max-width: 600px) {
+  .botdee-chats-backdrop {
+    background: rgba(0, 0, 0, 0.55);
   }
+  .botdee-chats-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: var(--botdee-kb, 0px);
+    width: 100%;
+    max-height: min(70dvh, 560px);
+  }
+  .botdee-chats-sheet {
+    max-height: min(70dvh, 560px);
+    padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    border-radius: 20px 20px 0 0;
+    border-bottom: 0;
+  }
+  .botdee-chats-handle {
+    display: block;
+  }
+}
+
+@media (max-width: 560px) {
   .botdee-chat-icon {
     width: 48px;
     height: 48px;

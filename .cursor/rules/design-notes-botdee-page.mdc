@@ -14,7 +14,7 @@ Resume: `@botdee$` / `$botdee$`. Rename history: `design-notes-botdee-rename.mdc
 | Piece | Role |
 |---|---|
 | Chat | `bot-dee-chat.js` → `executeBotSession` (Auth + `botDee` gate + classification → Gemini + `contextualSearch`); local `isHelpPrompt` / `isVersionPrompt` / `isPrivacyPrompt` |
-| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); compact left Back; no FloqR parent logo. **Chat-only** canvas (transcript + composer). Placeholder is **Ask BOT DEE…** — Enter / Shift+Enter live in Help (`help` / `privacy`). Name / demeanor / recap + saved chats/memories + approved facts → **My Profile → Feature & Orders → My BOT DEE** (`#foBotDeePane`, `#botDeePersonalizationPanel`). Demeanor radios are `.botdee-pref-demeanor-option` 44px rows (22px radios, horizontal labels) — never `overflow-wrap:anywhere` letter columns. No Settings button on the chat. Mock SMARTviews → **Master Admin → Features Mgmt → BOT DEE** subtabs. |
+| Chrome | Early-paint Site chrome; left BOT DEE icon (`data-floqr-chrome-icon="botDee"`); title only (no `?`); **← Back to Search** via `FLOQRNav.searchHome()`; header **+** / **−** Chats nest (44×44). no FloqR parent logo. **Chat-only** canvas (transcript + composer). Placeholder is **Ask BOT DEE…** — Enter / Shift+Enter live in Help (`help` / `privacy`). Name / demeanor / recap + saved chats/memories + approved facts → **My Profile → Feature & Orders → My BOT DEE** (`#foBotDeePane`, `#botDeePersonalizationPanel`). Demeanor radios are `.botdee-pref-demeanor-option` 44px rows (22px radios, horizontal labels) — never `overflow-wrap:anywhere` letter columns. No Settings button on the chat. Mock SMARTviews → **Master Admin → Features Mgmt → BOT DEE** subtabs. |
 | Modules | `botdee-page.js`, `botdee-access.js`, `botdee-help-repository.js`, `bot-dee-chat.js` / `.css`, `botdee-upgrade-ui.js`, `botdee-smartview.js` / `.css` |
 
 ## Routing
@@ -49,7 +49,7 @@ Versioned first-use (`personalization.botDeePersonalizationVersion`, current **2
 
 ## Durable resume (s3.3.006)
 
-Signed-in chat lives in `botDeeThreads/{uid}` (one thread per uid). Refresh or a second device calls `getBotDeeThread` and paints the last 12 turns while inside the conversation pause (`conversationIdleSeconds`; Master Admin; packaged default 300 / 5 minutes). Pause / farewell starts a new epoch. Flag `durableThreads` defaults **on**; set `0` on `botDeeSettings/default` to roll back. Functions deploy required — Pages-only does not persist.
+Signed-in chat lives in `botDeeThreads/{uid}` (one thread per uid). Refresh or a second device calls `getBotDeeThread`. The canvas **lands collapsed** (welcome / one-line pause status); last 12 turns stay in client `history` and server events for Send recall. **+** lists this session / earlier slices; resume paints that slice. Pause / farewell starts a new epoch. Flag `durableThreads` defaults **on**; set `0` on `botDeeSettings/default` to roll back. Functions deploy required to persist — collapse UX is Pages-only.
 
 ## Six-phase upgrade (spec v1.2)
 

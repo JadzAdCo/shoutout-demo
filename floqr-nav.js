@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.3.035";
+  const APP_V = "s3.3.036";
   function navT(key, fallback) {
     try {
       const fn = global.FLOQRI18n?.t;
@@ -204,6 +204,18 @@
     applyGlobalBack(anchorOrId = "floqrGlobalBack") {
       const anchor = typeof anchorOrId === "string" ? document.getElementById(anchorOrId) : anchorOrId;
       if (!anchor) return null;
+      if (pageName() === "botdee.html") {
+        const href = this.searchHome();
+        const label = navT("nav.backToSearchArrow", "← Back to Search");
+        anchor.href = href;
+        anchor.textContent = label;
+        anchor.setAttribute("aria-label", label);
+        anchor.setAttribute("data-i18n", "nav.backToSearchArrow");
+        anchor.dataset.from = "search";
+        anchor.classList.remove("hidden");
+        anchor.removeAttribute("aria-hidden");
+        return { href, label };
+      }
       const queryFrom = qs("from");
       const from = queryFrom || anchor.dataset.from || "";
       if (queryFrom) anchor.dataset.from = queryFrom;
