@@ -191,6 +191,7 @@ jobs:
               revokeSpatialGrantRef \
               attachGuestDraftToSubject \
               floqrSpatialGrant \
+              floqmediaPlanTrace \
               createSinemaScene \
               saveSinemaScene \
               loadSinemaScene
