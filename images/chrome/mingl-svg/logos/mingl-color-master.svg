@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Mingl logo">
+  <title>Mingl</title>
+  <desc>Three glossy people, conversation bubble, Mingl wordmark. Transparent canvas. No tile, no orbit.</desc>
+  <defs>
+    <radialGradient id="headTeal" cx="38%" cy="30%" r="72%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.52" stop-color="#f4ffff"/>
+      <stop offset="1" stop-color="#9af6f8"/>
+    </radialGradient>
+    <radialGradient id="headPurple" cx="38%" cy="30%" r="72%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.48" stop-color="#fbf0ff"/>
+      <stop offset="1" stop-color="#e0a4f8"/>
+    </radialGradient>
+    <linearGradient id="bodyTeal" x1="0.2" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#eefeff"/>
+      <stop offset="1" stop-color="#6aeff2"/>
+    </linearGradient>
+    <linearGradient id="bodyPurple" x1="0.2" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#f7e9ff"/>
+      <stop offset="1" stop-color="#d56af0"/>
+    </linearGradient>
+    <linearGradient id="bubbleFill" x1="0.15" y1="0" x2="0.95" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.62" stop-color="#f7ffff"/>
+      <stop offset="1" stop-color="#c8fbff"/>
+    </linearGradient>
+    <linearGradient id="bubbleStroke" x1="0" y1="0.15" x2="1" y2="0.9">
+      <stop offset="0" stop-color="#c43cf0"/>
+      <stop offset="0.42" stop-color="#d8b4ff"/>
+      <stop offset="1" stop-color="#03d8dc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Figures scaled up-canvas so the wordmark has a clear gap underneath. -->
+  <g transform="translate(512 16) scale(0.90) translate(-512 -16)">
+  <!-- Conversation bubble -->
+  <g fill="none">
+    <path d="M284 72H740a104 104 0 0 1 0 208H490l-92 78 18-78H284a104 104 0 0 1 0-208Z"
+          fill="url(#bubbleFill)" stroke="url(#bubbleStroke)" stroke-width="14" stroke-linejoin="round"/>
+    <g fill="#111318">
+      <circle cx="430" cy="176" r="22"/>
+      <circle cx="512" cy="176" r="22"/>
+      <circle cx="594" cy="176" r="22"/>
+    </g>
+  </g>
+
+  <!-- Rear people (teal trim) -->
+  <g stroke="#03d8dc" stroke-width="14" stroke-linejoin="round">
+    <circle cx="300" cy="428" r="90" fill="url(#headTeal)"/>
+    <circle cx="724" cy="428" r="90" fill="url(#headTeal)"/>
+    <path d="M108 678c0-118 86-186 192-186s192 68 192 186v22H108Z" fill="url(#bodyTeal)"/>
+    <path d="M532 678c0-118 86-186 192-186s192 68 192 186v22H532Z" fill="url(#bodyTeal)"/>
+  </g>
+  <g fill="#ffffff" opacity="0.55">
+    <ellipse cx="274" cy="402" rx="28" ry="18"/>
+    <ellipse cx="698" cy="402" rx="28" ry="18"/>
+    <ellipse cx="210" cy="560" rx="48" ry="22"/>
+    <ellipse cx="634" cy="560" rx="48" ry="22"/>
+  </g>
+
+  <!-- Center person (purple trim), in front -->
+  <g stroke="#c43cf0" stroke-width="16" stroke-linejoin="round">
+    <circle cx="512" cy="478" r="102" fill="url(#headPurple)"/>
+    <path d="M292 710c0-124 96-192 220-192s220 68 220 192v20H292Z" fill="url(#bodyPurple)"/>
+  </g>
+  <g fill="#ffffff" opacity="0.62">
+    <ellipse cx="478" cy="448" rx="34" ry="22"/>
+    <ellipse cx="430" cy="600" rx="56" ry="24"/>
+  </g>
+  </g>
+
+  <!-- Mingl™ — outlined Noto Sans Display Bold Italic (Min white / gl teal) -->
+  <g transform="translate(167.00 918.00) scale(1.30061)">
+    <path d="M4.83 0.0 36.54 -149.94H77.91L81.89999999999999 -37.8H82.74L136.07999999999998 -149.94H179.34L147.42 0.0H118.64999999999999L133.56 -70.98Q135.87 -81.69 139.125 -94.28999999999999Q142.38 -106.89 144.48 -116.13H143.85L88.61999999999999 0.0H59.64L56.07 -116.13H55.23Q54.6 -111.72 53.34 -104.055Q52.08 -96.39 50.504999999999995 -87.36Q48.93 -78.33 47.04 -69.72L32.97 0.0Z" fill="#ffffff" stroke="#1a1c22" stroke-width="10.76" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+<path d="M212.7 -128.94Q206.19 -128.94 201.78 -131.77499999999998Q197.37 -134.60999999999999 197.37 -141.32999999999998Q197.37 -150.35999999999999 202.41 -154.98Q207.45 -159.6 216.26999999999998 -159.6Q222.35999999999999 -159.6 226.875 -156.87Q231.39 -154.14 231.39 -147.42Q231.39 -139.23 226.875 -134.08499999999998Q222.35999999999999 -128.94 212.7 -128.94ZM168.18 0.0 192.54 -114.66H223.41L199.04999999999998 0.0Z" fill="#ffffff" stroke="#1a1c22" stroke-width="10.76" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+<path d="M216.45 0.0 240.80999999999997 -114.66H264.53999999999996L262.65 -93.45H263.28Q269.58 -103.74 277.77 -110.25Q285.96 -116.75999999999999 297.09 -116.75999999999999Q311.37 -116.75999999999999 318.29999999999995 -108.04499999999999Q325.22999999999996 -99.33 325.22999999999996 -84.42Q325.22999999999996 -80.42999999999999 324.495 -75.6Q323.76 -70.77 322.71 -65.31L309.27 0.0H278.18999999999994L292.26 -66.99Q293.09999999999997 -70.56 293.52 -73.71000000000001Q293.93999999999994 -76.86 293.93999999999994 -79.38Q293.93999999999994 -91.77 284.07 -91.77Q277.97999999999996 -91.77 272.93999999999994 -85.785Q267.9 -79.8 264.12 -69.72Q260.34 -59.64 257.60999999999996 -47.46L247.31999999999996 0.0Z" fill="#ffffff" stroke="#1a1c22" stroke-width="10.76" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+    <path d="M359.84999999999997 50.4Q347.67 50.4 339.69 48.405Q331.71 46.41 324.36 43.05L324.57 16.169999999999998Q332.34 20.37 340.74 22.68Q349.14 24.99 358.59 24.99Q368.46 24.99 374.76 20.055Q381.06 15.12 383.78999999999996 4.62L384.63 1.47Q385.46999999999997 -2.1 386.52 -5.984999999999999Q387.57 -9.87 388.40999999999997 -12.6Q389.25 -15.33 389.25 -15.33H388.40999999999997Q383.37 -8.19 376.755 -3.045Q370.14 2.1 360.06 2.1Q352.28999999999996 2.1 345.78 -2.205Q339.27 -6.51 335.28 -15.54Q331.28999999999996 -24.57 331.28999999999996 -38.64Q331.28999999999996 -52.71 334.86 -66.57Q338.43 -80.42999999999999 345.04499999999996 -91.77Q351.65999999999997 -103.11 361.005 -109.935Q370.34999999999997 -116.75999999999999 381.9 -116.75999999999999Q392.4 -116.75999999999999 398.28 -112.24499999999999Q404.15999999999997 -107.72999999999999 408.78 -99.96H409.62L415.28999999999996 -114.66H439.23L414.24 2.73Q410.46 20.79 402.68999999999994 31.185Q394.91999999999996 41.58 384.10499999999996 45.989999999999995Q373.28999999999996 50.4 359.84999999999997 50.4ZM375.18 -22.89Q381.06 -22.89 385.67999999999995 -27.93Q390.29999999999995 -32.97 393.55499999999995 -40.845Q396.81 -48.72 398.49 -57.54Q400.16999999999996 -66.36 400.16999999999996 -74.13Q400.16999999999996 -82.11 396.91499999999996 -86.94Q393.65999999999997 -91.77 387.99 -91.77Q382.74 -91.77 378.12 -87.255Q373.5 -82.74 370.03499999999997 -75.18Q366.57 -67.62 364.67999999999995 -58.59Q362.78999999999996 -49.559999999999995 362.78999999999996 -40.53Q362.78999999999996 -31.709999999999997 366.04499999999996 -27.299999999999997Q369.3 -22.89 375.18 -22.89Z" fill="#03d8dc" stroke="#1a1c22" stroke-width="10.76" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+<path d="M432.69 0.0 466.5 -159.6H497.37L463.56 0.0Z" fill="#03d8dc" stroke="#1a1c22" stroke-width="10.76" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+    <path d="M501.26279999999997 -151.48559999999998 501.49799999999993 -172.1832H507.08399999999995L511.61159999999995 -156.3072L516.786 -172.1832H522.1368L521.9015999999999 -151.48559999999998H518.1383999999999L518.256 -163.7748Q518.3148 -164.5392 518.3442 -165.53879999999998Q518.3736 -166.5384 518.4323999999999 -167.244H518.256L512.9639999999999 -151.48559999999998H509.90639999999996L505.20239999999995 -167.244H505.02599999999995Q505.02599999999995 -166.4796 505.0848 -165.53879999999998Q505.14359999999994 -164.59799999999998 505.0848 -163.7748L504.96719999999993 -151.48559999999998ZM490.44359999999995 -151.48559999999998 490.61999999999995 -169.0668H485.38679999999994L485.44559999999996 -172.1832H499.67519999999996V-169.0668H494.38319999999993L494.20679999999993 -151.48559999999998Z" fill="#ffffff" stroke="#1a1c22" stroke-width="6.15" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill"/>
+  </g>
+</svg>

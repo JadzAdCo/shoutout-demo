@@ -231,25 +231,40 @@
   const PEOPLE_WHO_IS = /^(?:who(?:'s| is| s))\s+/i;
   const PEOPLE_DO_YOU_KNOW = /^(?:do you know|did you meet)\s+/i;
   const PEOPLE_KNOW_OF = /^(?:what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
+  const PEOPLE_WHAT_ABOUT = /^(?:and\s+)?(?:what|how) about\s+/i;
   const PEOPLE_PROFILE_OF = /^(?:what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|look up|lookup)\s+/i;
-  const PEOPLE_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|lookup|find|search for|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
+  const PEOPLE_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|lookup|find|search for|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe|(?:and\s+)?(?:what|how) about)\s+/i;
   const PEOPLE_SUFFIX = /\s+(?:on floqr|on mingl|on here|(?:['’]s)?\s*(?:public )?profile)\s*$/i;
   const PEOPLE_STOP_AFTER = /^(working|on (?:duty|tonight)|the (?:dj|club)|playing|singing|available)\b/i;
   const PEOPLE_GENERIC = /^(this person|that person|them|him|her|someone|anybody|anyone)$/i;
   const PEOPLE_VENUE = /^(a |an |the )?(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?)\b/i;
   const PEOPLE_PRODUCT = /^(?:a |an |the )?(?:bot\s*dee|botdee|floq\s*ai|floqai|floqr|shout\s*outs?|mingl|floq\s*casts?|bartr|bart\s*r|rydr|vip(?:\s*reserv)?)\s*$/i;
   const PEOPLE_OPS = /\b(tonight|today|near me|on duty|available|playing|working)\b/i;
+  const PEOPLE_NAME_STOP = /^(my|mine|our|your|their|his|her|this|that|these|those|who|what|where|when|how|the|a|an|you|me|us|it|we|they)$/;
+  const PEOPLE_NAME_ROLE = /^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?|bottle|service|composer)$/;
+
+  function foldPeopleNameChars(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[\u2018\u2019\u201B\u2032`´]/g, "'")
+      .replace(/[\u201C\u201D]/g, '"');
+  }
+
+  function peoplePromptText(raw) {
+    return foldPeopleNameChars(String(raw || "")).replace(/\s+/g, " ").trim().slice(0, 200);
+  }
 
   function normalizePeopleQuery(raw) {
-    return String(raw || "").replace(/\s+/g, " ").trim().toLowerCase().replace(/[?!.,]+/g, " ").replace(/\s+/g, " ").trim();
+    return peoplePromptText(raw).toLowerCase().replace(/[?!.,]+/g, " ").replace(/\s+/g, " ").trim();
   }
 
   function extractPeopleNeedle(raw) {
-    const original = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200);
+    const original = peoplePromptText(raw);
     const n = normalizePeopleQuery(original);
     if (!n || PEOPLE_SELF_QUERY.test(n)) return "";
     let rest = original.replace(PEOPLE_PREFIX, "").replace(PEOPLE_SUFFIX, "").trim();
-    rest = rest.replace(/^[@]+/, "").replace(/["“”']/g, "").replace(/[?!.,]+$/g, "").trim();
+    rest = rest.replace(/^[@]+/, "").replace(/["']/g, "").replace(/[?!.,]+$/g, "").trim();
     const needle = normalizePeopleQuery(rest);
     if (!needle || needle.length < 2) return "";
     if (PEOPLE_STOP_AFTER.test(needle) || PEOPLE_GENERIC.test(needle)) return "";
@@ -258,9 +273,9 @@
   }
 
   function isPeopleNameNeedle(rest) {
-    const trimmed = String(rest || "").replace(/[?!]+$/g, "").trim();
+    const trimmed = foldPeopleNameChars(String(rest || "")).replace(/[?!]+$/g, "").trim();
     if (!trimmed) return false;
-    if (/^@[\w.-]+$/.test(trimmed)) return true;
+    if (/^@[\w.-]+$/.test(trimmed.replace(/^@+/, "@"))) return true;
     const needle = normalizePeopleQuery(trimmed);
     if (!needle || needle.length < 2) return false;
     if (PEOPLE_STOP_AFTER.test(needle) || PEOPLE_GENERIC.test(needle)) return false;
@@ -268,38 +283,38 @@
     const tokens = needle.split(" ").filter(Boolean);
     if (!tokens.length || tokens.length > 4) return false;
     return tokens.every(token => /^@?[\w.'-]+$/.test(token)
-      && !/^(my|mine|our|your|their|his|her|this|that|these|those|who|what|where|when|how|the|a|an)$/.test(token)
-      && !/^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?|bottle|service|composer)$/.test(token));
+      && !PEOPLE_NAME_STOP.test(token)
+      && !PEOPLE_NAME_ROLE.test(token));
   }
 
   function remainderAfterPeoplePrefix(raw) {
-    return String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200)
+    return peoplePromptText(raw)
       .replace(PEOPLE_WHO_IS, "")
       .replace(PEOPLE_DO_YOU_KNOW, "")
       .replace(PEOPLE_KNOW_OF, "")
+      .replace(PEOPLE_WHAT_ABOUT, "")
       .replace(PEOPLE_PROFILE_OF, "")
       .replace(PEOPLE_SUFFIX, "")
       .trim();
   }
 
   function isNamedPeopleProfileSuffix(raw) {
-    const match = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200)
-      .match(/^(.+?)(?:['’]s)?\s+(?:public )?profile\s*$/i);
+    const match = peoplePromptText(raw).match(/^(.+?)(?:['’]s)?\s+(?:public )?profile\s*$/i);
     if (!match) return false;
     return isPeopleNameNeedle(match[1].replace(/['’]s$/i, "").trim());
   }
 
   function isNamedPeopleNetworkSuffix(raw) {
-    const match = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200)
-      .match(/^(.+?)\s+(?:on floqr|on mingl|on here)\s*$/i);
+    const match = peoplePromptText(raw).match(/^(.+?)\s+(?:on floqr|on mingl|on here)\s*$/i);
     if (!match) return false;
     return isPeopleNameNeedle(match[1]);
   }
 
   function isPeopleLookupPrompt(raw) {
-    const original = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200);
+    const original = peoplePromptText(raw);
     if (PEOPLE_WHO_IS.test(original) || PEOPLE_DO_YOU_KNOW.test(original)
-      || PEOPLE_KNOW_OF.test(original) || PEOPLE_PROFILE_OF.test(original)) {
+      || PEOPLE_KNOW_OF.test(original) || PEOPLE_WHAT_ABOUT.test(original)
+      || PEOPLE_PROFILE_OF.test(original)) {
       const rest = remainderAfterPeoplePrefix(original);
       return isPeopleNameNeedle(rest) || PEOPLE_GENERIC.test(normalizePeopleQuery(rest));
     }
@@ -310,7 +325,7 @@
   }
 
   function classifyPeopleSearchIntent(raw) {
-    const original = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 200);
+    const original = peoplePromptText(raw);
     const n = normalizePeopleQuery(original);
     if (!n || n.length < 2) return {intent: "none", needle: "", self: false};
     if (PEOPLE_SELF_QUERY.test(n) || /^(what do you know (?:about|of) me|tell me about my (?:public )?profile|what can you tell me about me)$/.test(n)) {
@@ -481,7 +496,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.039";
+    return "s3.3.042";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -2060,6 +2075,7 @@
     sendMessage,
     openPhotoViewer,
     closePhotoViewer,
+    scrollTranscriptToLatest,
     DEFAULT_IDLE_SECONDS,
     clampIdleSeconds
   };

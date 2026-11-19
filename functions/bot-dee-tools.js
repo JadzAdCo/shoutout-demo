@@ -10,6 +10,7 @@ const vip = require("./vip-functions").__vipHelpers;
 const floqCast = require("./floqcast-functions").__floqCastHelpers;
 const checkout = require("./commerce-functions").__checkoutHelpers;
 const people = require("./people-directory-core");
+const headless = require("./headless-shoutout-core");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -151,29 +152,174 @@ async function listShoutOutTemplates(args, sessionRequest) {
     templateCount: venueTemplateIds ? venueTemplateIds.length : null,
     composeHref: href,
     note: venueTemplateIds
-      ? "Use startShoutOutCheckout with clubLocationId + shoutout payload, or open composeHref to pick a template on device."
-      : "Pass clubLocationId to list venue templates, or open composeHref to choose a club."
+      ? "Use startShoutOutCheckout with clubLocationId + message (optional templateId / screenFormatId). Paid templates return checkoutUrl; free boards submit pending. Open composeHref only for photo / jersey / Football Intro / Heist / Baller's Alert."
+      : "Pass clubLocationId to list venue templates, or startShoutOutCheckout with a club name + message."
+  };
+}
+
+async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth} = {}) {
+  const uid = text(auth?.uid, 120);
+  if (!uid) throw new HttpsError("unauthenticated", "Sign in required.");
+  const templateId = text(shoutout?.template || shoutout?.templateId, 80);
+  if (headless.isComposerOnlyTemplate(templateId) || Math.max(0, Math.round(Number(shoutout?.priceCents || 0))) > 0) {
+    throw new HttpsError("failed-precondition", "This ShoutOut template does not submit as a free board.");
+  }
+  const email = text(auth?.token?.email || shoutout.submittedBy, 200).toLowerCase();
+  const referenceNumber = headless.newReferenceNumber();
+  const locationName = text(shoutout.locationName || venue?.locationName || clubLocationId, 160);
+  const doc = {
+    ...shoutout,
+    clubLocationId,
+    location: clubLocationId,
+    club: clubLocationId,
+    locationName,
+    status: "pending",
+    editable: true,
+    paymentRequired: false,
+    paymentStatus: "unpaid",
+    headless: true,
+    source: "headless",
+    onboardingSource: "headless-shoutout",
+    submittedByUid: uid,
+    submittedBy: email,
+    actorEmail: email,
+    referenceNumber,
+    submittedAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+  const ref = await db.collection("shoutouts").add(doc);
+  await db.collection("shoutoutAudit").add({
+    shoutoutId: ref.id,
+    action: "submitted",
+    referenceNumber,
+    ownerUid: uid,
+    actorUid: uid,
+    actorEmail: email,
+    source: "headless",
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  return {
+    shoutoutId: ref.id,
+    referenceNumber,
+    portalHref: headless.portalShoutOutHref(ref.id),
+    venueName: locationName,
+    templateId: text(shoutout.template, 80),
+    screenFormatId: text(shoutout.screenFormatId, 40),
+    mainText: text(shoutout.mainText, 200)
   };
 }
 
 async function startShoutOutCheckout(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "shoutOut", sessionRequest);
+  await featureGates.assertPatronFeature(sessionRequest.auth, "shoutOut");
   const payload = args?.payload && typeof args.payload === "object" ? args.payload : {};
-  const rawClub = text(payload.clubLocationId || args?.clubLocationId || args?.locationName, 120);
-  const shoutout = payload.shoutout && typeof payload.shoutout === "object"
+  const existing = payload.shoutout && typeof payload.shoutout === "object"
     ? payload.shoutout
     : (args?.shoutout && typeof args.shoutout === "object" ? args.shoutout : null);
-  if (!rawClub || !shoutout) {
-    throw new HttpsError("invalid-argument", "startShoutOutCheckout needs clubLocationId and shoutout payload.");
+  const userPrompt = text(args?.userPrompt || payload.userPrompt, 2000);
+  const parsed = headless.parseShoutOutExecute(userPrompt);
+  const rawClub = text(
+    payload.clubLocationId
+      || args?.clubLocationId
+      || args?.locationName
+      || args?.locationId
+      || existing?.clubLocationId
+      || existing?.location
+      || parsed.clubQuery,
+    120
+  );
+  const message = text(existing?.mainText || args?.mainText || args?.message || args?.text || payload.mainText || payload.message || parsed.message, 400);
+  const templateId = text(
+    existing?.template || existing?.templateId || args?.templateId || payload.templateId || parsed.templateId,
+    80
+  );
+  const screenFormatId = text(
+    existing?.screenFormatId || args?.screenFormatId || payload.screenFormatId || parsed.screenFormatId,
+    40
+  );
+  if (!rawClub || !message) {
+    const needs = [];
+    if (!rawClub) needs.push("club");
+    if (!message) needs.push("message");
+    return {
+      ok: false,
+      tool: "startShoutOutCheckout",
+      needs,
+      composeHref: headless.shoutOutComposeHref(rawClub),
+      error: headless.missingAsk(needs)
+    };
   }
-  const clubLocationId = await requireClubLocationId(rawClub);
-  const result = await checkout.runCreateFloqrCheckoutSession(asRequest(sessionRequest, {
-    orderType: "shoutout",
-    payload: {clubLocationId, shoutout, priceCents: args?.priceCents || payload.priceCents},
-    returnBase: args?.returnBase,
-    correlationId: args?.correlationId
-  }));
-  return {ok: true, tool: "startShoutOutCheckout", clubLocationId, ...result};
+  let clubLocationId = "";
+  try {
+    clubLocationId = await requireClubLocationId(rawClub);
+  } catch (error) {
+    return {
+      ok: false,
+      tool: "startShoutOutCheckout",
+      needs: ["club"],
+      composeHref: headless.shoutOutComposeHref(""),
+      error: error.message || `Club not found for "${rawClub}".`
+    };
+  }
+  await featureGates.assertClubFeature(clubLocationId, "shoutOut");
+  const snap = await db.collection("clubLocations").doc(clubLocationId).get();
+  const venue = snap.exists ? {id: clubLocationId, ...(snap.data() || {})} : {id: clubLocationId};
+  const composed = headless.composeShoutOutPayload({
+    clubLocationId,
+    venue,
+    message,
+    templateId,
+    screenFormatId
+  });
+  if (!composed.ok) {
+    return {
+      ok: false,
+      tool: "startShoutOutCheckout",
+      needs: composed.missing && composed.missing.length ? composed.missing : ["compose"],
+      composerOnly: !!composed.composerOnly,
+      templateId: composed.templateId || templateId,
+      composeHref: composed.composeHref || headless.shoutOutComposeHref(clubLocationId),
+      error: composed.reason || headless.missingAsk(composed.missing)
+    };
+  }
+  const shoutout = {
+    ...composed.shoutout,
+    submittedByUid: sessionRequest.auth?.uid || "",
+    submittedBy: text(sessionRequest.auth?.token?.email, 200).toLowerCase()
+  };
+  const venueName = text(shoutout.locationName || venue.locationName || clubLocationId, 160);
+  if (composed.priceCents > 0) {
+    const result = await checkout.runCreateFloqrCheckoutSession(asRequest(sessionRequest, {
+      orderType: "shoutout",
+      payload: {clubLocationId, shoutout, priceCents: composed.priceCents},
+      returnBase: args?.returnBase,
+      correlationId: args?.correlationId
+    }));
+    return {
+      ok: true,
+      tool: "startShoutOutCheckout",
+      mode: "checkout",
+      clubLocationId,
+      venueName,
+      templateId: shoutout.template,
+      screenFormatId: shoutout.screenFormatId,
+      mainText: shoutout.mainText,
+      ...result
+    };
+  }
+  const submitted = await submitFreeHeadlessShoutOut({
+    clubLocationId,
+    shoutout,
+    venue,
+    auth: sessionRequest.auth
+  });
+  return {
+    ok: true,
+    tool: "startShoutOutCheckout",
+    mode: "pending",
+    clubLocationId,
+    venueName,
+    ...submitted
+  };
 }
 
 async function createVipHold(args, sessionRequest) {
@@ -295,13 +441,74 @@ async function createFloqCastCheckout(args, sessionRequest) {
   return {ok: true, tool: "createFloqCastCheckout", clubLocationId: clubLocationId || null, ...result};
 }
 
-function normalizeNeedle(value) {
+function foldNameChars(value) {
   return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u2018\u2019\u201B\u2032`´]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"');
+}
+
+function normalizeNeedle(value) {
+  return foldNameChars(value)
     .toLowerCase()
     .replace(/^@+/, "")
+    .replace(/['"]/g, "")
     .replace(/[^a-z0-9@\s._/-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function squeezeNeedle(value) {
+  return normalizeNeedle(value).replace(/\s+/g, "");
+}
+
+function identityAliases(data = {}) {
+  const handle = String(data.floqrHandle || data.username || data.minglHandle || "").replace(/^@+/, "").trim();
+  const first = String(data.firstName || "").trim();
+  const last = String(data.lastName || "").trim();
+  const legal = [first, last].filter(Boolean).join(" ");
+  const names = [
+    data.displayName, data.publicName, data.fullName, legal, handle
+  ].map(value => String(value || "").trim()).filter(Boolean);
+  const out = [];
+  const seen = new Set();
+  names.forEach(raw => {
+    const folded = normalizeNeedle(raw);
+    const squeezed = squeezeNeedle(raw);
+    [folded, squeezed].forEach(alias => {
+      if (!alias || seen.has(alias)) return;
+      seen.add(alias);
+      out.push(alias);
+    });
+  });
+  return out;
+}
+
+function scoreIdentity(data, needle, tokens) {
+  const n = normalizeNeedle(needle);
+  if (!n) return 0;
+  const squeezed = squeezeNeedle(needle);
+  const aliases = identityAliases(data);
+  let points = 0;
+  aliases.forEach(alias => {
+    if (alias === n || (squeezed && alias === squeezed)) {
+      points = Math.max(points, alias.length >= 4 || alias.includes(" ") ? 50 : 6);
+    } else if (n.length >= 4 && alias.includes(n)) {
+      points = Math.max(points, 24);
+    }
+  });
+  const hay = aliases.join(" ");
+  const hits = (Array.isArray(tokens) ? tokens : []).filter(token => token.length > 1 && hay.includes(token));
+  if (hits.length && hits.length === tokens.length) {
+    if (tokens.length >= 2) points = Math.max(points, 40);
+    else if (tokens[0] && tokens[0].length >= 4) points = Math.max(points, 12);
+  }
+  return points;
+}
+
+function scorePerson(data, needle, tokens) {
+  return Math.max(scoreIdentity(data, needle, tokens), scoreHay(userHaystack(data), needle, tokens));
 }
 
 function scoreHay(hay, needle, tokens) {
@@ -569,10 +776,10 @@ function isSelfQuery(needle, viewerData = {}) {
   if (myAsk && /\b(food|music|travel|hobby|hobbies|eat|drink|beverage|handle|bio|photo)\b/.test(n)) {
     if (!/\b(at|for)\b/.test(n)) return true;
   }
-  const handle = normalizeNeedle(viewerData.floqrHandle || viewerData.username || viewerData.minglHandle || "");
-  const name = normalizeNeedle(viewerData.displayName || viewerData.publicName || "");
-  if (handle && (n === handle || hasPhrase(n, handle))) return true;
-  if (name && name.length >= 4 && hasPhrase(n, name)) return true;
+  const aliases = identityAliases(viewerData);
+  const squeezed = squeezeNeedle(needle);
+  if (aliases.some(alias => alias === n || (squeezed && alias === squeezed))) return true;
+  if (aliases.some(alias => alias.length >= 4 && hasPhrase(n, alias))) return true;
   return false;
 }
 
@@ -689,8 +896,8 @@ function publicClubCard(id, data = {}, score) {
 
 function userHaystack(data = {}) {
   const parts = [
-    data.displayName, data.publicName, data.fullName, data.username,
-    data.floqrHandle, data.minglHandle, data.publicBio, data.bio, data.tagline, data.about,
+    data.displayName, data.publicName, data.fullName, data.firstName, data.lastName,
+    data.username, data.floqrHandle, data.minglHandle, data.publicBio, data.bio, data.tagline, data.about,
     data.headline, data.instagram, data.instagramHandle, data.website, data.publicWebsite,
     ...(Array.isArray(data.approvedRoles) ? data.approvedRoles : []),
     ...(Array.isArray(data.genres) ? data.genres : []),
@@ -773,7 +980,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         const data = doc.data() || {};
         // Connections: public profiles only — never private fields.
         if (!people.isPublic(data)) return;
-        const base = scoreHay(userHaystack(data), matchNeedle, tokens);
+        const base = scorePerson(data, matchNeedle, tokens);
         // Require a real name/handle match (threshold 8). No free pass for “friend” alone.
         if (base < 8) return;
         const points = base + (friendContext ? 12 : 6);
@@ -796,7 +1003,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         if (doc.id === viewerUid || seen.has(doc.id)) return;
         const data = doc.data() || {};
         if (!people.isPublic(data)) return;
-        const base = scoreHay(userHaystack(data), matchNeedle, tokens);
+        const base = scorePerson(data, matchNeedle, tokens);
         // Must match the query first — connection boost must not invent hits.
         if (base < 8) return;
         const points = base + (connected.has(doc.id) ? 10 : 0);
@@ -903,6 +1110,11 @@ module.exports = {
   publicMinglKeys,
   datapointAllowed,
   userHaystack,
+  identityAliases,
+  scoreIdentity,
+  scorePerson,
+  normalizeNeedle,
+  foldNameChars,
   isSelfQuery,
   unpublishedSelfCard,
   selfProfileCard,

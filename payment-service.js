@@ -104,6 +104,42 @@
     }, correlationId);
   }
 
+  async function startHeadlessShoutOut({
+    clubLocationId,
+    locationName,
+    message,
+    templateId,
+    screenFormatId,
+    status,
+    redirect = true
+  } = {}) {
+    requireUser();
+    const correlationId = window.FLOQRLog?.correlationId?.("chk") || `chk_${Date.now().toString(36)}`;
+    status?.("Preparing ShoutOut…");
+    try { await window.FLOQRClientIp?.ensure?.(); } catch (_e) {}
+    try {
+      const returnBase = new URL(".", window.location.href).href;
+      const response = await callable("createHeadlessShoutOutCheckout")({
+        clubLocationId,
+        locationName,
+        mainText: message,
+        message,
+        templateId,
+        screenFormatId,
+        returnBase,
+        correlationId
+      });
+      const result = response?.data || {};
+      if (!result.ok) {
+        throw new Error(result.error || "Could not start that ShoutOut from chat.");
+      }
+      if (result.checkoutUrl && redirect !== false) window.location.assign(result.checkoutUrl);
+      return result;
+    } catch (error) {
+      throw unwrapCallableError(error);
+    }
+  }
+
   async function startCheckout({orderType, payload = {}, status, redirect = true} = {}) {
     requireUser();
     const correlationId = window.FLOQRLog?.correlationId?.("chk") || `chk_${Date.now().toString(36)}`;
@@ -279,6 +315,7 @@
     getConnectStatus,
     getClubCheckoutReadiness,
     startCheckout,
+    startHeadlessShoutOut,
     confirmCheckoutSession,
     startConnectOnboarding,
     cancelCheckoutOrder,

@@ -60,6 +60,7 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.ok(longThrow.length <= bot.MAX_MESSAGE_CHARS);
   assert.ok(longBoard.length >= 160);
   assert.equal(bot.isShoutOutExecutePrompt(longThrow), true);
+  assert.equal(bot.isShoutOutExecutePrompt("at Decades that says Happy birthday Maya"), false);
   assert.equal(bot.omitContextualSearchForPrompt(longThrow, ["shoutOut", "botDee"]), true);
   assert.equal(bot.isChitchatPrompt("mail logging"), false);
 
@@ -353,6 +354,8 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
   assert.match(src, /uiLanguage/);
   assert.doesNotMatch(src, /purchaseVIPReservation/);
   assert.match(read("functions/bot-dee-tools.js"), /startShoutOutCheckout/);
+  assert.match(read("functions/bot-dee-tools.js"), /composeShoutOutPayload/);
+  assert.match(read("functions/commerce-functions.js"), /exports\.createHeadlessShoutOutCheckout/);
   assert.match(read("functions/bot-dee-tools.js"), /createVipHold/);
   assert.match(read("functions/bot-dee-tools.js"), /createFloqCastCheckout/);
   assert.match(read("functions/bot-dee-tools.js"), /lookupPublicProfiles/);
@@ -375,6 +378,7 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
     .some(t => t.name === "listShoutOutTemplates"));
   assert.match(src, /omitContextualSearchForPrompt/);
   assert.match(src, /isShoutOutExecutePrompt\(userPrompt\)/);
+  assert.match(src, /tryHeadlessShoutOut/);
   const historyChunks = src.split("prefs.appendActionHistory(").slice(1);
   assert.equal(historyChunks.length, 2);
   historyChunks.forEach(chunk => {
@@ -434,6 +438,9 @@ test("result cards localize to app language (no English ShoutOut label in German
 
   const links = bot.linksFromToolResult({checkoutUrl: "https://pay.example/x"}, "de");
   assert.equal(links[0].label, "Sicher bezahlen");
+  const pending = bot.linksFromToolResult({portalHref: "./patron-portal.html?tab=shoutouts&id=abc"}, "de");
+  assert.equal(pending[0].kind, "shoutout-pending");
+  assert.equal(pending[0].label, "In Meine ShoutOuts öffnen");
 
   assert.match(bot.systemInstruction("patron", "de", ["shoutOut", "botDee"]), /App language is "de"/);
   assert.match(read("bot-dee-chat.js"), /uiLanguage:\s*currentUiLanguage/);

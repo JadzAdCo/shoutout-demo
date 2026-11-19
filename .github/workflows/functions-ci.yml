@@ -162,6 +162,8 @@ jobs:
           # [firebase-deploy-features] in one commit deploy both lists.
           # [firebase-deploy-crawl] deploys only AI Crawling callables/schedules (includes
           # first-time scheduledRetirePastCrawledEvents, which functions:list cannot see yet).
+          # [firebase-deploy-smartvisuals] deploys SMARTvisuals Studio callables (first-time
+          # names that functions:list cannot see yet).
           set -euo pipefail
           COMMIT_MSG="${{ github.event.head_commit.message }}"
           FNS=()
@@ -211,6 +213,15 @@ jobs:
               previewDiscoveryAutoApprove
             echo "Crawl-only deploy tagged"
           fi
+          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-smartvisuals\]'; then
+            SUBSET=1
+            add_fns \
+              classifySmartVisual \
+              publishSmartVisualDraft \
+              setSmartVisualOverride \
+              getSmartVisualAdPolicy
+            echo "SMARTvisuals Studio deploy tagged"
+          fi
           if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-botdee\]'; then
             SUBSET=1
             add_fns \
@@ -242,7 +253,8 @@ jobs:
               setBotDeeLegalGate \
               getBotDeeProviderSlots \
               listBotDeeProviderSlots \
-              setBotDeeProviderSlot
+              setBotDeeProviderSlot \
+              createHeadlessShoutOutCheckout
             echo "BOT DEE hasUsedBotDee persist + six-phase + later-fill slot deploy tagged"
           fi
           if [ "$SUBSET" = "0" ]; then
@@ -261,6 +273,10 @@ jobs:
             # First-time BOT DEE six-phase callables (functions:list cannot see them yet).
             # Redeploy from origin/main after Instant Crawl merge cancelled the first batch run.
             for f in \
+              classifySmartVisual \
+              publishSmartVisualDraft \
+              setSmartVisualOverride \
+              getSmartVisualAdPolicy \
               executeBotSession \
               getBotDeeThread \
               renameBotDeeChat \

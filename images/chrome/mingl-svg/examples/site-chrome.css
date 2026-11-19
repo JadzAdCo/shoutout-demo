@@ -1,0 +1,3 @@
+/* Examples only: bind --mingl-ink to FLOQR’s existing Site Chrome tokens. */
+.mingl-icon { width: 28px; height: 28px; color: var(--mingl-ink, currentColor); }
+/* SVGs use currentColor, so CSS color controls the complete monochrome mark. */

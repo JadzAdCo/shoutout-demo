@@ -474,6 +474,42 @@
       page: "botdee.html#botDeeChatPage"
     },
     {
+      id: "help-smartvisuals-notification",
+      title: "Mingl Room SMARTnotification",
+      body: "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come only from the room record. Ads, if ever approved, sit below the card and stay labeled Ad.",
+      searchPhrases: [
+        "smartnotification", "smart notification", "mingl room invitation", "view invitation",
+        "cancun trip", "smartvisuals", "smartstencils", "smartbackgrounds"
+      ],
+      links: [{label: "Open Search", href: pageUrl("./", {start: "search"})}],
+      audiences: ["patron", "serviceMember", "venueAdmin"],
+      source: "help-repository-seed",
+      page: "index.html#categoryPage"
+    },
+    {
+      id: "help-smartvisuals-room",
+      title: "Room SMARTview with SMARTvisuals",
+      body: "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used to pick art. Group rooms are not live yet, so Join Now does not create a room or charge. A labeled Ad slot may sit below; it is empty until separately approved.",
+      searchPhrases: [
+        "room smartview invitation", "join now mingl", "smartstencils", "smartbackgrounds",
+        "cancun trip room", "bot-dee itinerary"
+      ],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin"],
+      source: "help-repository-seed",
+      page: "index.html#categoryPage"
+    },
+    {
+      id: "help-smartvisuals-studio",
+      title: "SMARTvisual Studio",
+      body: "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads stay a separate labeled slot and are off.",
+      searchPhrases: ["smartvisual studio", "asset registry", "smartvisuals library", "publish stencil"],
+      links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#smartvisualStudio"
+    },
+    {
       id: "help-botdee-room-smartview-invite",
       title: "Room SMARTview invite",
       body: "Invite others from Room SMARTview after you confirm. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Wrong-account, blocked, and non-friend invites will refuse when group rooms ship. Nothing is sent today; group rooms are not live.",
@@ -646,8 +682,8 @@
     {
       id: "help-botdee-smartcard-search",
       title: "Ask BOT DEE who someone is",
-      body: "Ask “Who am I?” to open your own SMARTview. Ask “Who is …” or “What do you know of …” plus a name or @handle to look up public FLOQR profiles. One match opens a People SMARTview card in the chat — not a markdown list. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether that account exists.",
-      searchPhrases: ["who am i", "who is", "what do you know of", "tell me about", "find person on floqr", "do you know this person", "people search bot dee", "lookup public profile"],
+      body: "Ask “Who am I?” to open your own SMARTview. Ask “Who is …”, “What do you know of …”, or “What about …” plus a first and last name, display name, or @handle. One match opens a People SMARTview card in the chat — not a markdown list or photo dump. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether that account exists.",
+      searchPhrases: ["who am i", "who is", "what do you know of", "what about", "tell me about", "display name", "find person on floqr", "do you know this person", "people search bot dee", "lookup public profile"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
@@ -791,6 +827,7 @@
       body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates.",
       searchPhrases: [
         "choose a shoutout venue", "shoutout venue", "nearest shoutout", "throw a shoutout",
+        "throw shoutout from chat", "headless shoutout",
         "search shoutout club", "display sizes", "patron custom shoutout", "choose location for shoutout"
       ],
       links: [

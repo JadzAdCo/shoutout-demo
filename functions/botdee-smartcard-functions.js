@@ -162,18 +162,26 @@ async function runPeopleSearch({query, page, uiLanguage, viewerUid, request}) {
         lookupError = true;
       } else {
         const profiles = Array.isArray(looked.profiles) ? looked.profiles : [];
+        let viewerMatch = null;
         for (const row of profiles) {
           if (!row || row.kind !== "user" || !row.id) continue;
-          if (row.id === viewerUid) continue;
+          const isViewer = row.id === viewerUid;
           const loaded = await loadAuthorizedPeopleView({
             viewerUid,
             subjectUid: row.id,
             uiLanguage,
-            allowPrivateSelf: false
+            allowPrivateSelf: isViewer
           });
           if (loaded && loaded.blocked) continue;
           if (loaded && loaded.hidden) continue;
-          if (loaded && loaded.view) matches.push(loaded.view);
+          if (!(loaded && loaded.view)) continue;
+          if (isViewer) viewerMatch = loaded.view;
+          else matches.push(loaded.view);
+        }
+        if (viewerMatch && !matches.length) {
+          selfView = viewerMatch;
+        } else if (viewerMatch) {
+          matches.unshift(viewerMatch);
         }
       }
     }

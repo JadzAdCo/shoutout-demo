@@ -1515,6 +1515,18 @@ exports.createFloqrCheckoutSession = onCall({
   memory:"256MiB"
 }, runCreateFloqrCheckoutSession);
 
+/** FloqR + BOT DEE headless ShoutOut: compose from club + message, then Stripe or pending submit. */
+exports.createHeadlessShoutOutCheckout = onCall({
+  region:"us-central1",
+  secrets:[STRIPE_SECRET_KEY],
+  timeoutSeconds:30,
+  memory:"256MiB"
+}, async (request) => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in required.");
+  const tools = require("./bot-dee-tools");
+  return tools.startShoutOutCheckout(request.data || {}, request);
+});
+
 
 async function cancelUnpaidOrder(orderId, authContext, reason = "cancelled") {
   const id = text(orderId, 120);
