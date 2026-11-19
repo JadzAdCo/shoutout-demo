@@ -600,6 +600,102 @@
     return !!(payload && typeof payload === "object" && payload.kind === "botDeeRoom");
   }
 
+  function isShoutOutPayload(payload) {
+    return !!(payload && typeof payload === "object" && payload.kind === "botDeeShoutOut");
+  }
+
+  function shoutNeedLabel(id) {
+    if (id === "template") return t("botdee.so.needTemplate", "Choose a template");
+    if (id === "handle") return t("botdee.so.needHandle", "Include your @handle?");
+    if (id === "media") return t("botdee.so.needMedia", "Text only, or photo/video via compose");
+    if (id === "compose") return t("botdee.so.needCompose", "Open compose for photo/video");
+    return esc(id);
+  }
+
+  function renderShoutOutCard(payload) {
+    const view = payload && typeof payload === "object" ? payload : {};
+    const needs = Array.isArray(view.needs) ? view.needs : [];
+    const templates = Array.isArray(view.templates) ? view.templates.slice(0, 8) : [];
+    const suggestions = Array.isArray(view.suggestions) ? view.suggestions : [];
+    const preview = resolveSameOriginHref(view.previewHref || "");
+    const compose = resolveSameOriginHref(view.composeHref || "");
+    const portal = resolveSameOriginHref(view.portalHref || "");
+    const checkout = String(view.checkoutUrl || "").trim();
+    const mode = String(view.mode || "draft");
+    const handleCopy = view.handleDecision === "include"
+      ? (view.attribution || t("botdee.so.handleOn", "FloqR card on"))
+      : (view.handleDecision === "skip"
+        ? t("botdee.so.handleOff", "No @handle")
+        : t("botdee.so.handleUnset", "Not chosen yet"));
+    const mediaCopy = view.mediaDecision === "compose"
+      ? t("botdee.so.photoCompose", "Photo/video — compose")
+      : (view.mediaDecision === "none"
+        ? t("botdee.so.textOnly", "Text only")
+        : (view.mediaUrl ? view.mediaUrl : t("botdee.so.mediaUnset", "Not chosen yet")));
+    const templateCopy = view.templateName
+      || (view.templateSuggestedName
+        ? t("botdee.so.templateDefault", "Traditional (default until you pick)")
+        : t("botdee.so.templateUnset", "Not chosen yet"));
+    const chip = row => {
+      const prompt = String(row.prompt || "").trim();
+      if (!prompt) return "";
+      return `<button type="button" class="botdee-so-chip" data-so-prompt="${esc(prompt)}">${esc(prompt)}</button>`;
+    };
+    const templateChipLabel = {
+      blackwhite: "Traditional",
+      birthday: "Birthday",
+      vip: "VIP",
+      neon: "Neon",
+      gold: "Gold",
+      graduation: "Graduation",
+      corporate: "Corporate",
+      classicHalloween: "Halloween"
+    };
+    const templateChips = templates.map(row => chip({prompt: templateChipLabel[row.id] || row.id})).join("");
+    const extraChips = suggestions.filter(row => ["includeHandle", "skipHandle", "textOnly", "photoCompose", "throwIt"].includes(row.id)).map(chip).join("");
+    return `<article class="botdee-sv-shoutout" data-kind="botDeeShoutOut" data-so-mode="${esc(mode)}">
+      <h2 class="botdee-so-title">${esc(t("botdee.so.title", "ShoutOut SMARTview"))}</h2>
+      <p class="botdee-so-hint">${esc(t("botdee.so.hint", "BOT DEE preview only. Reply in chat to fill this in. A third-party headless throw does not need this card."))}</p>
+      <dl class="botdee-so-facts">
+        <div><dt>${esc(t("botdee.so.venue", "Venue"))}</dt><dd>${esc(view.venueName || view.clubLocationId || "—")}</dd></div>
+        <div><dt>${esc(t("botdee.so.message", "Message"))}</dt><dd>${esc(view.mainText || "—")}</dd></div>
+        <div><dt>${esc(t("botdee.so.template", "Template"))}</dt><dd>${esc(templateCopy)}</dd></div>
+        <div><dt>${esc(t("botdee.so.handle", "@handle"))}</dt><dd>${esc(handleCopy)}</dd></div>
+        <div><dt>${esc(t("botdee.so.media", "Photo / video"))}</dt><dd>${esc(mediaCopy)}</dd></div>
+      </dl>
+      ${needs.length ? `<ul class="botdee-so-needs">${needs.map(id => `<li>${esc(shoutNeedLabel(id))}</li>`).join("")}</ul>` : ""}
+      ${preview ? `<div class="botdee-so-preview"><iframe title="${esc(t("botdee.so.preview", "ShoutOut preview"))}" src="${esc(preview)}" loading="lazy" referrerpolicy="no-referrer"></iframe></div>` : ""}
+      ${mode === "draft" ? `<div class="botdee-so-chips" role="group">${templateChips}${extraChips}</div>` : ""}
+      <div class="botdee-so-actions">
+        ${checkout ? `<a class="botdee-sv-action botdee-sv-action-main" href="${esc(checkout)}" rel="noopener">${esc(t("botdee.so.pay", "Pay securely"))}</a>` : ""}
+        ${portal ? `<a class="botdee-sv-action" href="${esc(portal)}">${esc(t("botdee.so.portal", "Open in My ShoutOuts"))}</a>` : ""}
+        ${compose ? `<a class="botdee-sv-action" href="${esc(compose)}">${esc(t("botdee.so.compose", "Open compose"))}</a>` : ""}
+      </div>
+    </article>`;
+  }
+
+  function bindShoutOutCard(card) {
+    if (!card || card.dataset.soBound === "1") return;
+    card.dataset.soBound = "1";
+    card.querySelectorAll("[data-so-prompt]").forEach(btn => {
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        const prompt = String(btn.getAttribute("data-so-prompt") || "").trim();
+        if (!prompt) return;
+        if (typeof global.FLOQRBotDeeChat?.sendMessage === "function") {
+          global.FLOQRBotDeeChat.sendMessage(prompt);
+          return;
+        }
+        const input = global.document?.getElementById("botDeeChatInput");
+        const form = global.document?.getElementById("botDeeChatForm");
+        if (input) {
+          input.value = prompt;
+          form?.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}));
+        }
+      });
+    });
+  }
+
   function rememberRoomDecline(key) {
     const token = String(key || "").slice(0, 80);
     if (!token) return;
@@ -768,6 +864,7 @@
     if (!payload || typeof payload !== "object") return "";
     if (isVersionPayload(payload)) return renderVersionCard(payload);
     if (isRoomPayload(payload)) return renderRoomCard(payload);
+    if (isShoutOutPayload(payload)) return renderShoutOutCard(payload);
     if (isCompactCard(payload)) return renderCompactPeopleCard(payload);
     if (peopleOf(payload)) return renderPeopleCard(payload);
     const mock = payload.sources && payload.sources.some(s => s.provider === "mock" || s.reuseRights === "unknown");
@@ -1347,6 +1444,7 @@
     wireActionLinks(el);
     el.querySelectorAll(".botdee-sv-version").forEach(card => bindVersionCard(card));
     el.querySelectorAll(".botdee-sv-room").forEach(card => bindRoomCard(card));
+    el.querySelectorAll(".botdee-sv-shoutout").forEach(card => bindShoutOutCard(card));
     const cards = el.querySelectorAll(".botdee-sv-people");
     let index = 0;
     list.forEach(payload => {
@@ -1382,6 +1480,8 @@
     renderRoomCard,
     isVersionPayload,
     isRoomPayload,
+    isShoutOutPayload,
+    renderShoutOutCard,
     localVersionPayload,
     peopleHeroMedia,
     isCompactCard,

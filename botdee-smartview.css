@@ -58,7 +58,8 @@
 .botdee-transcript .botdee-sv-host,
 .botdee-transcript .botdee-sv-people,
 .botdee-transcript .botdee-sv-version,
-.botdee-transcript .botdee-sv-room {
+.botdee-transcript .botdee-sv-room,
+.botdee-transcript .botdee-sv-shoutout {
   overflow: visible;
   max-height: none;
 }
@@ -848,4 +849,93 @@ body.botdee-sv-overlay-open { overflow: hidden; }
 @media (max-width: 390px) {
   .botdee-sv-room { padding: 0.8rem 0.75rem; }
   .botdee-sv-room-stats { grid-template-columns: 1fr; }
+}
+
+.botdee-sv-shoutout {
+  margin: 0.35rem 0 0;
+  padding: 0.9rem 0.95rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 35%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--floqr-panel, #111) 88%, #000);
+  color: var(--floqr-ink, #e8f7f8);
+}
+.botdee-so-title {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+.botdee-so-hint {
+  margin: 0.35rem 0 0.7rem;
+  font-size: 0.78rem;
+  color: var(--muted, #a5b9ba);
+  line-height: 1.4;
+}
+.botdee-so-facts {
+  margin: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.botdee-so-facts > div {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 0.4rem;
+  align-items: start;
+}
+.botdee-so-facts dt {
+  margin: 0;
+  color: var(--muted, #a5b9ba);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.botdee-so-facts dd {
+  margin: 0;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.botdee-so-needs {
+  margin: 0.7rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+.botdee-so-preview {
+  margin: 0.75rem 0 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 2 / 1;
+}
+.botdee-so-preview iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
+}
+.botdee-so-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0;
+}
+.botdee-so-chip {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 45%, transparent);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 0 0.85rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.botdee-so-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.75rem 0 0;
+}
+@media (max-width: 480px) {
+  .botdee-so-facts > div { grid-template-columns: 1fr; }
 }

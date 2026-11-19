@@ -206,54 +206,133 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   };
 }
 
-async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures) {
+function shoutOutSmartOutcome(reply, lang, extra = {}) {
+  const links = Array.isArray(extra.results) ? extra.results : [];
+  return {
+    reply,
+    results: links,
+    provider: extra.provider || "headless-shoutout",
+    model: extra.model || "startShoutOutCheckout",
+    toolRounds: extra.toolRounds == null ? 1 : extra.toolRounds,
+    uiLanguage: lang,
+    smartViews: Array.isArray(extra.smartViews) ? extra.smartViews : []
+  };
+}
+
+async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures, previousDraft) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const headless = require("./headless-shoutout-core");
+  const shoutView = require("./botdee-shoutout-smartview");
+  const threads = require("./bot-dee-thread");
+  const tools = require("./bot-dee-tools");
+  const uid = session?.userId || session?.request?.auth?.uid || "";
   const parsed = headless.parseShoutOutExecute(userPrompt);
-  if (!parsed.clubQuery || !parsed.message) {
+  if (previousDraft && /^(yes|yeah|yep|yup|ok|okay|sure)[.!?]*$/i.test(String(userPrompt || "").trim())) {
+    parsed.confirmSubmit = true;
+  }
+  if (parsed.cancel && previousDraft) {
+    try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
+    return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
+      model: "headless-draft",
+      toolRounds: 0,
+      smartViews: []
+    });
+  }
+  const merged = headless.mergeInteractiveDraft(previousDraft, parsed);
+  if (!merged.clubQuery || !merged.message) {
     return bot.shoutOutExecuteFallback(lang, allowed);
   }
-  const tools = require("./bot-dee-tools");
+  try {
+    merged.clubQuery = await tools.requireClubLocationId(merged.clubQuery);
+  } catch (error) {
+    const fallback = bot.shoutOutExecuteFallback(lang, allowed);
+    return shoutOutSmartOutcome(error.message || fallback.reply, lang, {
+      results: fallback.results,
+      model: "headless-draft",
+      toolRounds: 0
+    });
+  }
+  const confirm = parsed.confirmSubmit === true || merged.skipExtras === true;
+  if (confirm) merged.skipExtras = true;
+  if (merged.handleDecision === "include" && !merged.attribution) {
+    try {
+      merged.attribution = await tools.loadPatronShoutOutAttribution(uid);
+    } catch (_) {}
+  }
+  const needs = headless.interactiveNeeds(merged);
+  const viewBase = {
+    draft: merged,
+    needs,
+    venueName: merged.clubQuery
+  };
+  if (needs.includes("compose") || merged.mediaDecision === "compose") {
+    try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
+    const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "draft"});
+    const fallback = bot.shoutOutExecuteFallback(lang, allowed);
+    return shoutOutSmartOutcome(headless.missingAsk(["compose"]), lang, {
+      results: fallback.results,
+      model: "headless-draft",
+      toolRounds: 0,
+      smartViews: [view]
+    });
+  }
+  if (needs.length) {
+    try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
+    const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "draft"});
+    return shoutOutSmartOutcome(headless.missingAsk(needs), lang, {
+      model: "headless-draft",
+      toolRounds: 0,
+      smartViews: [view]
+    });
+  }
   const result = await tools.startShoutOutCheckout({
-    locationName: parsed.clubQuery,
-    clubLocationId: parsed.clubQuery,
-    mainText: parsed.message,
-    templateId: parsed.templateId,
-    screenFormatId: parsed.screenFormatId,
+    locationName: merged.clubQuery,
+    clubLocationId: merged.clubQuery,
+    mainText: merged.message,
+    templateId: merged.templateId || headless.DEFAULT_TEMPLATE_ID,
+    screenFormatId: merged.screenFormatId,
+    includeAttribution: merged.handleDecision === "include",
+    attribution: merged.attribution,
+    mediaUrl: merged.mediaUrl,
     userPrompt,
     returnBase: session?.request?.data?.returnBase
   }, session.request);
   const links = bot.linksFromToolResult(result, lang);
+  try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
   if (result?.ok && result.checkoutUrl) {
-    return {
-      reply: `Your ShoutOut at ${result.venueName || result.clubLocationId} is ready to pay. Open the secure Stripe link — I never take card numbers.`,
-      results: links,
-      provider: "headless-shoutout",
-      model: "startShoutOutCheckout",
-      toolRounds: 1,
-      uiLanguage: lang
-    };
+    const view = shoutView.buildShoutOutSmartView({
+      ...viewBase,
+      mode: "checkout",
+      needs: [],
+      venueName: result.venueName || merged.clubQuery,
+      checkoutUrl: result.checkoutUrl
+    });
+    return shoutOutSmartOutcome(
+      `Your ShoutOut at ${result.venueName || result.clubLocationId} is ready to pay. Open the secure Stripe link — I never take card numbers.`,
+      lang,
+      {results: links, smartViews: [view]}
+    );
   }
   if (result?.ok && result.shoutoutId) {
-    return {
-      reply: `Your ShoutOut is in for club approval at ${result.venueName || result.clubLocationId}. It will play after the venue accepts it.`,
-      results: links,
-      provider: "headless-shoutout",
-      model: "startShoutOutCheckout",
-      toolRounds: 1,
-      uiLanguage: lang
-    };
+    const view = shoutView.buildShoutOutSmartView({
+      ...viewBase,
+      mode: "submitted",
+      needs: [],
+      venueName: result.venueName || merged.clubQuery,
+      shoutoutId: result.shoutoutId,
+      portalHref: result.portalHref
+    });
+    return shoutOutSmartOutcome(
+      `Your ShoutOut is in for club approval at ${result.venueName || result.clubLocationId}. It will play after the venue accepts it.`,
+      lang,
+      {results: links, smartViews: [view]}
+    );
   }
   const fallback = bot.shoutOutExecuteFallback(lang, allowed);
-  return {
-    reply: result?.error || fallback.reply,
-    results: links.length ? links : fallback.results,
-    provider: "headless-shoutout",
-    model: "startShoutOutCheckout",
-    toolRounds: 1,
-    uiLanguage: lang
-  };
+  return shoutOutSmartOutcome(result?.error || fallback.reply, lang, {
+    results: links.length ? links : fallback.results
+  });
 }
 
 function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined, functionsReachable, geminiConfigured} = {}) {
@@ -536,9 +615,13 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       hasActiveRoom: false,
       declinedKeys: roomDeclined
     });
+    const previousShoutDraft = stored.headlessShoutOutDraft || null;
+    const shoutFollowUp = !!(previousShoutDraft
+      && require("./headless-shoutout-core").isInteractiveFollowUp(userPrompt, previousShoutDraft));
+    const shoutExecute = bot.isShoutOutExecutePrompt(userPrompt) || shoutFollowUp;
     let peopleAttached = null;
     const peopleIntent = peopleCards.classifyPeopleSearchIntent(userPrompt);
-    if (!roomAttached.handled) {
+    if (!roomAttached.handled && !shoutExecute) {
       try {
         peopleAttached = await peopleCards.attachPeopleSearch({
           query: userPrompt,
@@ -564,6 +647,22 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         replyKey: roomAttached.replyKey,
         geminiOnView: false
       };
+    } else if (shoutExecute) {
+      try {
+        outcome = await tryHeadlessShoutOut(
+          userPrompt, session, uiLanguage, allowedFeatures, previousShoutDraft
+        );
+      } catch (error) {
+        console.warn("BOT DEE headless ShoutOut failed", error?.message || error);
+        outcome = null;
+      }
+      if (!outcome) {
+        outcome = localSession(role, userPrompt, {
+          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+          functionsReachable: true,
+          geminiConfigured: !!apiKey
+        });
+      }
     } else if (peopleAttached && peopleAttached.handled) {
       outcome = {
         reply: peopleAttached.reply,
@@ -576,20 +675,6 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         peopleSearch: peopleAttached.peopleSearch,
         geminiOnView: false
       };
-    } else if (bot.isShoutOutExecutePrompt(userPrompt)) {
-      try {
-        outcome = await tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures);
-      } catch (error) {
-        console.warn("BOT DEE headless ShoutOut failed", error?.message || error);
-        outcome = null;
-      }
-      if (!outcome) {
-        outcome = localSession(role, userPrompt, {
-          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
-          functionsReachable: true,
-          geminiConfigured: !!apiKey
-        });
-      }
     } else if (peopleIntent.intent !== "none") {
       const peopleCore = require("./botdee-smartcard-core");
       outcome = {
@@ -671,9 +756,12 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         && outcome.smartViews.some(row => row && row.kind === "botDeeVersion");
       const alreadyRoom = Array.isArray(outcome.smartViews)
         && outcome.smartViews.some(row => row && row.kind === "botDeeRoom");
+      const alreadyShout = Array.isArray(outcome.smartViews)
+        && outcome.smartViews.some(row => row && row.kind === "botDeeShoutOut");
       if (
         !alreadyVersion
         && !alreadyRoom
+        && !alreadyShout
         && !outcome.smartViews
         && /\b(smartview|smart view|research library|explain (?:my )?recommendation)\b/i.test(userPrompt)
       ) {

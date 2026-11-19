@@ -479,6 +479,14 @@
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
         },
+        "help:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. Ein ShoutOut SMARTview zeigt die Antworten. Antworten Sie im Chat oder tippen Sie einen Chip. Foto/Video bleibt Compose. Ein echter Headless-Wurf von FloqR"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. Ein ShoutOut SMARTview zeigt die Antworten. Antworten Sie im Chat oder tippen Sie einen Chip. Foto/Video bleibt Compose. Ein echter Headless-Wurf von FloqR"
+        },
         "help:help-vip-book-table": {
           "label": "VIP-Tisch buchen (VIP reserV)",
           "blurb": "VIP reserV zeigt den Saalplan und bucht Tische. Öffne VIP reserV aus der Suche, wähle Decades oder Lima Twist Club und einen Abend, tippe einen grünen Tisch, halte 30 Minuten, akzeptiere die AGB und zahle die Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar. Marke VIP reserV w"
@@ -1533,6 +1541,14 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "SMARTview ShoutOut headless",
+          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. Un SMARTview ShoutOut prévisualise vos réponses. Répondez dans le chat ou touchez une puce. Photo et vidéo passent par co"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "SMARTview ShoutOut headless",
+          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. Un SMARTview ShoutOut prévisualise vos réponses. Répondez dans le chat ou touchez une puce. Photo et vidéo passent par co"
         },
         "help:help-vip-book-table": {
           "label": "Réserver une table VIP (VIP reserV)",
@@ -2589,6 +2605,14 @@
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
         },
+        "help:help-shoutout-headless-smartview": {
+          "label": "SMARTview ShoutOut headless",
+          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. Un SMARTview de ShoutOut previsualiza las respuestas. Responda en el chat o toque un chip. Foto y vídeo siguen en compose. Un envío h"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "SMARTview ShoutOut headless",
+          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. Un SMARTview de ShoutOut previsualiza las respuestas. Responda en el chat o toque un chip. Foto y vídeo siguen en compose. Un envío h"
+        },
         "help:help-vip-book-table": {
           "label": "Reservar mesa VIP (VIP reserV)",
           "blurb": "VIP reserV muestra el mapa y reserva mesas. Abre VIP reserV desde Buscar, elige Decades o Lima Twist Club y una noche, toca una mesa verde, reserva 30 minutos, acepta Términos y paga el depósito con FloqR Stripe. Barras y DJ no reservables. En Aurelia, use Explore 3D walk-through"
@@ -3643,6 +3667,14 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "SMARTview ShoutOut headless",
+          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. Una SMARTview ShoutOut anteprima le risposte. Rispondi in chat o tocca un chip. Foto e video restano su compose. Un throw headless FloqR o "
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "SMARTview ShoutOut headless",
+          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. Una SMARTview ShoutOut anteprima le risposte. Rispondi in chat o tocca un chip. Foto e video restano su compose. Un throw headless FloqR o "
         },
         "help:help-vip-book-table": {
           "label": "Prenota un tavolo VIP (VIP reserV)",
@@ -4699,6 +4731,14 @@
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
         },
+        "help:help-shoutout-headless-smartview": {
+          "label": "SMARTview ShoutOut headless",
+          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. Um SMARTview ShoutOut pré-visualiza as respostas. Responda no chat ou toque num chip. Foto e vídeo continuam no compose. Um envio headless FloqR ou "
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "SMARTview ShoutOut headless",
+          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. Um SMARTview ShoutOut pré-visualiza as respostas. Responda no chat ou toque num chip. Foto e vídeo continuam no compose. Um envio headless FloqR ou "
+        },
         "help:help-vip-book-table": {
           "label": "Reservar mesa VIP (VIP reserV)",
           "blurb": "VIP reserV mostra o mapa e reserva mesas. Abra VIP reserV na Busca, escolha Decades ou Lima Twist Club e uma noite, toque numa mesa verde, segure 30 minutos, aceite os Termos e pague o depósito com FloqR Stripe. Barras e DJ não reserváveis. Em Aurelia, use Explore 3D walk-through"
@@ -5753,6 +5793,14 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. SMARTview показывает ответы. Ответьте в чате или нажмите чип. Фото и видео по-прежнему через compose. Настоящий headless-запрос FloqR или третьей стороны эту карточ"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. SMARTview показывает ответы. Ответьте в чате или нажмите чип. Фото и видео по-прежнему через compose. Настоящий headless-запрос FloqR или третьей стороны эту карточ"
         },
         "help:help-vip-book-table": {
           "label": "Забронировать VIP-стол (VIP reserV)",
@@ -6809,6 +6857,14 @@
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
         },
+        "help:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Ένα ShoutOut SMARTview δείχνει τις απαντήσεις. Απαντήστε στη συνομιλία ή πατήστε chip. Φωτογραφία/βίντεο μένουν στο compose. Ένα πραγματικό headless throw από Floq"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Ένα ShoutOut SMARTview δείχνει τις απαντήσεις. Απαντήστε στη συνομιλία ή πατήστε chip. Φωτογραφία/βίντεο μένουν στο compose. Ένα πραγματικό headless throw από Floq"
+        },
         "help:help-vip-book-table": {
           "label": "Κράτηση VIP τραπεζιού (VIP reserV)",
           "blurb": "Το VIP reserV δείχνει τον χάρτη και κλείνει τραπέζια. Ανοίξτε VIP reserV από Αναζήτηση, επιλέξτε Decades ή Lima Twist Club και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα. Στην Aurelia χρησιμοποιήστε "
@@ -7863,6 +7919,14 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTview podgląda odpowiedzi. Odpowiedz na czacie albo stuknij chip. Zdjęcie i wideo nadal przez compose. Prawdziwy headless z FloqR lu"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTview podgląda odpowiedzi. Odpowiedz na czacie albo stuknij chip. Zdjęcie i wideo nadal przez compose. Prawdziwy headless z FloqR lu"
         },
         "help:help-vip-book-table": {
           "label": "Zarezerwuj stolik VIP (VIP reserV)",
@@ -8919,6 +8983,14 @@
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
         },
+        "help:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. Een ShoutOut SMARTview toont de antwoorden. Antwoord in de chat of tik een chip. Foto en video blijven compose. Een echte headless throw van FloqR of een d"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. Een ShoutOut SMARTview toont de antwoorden. Antwoord in de chat of tik een chip. Foto en video blijven compose. Een echte headless throw van FloqR of een d"
+        },
         "help:help-vip-book-table": {
           "label": "VIP-tafel boeken (VIP reserV)",
           "blurb": "VIP reserV toont de plattegrond en boekt tafels. Open VIP reserV via Zoeken, kies Decades of Lima Twist Club en een avond, tik een groene tafel, houd 30 minuten, accepteer voorwaarden en betaal de borg met FloqR Stripe. Bars en DJ niet boekbaar. Bij Aurelia gebruikt u Explore 3D "
@@ -9973,6 +10045,14 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. يعرض ShoutOut SMARTview الإجابات أثناء التعبئة. أجب في الدردشة أو اضغط شريحة. الصورة والفيديو ما زالا عبر compose. الرمي headless الحقيقي من FloqR أو طرف ثالث لا يستخدم هذه "
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "Headless ShoutOut SMARTview",
+          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. يعرض ShoutOut SMARTview الإجابات أثناء التعبئة. أجب في الدردشة أو اضغط شريحة. الصورة والفيديو ما زالا عبر compose. الرمي headless الحقيقي من FloqR أو طرف ثالث لا يستخدم هذه "
         },
         "help:help-vip-book-table": {
           "label": "حجز طاولة VIP (VIP reserV)",

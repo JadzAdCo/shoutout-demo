@@ -309,6 +309,16 @@ async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth
   };
 }
 
+async function loadPatronShoutOutAttribution(uid) {
+  const id = text(uid, 80);
+  if (!id) return "";
+  const snap = await db.collection("users").doc(id).get();
+  const data = snap.exists ? (snap.data() || {}) : {};
+  return headless.formatHandle(
+    data.floqrHandle || data.username || data.minglHandle || data.displayName || data.publicName
+  );
+}
+
 async function startShoutOutCheckout(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "shoutOut", sessionRequest);
   await featureGates.assertPatronFeature(sessionRequest.auth, "shoutOut");
@@ -364,13 +374,28 @@ async function startShoutOutCheckout(args, sessionRequest) {
   await featureGates.assertClubFeature(clubLocationId, "shoutOut");
   const snap = await db.collection("clubLocations").doc(clubLocationId).get();
   const venue = snap.exists ? {id: clubLocationId, ...(snap.data() || {})} : {id: clubLocationId};
+  const includeAttribution = args?.includeAttribution === true
+    || args?.includeAttribution === 1
+    || args?.includeAttribution === "1"
+    || existing?.includeAttribution === true;
+  const attribution = text(
+    args?.attribution || payload.attribution || existing?.attribution || parsed.attribution,
+    80
+  );
+  const mediaUrl = text(args?.mediaUrl || payload.mediaUrl || existing?.mediaUrl || parsed.mediaUrl, 500);
+  const mediaType = text(args?.mediaType || payload.mediaType || existing?.mediaType, 20);
   const composed = headless.composeShoutOutPayload({
     clubLocationId,
     venue,
     message,
     templateId,
     screenFormatId,
-    userPrompt
+    userPrompt,
+    includeAttribution,
+    attribution,
+    attributionChoice: text(args?.attributionChoice || existing?.attributionChoice, 40),
+    mediaUrl,
+    mediaType
   });
   if (!composed.ok) {
     return {
@@ -1224,6 +1249,7 @@ module.exports = {
   injectSelfProfile,
   resolveClubLocationId,
   requireClubLocationId,
+  loadPatronShoutOutAttribution,
   normalizeClubNeedle,
   CLUB_NAME_ALIASES
 };

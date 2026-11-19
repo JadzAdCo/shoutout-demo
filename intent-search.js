@@ -51,7 +51,8 @@
       blurb: "Send a live message to a FloqR display.",
       href: pageUrl("./", {start: "search"}),
       action: "shoutout",
-      patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/, /christine/, /zebbies\s*garden/]
+      searchPhrases: ["headless shoutout", "shoutout smartview", "include my handle", "throw shoutout from chat"],
+      patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/, /christine/, /zebbies\s*garden/, /headless\s*shout/]
     },
     {
       id: "football-intro",
