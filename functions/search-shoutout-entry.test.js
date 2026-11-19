@@ -94,7 +94,7 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(chrome, /shoutout-traditional-green\.png/);
   assert.match(chrome, /shoutout-nightlife\.png/);
   assert.match(chrome, /sinema-nightlife\.jpg/);
-  assert.match(chrome, /sinema-whiteblack\.jpg/);
+  assert.match(chrome, /sinema-whiteblack\.png/);
   assert.match(chrome, /mingl: "\.\/images\/chrome\/mingl-nightlife\.jpg/);
   assert.match(chrome, /mingl: "\.\/images\/chrome\/mingl-traditional\.jpg/);
   assert.match(chrome, /mingl: "\.\/images\/chrome\/mingl-whiteblack\.jpg/);

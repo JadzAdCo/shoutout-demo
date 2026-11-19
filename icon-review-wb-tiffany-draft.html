@@ -15,19 +15,20 @@
     .pair{display:grid;gap:8px;justify-items:center}
     .pair span{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#666}
     .pair img{width:220px;height:220px;object-fit:contain;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+    .checker{background-color:#fff;background-image:linear-gradient(45deg,#d9d9de 25%,transparent 25%),linear-gradient(-45deg,#d9d9de 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d9d9de 75%),linear-gradient(-45deg,transparent 75%,#d9d9de 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
     .search-icon-row{justify-content:center;flex-wrap:wrap;background:#fff;padding:22px 16px;border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
   </style>
 </head>
 <body>
   <h1>White/Black draft — Tiffany on gl / nema</h1>
-  <p>White/Black Si-nema re-rendered from the official mark: clapper objects (play, AI, sticks, film) keep official pixels on a white field; <b>Si-</b> is the official letter matte in black; <b>nema</b> stays Tiffany. No invert, no chopped S.</p>
+  <p>White/Black Si-nema: clap lid kept. Red-marked screen fill and hanging film are <b>transparent</b> (checkerboard). Play / AI / film keep vivid Tiffany outlines. Official <b>Si-</b> in black, <b>nema</b> Tiffany.</p>
 
   <h2>Search row (White/Black)</h2>
   <div class="search-icon-row">
     <span class="shoutout-icon-card"><span class="floqcast-icon-face chrome-photo-face"><img src="./images/chrome/floqcast-whiteblack.jpg" alt="" class="floqcast-tile-mark" width="96" height="96"/></span></span>
     <span class="shoutout-icon-card"><span class="botdee-icon-face chrome-photo-face"><img src="./images/chrome/botdee-whiteblack.jpg" alt="" class="botdee-tile-mark" width="96" height="96"/></span></span>
     <span class="shoutout-icon-card"><span class="vip-icon-face chrome-photo-face"><img src="./images/chrome/vip-whiteblack.jpg" alt="" class="vip-tile-mark" width="96" height="96"/></span></span>
-    <span class="shoutout-icon-card"><span class="sinema-icon-face chrome-photo-face"><img src="./images/chrome/sinema-whiteblack.jpg" alt="" class="sinema-tile-mark" width="96" height="96"/></span></span>
+    <span class="shoutout-icon-card"><span class="sinema-icon-face chrome-photo-face"><img src="./images/chrome/sinema-whiteblack.png" alt="" class="sinema-tile-mark" width="96" height="96"/></span></span>
     <span class="shoutout-icon-card"><span class="mingl-icon-face chrome-photo-face"><img src="./images/chrome/mingl-whiteblack.jpg" alt="" class="mingl-tile-mark" width="96" height="96"/></span></span>
   </div>
 
@@ -40,12 +41,13 @@
   <h2>Si-nema — live vs draft</h2>
   <div class="row">
     <div class="pair"><span>Live (soft invert)</span><img src="./images/review/sinema-whiteblack-before.jpg" alt="Si-nema White/Black before"/></div>
-    <div class="pair"><span>Draft (re-render)</span><img src="./images/chrome/sinema-whiteblack.jpg" alt="Si-nema White/Black draft"/></div>
+    <div class="pair"><span>Draft (transparent holes)</span><img class="checker" src="./images/chrome/sinema-whiteblack.png" alt="Si-nema White/Black draft PNG"/></div>
   </div>
 
   <h2>Si-nema draft at share-sheet size</h2>
   <div class="row">
-    <div class="pair"><span>360px</span><img src="./images/chrome/sinema-whiteblack.jpg" alt="Si-nema White/Black 360" style="width:360px;height:360px"/></div>
+    <div class="pair"><span>360px on checkerboard</span><img class="checker" src="./images/chrome/sinema-whiteblack.png" alt="Si-nema White/Black 360" style="width:360px;height:360px"/></div>
+    <div class="pair"><span>360px on white card</span><img src="./images/chrome/sinema-whiteblack.png" alt="Si-nema White/Black 360 white" style="width:360px;height:360px"/></div>
   </div>
 </body>
 </html>

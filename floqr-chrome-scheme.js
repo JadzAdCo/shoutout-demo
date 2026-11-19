@@ -113,7 +113,7 @@
     settings: "./images/chrome/settings-whiteblack.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-whiteblack.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-whiteblack.jpg?v=" + ICON_V,
-    sinema: "./images/chrome/sinema-whiteblack.jpg?v=" + ICON_V,
+    sinema: "./images/chrome/sinema-whiteblack.png?v=" + ICON_V,
     mingl: "./images/chrome/mingl-whiteblack.jpg?v=" + ICON_V
   };
   const ICON_PACK = {
