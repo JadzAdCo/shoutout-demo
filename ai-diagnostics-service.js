@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.044";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.044";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.045";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.045";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.045",
+      title: "s3.3.045 — ShoutOut SMARTpreview live LED template (display.html preview=1)",
+      checks: [
+        {label:"Live LED iframe", file:"botdee-smartview.js", includes:["shoutOutLedSrc", "botdee-so-led", "patchShoutOutLedSrc"]},
+        {label:"Composer preview not Xibo URL", file:"botdee-smartview.js", includes:["sanitizeShoutOutPreviewHref", "preview", "1"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-045-smartpreview-live-led"]}
+      ]
+    },
     {
       version: "s3.3.044",
       title: "s3.3.044 — ShoutOut SMARTpreview (template / @handle / media) without coupling core",
@@ -3506,6 +3515,15 @@
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.039. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — card shows photo full width on top, Don Papi and @handle on the next row, SMARTsummary as inline text (not a tall empty box). 3) Open My Profile → Features & Orders → My BOT DEE → View my SMARTview — same stack. 4) Phone ~390 and desktop ~1280. Empty fields take no height. Display URLs have no ?v=. 5) Mark Succeed/Failed.",
       expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
       troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
+    },
+    {
+      id:"s3-3-045-smartpreview-live-led",
+      area:"BOT DEE",
+      feature:"ShoutOut SMARTpreview shows the live LED template",
+      changed:"s3.3.045 — The dock paints the actual Display 1 composer preview (display.html?preview=1&template=&main=) so Traditional, Halloween, Neon, Gold, handle rail, and copy match the LED. Tapping a template or @handle chip updates the iframe immediately, then BOT DEE remounts from the draft. Fallback replica stays until the iframe loads. Xibo URLs stay display.html?location= only (no ?v=).",
+      howToTest:"1) After Pages publish. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js ?v=s3.3.045. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout at Decades that says Happy birthday Maya — docked SMARTpreview LED should look like Traditional (classic-bw letter board + FloqR rail), not a generic tinted box. 3) Tap Halloween — LED should switch to Classic Halloween (graveyard art, orange board) before or as BOT DEE replies. 4) Tap include my handle — FloqR card shows @handle. 5) Master Admin → Features Mgmt → BOT DEE → SMARTpreview — mock cards also show the live LED. 6) Mark Succeed/Failed.",
+      expected:"SMARTpreview LED matches the chosen template and updates as template / @handle / copy change. Not a static color replica. Display 1 Xibo URL unchanged.",
+      troubleshoot:"Still a red-frame replica with no graveyard/neon → cached botdee-smartview.js before iframe. LED is idle/club default → iframe src lost preview=1 (stableDisplayUrl stripped it; this SHA must use shoutOutLedSrc). Black iframe → display.html 404 or preview blocked; fallback replica should still show three lines. Template chip does not change art → bindShoutOutCard patchShoutOutLedSrc."
     },
     {
       id:"s3-3-044-headless-shoutout-smartview",

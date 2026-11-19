@@ -949,11 +949,33 @@ body.botdee-sv-overlay-open { overflow: hidden; }
   background: color-mix(in srgb, var(--accent, #00d4fe) 55%, var(--muted, #a5b9ba));
 }
 .botdee-so-board {
+  position: relative;
   margin: 0 0 0.75rem;
   aspect-ratio: 2 / 1;
   border-radius: 12px;
   overflow: hidden;
   background: #050505;
+}
+.botdee-so-led {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+}
+.botdee-so-board.is-led-ready .botdee-so-led {
+  opacity: 1;
+}
+.botdee-so-board.is-led-ready .botdee-so-board-fallback {
+  visibility: hidden;
+}
+.botdee-so-board-fallback {
+  position: absolute;
+  inset: 0;
 }
 .botdee-so-board-frame {
   width: 100%;

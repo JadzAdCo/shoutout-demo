@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.044 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.045 (stable)
 
+- s3.3.045: ShoutOut SMARTpreview shows the live LED template and updates as you edit
 - s3.3.044: BOT DEE ShoutOut SMARTpreview collects template/@handle/media; core stays one-shot
 - s3.3.043: Headless ShoutOut composer parity (classic-bw + Club Admin inbox + LED)
 - s3.3.042: Mingl Search chrome from v3 white/teal/purple vector

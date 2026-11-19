@@ -155,7 +155,7 @@ test("ShoutOut SMARTpreview paints a draft preview without submitting", () => {
   assert.equal(view.currentStep, "template");
 });
 
-test("ShoutOut SMARTpreview LED replica is not an iframe of display.html", () => {
+test("ShoutOut SMARTpreview LED is display.html composer preview and updates on chips", () => {
   const client = read("botdee-smartview.js");
   const css = read("botdee-smartview.css");
   assert.match(client, /botdee-so-board/);
@@ -163,8 +163,16 @@ test("ShoutOut SMARTpreview LED replica is not an iframe of display.html", () =>
   assert.match(client, /dockShoutOutPreview/);
   assert.match(client, /ShoutOut SMARTpreview/);
   assert.match(css, /data-skin="halloween"/);
+  const ledFn = client.slice(client.indexOf("function sanitizeShoutOutPreviewHref"), client.indexOf("function shoutStatusKey"));
+  assert.match(ledFn, /preview/);
+  assert.doesNotMatch(ledFn, /stableDisplayUrl/);
+  assert.doesNotMatch(ledFn, /searchParams\.set\(\s*["']v["']/);
   const cardFn = client.slice(client.indexOf("function renderShoutOutCard"), client.indexOf("function bindShoutOutCard"));
-  assert.doesNotMatch(cardFn, /<iframe/);
+  assert.match(cardFn, /<iframe class="botdee-so-led"/);
+  assert.match(cardFn, /shoutOutLedSrc/);
+  const bindFn = client.slice(client.indexOf("function bindShoutOutCard"), client.indexOf("function rememberRoomDecline"));
+  assert.match(bindFn, /patchShoutOutLedSrc/);
+  assert.match(bindFn, /SHOUT_TEMPLATE_PROMPTS/);
   const chat = read("bot-dee-chat.js");
   assert.match(chat, /applyShoutOutPreviewFromViews/);
   const page = read("botdee.html");
