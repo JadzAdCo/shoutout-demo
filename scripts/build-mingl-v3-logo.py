@@ -24,7 +24,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 from fontTools.misc.transform import Transform
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
@@ -306,12 +306,6 @@ def export_pngs(master: Path) -> Path:
     return out_1024
 
 
-def rounded_mask(size: int = S, radius: int = SQ_CORNER) -> Image.Image:
-    m = Image.new("L", (size, size), 0)
-    ImageDraw.Draw(m).rounded_rectangle([0, 0, size - 1, size - 1], radius=radius, fill=255)
-    return m
-
-
 def apply_rim(
     rgb: np.ndarray,
     ring_path: Path | None = None,
@@ -417,15 +411,12 @@ def invert_mark(mark: Image.Image) -> Image.Image:
     return Image.fromarray(np.dstack([inv, inv, inv, a]).astype(np.uint8), "RGBA")
 
 
-def clip_square(arr: np.ndarray) -> Image.Image:
-    img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGB")
-    bg = Image.new("RGB", (S, S), (0, 0, 0))
-    bg.paste(img, (0, 0), rounded_mask())
-    return bg
-
-
 def save_jpg(arr: np.ndarray, path: Path) -> None:
-    clip_square(arr).save(path, quality=96, subsampling=0)
+    # Full square like Si-nema. CSS `border-radius: 8.6%` (SQ_CORNER) rounds
+    # the Search face — do not bake a black canvas under light chromes.
+    Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGB").save(
+        path, quality=96, subsampling=0
+    )
     print(f"  wrote {path.name}")
 
 
@@ -450,10 +441,19 @@ def write_chrome_packs(mark: Image.Image) -> None:
         composite_on_field(mark, (6, 12, 8), CHROME / "sinema-blackdarkgreen.jpg"),
         CHROME / "mingl-blackdarkgreen.jpg",
     )
+    wb_field = (248, 248, 250)
+    wb_path = CHROME / "mingl-whiteblack.jpg"
     save_jpg(
-        composite_on_field(invert_mark(mark), (248, 248, 250), CHROME / "sinema-whiteblack.jpg"),
-        CHROME / "mingl-whiteblack.jpg",
+        composite_on_field(invert_mark(mark), wb_field, CHROME / "sinema-whiteblack.jpg"),
+        wb_path,
     )
+    corners = np.array(Image.open(wb_path).convert("RGB"))
+    for y, x in ((0, 0), (0, -1), (-1, 0), (-1, -1)):
+        if corners[y, x].min() < 200:
+            raise SystemExit(
+                f"{wb_path.name} corner {(y, x)}={tuple(corners[y, x])} is too dark "
+                "(baked black wedge; CSS should round a light full square)"
+            )
 
 
 def copy_owner_pack() -> None:
