@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.3.040-smartvisuals
+// FLOQR FIRESTORE RULES VERSION: s3.3.046-headless-vip-rooms
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.3.040-smartvisuals
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.2.40-floqr-admin-and-club-owned-tags
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.2.28-club-owned-template-tags
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.2.38-floqr-admin-templates
@@ -24,6 +25,7 @@ rules_version = '2';
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
+// - s3.3.046: botDeeRooms member-read, Functions-write (Room SMARTview join; no IP; shared tab/charge off)
 // - s3.3.032: usercharacter_analysis signed-in read when publicWithinFloqr==1 and the pair is not blocked (People SMARTcard live listen)
 // - s3.3.021: botDeeThreads.hasUsedBotDee 0|1 is Functions-write (owner read on the thread doc; clients cannot set it)
 // - s3.3.020: BOT DEE upgrade collections (archive/memories/research/executions/legal gates/feedback/manifest)
@@ -815,6 +817,24 @@ service cloud.firestore {
  && request.auth.uid == threadId
  && exists(/databases/$(database)/documents/botDeeThreads/$(threadId))
  && get(/databases/$(database)/documents/botDeeThreads/$(threadId)).data.uid == request.auth.uid;
+ allow write: if false;
+ }
+ }
+
+ match /botDeeRooms/{roomId} {
+ allow read: if signedIn()
+ && (
+ request.auth.uid == resource.data.hostUid
+ || request.auth.uid in resource.data.memberUids
+ );
+ allow write: if false;
+ match /turns/{turnId} {
+ allow read: if signedIn()
+ && exists(/databases/$(database)/documents/botDeeRooms/$(roomId))
+ && (
+ request.auth.uid == get(/databases/$(database)/documents/botDeeRooms/$(roomId)).data.hostUid
+ || request.auth.uid in get(/databases/$(database)/documents/botDeeRooms/$(roomId)).data.memberUids
+ );
  allow write: if false;
  }
  }

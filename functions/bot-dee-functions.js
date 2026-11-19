@@ -361,6 +361,173 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   });
 }
 
+function vipSmartOutcome(reply, lang, extra = {}) {
+  return {
+    reply,
+    results: extra.results || [],
+    provider: extra.provider || "headless-vip",
+    model: extra.model || "headless-vip",
+    toolRounds: extra.toolRounds == null ? 1 : extra.toolRounds,
+    uiLanguage: lang,
+    smartViews: extra.smartViews || [],
+    geminiOnView: false
+  };
+}
+
+function joinFailureOutcome(error, lang) {
+  const map = {
+    not_found: ["botdee.rs.joinFailed", "That Room SMARTview join link isn't available. Ask the host to Confirm again for a new link."],
+    closed: ["botdee.rs.joinClosed", "That Room SMARTview is closed. Ask the host for a new join link."],
+    full: ["botdee.rs.joinFull", "That Room SMARTview is full (8 people). Ask the host to open another room."],
+    missing_join: ["botdee.rs.joinFailed", "That Room SMARTview join link isn't available. Ask the host to Confirm again for a new link."]
+  };
+  const pair = map[error] || map.not_found;
+  return {
+    reply: pair[1],
+    results: [],
+    provider: "local-room-smartview",
+    model: "roomJoinFailed",
+    toolRounds: 0,
+    uiLanguage: lang,
+    smartViews: [],
+    replyKey: pair[0],
+    geminiOnView: false
+  };
+}
+
+function isPrivateBotDeeOutcome(outcome) {
+  if (!outcome) return false;
+  const provider = String(outcome.provider || "");
+  const model = String(outcome.model || "");
+  if (provider === "headless-vip" || provider === "headless-shoutout") return true;
+  if (provider === "people-smartcard") return true;
+  if (model === "roomJoinFailed") return true;
+  if (Array.isArray(outcome.smartViews) && outcome.smartViews.some(row => row && (row.kind === "botDeeVip" || row.kind === "botDeeShoutOut"))) {
+    return true;
+  }
+  return false;
+}
+
+async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, previousDraft) {
+  const lang = bot.normalizeUiLanguage(uiLanguage);
+  const allowed = allowedFeatures || null;
+  const headless = require("./headless-vip-core");
+  const vipView = require("./botdee-vip-smartview");
+  const threadsMod = require("./bot-dee-thread");
+  const tools = require("./bot-dee-tools");
+  const uid = session?.userId || session?.request?.auth?.uid || "";
+  const parsed = headless.parseVipExecute(userPrompt);
+  if (parsed.cancel && previousDraft) {
+    try { await threadsMod.persistHeadlessVipDraft(uid, null); } catch (_) {}
+    return vipSmartOutcome("Cancelled — that VIP reserV hold was not created.", lang, {
+      model: "headless-draft",
+      toolRounds: 0,
+      smartViews: []
+    });
+  }
+  let merged = headless.mergeInteractiveDraft(previousDraft, parsed);
+  if (parsed.sectionQuery) {
+    merged = headless.applySectionMatch(merged, parsed.sectionQuery).draft;
+  }
+  if (headless.isBareAffirmative(userPrompt) && merged.matches.length === 1 && !merged.sectionId) {
+    merged.sectionId = merged.matches[0].id;
+    merged.sectionLabel = merged.matches[0].label;
+  }
+  try {
+    if (merged.clubQuery) merged.clubQuery = await tools.requireClubLocationId(merged.clubQuery);
+  } catch (error) {
+    const fallback = bot.vipExecuteFallback(lang, allowed);
+    return vipSmartOutcome(error.message || fallback.reply, lang, {
+      results: fallback.results,
+      model: "headless-draft",
+      toolRounds: 0
+    });
+  }
+  const needs = headless.interactiveNeeds(merged);
+  const viewBase = {draft: merged, needs, venueName: merged.clubQuery};
+  if (needs.length) {
+    try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+    const view = vipView.buildVipSmartView({...viewBase, mode: "draft"});
+    return vipSmartOutcome(headless.missingAsk(needs, merged), lang, {
+      model: "headless-draft",
+      toolRounds: 0,
+      smartViews: [view]
+    });
+  }
+  const wantsHold = parsed.confirmHold || headless.isBareAffirmative(userPrompt);
+  const wantsTerms = parsed.acceptTerms || headless.isAcceptTermsPrompt(userPrompt);
+  if (!merged.holdId && !wantsHold && !wantsTerms) {
+    try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+    const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
+    return vipSmartOutcome(
+      `VIP reserV at ${merged.clubQuery}: ${merged.sectionLabel || merged.sectionId} on ${merged.night} for ${merged.partySize}. Reply hold it to reserve 30 minutes, or pick another table.`,
+      lang,
+      {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+    );
+  }
+  let holdLinks = [];
+  if (!merged.holdId) {
+    const hold = await tools.createVipHold({
+      clubLocationId: merged.clubQuery,
+      night: merged.night,
+      sectionId: merged.sectionId,
+      partySize: merged.partySize
+    }, session.request);
+    if (!hold?.ok) {
+      try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+      const view = vipView.buildVipSmartView({
+        ...viewBase,
+        mode: "draft",
+        draft: {...merged, matches: hold?.sections || merged.matches}
+      });
+      return vipSmartOutcome(hold?.error || "That table could not be held. Pick another section.", lang, {
+        model: "headless-draft",
+        toolRounds: 1,
+        smartViews: [view]
+      });
+    }
+    merged.holdId = hold.holdId || hold.hold?.holdId || "";
+    holdLinks = bot.linksFromToolResult(hold, lang);
+  }
+  if (merged.holdId && wantsTerms) {
+    try {
+      const consent = await tools.recordVipConsent({holdId: merged.holdId, checks: {terms: true}}, session.request);
+      merged.consentId = consent.consentId || "";
+      if (merged.consentId) {
+        const checkout = await tools.createVipCheckout({
+          holdId: merged.holdId,
+          consentId: merged.consentId,
+          returnBase: session?.request?.data?.returnBase
+        }, session.request);
+        const links = bot.linksFromToolResult(checkout, lang);
+        try { await threadsMod.persistHeadlessVipDraft(uid, null); } catch (_) {}
+        const view = vipView.buildVipSmartView({
+          ...viewBase,
+          mode: "checkout",
+          checkoutUrl: checkout.checkoutUrl || "",
+          passHref: checkout.passHref || ""
+        });
+        return vipSmartOutcome(
+          checkout.checkoutUrl
+            ? "VIP reserV is ready to pay. Open the secure link — I never take card numbers."
+            : (checkout.message || "VIP reserV hold is confirmed. Check your pass in My Profile."),
+          lang,
+          {results: links, smartViews: [view]}
+        );
+      }
+    } catch (error) {
+      console.warn("BOT DEE VIP consent/checkout failed", error?.message || error);
+    }
+  }
+  try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+  const view = vipView.buildVipSmartView({...viewBase, mode: "hold", draft: merged});
+  return vipSmartOutcome(
+    `Held ${merged.sectionLabel || merged.sectionId} at ${merged.clubQuery} for 30 minutes. Reply I agree to accept VIP Terms, then pay if a deposit is required.`,
+    lang,
+    {results: holdLinks, smartViews: [view]}
+  );
+}
+
 function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined, functionsReachable, geminiConfigured} = {}) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
@@ -454,6 +621,17 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
   }
   if (bot.isShoutOutExecutePrompt(userPrompt)) {
     const pack = bot.shoutOutExecuteFallback(lang, allowed);
+    return {
+      reply: pack.reply,
+      results: pack.results,
+      provider: pack.provider,
+      model: pack.model,
+      toolRounds: 0,
+      uiLanguage: lang
+    };
+  }
+  if (bot.isVipExecutePrompt(userPrompt)) {
+    const pack = bot.vipExecuteFallback(lang, allowed);
     return {
       reply: pack.reply,
       results: pack.results,
@@ -637,17 +815,86 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     const roomDeclined = Array.isArray(request.data?.roomSmartViewDeclined)
       ? request.data.roomSmartViewDeclined.map(value => String(value || "").slice(0, 80)).filter(Boolean).slice(0, 24)
       : [];
-    const roomAttached = require("./botdee-room-smartview").buildRoomSession(userPrompt, {
-      hasActiveRoom: false,
+    const roomLive = require("./botdee-room-live");
+    const roomMod = require("./botdee-room-smartview");
+    const roomConversationId = String(
+      persistedConversationId || request.data?.conversationId || stored.currentConversationId || ""
+    ).trim();
+    if (
+      stored.joinedRoomId
+      && stored.joinedRoomConversationId
+      && roomConversationId
+      && stored.joinedRoomConversationId !== roomConversationId
+    ) {
+      try { await threads.persistJoinedRoomId(uid, null); } catch (_) {}
+      stored.joinedRoomId = "";
+      stored.joinedRoomConversationId = "";
+    }
+    if (stored.joinedRoomId) {
+      try {
+        const liveRoom = await roomLive.loadRoom(stored.joinedRoomId);
+        if (!liveRoom || liveRoom.status !== "open" || !roomLive.memberOf(liveRoom, uid)) {
+          await threads.persistJoinedRoomId(uid, null);
+          stored.joinedRoomId = "";
+          stored.joinedRoomConversationId = "";
+        }
+      } catch (error) {
+        console.warn("BOT DEE room load failed", error?.message || error);
+      }
+    }
+    const joinToken = String(request.data?.joinToken || "").trim();
+    if (joinToken) {
+      try {
+        const joined = await roomLive.joinRoom({uid, token: joinToken});
+        if (joined.ok) {
+          await threads.persistJoinedRoomId(uid, joined.room.roomId, roomConversationId);
+          stored.joinedRoomId = joined.room.roomId;
+          stored.joinedRoomConversationId = roomConversationId;
+          const view = roomMod.buildRoomSmartView({
+            utterance: userPrompt,
+            hasActiveRoom: true,
+            participantCount: joined.room.participantCount,
+            joinHref: joined.room.joinHref || ""
+          });
+          view.hasActiveRoom = true;
+          view.roomsLive = true;
+          view.lifecycle = "active";
+          view.joinHref = joined.room.joinHref || `./botdee.html?join=${encodeURIComponent(joinToken)}`;
+          view.participantCount = joined.room.participantCount;
+          outcome = {
+            reply: "You're in this Room SMARTview. Joining is not a payment and does not open a shared tab.",
+            results: [],
+            provider: "local-room-smartview",
+            model: "roomJoin",
+            toolRounds: 0,
+            uiLanguage,
+            smartViews: [view],
+            replyKey: "botdee.rs.joined",
+            geminiOnView: false
+          };
+        } else {
+          outcome = joinFailureOutcome(joined.error, uiLanguage);
+        }
+      } catch (error) {
+        console.warn("BOT DEE room join failed", error?.message || error);
+        outcome = joinFailureOutcome("not_found", uiLanguage);
+      }
+    }
+    const roomAttached = roomMod.buildRoomSession(userPrompt, {
+      hasActiveRoom: !!stored.joinedRoomId,
       declinedKeys: roomDeclined
     });
     const previousShoutDraft = stored.headlessShoutOutDraft || null;
     const shoutFollowUp = !!(previousShoutDraft
       && require("./headless-shoutout-core").isInteractiveFollowUp(userPrompt, previousShoutDraft));
     const shoutExecute = bot.isShoutOutExecutePrompt(userPrompt) || shoutFollowUp;
+    const previousVipDraft = stored.headlessVipDraft || null;
+    const vipFollowUp = !!(previousVipDraft
+      && require("./headless-vip-core").isInteractiveFollowUp(userPrompt, previousVipDraft));
+    const vipExecute = bot.isVipExecutePrompt(userPrompt) || vipFollowUp;
     let peopleAttached = null;
     const peopleIntent = peopleCards.classifyPeopleSearchIntent(userPrompt);
-    if (!roomAttached.handled && !shoutExecute) {
+    if (!outcome && !shoutExecute && !vipExecute && !roomAttached.handled) {
       try {
         peopleAttached = await peopleCards.attachPeopleSearch({
           query: userPrompt,
@@ -661,18 +908,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       }
     }
     // Greetings / identity stay chat-like even when Gemini is down or mis-calls search.
-    if (roomAttached.handled) {
-      outcome = {
-        reply: roomAttached.reply,
-        results: [],
-        provider: roomAttached.provider,
-        model: roomAttached.model,
-        toolRounds: 0,
-        uiLanguage,
-        smartViews: roomAttached.smartViews || [],
-        replyKey: roomAttached.replyKey,
-        geminiOnView: false
-      };
+    if (outcome) {
+      /* join already handled */
     } else if (shoutExecute) {
       try {
         outcome = await tryHeadlessShoutOut(
@@ -688,6 +925,182 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
           functionsReachable: true,
           geminiConfigured: !!apiKey
         });
+      }
+    } else if (vipExecute) {
+      try {
+        outcome = await tryHeadlessVip(
+          userPrompt, session, uiLanguage, allowedFeatures, previousVipDraft
+        );
+      } catch (error) {
+        console.warn("BOT DEE headless VIP failed", error?.message || error);
+        outcome = null;
+      }
+      if (!outcome) {
+        outcome = localSession(role, userPrompt, {
+          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+          functionsReachable: true,
+          geminiConfigured: !!apiKey
+        });
+      }
+    } else if (roomAttached.handled) {
+      const classified = roomAttached.classified || {};
+      const confirmRoom = classified.command === "confirm" || classified.route === "confirm";
+      const leaveRoom = classified.command === "leave" || classified.command === "make_private";
+      const endRoom = classified.command === "end";
+      if (leaveRoom && stored.joinedRoomId) {
+        try {
+          const left = await roomLive.leaveRoom({uid, roomId: stored.joinedRoomId});
+          const closedByHost = !!(left && left.closed);
+          const members = closedByHost && Array.isArray(left.memberUids) && left.memberUids.length
+            ? left.memberUids
+            : [uid];
+          for (const member of members) {
+            try { await threads.persistJoinedRoomId(member, null); } catch (_) {}
+          }
+          stored.joinedRoomId = "";
+          stored.joinedRoomConversationId = "";
+          outcome = {
+            reply: closedByHost
+              ? "This Room SMARTview is closed. Private BOT DEE chat continues here."
+              : "You left this Room SMARTview. Your private BOT DEE chat continues here.",
+            results: [],
+            provider: "local-room-smartview",
+            model: closedByHost ? "roomEnd" : "roomLeave",
+            toolRounds: 0,
+            uiLanguage,
+            smartViews: [],
+            replyKey: closedByHost ? "botdee.rs.endedLive" : "botdee.rs.leftLive",
+            geminiOnView: false
+          };
+        } catch (error) {
+          console.warn("BOT DEE room leave failed", error?.message || error);
+        }
+      } else if (endRoom && stored.joinedRoomId) {
+        try {
+          const ended = await roomLive.endRoom({uid, roomId: stored.joinedRoomId});
+          if (ended.ok) {
+            const members = Array.isArray(ended.memberUids) && ended.memberUids.length
+              ? ended.memberUids
+              : [uid];
+            for (const member of members) {
+              try { await threads.persistJoinedRoomId(member, null); } catch (_) {}
+            }
+            stored.joinedRoomId = "";
+            stored.joinedRoomConversationId = "";
+            outcome = {
+              reply: "This Room SMARTview is closed. Private BOT DEE chat continues here.",
+              results: [],
+              provider: "local-room-smartview",
+              model: "roomEnd",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: [],
+              replyKey: "botdee.rs.endedLive",
+              geminiOnView: false
+            };
+          } else {
+            outcome = {
+              reply: "Only the host can end this Room SMARTview. Say leave the room to leave without closing it.",
+              results: [],
+              provider: "local-room-smartview",
+              model: "roomEndDenied",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: roomAttached.smartViews || [],
+              replyKey: "botdee.rs.endNeedsHost",
+              geminiOnView: false
+            };
+          }
+        } catch (error) {
+          console.warn("BOT DEE room end failed", error?.message || error);
+        }
+      } else if (confirmRoom) {
+        try {
+          let created = null;
+          if (stored.joinedRoomId) {
+            const rotated = await roomLive.rotateJoinToken({uid, roomId: stored.joinedRoomId});
+            if (rotated.ok) created = rotated;
+            else if (rotated.error === "not_host") {
+              const existing = await roomLive.loadRoom(stored.joinedRoomId);
+              outcome = {
+                reply: "You're already in this Room SMARTview. Ask the host to share the join link — Confirm does not open a second room.",
+                results: [],
+                provider: "local-room-smartview",
+                model: "roomConfirm",
+                toolRounds: 0,
+                uiLanguage,
+                smartViews: roomAttached.smartViews || [],
+                replyKey: "botdee.rs.alreadyOpen",
+                geminiOnView: false
+              };
+              if (existing) {
+                const view = (outcome.smartViews && outcome.smartViews[0]) || roomMod.buildRoomSmartView({
+                  utterance: userPrompt,
+                  classified,
+                  hasActiveRoom: true,
+                  participantCount: existing.participantCount
+                });
+                view.hasActiveRoom = true;
+                view.roomsLive = true;
+                view.lifecycle = "active";
+                view.needsConfirmation = false;
+                view.participantCount = existing.participantCount;
+                outcome.smartViews = [view];
+              }
+            }
+          }
+          if (!created && !outcome) {
+            created = await roomLive.createRoom({
+              hostUid: uid,
+              conversationId: roomConversationId,
+              title: classified.authorizedTitle || "BOT DEE group session"
+            });
+          }
+          if (created && created.ok) {
+            await threads.persistJoinedRoomId(uid, created.room.roomId, roomConversationId);
+            stored.joinedRoomId = created.room.roomId;
+            stored.joinedRoomConversationId = roomConversationId;
+            const view = (roomAttached.smartViews && roomAttached.smartViews[0]) || roomMod.buildRoomSmartView({
+              utterance: userPrompt,
+              classified,
+              hasActiveRoom: true,
+              participantCount: created.room.participantCount || 1
+            });
+            view.hasActiveRoom = true;
+            view.roomsLive = true;
+            view.lifecycle = "active";
+            view.needsConfirmation = false;
+            view.joinHref = created.room.joinHref;
+            view.participantCount = created.room.participantCount;
+            view.actions = {...(view.actions || {}), create: false, invite: true, end: true, tabOptIn: false, charge: false};
+            outcome = {
+              reply: `Room SMARTview is open. Share this join link so friends can talk with BOT DEE here — joining is not a payment: ${created.room.joinHref}`,
+              results: [{label: "Join this Room SMARTview", href: created.room.joinHref, kind: "room-join"}],
+              provider: "local-room-smartview",
+              model: "roomConfirm",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: [view],
+              replyKey: "botdee.rs.confirmedLive",
+              geminiOnView: false
+            };
+          }
+        } catch (error) {
+          console.warn("BOT DEE room confirm failed", error?.message || error);
+        }
+      }
+      if (!outcome) {
+        outcome = {
+          reply: roomAttached.reply,
+          results: [],
+          provider: roomAttached.provider,
+          model: roomAttached.model,
+          toolRounds: 0,
+          uiLanguage,
+          smartViews: roomAttached.smartViews || [],
+          replyKey: roomAttached.replyKey,
+          geminiOnView: false
+        };
       }
     } else if (peopleAttached && peopleAttached.handled) {
       outcome = {
@@ -736,6 +1149,22 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         geminiConfigured: !!apiKey
       });
     } else if (apiKey) {
+      if (stored.joinedRoomId) {
+        try {
+          const roomTurns = await roomLive.loadTurns(stored.joinedRoomId, 12);
+          if (roomTurns.length) {
+            history = roomTurns;
+            modelContext = execution.buildModelContext({
+              turns: roomTurns,
+              summary: "",
+              memories: [],
+              executions: []
+            });
+          }
+        } catch (error) {
+          console.warn("BOT DEE room turns load failed", error?.message || error);
+        }
+      }
       try {
         outcome = await runGeminiSession({
           apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures, personalization, modelContext
@@ -777,6 +1206,20 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         console.warn("BOT DEE persist model failed", err?.message || err);
       }
     }
+    if (stored.joinedRoomId && !isPrivateBotDeeOutcome(outcome)) {
+      try {
+        const written = await roomLive.appendTurn(stored.joinedRoomId, uid, "user", userPrompt);
+        if (written && written.ok && String(outcome.reply || "").trim()) {
+          await roomLive.appendTurn(stored.joinedRoomId, uid, "model", outcome.reply);
+        } else if (written && (written.error === "closed" || written.error === "not_found" || written.error === "not_member")) {
+          await threads.persistJoinedRoomId(uid, null);
+          stored.joinedRoomId = "";
+          stored.joinedRoomConversationId = "";
+        }
+      } catch (err) {
+        console.warn("BOT DEE room persist failed", err?.message || err);
+      }
+    }
     try {
       const alreadyVersion = Array.isArray(outcome.smartViews)
         && outcome.smartViews.some(row => row && row.kind === "botDeeVersion");
@@ -784,10 +1227,13 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         && outcome.smartViews.some(row => row && row.kind === "botDeeRoom");
       const alreadyShout = Array.isArray(outcome.smartViews)
         && outcome.smartViews.some(row => row && row.kind === "botDeeShoutOut");
+      const alreadyVip = Array.isArray(outcome.smartViews)
+        && outcome.smartViews.some(row => row && row.kind === "botDeeVip");
       if (
         !alreadyVersion
         && !alreadyRoom
         && !alreadyShout
+        && !alreadyVip
         && !outcome.smartViews
         && /\b(smartview|smart view|research library|explain (?:my )?recommendation)\b/i.test(userPrompt)
       ) {
@@ -1053,6 +1499,7 @@ exports.__botDeeHelpers = {
   runGeminiSession,
   localSession,
   tryHeadlessShoutOut,
+  tryHeadlessVip,
   geminiKey,
   BOT_DEE_SETTINGS_DOC
 };

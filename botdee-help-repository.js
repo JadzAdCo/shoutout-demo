@@ -463,7 +463,7 @@
     {
       id: "help-botdee-room-smartview",
       title: "Room SMARTview",
-      body: "In BOT DEE chat, say Open Room SMARTview or Start a group chat. A Room SMARTview card opens in the same bubble. Confirm before anything is created. Private BOT DEE messages stay private. Group rooms, invites, and a shared tab are not live yet — Confirm does not create a room, send an invite, or charge anyone. Site Chrome follows your Appearance theme.",
+      body: "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm mints a join link friends can open while signed in. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme.",
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
         "group chat bot dee", "talk to bot dee together"
@@ -512,7 +512,7 @@
     {
       id: "help-botdee-room-smartview-invite",
       title: "Room SMARTview invite",
-      body: "Invite others from Room SMARTview after you confirm. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Wrong-account, blocked, and non-friend invites will refuse when group rooms ship. Nothing is sent today; group rooms are not live.",
+      body: "After you confirm Room SMARTview, share the join link. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Joining is not a payment and does not open a shared tab.",
       searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -522,7 +522,7 @@
     {
       id: "help-botdee-room-smartview-join",
       title: "Join a Room SMARTview",
-      body: "Joining a Room SMARTview is not the same as joining a shared tab or approving a payment. When rooms ship, you will sign in and accept a bound invite. Opening a link does not join you automatically.",
+      body: "Open a Room SMARTview join link while signed in, or paste it in BOT DEE. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
       searchPhrases: ["join room smartview", "join this bot dee chat", "can my friends join us"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -532,7 +532,7 @@
     {
       id: "help-botdee-room-smartview-end",
       title: "End Room SMARTview",
-      body: "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats. There is no live room to close yet.",
+      body: "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats.",
       searchPhrases: ["end this room", "close room smartview", "end group chat bot dee"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -855,6 +855,21 @@
       audiences: ["patron", "masterAdmin"]
     },
     {
+      id: "help-botdee-headless-vip",
+      title: "VIP reserV from BOT DEE chat",
+      body: "Say VIP reserV or hold a VIP table at Aurelia in BOT DEE. Name the club, night, and table or area. Mezzanine is an area — BOT DEE lists V1–V4 and AURELIA SUITE so you can pick a table, then hold it, reply I agree to Terms, and pay if a deposit is required. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment.",
+      searchPhrases: [
+        "headless vip", "vip from chat", "hold a vip table at aurelia", "mezzanine",
+        "vip reserv bot dee", "book vip in bot dee", "v1 aurelia", "hold it vip"
+      ],
+      links: [
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},
+        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "botdee"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "masterAdmin"]
+    },
+    {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
       body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit when the club requires one. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe (or confirm without checkout if the venue does not require a deposit). A table only shows booked/unavailable (isReserved=1) after that payment or no-deposit confirm — a hold alone stays amber. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",
@@ -862,7 +877,8 @@
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
         "table reservation", "vip booth", "floor map", "decades table", "lima twist table",
         "table deposit", "hold a table", "aurelia vip", "aurelia 3d", "explore 3d", "3d walk-through",
-        "search a vip reserv club", "isReserved"
+        "search a vip reserv club", "isReserved", "headless vip", "vip from chat", "mezzanine",
+        "hold a vip table at aurelia"
       ],
       links: [
         {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "botdee"})},

@@ -122,7 +122,7 @@ test("existing-room commands do not create or charge; kick/end need confirm", ()
     assert.equal(classified.command, command);
     const view = room.buildRoomSmartView({classified});
     assert.equal(view.hasActiveRoom, false);
-    assert.equal(view.roomsLive, false);
+    assert.equal(view.roomsLive, true);
     assert.equal(view.actions.create, false);
     assert.equal(view.actions.charge, false);
     assert.equal(view.participantCount, 0);
@@ -146,7 +146,7 @@ test("localSession attaches Room SMARTview and still attaches Version SMARTview"
   assert.equal(setup.provider, "local-room-smartview");
   assert.equal(setup.smartViews[0].kind, "botDeeRoom");
   assert.equal(setup.smartViews[0].mode, "setup");
-  assert.equal(setup.smartViews[0].roomsLive, false);
+  assert.equal(setup.smartViews[0].roomsLive, true);
   const version = fns.__botDeeHelpers.localSession("patron", "Ver");
   assert.equal(version.provider, "local-version");
   assert.equal(version.smartViews[0].kind, "botDeeVersion");
@@ -236,13 +236,33 @@ test("BOT DEE Room SMARTview Cancun and Paris resolve to kit art when catalog is
   assert.match(generic, /data-sv-bg="bg-mingl-room"/);
 });
 
-test("chat wires Room SMARTview without new Firestore collections or create callables", () => {
+test("chat wires Room SMARTview join without charging", () => {
   const chat = read("bot-dee-chat.js");
   assert.match(chat, /roomSmartViewDeclined/);
   assert.match(chat, /ensureRoomSmartViews/);
+  assert.match(chat, /joinToken/);
   assert.match(read("functions/bot-dee-functions.js"), /buildRoomSession/);
   assert.match(read("functions/bot-dee-functions.js"), /roomAttached\.handled/);
+  assert.match(read("functions/bot-dee-functions.js"), /botdee-room-live/);
   assert.doesNotMatch(read("functions/botdee-room-smartview.js"), /createBotDeeRoom|botDeeRooms/);
+  assert.match(read("functions/botdee-room-live.js"), /botDeeRooms/);
+  assert.doesNotMatch(read("functions/botdee-room-live.js"), /charge:\s*true/);
   assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom/);
+  assert.match(read("botdee-smartview.js"), /confirm room smartview/);
   assert.match(read("botdee.html"), /botdee-room-smartview\.js/);
+  assert.equal(room.classifyRoomIntent("confirm room smartview").route, "confirm");
+  assert.equal(room.classifyRoomIntent("confirm room").route, "confirm");
+  assert.notEqual(room.classifyRoomIntent("confirm").route, "confirm");
+  assert.equal(room.classifyRoomIntent("confirm").handled, false);
+  const session = read("functions/bot-dee-functions.js");
+  assert.match(session, /joinFailureOutcome/);
+  assert.match(session, /isPrivateBotDeeOutcome/);
+  assert.match(session, /rotateJoinToken/);
+  assert.match(session, /persistJoinedRoomId\(uid, null\)/);
+  assert.match(read("functions/botdee-room-live.js"), /function leaveRoom/);
+  assert.match(read("functions/botdee-room-live.js"), /function endRoom/);
+  assert.match(session, /ended\.ok/);
+  assert.match(session, /roomEndDenied/);
+  assert.match(session, /memberUids/);
+  assert.match(read("functions/botdee-room-live.js"), /!== "open"/);
 });

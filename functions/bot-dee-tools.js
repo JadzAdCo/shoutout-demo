@@ -455,16 +455,55 @@ async function startShoutOutCheckout(args, sessionRequest) {
   };
 }
 
+async function getVipAvailability(args, sessionRequest) {
+  await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
+  const clubLocationId = await requireClubLocationId(args?.clubLocationId || args?.locationName);
+  const headlessVip = require("./headless-vip-core");
+  const sectionQuery = String(args?.sectionQuery || args?.area || args?.sectionId || "").trim();
+  const listed = sectionQuery
+    ? headlessVip.resolveSectionQuery(clubLocationId, sectionQuery)
+    : {ok: false, matches: headlessVip.listSections(clubLocationId, ""), reason: "list"};
+  return {
+    ok: true,
+    tool: "getVipAvailability",
+    clubLocationId,
+    night: String(args?.night || headlessVip.tonightIso()),
+    sectionQuery,
+    matchReason: listed.reason || (listed.ok ? "exact" : "list"),
+    sections: listed.matches || [],
+    note: listed.ok
+      ? "Use this sectionId with createVipHold."
+      : (listed.matches && listed.matches.length
+        ? "Several tables match. Ask the patron to pick a label, then createVipHold with that sectionId."
+        : "No matching table. Ask for V1 / C10 / a printed label, not only the area name.")
+  };
+}
+
 async function createVipHold(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
   const clubLocationId = await requireClubLocationId(args?.clubLocationId || args?.locationName);
+  const headlessVip = require("./headless-vip-core");
+  const wanted = String(args?.sectionId || args?.sectionQuery || args?.area || "").trim();
+  const match = headlessVip.resolveSectionQuery(clubLocationId, wanted);
+  if (!match.ok) {
+    return {
+      ok: false,
+      tool: "createVipHold",
+      clubLocationId,
+      error: match.reason === "area" || match.reason === "ambiguous"
+        ? "That name is an area with several tables. Pick one sectionId from the list."
+        : "That table section was not found.",
+      sections: match.matches || [],
+      sectionQuery: wanted
+    };
+  }
   const result = await vip.runCreateVipHold(asRequest(sessionRequest, {
     clubLocationId,
-    night: args?.night,
-    sectionId: args?.sectionId,
-    partySize: args?.partySize
+    night: args?.night || headlessVip.tonightIso(),
+    sectionId: match.matches[0].id,
+    partySize: args?.partySize || headlessVip.DEFAULT_PARTY
   }));
-  return {ok: true, tool: "createVipHold", clubLocationId, ...result};
+  return {ok: true, tool: "createVipHold", clubLocationId, sectionId: match.matches[0].id, ...result};
 }
 
 async function recordVipConsent(args, sessionRequest) {
@@ -1203,6 +1242,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
 const TOOL_RUNNERS = {
   listShoutOutTemplates,
   startShoutOutCheckout,
+  getVipAvailability,
   createVipHold,
   recordVipConsent,
   createVipCheckout,
@@ -1226,6 +1266,7 @@ module.exports = {
   runProductTool,
   listShoutOutTemplates,
   startShoutOutCheckout,
+  getVipAvailability,
   createVipHold,
   recordVipConsent,
   createVipCheckout,

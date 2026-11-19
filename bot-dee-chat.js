@@ -30,6 +30,7 @@
   let storedLastMessageAtMs = 0;
   let visitLiveTurns = [];
   let chatsUiBound = false;
+  let pendingJoinToken = "";
   let chatTitles = {};
   let liveConversationId = "";
   let storedConversationId = "";
@@ -1131,6 +1132,10 @@
       const split = global.FLOQRBotDeeSmartView.applyShoutOutPreviewFromViews(inlineViews);
       inlineViews = Array.isArray(split?.inline) ? split.inline : inlineViews;
     }
+    if (!isUser && global.FLOQRBotDeeSmartView?.applyVipPreviewFromViews) {
+      const split = global.FLOQRBotDeeSmartView.applyVipPreviewFromViews(inlineViews);
+      inlineViews = Array.isArray(split?.inline) ? split.inline : inlineViews;
+    }
     if (!isUser && inlineViews.length && global.FLOQRBotDeeSmartView?.mount) {
       const host = document.createElement("div");
       host.className = "botdee-sv-host";
@@ -1197,6 +1202,17 @@
     }
   }
 
+  function hasOpenWorkflow() {
+    const shout = byId("botDeeShoutOutPreviewDock");
+    if (shout && !shout.hidden && shout.querySelector(".botdee-sv-shoutout")) return true;
+    const vip = byId("botDeeVipPreviewDock");
+    if (vip && !vip.hidden && vip.querySelector(".botdee-sv-vip")) return true;
+    try {
+      if (document.querySelector(".botdee-sv-room[data-rs-active='1']")) return true;
+    } catch (_) {}
+    return false;
+  }
+
   function armIdleTimer(overrideMs) {
     clearIdleTimer();
     // fresh (welcome painted) and active both idle-out; ended stays quiet.
@@ -1204,7 +1220,13 @@
     const ms = overrideMs != null
       ? Math.max(0, Number(overrideMs) || 0)
       : clampIdleSeconds(idleSeconds) * 1000;
-    idleTimer = setTimeout(() => endConversation("idle"), ms);
+    idleTimer = setTimeout(() => {
+      if (hasOpenWorkflow()) {
+        armIdleTimer();
+        return;
+      }
+      endConversation("idle");
+    }, ms);
   }
 
   function markActive() {
@@ -1327,9 +1349,11 @@
         threadId: threadId || undefined,
         conversationId: liveConversationId || undefined,
         uiLanguage: currentUiLanguage(),
-        roomSmartViewDeclined: loadRoomDeclined()
+        roomSmartViewDeclined: loadRoomDeclined(),
+        joinToken: pendingJoinToken || undefined
       };
       const rawData = (await fn(payload))?.data || {};
+      pendingJoinToken = "";
       applyHasUsed(rawData, 1);
       const data = await ensurePeopleSmartViews(text, rawData);
       const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
@@ -2056,17 +2080,34 @@
     appendBubble("bot", `${t("botdee.recapLead", "Last time:")} ${recap}`);
   }
 
+  function captureJoinToken() {
+    try {
+      const url = new URL(location.href);
+      const token = String(url.searchParams.get("join") || "").trim();
+      if (!token) return;
+      pendingJoinToken = token;
+      url.searchParams.delete("join");
+      history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    } catch (_) {}
+  }
+
   function bind(opts = {}) {
     bindForm();
     bindChatsUi();
     pinComposerToViewport();
     global.FLOQRBotDeePersonalization?.bind?.();
+    captureJoinToken();
     const q = opts.q || new URL(location.href).searchParams.get("q");
     if (q) {
       const input = byId("botDeeChatInput");
       if (input) input.value = String(q).slice(0, 200);
     }
     restoreOrWelcome();
+    if (pendingJoinToken) {
+      setTimeout(() => {
+        sendMessage("I joined this Room SMARTview");
+      }, 400);
+    }
     return {sendMessage, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};
   }
 

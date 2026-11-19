@@ -1,6 +1,6 @@
 # CURRENT PACKAGE: FLOQR ShoutOut s3.3.046 (stable)
 
-- s3.3.046: App Check plan-trace results log to Master Admin Application Logging and Security Logs; enforcement stays off
+- s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join; App Check plan-trace logs to Master Admin (enforcement off)
 - s3.3.045: ShoutOut SMARTpreview shows the live LED template and updates as you edit
 - s3.3.044: BOT DEE ShoutOut SMARTpreview collects template/@handle/media; core stays one-shot
 - s3.3.043: Headless ShoutOut composer parity (classic-bw + Club Admin inbox + LED)

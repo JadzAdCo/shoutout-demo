@@ -721,6 +721,15 @@ test("people-directory photoOf prefers public-page slot 0 over Auth photoURL", (
   }), hero);
 });
 
+test("people SMARTview details do not reserve empty chip space", () => {
+  const css = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.css"), "utf8");
+  assert.doesNotMatch(css, /6\.4em/);
+  assert.match(css, /\.botdee-sv-details > \*/);
+  assert.match(css, /\.botdee-sv-tags:empty/);
+  assert.match(css, /\.botdee-sv-note:empty/);
+  assert.match(css, /\.botdee-sv-vip/);
+});
+
 test("chrome and help use SMARTview spelling, not SmartView", () => {
   const i18n = fs.readFileSync(path.join(__dirname, "..", "floqr-i18n.js"), "utf8");
   const help = fs.readFileSync(path.join(__dirname, "..", "floqr-i18n-help.js"), "utf8");
