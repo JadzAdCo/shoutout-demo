@@ -286,6 +286,25 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
       smartViews: [view]
     });
   }
+  if (headless.isBareNegative(userPrompt) && parsed.confirmSubmit !== true) {
+    const priorNeeds = previousDraft ? headless.interactiveNeeds(previousDraft) : [];
+    if (!priorNeeds.length) {
+      try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
+      return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
+        model: "headless-draft",
+        toolRounds: 0,
+        smartViews: [],
+        shoutOutPreview: "closed"
+      });
+    }
+    try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
+    const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "ready"});
+    return shoutOutSmartOutcome(
+      "ShoutOut SMARTpreview is ready. Reply throw it to send, or cancel the shoutout.",
+      lang,
+      {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+    );
+  }
   const result = await tools.startShoutOutCheckout({
     locationName: merged.clubQuery,
     clubLocationId: merged.clubQuery,

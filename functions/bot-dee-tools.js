@@ -203,22 +203,27 @@ async function notifyClubPendingHeadlessShoutOut({
     "Open Club Admin → Pending ShoutOuts to Approve & Push Live."
   ].filter(Boolean).join(" ");
   const link = `./admin.html?location=${encodeURIComponent(clubLocationId)}&panel=panelQueue`;
-  await Promise.all(recipients.map(uid => db.collection("inboxNotifications").add({
-    type: "pendingShoutout",
-    title: "Pending ShoutOut",
-    body,
-    clubLocationId,
-    locationName: locationName || clubLocationId,
-    shoutoutId: shoutoutId || "",
-    referenceNumber: referenceNumber || "",
-    senderUid: "system",
-    senderName: "System Message",
-    messageCategory: "system",
-    read: false,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    link,
-    recipientUid: uid
-  })));
+  const id = text(shoutoutId, 120);
+  await Promise.all(recipients.map(uid => {
+    const note = {
+      type: "pendingShoutout",
+      title: "Pending ShoutOut",
+      body,
+      clubLocationId,
+      locationName: locationName || clubLocationId,
+      shoutoutId: id,
+      referenceNumber: referenceNumber || "",
+      senderUid: "system",
+      senderName: "System Message",
+      messageCategory: "system",
+      read: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      link,
+      recipientUid: uid
+    };
+    if (!id) return db.collection("inboxNotifications").add(note);
+    return db.collection("inboxNotifications").doc(`pendingShoutout_${uid}_${id}`).set(note, {merge: true});
+  }));
   return {ok: true, recipients: recipients.length};
 }
 

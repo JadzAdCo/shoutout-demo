@@ -79,6 +79,19 @@ test("bare yes answers the current step and does not mint", () => {
   assert.equal(handleYes.handleDecision, "include");
   assert.equal(handleYes.confirmSubmit, false);
   assert.equal(headless.isInteractiveFollowUp("no", afterTemplate), true);
+  const noHandle = headless.parseShoutOutExecute("no");
+  headless.applyBareInteractiveReply(afterTemplate, noHandle, "no");
+  assert.equal(noHandle.handleDecision, "skip");
+  assert.equal(noHandle.confirmSubmit, false);
+  const ready = headless.mergeInteractiveDraft(afterTemplate, {
+    mediaDecision: "none",
+    handleDecision: "include",
+    attribution: "@Maya"
+  });
+  assert.deepEqual(headless.interactiveNeeds(ready), []);
+  const noReady = headless.parseShoutOutExecute("no");
+  headless.applyBareInteractiveReply(ready, noReady, "no");
+  assert.equal(noReady.confirmSubmit, false);
 });
 
 test("a new throw does not keep leftover extras", () => {
@@ -160,6 +173,9 @@ test("ShoutOut SMARTpreview LED replica is not an iframe of display.html", () =>
   assert.match(session, /shoutOutPreview: "closed"/);
   assert.match(session, /applyBareInteractiveReply/);
   assert.doesNotMatch(session, /parsed\.confirmSubmit = true/);
+  assert.match(session, /isBareNegative\(userPrompt\)/);
+  const tryFn = session.slice(session.indexOf("async function tryHeadlessShoutOut"), session.indexOf("function localSession"));
+  assert.ok(tryFn.indexOf("isBareNegative") < tryFn.indexOf("startShoutOutCheckout"));
   assert.match(session, /result\?\.ok && \(result\.checkoutUrl \|\| result\.shoutoutId\)/);
   const chatStart = chat.indexOf("function startNewChat");
   const chatRestore = chat.indexOf("function restoreTurns");
@@ -194,6 +210,8 @@ test("BOT DEE session collects extras before mint; FloqR callable stays one-shot
   const commerce = read("functions/commerce-functions.js");
   assert.doesNotMatch(commerce, /interactiveNeeds/);
   assert.match(commerce, /notifyClubPendingHeadlessShoutOut/);
+  assert.match(commerce, /headlessClubInboxAt/);
+  assert.match(commerce, /fulfillmentStatus === "submitted-for-club-approval"/);
   const client = read("botdee-smartview.js");
   assert.match(client, /botDeeShoutOut/);
   assert.match(client, /renderShoutOutCard/);

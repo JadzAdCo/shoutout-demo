@@ -132,6 +132,8 @@ test("startShoutOutCheckout and FloqR callable accept flat club + message", () =
   assert.match(tools, /notifyClubPendingHeadlessShoutOut/);
   assert.match(tools, /panel=panelQueue/);
   assert.doesNotMatch(tools, /tab=queue/);
+  assert.match(tools, /pendingShoutout_\$\{uid\}_\$\{id\}/);
+  assert.match(tools, /\.set\(note, \{merge: true\}\)/);
   assert.match(tools, /args\?\.mainText \|\| args\?\.message/);
   assert.match(tools, /does not submit as a free board/);
   assert.match(tools, /userPrompt/);
