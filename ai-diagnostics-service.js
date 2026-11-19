@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.040";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.040";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.041";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.041";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.041",
+      title: "s3.3.041 — BOT DEE + FloqR headless ShoutOut checkout",
+      checks: [
+        {label:"Compose-from-chat core", file:"functions/headless-shoutout-core.js", includes:["parseShoutOutExecute", "composeShoutOutPayload", "classicHalloween"]},
+        {label:"Flat startShoutOutCheckout", file:"functions/bot-dee-tools.js", includes:["composeShoutOutPayload", "submitFreeHeadlessShoutOut", "args?.mainText || args?.message"]},
+        {label:"FloqR callable", file:"functions/commerce-functions.js", includes:["exports.createHeadlessShoutOutCheckout"]},
+        {label:"Session intercept", file:"functions/bot-dee-functions.js", includes:["tryHeadlessShoutOut"]},
+        {label:"Client helper", file:"payment-service.js", includes:["startHeadlessShoutOut", "createHeadlessShoutOutCheckout"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-041-botdee-headless-checkout"]}
+      ]
+    },
     {
       version: "s3.3.040",
       title: "s3.3.040 — People lookup matches display name, legal name, handle, what-about",
@@ -3460,6 +3472,15 @@
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.039. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — card shows photo full width on top, Don Papi and @handle on the next row, SMARTsummary as inline text (not a tall empty box). 3) Open My Profile → Features & Orders → My BOT DEE → View my SMARTview — same stack. 4) Phone ~390 and desktop ~1280. Empty fields take no height. Display URLs have no ?v=. 5) Mark Succeed/Failed.",
       expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
       troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
+    },
+    {
+      id:"s3-3-041-botdee-headless-checkout",
+      area:"BOT DEE",
+      feature:"Headless ShoutOut from BOT DEE + FloqR (no composer)",
+      changed:"s3.3.041 — startShoutOutCheckout accepts club + message (optional template/screen). executeBotSession throws from chat when both are present: paid templates mint Stripe checkoutUrl; free Traditional boards submit pending. FloqR pages call createHeadlessShoutOutCheckout / FLOQRPayments.startHeadlessShoutOut. Photo/jersey/Football Intro/Heist/Baller's Alert still open compose. Functions deploy required ([firebase-deploy-botdee]).",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.041. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout — expect ask for club + message and one compose link, NOT stacked Halloween/Baller's help. 3) Send throw a shoutout at Decades that says Happy birthday Maya — expect pending My ShoutOuts link (free Traditional) OR a Pay securely Stripe URL, never a card-number prompt. 4) Send throw a halloween shoutout at Aurelia that says BOO — Pay securely Stripe (~$15). 5) Send how do I throw a shoutout — help/search cards OK. 6) Mark Succeed/Failed.",
+      expected:"Complete throw (venue + copy) mints checkout or pending submit from chat. Incomplete throw asks. How-to stays search. No card collection in BOT DEE.",
+      troubleshoot:"Still compose-only with a complete throw → executeBotSession / createHeadlessShoutOutCheckout not this SHA (Functions deploy). Still stacked help → cached bot-dee-chat.js or Gemini path not intercepting isShoutOutExecutePrompt. Checkout missing on halloween → STRIPE_SECRET_KEY on executeBotSession / createHeadlessShoutOutCheckout. Free board missing in Club Admin → Functions Admin write to shoutouts; confirm signed-in uid. Club not found → alias (Aurelia → temp-democlub-1, Decades → decades-washington-dc)."
     },
     {
       id:"s3-3-038-botdee-throw-shoutout",

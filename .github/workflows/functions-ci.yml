@@ -252,7 +252,8 @@ jobs:
               setBotDeeLegalGate \
               getBotDeeProviderSlots \
               listBotDeeProviderSlots \
-              setBotDeeProviderSlot
+              setBotDeeProviderSlot \
+              createHeadlessShoutOutCheckout
             echo "BOT DEE hasUsedBotDee persist + six-phase + later-fill slot deploy tagged"
           fi
           if [ "$SUBSET" = "0" ]; then

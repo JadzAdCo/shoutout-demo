@@ -1076,6 +1076,7 @@
         "paySecurely": "Sicher bezahlen",
         "floqcastPreview": "FloqCAST-Vorschau öffnen",
         "shoutoutCompose": "ShoutOut-Composer öffnen",
+        "shoutoutPending": "In Meine ShoutOuts öffnen",
         "vipTerms": "VIP-Bedingungen fortsetzen"
       },
       "fallback": {
@@ -2130,6 +2131,7 @@
         "paySecurely": "Payer en toute sécurité",
         "floqcastPreview": "Ouvrir l’aperçu FloqCAST",
         "shoutoutCompose": "Ouvrir la composition ShoutOut",
+        "shoutoutPending": "Ouvrir dans Mes ShoutOuts",
         "vipTerms": "Continuer les conditions VIP"
       },
       "fallback": {
@@ -3184,6 +3186,7 @@
         "paySecurely": "Pagar de forma segura",
         "floqcastPreview": "Abrir vista previa de FloqCAST",
         "shoutoutCompose": "Abrir el compositor de ShoutOut",
+        "shoutoutPending": "Abrir en Mis ShoutOuts",
         "vipTerms": "Continuar con los términos VIP"
       },
       "fallback": {
@@ -4238,6 +4241,7 @@
         "paySecurely": "Paga in sicurezza",
         "floqcastPreview": "Apri anteprima FloqCAST",
         "shoutoutCompose": "Apri il composer ShoutOut",
+        "shoutoutPending": "Apri in I miei ShoutOuts",
         "vipTerms": "Continua i Termini VIP"
       },
       "fallback": {
@@ -5292,6 +5296,7 @@
         "paySecurely": "Pagar com segurança",
         "floqcastPreview": "Abrir prévia do FloqCAST",
         "shoutoutCompose": "Abrir o compositor de ShoutOut",
+        "shoutoutPending": "Abrir em Meus ShoutOuts",
         "vipTerms": "Continuar os Termos VIP"
       },
       "fallback": {
@@ -6346,6 +6351,7 @@
         "paySecurely": "Оплатить безопасно",
         "floqcastPreview": "Открыть превью FloqCAST",
         "shoutoutCompose": "Открыть композитор ShoutOut",
+        "shoutoutPending": "Открыть в Мои ShoutOuts",
         "vipTerms": "Продолжить условия VIP"
       },
       "fallback": {
@@ -7400,6 +7406,7 @@
         "paySecurely": "Πληρώστε με ασφάλεια",
         "floqcastPreview": "Άνοιγμα προεπισκόπησης FloqCAST",
         "shoutoutCompose": "Άνοιγμα σύνθεσης ShoutOut",
+        "shoutoutPending": "Άνοιγμα στα ShoutOuts μου",
         "vipTerms": "Συνέχεια όρων VIP"
       },
       "fallback": {
@@ -8454,6 +8461,7 @@
         "paySecurely": "Zapłać bezpiecznie",
         "floqcastPreview": "Otwórz podgląd FloqCAST",
         "shoutoutCompose": "Otwórz kompozytor ShoutOut",
+        "shoutoutPending": "Otwórz w Moje ShoutOuts",
         "vipTerms": "Kontynuuj warunki VIP"
       },
       "fallback": {
@@ -9508,6 +9516,7 @@
         "paySecurely": "Veilig betalen",
         "floqcastPreview": "FloqCAST-voorbeeld openen",
         "shoutoutCompose": "ShoutOut-composer openen",
+        "shoutoutPending": "Openen in Mijn ShoutOuts",
         "vipTerms": "VIP-voorwaarden voortzetten"
       },
       "fallback": {
@@ -10562,6 +10571,7 @@
         "paySecurely": "ادفع بأمان",
         "floqcastPreview": "فتح معاينة FloqCAST",
         "shoutoutCompose": "فتح مؤلف ShoutOut",
+        "shoutoutPending": "فتح في ShoutOuts الخاصة بي",
         "vipTerms": "متابعة شروط VIP"
       },
       "fallback": {

@@ -206,6 +206,56 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   };
 }
 
+async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures) {
+  const lang = bot.normalizeUiLanguage(uiLanguage);
+  const allowed = allowedFeatures || null;
+  const headless = require("./headless-shoutout-core");
+  const parsed = headless.parseShoutOutExecute(userPrompt);
+  if (!parsed.clubQuery || !parsed.message) {
+    return bot.shoutOutExecuteFallback(lang, allowed);
+  }
+  const tools = require("./bot-dee-tools");
+  const result = await tools.startShoutOutCheckout({
+    locationName: parsed.clubQuery,
+    clubLocationId: parsed.clubQuery,
+    mainText: parsed.message,
+    templateId: parsed.templateId,
+    screenFormatId: parsed.screenFormatId,
+    userPrompt,
+    returnBase: session?.request?.data?.returnBase
+  }, session.request);
+  const links = bot.linksFromToolResult(result, lang);
+  if (result?.ok && result.checkoutUrl) {
+    return {
+      reply: `Your ShoutOut at ${result.venueName || result.clubLocationId} is ready to pay. Open the secure Stripe link — I never take card numbers.`,
+      results: links,
+      provider: "headless-shoutout",
+      model: "startShoutOutCheckout",
+      toolRounds: 1,
+      uiLanguage: lang
+    };
+  }
+  if (result?.ok && result.shoutoutId) {
+    return {
+      reply: `Your ShoutOut is in for club approval at ${result.venueName || result.clubLocationId}. It will play after the venue accepts it.`,
+      results: links,
+      provider: "headless-shoutout",
+      model: "startShoutOutCheckout",
+      toolRounds: 1,
+      uiLanguage: lang
+    };
+  }
+  const fallback = bot.shoutOutExecuteFallback(lang, allowed);
+  return {
+    reply: result?.error || fallback.reply,
+    results: links.length ? links : fallback.results,
+    provider: "headless-shoutout",
+    model: "startShoutOutCheckout",
+    toolRounds: 1,
+    uiLanguage: lang
+  };
+}
+
 function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined, functionsReachable, geminiConfigured} = {}) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
@@ -526,6 +576,20 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         peopleSearch: peopleAttached.peopleSearch,
         geminiOnView: false
       };
+    } else if (bot.isShoutOutExecutePrompt(userPrompt)) {
+      try {
+        outcome = await tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures);
+      } catch (error) {
+        console.warn("BOT DEE headless ShoutOut failed", error?.message || error);
+        outcome = null;
+      }
+      if (!outcome) {
+        outcome = localSession(role, userPrompt, {
+          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+          functionsReachable: true,
+          geminiConfigured: !!apiKey
+        });
+      }
     } else if (peopleIntent.intent !== "none") {
       const peopleCore = require("./botdee-smartcard-core");
       outcome = {
@@ -873,6 +937,7 @@ exports.renameBotDeeChat = onCall(GET_THREAD_OPTS, async request => {
 exports.__botDeeHelpers = {
   runGeminiSession,
   localSession,
+  tryHeadlessShoutOut,
   geminiKey,
   BOT_DEE_SETTINGS_DOC
 };

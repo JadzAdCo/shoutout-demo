@@ -70,10 +70,17 @@ const TOOL_DEFS = [
   {
     name: "startShoutOutCheckout",
     description:
-      "Start Stripe Checkout for a composed ShoutOut. Requires clubLocationId and shoutout payload (templateId, text fields, screenFormatId as collected). Re-validates shoutOut. Returns checkoutUrl — never collect card data.",
+      "Throw a ShoutOut from chat (headless). Pass clubLocationId or locationName plus message/mainText. Optional templateId (default Traditional blackwhite) and screenFormatId. Server fits the copy to the venue LED. Paid templates return checkoutUrl; free boards submit pending (shoutoutId). Never collect card data. Do not invent checkoutUrl. Football Intro, jerseys, Baller's Alert, Heist art, and photo boards return composeHref instead.",
     parameters: obj({
-      clubLocationId: str("Venue location id."),
-      shoutout: {type: Type.OBJECT, description: "ShoutOut compose payload (templateId, message fields, screenFormatId, etc.)."},
+      clubLocationId: str("Venue slug or display name (e.g. Aurelia, decades-washington-dc)."),
+      locationName: str("Optional venue display name."),
+      locationId: str("Alias for clubLocationId."),
+      message: str("Board copy the patron wants on the LED."),
+      mainText: str("Alias for message."),
+      text: str("Alias for message."),
+      templateId: str("Optional template id. Default blackwhite. classicHalloween is paid."),
+      screenFormatId: str("Optional LED size: led-96x48, led-64x48, or led-64x32."),
+      shoutout: {type: Type.OBJECT, description: "Optional full compose payload if already collected."},
       payload: {type: Type.OBJECT, description: "Optional wrapper with clubLocationId + shoutout."},
       returnBase: str("Optional return base URL."),
       correlationId: str("Optional correlation id.")
@@ -448,7 +455,7 @@ function shoutOutExecuteFallback(lang, allowedFeatures) {
     kind: "shoutout"
   }, code);
   return {
-    reply: "I can start a ShoutOut from chat once I have the club and the message. Which venue should it play on, and what should it say? You can also open compose to pick a template on your phone.",
+    reply: "I can throw a ShoutOut from chat — name the club and the message (template optional; Traditional board is the default). Paid templates get a secure Stripe link. You can also open compose for photo, jersey, Football Intro, Heist, or Baller's Alert boards.",
     results: [link],
     provider: "local-shoutout",
     model: "listShoutOutTemplates"
@@ -458,7 +465,7 @@ function shoutOutExecuteFallback(lang, allowedFeatures) {
 function hasShoutOutActionLink(links) {
   return (Array.isArray(links) ? links : []).some(link => {
     const kind = String(link?.kind || "").toLowerCase();
-    return kind === "checkout" || kind === "shoutout";
+    return kind === "checkout" || kind === "shoutout" || kind === "shoutout-pending";
   });
 }
 
@@ -911,7 +918,9 @@ async function runTool(name, args, session) {
   if (!session?.request) {
     return {ok: false, error: "Session request missing for product tool."};
   }
-  return tools.runProductTool(name, args, session.request);
+  const toolArgs = args && typeof args === "object" ? {...args} : {};
+  if (!toolArgs.userPrompt && session?.lastUserPrompt) toolArgs.userPrompt = session.lastUserPrompt;
+  return tools.runProductTool(name, toolArgs, session.request);
 }
 
 function toolDeclarations(allowedFeatures, options) {
@@ -985,6 +994,7 @@ function localizeActionLink(link, lang) {
   if (kind === "checkout" && pack.action.paySecurely) next.label = pack.action.paySecurely;
   if (kind === "floqcast" && pack.action.floqcastPreview) next.label = pack.action.floqcastPreview;
   if (kind === "shoutout" && pack.action.shoutoutCompose) next.label = pack.action.shoutoutCompose;
+  if (kind === "shoutout-pending" && pack.action.shoutoutPending) next.label = pack.action.shoutoutPending;
   if (kind === "vip" && pack.action.vipTerms) next.label = pack.action.vipTerms;
   return next;
 }
@@ -1032,7 +1042,7 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     "When they ask about a friend or connection by name (e.g. my friend James) and no People card was attached, call lookupPublicProfiles with that name — the tool prefers Mingl/chat connections' public profiles. Summarize public fields in one or two sentences only; if nothing public matches, say so honestly.",
     "When the user asks about any other person, @handle, DJ, staff member, a club public page / photos, or what is on a public FLOQR profile (including their own: \"my public profile\", food / music / travel people can see) and no People card was attached, call lookupPublicProfiles. If the viewer can see those volunteered public datapoints, you can too — still do not dump every key as markdown. Never say FLOQR does not track music, food, travel, hobbies, or similar — if a field is absent from the tool result, say it is not on that public profile (not filled or not opted public). Never invent private details (email, phone, PAN, GPS). If nothing public matches, say so honestly. If photoCount > 0, say the photos are shown in the chat — NEVER print http(s) URLs, firebasestorage, googleusercontent, token=, storage paths, or \"View Image\" links. The UI renders photos.",
     "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
-    "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
+    "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = when they name a club and the board message, call startShoutOutCheckout immediately with clubLocationId/locationName + message (templateId optional; default Traditional blackwhite). Do not wait for a full shoutout object. If the tool returns checkoutUrl, tell them to Pay securely. If it returns shoutoutId, the board is pending club approval. If needs club or message, ask only for the missing piece. Never invent a checkout URL. Photo / jersey / Football Intro / Heist / Baller's Alert stay on composeHref.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     "If they ask where you left off, recap the last two meaningful retrieved turns — skip a post-pause hello/Hey. Distinguish discussed vs booked: never claim a VIP reservation, hold, or payment is confirmed unless a tool result in this turn or a stored execution receipt says so. Talking about a venue or VIP tables is discussion, not a booking.",
@@ -1149,7 +1159,12 @@ function linksFromToolResult(result, lang) {
   const links = [];
   if (result.checkoutUrl) links.push(localizeActionLink({label: "Pay securely", href: result.checkoutUrl, kind: "checkout"}, code));
   if (result.previewPath) links.push(localizeActionLink({label: "Open FloqCAST preview", href: result.previewPath, kind: "floqcast"}, code));
-  if (result.composeHref) links.push(localizeActionLink({label: "Open ShoutOut compose", href: result.composeHref, kind: "shoutout"}, code));
+  if (result.portalHref) {
+    links.push(localizeActionLink({label: "Open in My ShoutOuts", href: result.portalHref, kind: "shoutout-pending"}, code));
+  }
+  if (result.composeHref && !result.checkoutUrl && !result.portalHref) {
+    links.push(localizeActionLink({label: "Open ShoutOut compose", href: result.composeHref, kind: "shoutout"}, code));
+  }
   if (result.holdId && !result.checkoutUrl) {
     links.push(localizeActionLink({
       label: "Continue VIP Terms",
