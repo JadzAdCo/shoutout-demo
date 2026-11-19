@@ -399,6 +399,29 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-headless-vip",
+      "id": "help-botdee-headless-vip",
+      "kind": "help",
+      "label": "VIP reserV from BOT DEE chat",
+      "blurb": "Say VIP reserV or hold a VIP table at Aurelia in BOT DEE. Name the club, night, and table or area. Mezzanine is an area — BOT DEE lists V1–V4 and AURELIA SUITE so you can pick a table, then hold it, reply I agree to Terms, and pay if a deposit is required. BOT DEE never takes car",
+      "href": "./botdee.html?from=botdee",
+      "phrases": [
+        "vip reserv from bot dee chat",
+        "say vip reserv or hold a vip table at aurelia in bot dee. name the club night and table or area. mezzanine is an area bot dee lists v1 v4 and aurelia suite so y",
+        "headless vip",
+        "vip from chat",
+        "hold a vip table at aurelia",
+        "mezzanine",
+        "vip reserv bot dee",
+        "book vip in bot dee",
+        "v1 aurelia",
+        "hold it vip",
+        "open bot dee",
+        "open vip reserv",
+        "help-botdee-headless-vip"
+      ]
+    },
+    {
       "sourceId": "help:help-botdee-knows-of-me",
       "id": "help-botdee-knows-of-me",
       "kind": "help",
@@ -547,11 +570,11 @@
       "id": "help-botdee-room-smartview",
       "kind": "help",
       "label": "Room SMARTview",
-      "blurb": "In BOT DEE chat, say Open Room SMARTview or Start a group chat. A Room SMARTview card opens in the same bubble. Confirm before anything is created. Private BOT DEE messages stay private. Group rooms, invites, and a shared tab are not live yet — Confirm does not create a room, sen",
+      "blurb": "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm mints a join link friends can open while signed in. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your A",
       "href": "./botdee.html",
       "phrases": [
         "room smartview",
-        "in bot dee chat say open room smartview or start a group chat. a room smartview card opens in the same bubble. confirm before anything is created. private bot d",
+        "in bot dee chat say open room smartview or start a group chat. confirm mints a join link friends can open while signed in. joining is not a payment and does not",
         "start a group chat",
         "open room smartview",
         "create a room",
@@ -566,11 +589,11 @@
       "id": "help-botdee-room-smartview-end",
       "kind": "help",
       "label": "End Room SMARTview",
-      "blurb": "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats. There is no live room to close yet.",
+      "blurb": "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats.",
       "href": "./botdee.html",
       "phrases": [
         "end room smartview",
-        "only the host can end a room and only after confirm. ending does not charge anyone or erase other people s private chats. there is no live room to close yet.",
+        "only the host can end a room and only after confirm. ending does not charge anyone or erase other people s private chats.",
         "end this room",
         "close room smartview",
         "end group chat bot dee",
@@ -583,11 +606,11 @@
       "id": "help-botdee-room-smartview-invite",
       "kind": "help",
       "label": "Room SMARTview invite",
-      "blurb": "Invite others from Room SMARTview after you confirm. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Wrong-account, blocked, and non-friend invites will refuse when group rooms ship. Nothing is sent today; group rooms a",
+      "blurb": "After you confirm Room SMARTview, share the join link. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Joining is not a payment and does not open a shared tab.",
       "href": "./botdee.html",
       "phrases": [
         "room smartview invite",
-        "invite others from room smartview after you confirm. named people are not looked up just because you typed a name floqr will not say whether an account exists. ",
+        "after you confirm room smartview share the join link. named people are not looked up just because you typed a name floqr will not say whether an account exists.",
         "invite others to this chat",
         "invite friends bot dee",
         "bring my friends into this conversation",
@@ -600,11 +623,11 @@
       "id": "help-botdee-room-smartview-join",
       "kind": "help",
       "label": "Join a Room SMARTview",
-      "blurb": "Joining a Room SMARTview is not the same as joining a shared tab or approving a payment. When rooms ship, you will sign in and accept a bound invite. Opening a link does not join you automatically.",
+      "blurb": "Open a Room SMARTview join link while signed in, or paste it in BOT DEE. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
       "href": "./botdee.html",
       "phrases": [
         "join a room smartview",
-        "joining a room smartview is not the same as joining a shared tab or approving a payment. when rooms ship you will sign in and accept a bound invite. opening a l",
+        "open a room smartview join link while signed in or paste it in bot dee. joining the room is not joining a shared tab and does not approve a payment. bot dee nev",
         "join room smartview",
         "join this bot dee chat",
         "can my friends join us",
@@ -3260,9 +3283,9 @@
         "3d walk-through",
         "search a vip reserv club",
         "isreserved",
-        "open vip reserv",
-        "aurelia 3d walk-through",
-        "help-vip-book-table"
+        "headless vip",
+        "vip from chat",
+        "mezzanine"
       ]
     },
     {
@@ -3699,16 +3722,19 @@
       "id": "help-botdee-room-smartview",
       "kind": "help",
       "label": "Room SMARTview",
-      "blurb": "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm before anything is created. Private chat stays private. Group rooms are not live yet.",
+      "blurb": "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm mints a join link. Joining is not a payment and does not open a shared tab.",
       "href": "./botdee.html",
       "phrases": [
         "room smartview",
-        "type open room smartview or start a group chat in bot dee. confirm before anything is created. private chat stays private. group rooms are not live yet.",
+        "type open room smartview or start a group chat in bot dee. confirm mints a join link. joining is not a payment and does not open a shared tab.",
         "start a group chat",
         "open room smartview",
         "create a room",
         "invite others to this chat",
         "share this conversation",
+        "join room smartview",
+        "joined bot dee session",
+        "confirm room smartview",
         "help-botdee-room-smartview"
       ]
     },
@@ -4750,6 +4776,9 @@
         "vip booth",
         "bottle service reservation",
         "floor map booking",
+        "headless vip",
+        "hold a vip table at aurelia",
+        "mezzanine",
         "vip-reserv"
       ]
     }

@@ -59,19 +59,19 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "В чате BOT DEE скажите Open Room SMARTview или Start a group chat. Карточка Room SMARTview откроется в том же пузыре. Подтвердите, прежде чем что-то создаётся. Личные сообщения BOT DEE остаются личными. Групповые room, приглашения и общий счёт ещё не в эфире — Подтвердить не создаёт room, не шлёт приглашение и никого не списывает. Site Chrome следует теме Appearance."
+        body: "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat. Confirm ينشئ رابط انضمام للأصدقاء المسجّلين. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً. BOT DEE لا يأخذ أرقام البطاقات أبداً. الرسائل الخاصة تبقى خاصة. Site Chrome يتبع Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "Приглашение Room SMARTview",
-        body: "Приглашайте других из Room SMARTview после подтверждения. Имена не ищутся только потому, что вы их набрали — FLOQR не скажет, существует ли аккаунт. Неверный аккаунт, блок и не-друзья будут отказны, когда появятся групповые room. Сегодня ничего не отправляется; групповые room не в эфире."
+        title: "دعوة Room SMARTview",
+        body: "بعد Confirm شارك رابط Room SMARTview. الأسماء لا تُبحث فقط لأنك كتبتها — FLOQR لن يقول إن كان الحساب موجوداً. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً."
       },
       "help-botdee-room-smartview-join": {
-        title: "Войти в Room SMARTview",
-        body: "Вход в Room SMARTview — это не вход в общий счёт и не одобрение платежа. Когда появятся room, вы войдёте и примете привязанное приглашение. Открытие ссылки само по себе не присоединяет."
+        title: "الانضمام إلى Room SMARTview",
+        body: "افتح رابط Room SMARTview وأنت مسجّل الدخول، أو الصقه في BOT DEE. الانضمام إلى room ليس انضماماً إلى حساب مشترك ولا يوافق على دفع. BOT DEE لا يأخذ أرقام البطاقات أبداً."
       },
       "help-botdee-room-smartview-end": {
-        title: "Завершить Room SMARTview",
-        body: "Только хост может завершить room и только после подтверждения. Завершение никого не списывает и не стирает чужие личные чаты. Пока нет живой room для закрытия."
+        title: "إنهاء Room SMARTview",
+        body: "المضيف فقط يمكنه إنهاء room وبعد التأكيد فقط. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة."
       },
       "help-botdee-room-smartview-tab": {
         title: "Общий счёт Room SMARTview",
@@ -232,6 +232,10 @@
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
         body: "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Док показывает живой LED-шаблон (тот же предпросмотр Display 1) и обновляется при выборе шаблона, @handle или текст/фото. Ответьте в чате или нажмите чип. Фото и видео по-прежнему через compose. Настоящий headless-запрос FloqR или третьей стороны эту карточку не использует — площадка, текст и опции в одном запросе."
+      },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV из чата BOT DEE",
+        body: "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview — не платёж."
       },
       "help-vip-book-table": {
         title: "Забронировать VIP-стол (VIP reserV)",
@@ -731,6 +735,10 @@
         title: "ShoutOut SMARTpreview",
         body: "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Het dock toont het echte LED-sjabloon (dezelfde Display 1-composervoorvertoning) en werkt bij als u sjabloon, @handle of tekst vs foto kiest. Antwoord in de chat of tik een chip. Foto en video blijven compose. Een echte headless throw van FloqR of een derde gebruikt deze kaart niet — venue, bericht en optionele extras in één verzoek."
       },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV vanuit BOT DEE-chat",
+        body: "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Room SMARTview is geen betaling."
+      },
       "help-vip-book-table": {
         title: "VIP-tafel boeken (VIP reserV)",
         body: "VIP reserV toont de plattegrond en boekt tafels. Open VIP reserV via Zoeken, kies Decades of Lima Twist Club en een avond, tik een groene tafel, houd 30 minuten, accepteer voorwaarden en betaal de borg met FloqR Stripe. Bars en DJ niet boekbaar. Bij Aurelia gebruikt u Explore 3D walk-through voor de interactieve ruimte (boeken blijft op de 2D-kaart)."
@@ -1228,6 +1236,10 @@
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
         body: "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Le dock affiche le vrai modèle LED (la même prévisualisation composeur Display 1) et se met à jour quand vous choisissez un modèle, un @handle ou texte vs photo. Répondez dans le chat ou touchez une puce. Photo et vidéo passent par compose. Un envoi headless FloqR ou tiers n’utilise pas cette carte — envoyez lieu, message et extras optionnels en une requête."
+      },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV depuis le chat BOT DEE",
+        body: "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de carte. Rejoindre un Room SMARTview n’est pas un paiement."
       },
       "help-vip-book-table": {
         title: "Réserver une table VIP (VIP reserV)",
@@ -1727,6 +1739,10 @@
         title: "ShoutOut SMARTpreview",
         body: "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Das Dock zeigt die echte LED-Vorlage (dieselbe Display-1-Composer-Vorschau) und aktualisiert sich, wenn Sie Vorlage, @handle oder Text/Foto wählen. Antworten Sie im Chat oder tippen Sie einen Chip. Foto/Video bleibt Compose. Ein echter Headless-Wurf von FloqR oder Dritten nutzt diese Karte nicht — Venue, Text und optionale Extras in einer Anfrage."
       },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV aus dem BOT DEE-Chat",
+        body: "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennummern. Room SMARTview beitreten ist keine Zahlung."
+      },
       "help-vip-book-table": {
         title: "VIP-Tisch buchen (VIP reserV)",
         body: "VIP reserV zeigt den Saalplan und bucht Tische. Öffne VIP reserV aus der Suche, wähle Decades oder Lima Twist Club und einen Abend, tippe einen grünen Tisch, halte 30 Minuten, akzeptiere die AGB und zahle die Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar. Marke VIP reserV wird nicht übersetzt. Bei Aurelia öffnen Sie Explore 3D walk-through für den interaktiven Raum (Buchung bleibt auf dem 2D-Plan)."
@@ -2224,6 +2240,10 @@
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
         body: "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. El dock muestra la plantilla LED real (la misma vista previa de compositor de Display 1) y se actualiza al elegir plantilla, @handle o texto vs foto. Responda en el chat o toque un chip. Foto y vídeo siguen en compose. Un envío headless de FloqR o de un tercero no usa esta tarjeta: local, mensaje y extras opcionales en una petición."
+      },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV desde el chat de BOT DEE",
+        body: "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no es un pago."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -2723,6 +2743,10 @@
         title: "ShoutOut SMARTpreview",
         body: "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Il dock mostra il vero template LED (la stessa anteprima composer di Display 1) e si aggiorna quando scegli template, @handle o testo vs foto. Rispondi in chat o tocca un chip. Foto e video restano su compose. Un throw headless FloqR o di terzi non usa questa scheda — locale, messaggio ed extra opzionali in una richiesta."
       },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV dalla chat BOT DEE",
+        body: "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview non è un pagamento."
+      },
       "help-vip-book-table": {
         title: "Prenota un tavolo VIP (VIP reserV)",
         body: "VIP reserV mostra la mappa e prenota tavoli. Apri VIP reserV da Cerca, scegli Decades o Lima Twist Club e una serata, tocca un tavolo verde, tieni 30 minuti, accetta i Termini e paga il deposito con FloqR Stripe. Bar e DJ non prenotabili. Ad Aurelia usa Explore 3D walk-through per la sala interattiva (la prenotazione resta sulla mappa 2D)."
@@ -3220,6 +3244,10 @@
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
         body: "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. O dock mostra o modelo LED real (a mesma pré-visualização do compositor Display 1) e atualiza quando escolhe modelo, @handle ou texto vs foto. Responda no chat ou toque num chip. Foto e vídeo continuam no compose. Um envio headless FloqR ou de terceiros não usa este cartão — venue, mensagem e extras opcionais num pedido."
+      },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV a partir do chat BOT DEE",
+        body: "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SMARTview não é um pagamento."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -3719,6 +3747,10 @@
         title: "ShoutOut SMARTpreview",
         body: "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Το dock δείχνει το πραγματικό LED πρότυπο (την ίδια προεπισκόπηση Display 1) και ενημερώνεται όταν επιλέγετε πρότυπο, @handle ή κείμενο/φωτογραφία. Απαντήστε στη συνομιλία ή πατήστε chip. Φωτογραφία/βίντεο μένουν στο compose. Ένα πραγματικό headless throw από FloqR ή τρίτο δεν χρησιμοποιεί αυτή την κάρτα — χώρος, μήνυμα και προαιρετικά extras σε ένα αίτημα."
       },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV από τη συνομιλία BOT DEE",
+        body: "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Η είσοδος σε Room SMARTview δεν είναι πληρωμή."
+      },
       "help-vip-book-table": {
         title: "Κράτηση VIP τραπεζιού (VIP reserV)",
         body: "Το VIP reserV δείχνει τον χάρτη και κλείνει τραπέζια. Ανοίξτε VIP reserV από Αναζήτηση, επιλέξτε Decades ή Lima Twist Club και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα. Στην Aurelia χρησιμοποιήστε Explore 3D walk-through για την διαδραστική αίθουσα (η κράτηση μένει στο 2D)."
@@ -4217,6 +4249,10 @@
         title: "ShoutOut SMARTpreview",
         body: "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Dock pokazuje żywy szablon LED (ten sam podgląd Display 1) i odświeża się po wyborze szablonu, @handle albo tekst vs zdjęcie. Odpowiedz na czacie albo stuknij chip. Zdjęcie i wideo nadal przez compose. Prawdziwy headless z FloqR lub strony trzeciej nie używa tej karty — lokal, treść i opcjonalne dodatki w jednym żądaniu."
       },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV z czatu BOT DEE",
+        body: "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołączenie do Room SMARTview nie jest płatnością."
+      },
       "help-vip-book-table": {
         title: "Zarezerwuj stolik VIP (VIP reserV)",
         body: "VIP reserV pokazuje mapę i rezerwuje stoliki. Otwórz VIP reserV z Wyszukiwania, wybierz Decades lub Lima Twist Club i wieczór, stuknij zielony stolik, blokuj 30 min, zaakceptuj warunki i zapłać depozyt FloqR Stripe. Bary i DJ nie do rezerwacji. W Aurelii użyj Explore 3D walk-through dla interaktywnej sali (rezerwacja zostaje na mapie 2D)."
@@ -4714,6 +4750,10 @@
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
         body: "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. يعرض الإرساء قالب LED الحي (نفس معاينة Display 1) ويتحدّث عند اختيار القالب أو @handle أو نص مقابل صورة. أجب في الدردشة أو اضغط شريحة. الصورة والفيديو ما زالا عبر compose. الرمي headless الحقيقي من FloqR أو طرف ثالث لا يستخدم هذه البطاقة — المكان والرسالة والإضافات الاختيارية في طلب واحد."
+      },
+      "help-botdee-headless-vip": {
+        title: "VIP reserV من محادثة BOT DEE",
+        body: "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
       },
       "help-vip-book-table": {
         title: "حجز طاولة VIP (VIP reserV)",

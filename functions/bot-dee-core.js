@@ -91,12 +91,24 @@ const TOOL_DEFS = [
     })
   },
   {
-    name: "createVipHold",
-    description: "Hold a VIP table section for 30 minutes. Needs clubLocationId, night (YYYY-MM-DD), sectionId, partySize. Re-validates vipReservations.",
+    name: "getVipAvailability",
+    description:
+      "List VIP reserV bookable tables for a club (optional night and area). Accepts display names (Aurelia) and area names (Mezzanine, West Booths). Returns sectionId + label + capacity. Call this BEFORE createVipHold when the patron names an area instead of a table id. Never pass Mezzanine as sectionId.",
     parameters: obj({
-      clubLocationId: str("Venue id."),
+      clubLocationId: str("Venue slug or display name (e.g. Aurelia, temp-democlub-1)."),
+      locationName: str("Optional venue display name."),
+      night: str("Optional night YYYY-MM-DD."),
+      sectionQuery: str("Optional area or table needle (Mezzanine, V1, C10)."),
+      area: str("Alias for sectionQuery.")
+    }, ["clubLocationId"])
+  },
+  {
+    name: "createVipHold",
+    description: "Hold a VIP table section for 30 minutes. Needs clubLocationId, night (YYYY-MM-DD), sectionId (table id like aurelia-v1 or V1 — never an area name like Mezzanine), partySize. Re-validates vipReservations.",
+    parameters: obj({
+      clubLocationId: str("Venue id or display name (Aurelia)."),
       night: str("Night date YYYY-MM-DD."),
-      sectionId: str("Floor section id."),
+      sectionId: str("Floor section id or printed label (V1, C10). Not an area name."),
       partySize: {type: Type.INTEGER, description: "Party size within section capacity."}
     }, ["clubLocationId", "night", "sectionId", "partySize"])
   },
@@ -149,6 +161,7 @@ const TOOL_FEATURE_KEY = Object.freeze({
   lookupPublicProfiles: null,
   listShoutOutTemplates: "shoutOut",
   startShoutOutCheckout: "shoutOut",
+  getVipAvailability: "vipReservations",
   createVipHold: "vipReservations",
   recordVipConsent: "vipReservations",
   createVipCheckout: "vipReservations",
@@ -473,10 +486,47 @@ function hasShoutOutActionLink(links) {
   });
 }
 
+function isVipExecutePrompt(raw) {
+  try {
+    return require("./headless-vip-core").isVipExecutePrompt(raw);
+  } catch (_) {
+    return false;
+  }
+}
+
+function vipExecuteFallback(lang, allowedFeatures) {
+  const code = normalizeUiLanguage(lang);
+  const allowed = allowedFeatureSet(allowedFeatures);
+  if (allowed && !allowed.has("vipReservations")) {
+    return {
+      reply: "VIP reserV isn't available on your account yet.",
+      results: [],
+      provider: "local-vip",
+      model: "vipReservations"
+    };
+  }
+  const link = localizeActionLink({
+    label: "Open VIP reserV",
+    href: "./vip.html?from=botdee",
+    kind: "vip"
+  }, code);
+  return {
+    reply: "I can hold a VIP table from chat — name the club, night, and table or area (Mezzanine, V1, C10). Joining a BOT DEE room is not a payment. You can also open the VIP reserV map.",
+    results: [link],
+    provider: "local-vip",
+    model: "vipReservations"
+  };
+}
+
 function omitContextualSearchForPrompt(userPrompt, allowedFeatures) {
-  if (!isShoutOutExecutePrompt(userPrompt)) return false;
   const tools = toolDeclarations(allowedFeatures);
-  return tools.some(tool => tool.name === "listShoutOutTemplates");
+  if (isShoutOutExecutePrompt(userPrompt)) {
+    return tools.some(tool => tool.name === "listShoutOutTemplates");
+  }
+  if (isVipExecutePrompt(userPrompt)) {
+    return tools.some(tool => tool.name === "createVipHold" || tool.name === "getVipAvailability");
+  }
+  return false;
 }
 
 /** Bare help / how-to-use-BOT-DEE — local reply like version; never dump search cards.
@@ -1045,8 +1095,9 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     "People / profile lookups (who is X, what do you know of X, tell me about X, me / who am I) are answered by a People SMARTview card in the chat UI. Do not print markdown field dumps (**Bio**, Location, Details, Looking to Meet, Social Handles) or asterisk spec sheets. One short sentence is enough; never invent Master Admin, SOS2FA, or token claims.",
     "When they ask about a friend or connection by name (e.g. my friend James) and no People card was attached, call lookupPublicProfiles with that name — the tool prefers Mingl/chat connections' public profiles. Summarize public fields in one or two sentences only; if nothing public matches, say so honestly.",
     "When the user asks about any other person, @handle, DJ, staff member, a club public page / photos, or what is on a public FLOQR profile (including their own: \"my public profile\", food / music / travel people can see) and no People card was attached, call lookupPublicProfiles. If the viewer can see those volunteered public datapoints, you can too — still do not dump every key as markdown. Never say FLOQR does not track music, food, travel, hobbies, or similar — if a field is absent from the tool result, say it is not on that public profile (not filled or not opted public). Never invent private details (email, phone, PAN, GPS). If nothing public matches, say so honestly. If photoCount > 0, say the photos are shown in the chat — NEVER print http(s) URLs, firebasestorage, googleusercontent, token=, storage paths, or \"View Image\" links. The UI renders photos.",
-    "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
-    "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = when they name a club and the board message, call startShoutOutCheckout immediately with clubLocationId/locationName + message (templateId optional; default Traditional blackwhite). Do not wait for a full shoutout object. If the tool returns checkoutUrl, tell them to Pay securely. If it returns shoutoutId, the board is pending club approval. If needs club or message, ask only for the missing piece. Never invent a checkout URL. Photo / jersey / Football Intro / Heist / Baller's Alert stay on composeHref.",
+    "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / getVipAvailability / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
+    "VIP reserV: Mezzanine / West Booths / Dance Floor are AREAS, not sectionId. Call getVipAvailability with sectionQuery Mezzanine first, then createVipHold with a returned table id (aurelia-v1 / V1). Never pass Mezzanine as sectionId. If getVipAvailability returns several matches, list the labels and ask which table. Night is YYYY-MM-DD (tonight is OK to resolve server-side).",
+    "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = getVipAvailability when the table is unclear, then createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = when they name a club and the board message, call startShoutOutCheckout immediately with clubLocationId/locationName + message (templateId optional; default Traditional blackwhite). Do not wait for a full shoutout object. If the tool returns checkoutUrl, tell them to Pay securely. If it returns shoutoutId, the board is pending club approval. If needs club or message, ask only for the missing piece. Never invent a checkout URL. Photo / jersey / Football Intro / Heist / Baller's Alert stay on composeHref.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     "If they ask where you left off, recap the last two meaningful retrieved turns — skip a post-pause hello/Hey. Distinguish discussed vs booked: never claim a VIP reservation, hold, or payment is confirmed unless a tool result in this turn or a stored execution receipt says so. Talking about a venue or VIP tables is discussion, not a booking.",
@@ -1223,8 +1274,10 @@ module.exports = {
   },
   isHelpPrompt,
   isShoutOutExecutePrompt,
+  isVipExecutePrompt,
   shoutOutComposeHref,
   shoutOutExecuteFallback,
+  vipExecuteFallback,
   hasShoutOutActionLink,
   omitContextualSearchForPrompt,
   isPrivacyPrompt,

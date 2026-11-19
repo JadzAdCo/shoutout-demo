@@ -1,13 +1,12 @@
 /* BOT DEE Room SMARTview v2 — deterministic intent routing.
-   Chat-embedded confirmation card only. Group rooms / invites / shared tab
-   are not live. Never create, invite, share, or charge from a classifier hit.
-   Request-scoped payload — no new Firestore docs. */
+   Confirm mints a join link (Functions-write live module). Shared tab / charge
+   stay off. Classifier never writes Firestore. */
 "use strict";
 
 const SCHEMA_VERSION = "floqr.botDeeRoomSmartView/1";
 const KIND = "botDeeRoom";
 const MEMBER_CAP = 8;
-const ROOMS_LIVE = false;
+const ROOMS_LIVE = true;
 
 const TYPOS = [
   [/\borders\b/g, "others"],
@@ -327,6 +326,12 @@ function shareableFactsFromUtterance(raw) {
 
 function detectCommand(normalized, raw) {
   if (
+    /^(?:confirm(?: room(?: smartview)?)?)$/.test(normalized)
+    || /\bconfirm room smartview\b/.test(normalized)
+  ) {
+    return "confirm";
+  }
+  if (
     /^(?:invite|add)\s+(?:two more|more)\s+(?:friends|people|guests)/.test(normalized)
     || /invite (?:two more|more) (?:friends|people)/.test(normalized)
     || /noch zwei freunde einladen/.test(normalized)
@@ -477,7 +482,7 @@ function classifyRoomIntent(raw, opts) {
     const row = {
       ...empty,
       level: "command",
-      route: "command",
+      route: command === "confirm" ? "confirm" : "command",
       command,
       handled: true,
       needsConfirmation: command === "kick" || command === "end",
@@ -554,10 +559,16 @@ function replyFor(classified) {
       text: "I can’t use private BOT DEE history or host memory for that. Room SMARTview only uses what this group later confirms."
     };
   }
+  if (row.route === "confirm") {
+    return {
+      key: "botdee.rs.confirmedLive",
+      text: "Room SMARTview is open. Share the join link so friends can talk with BOT DEE here. Joining is not a payment."
+    };
+  }
   if (row.route === "setup") {
     return {
       key: "botdee.rs.setupIntro",
-      text: "Here’s Room SMARTview setup. Confirm to continue — nothing is created until you say so. Your private BOT DEE chat stays private."
+      text: "Here’s Room SMARTview setup. Confirm to mint a join link — friends can talk with BOT DEE in this room. Joining is not a payment. Your private BOT DEE chat stays private."
     };
   }
   if (row.route === "reopen") {
@@ -579,7 +590,7 @@ function replyFor(classified) {
     };
   }
   const commandCopy = {
-    invite: ["botdee.rs.commandInvite", "Invite more people from Room SMARTview. Group rooms are not live yet — no invite is sent until that ships."],
+    invite: ["botdee.rs.commandInvite", "Share the Room SMARTview join link. Joining is not a payment and does not open a shared tab."],
     members: ["botdee.rs.commandMembers", "There is no active Room SMARTview yet, so there is no member list to show."],
     summarize: ["botdee.rs.commandSummary", "There are no room-only decisions yet. Private BOT DEE history is not used as a room summary."],
     who_pays: ["botdee.rs.commandWhoPays", "No one is charged from chat. A shared tab needs a later opt-in per person — it is not live."],
@@ -636,12 +647,13 @@ function buildRoomSmartView(opts) {
     },
     actions: {
       create: false,
-      invite: false,
+      invite: classified.hasActiveRoom === true,
       kick: false,
-      end: false,
+      end: classified.hasActiveRoom === true,
       tabOptIn: false,
       charge: false
     },
+    joinHref: text(options.joinHref, 240),
     replyKey: copy.key,
     declineKey: classified.declineKey || declineKey(classified)
   };

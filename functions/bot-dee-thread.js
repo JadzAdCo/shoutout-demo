@@ -405,7 +405,11 @@ function snapshotToState(snap, uid, settings, nowMs) {
     [prefs.SESSION_RESET_FIELD]: staleGeneration ? 0 : prefs.sessionResetVersionOf(data),
     headlessShoutOutDraft: staleGeneration ? null : (data.headlessShoutOutDraft && typeof data.headlessShoutOutDraft === "object"
       ? data.headlessShoutOutDraft
-      : null)
+      : null),
+    headlessVipDraft: staleGeneration ? null : (data.headlessVipDraft && typeof data.headlessVipDraft === "object"
+      ? data.headlessVipDraft
+      : null),
+    joinedRoomId: staleGeneration ? "" : String(data.joinedRoomId || "").trim().slice(0, 80)
   };
 }
 
@@ -793,6 +797,43 @@ async function persistHeadlessShoutOutDraft(uid, draft) {
   return {ok: true};
 }
 
+async function persistHeadlessVipDraft(uid, draft) {
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const now = Date.now();
+  if (!draft) {
+    await ref.set({
+      headlessVipDraft: admin.firestore.FieldValue.delete(),
+      updatedAtMs: now
+    }, {merge: true});
+    return {ok: true, cleared: true};
+  }
+  const headless = require("./headless-vip-core");
+  await ref.set({
+    headlessVipDraft: headless.clipInteractiveDraft(draft),
+    updatedAtMs: now
+  }, {merge: true});
+  return {ok: true};
+}
+
+async function persistJoinedRoomId(uid, roomId) {
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const now = Date.now();
+  if (!roomId) {
+    await ref.set({
+      joinedRoomId: admin.firestore.FieldValue.delete(),
+      updatedAtMs: now
+    }, {merge: true});
+    return {ok: true, cleared: true};
+  }
+  await ref.set({
+    joinedRoomId: String(roomId).trim().slice(0, 80),
+    updatedAtMs: now
+  }, {merge: true});
+  return {ok: true};
+}
+
 async function persistUserTurn(uid, settings, userText, opts) {
   if (!settings?.durableThreads) return {ok: true, skipped: true};
   const ref = threadRef(uid);
@@ -974,6 +1015,8 @@ module.exports = {
   persistExchange,
   persistUserTurn,
   persistHeadlessShoutOutDraft,
+  persistHeadlessVipDraft,
+  persistJoinedRoomId,
   persistModelTurn,
   persistArchiveTurns,
   loadArchiveHistory,

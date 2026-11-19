@@ -717,13 +717,15 @@ body.botdee-photo-popout-page {
 .botdee-so-dock.is-open {
   padding: 0 0 2px;
 }
-.botdee-so-dock .botdee-sv-shoutout {
+.botdee-so-dock .botdee-sv-shoutout,
+.botdee-so-dock .botdee-sv-vip {
   margin: 0;
 }
 .botdee-so-dock .botdee-so-foot {
   display: none;
 }
-body.botdee-so-dock-open .botdee-transcript {
+body.botdee-so-dock-open .botdee-transcript,
+body.botdee-vip-dock-open .botdee-transcript {
   flex: 1 1 auto;
 }
 

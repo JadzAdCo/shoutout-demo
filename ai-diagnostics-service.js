@@ -223,6 +223,18 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.046",
+      title: "s3.3.046 — People SMARTview chip gaps + headless VIP reserV + Room join",
+      checks: [
+        {label:"People details collapse empty space", file:"botdee-smartview.css", includes:[".botdee-sv-details > *", ".botdee-sv-tags:empty", "max-height: none"], notIncludes:["6.4em"]},
+        {label:"Headless VIP core", file:"functions/headless-vip-core.js", includes:["resolveSectionQuery", "isVipExecutePrompt", "Mezzanine"]},
+        {label:"Session intercepts VIP", file:"functions/bot-dee-functions.js", includes:["tryHeadlessVip", "headlessVipDraft", "botdee-room-live"]},
+        {label:"Room join live", file:"functions/botdee-room-live.js", includes:["botDeeRooms", "joinTokenHash", "charge: false"]},
+        {label:"Idle skip while docks/room open", file:"bot-dee-chat.js", includes:["hasOpenWorkflow", "botDeeVipPreviewDock", "data-rs-active"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-046-people-gaps-headless-vip-rooms"]}
+      ]
+    },
+    {
       version: "s3.3.045",
       title: "s3.3.045 — ShoutOut SMARTpreview live LED template (display.html preview=1)",
       checks: [
@@ -3524,6 +3536,15 @@
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.039. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — card shows photo full width on top, Don Papi and @handle on the next row, SMARTsummary as inline text (not a tall empty box). 3) Open My Profile → Features & Orders → My BOT DEE → View my SMARTview — same stack. 4) Phone ~390 and desktop ~1280. Empty fields take no height. Display URLs have no ?v=. 5) Mark Succeed/Failed.",
       expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
       troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
+    },
+    {
+      id:"s3-3-046-people-gaps-headless-vip-rooms",
+      area:"BOT DEE",
+      feature:"People SMARTview spacing + headless VIP reserV + joined Room SMARTview",
+      changed:"s3.3.046 — People SMARTview details box no longer reserves empty bands around Music/Nightlife chips and genre tags. Headless VIP reserV from chat: Mezzanine at Aurelia lists V1–V4 + AURELIA SUITE instead of “section wasn’t found.” Confirm Room SMARTview mints a join link; joining is not a payment. Idle pause does not fire while a ShoutOut/VIP dock or active room is open.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.css / bot-dee-chat.js ?v=s3.3.046. Sign in with BOT DEE + VIP reserV. 2) Ask Who is Don Banyong — People SMARTview details box hugs Music / Nightlife / Sports / Events and Hip hop tags; no empty bands above, between, or below those chips. 3) New chat: VIP reserV at Aurelia → Mezzanine. Expect a table list (V1–V4, AURELIA SUITE), not “section wasn’t found.” Reply V1 then hold it. I agree must not ask for card numbers. 4) Open Room SMARTview → Confirm — join link appears. Opening botdee.html?join= while signed in joins without charging. Session must not pause with “I’ll pause here for now” while the VIP dock or room card is open. 5) Throw a shoutout still works in the same chat. 6) Mark Succeed/Failed.",
+      expected:"Tight People card. Headless VIP lists Mezzanine tables and can hold V1. Room Confirm mints a join link. Idle does not drop an in-progress VIP/room/shoutout. No card numbers in chat. Display URLs have no ?v=.",
+      troubleshoot:"Empty chip bands remain → cached botdee-smartview.css still has 6.4em tag height. Mezzanine miss → Functions executeBotSession not this SHA (tryHeadlessVip / resolveSectionQuery missing). Idle pause mid-VIP → cached bot-dee-chat.js without hasOpenWorkflow. Confirm still “not live” → ROOMS_LIVE false or botdee-room-live not deployed. Join 404 → Firestore rules botDeeRooms not published."
     },
     {
       id:"s3-3-045-smartpreview-live-led",
