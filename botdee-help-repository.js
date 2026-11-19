@@ -848,10 +848,11 @@
       ],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},
-        {label: "Open ShoutOut", href: pageUrl("./shoutout-search.html", {from: "botdee"})}
+        {label: "Open ShoutOut", href: pageUrl("./shoutout-search.html", {from: "botdee"})},
+        {label: "SMARTpreview (Master Admin)", href: pageUrl("./master-admin.html") + "#featuresBotDee-smartpreview"}
       ],
       source: "help-repository-seed",
-      audiences: ["patron"]
+      audiences: ["patron", "masterAdmin"]
     },
     {
       id: "help-vip-book-table",

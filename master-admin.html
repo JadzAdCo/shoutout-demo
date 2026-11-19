@@ -1543,6 +1543,7 @@
             <button type="button" class="admin-subtab active" role="tab" aria-selected="true" data-botdee-page="pause" data-i18n="master.botDeeSubPause">Conversation Pause</button>
             <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-botdee-page="legal" data-i18n="master.botDeeSubLegal">Version &amp; Legal Gates</button>
             <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-botdee-page="smartviews" data-i18n="master.botDeeSubSmartviews">SMARTviews</button>
+            <button type="button" class="admin-subtab" role="tab" aria-selected="false" data-botdee-page="smartpreview" data-i18n="master.botDeeSubSmartpreview">SMARTpreview</button>
           </div>
         </div>
         <div class="card botdee-mgmt-page" data-botdee-page="pause">
@@ -1649,6 +1650,19 @@
             <button type="button" id="botDeeMasterLoadSmartViews" class="buttonlike" data-i18n="botdee.libraryRefresh">Show mock SMARTviews</button>
           </p>
           <div id="botDeeMasterSmartViewDemo" class="botdee-sv-host report-block" aria-live="polite"></div>
+        </div>
+        <div class="card botdee-mgmt-page hidden" data-botdee-page="smartpreview" hidden>
+          <h3 class="brand-mixed-case"
+            data-i18n="master.botDeeSubSmartpreview"
+            data-floqr-help-id="help-shoutout-headless-smartview"
+            data-floqr-help-title="ShoutOut SMARTpreview"
+            data-floqr-help-search="smartpreview|shoutout smartpreview|headless shoutout|bot dee shoutout preview"
+            data-floqr-help-body="ShoutOut SMARTpreview is the optional BOT DEE collection card. These labeled mocks show draft, handle, ready, Halloween pay, and submitted. A true headless throw from FloqR or a third party does not use this card. LED still waits on Club Admin Approve.">SMARTpreview</h3>
+          <p class="sub small" data-i18n="master.botDeeSmartpreviewNote">ShoutOut SMARTpreview is the optional BOT DEE collection card. These labeled mocks show draft, handle, ready, Halloween pay, and submitted. A true headless throw from FloqR or a third party does not use this card. LED still waits on Club Admin Approve.</p>
+          <p class="botdee-upgrade-actions">
+            <button type="button" id="botDeeMasterLoadSmartPreview" class="buttonlike" data-i18n="master.botDeeSmartpreviewShow">Show ShoutOut SMARTpreview</button>
+          </p>
+          <div id="botDeeMasterSmartPreviewDemo" class="botdee-sv-host botdee-so-master-host report-block" aria-live="polite"></div>
         </div>
       </section>
 

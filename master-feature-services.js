@@ -811,6 +811,10 @@
       root.FLOQRBotDeeUpgradeUi?.bind?.();
       root.FLOQRBotDeeUpgradeUi?.loadDemos?.("botDeeMasterSmartViewDemo");
     }
+    if (key === "smartpreview") {
+      root.FLOQRBotDeeUpgradeUi?.bind?.();
+      root.FLOQRBotDeeUpgradeUi?.loadSmartPreviewDemos?.("botDeeMasterSmartPreviewDemo");
+    }
     if (key === "pause") loadBotDeeSettings();
   }
 

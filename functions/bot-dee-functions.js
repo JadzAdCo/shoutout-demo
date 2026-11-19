@@ -229,9 +229,7 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   const tools = require("./bot-dee-tools");
   const uid = session?.userId || session?.request?.auth?.uid || "";
   const parsed = headless.parseShoutOutExecute(userPrompt);
-  if (previousDraft && /^(yes|yeah|yep|yup|ok|okay|sure)[.!?]*$/i.test(String(userPrompt || "").trim())) {
-    parsed.confirmSubmit = true;
-  }
+  headless.applyBareInteractiveReply(previousDraft, parsed, userPrompt);
   if (parsed.cancel && previousDraft) {
     try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
     return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
@@ -301,7 +299,11 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
     returnBase: session?.request?.data?.returnBase
   }, session.request);
   const links = bot.linksFromToolResult(result, lang);
-  try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
+  if (result?.ok && (result.checkoutUrl || result.shoutoutId)) {
+    try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
+  } else {
+    try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
+  }
   if (result?.ok && result.checkoutUrl) {
     const view = shoutView.buildShoutOutSmartView({
       ...viewBase,
@@ -332,8 +334,11 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
     );
   }
   const fallback = bot.shoutOutExecuteFallback(lang, allowed);
+  const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "draft"});
   return shoutOutSmartOutcome(result?.error || fallback.reply, lang, {
-    results: links.length ? links : fallback.results
+    results: links.length ? links : fallback.results,
+    smartViews: [view],
+    model: "headless-draft"
   });
 }
 

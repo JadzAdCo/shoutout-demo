@@ -64,6 +64,40 @@ test("throw it skips remaining extras; photo asks compose", () => {
   assert.ok(headless.interactiveNeeds(photo).includes("compose"));
 });
 
+test("bare yes answers the current step and does not mint", () => {
+  const draft = headless.mergeInteractiveDraft({}, headless.parseShoutOutExecute(
+    "throw a shoutout at Decades that says Happy birthday Maya"
+  ));
+  const yes = headless.parseShoutOutExecute("yes");
+  headless.applyBareInteractiveReply(draft, yes, "yes");
+  assert.equal(yes.confirmSubmit, false);
+  assert.equal(yes.templateId, "blackwhite");
+  const afterTemplate = headless.mergeInteractiveDraft(draft, yes);
+  assert.equal(afterTemplate.templateChosen, true);
+  const handleYes = headless.parseShoutOutExecute("yes");
+  headless.applyBareInteractiveReply(afterTemplate, handleYes, "ok");
+  assert.equal(handleYes.handleDecision, "include");
+  assert.equal(handleYes.confirmSubmit, false);
+  assert.equal(headless.isInteractiveFollowUp("no", afterTemplate), true);
+});
+
+test("a new throw does not keep leftover extras", () => {
+  const first = headless.mergeInteractiveDraft({}, headless.parseShoutOutExecute(
+    "throw a halloween shoutout at Decades that says BOO with my handle"
+  ));
+  assert.equal(first.templateId, "classicHalloween");
+  assert.equal(first.handleDecision, "include");
+  const second = headless.mergeInteractiveDraft(first, headless.parseShoutOutExecute(
+    "throw a shoutout at Aurelia that says We love you Priya"
+  ));
+  assert.equal(second.clubQuery, "temp-democlub-1");
+  assert.equal(second.message, "We love you Priya");
+  assert.equal(second.templateId, "");
+  assert.equal(second.templateChosen, false);
+  assert.equal(second.handleDecision, "");
+  assert.deepEqual(headless.interactiveNeeds(second).sort(), ["handle", "media", "template"]);
+});
+
 test("API compose still defaults Traditional without SMARTview", () => {
   const composed = headless.composeShoutOutPayload({
     clubLocationId: "decades-washington-dc",
@@ -124,6 +158,31 @@ test("ShoutOut SMARTpreview LED replica is not an iframe of display.html", () =>
   assert.match(page, /id="botDeeShoutOutPreviewDock"/);
   const session = read("functions/bot-dee-functions.js");
   assert.match(session, /shoutOutPreview: "closed"/);
+  assert.match(session, /applyBareInteractiveReply/);
+  assert.doesNotMatch(session, /parsed\.confirmSubmit = true/);
+  assert.match(session, /result\?\.ok && \(result\.checkoutUrl \|\| result\.shoutoutId\)/);
+  const chatStart = chat.indexOf("function startNewChat");
+  const chatRestore = chat.indexOf("function restoreTurns");
+  assert.match(chat.slice(chatStart, chatStart + 400), /clearShoutOutPreviewDock/);
+  assert.match(chat.slice(chatRestore, chatRestore + 400), /clearShoutOutPreviewDock/);
+});
+
+test("Master Admin SMARTpreview mocks match packaged catalog", () => {
+  const file = path.join(root, "botdee-smartpreview-mock.json");
+  assert.ok(fs.existsSync(file), "commit botdee-smartpreview-mock.json");
+  const payload = JSON.parse(fs.readFileSync(file, "utf8"));
+  assert.deepEqual(payload.views, shout.mockCatalog());
+  assert.equal(payload.views.length, 5);
+  assert.equal(payload.views[0].kind, "botDeeShoutOut");
+  assert.doesNotMatch(JSON.stringify(payload.views), /[?&]v=/);
+  const master = read("master-admin.html");
+  assert.match(master, /data-botdee-page="smartpreview"/);
+  assert.match(master, /id="botDeeMasterSmartPreviewDemo"/);
+  assert.match(master, /id="botDeeMasterLoadSmartPreview"/);
+  assert.match(read("master-admin-app.js"), /botDeeMasterSmartPreviewDemo/);
+  assert.match(read("master-feature-services.js"), /loadSmartPreviewDemos/);
+  assert.match(read("botdee-upgrade-ui.js"), /botdee-smartpreview-mock\.json/);
+  assert.doesNotMatch(read("functions/headless-shoutout-core.js"), /botdee-smartpreview-mock/);
 });
 
 test("BOT DEE session collects extras before mint; FloqR callable stays one-shot", () => {
@@ -134,6 +193,7 @@ test("BOT DEE session collects extras before mint; FloqR callable stays one-shot
   assert.match(session, /isInteractiveFollowUp/);
   const commerce = read("functions/commerce-functions.js");
   assert.doesNotMatch(commerce, /interactiveNeeds/);
+  assert.match(commerce, /notifyClubPendingHeadlessShoutOut/);
   const client = read("botdee-smartview.js");
   assert.match(client, /botDeeShoutOut/);
   assert.match(client, /renderShoutOutCard/);

@@ -585,8 +585,11 @@ test("Master Admin SMARTviews subtab preserved", () => {
   assert.match(master, /data-botdee-page="smartviews"/);
   assert.match(master, /id="botDeeMasterSmartViewDemo"/);
   assert.match(master, /id="botDeeMasterLoadSmartViews"/);
+  assert.match(master, /data-botdee-page="smartpreview"/);
+  assert.match(master, /id="botDeeMasterSmartPreviewDemo"/);
   const app = fs.readFileSync(path.join(__dirname, "..", "master-admin-app.js"), "utf8");
   assert.match(app, /botDeeMasterSmartViewDemo/);
+  assert.match(app, /botDeeMasterSmartPreviewDemo/);
   assert.match(app, /featuresBotDee\[-_:\]/);
 });
 

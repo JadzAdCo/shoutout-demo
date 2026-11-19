@@ -1,0 +1,773 @@
+{
+  "schemaVersion": "floqr.botDeeShoutOutSmartView/export",
+  "updatedAt": "2026-11-19",
+  "views": [
+    {
+      "schemaVersion": "floqr.botDeeShoutOutSmartView/1",
+      "kind": "botDeeShoutOut",
+      "generatedAtIso": "2026-11-19T12:00:00.000Z",
+      "title": "ShoutOut",
+      "mode": "draft",
+      "venueName": "Decades",
+      "clubLocationId": "decades-washington-dc",
+      "mainText": "Happy birthday Maya",
+      "templateId": "",
+      "templateName": "",
+      "templateSuggestedId": "blackwhite",
+      "templateSuggestedName": "Traditional Black and White ShoutOut",
+      "screenFormatId": "led-96x48",
+      "screenFormatLabel": "96×48",
+      "includeAttribution": false,
+      "attribution": "",
+      "handleDecision": "",
+      "mediaDecision": "",
+      "mediaUrl": "",
+      "previewLines": [
+        "HAPPY BIRTHDAY",
+        "MAYA"
+      ],
+      "boardSkin": "traditional",
+      "currentStep": "template",
+      "needs": [
+        "template",
+        "handle",
+        "media"
+      ],
+      "templates": [
+        {
+          "id": "blackwhite",
+          "name": "Traditional Black and White ShoutOut",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "birthday",
+          "name": "Birthday Glow",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "vip",
+          "name": "VIP Table",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "neon",
+          "name": "Neon ShoutOut",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "gold",
+          "name": "Gold Celebration",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "graduation",
+          "name": "Graduation Night",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "corporate",
+          "name": "Corporate Event",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "classicHalloween",
+          "name": "Classic Halloween",
+          "priceCents": 1500,
+          "className": "classic-bw classic-halloween"
+        }
+      ],
+      "suggestions": [
+        {
+          "id": "blackwhite",
+          "prompt": "Traditional",
+          "group": "template"
+        },
+        {
+          "id": "neon",
+          "prompt": "Neon",
+          "group": "template"
+        },
+        {
+          "id": "birthday",
+          "prompt": "Birthday",
+          "group": "template"
+        },
+        {
+          "id": "gold",
+          "prompt": "Gold",
+          "group": "template"
+        },
+        {
+          "id": "vip",
+          "prompt": "VIP",
+          "group": "template"
+        },
+        {
+          "id": "graduation",
+          "prompt": "Graduation",
+          "group": "template"
+        },
+        {
+          "id": "corporate",
+          "prompt": "Corporate",
+          "group": "template"
+        },
+        {
+          "id": "classicHalloween",
+          "prompt": "Halloween",
+          "group": "template"
+        },
+        {
+          "id": "includeHandle",
+          "prompt": "include my handle",
+          "group": "handle"
+        },
+        {
+          "id": "skipHandle",
+          "prompt": "no handle",
+          "group": "handle"
+        },
+        {
+          "id": "textOnly",
+          "prompt": "text only",
+          "group": "media"
+        },
+        {
+          "id": "photoCompose",
+          "prompt": "with a photo",
+          "group": "media"
+        },
+        {
+          "id": "throwIt",
+          "prompt": "throw it",
+          "group": "throw"
+        }
+      ],
+      "previewHref": "./display.html?location=decades-washington-dc&template=blackwhite&main=Happy+birthday+Maya&screen=led-96x48&preview=1",
+      "composeHref": "./shoutout-search.html?from=botdee&location=decades-washington-dc",
+      "checkoutUrl": "",
+      "shoutoutId": "",
+      "portalHref": "",
+      "priceCents": 0,
+      "mockLabel": "Draft — choose template"
+    },
+    {
+      "schemaVersion": "floqr.botDeeShoutOutSmartView/1",
+      "kind": "botDeeShoutOut",
+      "generatedAtIso": "2026-11-19T12:00:00.000Z",
+      "title": "ShoutOut",
+      "mode": "draft",
+      "venueName": "Decades",
+      "clubLocationId": "decades-washington-dc",
+      "mainText": "Happy birthday Maya",
+      "templateId": "blackwhite",
+      "templateName": "Traditional Black and White ShoutOut",
+      "templateSuggestedId": "",
+      "templateSuggestedName": "Traditional Black and White ShoutOut",
+      "screenFormatId": "led-96x48",
+      "screenFormatLabel": "96×48",
+      "includeAttribution": false,
+      "attribution": "",
+      "handleDecision": "",
+      "mediaDecision": "",
+      "mediaUrl": "",
+      "previewLines": [
+        "HAPPY BIRTHDAY",
+        "MAYA"
+      ],
+      "boardSkin": "traditional",
+      "currentStep": "handle",
+      "needs": [
+        "handle",
+        "media"
+      ],
+      "templates": [
+        {
+          "id": "blackwhite",
+          "name": "Traditional Black and White ShoutOut",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "birthday",
+          "name": "Birthday Glow",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "vip",
+          "name": "VIP Table",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "neon",
+          "name": "Neon ShoutOut",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "gold",
+          "name": "Gold Celebration",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "graduation",
+          "name": "Graduation Night",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "corporate",
+          "name": "Corporate Event",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "classicHalloween",
+          "name": "Classic Halloween",
+          "priceCents": 1500,
+          "className": "classic-bw classic-halloween"
+        }
+      ],
+      "suggestions": [
+        {
+          "id": "blackwhite",
+          "prompt": "Traditional",
+          "group": "template"
+        },
+        {
+          "id": "neon",
+          "prompt": "Neon",
+          "group": "template"
+        },
+        {
+          "id": "birthday",
+          "prompt": "Birthday",
+          "group": "template"
+        },
+        {
+          "id": "gold",
+          "prompt": "Gold",
+          "group": "template"
+        },
+        {
+          "id": "vip",
+          "prompt": "VIP",
+          "group": "template"
+        },
+        {
+          "id": "graduation",
+          "prompt": "Graduation",
+          "group": "template"
+        },
+        {
+          "id": "corporate",
+          "prompt": "Corporate",
+          "group": "template"
+        },
+        {
+          "id": "classicHalloween",
+          "prompt": "Halloween",
+          "group": "template"
+        },
+        {
+          "id": "includeHandle",
+          "prompt": "include my handle",
+          "group": "handle"
+        },
+        {
+          "id": "skipHandle",
+          "prompt": "no handle",
+          "group": "handle"
+        },
+        {
+          "id": "textOnly",
+          "prompt": "text only",
+          "group": "media"
+        },
+        {
+          "id": "photoCompose",
+          "prompt": "with a photo",
+          "group": "media"
+        },
+        {
+          "id": "throwIt",
+          "prompt": "throw it",
+          "group": "throw"
+        }
+      ],
+      "previewHref": "./display.html?location=decades-washington-dc&template=blackwhite&main=Happy+birthday+Maya&screen=led-96x48&preview=1",
+      "composeHref": "./shoutout-search.html?from=botdee&location=decades-washington-dc",
+      "checkoutUrl": "",
+      "shoutoutId": "",
+      "portalHref": "",
+      "priceCents": 0,
+      "mockLabel": "Handle — FloqR card"
+    },
+    {
+      "schemaVersion": "floqr.botDeeShoutOutSmartView/1",
+      "kind": "botDeeShoutOut",
+      "generatedAtIso": "2026-11-19T12:00:00.000Z",
+      "title": "ShoutOut",
+      "mode": "draft",
+      "venueName": "Decades",
+      "clubLocationId": "decades-washington-dc",
+      "mainText": "Happy birthday Maya",
+      "templateId": "blackwhite",
+      "templateName": "Traditional Black and White ShoutOut",
+      "templateSuggestedId": "",
+      "templateSuggestedName": "Traditional Black and White ShoutOut",
+      "screenFormatId": "led-96x48",
+      "screenFormatLabel": "96×48",
+      "includeAttribution": true,
+      "attribution": "@Maya",
+      "handleDecision": "include",
+      "mediaDecision": "none",
+      "mediaUrl": "",
+      "previewLines": [
+        "HAPPY BIRTHDAY",
+        "MAYA"
+      ],
+      "boardSkin": "traditional",
+      "currentStep": "throw",
+      "needs": [],
+      "templates": [
+        {
+          "id": "blackwhite",
+          "name": "Traditional Black and White ShoutOut",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "birthday",
+          "name": "Birthday Glow",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "vip",
+          "name": "VIP Table",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "neon",
+          "name": "Neon ShoutOut",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "gold",
+          "name": "Gold Celebration",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "graduation",
+          "name": "Graduation Night",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "corporate",
+          "name": "Corporate Event",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "classicHalloween",
+          "name": "Classic Halloween",
+          "priceCents": 1500,
+          "className": "classic-bw classic-halloween"
+        }
+      ],
+      "suggestions": [
+        {
+          "id": "blackwhite",
+          "prompt": "Traditional",
+          "group": "template"
+        },
+        {
+          "id": "neon",
+          "prompt": "Neon",
+          "group": "template"
+        },
+        {
+          "id": "birthday",
+          "prompt": "Birthday",
+          "group": "template"
+        },
+        {
+          "id": "gold",
+          "prompt": "Gold",
+          "group": "template"
+        },
+        {
+          "id": "vip",
+          "prompt": "VIP",
+          "group": "template"
+        },
+        {
+          "id": "graduation",
+          "prompt": "Graduation",
+          "group": "template"
+        },
+        {
+          "id": "corporate",
+          "prompt": "Corporate",
+          "group": "template"
+        },
+        {
+          "id": "classicHalloween",
+          "prompt": "Halloween",
+          "group": "template"
+        },
+        {
+          "id": "includeHandle",
+          "prompt": "include my handle",
+          "group": "handle"
+        },
+        {
+          "id": "skipHandle",
+          "prompt": "no handle",
+          "group": "handle"
+        },
+        {
+          "id": "textOnly",
+          "prompt": "text only",
+          "group": "media"
+        },
+        {
+          "id": "photoCompose",
+          "prompt": "with a photo",
+          "group": "media"
+        },
+        {
+          "id": "throwIt",
+          "prompt": "throw it",
+          "group": "throw"
+        }
+      ],
+      "previewHref": "./display.html?location=decades-washington-dc&template=blackwhite&main=Happy+birthday+Maya&attribution=%40Maya&includeAttribution=1&screen=led-96x48&preview=1",
+      "composeHref": "./shoutout-search.html?from=botdee&location=decades-washington-dc",
+      "checkoutUrl": "",
+      "shoutoutId": "",
+      "portalHref": "",
+      "priceCents": 0,
+      "mockLabel": "Ready — throw it"
+    },
+    {
+      "schemaVersion": "floqr.botDeeShoutOutSmartView/1",
+      "kind": "botDeeShoutOut",
+      "generatedAtIso": "2026-11-19T12:00:00.000Z",
+      "title": "ShoutOut",
+      "mode": "checkout",
+      "venueName": "Decades",
+      "clubLocationId": "decades-washington-dc",
+      "mainText": "Happy birthday Maya",
+      "templateId": "classicHalloween",
+      "templateName": "Classic Halloween",
+      "templateSuggestedId": "",
+      "templateSuggestedName": "Traditional Black and White ShoutOut",
+      "screenFormatId": "led-96x48",
+      "screenFormatLabel": "96×48",
+      "includeAttribution": true,
+      "attribution": "@Maya",
+      "handleDecision": "include",
+      "mediaDecision": "none",
+      "mediaUrl": "",
+      "previewLines": [
+        "HAPPY BIRTHDAY",
+        "MAYA"
+      ],
+      "boardSkin": "halloween",
+      "currentStep": "",
+      "needs": [],
+      "templates": [
+        {
+          "id": "blackwhite",
+          "name": "Traditional Black and White ShoutOut",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "birthday",
+          "name": "Birthday Glow",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "vip",
+          "name": "VIP Table",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "neon",
+          "name": "Neon ShoutOut",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "gold",
+          "name": "Gold Celebration",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "graduation",
+          "name": "Graduation Night",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "corporate",
+          "name": "Corporate Event",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "classicHalloween",
+          "name": "Classic Halloween",
+          "priceCents": 1500,
+          "className": "classic-bw classic-halloween"
+        }
+      ],
+      "suggestions": [
+        {
+          "id": "blackwhite",
+          "prompt": "Traditional",
+          "group": "template"
+        },
+        {
+          "id": "neon",
+          "prompt": "Neon",
+          "group": "template"
+        },
+        {
+          "id": "birthday",
+          "prompt": "Birthday",
+          "group": "template"
+        },
+        {
+          "id": "gold",
+          "prompt": "Gold",
+          "group": "template"
+        },
+        {
+          "id": "vip",
+          "prompt": "VIP",
+          "group": "template"
+        },
+        {
+          "id": "graduation",
+          "prompt": "Graduation",
+          "group": "template"
+        },
+        {
+          "id": "corporate",
+          "prompt": "Corporate",
+          "group": "template"
+        },
+        {
+          "id": "classicHalloween",
+          "prompt": "Halloween",
+          "group": "template"
+        },
+        {
+          "id": "includeHandle",
+          "prompt": "include my handle",
+          "group": "handle"
+        },
+        {
+          "id": "skipHandle",
+          "prompt": "no handle",
+          "group": "handle"
+        },
+        {
+          "id": "textOnly",
+          "prompt": "text only",
+          "group": "media"
+        },
+        {
+          "id": "photoCompose",
+          "prompt": "with a photo",
+          "group": "media"
+        },
+        {
+          "id": "throwIt",
+          "prompt": "throw it",
+          "group": "throw"
+        }
+      ],
+      "previewHref": "./display.html?location=decades-washington-dc&template=classicHalloween&main=Happy+birthday+Maya&attribution=%40Maya&includeAttribution=1&screen=led-96x48&preview=1",
+      "composeHref": "./shoutout-search.html?from=botdee&location=decades-washington-dc",
+      "checkoutUrl": "",
+      "shoutoutId": "",
+      "portalHref": "",
+      "priceCents": 1500,
+      "mockLabel": "Halloween — pay"
+    },
+    {
+      "schemaVersion": "floqr.botDeeShoutOutSmartView/1",
+      "kind": "botDeeShoutOut",
+      "generatedAtIso": "2026-11-19T12:00:00.000Z",
+      "title": "ShoutOut",
+      "mode": "submitted",
+      "venueName": "Decades",
+      "clubLocationId": "decades-washington-dc",
+      "mainText": "Happy birthday Maya",
+      "templateId": "blackwhite",
+      "templateName": "Traditional Black and White ShoutOut",
+      "templateSuggestedId": "",
+      "templateSuggestedName": "Traditional Black and White ShoutOut",
+      "screenFormatId": "led-96x48",
+      "screenFormatLabel": "96×48",
+      "includeAttribution": true,
+      "attribution": "@Maya",
+      "handleDecision": "include",
+      "mediaDecision": "none",
+      "mediaUrl": "",
+      "previewLines": [
+        "HAPPY BIRTHDAY",
+        "MAYA"
+      ],
+      "boardSkin": "traditional",
+      "currentStep": "",
+      "needs": [],
+      "templates": [
+        {
+          "id": "blackwhite",
+          "name": "Traditional Black and White ShoutOut",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "birthday",
+          "name": "Birthday Glow",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "vip",
+          "name": "VIP Table",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "neon",
+          "name": "Neon ShoutOut",
+          "priceCents": 0,
+          "className": "neon"
+        },
+        {
+          "id": "gold",
+          "name": "Gold Celebration",
+          "priceCents": 0,
+          "className": "gold"
+        },
+        {
+          "id": "graduation",
+          "name": "Graduation Night",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "corporate",
+          "name": "Corporate Event",
+          "priceCents": 0,
+          "className": "classic-bw"
+        },
+        {
+          "id": "classicHalloween",
+          "name": "Classic Halloween",
+          "priceCents": 1500,
+          "className": "classic-bw classic-halloween"
+        }
+      ],
+      "suggestions": [
+        {
+          "id": "blackwhite",
+          "prompt": "Traditional",
+          "group": "template"
+        },
+        {
+          "id": "neon",
+          "prompt": "Neon",
+          "group": "template"
+        },
+        {
+          "id": "birthday",
+          "prompt": "Birthday",
+          "group": "template"
+        },
+        {
+          "id": "gold",
+          "prompt": "Gold",
+          "group": "template"
+        },
+        {
+          "id": "vip",
+          "prompt": "VIP",
+          "group": "template"
+        },
+        {
+          "id": "graduation",
+          "prompt": "Graduation",
+          "group": "template"
+        },
+        {
+          "id": "corporate",
+          "prompt": "Corporate",
+          "group": "template"
+        },
+        {
+          "id": "classicHalloween",
+          "prompt": "Halloween",
+          "group": "template"
+        },
+        {
+          "id": "includeHandle",
+          "prompt": "include my handle",
+          "group": "handle"
+        },
+        {
+          "id": "skipHandle",
+          "prompt": "no handle",
+          "group": "handle"
+        },
+        {
+          "id": "textOnly",
+          "prompt": "text only",
+          "group": "media"
+        },
+        {
+          "id": "photoCompose",
+          "prompt": "with a photo",
+          "group": "media"
+        },
+        {
+          "id": "throwIt",
+          "prompt": "throw it",
+          "group": "throw"
+        }
+      ],
+      "previewHref": "./display.html?location=decades-washington-dc&template=blackwhite&main=Happy+birthday+Maya&attribution=%40Maya&includeAttribution=1&screen=led-96x48&preview=1",
+      "composeHref": "./shoutout-search.html?from=botdee&location=decades-washington-dc",
+      "checkoutUrl": "",
+      "shoutoutId": "mock-headless-shoutout",
+      "portalHref": "./patron-portal.html?tab=feature-orders",
+      "priceCents": 0,
+      "mockLabel": "Submitted — pending Club Admin"
+    }
+  ]
+}

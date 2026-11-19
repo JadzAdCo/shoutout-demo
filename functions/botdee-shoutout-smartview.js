@@ -126,6 +126,77 @@ function isShoutOutPayload(payload) {
   return !!(payload && typeof payload === "object" && payload.kind === KIND);
 }
 
+const MOCK_NOW_MS = Date.parse("2026-11-19T12:00:00.000Z");
+const MOCK_VENUE = "decades-washington-dc";
+const MOCK_MESSAGE = "Happy birthday Maya";
+
+function mockDraft(extra) {
+  return Object.assign({
+    clubQuery: MOCK_VENUE,
+    message: MOCK_MESSAGE,
+    screenFormatId: "led-96x48"
+  }, extra || {});
+}
+
+/** Labeled Master Admin mocks. Chat never requires this catalog. */
+function mockCatalog(nowMs) {
+  const stamp = Number.isFinite(Number(nowMs)) ? Number(nowMs) : MOCK_NOW_MS;
+  const venueName = "Decades";
+  const portalHref = "./patron-portal.html?tab=feature-orders";
+  return [
+    Object.assign(buildShoutOutSmartView({
+      draft: mockDraft(),
+      venueName,
+      nowMs: stamp,
+      mode: "draft"
+    }), {mockLabel: "Draft — choose template"}),
+    Object.assign(buildShoutOutSmartView({
+      draft: mockDraft({templateId: "blackwhite", templateChosen: true}),
+      venueName,
+      nowMs: stamp,
+      mode: "draft"
+    }), {mockLabel: "Handle — FloqR card"}),
+    Object.assign(buildShoutOutSmartView({
+      draft: mockDraft({
+        templateId: "blackwhite",
+        templateChosen: true,
+        handleDecision: "include",
+        attribution: "@Maya",
+        mediaDecision: "none"
+      }),
+      venueName,
+      nowMs: stamp,
+      mode: "draft"
+    }), {mockLabel: "Ready — throw it"}),
+    Object.assign(buildShoutOutSmartView({
+      draft: mockDraft({
+        templateId: "classicHalloween",
+        templateChosen: true,
+        handleDecision: "include",
+        attribution: "@Maya",
+        mediaDecision: "none"
+      }),
+      venueName,
+      nowMs: stamp,
+      mode: "checkout"
+    }), {mockLabel: "Halloween — pay"}),
+    Object.assign(buildShoutOutSmartView({
+      draft: mockDraft({
+        templateId: "blackwhite",
+        templateChosen: true,
+        handleDecision: "include",
+        attribution: "@Maya",
+        mediaDecision: "none"
+      }),
+      venueName,
+      nowMs: stamp,
+      mode: "submitted",
+      shoutoutId: "mock-headless-shoutout",
+      portalHref
+    }), {mockLabel: "Submitted — pending Club Admin"})
+  ];
+}
+
 module.exports = {
   SCHEMA_VERSION,
   KIND,
@@ -134,5 +205,6 @@ module.exports = {
   boardSkin,
   suggestionPrompts,
   buildShoutOutSmartView,
-  isShoutOutPayload
+  isShoutOutPayload,
+  mockCatalog
 };

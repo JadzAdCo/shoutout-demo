@@ -1600,6 +1600,7 @@
   }
 
   function restoreTurns(turns) {
+    global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
     const log = byId("botDeeTranscript");
     if (log) log.innerHTML = "";
     history.length = 0;
@@ -1619,6 +1620,7 @@
   }
 
   function landCollapsed(data) {
+    global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
     const turns = cloneTurns(data.turns);
     const archive = cloneTurns(data.archiveTurns);
     storedTurns = turns.length ? turns : archive;
@@ -1712,6 +1714,7 @@
   }
 
   function startNewChat() {
+    global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
     const log = byId("botDeeTranscript");
     if (log) log.innerHTML = "";
     setChatsOpen(false);

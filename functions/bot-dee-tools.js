@@ -202,7 +202,7 @@ async function notifyClubPendingHeadlessShoutOut({
     `Ref ${referenceNumber || shoutoutId}.`,
     "Open Club Admin → Pending ShoutOuts to Approve & Push Live."
   ].filter(Boolean).join(" ");
-  const link = `./admin.html?location=${encodeURIComponent(clubLocationId)}&tab=queue`;
+  const link = `./admin.html?location=${encodeURIComponent(clubLocationId)}&panel=panelQueue`;
   await Promise.all(recipients.map(uid => db.collection("inboxNotifications").add({
     type: "pendingShoutout",
     title: "Pending ShoutOut",
@@ -1250,6 +1250,7 @@ module.exports = {
   resolveClubLocationId,
   requireClubLocationId,
   loadPatronShoutOutAttribution,
+  notifyClubPendingHeadlessShoutOut,
   normalizeClubNeedle,
   CLUB_NAME_ALIASES
 };

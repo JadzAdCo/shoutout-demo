@@ -389,6 +389,31 @@ function isCancelShoutOutPrompt(raw) {
   return /\b(?:cancel(?: the)? shoutout|never mind|nevermind|stop (?:the )?shoutout|forget (?:the |this )?shoutout)\b/i.test(String(raw || ""));
 }
 
+function isBareAffirmative(raw) {
+  return /^(yes|yeah|yep|yup|ok|okay|sure)[.!?]*$/i.test(String(raw || "").trim());
+}
+
+function isBareNegative(raw) {
+  return /^(no|nope|nah|skip)[.!?]*$/i.test(String(raw || "").trim());
+}
+
+/** Map a bare yes/no onto the current SMARTpreview step. Never mint on “yes” while extras remain. */
+function applyBareInteractiveReply(draft, parsed, raw) {
+  const next = parsed && typeof parsed === "object" ? parsed : {};
+  if (!draft) return next;
+  const step = interactiveNeeds(draft)[0] || "";
+  if (isBareAffirmative(raw)) {
+    if (step === "handle") next.handleDecision = next.handleDecision || "include";
+    else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
+    else if (step === "template") next.templateId = next.templateId || DEFAULT_TEMPLATE_ID;
+    else if (!step) next.confirmSubmit = true;
+  } else if (isBareNegative(raw)) {
+    if (step === "handle") next.handleDecision = next.handleDecision || "skip";
+    else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
+  }
+  return next;
+}
+
 function parseShoutOutExtras(raw) {
   const source = String(raw || "").trim();
   const handle = parseHandleHint(source);
@@ -475,10 +500,11 @@ function clipInteractiveDraft(draft = {}) {
 }
 
 function mergeInteractiveDraft(previous, parsed = {}, extras = {}) {
-  const base = clipInteractiveDraft(previous);
-  const next = {...base};
   const club = text(parsed.clubQuery || extras.clubQuery, 120);
   const message = text(parsed.message || extras.message, 400);
+  const freshThrow = !!(club && message);
+  const base = freshThrow ? emptyInteractiveDraft() : clipInteractiveDraft(previous);
+  const next = {...base};
   if (club) next.clubQuery = club;
   if (message) next.message = message;
   const templateId = resolveTemplateId(parsed.templateId || extras.templateId || "") || "";
@@ -513,7 +539,7 @@ function isInteractiveFollowUp(raw, draft) {
   const extras = parseShoutOutExtras(raw);
   if (extras.cancel || extras.confirmSubmit || extras.skipExtras) return true;
   if (extras.templateId || extras.handleDecision || extras.mediaDecision || extras.screenFormatId) return true;
-  if (/^(yes|yeah|yep|yup|ok|okay|sure)[.!?]*$/i.test(String(raw || "").trim())) return true;
+  if (isBareAffirmative(raw) || isBareNegative(raw)) return true;
   return false;
 }
 
@@ -746,5 +772,8 @@ module.exports = {
   formatHandle,
   isConfirmSubmitPrompt,
   isSkipExtrasPrompt,
-  isCancelShoutOutPrompt
+  isCancelShoutOutPrompt,
+  isBareAffirmative,
+  isBareNegative,
+  applyBareInteractiveReply
 };

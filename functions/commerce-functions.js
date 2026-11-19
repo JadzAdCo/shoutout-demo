@@ -2232,6 +2232,24 @@ async function finalizePaidOrder(orderId, session) {
       ...testFields
     }, {merge:true});
     try {
+      if (shoutout.headless === true || shoutout.source === "headless") {
+        const tools = require("./bot-dee-tools");
+        const locId = text(order.clubLocationId || shoutout.clubLocationId || shoutout.location, 120);
+        const locSnap = locId ? await db.collection("clubLocations").doc(locId).get() : null;
+        const venue = locSnap && locSnap.exists ? locSnap.data() || {} : {};
+        await tools.notifyClubPendingHeadlessShoutOut({
+          clubLocationId: locId,
+          venue,
+          shoutoutId: shoutoutRef.id,
+          mainText: text(shoutout.mainText, 200),
+          referenceNumber: text(shoutout.referenceNumber || order.invoiceNumber, 80),
+          locationName: text(shoutout.locationName || venue.locationName || locId, 160)
+        });
+      }
+    } catch (notifyErr) {
+      console.warn("headless paid club inbox skipped", notifyErr?.message || notifyErr);
+    }
+    try {
       let ownerPhone = "";
       if (order.ownerUid) {
         const userSnap = await db.collection("users").doc(order.ownerUid).get();

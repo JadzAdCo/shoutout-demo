@@ -194,6 +194,50 @@
     return Array.isArray(payload.views) ? payload.views : [];
   }
 
+  async function loadMockPreviewViews() {
+    const nav = global.FLOQRNav;
+    const mockUrl = nav?.stampCurrentVersion
+      ? nav.stampCurrentVersion("./botdee-smartpreview-mock.json")
+      : "./botdee-smartpreview-mock.json";
+    const res = await fetch(mockUrl, {credentials: "same-origin"});
+    if (!res.ok) throw new Error("smartpreview_mock_fetch_failed");
+    const payload = await res.json();
+    return Array.isArray(payload.views) ? payload.views : [];
+  }
+
+  async function loadSmartPreviewDemos(hostId) {
+    const host = byId(hostId || "botDeeMasterSmartPreviewDemo");
+    if (!host || !global.FLOQRBotDeeSmartView) return;
+    const busy = t("botdee.chatThinking", "BOT DEE is thinking…");
+    host.setAttribute("aria-busy", "true");
+    if (!host.innerHTML.trim()) host.textContent = busy;
+    try {
+      const views = await loadMockPreviewViews();
+      if (!views.length) {
+        host.textContent = t("botdee.libraryEmpty", "No saved SMARTviews yet.");
+        return;
+      }
+      host.textContent = "";
+      views.forEach(view => {
+        const wrap = global.document.createElement("div");
+        wrap.className = "botdee-so-master-card";
+        const cap = global.document.createElement("p");
+        cap.className = "eyebrow";
+        cap.textContent = String(view.mockLabel || view.mode || "ShoutOut SMARTpreview");
+        const cardHost = global.document.createElement("div");
+        cardHost.className = "botdee-sv-host";
+        wrap.appendChild(cap);
+        wrap.appendChild(cardHost);
+        host.appendChild(wrap);
+        global.FLOQRBotDeeSmartView.mount(cardHost, [{...view, surface: "bubble"}]);
+      });
+    } catch (_) {
+      host.textContent = t("botdee.libraryEmpty", "No saved SMARTviews yet.");
+    } finally {
+      host.removeAttribute("aria-busy");
+    }
+  }
+
   async function loadDemos(hostId) {
     const host = byId(hostId || "botDeeMasterSmartViewDemo");
     if (!host || !global.FLOQRBotDeeSmartView) return;
@@ -269,6 +313,7 @@
     byId("botDeeDeleteArchiveBtn")?.addEventListener("click", deleteArchive);
     byId("botDeeLoadSmartViews")?.addEventListener("click", () => loadMySmartView().catch(() => {}));
     byId("botDeeMasterLoadSmartViews")?.addEventListener("click", () => loadDemos("botDeeMasterSmartViewDemo"));
+    byId("botDeeMasterLoadSmartPreview")?.addEventListener("click", () => loadSmartPreviewDemos("botDeeMasterSmartPreviewDemo"));
     byId("botDeeEditSmartSummary")?.addEventListener("click", async () => {
       setLine("botDeeUpgradeStatus", t("botdee.chatThinking", "BOT DEE is thinking…"));
       try {
@@ -287,6 +332,7 @@
     loadConsent,
     loadKnows,
     loadDemos,
+    loadSmartPreviewDemos,
     loadMySmartView,
     smartViewLoadCopy,
     applyUsageFlag
