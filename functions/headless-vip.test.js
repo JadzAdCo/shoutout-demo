@@ -53,10 +53,30 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   assert.match(session, /tryHeadlessVip/);
   assert.match(session, /isVipExecutePrompt/);
   assert.match(session, /headlessVipDraft/);
+  assert.match(session, /if \(!merged\.holdId\)/);
+  assert.match(session, /wantsTerms/);
+  const shoutIdx = session.indexOf("} else if (shoutExecute) {");
+  const vipIdx = session.indexOf("} else if (vipExecute) {");
+  const roomIdx = session.indexOf("} else if (roomAttached.handled) {");
+  assert.ok(shoutIdx > 0 && vipIdx > shoutIdx && roomIdx > vipIdx);
   const tools = read("functions/bot-dee-tools.js");
   assert.match(tools, /resolveSectionQuery/);
   assert.match(tools, /getVipAvailability/);
   const core = read("functions/bot-dee-core.js");
   assert.match(core, /getVipAvailability/);
   assert.match(core, /isVipExecutePrompt/);
+});
+
+test("VIP follow-up does not swallow people lookup or hello", () => {
+  const parsed = vip.parseVipExecute("VIP reserV at Aurelia");
+  const draft = vip.mergeInteractiveDraft(null, parsed);
+  assert.equal(vip.isInteractiveFollowUp("hello", draft), false);
+  assert.equal(vip.isInteractiveFollowUp("Who is Don Banyong", draft), false);
+  assert.equal(vip.extractSectionNeedle("Who is Don Banyong"), "");
+  assert.equal(vip.extractSectionNeedle("hello"), "");
+  assert.equal(vip.isInteractiveFollowUp("V1", draft), true);
+  assert.equal(vip.isInteractiveFollowUp("I agree", draft), true);
+  assert.equal(vip.isInteractiveFollowUp("hold it", draft), true);
+  assert.equal(vip.isInteractiveFollowUp("confirm room smartview", draft), false);
+  assert.equal(vip.isConfirmHoldPrompt("confirm"), true);
 });

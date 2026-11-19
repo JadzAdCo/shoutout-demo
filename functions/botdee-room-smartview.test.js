@@ -251,4 +251,14 @@ test("chat wires Room SMARTview join without charging", () => {
   assert.match(read("botdee-smartview.js"), /confirm room smartview/);
   assert.match(read("botdee.html"), /botdee-room-smartview\.js/);
   assert.equal(room.classifyRoomIntent("confirm room smartview").route, "confirm");
+  assert.equal(room.classifyRoomIntent("confirm room").route, "confirm");
+  assert.notEqual(room.classifyRoomIntent("confirm").route, "confirm");
+  assert.equal(room.classifyRoomIntent("confirm").handled, false);
+  const session = read("functions/bot-dee-functions.js");
+  assert.match(session, /joinFailureOutcome/);
+  assert.match(session, /isPrivateBotDeeOutcome/);
+  assert.match(session, /rotateJoinToken/);
+  assert.match(session, /persistJoinedRoomId\(uid, null\)/);
+  assert.match(read("functions/botdee-room-live.js"), /function leaveRoom/);
+  assert.match(read("functions/botdee-room-live.js"), /function endRoom/);
 });

@@ -139,6 +139,62 @@ function memberOf(room, uid) {
   return room.hostUid === id || (Array.isArray(room.memberUids) && room.memberUids.includes(id));
 }
 
+async function rotateJoinToken({uid, roomId}) {
+  const member = text(uid, 80);
+  const id = text(roomId, 80);
+  if (!member || !id) return {ok: false, error: "missing_room"};
+  const snap = await roomRef(id).get();
+  if (!snap.exists) return {ok: false, error: "not_found"};
+  const row = snap.data() || {};
+  if (text(row.hostUid, 80) !== member) return {ok: false, error: "not_host"};
+  if (text(row.status, 20) !== "open") return {ok: false, error: "closed"};
+  const token = mintToken();
+  await snap.ref.set({
+    joinTokenHash: hashToken(token),
+    updatedAtMs: Date.now()
+  }, {merge: true});
+  return {
+    ok: true,
+    room: publicRoom(id, row, {joinHref: `./botdee.html?join=${encodeURIComponent(token)}`}),
+    joinToken: token
+  };
+}
+
+async function leaveRoom({uid, roomId}) {
+  const member = text(uid, 80);
+  const id = text(roomId, 80);
+  if (!member || !id) return {ok: false, error: "missing_room"};
+  const snap = await roomRef(id).get();
+  if (!snap.exists) return {ok: false, error: "not_found"};
+  const row = snap.data() || {};
+  if (text(row.hostUid, 80) === member) {
+    return endRoom({uid: member, roomId: id});
+  }
+  const members = Array.isArray(row.memberUids) ? row.memberUids.map(value => text(value, 80)).filter(Boolean) : [];
+  if (!members.includes(member)) return {ok: false, error: "not_member"};
+  const next = members.filter(value => value !== member);
+  await snap.ref.set({
+    memberUids: next,
+    updatedAtMs: Date.now()
+  }, {merge: true});
+  return {ok: true, left: true, room: publicRoom(id, {...row, memberUids: next})};
+}
+
+async function endRoom({uid, roomId}) {
+  const member = text(uid, 80);
+  const id = text(roomId, 80);
+  if (!member || !id) return {ok: false, error: "missing_room"};
+  const snap = await roomRef(id).get();
+  if (!snap.exists) return {ok: false, error: "not_found"};
+  const row = snap.data() || {};
+  if (text(row.hostUid, 80) !== member) return {ok: false, error: "not_host"};
+  await snap.ref.set({
+    status: "closed",
+    updatedAtMs: Date.now()
+  }, {merge: true});
+  return {ok: true, closed: true, room: publicRoom(id, {...row, status: "closed"})};
+}
+
 module.exports = {
   COLLECTION,
   MEMBER_CAP,
@@ -150,5 +206,8 @@ module.exports = {
   loadRoom,
   appendTurn,
   loadTurns,
-  memberOf
+  memberOf,
+  rotateJoinToken,
+  leaveRoom,
+  endRoom
 };

@@ -326,7 +326,7 @@ function shareableFactsFromUtterance(raw) {
 
 function detectCommand(normalized, raw) {
   if (
-    /^(?:confirm(?: room(?: smartview)?)?)$/.test(normalized)
+    /^(?:confirm room(?: smartview)?)$/.test(normalized)
     || /\bconfirm room smartview\b/.test(normalized)
   ) {
     return "confirm";

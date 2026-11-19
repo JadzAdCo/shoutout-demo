@@ -192,9 +192,6 @@ function extractSectionNeedle(raw) {
   if (/\bnorth vip\b/.test(folded)) return "North VIP";
   if (/\bsouth vip\b/.test(folded)) return "South VIP";
   if (/^[a-z]{1,3}\d{1,3}$/i.test(source.trim())) return source.trim();
-  if (source.trim().length <= 24 && !/\b(vip|reserv|book|hold|table|night|party)\b/i.test(source)) {
-    return source.trim();
-  }
   return "";
 }
 
@@ -314,15 +311,17 @@ function interactiveNeeds(draft) {
 
 function isInteractiveFollowUp(raw, draft) {
   if (!draft || typeof draft !== "object") return false;
+  const row = clipInteractiveDraft(draft);
+  if (!row.clubQuery) return false;
   const source = String(raw || "").trim();
   if (!source || source.length > 200) return false;
   if (isVipExecutePrompt(source) || isCancelVipPrompt(source) || isConfirmHoldPrompt(source) || isAcceptTermsPrompt(source)) {
     return true;
   }
-  if (parseNight(source) || parsePartySize(source) || extractSectionNeedle(source)) return true;
-  if (isBareAffirmative(source)) return true;
+  if (parseNight(source) || parsePartySize(source)) return true;
+  if (extractSectionNeedle(source)) return true;
+  if (isBareAffirmative(source) && row.matches.length === 1 && !row.sectionId) return true;
   if (/^[a-z]{1,3}\d{1,3}$/i.test(source)) return true;
-  if (fold(source).length <= 28) return true;
   return false;
 }
 

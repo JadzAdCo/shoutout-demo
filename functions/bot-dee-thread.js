@@ -42,6 +42,8 @@ function emptyState(settings) {
     chatTitles: {},
     currentConversationId: "",
     archiveConversationId: "",
+    joinedRoomId: "",
+    joinedRoomConversationId: "",
     [prefs.LAST_USED_FIELD]: 0,
     [prefs.SESSION_RESET_FIELD]: 0
   };
@@ -376,7 +378,7 @@ function snapshotToState(snap, uid, settings, nowMs) {
   const staleGeneration = prefs.needsSessionReset(data);
   // Idle ends the session lease (pause UX) — it must not empty the retrieval cursor.
   const retrievalTurns = staleGeneration ? [] : bot.clipStoredTurns(data.turns);
-  return {
+  const state = {
     durable: true,
     status: staleGeneration ? "fresh" : (idleEnded ? "idle_ended" : (retrievalTurns.length ? "active" : "fresh")),
     threadId,
@@ -409,8 +411,18 @@ function snapshotToState(snap, uid, settings, nowMs) {
     headlessVipDraft: staleGeneration ? null : (data.headlessVipDraft && typeof data.headlessVipDraft === "object"
       ? data.headlessVipDraft
       : null),
+    joinedRoomConversationId: staleGeneration ? "" : clipConversationId(data.joinedRoomConversationId),
     joinedRoomId: staleGeneration ? "" : String(data.joinedRoomId || "").trim().slice(0, 80)
   };
+  if (
+    state.joinedRoomId
+    && state.joinedRoomConversationId
+    && state.currentConversationId
+    && state.joinedRoomConversationId !== state.currentConversationId
+  ) {
+    state.joinedRoomId = "";
+  }
+  return state;
 }
 
 /** Overlay skip hides events before this seq. Events stay on disk for diagnostics. */
@@ -816,19 +828,22 @@ async function persistHeadlessVipDraft(uid, draft) {
   return {ok: true};
 }
 
-async function persistJoinedRoomId(uid, roomId) {
+async function persistJoinedRoomId(uid, roomId, conversationId) {
   const ref = threadRef(uid);
   if (!ref) return {ok: false, error: "missing_uid"};
   const now = Date.now();
   if (!roomId) {
     await ref.set({
       joinedRoomId: admin.firestore.FieldValue.delete(),
+      joinedRoomConversationId: admin.firestore.FieldValue.delete(),
       updatedAtMs: now
     }, {merge: true});
     return {ok: true, cleared: true};
   }
+  const convo = clipConversationId(conversationId);
   await ref.set({
     joinedRoomId: String(roomId).trim().slice(0, 80),
+    joinedRoomConversationId: convo || admin.firestore.FieldValue.delete(),
     updatedAtMs: now
   }, {merge: true});
   return {ok: true};
