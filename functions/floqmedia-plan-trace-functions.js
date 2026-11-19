@@ -10,6 +10,7 @@ const {onRequest} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const {GoogleGenAI} = require("@google/genai");
 const geminiAccessLog = require("./gemini-api-access-log");
+const appCheckLog = require("./app-check-log");
 const core = require("./floqmedia-plan-trace-core");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -63,6 +64,7 @@ exports.floqmediaPlanTrace = onRequest(HTTP_OPTS, async (req, res) => {
   await core.handlePlanTraceRequest(req, res, {
     generateContent,
     logAccess,
+    logAppCheck: (entry) => appCheckLog.logAppCheckResult(db, entry),
     model: TEXT_MODEL
   });
 });

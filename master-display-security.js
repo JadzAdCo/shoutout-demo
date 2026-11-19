@@ -723,6 +723,46 @@
     }
   }
 
+  async function loadAppCheckSecurityLogs() {
+    const host = byId("appCheckSecurityLogReport");
+    if (!host || !firebase.firestore) return;
+    setText("appCheckSecurityLogStatus", "Loading App Check security rows…");
+    try {
+      const db = firebase.firestore();
+      let rows = [];
+      try {
+        const snap = await db.collection("appLogs")
+          .where("category", "==", "security")
+          .orderBy("createdAt", "desc")
+          .limit(80)
+          .get();
+        rows = snap.docs.map((doc) => ({id: doc.id, ...(doc.data() || {})}));
+      } catch (_) {
+        const snap = await db.collection("appLogs").orderBy("createdAt", "desc").limit(250).get();
+        rows = snap.docs.map((doc) => ({id: doc.id, ...(doc.data() || {})}));
+      }
+      rows = rows.filter((row) => row.category === "security" && row.action === "app-check");
+      if (!rows.length) {
+        host.innerHTML = "<p class='sub'>No App Check security rows yet.</p>";
+        setText("appCheckSecurityLogStatus", "No App Check rejections.");
+        return;
+      }
+      host.innerHTML = rows.map((row) => {
+        const details = row.details || {};
+        const when = row.createdAtMs || row.createdAt?.toMillis?.() || 0;
+        return `<article class="queue-item log-row level-error">
+          <div class="message-envelope-head"><strong>${esc(details.outcome || "error")} · App Check</strong><span>${esc(formatWhen(when))}</span></div>
+          <p>${esc(row.message || "")}</p>
+          <small>app ${esc(details.appId || "—")} · enforce ${esc(details.enforce || "—")} · ${esc(details.failureReason || details.operation || "")}</small>
+        </article>`;
+      }).join("");
+      setText("appCheckSecurityLogStatus", `Showing ${rows.length} App Check security row(s).`);
+    } catch (err) {
+      host.innerHTML = `<p class='sub'>${esc(err?.message || "Could not load App Check logs.")}</p>`;
+      setText("appCheckSecurityLogStatus", err?.message || "App Check log load failed.");
+    }
+  }
+
   function bind() {
     byId("loadDisplaySecurityBtn")?.addEventListener("click", () => loadVenueDisplaySecurity());
     byId("loadDisplaySecurityBtnBottom")?.addEventListener("click", () => loadVenueDisplaySecurity());
@@ -734,7 +774,9 @@
       const filter = String(byId("securityLogVenueFilter")?.value || "").trim();
       const id = filter ? resolveLocationIdFromFilter(filter) : "";
       loadDisplayAccessLogs(id);
+      loadAppCheckSecurityLogs();
     });
+    byId("refreshAppCheckSecurityLogsBtn")?.addEventListener("click", () => loadAppCheckSecurityLogs());
     byId("exportSecurityLogsBtn")?.addEventListener("click", () => exportSecurityLogsCsv());
     byId("markSecurityMessagesReadBtn")?.addEventListener("click", () => markVisibleSecurityMessagesRead());
     byId("deleteReadSecurityMessagesBtn")?.addEventListener("click", () => deleteReadSecurityMessages());
@@ -791,6 +833,7 @@
     loadVenueDisplaySecurity,
     saveVenueDisplaySecurity,
     loadDisplayAccessLogs,
+    loadAppCheckSecurityLogs,
     detectMyIp,
     rotateBoardToken,
     startMasterSystemMessageFeed,

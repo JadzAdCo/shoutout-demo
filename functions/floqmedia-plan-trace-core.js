@@ -7,12 +7,13 @@ const {Type} = require("@google/genai");
 
 const TEXT_MODEL = process.env.FLOQR_GEMINI_TEXT_MODEL || "gemini-3.6-flash";
 const OPERATION = "spatial-plan-trace";
+const APP_CHECK_HEADER = "X-Firebase-AppCheck";
+const SPATIAL_STUDIO_APP_ID = "1:858205816285:web:e586eb1c2d7c4567cfa234";
+const APP_CHECK_REJECTED = "This request was not accepted.";
 const UNREADABLE_ERROR = "That file could not be read as a floor plan.";
 const OVERSIZE_ERROR = "That file is too large. Use a file under 12 MB.";
 const ORIGIN_ERROR = "That request is not allowed from this site.";
-const APP_CHECK_ERROR = "FloqR could not read that plan.";
 const ALLOW_HEADERS = "Content-Type, Authorization, X-Firebase-AppCheck";
-const APP_CHECK_HEADER = "X-Firebase-AppCheck";
 const MAX_APP_CHECK_CHARS = 8192;
 const MAX_FILE_BYTES = 12 * 1024 * 1024;
 const MAX_BASE64_CHARS = Math.ceil(MAX_FILE_BYTES * 4 / 3) + 128;
@@ -369,29 +370,64 @@ function validateTrace(raw) {
 }
 
 function appCheckEnforced(deps = {}) {
+  if (deps && Object.prototype.hasOwnProperty.call(deps, "enforce")) {
+    return deps.enforce === true || deps.enforce === 1 || deps.enforce === "1";
+  }
   const env = deps.env || process.env;
-  return String(env.FLOQR_APP_CHECK_ENFORCE || "") === "1";
+  return String(env.FLOQR_APP_CHECK_ENFORCE || "").trim() === "1";
 }
 
+/** The one App Check verifier. Callers pass {consume: true}. */
 async function defaultVerifyAppCheck(token, options) {
   const {getAppCheck} = require("firebase-admin/app-check");
   return getAppCheck().verifyToken(token, options);
 }
 
-async function inspectAppCheck(req, deps) {
+function appCheckFailureCode(error) {
+  const code = String(error?.code || error?.errorInfo?.code || "invalid")
+    .replace(/^app-check\//, "")
+    .trim();
+  if (!code || code.split(".").length >= 3) return "invalid";
+  return code.slice(0, 80);
+}
+
+/** Monitor mode logs a bad pass and still traces. Enforce rejects before Gemini. */
+async function inspectAppCheck(req, deps = {}) {
+  const enforce = appCheckEnforced(deps);
   const token = String(header(req, APP_CHECK_HEADER) || "").trim();
-  if (!token) return {ok: false, failureReason: "app_check_missing"};
-  if (token.length > MAX_APP_CHECK_CHARS) return {ok: false, failureReason: "app_check_invalid"};
-  const verify = typeof deps.verifyAppCheck === "function" ? deps.verifyAppCheck : defaultVerifyAppCheck;
-  try {
-    const decoded = await verify(token, {consume: true});
-    if (!decoded || decoded.alreadyConsumed === true) {
-      return {ok: false, failureReason: "app_check_invalid"};
-    }
-    return {ok: true};
-  } catch (_error) {
-    return {ok: false, failureReason: "app_check_invalid"};
+  if (!token) {
+    return {ok: false, outcome: "app_check_missing", failureReason: "missing", appId: "", enforce};
   }
+  if (token.length > MAX_APP_CHECK_CHARS) {
+    return {ok: false, outcome: "app_check_invalid", failureReason: "invalid", appId: "", enforce};
+  }
+  const verify = typeof deps.verifyAppCheck === "function" ? deps.verifyAppCheck : defaultVerifyAppCheck;
+  let decoded;
+  try {
+    decoded = await verify(token, {consume: true});
+  } catch (error) {
+    return {
+      ok: false,
+      outcome: "app_check_invalid",
+      failureReason: appCheckFailureCode(error),
+      appId: "",
+      enforce
+    };
+  }
+  const appId = String(decoded?.appId || decoded?.token?.app_id || "").trim().slice(0, 120);
+  if (decoded?.alreadyConsumed === true) {
+    return {ok: false, outcome: "app_check_reused", failureReason: "already_consumed", appId, enforce};
+  }
+  if (!decoded || appId !== SPATIAL_STUDIO_APP_ID) {
+    return {
+      ok: false,
+      outcome: "app_check_invalid",
+      failureReason: appId ? "app_id_mismatch" : "app_id_missing",
+      appId,
+      enforce
+    };
+  }
+  return {ok: true, outcome: "verified", failureReason: "", appId, enforce};
 }
 
 async function safeLog(logAccess, entry) {
@@ -404,6 +440,22 @@ async function safeLog(logAccess, entry) {
     });
   } catch (error) {
     console.warn("spatial-plan-trace access log failed", error?.message || error);
+  }
+}
+
+async function safeAppCheckLog(deps, entry) {
+  if (typeof deps.logAppCheck !== "function") return;
+  try {
+    await deps.logAppCheck({
+      operation: OPERATION,
+      outcome: entry.outcome,
+      failureReason: entry.failureReason || "",
+      appId: entry.appId || "",
+      enforce: entry.enforce === true,
+      tokens: entry.tokens || null
+    });
+  } catch (error) {
+    console.warn("app-check log failed", error?.code || "log_failed");
   }
 }
 
@@ -427,90 +479,104 @@ async function handlePlanTraceRequest(req, res, deps = {}) {
     return {ok: false, status: 405};
   }
 
-  const model = text(deps.model, 80) || TEXT_MODEL;
   const appCheck = await inspectAppCheck(req, deps);
-  if (!appCheck.ok) {
-    await safeLog(deps.logAccess, {
-      ok: false,
-      model,
-      failureReason: appCheck.failureReason,
-      details: {totalTokens: 0}
-    });
-    if (appCheckEnforced(deps)) {
-      sendJson(res, 401, {ok: false, error: APP_CHECK_ERROR});
-      return {ok: false, status: 401, error: APP_CHECK_ERROR};
-    }
-  }
-
-  const body = readBody(req);
-  if (!body) {
-    sendJson(res, 400, {ok: false, error: UNREADABLE_ERROR});
-    return {ok: false, status: 400};
-  }
-  const upload = parseTraceUpload(body);
-  if (!upload.ok) {
-    sendJson(res, upload.status || 400, {ok: false, error: upload.error || UNREADABLE_ERROR});
-    return {ok: false, status: upload.status || 400, error: upload.error};
-  }
-
-  const generateContent = deps.generateContent;
-  if (typeof generateContent !== "function") {
-    await safeLog(deps.logAccess, {ok: false, model, failureReason: "gemini_unconfigured", details: {totalTokens: 0}});
-    sendJson(res, 200, {ok: false, error: UNREADABLE_ERROR});
-    return {ok: false, status: 200, error: UNREADABLE_ERROR};
-  }
-
-  let response;
+  let geminiTokens = null;
+  let result;
   try {
-    response = await generateContent({
-      model,
-      contents: buildGeminiContents(upload),
-      config: {
-        temperature: 0.1,
-        responseMimeType: "application/json",
-        responseSchema: TRACE_SCHEMA
-      }
-    });
-  } catch (error) {
-    await safeLog(deps.logAccess, {
-      ok: false,
-      model,
-      failureReason: text(error?.message || error, 180) || "gemini_failed",
-      details: {totalTokens: 0}
-    });
-    sendJson(res, 200, {ok: false, error: UNREADABLE_ERROR});
-    return {ok: false, status: 200, error: UNREADABLE_ERROR};
-  }
+    if (appCheck.enforce && appCheck.outcome !== "verified") {
+      sendJson(res, 401, {ok: false, error: APP_CHECK_REJECTED});
+      result = {ok: false, status: 401, error: APP_CHECK_REJECTED, appCheck: appCheck.outcome};
+      return result;
+    }
 
-  const tokens = tokenCounts(response);
-  const validated = validateTrace(extractModelText(response));
-  if (!validated.ok) {
-    await safeLog(deps.logAccess, {
-      ok: false,
-      model,
-      failureReason: "trace_invalid",
-      details: tokens
-    });
-    sendJson(res, 200, {ok: false, error: UNREADABLE_ERROR});
-    return {ok: false, status: 200, error: UNREADABLE_ERROR};
-  }
+    const body = readBody(req);
+    if (!body) {
+      sendJson(res, 400, {ok: false, error: UNREADABLE_ERROR});
+      result = {ok: false, status: 400};
+      return result;
+    }
+    const upload = parseTraceUpload(body);
+    if (!upload.ok) {
+      sendJson(res, upload.status || 400, {ok: false, error: upload.error || UNREADABLE_ERROR});
+      result = {ok: false, status: upload.status || 400, error: upload.error};
+      return result;
+    }
 
-  await safeLog(deps.logAccess, {
-    ok: true,
-    model,
-    details: tokens
-  });
-  sendJson(res, 200, {ok: true, trace: validated.trace});
-  return {ok: true, status: 200, trace: validated.trace};
+    const generateContent = deps.generateContent;
+    const model = text(deps.model, 80) || TEXT_MODEL;
+    if (typeof generateContent !== "function") {
+      await safeLog(deps.logAccess, {ok: false, model, failureReason: "gemini_unconfigured", details: {totalTokens: 0}});
+      sendJson(res, 200, {ok: false, error: UNREADABLE_ERROR});
+      result = {ok: false, status: 200, error: UNREADABLE_ERROR};
+      return result;
+    }
+
+    let response;
+    try {
+      geminiTokens = {promptTokens: 0, candidateTokens: 0, totalTokens: 0};
+      response = await generateContent({
+        model,
+        contents: buildGeminiContents(upload),
+        config: {
+          temperature: 0.1,
+          responseMimeType: "application/json",
+          responseSchema: TRACE_SCHEMA
+        }
+      });
+      geminiTokens = tokenCounts(response);
+    } catch (error) {
+      await safeLog(deps.logAccess, {
+        ok: false,
+        model,
+        failureReason: text(error?.message || error, 180) || "gemini_failed",
+        details: {totalTokens: 0}
+      });
+      sendJson(res, 200, {ok: false, error: UNREADABLE_ERROR});
+      result = {ok: false, status: 200, error: UNREADABLE_ERROR};
+      return result;
+    }
+
+    const validated = validateTrace(extractModelText(response));
+    if (!validated.ok) {
+      await safeLog(deps.logAccess, {
+        ok: false,
+        model,
+        failureReason: "trace_invalid",
+        details: geminiTokens
+      });
+      sendJson(res, 200, {ok: false, error: UNREADABLE_ERROR});
+      result = {ok: false, status: 200, error: UNREADABLE_ERROR};
+      return result;
+    }
+
+    await safeLog(deps.logAccess, {
+      ok: true,
+      model,
+      details: geminiTokens
+    });
+    sendJson(res, 200, {ok: true, trace: validated.trace});
+    result = {ok: true, status: 200, trace: validated.trace};
+    return result;
+  } finally {
+    await safeAppCheckLog(deps, {
+      outcome: appCheck.outcome,
+      failureReason: appCheck.failureReason,
+      appId: appCheck.appId,
+      enforce: appCheck.enforce === true,
+      tokens: geminiTokens
+    });
+  }
 }
 
 module.exports = {
   TEXT_MODEL,
   OPERATION,
+  APP_CHECK_HEADER,
+  SPATIAL_STUDIO_APP_ID,
+  APP_CHECK_REJECTED,
   UNREADABLE_ERROR,
   OVERSIZE_ERROR,
   ORIGIN_ERROR,
-  APP_CHECK_ERROR,
   ALLOW_HEADERS,
   MAX_FILE_BYTES,
   MAX_OBJECTS,
@@ -523,5 +589,6 @@ module.exports = {
   buildGeminiContents,
   extractJsonObject,
   validateTrace,
+  inspectAppCheck,
   handlePlanTraceRequest
 };

@@ -65,7 +65,7 @@
     ["aiTemplatePromptHistory", "ownMaster", 0, "Patron AI template prompts"],
     ["aiUserNotificationPreferences", "ownMaster", 0, "Patron notification choices"],
     ["aiUserSignals", "ownMaster", 0, "Patron interest signals"],
-    ["appLogs", "master", 0, "Application logs"],
+    ["appLogs", "master", 0, "Application logs, including App Check outcomes"],
     ["geminiApiAccessLogs", "master", 0, "Gemini API success/failure access audit (30-day; Master Admin or FloqR Admin)"],
     ["approvedShoutOutLibrary", "public", 0, "Approved ShoutOut ideas"],
     ["audienceCampaigns", "clubAdmin", 0, "Club audience campaigns"],

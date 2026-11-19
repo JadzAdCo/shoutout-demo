@@ -356,7 +356,10 @@
       }
       if (panelId === "networkDashboard") loadNetworkReports({force: false});
       if (panelId === "networkReconciliation") loadNetworkPaymentLedger();
-      if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
+      if (panelId === "securityLogs") {
+        window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
+        window.FLOQRDisplaySecurity?.loadAppCheckSecurityLogs?.();
+      }
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
       if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
       if (panelId === "shoutoutCompletedLog" || panelId === "shoutoutRetention") {

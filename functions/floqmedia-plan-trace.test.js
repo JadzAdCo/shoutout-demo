@@ -5,6 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
+delete process.env.FLOQR_APP_CHECK_ENFORCE;
 const core = require("./floqmedia-plan-trace-core");
 
 const root = path.resolve(__dirname, "..");
@@ -394,13 +395,13 @@ test("monitor mode still returns a trace when the App Check pass is missing", as
   assert.equal(res.body.ok, true);
   assert.deepEqual(res.body.trace, KNOWN_TRACE);
   assert.equal(called.n, 1);
-  assert.equal(logs[0].ok, false);
-  assert.equal(logs[0].operation, "spatial-plan-trace");
-  assert.equal(logs[0].failureReason, "app_check_missing");
-  assert.equal(logs[1].ok, true);
+  assert.equal(logs.length, 1);
+  assert.equal(logs[0].ok, true);
+  assert.equal(logs.some((entry) => String(entry.failureReason || "").startsWith("app_check_")), false);
   assert.equal(JSON.stringify(logs).includes(PNG_1X1), false);
 
   const invalidLogs = [];
+  const invalidApp = [];
   const invalidCalls = {n: 0};
   const invalid = await core.handlePlanTraceRequest(
     mockReq({appCheck: "not-a-pass", body: {fileName: "lobby.png", mime: "image/png", dataBase64: PNG_1X1}}),
@@ -412,17 +413,21 @@ test("monitor mode still returns a trace when the App Check pass is missing", as
         invalidCalls.n += 1;
         return {text: JSON.stringify(KNOWN_TRACE), usageMetadata: {totalTokenCount: 1}};
       },
-      logAccess: async (entry) => invalidLogs.push(entry)
+      logAccess: async (entry) => invalidLogs.push(entry),
+      logAppCheck: async (entry) => invalidApp.push(entry)
     }
   );
   assert.equal(invalid.ok, true);
   assert.equal(invalidCalls.n, 1);
-  assert.equal(invalidLogs[0].failureReason, "app_check_invalid");
-  assert.equal(invalidLogs[0].operation, "spatial-plan-trace");
+  assert.equal(invalidLogs.some((entry) => String(entry.failureReason || "").startsWith("app_check_")), false);
+  assert.equal(invalidApp[0].outcome, "app_check_invalid");
+  assert.equal(invalidApp[0].operation, "spatial-plan-trace");
+  assert.equal(invalidApp[0].enforce, false);
 });
 
 test("enforce mode returns 401 and does not call Gemini", async () => {
   const logs = [];
+  const appChecks = [];
   const called = {n: 0};
   const secret = "limited-use-pass-should-not-be-logged";
   const res = mockRes();
@@ -438,40 +443,45 @@ test("enforce mode returns 401 and does not call Gemini", async () => {
         throw new Error(`invalid pass ${secret}`);
       },
       generateContent: async () => { called.n += 1; return {}; },
-      logAccess: async (entry) => logs.push(entry)
+      logAccess: async (entry) => logs.push(entry),
+      logAppCheck: async (entry) => appChecks.push(entry)
     }
   );
   assert.equal(result.ok, false);
   assert.equal(result.status, 401);
   assert.equal(res.statusCode, 401);
-  assert.deepEqual(res.body, {ok: false, error: core.APP_CHECK_ERROR});
-  assert.equal(core.APP_CHECK_ERROR, "FloqR could not read that plan.");
+  assert.deepEqual(res.body, {ok: false, error: core.APP_CHECK_REJECTED});
   assert.equal(called.n, 0);
-  assert.equal(logs.length, 1);
-  assert.equal(logs[0].operation, "spatial-plan-trace");
-  assert.equal(logs[0].failureReason, "app_check_invalid");
-  assert.equal(JSON.stringify(logs).includes(secret), false);
+  assert.equal(logs.length, 0);
+  assert.equal(appChecks[0].operation, "spatial-plan-trace");
+  assert.equal(appChecks[0].outcome, "app_check_invalid");
+  assert.equal(appChecks[0].enforce, true);
+  assert.equal(JSON.stringify(appChecks).includes(secret), false);
   assert.equal(JSON.stringify(logs).includes(PNG_1X1), false);
   assert.equal(res.headers["Access-Control-Allow-Headers"], core.ALLOW_HEADERS);
 
   const missingCalls = {n: 0};
   const missingLogs = [];
+  const missingApp = [];
   const missing = await core.handlePlanTraceRequest(
     mockReq({body: {fileName: "lobby.png", mime: "image/png", dataBase64: PNG_1X1}}),
     mockRes(),
     {
       env: {FLOQR_APP_CHECK_ENFORCE: "1"},
       generateContent: async () => { missingCalls.n += 1; return {}; },
-      logAccess: async (entry) => missingLogs.push(entry)
+      logAccess: async (entry) => missingLogs.push(entry),
+      logAppCheck: async (entry) => missingApp.push(entry)
     }
   );
   assert.equal(missing.status, 401);
   assert.equal(missingCalls.n, 0);
-  assert.equal(missingLogs[0].failureReason, "app_check_missing");
-  assert.equal(missingLogs[0].operation, "spatial-plan-trace");
+  assert.equal(missingLogs.length, 0);
+  assert.equal(missingApp[0].outcome, "app_check_missing");
+  assert.equal(missingApp[0].operation, "spatial-plan-trace");
+  assert.equal(missingApp[0].enforce, true);
 });
 
-test("a second consume of the same App Check pass is app_check_invalid", async () => {
+test("a second consume of the same App Check pass is app_check_reused", async () => {
   const seen = new Set();
   const optionsSeen = [];
   const pass = "limited-use-pass-once";
@@ -492,33 +502,50 @@ test("a second consume of the same App Check pass is app_check_invalid", async (
   };
 
   const firstLogs = [];
+  const firstApp = [];
   const first = await core.handlePlanTraceRequest(
     mockReq({appCheck: pass, body}),
     mockRes(),
-    {env: {}, verifyAppCheck, generateContent, logAccess: async (entry) => firstLogs.push(entry)}
+    {
+      env: {},
+      verifyAppCheck,
+      generateContent,
+      logAccess: async (entry) => firstLogs.push(entry),
+      logAppCheck: async (entry) => firstApp.push(entry)
+    }
   );
   assert.equal(first.ok, true);
   assert.equal(firstLogs.some((entry) => String(entry.failureReason || "").startsWith("app_check_")), false);
+  assert.equal(firstApp[0].outcome, "verified");
 
   const secondLogs = [];
+  const secondApp = [];
   const secondRes = mockRes();
   const second = await core.handlePlanTraceRequest(
     mockReq({appCheck: pass, body}),
     secondRes,
-    {env: {}, verifyAppCheck, generateContent, logAccess: async (entry) => secondLogs.push(entry)}
+    {
+      env: {},
+      verifyAppCheck,
+      generateContent,
+      logAccess: async (entry) => secondLogs.push(entry),
+      logAppCheck: async (entry) => secondApp.push(entry)
+    }
   );
   assert.equal(second.ok, true);
   assert.equal(secondRes.statusCode, 200);
   assert.equal(secondRes.body.ok, true);
-  assert.equal(secondLogs[0].operation, "spatial-plan-trace");
-  assert.equal(secondLogs[0].failureReason, "app_check_invalid");
+  assert.equal(secondLogs.some((entry) => String(entry.failureReason || "").startsWith("app_check_")), false);
+  assert.equal(secondApp[0].operation, "spatial-plan-trace");
+  assert.equal(secondApp[0].outcome, "app_check_reused");
   assert.equal(calls.n, 2);
   assert.deepEqual(optionsSeen, [{consume: true}, {consume: true}]);
   assert.equal(JSON.stringify(firstLogs).includes(pass), false);
-  assert.equal(JSON.stringify(secondLogs).includes(pass), false);
+  assert.equal(JSON.stringify(secondApp).includes(pass), false);
   assert.equal(JSON.stringify(secondLogs).includes(PNG_1X1), false);
 
   const enforcedLogs = [];
+  const enforcedApp = [];
   const enforcedCalls = {n: 0};
   const enforced = await core.handlePlanTraceRequest(
     mockReq({appCheck: pass, body}),
@@ -527,13 +554,15 @@ test("a second consume of the same App Check pass is app_check_invalid", async (
       env: {FLOQR_APP_CHECK_ENFORCE: "1"},
       verifyAppCheck,
       generateContent: async () => { enforcedCalls.n += 1; return {}; },
-      logAccess: async (entry) => enforcedLogs.push(entry)
+      logAccess: async (entry) => enforcedLogs.push(entry),
+      logAppCheck: async (entry) => enforcedApp.push(entry)
     }
   );
   assert.equal(enforced.status, 401);
   assert.equal(enforcedCalls.n, 0);
-  assert.equal(enforcedLogs[0].failureReason, "app_check_invalid");
-  assert.equal(JSON.stringify(enforcedLogs).includes(pass), false);
+  assert.equal(enforcedLogs.length, 0);
+  assert.equal(enforcedApp[0].outcome, "app_check_reused");
+  assert.equal(JSON.stringify(enforcedApp).includes(pass), false);
 });
 
 test("HTTP function is exported next to the other spatial functions and tagged for spatial deploy", () => {

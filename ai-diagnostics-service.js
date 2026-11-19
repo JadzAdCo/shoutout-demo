@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.045";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.045";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.046";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.046";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -3480,6 +3480,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-046-app-check-master-logs",
+      area:"Master Admin",
+      feature:"App Check logs on Application Logging and Security Logs",
+      changed:"Spatial Studio plan trace verifies App Check in monitor mode and writes both results to appLogs. Diagnostics category app-check action spatial-plan-trace. Rejected passes also use category security action app-check on Security Logs → App Check. Enforcement stays off. A missing pass in monitor mode does not send a Security System Message and does not flash the Gemini failure light.",
+      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a commit whose message contains [firebase-deploy] and [firebase-deploy-spatial]. 2) Hard-refresh Master Admin → Diagnostics → Application Logging. Category filter placeholder includes app-check. 3) Security → Security Logs still lists venue display allow/deny above a new App Check subsection. 4) A Spatial Studio import with no pass still returns a trace while enforcement is off, and Application Logging shows a warn row category app-check (not gemini, not critical). 5) Mark Succeed/Failed.",
+      expected:"Venue display log is unchanged and still uses displayAccessLogs. App Check rows are appLogs only. Verified is info. Missing while enforcement is off is warn and does not flash Application Logging. Invalid or reused passes appear under Security Logs → App Check. FLOQR_APP_CHECK_ENFORCE is not 1.",
+      troubleshoot:"No App Check subsection → hard-refresh master-admin.html and master-display-security.js. Gemini tab flashes on a missing pass → the row was written category gemini or severity critical; it must be category app-check. Trace refused with no enforcement → FLOQR_APP_CHECK_ENFORCE was set to 1; leave it unset. 404 on floqmediaPlanTrace → spatial subset deploy did not finish."
+    },
     {
       id:"s3-3-038-smartvisuals-search-notification",
       area:"Mingl",
