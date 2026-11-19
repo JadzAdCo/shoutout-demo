@@ -135,6 +135,7 @@
       checkout: "botdee.link.paySecurely",
       floqcast: "botdee.link.floqcastPreview",
       shoutout: "botdee.link.shoutoutCompose",
+      "shoutout-pending": "botdee.link.shoutoutPending",
       vip: "botdee.link.vipTerms"
     };
     return (results || []).filter(row => {
@@ -496,7 +497,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.042";
+    return "s3.3.043";
   }
 
   function isVersionSmartViewAlias(raw) {

@@ -12,21 +12,48 @@ const SCREEN_LABELS = Object.freeze({
   "led-64x32": "64×32"
 });
 
+const TEXT_LAYOUT_VERSION = "29.08.4";
+
 const CLASSIC_BOARD_CAPS = Object.freeze({
-  "led-96x48": {profileId: "classicBoard", lineCount: 3, perLine: 15, main: 45, sub: 20},
-  "led-64x48": {profileId: "classicBoard", lineCount: 3, perLine: 12, main: 36, sub: 18},
-  "led-64x32": {profileId: "classicBoard", lineCount: 3, perLine: 10, main: 30, sub: 14}
+  "led-96x48": {
+    profileId: "classicBoard", lineCount: 3, perLine: 15, main: 45, sub: 20,
+    mainTextSizePercent: 20.8, subTextSizePercent: 7.8, minimumFontPixels: 0
+  },
+  "led-64x48": {
+    profileId: "classicBoard", lineCount: 3, perLine: 12, main: 36, sub: 18,
+    mainTextSizePercent: 20.8, subTextSizePercent: 7.8, minimumFontPixels: 0
+  },
+  "led-64x32": {
+    profileId: "classicBoard", lineCount: 3, perLine: 10, main: 30, sub: 14,
+    mainTextSizePercent: 20.8, subTextSizePercent: 7.8, minimumFontPixels: 0
+  }
 });
 
+/** Catalog className / name must match shared-data.js or Preview + LED skip classic-bw. */
 const HEADLESS_TEXT_TEMPLATES = Object.freeze({
-  blackwhite: {name: "Traditional", className: "blackwhite", priceCents: 0},
-  birthday: {name: "Birthday", className: "birthday", priceCents: 0},
-  vip: {name: "VIP", className: "vip", priceCents: 0},
-  neon: {name: "Neon", className: "neon", priceCents: 0},
-  gold: {name: "Gold", className: "gold", priceCents: 0},
-  graduation: {name: "Graduation", className: "graduation", priceCents: 0},
-  corporate: {name: "Corporate", className: "corporate", priceCents: 0},
-  classicHalloween: {name: "Classic Halloween", className: "classicHalloween", priceCents: 1500}
+  blackwhite: {
+    name: "Traditional Black and White ShoutOut",
+    className: "classic-bw",
+    priceCents: 0,
+    identityRail: true,
+    identityAnimation: "identity-loop",
+    identityAnimationSeconds: 6
+  },
+  birthday: {name: "Birthday Glow", className: "neon", priceCents: 0, identityRail: true},
+  vip: {name: "VIP Table", className: "gold", priceCents: 0, identityRail: true},
+  neon: {name: "Neon ShoutOut", className: "neon", priceCents: 0, identityRail: true},
+  gold: {name: "Gold Celebration", className: "gold", priceCents: 0, identityRail: true},
+  graduation: {name: "Graduation Night", className: "classic-bw", priceCents: 0, identityRail: true},
+  corporate: {name: "Corporate Event", className: "classic-bw", priceCents: 0, identityRail: true},
+  classicHalloween: {
+    name: "Classic Halloween",
+    className: "classic-bw classic-halloween",
+    priceCents: 1500,
+    identityRail: true,
+    allowEmoji: true,
+    halloweenFinale: true,
+    defaultBackgroundUrl: "./images/halloween/classic-halloween-2x1.svg"
+  }
 });
 
 const TEMPLATE_ALIASES = Object.freeze({
@@ -163,7 +190,13 @@ function pickTemplate(venue = {}, requested = "") {
     templateId: id,
     templateName: chosen.name,
     templateClassName: chosen.className,
-    priceCents: chosen.priceCents || 0
+    priceCents: chosen.priceCents || 0,
+    identityRail: chosen.identityRail !== false,
+    identityAnimation: chosen.identityAnimation || "identity-loop",
+    identityAnimationSeconds: chosen.identityAnimationSeconds || 6,
+    allowEmoji: chosen.allowEmoji === true,
+    halloweenFinale: chosen.halloweenFinale === true,
+    defaultBackgroundUrl: chosen.defaultBackgroundUrl || ""
   };
 }
 
@@ -363,6 +396,11 @@ function composeShoutOutPayload({
   const caps = textCaps(picked.templateId, screen);
   const locationName = text(venue.locationName || venue.brandName || venue.displayName || club, 160);
   const brandName = text(venue.brandName || venue.locationName || "", 160);
+  const fullAddress = text(
+    venue.fullAddress || venue.locationAddress || venue.formattedAddress || venue.address || "",
+    240
+  );
+  const streetAddress = text(venue.streetAddress || venue.addressLine1 || "", 160);
   const mainText = fitMainText(main, caps);
   return {
     ok: true,
@@ -380,17 +418,40 @@ function composeShoutOutPayload({
       locationName,
       brandName,
       clubName: locationName,
+      country: text(venue.country, 80),
+      region: text(venue.region || venue.state || venue.province, 80),
+      city: text(venue.city, 80),
+      streetAddress,
+      postalCode: text(venue.postalCode || venue.zip, 24),
+      fullAddress,
+      locationAddress: fullAddress,
+      locationLabel: text(venue.locationLabel, 160),
       template: picked.templateId,
       templateId: picked.templateId,
       templateName: picked.templateName,
       templateClassName: picked.templateClassName,
+      templateSupportsMedia: false,
       screenFormatId: screen,
       screenFormatLabel: SCREEN_LABELS[screen] || screen,
+      textLayoutVersion: TEXT_LAYOUT_VERSION,
       textProfileId: caps.profileId,
       maxMainCharacters: caps.main,
       maxSubCharacters: caps.sub,
       lineCount: caps.lineCount,
       maxCharactersPerLine: caps.perLine,
+      minimumFontPixels: caps.minimumFontPixels || 0,
+      mainTextSizePercent: caps.mainTextSizePercent || 20.8,
+      subTextSizePercent: caps.subTextSizePercent || 7.8,
+      identityRail: picked.identityRail !== false,
+      identityAnimation: picked.identityAnimation || "identity-loop",
+      identityAnimationSeconds: picked.identityAnimationSeconds || 6,
+      includeAttribution: false,
+      attribution: "",
+      attributionChoice: "none",
+      allowEmoji: picked.allowEmoji === true,
+      halloweenFinale: picked.halloweenFinale === true,
+      backgroundUrl: picked.defaultBackgroundUrl || "",
+      defaultBackgroundUrl: picked.defaultBackgroundUrl || "",
       mainText,
       subText: "",
       priceCents: picked.priceCents || 0,
@@ -425,6 +486,7 @@ function portalShoutOutHref(shoutoutId) {
 
 module.exports = {
   DEFAULT_TEMPLATE_ID,
+  TEXT_LAYOUT_VERSION,
   LED_FORMATS,
   SCREEN_LABELS,
   HEADLESS_TEXT_TEMPLATES,

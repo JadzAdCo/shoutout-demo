@@ -157,7 +157,72 @@ async function listShoutOutTemplates(args, sessionRequest) {
   };
 }
 
-async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth} = {}) {
+function clientIpFromRequest(sessionRequest) {
+  const req = sessionRequest?.rawRequest || {};
+  const headers = req.headers || {};
+  const xf = String(headers["x-forwarded-for"] || "").split(",")[0].trim();
+  const real = String(headers["x-real-ip"] || "").trim();
+  let ip = xf || real || req.ip || req.socket?.remoteAddress || req.connection?.remoteAddress || "";
+  if (ip.startsWith("::ffff:")) ip = ip.slice(7);
+  return String(ip || "").trim().slice(0, 80);
+}
+
+async function notifyClubPendingHeadlessShoutOut({
+  clubLocationId,
+  venue = {},
+  shoutoutId,
+  mainText,
+  referenceNumber,
+  locationName
+} = {}) {
+  const uids = new Set([
+    ...(Array.isArray(venue.adminUids) ? venue.adminUids : []),
+    ...(Array.isArray(venue.masterAdminUids) ? venue.masterAdminUids : [])
+  ].map(value => text(value, 160)).filter(Boolean));
+  try {
+    const snap = await db.collection("clubEmployeeDesignations")
+      .where("clubLocationId", "==", clubLocationId)
+      .limit(80)
+      .get();
+    snap.forEach(doc => {
+      const row = doc.data() || {};
+      if (text(row.status, 40).toLowerCase() === "rejected") return;
+      const roles = `${row.roleElectionType || ""} ${(row.workerRoles || []).join(" ")}`;
+      if (/club\s*admin/i.test(roles) && row.workerUid) uids.add(text(row.workerUid, 160));
+    });
+  } catch (_error) {
+    /* designation query optional */
+  }
+  const recipients = [...uids];
+  if (!recipients.length) return {ok: false, skipped: "no-admin-recipients"};
+  const snippet = text(mainText, 80);
+  const body = [
+    `FloqR: ShoutOut pending at ${locationName || clubLocationId}.`,
+    snippet ? `"${snippet}"` : "",
+    `Ref ${referenceNumber || shoutoutId}.`,
+    "Open Club Admin → Pending ShoutOuts to Approve & Push Live."
+  ].filter(Boolean).join(" ");
+  const link = `./admin.html?location=${encodeURIComponent(clubLocationId)}&tab=queue`;
+  await Promise.all(recipients.map(uid => db.collection("inboxNotifications").add({
+    type: "pendingShoutout",
+    title: "Pending ShoutOut",
+    body,
+    clubLocationId,
+    locationName: locationName || clubLocationId,
+    shoutoutId: shoutoutId || "",
+    referenceNumber: referenceNumber || "",
+    senderUid: "system",
+    senderName: "System Message",
+    messageCategory: "system",
+    read: false,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    link,
+    recipientUid: uid
+  })));
+  return {ok: true, recipients: recipients.length};
+}
+
+async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth, sessionRequest} = {}) {
   const uid = text(auth?.uid, 120);
   if (!uid) throw new HttpsError("unauthenticated", "Sign in required.");
   const templateId = text(shoutout?.template || shoutout?.templateId, 80);
@@ -167,6 +232,22 @@ async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth
   const email = text(auth?.token?.email || shoutout.submittedBy, 200).toLowerCase();
   const referenceNumber = headless.newReferenceNumber();
   const locationName = text(shoutout.locationName || venue?.locationName || clubLocationId, 160);
+  let profile = {};
+  try {
+    const userSnap = await db.collection("users").doc(uid).get();
+    profile = userSnap.exists ? userSnap.data() || {} : {};
+  } catch (_error) {
+    profile = {};
+  }
+  const clientIp = clientIpFromRequest(sessionRequest);
+  const actor = require("./shoutout-compliance-functions").actorFieldsFromSources({
+    submittedByUid: uid,
+    submittedBy: email,
+    actorEmail: email,
+    clientIp,
+    ipSource: clientIp ? "headless-submit" : ""
+  }, profile);
+  const now = admin.firestore.FieldValue.serverTimestamp();
   const doc = {
     ...shoutout,
     clubLocationId,
@@ -181,10 +262,16 @@ async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth
     source: "headless",
     onboardingSource: "headless-shoutout",
     submittedByUid: uid,
-    submittedBy: email,
-    actorEmail: email,
+    submittedBy: actor.submittedBy || email,
+    actorEmail: actor.actorEmail || email,
+    actorPhone: actor.actorPhone || "",
+    actorIdentifier: actor.actorIdentifier || email,
+    clientIp: actor.clientIp || "",
+    ipSource: actor.ipSource || "",
     referenceNumber,
-    submittedAt: admin.firestore.FieldValue.serverTimestamp()
+    createdAt: now,
+    submittedAt: now,
+    updatedAt: now
   };
   const ref = await db.collection("shoutouts").add(doc);
   await db.collection("shoutoutAudit").add({
@@ -193,10 +280,24 @@ async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth
     referenceNumber,
     ownerUid: uid,
     actorUid: uid,
-    actorEmail: email,
+    actorEmail: actor.actorEmail || email,
+    clientIp: actor.clientIp || "",
+    ipSource: actor.ipSource || "",
     source: "headless",
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
+    createdAt: now
   });
+  try {
+    await notifyClubPendingHeadlessShoutOut({
+      clubLocationId,
+      venue,
+      shoutoutId: ref.id,
+      mainText: text(shoutout.mainText, 200),
+      referenceNumber,
+      locationName
+    });
+  } catch (error) {
+    console.warn("headless pending club inbox skipped", error?.message || error);
+  }
   return {
     shoutoutId: ref.id,
     referenceNumber,
@@ -268,7 +369,8 @@ async function startShoutOutCheckout(args, sessionRequest) {
     venue,
     message,
     templateId,
-    screenFormatId
+    screenFormatId,
+    userPrompt
   });
   if (!composed.ok) {
     return {
@@ -310,7 +412,8 @@ async function startShoutOutCheckout(args, sessionRequest) {
     clubLocationId,
     shoutout,
     venue,
-    auth: sessionRequest.auth
+    auth: sessionRequest.auth,
+    sessionRequest
   });
   return {
     ok: true,

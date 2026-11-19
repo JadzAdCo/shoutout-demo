@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.042";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.042";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.043";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.043";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.043",
+      title: "s3.3.043 — Headless ShoutOut composer parity (className + club notify + LED)",
+      checks: [
+        {label:"Catalog className", file:"functions/headless-shoutout-core.js", includes:["className: \"classic-bw\"", "classic-bw classic-halloween"]},
+        {label:"Club pending inbox", file:"functions/bot-dee-tools.js", includes:["notifyClubPendingHeadlessShoutOut", "pendingShoutout"]},
+        {label:"Approve catalog className", file:"admin-app.js", includes:["templateClassName: packaged.className || item.templateClassName"]},
+        {label:"Pending link kind", file:"bot-dee-chat.js", includes:["shoutout-pending"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-043-headless-shoutout-complete"]}
+      ]
+    },
     {
       version: "s3.3.041",
       title: "s3.3.041 — BOT DEE + FloqR headless ShoutOut checkout",
@@ -3472,6 +3483,15 @@
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.039. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — card shows photo full width on top, Don Papi and @handle on the next row, SMARTsummary as inline text (not a tall empty box). 3) Open My Profile → Features & Orders → My BOT DEE → View my SMARTview — same stack. 4) Phone ~390 and desktop ~1280. Empty fields take no height. Display URLs have no ?v=. 5) Mark Succeed/Failed.",
       expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
       troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
+    },
+    {
+      id:"s3-3-043-headless-shoutout-complete",
+      area:"BOT DEE",
+      feature:"Headless ShoutOut completes composer + Club Admin + LED path",
+      changed:"s3.3.043 — Free throw from chat writes a composer-parity pending ShoutOut (catalog className classic-bw, venue address, identity rail, layout percents). Club Admin Inbox gets Pending ShoutOut → admin.html?location=&tab=queue. Approve & Push Live uses packaged className so Display 1 matches Traditional. Paid Halloween still Stripe then pending. LED does not play until Approve.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.043. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout at Decades that says Happy birthday Maya — pending My ShoutOuts link (Open in My ShoutOuts), not compose-only. 3) My Profile → Feature & Orders → My ShoutOuts → Pending shows the row; Preview is the Traditional three-line board (classic-bw), not a generic neon stub. 4) Sign in Club Admin for Decades — Pending ShoutOuts queue has the copy; Inbox has Pending ShoutOut. Preview, then Approve & Push Live. 5) display.html?location=decades-washington-dc (no ?v=) plays the message on the Traditional board with FloqR card. 6) Mark Succeed/Failed.",
+      expected:"Chat throw → pending My ShoutOuts. Club Admin sees it, Approve pushes live Traditional LED. Not live until Approve. Halloween still Pay securely first.",
+      troubleshoot:"Pending missing in Club Admin → executeBotSession not this SHA or clubLocationId alias (Decades → decades-washington-dc). LED looks like neon / no letter board → cached admin-app.js (packaged.className) or display-app.js. Inbox missing for club → Functions submitFreeHeadlessShoutOut notify; adminUids empty on the club doc. Still compose-only → Functions deploy [firebase-deploy-botdee]."
     },
     {
       id:"s3-3-041-botdee-headless-checkout",
