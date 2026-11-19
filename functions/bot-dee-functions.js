@@ -830,6 +830,18 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       stored.joinedRoomId = "";
       stored.joinedRoomConversationId = "";
     }
+    if (stored.joinedRoomId) {
+      try {
+        const liveRoom = await roomLive.loadRoom(stored.joinedRoomId);
+        if (!liveRoom || liveRoom.status !== "open" || !roomLive.memberOf(liveRoom, uid)) {
+          await threads.persistJoinedRoomId(uid, null);
+          stored.joinedRoomId = "";
+          stored.joinedRoomConversationId = "";
+        }
+      } catch (error) {
+        console.warn("BOT DEE room load failed", error?.message || error);
+      }
+    }
     const joinToken = String(request.data?.joinToken || "").trim();
     if (joinToken) {
       try {
@@ -937,19 +949,27 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       const endRoom = classified.command === "end";
       if (leaveRoom && stored.joinedRoomId) {
         try {
-          await roomLive.leaveRoom({uid, roomId: stored.joinedRoomId});
-          await threads.persistJoinedRoomId(uid, null);
+          const left = await roomLive.leaveRoom({uid, roomId: stored.joinedRoomId});
+          const closedByHost = !!(left && left.closed);
+          const members = closedByHost && Array.isArray(left.memberUids) && left.memberUids.length
+            ? left.memberUids
+            : [uid];
+          for (const member of members) {
+            try { await threads.persistJoinedRoomId(member, null); } catch (_) {}
+          }
           stored.joinedRoomId = "";
           stored.joinedRoomConversationId = "";
           outcome = {
-            reply: "You left this Room SMARTview. Your private BOT DEE chat continues here.",
+            reply: closedByHost
+              ? "This Room SMARTview is closed. Private BOT DEE chat continues here."
+              : "You left this Room SMARTview. Your private BOT DEE chat continues here.",
             results: [],
             provider: "local-room-smartview",
-            model: "roomLeave",
+            model: closedByHost ? "roomEnd" : "roomLeave",
             toolRounds: 0,
             uiLanguage,
             smartViews: [],
-            replyKey: "botdee.rs.leftLive",
+            replyKey: closedByHost ? "botdee.rs.endedLive" : "botdee.rs.leftLive",
             geminiOnView: false
           };
         } catch (error) {
@@ -958,22 +978,39 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       } else if (endRoom && stored.joinedRoomId) {
         try {
           const ended = await roomLive.endRoom({uid, roomId: stored.joinedRoomId});
-          await threads.persistJoinedRoomId(uid, null);
-          stored.joinedRoomId = "";
-          stored.joinedRoomConversationId = "";
-          outcome = {
-            reply: ended.ok
-              ? "This Room SMARTview is closed. Private BOT DEE chat continues here."
-              : "Ending a room needs the host. Your private BOT DEE chat continues here.",
-            results: [],
-            provider: "local-room-smartview",
-            model: "roomEnd",
-            toolRounds: 0,
-            uiLanguage,
-            smartViews: [],
-            replyKey: ended.ok ? "botdee.rs.endedLive" : "botdee.rs.commandEnd",
-            geminiOnView: false
-          };
+          if (ended.ok) {
+            const members = Array.isArray(ended.memberUids) && ended.memberUids.length
+              ? ended.memberUids
+              : [uid];
+            for (const member of members) {
+              try { await threads.persistJoinedRoomId(member, null); } catch (_) {}
+            }
+            stored.joinedRoomId = "";
+            stored.joinedRoomConversationId = "";
+            outcome = {
+              reply: "This Room SMARTview is closed. Private BOT DEE chat continues here.",
+              results: [],
+              provider: "local-room-smartview",
+              model: "roomEnd",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: [],
+              replyKey: "botdee.rs.endedLive",
+              geminiOnView: false
+            };
+          } else {
+            outcome = {
+              reply: "Only the host can end this Room SMARTview. Say leave the room to leave without closing it.",
+              results: [],
+              provider: "local-room-smartview",
+              model: "roomEndDenied",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: roomAttached.smartViews || [],
+              replyKey: "botdee.rs.endNeedsHost",
+              geminiOnView: false
+            };
+          }
         } catch (error) {
           console.warn("BOT DEE room end failed", error?.message || error);
         }
@@ -1171,9 +1208,13 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     }
     if (stored.joinedRoomId && !isPrivateBotDeeOutcome(outcome)) {
       try {
-        await roomLive.appendTurn(stored.joinedRoomId, uid, "user", userPrompt);
-        if (String(outcome.reply || "").trim()) {
+        const written = await roomLive.appendTurn(stored.joinedRoomId, uid, "user", userPrompt);
+        if (written && written.ok && String(outcome.reply || "").trim()) {
           await roomLive.appendTurn(stored.joinedRoomId, uid, "model", outcome.reply);
+        } else if (written && (written.error === "closed" || written.error === "not_found" || written.error === "not_member")) {
+          await threads.persistJoinedRoomId(uid, null);
+          stored.joinedRoomId = "";
+          stored.joinedRoomConversationId = "";
         }
       } catch (err) {
         console.warn("BOT DEE room persist failed", err?.message || err);

@@ -108,8 +108,14 @@ async function appendTurn(roomId, uid, role, body) {
   const id = text(roomId, 80);
   const textBody = text(body, 2000);
   if (!id || !textBody) return {ok: false};
-  await roomRef(id).collection("turns").add({
-    uid: text(uid, 80),
+  const snap = await roomRef(id).get();
+  if (!snap.exists) return {ok: false, error: "not_found"};
+  const row = snap.data() || {};
+  if (text(row.status, 20) !== "open") return {ok: false, error: "closed"};
+  const member = text(uid, 80);
+  if (!memberOf(publicRoom(id, row), member)) return {ok: false, error: "not_member"};
+  await snap.ref.collection("turns").add({
+    uid: member,
     role: role === "user" ? "user" : "model",
     text: textBody,
     createdAtMs: Date.now()
@@ -120,6 +126,9 @@ async function appendTurn(roomId, uid, role, body) {
 async function loadTurns(roomId, limit = 12) {
   const id = text(roomId, 80);
   if (!id) return [];
+  const roomSnap = await roomRef(id).get();
+  if (!roomSnap.exists) return [];
+  if (text((roomSnap.data() || {}).status, 20) !== "open") return [];
   const snap = await roomRef(id).collection("turns")
     .orderBy("createdAtMs", "desc")
     .limit(Math.max(1, Math.min(24, Number(limit) || 12)))
@@ -188,11 +197,20 @@ async function endRoom({uid, roomId}) {
   if (!snap.exists) return {ok: false, error: "not_found"};
   const row = snap.data() || {};
   if (text(row.hostUid, 80) !== member) return {ok: false, error: "not_host"};
+  const members = Array.isArray(row.memberUids) ? row.memberUids.map(value => text(value, 80)).filter(Boolean) : [];
+  if (text(row.hostUid, 80) && !members.includes(text(row.hostUid, 80))) {
+    members.push(text(row.hostUid, 80));
+  }
   await snap.ref.set({
     status: "closed",
     updatedAtMs: Date.now()
   }, {merge: true});
-  return {ok: true, closed: true, room: publicRoom(id, {...row, status: "closed"})};
+  return {
+    ok: true,
+    closed: true,
+    memberUids: members.slice(0, MEMBER_CAP),
+    room: publicRoom(id, {...row, status: "closed"})
+  };
 }
 
 module.exports = {

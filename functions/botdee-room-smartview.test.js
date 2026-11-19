@@ -261,4 +261,8 @@ test("chat wires Room SMARTview join without charging", () => {
   assert.match(session, /persistJoinedRoomId\(uid, null\)/);
   assert.match(read("functions/botdee-room-live.js"), /function leaveRoom/);
   assert.match(read("functions/botdee-room-live.js"), /function endRoom/);
+  assert.match(session, /ended\.ok/);
+  assert.match(session, /roomEndDenied/);
+  assert.match(session, /memberUids/);
+  assert.match(read("functions/botdee-room-live.js"), /!== "open"/);
 });
