@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.041 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.042 (stable)
 
+- s3.3.042: Mingl Search chrome from v3 white/teal/purple vector
 - s3.3.041: BOT DEE + FloqR headless ShoutOut (club + message → Stripe or pending)
 - s3.3.040: People lookup matches legal name, display name, handle, what-about
 - s3.3.039: People card stacked layout (photo, name+handle, compact SMARTsummary)

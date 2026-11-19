@@ -14,7 +14,7 @@ test("BOT DEE page is botdee.html and every entry point goes there", () => {
   assert.match(nav, /start === "intent"[\s\S]{0,200}location\.replace\(buildUrl\("\.\/botdee\.html"/, "old ?start=intent links redirect");
   assert.match(read("index.html"), /id="intentSearchBtnCard"[^>]*class="[^"]*botdee-icon-card[^"]*"[^>]*href="\.\/botdee\.html\?from=search"/);
   assert.match(read("index.html"), /intentSearchBtnCard[\s\S]*?botdee-(?:nightlife|traditional|whiteblack)\.jpg/);
-  assert.match(read("styles.css"), /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face(?:,\.sinema-icon-face)?\{[^}]*background:transparent/);
+  assert.match(read("styles.css"), /\.botdee-icon-face,\.floqcast-icon-face,\.shoutout-icon-face,\.vip-icon-face,\.settings-icon-face(?:,\.[a-z]+-icon-face)*\{[^}]*background:transparent/);
   assert.ok(fs.existsSync(path.join(root, "botdee.html")), "botdee.html is the canonical page");
   assert.equal(fs.existsSync(path.join(root, "floqai.html")), false, "floqai.html removed");
   assert.equal(fs.existsSync(path.join(root, "floqai-search.html")), false, "floqai-search.html removed");
