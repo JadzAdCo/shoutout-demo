@@ -95,6 +95,14 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(chrome, /shoutout-nightlife\.png/);
   assert.match(chrome, /sinema-nightlife\.jpg/);
   assert.match(chrome, /sinema-whiteblack\.png/);
+  assert.ok(fs.existsSync(path.join(root, "scripts/build-sinema-chrome-icons.py")));
+  assert.ok(fs.existsSync(path.join(root, "images/chrome/sinema-svg/logos/sinema-color-master.svg")));
+  assert.ok(fs.existsSync(path.join(root, "images/chrome/sinema-whiteblack.png")));
+  const sinemaSvg = read("images/chrome/sinema-svg/logos/sinema-color-master.svg");
+  assert.match(sinemaSvg, /aria-label="Si-nema logo"/);
+  assert.doesNotMatch(sinemaSvg, /<image[\s>]/, "Si-nema master is real vector, not a PNG wrap");
+  assert.match(sinemaSvg, /Transparent canvas/);
+  assert.match(sinemaSvg, /no black fills/);
   assert.match(chrome, /mingl: "\.\/images\/chrome\/mingl-nightlife\.jpg/);
   assert.match(chrome, /mingl: "\.\/images\/chrome\/mingl-traditional\.jpg/);
   assert.match(chrome, /mingl: "\.\/images\/chrome\/mingl-whiteblack\.jpg/);
