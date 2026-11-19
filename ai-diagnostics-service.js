@@ -224,7 +224,7 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.044",
-      title: "s3.3.044 — BOT DEE ShoutOut SMARTview (template / @handle / media) without coupling core",
+      title: "s3.3.044 — ShoutOut SMARTpreview (template / @handle / media) without coupling core",
       checks: [
         {label:"Interactive draft (no SMARTview in core)", file:"functions/headless-shoutout-core.js", includes:["interactiveNeeds", "mergeInteractiveDraft", "parseHandleHint"]},
         {label:"Optional SMARTview", file:"functions/botdee-shoutout-smartview.js", includes:["botDeeShoutOut", "never require this module"]},
@@ -3499,10 +3499,10 @@
     {
       id:"s3-3-044-headless-shoutout-smartview",
       area:"BOT DEE",
-      feature:"Headless ShoutOut SMARTview collects template, @handle, and media",
-      changed:"s3.3.044 — BOT DEE no longer silently submits Traditional-only. After venue + copy, chat asks template (Traditional default), FloqR-card @handle, and text-only vs photo/video compose. A ShoutOut SMARTview previews the draft. Reply Traditional / include my handle / text only / throw it, or tap chips. Core createHeadlessShoutOutCheckout stays a one-shot payload (third-party / FloqR pages do not need the card). LED still waits on Club Admin Approve.",
-      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js ?v=s3.3.044. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout at Decades that says Happy birthday Maya — expect a ShoutOut SMARTview plus a question for template / @handle / photo, NOT an immediate pending submit. 3) Reply Traditional then include my handle then text only — preview updates; then throw it (or Pay securely if Halloween). 4) Send throw a traditional shoutout at Decades that says Happy birthday Maya with my handle text only — may complete in one turn. 5) FloqR/API one-shot still defaults Traditional without the card. 6) Mark Succeed/Failed.",
-      expected:"BOT DEE collects extras and shows SMARTview preview. Third-party/FloqR headless does not require the card. Photo/video still opens compose. Pending until Club Admin Approve.",
+      feature:"ShoutOut SMARTpreview collects template, @handle, and media",
+      changed:"s3.3.044 — BOT DEE no longer silently submits Traditional-only. After venue + copy, chat asks template (Traditional default), FloqR-card @handle, and text-only vs photo/video compose. ShoutOut SMARTpreview docks above the composer and follows this chat. Reply Traditional / include my handle / text only / throw it, or tap chips. Core createHeadlessShoutOutCheckout stays a one-shot payload (third-party / FloqR pages do not need the card). LED still waits on Club Admin Approve.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js ?v=s3.3.044. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout at Decades that says Happy birthday Maya — expect ShoutOut SMARTpreview docked above the composer (not only in a scrolled-away bubble), plus a question for template / @handle / photo, NOT an immediate pending submit. 3) Reply Traditional then include my handle then text only — dock updates in place; then throw it (or Pay securely if Halloween). 4) Send throw a traditional shoutout at Decades that says Happy birthday Maya with my handle text only — may complete in one turn. 5) FloqR/API one-shot still defaults Traditional without the card. 6) Mark Succeed/Failed.",
+      expected:"ShoutOut SMARTpreview docks above the composer and follows this chat. Third-party/FloqR headless does not require the card. Photo/video still opens compose. Pending until Club Admin Approve.",
       troubleshoot:"Immediate pending with no questions → executeBotSession not this SHA (still s3.3.043 one-shot). Card missing → cached botdee-smartview.js. Follow-up Traditional ignored → headlessShoutOutDraft not persisted (Functions deploy [firebase-deploy-botdee]). Third-party now asking questions → createHeadlessShoutOutCheckout must stay startShoutOutCheckout, not tryHeadlessShoutOut."
     },
     {

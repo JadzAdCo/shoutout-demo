@@ -215,7 +215,8 @@ function shoutOutSmartOutcome(reply, lang, extra = {}) {
     model: extra.model || "startShoutOutCheckout",
     toolRounds: extra.toolRounds == null ? 1 : extra.toolRounds,
     uiLanguage: lang,
-    smartViews: Array.isArray(extra.smartViews) ? extra.smartViews : []
+    smartViews: Array.isArray(extra.smartViews) ? extra.smartViews : [],
+    shoutOutPreview: extra.shoutOutPreview || ""
   };
 }
 
@@ -236,7 +237,8 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
     return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
       model: "headless-draft",
       toolRounds: 0,
-      smartViews: []
+      smartViews: [],
+      shoutOutPreview: "closed"
     });
   }
   const merged = headless.mergeInteractiveDraft(previousDraft, parsed);
@@ -797,6 +799,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       consent,
       hasUsedBotDee: 1,
       smartViews: Array.isArray(outcome.smartViews) ? outcome.smartViews : [],
+      shoutOutPreview: outcome.shoutOutPreview || "",
       peopleSearch: outcome.peopleSearch || null,
       replyKey: outcome.replyKey || outcome.peopleSearch?.replyKey || "",
       geminiOnView: outcome.geminiOnView === true

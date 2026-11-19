@@ -51,7 +51,7 @@
       blurb: "Send a live message to a FloqR display.",
       href: pageUrl("./", {start: "search"}),
       action: "shoutout",
-      searchPhrases: ["headless shoutout", "shoutout smartview", "include my handle", "throw shoutout from chat"],
+      searchPhrases: ["headless shoutout", "shoutout smartview", "shoutout smartpreview", "include my handle", "throw shoutout from chat"],
       patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/, /christine/, /zebbies\s*garden/, /headless\s*shout/]
     },
     {

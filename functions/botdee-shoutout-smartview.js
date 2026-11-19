@@ -1,6 +1,6 @@
-/* BOT DEE ShoutOut SMARTview — chat preview of a headless draft.
-   Optional BOT DEE collection UI only. Headless compose / checkout
-   (headless-shoutout-core.js) never require this module. Third-party
+/* ShoutOut SMARTpreview — BOT DEE collection preview of a headless draft.
+   Optional BOT DEE UI only; docks above the composer. Headless compose /
+   checkout (headless-shoutout-core.js) never require this module. Third-party
    one-shot throws stay a payload contract. */
 "use strict";
 
@@ -30,20 +30,54 @@ function previewHref(draft = {}) {
 
 function suggestionPrompts() {
   return [
-    {id: "blackwhite", prompt: "Traditional"},
-    {id: "neon", prompt: "Neon"},
-    {id: "birthday", prompt: "Birthday"},
-    {id: "gold", prompt: "Gold"},
-    {id: "vip", prompt: "VIP"},
-    {id: "graduation", prompt: "Graduation"},
-    {id: "corporate", prompt: "Corporate"},
-    {id: "classicHalloween", prompt: "Halloween"},
-    {id: "includeHandle", prompt: "include my handle"},
-    {id: "skipHandle", prompt: "no handle"},
-    {id: "textOnly", prompt: "text only"},
-    {id: "photoCompose", prompt: "with a photo"},
-    {id: "throwIt", prompt: "throw it"}
+    {id: "blackwhite", prompt: "Traditional", group: "template"},
+    {id: "neon", prompt: "Neon", group: "template"},
+    {id: "birthday", prompt: "Birthday", group: "template"},
+    {id: "gold", prompt: "Gold", group: "template"},
+    {id: "vip", prompt: "VIP", group: "template"},
+    {id: "graduation", prompt: "Graduation", group: "template"},
+    {id: "corporate", prompt: "Corporate", group: "template"},
+    {id: "classicHalloween", prompt: "Halloween", group: "template"},
+    {id: "includeHandle", prompt: "include my handle", group: "handle"},
+    {id: "skipHandle", prompt: "no handle", group: "handle"},
+    {id: "textOnly", prompt: "text only", group: "media"},
+    {id: "photoCompose", prompt: "with a photo", group: "media"},
+    {id: "throwIt", prompt: "throw it", group: "throw"}
   ];
+}
+
+/** Three classic-board lines for the SMARTview replica. Not Display 1. */
+function previewLines(message = "") {
+  const perLine = 15;
+  const lineCount = 3;
+  const clean = String(message || "").replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim().toUpperCase();
+  if (!clean) return [];
+  const rows = [];
+  let row = [];
+  clean.split(/\s+/).filter(Boolean).forEach(word => {
+    const chunks = [];
+    for (let i = 0; i < word.length; i += perLine) chunks.push(word.slice(i, i + perLine));
+    chunks.forEach(chunk => {
+      const nextLen = row.length ? row.join("").length + 1 + chunk.length : chunk.length;
+      if (nextLen <= perLine) {
+        if (row.length) row.push(" ");
+        row.push(chunk);
+      } else if (rows.length < lineCount) {
+        if (row.length) rows.push(row.join(""));
+        row = [chunk];
+      }
+    });
+  });
+  if (row.length && rows.length < lineCount) rows.push(row.join(""));
+  return rows.slice(0, lineCount);
+}
+
+function boardSkin(templateId) {
+  const id = String(templateId || headless.DEFAULT_TEMPLATE_ID);
+  if (id === "classicHalloween") return "halloween";
+  if (id === "gold" || id === "vip") return "gold";
+  if (id === "neon" || id === "birthday") return "neon";
+  return "traditional";
 }
 
 function buildShoutOutSmartView(opts = {}) {
@@ -73,6 +107,9 @@ function buildShoutOutSmartView(opts = {}) {
     handleDecision: draft.handleDecision,
     mediaDecision: draft.mediaDecision,
     mediaUrl: draft.mediaUrl,
+    previewLines: previewLines(draft.message),
+    boardSkin: boardSkin(draft.templateId || headless.DEFAULT_TEMPLATE_ID),
+    currentStep: needs[0] || (mode === "draft" ? "throw" : ""),
     needs,
     templates: headless.listHeadlessTemplates(),
     suggestions: suggestionPrompts(),
@@ -93,6 +130,8 @@ module.exports = {
   SCHEMA_VERSION,
   KIND,
   previewHref,
+  previewLines,
+  boardSkin,
   suggestionPrompts,
   buildShoutOutSmartView,
   isShoutOutPayload

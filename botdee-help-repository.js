@@ -838,12 +838,13 @@
     },
     {
       id: "help-shoutout-headless-smartview",
-      title: "Headless ShoutOut SMARTview",
-      body: "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. A ShoutOut SMARTview previews those answers as you fill them. Reply in chat or tap a chip. Photo and video boards still open compose. A true headless throw from FloqR or a third party does not use this card — pass venue, message, and optional extras in one request.",
+      title: "ShoutOut SMARTpreview",
+      body: "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. Reply in chat or tap a chip. Photo and video boards still open compose. A true headless throw from FloqR or a third party does not use this card — pass venue, message, and optional extras in one request.",
       searchPhrases: [
-        "headless shoutout smartview", "shoutout smartview", "choose shoutout template",
-        "include my handle", "floqr card handle", "throw shoutout photo", "throw shoutout video",
-        "bot dee shoutout preview", "headless shoutout extras"
+        "headless shoutout smartview", "shoutout smartview", "shoutout smartpreview",
+        "choose shoutout template", "include my handle", "floqr card handle",
+        "throw shoutout photo", "throw shoutout video", "bot dee shoutout preview",
+        "headless shoutout extras", "smartpreview"
       ],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},

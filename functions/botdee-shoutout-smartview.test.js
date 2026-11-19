@@ -90,7 +90,7 @@ test("API compose honors handle + halloween from the payload", () => {
   assert.equal(composed.shoutout.attribution, "@DonPapi");
 });
 
-test("ShoutOut SMARTview paints a draft preview without submitting", () => {
+test("ShoutOut SMARTpreview paints a draft preview without submitting", () => {
   const draft = headless.mergeInteractiveDraft({}, headless.parseShoutOutExecute(
     "throw a shoutout at Decades that says Happy birthday Maya"
   ));
@@ -103,6 +103,27 @@ test("ShoutOut SMARTview paints a draft preview without submitting", () => {
   assert.match(view.previewHref, /preview=1/);
   assert.doesNotMatch(view.previewHref, /[?&]v=/);
   assert.ok(view.templates.some(row => row.id === "blackwhite"));
+  assert.deepEqual(view.previewLines, ["HAPPY BIRTHDAY", "MAYA"]);
+  assert.equal(view.boardSkin, "traditional");
+  assert.equal(view.currentStep, "template");
+});
+
+test("ShoutOut SMARTpreview LED replica is not an iframe of display.html", () => {
+  const client = read("botdee-smartview.js");
+  const css = read("botdee-smartview.css");
+  assert.match(client, /botdee-so-board/);
+  assert.match(client, /botdee-so-step/);
+  assert.match(client, /dockShoutOutPreview/);
+  assert.match(client, /ShoutOut SMARTpreview/);
+  assert.match(css, /data-skin="halloween"/);
+  const cardFn = client.slice(client.indexOf("function renderShoutOutCard"), client.indexOf("function bindShoutOutCard"));
+  assert.doesNotMatch(cardFn, /<iframe/);
+  const chat = read("bot-dee-chat.js");
+  assert.match(chat, /applyShoutOutPreviewFromViews/);
+  const page = read("botdee.html");
+  assert.match(page, /id="botDeeShoutOutPreviewDock"/);
+  const session = read("functions/bot-dee-functions.js");
+  assert.match(session, /shoutOutPreview: "closed"/);
 });
 
 test("BOT DEE session collects extras before mint; FloqR callable stays one-shot", () => {
