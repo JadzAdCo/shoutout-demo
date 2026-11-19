@@ -74,6 +74,12 @@ test("recap uses last two meaningful turns; action history is one line", () => {
   );
   const withHistory = p.appendActionHistory("Done.", [{kind: "checkout", status: "Open"}]);
   assert.match(withHistory, /Payment needed · Open · View/);
+  const helpCards = [
+    {label: "Throw a ShoutOut", href: "./?start=search", blurb: "LED message"},
+    {kind: "shoutout", label: "Open ShoutOut compose", href: "./shoutout-search.html?from=botdee"}
+  ];
+  assert.match(p.appendActionHistory("Here is what I found.", helpCards), /ShoutOut requested · Ready · View/);
+  assert.equal(p.appendActionHistory("Here is what I found.", []), "Here is what I found.");
 });
 
 function loadUi() {

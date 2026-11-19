@@ -92,7 +92,11 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   const contents = modelContext
     ? bot.contextToContents(modelContext, userPrompt)
     : bot.historyToContents(history, userPrompt);
-  const tools = [{functionDeclarations: bot.toolDeclarations(allowed)}];
+  const tools = [{
+    functionDeclarations: bot.toolDeclarations(allowed, {
+      omitContextualSearch: bot.omitContextualSearchForPrompt(userPrompt, allowed)
+    })
+  }];
   let lastSearch = null;
   const actionLinks = [];
   const mediaItems = [];
@@ -121,10 +125,24 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
     const calls = response.functionCalls || [];
     if (!calls.length) {
       const text = bot.extractText(response);
-      const replyRaw = text || bot.formatSearchFallback(lastSearch, lang, allowed);
+      const throwPack = bot.isShoutOutExecutePrompt(userPrompt)
+        && !bot.hasShoutOutActionLink(actionLinks)
+        ? bot.shoutOutExecuteFallback(lang, allowed)
+        : null;
+      const replyRaw = text
+        || (throwPack ? throwPack.reply : bot.formatSearchFallback(lastSearch, lang, allowed));
+      const resultCards = throwPack && !text
+        ? [...throwPack.results, ...actionLinks]
+        : [
+          ...(throwPack ? [] : bot.resultsForClient(lastSearch, lang)),
+          ...actionLinks
+        ];
       return {
-        reply: prefs.appendActionHistory(bot.sanitizeFeatureMentions(replyRaw, allowed), actionLinks),
-        results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
+        reply: prefs.appendActionHistory(
+          bot.sanitizeFeatureMentions(bot.redactPrivilegeReply(replyRaw), allowed),
+          actionLinks
+        ),
+        results: resultCards,
         media: mediaItems.slice(0, 8),
         provider: "gemini",
         model: bot.TEXT_MODEL,
@@ -155,17 +173,30 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
       bot.mediaFromToolResult(result).forEach(item => {
         if (!mediaItems.some(existing => existing.url === item.url)) mediaItems.push(item);
       });
-      responseParts.push(functionResponsePart(call, bot.stripMediaFromToolResult(result)));
+      responseParts.push(functionResponsePart(
+        call,
+        bot.stripPrivilegeFromToolResult(bot.stripMediaFromToolResult(result))
+      ));
     }
     contents.push({role: "user", parts: responseParts});
   }
 
+  const throwPack = bot.isShoutOutExecutePrompt(userPrompt)
+    && !bot.hasShoutOutActionLink(actionLinks)
+    ? bot.shoutOutExecuteFallback(lang, allowed)
+    : null;
+  const truncatedCards = throwPack
+    ? [...throwPack.results, ...actionLinks]
+    : [...bot.resultsForClient(lastSearch, lang), ...actionLinks];
   return {
     reply: prefs.appendActionHistory(
-      bot.sanitizeFeatureMentions(bot.formatSearchFallback(lastSearch, lang, allowed), allowed),
+      bot.sanitizeFeatureMentions(
+        bot.redactPrivilegeReply(throwPack ? throwPack.reply : bot.formatSearchFallback(lastSearch, lang, allowed)),
+        allowed
+      ),
       actionLinks
     ),
-    results: [...bot.resultsForClient(lastSearch, lang), ...actionLinks],
+    results: truncatedCards,
     media: mediaItems.slice(0, 8),
     provider: "gemini",
     model: bot.TEXT_MODEL,
@@ -175,10 +206,70 @@ async function runGeminiSession({apiKey, role, history, userPrompt, session, uiL
   };
 }
 
+async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures) {
+  const lang = bot.normalizeUiLanguage(uiLanguage);
+  const allowed = allowedFeatures || null;
+  const headless = require("./headless-shoutout-core");
+  const parsed = headless.parseShoutOutExecute(userPrompt);
+  if (!parsed.clubQuery || !parsed.message) {
+    return bot.shoutOutExecuteFallback(lang, allowed);
+  }
+  const tools = require("./bot-dee-tools");
+  const result = await tools.startShoutOutCheckout({
+    locationName: parsed.clubQuery,
+    clubLocationId: parsed.clubQuery,
+    mainText: parsed.message,
+    templateId: parsed.templateId,
+    screenFormatId: parsed.screenFormatId,
+    userPrompt,
+    returnBase: session?.request?.data?.returnBase
+  }, session.request);
+  const links = bot.linksFromToolResult(result, lang);
+  if (result?.ok && result.checkoutUrl) {
+    return {
+      reply: `Your ShoutOut at ${result.venueName || result.clubLocationId} is ready to pay. Open the secure Stripe link — I never take card numbers.`,
+      results: links,
+      provider: "headless-shoutout",
+      model: "startShoutOutCheckout",
+      toolRounds: 1,
+      uiLanguage: lang
+    };
+  }
+  if (result?.ok && result.shoutoutId) {
+    return {
+      reply: `Your ShoutOut is in for club approval at ${result.venueName || result.clubLocationId}. It will play after the venue accepts it.`,
+      results: links,
+      provider: "headless-shoutout",
+      model: "startShoutOutCheckout",
+      toolRounds: 1,
+      uiLanguage: lang
+    };
+  }
+  const fallback = bot.shoutOutExecuteFallback(lang, allowed);
+  return {
+    reply: result?.error || fallback.reply,
+    results: links.length ? links : fallback.results,
+    provider: "headless-shoutout",
+    model: "startShoutOutCheckout",
+    toolRounds: 1,
+    uiLanguage: lang
+  };
+}
+
 function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined, functionsReachable, geminiConfigured} = {}) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const isActive = !!active;
+  if (bot.isPrivilegeAskPrompt(userPrompt)) {
+    return {
+      reply: bot.privilegeRefuseReply(),
+      results: [],
+      provider: "local-privacy",
+      model: "privilege-guard",
+      toolRounds: 0,
+      uiLanguage: lang
+    };
+  }
   if (bot.isAckPrompt(userPrompt)) {
     return {
       reply: bot.ackReply(role, userPrompt),
@@ -256,6 +347,17 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
       uiLanguage: lang
     };
   }
+  if (bot.isShoutOutExecutePrompt(userPrompt)) {
+    const pack = bot.shoutOutExecuteFallback(lang, allowed);
+    return {
+      reply: pack.reply,
+      results: pack.results,
+      provider: pack.provider,
+      model: pack.model,
+      toolRounds: 0,
+      uiLanguage: lang
+    };
+  }
   const room = require("./botdee-room-smartview").buildRoomSession(userPrompt, {
     hasActiveRoom: false,
     declinedKeys: Array.isArray(roomSmartViewDeclined) ? roomSmartViewDeclined : []
@@ -272,7 +374,11 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
       replyKey: room.replyKey
     };
   }
-  const search = bot.localizeSearchPayload(bot.contextualSearch(userPrompt, role, allowed), lang, allowed);
+  const search = bot.localizeSearchPayload(
+    bot.contextualSearch(userPrompt, bot.geminiGroundingRole(role), allowed),
+    lang,
+    allowed
+  );
   return {
     reply: bot.sanitizeFeatureMentions(bot.formatSearchFallback(search, lang, allowed), allowed),
     results: bot.resultsForClient(search, lang),
@@ -365,6 +471,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         console.warn("BOT DEE execution load failed", err?.message || err);
       }
     }
+    // chatTitles are user-chosen + Chats labels only. Never put them in Gemini
+    // context (privilege-leak: a title must not carry Master Admin identity).
     const modelContext = execution.buildModelContext({
       turns: history,
       summary,
@@ -398,12 +506,17 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     });
 
     const apiKey = geminiKey();
+    let persistedConversationId = "";
     if (settings.durableThreads) {
       try {
-        await threads.persistUserTurn(uid, settings, storedUserText, {
+        const persistedUser = await threads.persistUserTurn(uid, settings, storedUserText, {
           receivedAtMs,
-          consent
+          consent,
+          conversationId: request.data?.conversationId
         });
+        if (persistedUser && persistedUser.conversationId) {
+          persistedConversationId = persistedUser.conversationId;
+        }
       } catch (err) {
         console.warn("BOT DEE persist user failed", err?.message || err);
         throw new HttpsError("unavailable", "BOT DEE could not save that message. Try again.");
@@ -424,6 +537,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       declinedKeys: roomDeclined
     });
     let peopleAttached = null;
+    const peopleIntent = peopleCards.classifyPeopleSearchIntent(userPrompt);
     if (!roomAttached.handled) {
       try {
         peopleAttached = await peopleCards.attachPeopleSearch({
@@ -462,8 +576,42 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         peopleSearch: peopleAttached.peopleSearch,
         geminiOnView: false
       };
+    } else if (bot.isShoutOutExecutePrompt(userPrompt)) {
+      try {
+        outcome = await tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures);
+      } catch (error) {
+        console.warn("BOT DEE headless ShoutOut failed", error?.message || error);
+        outcome = null;
+      }
+      if (!outcome) {
+        outcome = localSession(role, userPrompt, {
+          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+          functionsReachable: true,
+          geminiConfigured: !!apiKey
+        });
+      }
+    } else if (peopleIntent.intent !== "none") {
+      const peopleCore = require("./botdee-smartcard-core");
+      outcome = {
+        reply: peopleCore.fallbackReply("error"),
+        results: [],
+        provider: "people-smartcard",
+        model: "peopleSearch",
+        toolRounds: 0,
+        uiLanguage,
+        smartViews: [],
+        peopleSearch: {
+          schemaVersion: peopleCore.SCHEMA_VERSION,
+          mode: "error",
+          intent: peopleIntent.intent,
+          geminiOnView: false,
+          replyKey: peopleCore.replyKeyForMode("error")
+        },
+        geminiOnView: false
+      };
     } else if (
-      bot.isAckPrompt(userPrompt)
+      bot.isPrivilegeAskPrompt(userPrompt)
+      || bot.isAckPrompt(userPrompt)
       || bot.isMoodPrompt(userPrompt)
       || bot.isChitchatPrompt(userPrompt)
       || bot.isIdentityPrompt(userPrompt)
@@ -508,7 +656,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
           receivedAtMs,
           media: outcome.media,
           consent,
-          allowEmpty: versionCardOnly
+          allowEmpty: versionCardOnly,
+          conversationId: persistedConversationId
         });
         if (bot.isFarewellPrompt(userPrompt)) {
           await threads.markIdleEnded(uid, settings);
@@ -535,9 +684,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     console.info(JSON.stringify({
       event: "botdee.session",
       uid,
-      role,
       uiLanguage,
-      allowedFeatures,
       provider: outcome.provider,
       durable: !!settings.durableThreads,
       results: (outcome.results || []).length,
@@ -557,11 +704,14 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       toolRounds: outcome.toolRounds || 0,
       durable: !!settings.durableThreads,
       threadId: coercedThreadId || bot.threadIdForUid(uid),
+      conversationId: persistedConversationId,
       conversationIdleSeconds: settings.conversationIdleSeconds,
       consent,
       hasUsedBotDee: 1,
       smartViews: Array.isArray(outcome.smartViews) ? outcome.smartViews : [],
-      replyKey: outcome.replyKey || ""
+      peopleSearch: outcome.peopleSearch || null,
+      replyKey: outcome.replyKey || outcome.peopleSearch?.replyKey || "",
+      geminiOnView: outcome.geminiOnView === true
     };
   } catch (error) {
     throw asHttps(error);
@@ -673,6 +823,7 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
         hasUsedBotDee,
         personalization: prefs.normalizePersonalization({}, {profileFirstName}),
         profileFirstName,
+        chatTitles: {},
         [prefs.LAST_USED_FIELD]: 0
       };
     }
@@ -700,6 +851,34 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       retrievalFromSeq: state.retrievalFromSeq
     });
     const profileFirstName = await readProfileFirstName(uid);
+    const currentConversationId = threads.clipConversationId(state.currentConversationId)
+      || threads.conversationIdFromTurns(retrievalTurns);
+    const archiveConversationId = threads.clipConversationId(state.archiveConversationId)
+      || threads.conversationIdFromTurns(archiveTurns);
+    if (currentConversationId) {
+      retrievalTurns.forEach(row => {
+        if (row && !row.conversationId) row.conversationId = currentConversationId;
+      });
+    }
+    if (archiveConversationId) {
+      archiveTurns.forEach(row => {
+        if (row && !row.conversationId) row.conversationId = archiveConversationId;
+      });
+    }
+    const titleSlices = {
+      currentConversationId,
+      archiveConversationId,
+      liveConversationId: currentConversationId,
+      currentTurns: retrievalTurns,
+      archiveTurns
+    };
+    let chatTitles = threads.migrateChatTitles(state.chatTitles, titleSlices);
+    if (threads.chatTitlesNeedWrite(state.chatTitles)) {
+      try {
+        const saved = await threads.persistChatTitles(uid, state.chatTitles, Date.now(), titleSlices);
+        if (saved && saved.chatTitles) chatTitles = saved.chatTitles;
+      } catch (_) {}
+    }
     return {
       ok: true,
       durable: true,
@@ -710,11 +889,14 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
       consent: state.consent,
       hasUsedBotDee: state.hasUsedBotDee === 1 ? 1 : 0,
       conversationEpoch: state.conversationEpoch,
+      currentConversationId,
+      archiveConversationId,
       lastMessageAtMs: state.lastMessageAtMs,
       remainingMs: state.remainingMs,
       idleSeconds: settings.conversationIdleSeconds,
       personalization: prefs.normalizePersonalization(state.personalization, {profileFirstName}),
       profileFirstName,
+      chatTitles,
       [prefs.LAST_USED_FIELD]: Number(state[prefs.LAST_USED_FIELD]) || 0
     };
   } catch (error) {
@@ -722,9 +904,40 @@ exports.getBotDeeThread = onCall(GET_THREAD_OPTS, async request => {
   }
 });
 
+exports.renameBotDeeChat = onCall(GET_THREAD_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "Sign in to rename a BOT DEE chat.");
+    }
+    await audit.assertFeatureAccess(request.auth, "botDee", request);
+    const uid = request.auth.uid;
+    const result = await threads.renameChat(uid, request.data?.chatId, request.data?.title, Date.now(), {
+      conversationId: request.data?.conversationId
+    });
+    if (!result.ok) {
+      if (result.error === "invalid_chat_id" || result.error === "empty_title") {
+        throw new HttpsError("invalid-argument", "Enter a chat title.");
+      }
+      throw new HttpsError("failed-precondition", "Could not rename that chat.");
+    }
+    return {
+      ok: true,
+      chatId: result.chatId,
+      title: result.title,
+      chatTitles: result.chatTitles
+    };
+  } catch (error) {
+    if (error?.code === "permission-denied") {
+      throw new HttpsError("permission-denied", "You can only rename your own chats.");
+    }
+    throw asHttps(error);
+  }
+});
+
 exports.__botDeeHelpers = {
   runGeminiSession,
   localSession,
+  tryHeadlessShoutOut,
   geminiKey,
   BOT_DEE_SETTINGS_DOC
 };

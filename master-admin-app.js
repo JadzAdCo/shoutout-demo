@@ -192,6 +192,7 @@
     featuresVipPayments: "Features Mgmt · VIP reserV Payments",
     featuresBotDee: "Features Mgmt · BOT DEE",
     featuresAuditTrail: "Features Mgmt · Audit Trail",
+    smartvisualStudio: "SMARTvisual Studio",
     dataClassification: "Security · Data classification",
     adApprovalQueue: "Ad Management · Approval queue",
     adLiveCampaigns: "Ad Management · Live & scheduled",

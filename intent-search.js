@@ -212,6 +212,33 @@
       ]
     },
     {
+      id: "help-smartvisuals-notification",
+      kind: "help",
+      label: "Mingl Room SMARTnotification",
+      blurb: "Search can show a compact Mingl Room Invitation. View Invitation opens Room SMARTview. Art is illustration, not a photo.",
+      links: [{label: "Open Search", href: pageUrl("./", {start: "search"})}],
+      searchPhrases: [
+        "smartnotification", "mingl room invitation", "view invitation", "cancun trip",
+        "smartvisuals", "smartstencils", "smartbackgrounds"
+      ],
+      patterns: [
+        /smart\s*notification/,
+        /mingl\s+room\s+invitation/,
+        /smart\s*visual/,
+        /smart\s*stencil/,
+        /smart\s*background/
+      ]
+    },
+    {
+      id: "help-smartvisuals-room",
+      kind: "help",
+      label: "Room SMARTview with SMARTvisuals",
+      blurb: "Room SMARTview uses SMARTstencils and SMARTbackgrounds from the authorized room title. Join Now does not create a live room yet.",
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
+      searchPhrases: ["room smartview invitation", "join now mingl", "cancun trip room"],
+      patterns: [/join\s+now/, /room\s+smartview\s+invitation/]
+    },
+    {
       id: "help-post-ad",
       kind: "help",
       label: "Post an ad on FLOQR",
@@ -1072,6 +1099,7 @@
     "help-botdee-room-smartview": ["patron"], "help-botdee-room-smartview-invite": ["patron"], "help-botdee-room-smartview-join": ["patron"],
     "help-botdee-room-smartview-end": ["patron"], "help-botdee-room-smartview-tab": ["patron"], "help-botdee-room-smartview-who-pays": ["patron"],
     "help-botdee-room-smartview-kick": ["patron"], "help-botdee-room-smartview-share": ["patron"],
+    "help-smartvisuals-notification": ["patron"], "help-smartvisuals-room": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-profile-account-type": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],
     "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],

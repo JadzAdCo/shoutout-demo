@@ -2,8 +2,17 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.036";  const packs = {
+  const VERSION = "s3.3.041";
+  const packs = {
     "ru": {
+      "help-smartvisuals-notification": {
+        title: "SMARTnotification Mingl Room",
+        body: "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Реклама, если её одобрят, будет под карточкой с меткой Ad."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview и SMARTvisuals",
+        body: "Room SMARTview показывает приглашение Mingl: время, RSVP или эфир и «Присоединиться». SMARTstencils и SMARTbackgrounds следуют разрешённому названию — Cancun Trip даёт travel-иллюстрацию, не фото и не партнёрство. Личный чат BOT DEE не выбирает картинку. Групповые room ещё не в эфире; кнопка ничего не создаёт и не списывает. Слот Ad снизу пуст до отдельного одобрения."
+      },
       "help-scheduling-schedule-for": {
         title: "Расписание персонала",
         body: "Планируйте смены и букинги и уведомляйте каждого через Inbox, Email, SMS или WhatsApp. В разделе «Расписание для» выберите, с чьим календарём вы работаете: «Моё расписание DJ» — ваш собственный календарь, «Клуб» — клубы, которыми вы управляете, «Промо-компания» — компании, для которых вы промоутер. У каждого календаря своя подписка за 20 $ в месяц. Смены, назначенные вам, появляются в разделе «Мои назначения», где их можно подтвердить или отклонить."
@@ -30,11 +39,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "Спросить BOT DEE, кто это",
-        body: "«Who am I?» открывает ваш SMARTview. «Who is …» и имя или @хендл ищут публичные профили. Один результат — SMARTview. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
+        body: "«Who am I?» открывает ваш SMARTview. «Who is …», «What do you know of …» или «What about …» плюс имя и фамилия, display name или @хендл. Один результат — карточка People SMARTview в чате, не markdown и не сетка фото. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard людей",
-        body: "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: квадратное фото слева, имя, публичные хендлы, город и SMARTsummary на 4 строки справа. Нажмите карточку, чтобы открыть полный SMARTview. Это тот же публичный профиль и SMARTsummary. Открытие не вызывает Gemini."
+        body: "Если подходит несколько публичных профилей FLOQR, BOT DEE показывает компактные карточки в чате: сначала фото на всю ширину, затем имя и хендл, затем сжатый SMARTsummary без пустой рамки. Нажмите карточку, чтобы открыть полный SMARTview — та же укладка. Это тот же публичный профиль и SMARTsummary. Открытие не вызывает Gemini."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
@@ -490,6 +499,14 @@
       }
     },
     "nl": {
+      "help-smartvisuals-notification": {
+        title: "Mingl Room SMARTnotification",
+        body: "Op Zoeken kan een compacte Mingl Room-uitnodiging verschijnen. Uitnodiging bekijken opent Room SMARTview. Niet nu verbergt hem deze sessie. De art is SMARTbackground-illustratie met SMARTstencils — geen foto en geen officieel merkteken. Namen en RSVP komen alleen uit het room-record. Ads, indien ooit goedgekeurd, zitten eronder en blijven Ad."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview met SMARTvisuals",
+        body: "Room SMARTview toont de Mingl-uitnodiging: tijd, RSVP of live, en Nu deelnemen. SMARTstencils en SMARTbackgrounds volgen de goedgekeurde titel — Cancun Trip gebruikt reisart, geen echte foto of officieel partnerschap. Privé BOT DEE-chat kiest geen art. Groepsrooms zijn niet live; Deelnemen maakt niets en rekent niets. Een Ad-slot eronder blijft leeg tot aparte goedkeuring."
+      },
       "help-scheduling-schedule-for": {
         title: "Personeelsplanning",
         body: "Plan diensten en boekingen en laat iedereen het weten via Inbox, Email, SMS of WhatsApp. Kies onder 'Planning voor' aan welke agenda je werkt: 'Mijn DJ-planning' is je eigen agenda, 'Club' toont de clubs die je beheert en 'Promotiebedrijf' de bedrijven waarvoor je promoot. Elke agenda heeft een eigen abonnement van $ 20 per maand. Diensten die aan jou zijn toegewezen verschijnen onder 'Mijn toewijzingen', waar je ze bevestigt of weigert."
@@ -516,11 +533,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "BOT DEE vragen wie iemand is",
-        body: "“Who am I?” opent uw SMARTview. “Who is …” plus naam of @handle zoekt openbare profielen. Eén match opent SMARTview. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
+        body: "“Who am I?” opent uw SMARTview. “Who is …”, “What do you know of …” of “What about …” plus voor- en achternaam, weergavenaam of @handle. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst of fotogrid. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
       },
       "help-botdee-smartcard": {
         title: "Mensen-SMARTcards",
-        body: "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: vierkante foto links, naam, openbare handles, stad en een SMARTsummary van 4 regels rechts. Tik om de volledige SMARTview te openen. Kaarten gebruiken hetzelfde openbare profiel en dezelfde SMARTsummary. Openen roept Gemini niet aan."
+        body: "Als meer dan één openbaar FLOQR-profiel past, toont BOT DEE compacte mensen-SMARTcards in de chat: eerst een foto over de volle breedte, dan naam en handle, dan een compacte SMARTsummary zonder opgevulde box. Tik om de volledige SMARTview te openen — dezelfde stapeling. Kaarten gebruiken hetzelfde openbare profiel en dezelfde SMARTsummary. Openen roept Gemini niet aan."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
@@ -976,6 +993,14 @@
       }
     },
     "fr": {
+      "help-smartvisuals-notification": {
+        title: "SMARTnotification Mingl Room",
+        body: "Une invitation Mingl Room compacte peut s’afficher dans la Recherche. Voir l’invitation ouvre Room SMARTview. Pas maintenant la masque pour cette session. L’art est une illustration SMARTbackground avec SMARTstencils — pas une photo ni une marque officielle. Les noms et RSVP viennent uniquement du dossier de la room. Les pubs, si un jour approuvées, restent sous la carte avec le libellé Ad."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview et SMARTvisuals",
+        body: "Room SMARTview montre l’invitation Mingl : horaire, RSVP ou statut live, et Rejoindre. SMARTstencils et SMARTbackgrounds suivent le titre autorisé — Cancun Trip utilise un art voyage, pas une photo réelle ni un partenariat officiel. Le chat BOT DEE privé ne choisit jamais l’art. Les rooms de groupe ne sont pas en ligne ; Rejoindre ne crée rien et ne facture pas. Un slot Ad étiqueté peut rester dessous, vide jusqu’à approbation."
+      },
       "help-scheduling-schedule-for": {
         title: "Planification du personnel",
         body: "Planifiez des shifts et des bookings, puis prévenez chaque personne par Inbox, Email, SMS ou WhatsApp. Sous « Planning pour », choisissez le calendrier sur lequel vous travaillez : « Mon planning DJ » est votre propre calendrier, « Club » liste les clubs que vous gérez et « Société de promotion » les sociétés pour lesquelles vous faites la promotion. Chaque calendrier a son propre abonnement à 20 $/mois. Les shifts qui vous sont attribués apparaissent sous « Mes affectations », où vous les confirmez ou les refusez."
@@ -1002,11 +1027,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "Demander à BOT DEE qui est quelqu’un",
-        body: "« Who am I ? » ouvre votre SMARTview. « Who is … » plus un nom ou @identifiant cherche les profils publics. Un résultat ouvre SMARTview. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existence du compte."
+        body: "« Who am I ? » ouvre votre SMARTview. « Who is … », « What do you know of … » ou « What about … » plus prénom et nom, nom d’affichage ou @identifiant. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown ni une grille de photos. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existence du compte."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards Personnes",
-        body: "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo carrée à gauche, nom, identifiants publics, ville et SMARTsummary de 4 lignes à droite. Touchez une carte pour ouvrir le SMARTview complet. Les cartes utilisent le même profil public et le même SMARTsummary que SMARTview. Ouvrir une carte n’appelle pas Gemini."
+        body: "Quand plusieurs profils publics FLOQR correspondent, BOT DEE affiche des SMARTcards compactes dans le chat : photo pleine largeur d’abord, puis nom et identifiant, puis un SMARTsummary compact sans boîte remplie. Touchez une carte pour ouvrir le SMARTview complet — même empilement. Les cartes utilisent le même profil public et le même SMARTsummary que SMARTview. Ouvrir une carte n’appelle pas Gemini."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
@@ -1462,6 +1487,14 @@
       }
     },
     "de": {
+      "help-smartvisuals-notification": {
+        title: "Mingl Room SMARTnotification",
+        body: "Auf der Suche kann eine kompakte Mingl-Room-Einladung erscheinen. Einladung ansehen öffnet Room SMARTview. Nicht jetzt blendet sie für diese Sitzung aus. Die Grafik ist SMARTbackground-Illustration mit SMARTstencils — kein Foto, kein offizielles Zeichen. Namen und RSVP kommen nur aus dem Room-Datensatz. Anzeigen sitzen darunter und bleiben mit Ad gekennzeichnet."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview mit SMARTvisuals",
+        body: "Room SMARTview zeigt die Mingl-Einladung: Zeit, RSVP oder Live, Jetzt beitreten. SMARTstencils und SMARTbackgrounds folgen dem freigegebenen Titel — Cancun Trip nutzt Reisekunst, kein echtes Foto, keine Partnerschaft. Privater BOT-DEE-Chat wählt keine Grafik. Gruppenräume sind nicht live; Beitreten erzeugt nichts und belastet nicht. Ein Ad-Slot darunter bleibt leer bis zur Freigabe."
+      },
       "help-scheduling-schedule-for": {
         title: "Mitarbeiterplanung",
         body: "Plane Schichten und Bookings und benachrichtige jede Person per Inbox, Email, SMS oder WhatsApp. Unter „Planen für“ wählst du, wessen Kalender du bearbeitest: „Mein DJ-Plan“ ist dein eigener Kalender, „Club“ zeigt die Clubs, die du verwaltest, und „Promo-Firma“ die Firmen, für die du promotest. Jeder Kalender hat sein eigenes Abo für 20 $/Monat. Schichten für dich erscheinen unter „Meine Einsätze“, wo du sie bestätigst oder ablehnst."
@@ -1488,11 +1521,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "BOT DEE fragen, wer jemand ist",
-        body: "„Who am I?“ öffnet Ihre SMARTview. „Who is …“ plus Name oder @Handle sucht öffentliche Profile. Ein Treffer öffnet SMARTview. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
+        body: "„Who am I?“ öffnet Ihre SMARTview. „Who is …“, „What do you know of …“ oder „What about …“ plus Vor- und Nachname, Anzeigename oder @Handle. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste und kein Fotogitter. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
       },
       "help-botdee-smartcard": {
         title: "Personen-SMARTcards",
-        body: "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: quadratisches Foto links, Name, öffentliche Handles, Stadt und 4-zeilige SMARTsummary rechts. Tippen öffnet die volle SMARTview. Karten nutzen dasselbe öffentliche Profil und dieselbe SMARTsummary. Öffnen ruft Gemini nicht auf."
+        body: "Wenn mehrere öffentliche FLOQR-Profile passen, zeigt BOT DEE kompakte Personen-SMARTcards im Chat: zuerst das Foto in voller Breite, dann Name und Handle, dann eine kompakte SMARTsummary ohne gepolsterte Box. Tippen öffnet die volle SMARTview — dasselbe Layout. Karten nutzen dasselbe öffentliche Profil und dieselbe SMARTsummary. Öffnen ruft Gemini nicht auf."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
@@ -1948,6 +1981,14 @@
       }
     },
     "es": {
+      "help-smartvisuals-notification": {
+        title: "SMARTnotification de Mingl Room",
+        body: "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Los anuncios, si se aprueban, van debajo con la etiqueta Ad."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview con SMARTvisuals",
+        body: "Room SMARTview muestra la invitación Mingl: horario, RSVP o en vivo, y Unirse. SMARTstencils y SMARTbackgrounds siguen el título autorizado — Cancun Trip usa arte de viaje, no foto real ni alianza oficial. El chat privado de BOT DEE no elige el arte. Las rooms de grupo no están en vivo; Unirse no crea ni cobra. Un hueco Ad etiquetado puede quedar debajo, vacío hasta otra aprobación."
+      },
       "help-scheduling-schedule-for": {
         title: "Planificación del personal",
         body: "Planifica turnos y contrataciones y avisa a cada persona por Inbox, Email, SMS o WhatsApp. En «Horario de», elige el calendario con el que trabajas: «Mi horario de DJ» es tu propio calendario, «Club» muestra los clubs que administras y «Empresa de promoción» las empresas para las que promocionas. Cada calendario tiene su propia suscripción de 20 $/mes. Los turnos que te asignan aparecen en «Mis asignaciones», donde los confirmas o rechazas."
@@ -1974,11 +2015,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "Preguntar a BOT DEE quién es alguien",
-        body: "«Who am I?» abre su SMARTview. «Who is …» más un nombre o @identificador busca perfiles públicos. Un resultado abre SMARTview. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
+        body: "«Who am I?» abre su SMARTview. «Who is …», «What do you know of …» o «What about …» más nombre y apellido, nombre para mostrar o @identificador. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown ni una cuadrícula de fotos. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards de personas",
-        body: "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: foto cuadrada a la izquierda, nombre, identificadores públicos, ciudad y SMARTsummary de 4 líneas a la derecha. Toque una tarjeta para abrir el SMARTview completo. Las tarjetas usan el mismo perfil público y SMARTsummary. Abrir una tarjeta no llama a Gemini."
+        body: "Si coinciden varios perfiles públicos de FLOQR, BOT DEE muestra SMARTcards compactas en el chat: primero la foto a todo el ancho, luego nombre y @identificador, luego un SMARTsummary compacto sin caja rellena. Toque una tarjeta para abrir el SMARTview completo — el mismo apilado. Las tarjetas usan el mismo perfil público y SMARTsummary. Abrir una tarjeta no llama a Gemini."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
@@ -2434,6 +2475,14 @@
       }
     },
     "it": {
+      "help-smartvisuals-notification": {
+        title: "SMARTnotification Mingl Room",
+        body: "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Gli ads, se approvati, restano sotto con etichetta Ad."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview con SMARTvisuals",
+        body: "Room SMARTview mostra l’invito Mingl: orario, RSVP o live, e Entra ora. SMARTstencils e SMARTbackgrounds seguono il titolo autorizzato — Cancun Trip usa arte di viaggio, non una foto reale né una partnership. La chat privata BOT DEE non sceglie l’arte. Le room di gruppo non sono live; Entra non crea e non addebita. Uno slot Ad sotto resta vuoto fino ad approvazione."
+      },
       "help-scheduling-schedule-for": {
         title: "Pianificazione del personale",
         body: "Pianifica turni e ingaggi, poi avvisa ogni persona tramite Inbox, Email, SMS o WhatsApp. In «Turni per» scegli il calendario su cui lavori: «Il mio calendario DJ» è il tuo calendario, «Club» elenca i club che gestisci e «Società di promozione» le società per cui fai promozione. Ogni calendario ha il proprio abbonamento da 20 $/mese. I turni assegnati a te compaiono in «I miei incarichi», dove li confermi o li rifiuti."
@@ -2460,11 +2509,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "Chiedere a BOT DEE chi è qualcuno",
-        body: "“Who am I?” apre il tuo SMARTview. “Who is …” più nome o @handle cerca profili pubblici. Un risultato apre SMARTview. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
+        body: "“Who am I?” apre il tuo SMARTview. “Who is …”, “What do you know of …” o “What about …” più nome e cognome, nome visualizzato o @handle. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown né una griglia di foto. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard persone",
-        body: "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: foto quadrata a sinistra, nome, handle pubblici, città e SMARTsummary di 4 righe a destra. Tocca una scheda per aprire lo SMARTview completo. Le schede usano lo stesso profilo pubblico e SMARTsummary. Aprire una scheda non chiama Gemini."
+        body: "Se più profili pubblici FLOQR corrispondono, BOT DEE mostra SMARTcard compatte in chat: prima la foto a tutta larghezza, poi nome e handle, poi un SMARTsummary compatto senza riquadro imbottito. Tocca una scheda per aprire lo SMARTview completo — stesso impilamento. Le schede usano lo stesso profilo pubblico e SMARTsummary. Aprire una scheda non chiama Gemini."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
@@ -2920,6 +2969,14 @@
       }
     },
     "pt": {
+      "help-smartvisuals-notification": {
+        title: "SMARTnotification Mingl Room",
+        body: "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Anúncios, se aprovados, ficam abaixo com a etiqueta Ad."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview com SMARTvisuals",
+        body: "O Room SMARTview mostra o convite Mingl: horário, RSVP ou direto, e Entrar agora. SMARTstencils e SMARTbackgrounds seguem o título autorizado — Cancun Trip usa arte de viagem, não foto real nem parceria oficial. O chat privado BOT DEE não escolhe a arte. Rooms de grupo ainda não estão live; Entrar não cria nem cobra. Um espaço Ad abaixo fica vazio até aprovação à parte."
+      },
       "help-scheduling-schedule-for": {
         title: "Agendamento de pessoal",
         body: "Planeje turnos e contratações e avise cada pessoa por Inbox, Email, SMS ou WhatsApp. Em «Escala de», escolha em qual agenda você está trabalhando: «Minha agenda de DJ» é a sua própria agenda, «Clube» lista os clubes que você administra e «Empresa de promoção» as empresas para as quais você promove. Cada agenda tem sua própria assinatura de US$ 20/mês. Os turnos enviados para você aparecem em «Minhas atribuições», onde você os confirma ou recusa."
@@ -2946,11 +3003,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "Perguntar ao BOT DEE quem é alguém",
-        body: "“Who am I?” abre o seu SMARTview. “Who is …” mais um nome ou @handle procura perfis públicos. Um resultado abre o SMARTview. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
+        body: "“Who am I?” abre o seu SMARTview. “Who is …”, “What do you know of …” ou “What about …” mais nome e apelido, nome de exibição ou @handle. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown nem uma grelha de fotos. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards de pessoas",
-        body: "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto quadrada à esquerda, nome, handles públicos, cidade e SMARTsummary de 4 linhas à direita. Toque para abrir o SMARTview completo. As cards usam o mesmo perfil público e SMARTsummary. Abrir não chama o Gemini."
+        body: "Quando mais de um perfil público FLOQR corresponde, o BOT DEE mostra SMARTcards compactas no chat: foto em largura total primeiro, depois nome e handle, depois um SMARTsummary compacto sem caixa preenchida. Toque para abrir o SMARTview completo — o mesmo empilhamento. As cards usam o mesmo perfil público e SMARTsummary. Abrir não chama o Gemini."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
@@ -3406,6 +3463,14 @@
       }
     },
     "el": {
+      "help-smartvisuals-notification": {
+        title: "SMARTnotification Mingl Room",
+        body: "Στην Αναζήτηση μπορεί να εμφανιστεί συμπαγής πρόσκληση Mingl Room. Η προβολή ανοίγει το Room SMARTview. Όχι τώρα την κρύβει σε αυτή τη συνεδρία. Η εικόνα είναι εικονογράφηση SMARTbackground με SMARTstencils — όχι φωτογραφία ούτε επίσημο σήμα. Ονόματα και RSVP μόνο από την εγγραφή room. Οι διαφημίσεις, αν εγκριθούν, μένουν κάτω με ετικέτα Ad."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview με SMARTvisuals",
+        body: "Το Room SMARTview δείχνει την πρόσκληση Mingl: ώρα, RSVP ή ζωντανά, και Συμμετοχή τώρα. SMARTstencils και SMARTbackgrounds ακολουθούν τον εγκεκριμένο τίτλο — το Cancun Trip χρησιμοποιεί ταξιδιωτική τέχνη, όχι πραγματική φωτογραφία ούτε επίσημη συνεργασία. Η ιδιωτική συνομιλία BOT DEE δεν διαλέγει τέχνη. Οι ομαδικές room δεν είναι ζωντανές· η Συμμετοχή δεν δημιουργεί ούτε χρεώνει. Ένα Ad slot από κάτω μένει κενό μέχρι ξεχωριστή έγκριση."
+      },
       "help-scheduling-schedule-for": {
         title: "Προγραμματισμός προσωπικού",
         body: "Σχεδιάστε βάρδιες και κρατήσεις και ειδοποιήστε κάθε άτομο μέσω Inbox, Email, SMS ή WhatsApp. Στο «Πρόγραμμα για» επιλέξτε σε ποιο ημερολόγιο δουλεύετε: «Το πρόγραμμά μου ως DJ» είναι το δικό σας ημερολόγιο, το «Club» δείχνει τα clubs που διαχειρίζεστε και η «Εταιρεία προώθησης» τις εταιρείες για τις οποίες κάνετε προώθηση. Κάθε ημερολόγιο έχει τη δική του συνδρομή 20 $/μήνα. Οι βάρδιες που σας ανατίθενται εμφανίζονται στις «Οι αναθέσεις μου», όπου τις επιβεβαιώνετε ή τις απορρίπτετε."
@@ -3432,11 +3497,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
-        body: "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …» και όνομα ή @handle ψάχνει δημόσια προφίλ. Ένα αποτέλεσμα ανοίγει SMARTview. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
+        body: "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …», «What do you know of …» ή «What about …» με όνομα και επώνυμο, εμφανιζόμενο όνομα ή @handle. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown ούτε πλέγμα φωτογραφιών. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard ατόμων",
-        body: "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: τετράγωνη φωτογραφία αριστερά, όνομα, δημόσια handles, πόλη και SMARTsummary 4 γραμμών δεξιά. Πατήστε για πλήρες SMARTview. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SMARTsummary. Το άνοιγμα δεν καλεί Gemini."
+        body: "Όταν ταιριάζουν περισσότερα δημόσια προφίλ FLOQR, ο BOT DEE δείχνει συμπαγείς SMARTcard στη συνομιλία: πρώτα φωτογραφία σε πλήρες πλάτος, μετά όνομα και handle, μετά συμπαγές SMARTsummary χωρίς γεμάτο πλαίσιο. Πατήστε για πλήρες SMARTview — ίδια στοίβαξη. Οι κάρτες χρησιμοποιούν το ίδιο δημόσιο προφίλ και SMARTsummary. Το άνοιγμα δεν καλεί Gemini."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
@@ -3892,6 +3957,14 @@
       }
     },
     "pl": {
+      "help-smartvisuals-notification": {
+        title: "SMARTnotification Mingl Room",
+        body: "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Reklamy, jeśli kiedyś zatwierdzone, zostają pod kartą z etykietą Ad."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview ze SMARTvisuals",
+        body: "Room SMARTview pokazuje zaproszenie Mingl: czas, RSVP lub na żywo i Dołącz teraz. SMARTstencils i SMARTbackgrounds idą za zatwierdzonym tytułem — Cancun Trip to sztuka podróży, nie zdjęcie i nie partnerstwo. Prywatny czat BOT DEE nie dobiera grafiki. Pokoje grupowe nie są live; Dołącz nic nie tworzy i nie obciąża. Slot Ad poniżej zostaje pusty do osobnej zgody."
+      },
       "help-scheduling-schedule-for": {
         title: "Planowanie personelu",
         body: "Planuj zmiany i bookingi, a potem powiadamiaj każdą osobę przez Inbox, Email, SMS lub WhatsApp. W sekcji „Grafik dla” wybierz, czyim kalendarzem się zajmujesz: „Mój grafik DJ” to twój własny kalendarz, „Klub” pokazuje kluby, którymi zarządzasz, a „Firma promocyjna” firmy, dla których promujesz. Każdy kalendarz ma własną subskrypcję za 20 $/miesiąc. Zmiany przypisane tobie pojawiają się w „Moje przydziały”, gdzie je potwierdzasz lub odrzucasz."
@@ -3918,11 +3991,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "Zapytaj BOT DEE, kim ktoś jest",
-        body: "„Who am I?” otwiera Twoje SMARTview. „Who is …” plus imię lub @handle szuka publicznych profili. Jeden wynik otwiera SMARTview. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
+        body: "„Who am I?” otwiera Twoje SMARTview. „Who is …”, „What do you know of …” lub „What about …” plus imię i nazwisko, nazwa wyświetlana lub @handle. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown ani siatkę zdjęć. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard osób",
-        body: "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: kwadratowe zdjęcie po lewej, imię, publiczne handlе, miasto i 4-wierszowe SMARTsummary po prawej. Dotknij, aby otworzyć pełny SMARTview. Karty używają tego samego profilu i SMARTsummary. Otwarcie nie wywołuje Gemini."
+        body: "Gdy pasuje więcej niż jeden publiczny profil FLOQR, BOT DEE pokazuje zwarte karty w czacie: najpierw zdjęcie na pełną szerokość, potem imię i handle, potem zwarty SMARTsummary bez wypełnionego pola. Dotknij, aby otworzyć pełny SMARTview — ten sam układ. Karty używają tego samego profilu i SMARTsummary. Otwarcie nie wywołuje Gemini."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
@@ -4378,6 +4451,14 @@
       }
     },
     "ar": {
+      "help-smartvisuals-notification": {
+        title: "SMARTnotification لـ Mingl Room",
+        body: "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. الإعلانات إن وُافق عليها تبقى أسفل البطاقة بوسم Ad."
+      },
+      "help-smartvisuals-room": {
+        title: "Room SMARTview مع SMARTvisuals",
+        body: "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. موضع Ad الموسوم أسفل البطاقة يبقى فارغًا حتى موافقة منفصلة."
+      },
       "help-scheduling-schedule-for": {
         title: "جداول الموظفين",
         body: "خطّط المناوبات والحجوزات ثم أبلغ كل شخص عبر Inbox أو Email أو SMS أو WhatsApp. من «الجدول لـ» اختر التقويم الذي تعمل عليه: «جدولي كـ DJ» هو تقويمك الخاص، و«نادٍ» يعرض النوادي التي تديرها، و«شركة ترويج» يعرض الشركات التي تروّج لها. لكل تقويم اشتراكه الخاص بـ 20 دولارًا شهريًا. تظهر المناوبات المسندة إليك في «مهامي» حيث تؤكدها أو ترفضها."
@@ -4404,11 +4485,11 @@
       },
       "help-botdee-smartcard-search": {
         title: "اسأل BOT DEE من هذا الشخص",
-        body: "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» مع اسم أو @معرّف يبحث عن الملفات العامة. نتيجة واحدة تفتح SMARTview. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
+        body: "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» أو «What about …» مع الاسم الأول والأخير أو الاسم المعروض أو @معرّف. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown أو شبكة صور. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard الأشخاص",
-        body: "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: صورة مربعة يسارًا، الاسم والمعرّفات العامة والمدينة وSMARTsummary من 4 أسطر يمينًا. اضغط لفتح SMARTview الكامل. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
+        body: "عندما يطابق أكثر من ملف FLOQR عام، يعرض BOT DEE بطاقات مضغوطة في الدردشة: الصورة بعرض كامل أولاً، ثم الاسم والمعرّف، ثم SMARTsummary مضغوط بلا صندوق مبطّن. اضغط لفتح SMARTview الكامل — نفس الترتيب. البطاقات تستخدم نفس الملف العام وSMARTsummary. الفتح لا يستدعي Gemini."
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",

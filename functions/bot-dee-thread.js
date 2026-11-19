@@ -3,6 +3,7 @@
    Opt-in archive lives under archive/ and is not cleared by the 300s idle pause. */
 "use strict";
 
+const crypto = require("crypto");
 const admin = require("firebase-admin");
 const bot = require("./bot-dee-core");
 const prefs = require("./botdee-personalization");
@@ -38,9 +39,320 @@ function emptyState(settings) {
     personalization: prefs.normalizePersonalization({}),
     retrievalFromSeq: 0,
     sessionReset: false,
+    chatTitles: {},
+    currentConversationId: "",
+    archiveConversationId: "",
     [prefs.LAST_USED_FIELD]: 0,
     [prefs.SESSION_RESET_FIELD]: 0
   };
+}
+
+const CHAT_TITLE_MAX = 80;
+const CONVERSATION_ID_RE = bot.CONVERSATION_ID_RE;
+const LEGACY_HASH_ID_RE = /^c_[0-9a-f]{16}$/;
+const SLOT_CHAT_ID_RE = /^(live|current|archive)$/;
+const CHAT_ID_RE = CONVERSATION_ID_RE;
+const STABLE_CHAT_ID_RE = CONVERSATION_ID_RE;
+
+function clipChatTitle(raw) {
+  return String(raw || "")
+    .replace(/[\u0000-\u001f\u007f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, CHAT_TITLE_MAX);
+}
+
+function clipConversationId(raw) {
+  return bot.clipConversationId(raw);
+}
+
+function mintConversationId() {
+  return `cv_${crypto.randomBytes(16).toString("hex")}`;
+}
+
+function fnv1a(str, seed) {
+  let h = (Number(seed) >>> 0) || 2166136261;
+  const s = String(str || "");
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h;
+}
+
+function normalizeFirstUserLine(raw) {
+  return String(raw || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 80);
+}
+
+/** Legacy hash of first user text. Kept only to migrate leftover c_ keys onto conversationId. */
+function conversationIdFromFirstUser(text) {
+  const line = normalizeFirstUserLine(text);
+  if (!line) return "";
+  const a = fnv1a(line, 2166136261).toString(16).padStart(8, "0");
+  const b = fnv1a(line, 0x811c9dc5 ^ 0x01000193).toString(16).padStart(8, "0");
+  return `c_${a}${b}`;
+}
+
+function firstUserTextFromTurns(turns) {
+  const row = (Array.isArray(turns) ? turns : []).find(
+    item => item && (item.role === "user" || item.role === "User") && String(item.text || "").trim()
+  );
+  return row ? String(row.text).trim() : "";
+}
+
+function conversationIdFromTurns(turns) {
+  const list = Array.isArray(turns) ? turns : [];
+  for (let i = 0; i < list.length; i += 1) {
+    const id = clipConversationId(list[i] && list[i].conversationId);
+    if (id) return id;
+  }
+  return "";
+}
+
+function stampConversation(turn, conversationId) {
+  const id = clipConversationId(conversationId);
+  if (!turn || !id) return turn;
+  turn.conversationId = id;
+  return turn;
+}
+
+function eventFields(base, conversationId) {
+  const id = clipConversationId(conversationId);
+  return id ? {...base, conversationId: id} : base;
+}
+
+function resolveConversationIds(prev, nextEpoch, clientId) {
+  const row = prev && typeof prev === "object" ? prev : {};
+  const prevEpoch = Math.max(1, Math.floor(Number(row.conversationEpoch) || 1));
+  let current = clipConversationId(row.currentConversationId);
+  let archive = clipConversationId(row.archiveConversationId);
+  const client = clipConversationId(clientId);
+  if (nextEpoch > prevEpoch) {
+    archive = current || archive;
+    current = client && client !== archive ? client : mintConversationId();
+    return {currentConversationId: current, archiveConversationId: archive};
+  }
+  if (!current) current = client || mintConversationId();
+  return {currentConversationId: current, archiveConversationId: archive};
+}
+
+function threadConversationPatch(ids) {
+  const patch = {};
+  const current = clipConversationId(ids && ids.currentConversationId);
+  const archive = clipConversationId(ids && ids.archiveConversationId);
+  if (current) patch.currentConversationId = current;
+  if (archive) patch.archiveConversationId = archive;
+  return patch;
+}
+
+function titleSlicesFrom(ids, currentTurns, archiveTurns) {
+  const current = clipConversationId(ids && ids.currentConversationId);
+  const archive = clipConversationId(ids && ids.archiveConversationId);
+  return {
+    currentConversationId: current,
+    archiveConversationId: archive,
+    liveConversationId: current,
+    currentTurns: currentTurns || [],
+    archiveTurns: archiveTurns || []
+  };
+}
+
+function clipTitleRow(row) {
+  const title = clipChatTitle(typeof row === "string" ? row : row?.title);
+  if (!title) return null;
+  return {
+    title,
+    updatedAtMs: Math.max(0, Math.floor(Number(row?.updatedAtMs) || 0))
+  };
+}
+
+function isTitleMapKey(id) {
+  return CONVERSATION_ID_RE.test(id) || LEGACY_HASH_ID_RE.test(id) || SLOT_CHAT_ID_RE.test(id);
+}
+
+/** Display labels for + Chats rows. Never sent to Gemini. Keeps leftover slot / hash keys until migrate. */
+function normalizeChatTitles(raw) {
+  const src = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  const out = {};
+  Object.keys(src).forEach(id => {
+    if (!isTitleMapKey(id)) return;
+    const row = clipTitleRow(src[id]);
+    if (!row) return;
+    out[id] = row;
+  });
+  return out;
+}
+
+function migrateChatTitles(raw, slices) {
+  const src = normalizeChatTitles(raw);
+  const map = slices && typeof slices === "object" ? slices : {};
+  const currentId = clipConversationId(map.currentConversationId)
+    || conversationIdFromTurns(map.currentTurns || map.current);
+  const archiveId = clipConversationId(map.archiveConversationId)
+    || conversationIdFromTurns(map.archiveTurns || map.archive);
+  const liveId = clipConversationId(map.liveConversationId)
+    || conversationIdFromTurns(map.liveTurns || map.live)
+    || currentId;
+  const out = {};
+  Object.keys(src).forEach(id => {
+    if (CONVERSATION_ID_RE.test(id)) out[id] = src[id];
+  });
+  const slotIds = {live: liveId, current: currentId, archive: archiveId};
+  ["live", "current", "archive"].forEach(slot => {
+    const row = src[slot];
+    const id = slotIds[slot];
+    if (!row || !id || out[id]) return;
+    out[id] = row;
+  });
+  const claimedHashes = new Set();
+  const hashTargets = [
+    [currentId, map.currentTurns || map.current, map.firstUserText],
+    [archiveId, map.archiveTurns || map.archive, ""],
+    [liveId, map.liveTurns || map.live, ""]
+  ];
+  hashTargets.forEach(([id, turns, extraText]) => {
+    if (!id) return;
+    const hashed = conversationIdFromFirstUser(firstUserTextFromTurns(turns) || extraText);
+    if (hashed && src[hashed]) {
+      if (!out[id]) out[id] = src[hashed];
+      claimedHashes.add(hashed);
+    }
+  });
+  const leftoverHashes = Object.keys(src).filter(id => LEGACY_HASH_ID_RE.test(id) && !claimedHashes.has(id));
+  if (currentId && leftoverHashes.length === 1 && !out[currentId]) {
+    out[currentId] = src[leftoverHashes[0]];
+    claimedHashes.add(leftoverHashes[0]);
+  }
+  Object.keys(src).forEach(id => {
+    if (LEGACY_HASH_ID_RE.test(id) && !claimedHashes.has(id)) out[id] = src[id];
+  });
+  return out;
+}
+
+function chatTitlesNeedWrite(raw) {
+  const src = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  return Object.keys(src).some(id => SLOT_CHAT_ID_RE.test(id));
+}
+
+function chatTitlesNeedMigrate(raw, slices) {
+  if (chatTitlesNeedWrite(raw)) return true;
+  const src = normalizeChatTitles(raw);
+  const next = migrateChatTitles(raw, slices);
+  const srcHashes = Object.keys(src).filter(id => LEGACY_HASH_ID_RE.test(id));
+  const nextHashes = Object.keys(next).filter(id => LEGACY_HASH_ID_RE.test(id));
+  return nextHashes.length < srcHashes.length;
+}
+
+async function persistChatTitles(uid, titles, nowMs, slices) {
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const now = Number(nowMs) || Date.now();
+  const extra = slices && typeof slices === "object" ? slices : {};
+  let next = migrateChatTitles(titles, extra);
+  let skipped = false;
+  await db().runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) {
+      skipped = true;
+      return;
+    }
+    const prev = snap.data() || {};
+    if (prev.uid && prev.uid !== uid) {
+      const err = new Error("owner_mismatch");
+      err.code = "permission-denied";
+      throw err;
+    }
+    if (!chatTitlesNeedWrite(prev.chatTitles)) {
+      skipped = true;
+      next = migrateChatTitles(prev.chatTitles, extra);
+      return;
+    }
+    const ids = {
+      currentConversationId: clipConversationId(prev.currentConversationId)
+        || clipConversationId(extra.currentConversationId)
+        || conversationIdFromTurns(extra.currentTurns || extra.current)
+        || mintConversationId(),
+      archiveConversationId: clipConversationId(prev.archiveConversationId)
+        || clipConversationId(extra.archiveConversationId)
+        || conversationIdFromTurns(extra.archiveTurns || extra.archive)
+    };
+    next = migrateChatTitles(prev.chatTitles, {...extra, ...ids});
+    const patch = {
+      chatTitles: next,
+      updatedAtMs: now
+    };
+    if (!clipConversationId(prev.currentConversationId) && ids.currentConversationId) {
+      patch.currentConversationId = ids.currentConversationId;
+    }
+    if (!clipConversationId(prev.archiveConversationId) && ids.archiveConversationId) {
+      patch.archiveConversationId = ids.archiveConversationId;
+    }
+    tx.update(ref, patch);
+  });
+  return {ok: true, skipped, chatTitles: next};
+}
+
+async function renameChat(uid, chatId, title, nowMs, opts) {
+  const extra = opts && typeof opts === "object" && !Array.isArray(opts) ? opts : {};
+  let id = clipConversationId(chatId) || clipConversationId(extra.conversationId);
+  if (!id && LEGACY_HASH_ID_RE.test(String(chatId || "").trim())) {
+    id = String(chatId).trim();
+  }
+  if (!CONVERSATION_ID_RE.test(id) && !LEGACY_HASH_ID_RE.test(id)) {
+    return {ok: false, error: "invalid_chat_id"};
+  }
+  const clipped = clipChatTitle(title);
+  if (!clipped) return {ok: false, error: "empty_title"};
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const now = Number(nowMs) || Date.now();
+  let titles = {};
+  await db().runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    const prev = snap.exists ? snap.data() || {} : {};
+    if (prev.uid && prev.uid !== uid) {
+      const err = new Error("owner_mismatch");
+      err.code = "permission-denied";
+      throw err;
+    }
+    const slices = extra.slices || titleSlicesFrom({
+      currentConversationId: prev.currentConversationId,
+      archiveConversationId: prev.archiveConversationId
+    }, extra.currentTurns, extra.archiveTurns);
+    titles = migrateChatTitles(prev.chatTitles, slices);
+    if (LEGACY_HASH_ID_RE.test(id)) {
+      const known = clipConversationId(slices.currentConversationId)
+        || clipConversationId(slices.archiveConversationId);
+      if (known) {
+        titles[known] = {title: clipped, updatedAtMs: now};
+        delete titles[id];
+        id = known;
+      } else {
+        titles[id] = {title: clipped, updatedAtMs: now};
+      }
+    } else {
+      titles[id] = {title: clipped, updatedAtMs: now};
+    }
+    const patch = {
+      chatTitles: titles,
+      updatedAtMs: now,
+      revision: Math.max(0, Math.floor(Number(prev.revision) || 0)) + 1
+    };
+    if (snap.exists) {
+      tx.update(ref, patch);
+    } else {
+      tx.set(ref, {
+        uid,
+        threadId: bot.threadIdForUid(uid),
+        ...patch
+      });
+    }
+  });
+  return {ok: true, chatId: id, title: clipped, chatTitles: titles};
 }
 
 function snapshotToState(snap, uid, settings, nowMs) {
@@ -86,6 +398,9 @@ function snapshotToState(snap, uid, settings, nowMs) {
     summary: staleGeneration ? "" : String(data.summary || data.lastSummary || "").trim(),
     retrievalFromSeq: staleGeneration ? 0 : Math.max(0, Math.floor(Number(data.retrievalFromSeq) || 0)),
     sessionReset: staleGeneration,
+    chatTitles: staleGeneration ? {} : normalizeChatTitles(data.chatTitles),
+    currentConversationId: staleGeneration ? "" : clipConversationId(data.currentConversationId),
+    archiveConversationId: staleGeneration ? "" : clipConversationId(data.archiveConversationId),
     [prefs.LAST_USED_FIELD]: staleGeneration ? 0 : (Number(data[prefs.LAST_USED_FIELD]) || 0),
     [prefs.SESSION_RESET_FIELD]: staleGeneration ? 0 : prefs.sessionResetVersionOf(data)
   };
@@ -203,8 +518,15 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
     let firstSeq = Math.max(0, Math.floor(Number(prev.firstSeq) || 0));
     const userSeq = eventCount + 1;
     const modelSeq = eventCount + 2;
-    const userTurn = {role: "user", text: userStored, seq: userSeq, atMs: receivedAtMs};
-    const modelTurn = {role: "model", text: modelStored, seq: modelSeq, atMs: now};
+    const ids = resolveConversationIds(prev, epoch, options.conversationId);
+    const userTurn = stampConversation(
+      {role: "user", text: userStored, seq: userSeq, atMs: receivedAtMs},
+      ids.currentConversationId
+    );
+    const modelTurn = stampConversation(
+      {role: "model", text: modelStored, seq: modelSeq, atMs: now},
+      ids.currentConversationId
+    );
     const media = bot.clipStoredMedia(options.media);
     if (media.length) modelTurn.media = media;
     const nextTurns = bot.clipStoredTurns([...turns, userTurn, modelTurn]);
@@ -212,24 +534,24 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
     const userId = bot.eventDocId(userSeq);
     const modelId = bot.eventDocId(modelSeq);
     if (userId) {
-      tx.set(events.doc(userId), {
+      tx.set(events.doc(userId), eventFields({
         seq: userSeq,
         epoch,
         role: "user",
         text: userStored,
         atMs: receivedAtMs,
         uid
-      });
+      }, ids.currentConversationId));
     }
     if (modelId) {
-      tx.set(events.doc(modelId), {
+      tx.set(events.doc(modelId), eventFields({
         seq: modelSeq,
         epoch,
         role: "model",
         text: modelStored,
         atMs: now,
         uid
-      });
+      }, ids.currentConversationId));
     }
     if (!firstSeq) firstSeq = userSeq;
     eventCount = modelSeq;
@@ -238,6 +560,7 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
       if (staleId) tx.delete(events.doc(staleId));
       firstSeq += 1;
     }
+    const slices = titleSlicesFrom(ids, nextTurns, []);
     tx.set(ref, {
       schemaVersion: bot.THREAD_SCHEMA_VERSION,
       uid,
@@ -253,10 +576,14 @@ async function persistExchange(uid, settings, userText, modelText, opts) {
       hasUsedBotDee: 1,
       hasUsedBotDeeAtMs: now,
       updatedAtMs: now,
+      ...threadConversationPatch(ids),
       [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs),
       [prefs.SESSION_RESET_FIELD]: prefs.CURRENT_VERSION,
       retrievalFromSeq: nextRetrievalFromSeq(prev, prev.eventCount)
     }, {merge: true});
+    if (chatTitlesNeedMigrate(prev.chatTitles, slices)) {
+      tx.update(ref, {chatTitles: migrateChatTitles(prev.chatTitles, slices)});
+    }
   });
   return {ok: true};
 }
@@ -272,16 +599,25 @@ async function markIdleEnded(uid, settings, nowMs) {
     if (!snap.exists) return;
     const prev = snap.data() || {};
     const epoch = Math.max(1, Math.floor(Number(prev.conversationEpoch) || 1)) + 1;
+    const current = clipConversationId(prev.currentConversationId);
     tx.set(ref, {
       status: "idle_ended",
       conversationEpoch: epoch,
       lastMessageAtMs: 0,
       lastMessageAtIso: new Date(now).toISOString(),
       revision: Math.max(0, Math.floor(Number(prev.revision) || 0)) + 1,
-      updatedAtMs: now
+      updatedAtMs: now,
+      ...(current ? {archiveConversationId: current} : {})
     }, {merge: true});
   });
   return {ok: true};
+}
+
+function publicTurn(row) {
+  const item = {role: row.role, text: row.text};
+  const conversationId = clipConversationId(row && row.conversationId);
+  if (conversationId) item.conversationId = conversationId;
+  return item;
 }
 
 function eventsToTurns(rows, limit, minSeq) {
@@ -290,15 +626,24 @@ function eventsToTurns(rows, limit, minSeq) {
   return (Array.isArray(rows) ? rows : [])
     .slice()
     .sort((a, b) => (Number(a.seq) || 0) - (Number(b.seq) || 0))
-    .map(row => ({
-      role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
-      text: String(row?.text || row?.sanitizedContent || ""),
-      seq: Math.max(0, Math.floor(Number(row?.seq) || 0)),
-      atMs: Number(row?.atMs) || 0
-    }))
+    .map(row => {
+      const item = {
+        role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
+        text: String(row?.text || row?.sanitizedContent || ""),
+        seq: Math.max(0, Math.floor(Number(row?.seq) || 0)),
+        atMs: Number(row?.atMs) || 0
+      };
+      const conversationId = clipConversationId(row?.conversationId);
+      if (conversationId) item.conversationId = conversationId;
+      return item;
+    })
     .filter(row => row.text && (min === 0 || row.seq >= min))
     .slice(-cap)
-    .map(row => ({role: row.role, text: row.text, seq: row.seq, atMs: row.atMs}));
+    .map(row => {
+      const item = {role: row.role, text: row.text, seq: row.seq, atMs: row.atMs};
+      if (row.conversationId) item.conversationId = row.conversationId;
+      return item;
+    });
 }
 
 /** Last 12 events win over in-doc turns. Archive is fallback only when both are empty.
@@ -315,13 +660,13 @@ function assembleRetrievalTurns({
   if (sessionReset) return [];
   const minSeq = Math.max(0, Math.floor(Number(retrievalFromSeq) || 0));
   const fromEvents = eventsToTurns(events, 12, minSeq);
-  if (fromEvents.length) return fromEvents.map(row => ({role: row.role, text: row.text}));
+  if (fromEvents.length) return fromEvents.map(publicTurn);
   const fromDoc = bot.clipStoredTurns(docTurns).filter(row => passesRetrievalCursor(row, minSeq, true));
-  if (fromDoc.length) return fromDoc.map(row => ({role: row.role, text: row.text}));
+  if (fromDoc.length) return fromDoc.map(publicTurn);
   if (idleEnded && archiveConsent && Array.isArray(archiveTurns) && archiveTurns.length) {
     return bot.clipStoredTurns(archiveTurns)
       .filter(row => passesRetrievalCursor(row, minSeq, false))
-      .map(row => ({role: row.role, text: row.text}));
+      .map(publicTurn);
   }
   return [];
 }
@@ -376,6 +721,8 @@ async function loadArchiveHistory(uid, limit) {
       if (seq) item.seq = seq;
       const atMs = Number(row.atMs) || 0;
       if (atMs) item.atMs = atMs;
+      const conversationId = clipConversationId(row.conversationId);
+      if (conversationId) item.conversationId = conversationId;
       return item;
     })
     .filter(row => row.text);
@@ -411,7 +758,12 @@ async function persistArchiveTurns(uid, consent, rows) {
   (Array.isArray(rows) ? rows : []).forEach(row => {
     const msg = memory.archiveMessage(row);
     if (!msg.messageId || !msg.sanitizedContent) return;
-    batch.set(ref.collection("archive").doc(msg.messageId), {uid, ...msg}, {merge: true});
+    const conversationId = clipConversationId(row.conversationId);
+    batch.set(
+      ref.collection("archive").doc(msg.messageId),
+      {uid, ...msg, ...(conversationId ? {conversationId} : {})},
+      {merge: true}
+    );
     writes += 1;
   });
   if (!writes) return {ok: true, skipped: true};
@@ -436,11 +788,15 @@ async function persistUserTurn(uid, settings, userText, opts) {
     let eventCount = Math.max(0, Math.floor(Number(prev.eventCount) || 0));
     let firstSeq = Math.max(0, Math.floor(Number(prev.firstSeq) || 0));
     const userSeq = eventCount + 1;
-    const userTurn = {role: "user", text: userStored, seq: userSeq, atMs: receivedAtMs};
+    const ids = resolveConversationIds(prev, epoch, options.conversationId);
+    const userTurn = stampConversation(
+      {role: "user", text: userStored, seq: userSeq, atMs: receivedAtMs},
+      ids.currentConversationId
+    );
     const nextTurns = bot.clipStoredTurns([...turns, userTurn]);
     const userId = bot.eventDocId(userSeq);
     if (userId) {
-      tx.set(ref.collection("events").doc(userId), {
+      tx.set(ref.collection("events").doc(userId), eventFields({
         seq: userSeq,
         epoch,
         role: "user",
@@ -448,10 +804,11 @@ async function persistUserTurn(uid, settings, userText, opts) {
         atMs: receivedAtMs,
         uid,
         status: "pending_model"
-      });
+      }, ids.currentConversationId));
     }
     if (!firstSeq) firstSeq = userSeq;
     eventCount = userSeq;
+    const slices = titleSlicesFrom(ids, nextTurns, []);
     tx.set(ref, {
       schemaVersion: bot.THREAD_SCHEMA_VERSION,
       uid,
@@ -467,11 +824,21 @@ async function persistUserTurn(uid, settings, userText, opts) {
       hasUsedBotDee: 1,
       hasUsedBotDeeAtMs: now,
       updatedAtMs: now,
+      ...threadConversationPatch(ids),
       [prefs.LAST_USED_FIELD]: prefs.nextLastUsed(prev[prefs.LAST_USED_FIELD], receivedAtMs),
       [prefs.SESSION_RESET_FIELD]: prefs.CURRENT_VERSION,
       retrievalFromSeq: nextRetrievalFromSeq(prev, prev.eventCount)
     }, {merge: true});
-    written = {seq: userSeq, epoch, receivedAtMs, userStored};
+    if (chatTitlesNeedMigrate(prev.chatTitles, slices)) {
+      tx.update(ref, {chatTitles: migrateChatTitles(prev.chatTitles, slices)});
+    }
+    written = {
+      seq: userSeq,
+      epoch,
+      receivedAtMs,
+      userStored,
+      conversationId: ids.currentConversationId
+    };
   });
   const consent = memory.normalizeConsent(options.consent);
   if (written && memory.consentAllows(consent, "archive")) {
@@ -481,6 +848,7 @@ async function persistUserTurn(uid, settings, userText, opts) {
       role: "user",
       text: written.userStored,
       atMs: written.receivedAtMs,
+      conversationId: written.conversationId,
       idempotencyKey: bot.eventDocId(written.seq)
     }]);
   }
@@ -506,21 +874,25 @@ async function persistModelTurn(uid, settings, modelText, opts) {
     let eventCount = Math.max(0, Math.floor(Number(prev.eventCount) || 0));
     let firstSeq = Math.max(0, Math.floor(Number(prev.firstSeq) || 0));
     const epoch = Math.max(1, Math.floor(Number(prev.conversationEpoch) || 1));
+    const ids = resolveConversationIds(prev, epoch, options.conversationId);
     const modelSeq = eventCount + 1;
-    const modelTurn = {role: "model", text: modelStored, seq: modelSeq, atMs: now};
+    const modelTurn = stampConversation(
+      {role: "model", text: modelStored, seq: modelSeq, atMs: now},
+      ids.currentConversationId
+    );
     const media = bot.clipStoredMedia(options.media);
     if (media.length) modelTurn.media = media;
     const nextTurns = bot.clipStoredTurns([...turns, modelTurn]);
     const modelId = bot.eventDocId(modelSeq);
     if (modelId) {
-      tx.set(ref.collection("events").doc(modelId), {
+      tx.set(ref.collection("events").doc(modelId), eventFields({
         seq: modelSeq,
         epoch,
         role: "model",
         text: modelStored,
         atMs: now,
         uid
-      });
+      }, ids.currentConversationId));
     }
     eventCount = modelSeq;
     while (eventCount - firstSeq + 1 > bot.MAX_STORED_EVENTS && firstSeq <= eventCount) {
@@ -534,9 +906,10 @@ async function persistModelTurn(uid, settings, modelText, opts) {
       turns: nextTurns,
       eventCount,
       firstSeq,
-      updatedAtMs: now
+      updatedAtMs: now,
+      ...threadConversationPatch(ids)
     }, {merge: true});
-    written = {seq: modelSeq, epoch, modelStored};
+    written = {seq: modelSeq, epoch, modelStored, conversationId: ids.currentConversationId};
   });
   const consent = memory.normalizeConsent(options.consent);
   if (written && memory.consentAllows(consent, "archive")) {
@@ -546,6 +919,7 @@ async function persistModelTurn(uid, settings, modelText, opts) {
       role: "model",
       text: written.modelStored,
       atMs: now,
+      conversationId: written.conversationId,
       idempotencyKey: bot.eventDocId(written.seq)
     }]);
   }
@@ -594,5 +968,22 @@ module.exports = {
   savePersonalization,
   snapshotToState,
   nextTranscript,
-  emptyState
+  emptyState,
+  clipChatTitle,
+  normalizeChatTitles,
+  migrateChatTitles,
+  chatTitlesNeedWrite,
+  persistChatTitles,
+  conversationIdFromFirstUser,
+  conversationIdFromTurns,
+  firstUserTextFromTurns,
+  mintConversationId,
+  clipConversationId,
+  renameChat,
+  CHAT_TITLE_MAX,
+  CHAT_ID_RE,
+  CONVERSATION_ID_RE,
+  STABLE_CHAT_ID_RE,
+  SLOT_CHAT_ID_RE,
+  LEGACY_HASH_ID_RE
 };

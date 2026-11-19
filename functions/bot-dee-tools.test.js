@@ -173,6 +173,44 @@ test("isSelfQuery recognizes my public profile and the viewer's handle/name", ()
   assert.equal(tools.isSelfQuery("notdonbans", SAMPLE_PUBLIC), false);
 });
 
+const DON_ALIASES = {
+  ...SAMPLE_PUBLIC,
+  firstName: "Don",
+  lastName: "Banyong",
+  fullName: "Don Banyong",
+  displayName: "Don Papi",
+  floqrHandle: "DonBans"
+};
+
+test("people lookup matches first+last, display name, squeezed alias, and handle", () => {
+  const aliases = tools.identityAliases(DON_ALIASES);
+  assert.ok(aliases.includes("don banyong"));
+  assert.ok(aliases.includes("don papi"));
+  assert.ok(aliases.includes("donpapi"));
+  assert.ok(aliases.includes("donbans"));
+  ["don banyong", "Don Papi", "DonPapi", "@DonBans", "DonBans"].forEach(needle => {
+    assert.ok(tools.scoreIdentity(DON_ALIASES, needle, needle.toLowerCase().replace(/^@/, "").split(/\s+/)) >= 8, needle);
+    assert.equal(tools.isSelfQuery(needle, DON_ALIASES), true, needle);
+    assert.ok(tools.scorePerson(DON_ALIASES, tools.normalizeNeedle(needle), tools.normalizeNeedle(needle).split(/\s+/).filter(Boolean)) >= 8, needle);
+  });
+  assert.ok(tools.scoreIdentity(DON_ALIASES, "aurelia", ["aurelia"]) < 8);
+  assert.equal(tools.isSelfQuery("don banyong", SAMPLE_PUBLIC), false, "display-only profile does not match legal name");
+});
+
+test("identity fold matches accented names and curly apostrophes", () => {
+  const row = {
+    firstName: "José",
+    lastName: "O’Brien",
+    displayName: "José O’Brien",
+    fullName: "José O’Brien",
+    floqrHandle: "joseob"
+  };
+  assert.ok(tools.scoreIdentity(row, "Jose O'Brien", ["jose", "obrien"]) >= 8);
+  assert.ok(tools.scoreIdentity(row, "José", ["jose"]) >= 8);
+  assert.equal(tools.normalizeNeedle("O’Brien"), "obrien");
+  assert.equal(tools.normalizeNeedle("José"), "jose");
+});
+
 test("injectSelfProfile does not send Mingl datapoints from a non-public self profile", () => {
   const privateSelf = {
     ...SAMPLE_PUBLIC,

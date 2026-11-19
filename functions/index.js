@@ -17,6 +17,7 @@ module.exports = {
   ...require("./data-classification-functions"),
   executeBotSession: require("./bot-dee-functions").executeBotSession,
   getBotDeeThread: require("./bot-dee-functions").getBotDeeThread,
+  renameBotDeeChat: require("./bot-dee-functions").renameBotDeeChat,
   saveBotDeePersonalization: require("./bot-dee-functions").saveBotDeePersonalization,
   setBotDeeSettings: require("./bot-dee-functions").setBotDeeSettings,
   getBotDeeCapabilityManifest: require("./botdee-upgrade-functions").getBotDeeCapabilityManifest,
@@ -126,5 +127,9 @@ module.exports = {
   confirmAdIntakePayment: adFns.confirmAdIntakePayment,
   getAdInvoice: adFns.getAdInvoice,
   onAdInvoiceCreated: adFns.onAdInvoiceCreated,
-  expireAdCampaigns: adFns.expireAdCampaigns
+  expireAdCampaigns: adFns.expireAdCampaigns,
+  classifySmartVisual: require("./smartvisuals-functions").classifySmartVisual,
+  publishSmartVisualDraft: require("./smartvisuals-functions").publishSmartVisualDraft,
+  setSmartVisualOverride: require("./smartvisuals-functions").setSmartVisualOverride,
+  getSmartVisualAdPolicy: require("./smartvisuals-functions").getSmartVisualAdPolicy
 };

@@ -30,6 +30,17 @@
   let storedLastMessageAtMs = 0;
   let visitLiveTurns = [];
   let chatsUiBound = false;
+  let chatTitles = {};
+  let liveConversationId = "";
+  let storedConversationId = "";
+  let archiveConversationId = "";
+  let renameTarget = null;
+  let renameDialogBound = false;
+  let swallowRename = null;
+  let swallowRenameTimer = 0;
+  const LONG_PRESS_MS = 520;
+  const SWALLOW_CLICK_MS = 800;
+  const CHAT_TITLE_MAX = 80;
 
   const byId = id => document.getElementById(id);
   const t = (key, fallback) => {
@@ -215,6 +226,263 @@
     return false;
   }
 
+  /** Keep in sync with functions/botdee-smartcard-core.js classifyPeopleSearchIntent. */
+  const PEOPLE_SELF_QUERY = /^(me|myself|my profile|my account|my info|my information|about me|who am i|what(?:'s| is| do you) know (?:about|of) (?:me|myself)|tell me about (?:me|myself)|describe (?:me|myself)|what can you tell me about (?:me|myself))$/i;
+  const PEOPLE_WHO_IS = /^(?:who(?:'s| is| s))\s+/i;
+  const PEOPLE_DO_YOU_KNOW = /^(?:do you know|did you meet)\s+/i;
+  const PEOPLE_KNOW_OF = /^(?:what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe)\s+/i;
+  const PEOPLE_WHAT_ABOUT = /^(?:and\s+)?(?:what|how) about\s+/i;
+  const PEOPLE_PROFILE_OF = /^(?:what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|look up|lookup)\s+/i;
+  const PEOPLE_PREFIX = /^(?:who(?:'s| is| s)|do you know|did you meet|look up|lookup|find|search for|what(?:'s| is) (?:on )?(?:the )?profile (?:of|for)|what(?:'s| is| do you) know (?:of|about)|what can you tell me about|tell me about|describe|(?:and\s+)?(?:what|how) about)\s+/i;
+  const PEOPLE_SUFFIX = /\s+(?:on floqr|on mingl|on here|(?:['’]s)?\s*(?:public )?profile)\s*$/i;
+  const PEOPLE_STOP_AFTER = /^(working|on (?:duty|tonight)|the (?:dj|club)|playing|singing|available)\b/i;
+  const PEOPLE_GENERIC = /^(this person|that person|them|him|her|someone|anybody|anyone)$/i;
+  const PEOPLE_VENUE = /^(a |an |the )?(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?)\b/i;
+  const PEOPLE_PRODUCT = /^(?:a |an |the )?(?:bot\s*dee|botdee|floq\s*ai|floqai|floqr|shout\s*outs?|mingl|floq\s*casts?|bartr|bart\s*r|rydr|vip(?:\s*reserv)?)\s*$/i;
+  const PEOPLE_OPS = /\b(tonight|today|near me|on duty|available|playing|working)\b/i;
+  const PEOPLE_NAME_STOP = /^(my|mine|our|your|their|his|her|this|that|these|those|who|what|where|when|how|the|a|an|you|me|us|it|we|they)$/;
+  const PEOPLE_NAME_ROLE = /^(djs?|clubs?|venues?|events?|shoutouts?|vips?|tables?|reservations?|bookings?|bottle|service|composer)$/;
+
+  function foldPeopleNameChars(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[\u2018\u2019\u201B\u2032`´]/g, "'")
+      .replace(/[\u201C\u201D]/g, '"');
+  }
+
+  function peoplePromptText(raw) {
+    return foldPeopleNameChars(String(raw || "")).replace(/\s+/g, " ").trim().slice(0, 200);
+  }
+
+  function normalizePeopleQuery(raw) {
+    return peoplePromptText(raw).toLowerCase().replace(/[?!.,]+/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  function extractPeopleNeedle(raw) {
+    const original = peoplePromptText(raw);
+    const n = normalizePeopleQuery(original);
+    if (!n || PEOPLE_SELF_QUERY.test(n)) return "";
+    let rest = original.replace(PEOPLE_PREFIX, "").replace(PEOPLE_SUFFIX, "").trim();
+    rest = rest.replace(/^[@]+/, "").replace(/["']/g, "").replace(/[?!.,]+$/g, "").trim();
+    const needle = normalizePeopleQuery(rest);
+    if (!needle || needle.length < 2) return "";
+    if (PEOPLE_STOP_AFTER.test(needle) || PEOPLE_GENERIC.test(needle)) return "";
+    if (PEOPLE_VENUE.test(needle) || PEOPLE_PRODUCT.test(needle) || PEOPLE_OPS.test(needle)) return "";
+    return rest;
+  }
+
+  function isPeopleNameNeedle(rest) {
+    const trimmed = foldPeopleNameChars(String(rest || "")).replace(/[?!]+$/g, "").trim();
+    if (!trimmed) return false;
+    if (/^@[\w.-]+$/.test(trimmed.replace(/^@+/, "@"))) return true;
+    const needle = normalizePeopleQuery(trimmed);
+    if (!needle || needle.length < 2) return false;
+    if (PEOPLE_STOP_AFTER.test(needle) || PEOPLE_GENERIC.test(needle)) return false;
+    if (PEOPLE_VENUE.test(needle) || PEOPLE_PRODUCT.test(needle) || PEOPLE_OPS.test(needle)) return false;
+    const tokens = needle.split(" ").filter(Boolean);
+    if (!tokens.length || tokens.length > 4) return false;
+    return tokens.every(token => /^@?[\w.'-]+$/.test(token)
+      && !PEOPLE_NAME_STOP.test(token)
+      && !PEOPLE_NAME_ROLE.test(token));
+  }
+
+  function remainderAfterPeoplePrefix(raw) {
+    return peoplePromptText(raw)
+      .replace(PEOPLE_WHO_IS, "")
+      .replace(PEOPLE_DO_YOU_KNOW, "")
+      .replace(PEOPLE_KNOW_OF, "")
+      .replace(PEOPLE_WHAT_ABOUT, "")
+      .replace(PEOPLE_PROFILE_OF, "")
+      .replace(PEOPLE_SUFFIX, "")
+      .trim();
+  }
+
+  function isNamedPeopleProfileSuffix(raw) {
+    const match = peoplePromptText(raw).match(/^(.+?)(?:['’]s)?\s+(?:public )?profile\s*$/i);
+    if (!match) return false;
+    return isPeopleNameNeedle(match[1].replace(/['’]s$/i, "").trim());
+  }
+
+  function isNamedPeopleNetworkSuffix(raw) {
+    const match = peoplePromptText(raw).match(/^(.+?)\s+(?:on floqr|on mingl|on here)\s*$/i);
+    if (!match) return false;
+    return isPeopleNameNeedle(match[1]);
+  }
+
+  function isPeopleLookupPrompt(raw) {
+    const original = peoplePromptText(raw);
+    if (PEOPLE_WHO_IS.test(original) || PEOPLE_DO_YOU_KNOW.test(original)
+      || PEOPLE_KNOW_OF.test(original) || PEOPLE_WHAT_ABOUT.test(original)
+      || PEOPLE_PROFILE_OF.test(original)) {
+      const rest = remainderAfterPeoplePrefix(original);
+      return isPeopleNameNeedle(rest) || PEOPLE_GENERIC.test(normalizePeopleQuery(rest));
+    }
+    const findMatch = original.match(/^(?:find|search for)\s+(.+)$/i);
+    return (findMatch && isPeopleNameNeedle(findMatch[1]))
+      || isNamedPeopleProfileSuffix(original)
+      || isNamedPeopleNetworkSuffix(original);
+  }
+
+  function classifyPeopleSearchIntent(raw) {
+    const original = peoplePromptText(raw);
+    const n = normalizePeopleQuery(original);
+    if (!n || n.length < 2) return {intent: "none", needle: "", self: false};
+    if (PEOPLE_SELF_QUERY.test(n) || /^(what do you know (?:about|of) me|tell me about my (?:public )?profile|what can you tell me about me)$/.test(n)) {
+      return {intent: "self", needle: "me", self: true};
+    }
+    if (!isPeopleLookupPrompt(original)) return {intent: "none", needle: "", self: false};
+    const needle = extractPeopleNeedle(raw);
+    if (needle && isPeopleNameNeedle(needle)) return {intent: "person", needle, self: false};
+    const rest = normalizePeopleQuery(remainderAfterPeoplePrefix(original));
+    if (PEOPLE_GENERIC.test(rest)) return {intent: "empty", needle: "", self: false};
+    return {intent: "none", needle: "", self: false};
+  }
+
+  function canonicalPeopleLookupQuery(classified) {
+    if (!classified || classified.intent === "none") return "";
+    if (classified.intent === "self") return "Who am I?";
+    if (classified.intent === "empty") return "Who is this person?";
+    const needle = String(classified.needle || "").replace(/[?!.,]+$/g, "").trim();
+    if (!needle) return "Who is this person?";
+    return `Who is ${needle}?`;
+  }
+
+  function hasPeopleSmartView(views) {
+    return (Array.isArray(views) ? views : []).some(row => (
+      row && (row.kind === "patron" || row.floqrPublicData?.peopleV2)
+    ));
+  }
+
+  function looksLikeProfileFieldDump(raw) {
+    const blob = String(raw || "");
+    if (!blob.trim()) return false;
+    const headings = ["Bio", "Location", "Details", "Looking to Meet", "Social Handles"];
+    let hits = 0;
+    for (const heading of headings) {
+      const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (new RegExp(`\\*\\*\\s*${escaped}\\s*\\*\\*`, "i").test(blob)
+        || new RegExp(`(?:^|\\n)\\s*(?:\\*\\*)?${escaped}(?:\\*\\*)?\\s*:`, "im").test(blob)) {
+        hits += 1;
+      }
+    }
+    return hits >= 2;
+  }
+
+  function peopleSearchAlreadyHandled(data) {
+    const provider = String(data?.provider || "");
+    const search = data?.peopleSearch;
+    if (provider === "people-smartcard") return true;
+    if (search && search.intent && search.intent !== "none") return true;
+    return false;
+  }
+
+  function stripPeopleFieldDump(session, classified) {
+    const row = session && typeof session === "object" ? session : {};
+    if (!classified || classified.intent === "none") return row;
+    const cardsOn = hasPeopleSmartView(row.smartViews);
+    const dump = looksLikeProfileFieldDump(row.reply);
+    const helpDump = Array.isArray(row.results) && row.results.length;
+    if (!dump && !helpDump) return row;
+    const key = row.peopleSearch?.replyKey
+      || (cardsOn ? "botdee.sc.oneResult" : "botdee.sc.none");
+    return {
+      ...row,
+      reply: t(key, cardsOn ? "Here is their SMARTview." : "No eligible public profile matched."),
+      results: []
+    };
+  }
+
+  async function ensurePeopleSmartViews(text, data) {
+    const classified = classifyPeopleSearchIntent(text);
+    const session = data && typeof data === "object" ? data : {};
+    if (classified.intent === "none") return session;
+    if (peopleSearchAlreadyHandled(session)) return stripPeopleFieldDump(session, classified);
+    const searchFn = callable("searchPeopleSmartCards");
+    if (searchFn) {
+      try {
+        const looked = (await searchFn({
+          query: canonicalPeopleLookupQuery(classified) || text,
+          uiLanguage: currentUiLanguage()
+        }))?.data || {};
+        return stripPeopleFieldDump({
+          ...session,
+          reply: looked.reply || "",
+          results: [],
+          media: [],
+          smartViews: Array.isArray(looked.views) ? looked.views : [],
+          peopleSearch: looked.peopleSearch || {
+            mode: "none",
+            intent: classified.intent,
+            geminiOnView: false,
+            replyKey: "botdee.sc.none"
+          },
+          provider: "people-smartcard"
+        }, classified);
+      } catch (_) {}
+    }
+    return stripPeopleFieldDump({
+      ...session,
+      reply: looksLikeProfileFieldDump(session.reply)
+        ? t("botdee.sc.none", "No eligible public profile matched.")
+        : session.reply,
+      results: classified.intent !== "none" ? [] : session.results,
+      peopleSearch: session.peopleSearch || {
+        mode: "none",
+        intent: classified.intent,
+        geminiOnView: false,
+        replyKey: "botdee.sc.none"
+      }
+    }, classified);
+  }
+
+  const PRIVILEGE_REFUSE_EN = "I don't have account-security details.";
+  const VIEWER_PRIVILEGE_ROLE = "(?:master(?:\\s|-)*admin|super(?:\\s|-)*admin|beta(?:\\s|-)*tester|club(?:\\s|-)*admin|privileged(?:\\s|-)*employee)";
+  /** Keep in sync with functions/botdee-privilege-guard.js (test asserts identical join source). */
+  const PRIVILEGE_LEAK_RE = new RegExp([
+    `\\bi\\s+(?:can\\s+)?see\\s+you\\s+as\\s+(?:a\\s+|an\\s+|the\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+    `\\byour\\s+login\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+    `\\byour\\s+role\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+    `\\byou(?:'re|\\s+are|\\s+were|\\s+have\\s+been)\\s+(?:a\\s+|an\\s+)?${VIEWER_PRIVILEGE_ROLE}\\b`,
+    `\\byou\\s+(?:have|use|enabled)\\s+(?:a\\s+|an\\s+)?(?:${VIEWER_PRIVILEGE_ROLE}|sos\\s*-?\\s*2fa|sos2fa)\\b`,
+    `\\byou\\s+(?:can|cannot|can't|may|may\\s+not)\\s+(?:open|access)\\s+(?:the\\s+)?master(?:\\s|-)*admin\\b`,
+    `\\bwhether\\s+you\\s+can\\s+open\\s+master(?:\\s|-)*admin\\b`,
+    `\\byour\\s+(?:sos\\s*-?\\s*2fa|sos2fa)\\b`,
+    `\\byour\\s+(?:token\\s+|id\\s+token\\s+|custom\\s+)?claims\\b`,
+    `\\byour\\s+classification\\s+role\\b`,
+    `\\byour\\s+club[- ]admin\\s+status\\b`,
+    `\\bviewer\\s+classification\\b`,
+    `\\b(?:this\\s+user|this\\s+account|the\\s+viewer|the\\s+signed[-\\s]?in\\s+user|the\\s+user|viewer)\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+    `\\buser\\s+is\\s+(?:a\\s+|an\\s+)?(?:master|${VIEWER_PRIVILEGE_ROLE})\\b`,
+    "\\bisMasterAdmin\\b",
+    "\\bisSuperAdmin\\b",
+    "\\bisBetaTester\\b",
+    "\\bisClubAdmin\\b",
+    "\\btokenClaims\\b",
+    "\\bcustomClaims\\b"
+  ].join("|"), "i");
+
+  function privilegeRefuseReply() {
+    return t("botdee.privilegeRefuse", PRIVILEGE_REFUSE_EN);
+  }
+
+  function isPrivilegeAskPrompt(raw) {
+    const q = normalizeChat(raw);
+    if (!q || q.length > 200) return false;
+    if (/^(?:who am i|about me|what do you know about me|tell me about me)\??$/.test(q)) return false;
+    if (/(?:am i|are we|is my (?:account|login)|do i have|what(?: s| is) my|can i open|can i access).{0,48}club\s*-?\s*admin/.test(q)) {
+      return true;
+    }
+    if (/(?:am i|are we|is my (?:account|login|user)|do i have|what(?: s| is) my|can i open|can i access|tell me if i(?: m| am))/.test(q)
+      && /master\s*-?\s*admin|super\s*-?\s*admin|sos\s*-?\s*2fa|sos2fa|beta\s*-?\s*tester|token\s+claims?|custom\s+claims?/.test(q)) {
+      return true;
+    }
+    if (/^(?:am i (?:a |the )?(?:master|super|admin|privileged)|what(?: s| is) my (?:privilege|access level|admin status)|what privileges? do i have)\??$/.test(q)) {
+      return true;
+    }
+    return false;
+  }
+
   function packageLabel() {
     try {
       const nav = global.FLOQRNav;
@@ -228,7 +496,8 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.036";  }
+    return "s3.3.041";
+  }
 
   function isVersionSmartViewAlias(raw) {
     const q = String(raw || "")
@@ -864,6 +1133,20 @@
     }
     row.appendChild(article);
     log.appendChild(row);
+    scrollTranscriptToLatest();
+  }
+
+  function scrollTranscriptToLatest() {
+    const log = byId("botDeeTranscript");
+    if (!log) return;
+    const last = log.lastElementChild;
+    const card = last?.querySelector(".botdee-sv-people, .botdee-sv-version, .botdee-sv-room");
+    if (last && card && card.scrollHeight > log.clientHeight * 0.85) {
+      const logBox = log.getBoundingClientRect();
+      const lastBox = last.getBoundingClientRect();
+      log.scrollTop += lastBox.top - logBox.top;
+      return;
+    }
     log.scrollTop = log.scrollHeight;
   }
 
@@ -939,6 +1222,7 @@
   }
 
   function localBotReply(text, {resuming}) {
+    if (isPrivilegeAskPrompt(text)) return privilegeRefuseReply();
     if (isIdentityPrompt(text)) return identityReply();
     if (isVersionPrompt(text)) return versionReply(text);
     if (isPrivacyPrompt(text)) return privacyReply();
@@ -975,17 +1259,20 @@
     if (resuming) {
       // Lease ended (pause bubble). Durable retrieve is on the server; do not wipe it.
       phase = "fresh";
+      liveConversationId = mintConversationId();
+    } else if (!liveConversationId) {
+      liveConversationId = storedConversationId || mintConversationId();
     }
 
     appendBubble("user", text);
     pushHistory("user", text);
-    visitLiveTurns.push({role: "user", text});
+    visitLiveTurns.push({role: "user", text, conversationId: liveConversationId});
     setChatsOpen(false);
     renderChatsList();
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
-    if (!durableEnabled && (isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text) || isRoomSmartViewPrompt(text))) {
+    if (!durableEnabled && classifyPeopleSearchIntent(text).intent === "none" && (isPrivilegeAskPrompt(text) || isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text) || isRoomSmartViewPrompt(text))) {
       const roomSession = !isVersionPrompt(text) && !isHelpPrompt(text) && !isPrivacyPrompt(text)
         ? buildLocalRoomSession(text)
         : null;
@@ -996,7 +1283,7 @@
       const roomViews = roomSession ? ensureRoomSmartViews(text, roomSession.smartViews || []) : [];
       appendBubble("bot", reply, [], [], versionViews.concat(roomViews));
       pushHistory("model", reply);
-      visitLiveTurns.push({role: "model", text: reply});
+      visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
       setStatus("");
       if (isFarewellPrompt(text)) {
         endConversation("silent");
@@ -1032,11 +1319,13 @@
         message: text,
         history: history.slice(0, -1).map(row => ({role: row.role, text: row.text})),
         threadId: threadId || undefined,
+        conversationId: liveConversationId || undefined,
         uiLanguage: currentUiLanguage(),
         roomSmartViewDeclined: loadRoomDeclined()
       };
-      const data = (await fn(payload))?.data || {};
-      applyHasUsed(data, 1);
+      const rawData = (await fn(payload))?.data || {};
+      applyHasUsed(rawData, 1);
+      const data = await ensurePeopleSmartViews(text, rawData);
       const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
       const peopleSearch = data.peopleSearch || null;
       const roomView = Array.isArray(data.smartViews)
@@ -1045,16 +1334,25 @@
       const views = ensureVersionSmartViews(text, ensureRoomSmartViews(text, data.smartViews));
       const versionCardOnly = isVersionSmartViewAlias(text)
         && views.some(row => row && row.kind === "botDeeVersion");
+      const peopleCard = hasPeopleSmartView(views);
       const reply = versionCardOnly
         ? ""
         : peopleSearch?.replyKey
           ? t(peopleSearch.replyKey, displayReply(data.reply))
           : (data.replyKey || roomView?.replyKey)
             ? t(data.replyKey || roomView.replyKey, displayReply(data.reply))
-            : displayReply(data.reply);
-      appendBubble("bot", reply, localizeResults(data.results), media, views, peopleSearch);
+            : (peopleCard && looksLikeProfileFieldDump(data.reply)
+              ? t("botdee.sc.oneResult", "Here is their SMARTview.")
+              : displayReply(data.reply));
+      appendBubble("bot", reply, localizeResults(peopleCard ? [] : data.results), media, views, peopleSearch);
       pushHistory("model", reply);
-      if (reply) visitLiveTurns.push({role: "model", text: reply});
+      if (reply) visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
+      if (data.conversationId && /^cv_[0-9a-f]{32}$/.test(String(data.conversationId))) {
+        liveConversationId = String(data.conversationId);
+        visitLiveTurns.forEach(row => {
+          if (row && !row.conversationId) row.conversationId = liveConversationId;
+        });
+      }
       if (data.threadId) threadId = String(data.threadId);
       if (data.durable === true) durableEnabled = true;
       if (data.durable === false) durableEnabled = false;
@@ -1137,6 +1435,9 @@
     ) {
       return t("botdee.chatEmpty", "No answer yet — try asking another way.");
     }
+    if (text === PRIVILEGE_REFUSE_EN || PRIVILEGE_LEAK_RE.test(text)) {
+      return privilegeRefuseReply();
+    }
     if (isProductCatalogGreeting(text)) {
       const fromPrefs = global.FLOQRBotDeePersonalization?.greetingFor?.();
       if (fromPrefs) return fromPrefs;
@@ -1145,21 +1446,130 @@
     return scrubGatedBrands(stripBackendLinks(text));
   }
 
+  function modelBubbleText(role, raw, media) {
+    const rawText = String(raw || "").trim();
+    if (role === "model" && !rawText && !media.length) return "";
+    if (role === "model" && !rawText) return "";
+    return role === "model" ? displayReply(raw) : rawText;
+  }
+
   function cloneTurns(turns) {
     return (Array.isArray(turns) ? turns : [])
-      .map(row => ({
-        role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
-        text: String(row?.text || "").trim(),
-        media: Array.isArray(row?.media) ? row.media : undefined,
-        seq: row?.seq,
-        atMs: row?.atMs
-      }))
+      .map(row => {
+        const item = {
+          role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
+          text: String(row?.text || "").trim(),
+          media: Array.isArray(row?.media) ? row.media : undefined,
+          seq: row?.seq,
+          atMs: row?.atMs
+        };
+        const conversationId = clipConversationId(row?.conversationId);
+        if (conversationId) item.conversationId = conversationId;
+        return item;
+      })
       .filter(row => row.text || (row.media && row.media.length));
   }
 
   function firstUserLine(turns) {
     const row = cloneTurns(turns).find(item => item.role === "user" && item.text);
     return row ? row.text.replace(/\s+/g, " ").slice(0, 72) : "";
+  }
+
+  function clipConversationId(raw) {
+    const id = String(raw || "").trim();
+    return /^cv_[0-9a-f]{32}$/.test(id) ? id : "";
+  }
+
+  function mintConversationId() {
+    try {
+      const bytes = new Uint8Array(16);
+      (global.crypto || crypto).getRandomValues(bytes);
+      return `cv_${Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("")}`;
+    } catch (_) {
+      const hex = `${Date.now().toString(16).padStart(12, "0")}${Math.random().toString(16).slice(2)}0000000000000000`;
+      return `cv_${hex.slice(0, 32)}`;
+    }
+  }
+
+  function fnv1a(str, seed) {
+    let h = (Number(seed) >>> 0) || 2166136261;
+    const s = String(str || "");
+    for (let i = 0; i < s.length; i += 1) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h;
+  }
+
+  function conversationIdFromFirstUser(text) {
+    const line = String(text || "").toLowerCase().replace(/\s+/g, " ").trim().slice(0, 80);
+    if (!line) return "";
+    const a = fnv1a(line, 2166136261).toString(16).padStart(8, "0");
+    const b = fnv1a(line, 0x811c9dc5 ^ 0x01000193).toString(16).padStart(8, "0");
+    return `c_${a}${b}`;
+  }
+
+  function firstUserText(turns) {
+    const row = cloneTurns(turns).find(item => item.role === "user" && item.text);
+    return row ? String(row.text).trim() : "";
+  }
+
+  function conversationIdFromTurns(turns) {
+    const list = cloneTurns(turns);
+    for (let i = 0; i < list.length; i += 1) {
+      const id = clipConversationId(list[i].conversationId);
+      if (id) return id;
+    }
+    return "";
+  }
+
+  function clipChatTitle(raw) {
+    return String(raw || "")
+      .replace(/[\u0000-\u001f\u007f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, CHAT_TITLE_MAX);
+  }
+
+  function titleForChat(chatId, fallback) {
+    const row = chatTitles && chatTitles[chatId];
+    const stored = clipChatTitle(typeof row === "string" ? row : row?.title);
+    return stored || fallback || "";
+  }
+
+  function applyChatTitles(raw) {
+    const src = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+    chatTitles = {};
+    Object.keys(src).forEach(id => {
+      const title = clipChatTitle(typeof src[id] === "string" ? src[id] : src[id]?.title);
+      if (!title) return;
+      if (/^cv_[0-9a-f]{32}$/.test(id) || /^c_[0-9a-f]{16}$/.test(id)) {
+        chatTitles[id] = {title, updatedAtMs: Number(src[id]?.updatedAtMs) || 0};
+      }
+    });
+    const currentId = storedConversationId || conversationIdFromTurns(storedTurns);
+    const archivedId = archiveConversationId || conversationIdFromTurns(storedArchiveTurns);
+    const liveId = liveConversationId || conversationIdFromTurns(visitLiveTurns) || currentId;
+    const slotIds = {live: liveId, current: currentId, archive: archivedId};
+    ["live", "current", "archive"].forEach(slot => {
+      const title = clipChatTitle(typeof src[slot] === "string" ? src[slot] : src[slot]?.title);
+      const id = slotIds[slot];
+      if (!title || !id || chatTitles[id]) return;
+      chatTitles[id] = {title, updatedAtMs: Number(src[slot]?.updatedAtMs) || 0};
+    });
+    const hashTargets = [
+      [currentId, storedTurns],
+      [archivedId, storedArchiveTurns],
+      [liveId, visitLiveTurns]
+    ];
+    hashTargets.forEach(([id, turns]) => {
+      if (!id || chatTitles[id]) return;
+      const hashed = conversationIdFromFirstUser(firstUserText(turns));
+      const row = hashed && src[hashed];
+      const title = clipChatTitle(typeof row === "string" ? row : row?.title);
+      if (!title) return;
+      chatTitles[id] = {title, updatedAtMs: Number(row?.updatedAtMs) || 0};
+    });
   }
 
   function formatChatWhen(ms) {
@@ -1186,8 +1596,7 @@
     history.length = 0;
     cloneTurns(turns).forEach(row => {
       const media = row.role === "model" ? mergeMedia(row.media, harvestMediaFromText(row.text)) : [];
-      if (row.role === "model" && !row.text && !media.length) return;
-      const text = row.role === "model" ? displayReply(row.text) : row.text;
+      const text = modelBubbleText(row.role, row.text, media);
       if (!text && !media.length) return;
       appendBubble(row.role === "user" ? "user" : "bot", text, null, media);
       if (text) pushHistory(row.role, text);
@@ -1206,6 +1615,19 @@
     storedTurns = turns.length ? turns : archive;
     storedArchiveTurns = archive;
     storedLastMessageAtMs = Number(data.lastMessageAtMs) || 0;
+    storedConversationId = clipConversationId(data.currentConversationId) || conversationIdFromTurns(storedTurns);
+    archiveConversationId = clipConversationId(data.archiveConversationId) || conversationIdFromTurns(storedArchiveTurns);
+    if (storedConversationId) {
+      storedTurns.forEach(row => {
+        if (row && !row.conversationId) row.conversationId = storedConversationId;
+      });
+    }
+    if (archiveConversationId) {
+      storedArchiveTurns.forEach(row => {
+        if (row && !row.conversationId) row.conversationId = archiveConversationId;
+      });
+    }
+    applyChatTitles(data.chatTitles);
     const recall = storedTurns.length ? storedTurns : archive;
     // Visual collapse only — keep last turns in client history so Send still
     // ships BOT DEE context. Server retrieve is unchanged.
@@ -1286,6 +1708,7 @@
     setChatsOpen(false);
     phase = "fresh";
     setStatus("");
+    liveConversationId = mintConversationId();
     welcome();
     byId("botDeeChatInput")?.focus();
   }
@@ -1293,6 +1716,7 @@
   function resumeSlice(turns) {
     const rows = cloneTurns(turns);
     if (!rows.length) return;
+    liveConversationId = conversationIdFromTurns(rows) || liveConversationId;
     restoreTurns(rows);
     setChatsOpen(false);
     phase = "active";
@@ -1318,7 +1742,9 @@
       return;
     }
     if (hint) hint.hidden = false;
-    const addRow = (label, meta, onClick, primary) => {
+    const addRow = (label, meta, onClick, primary, chatId) => {
+      const row = document.createElement("div");
+      row.className = "botdee-chats-item";
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = primary ? "botdee-chats-row botdee-chats-row-primary" : "botdee-chats-row";
@@ -1329,27 +1755,211 @@
         span.textContent = meta;
         btn.appendChild(span);
       }
-      btn.addEventListener("click", onClick);
-      list.appendChild(btn);
+      btn.addEventListener("click", event => {
+        if (renameClickShouldSwallow(event, btn)) return;
+        onClick(event);
+      });
+      row.appendChild(btn);
+      if (chatId) {
+        const renameLabel = titleForChat(chatId, meta || label);
+        bindChatLongPress(btn, chatId, renameLabel);
+        const rename = document.createElement("button");
+        rename.type = "button";
+        rename.className = "botdee-chats-rename";
+        rename.setAttribute("aria-label", t("botdee.chatsRenameAria", "Rename chat"));
+        rename.title = t("botdee.chatsRename", "Rename");
+        rename.textContent = "⋯";
+        rename.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openRenameDialog(chatId, renameLabel);
+        });
+        row.appendChild(rename);
+      }
+      list.appendChild(row);
     };
     addRow(t("botdee.chatsNew", "New chat"), "", startNewChat, true);
     if (visitLiveTurns.length) {
+      const snippet = firstUserLine(visitLiveTurns);
+      const liveId = conversationIdFromTurns(visitLiveTurns) || liveConversationId;
       addRow(
         t("botdee.chatsResume", "This session"),
-        firstUserLine(visitLiveTurns),
-        () => resumeSlice(visitLiveTurns)
+        titleForChat(liveId, snippet),
+        () => resumeSlice(visitLiveTurns),
+        false,
+        liveId
       );
     }
     const earlier = [];
-    if (storedTurns.length) earlier.push(storedTurns);
-    if (storedArchiveTurns.length && firstUserLine(storedArchiveTurns) !== firstUserLine(storedTurns)) {
-      earlier.push(storedArchiveTurns);
+    if (storedTurns.length) {
+      earlier.push({
+        slice: storedTurns,
+        chatId: conversationIdFromTurns(storedTurns) || storedConversationId
+      });
     }
-    earlier.forEach((slice, index) => {
+    if (storedArchiveTurns.length && firstUserLine(storedArchiveTurns) !== firstUserLine(storedTurns)) {
+      earlier.push({
+        slice: storedArchiveTurns,
+        chatId: conversationIdFromTurns(storedArchiveTurns) || archiveConversationId
+      });
+    }
+    earlier.forEach((row, index) => {
       const when = formatChatWhen(storedLastMessageAtMs);
-      const line = firstUserLine(slice);
-      const title = [when, line].filter(Boolean).join(" · ") || t("botdee.chatsPanelTitle", "Chats");
-      addRow(title, index === 0 && storedTurns.length ? "" : "", () => resumeSlice(slice));
+      const line = firstUserLine(row.slice);
+      const fallback = [when, line].filter(Boolean).join(" · ") || t("botdee.chatsPanelTitle", "Chats");
+      const title = titleForChat(row.chatId, fallback);
+      addRow(title, index === 0 && storedTurns.length && title === fallback ? "" : (title !== fallback ? fallback : ""), () => resumeSlice(row.slice), false, row.chatId);
+    });
+  }
+
+  function armRenameClickSwallow(pointerId, btn) {
+    disarmRenameClickSwallow();
+    swallowRename = {pointerId, btn};
+    swallowRenameTimer = global.setTimeout(() => {
+      swallowRenameTimer = 0;
+      swallowRename = null;
+    }, SWALLOW_CLICK_MS);
+  }
+
+  function disarmRenameClickSwallow() {
+    if (swallowRenameTimer) {
+      global.clearTimeout(swallowRenameTimer);
+      swallowRenameTimer = 0;
+    }
+    swallowRename = null;
+  }
+
+  function leftoverRenameClick(event, btn) {
+    if (!swallowRename) return false;
+    const armedBtn = swallowRename.btn;
+    const target = event?.target;
+    if (btn && armedBtn === btn) return true;
+    if (armedBtn && target && (target === armedBtn || armedBtn.contains(target))) return true;
+    const samePointer = swallowRename.pointerId != null && event?.pointerId === swallowRename.pointerId;
+    const dialog = byId("botDeeRenameDialog");
+    const chatsBackdrop = byId("botDeeChatsBackdrop");
+    if (target !== dialog && target !== chatsBackdrop) return false;
+    return samePointer || event?.pointerId == null;
+  }
+
+  function renameClickShouldSwallow(event, btn) {
+    if (!leftoverRenameClick(event, btn)) return false;
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    disarmRenameClickSwallow();
+    return true;
+  }
+
+  function bindChatLongPress(btn, chatId, label) {
+    let timer = 0;
+    const start = event => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      clearTimeout(timer);
+      const pointerId = event.pointerId;
+      timer = global.setTimeout(() => {
+        timer = 0;
+        armRenameClickSwallow(pointerId, btn);
+        openRenameDialog(chatId, label);
+      }, LONG_PRESS_MS);
+    };
+    const cancelTimer = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = 0;
+      }
+    };
+    btn.addEventListener("pointerdown", start);
+    btn.addEventListener("pointerup", cancelTimer);
+    btn.addEventListener("pointercancel", () => {
+      cancelTimer();
+      disarmRenameClickSwallow();
+    });
+    btn.addEventListener("pointerleave", cancelTimer);
+    btn.addEventListener("contextmenu", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      cancelTimer();
+      disarmRenameClickSwallow();
+      openRenameDialog(chatId, label);
+    });
+  }
+
+  function setRenameOpen(open) {
+    const dialog = byId("botDeeRenameDialog");
+    if (!dialog) return;
+    dialog.hidden = !open;
+    dialog.setAttribute("aria-hidden", open ? "false" : "true");
+    if (!open) {
+      renameTarget = null;
+      disarmRenameClickSwallow();
+    }
+  }
+
+  function openRenameDialog(chatId, currentLabel) {
+    renameTarget = {chatId, currentLabel};
+    const input = byId("botDeeRenameInput");
+    const status = byId("botDeeRenameStatus");
+    if (status) status.textContent = "";
+    if (input) {
+      input.value = titleForChat(chatId, clipChatTitle(currentLabel));
+    }
+    setRenameOpen(true);
+    global.setTimeout(() => {
+      input?.focus();
+      input?.select();
+    }, 30);
+  }
+
+  async function saveRename() {
+    const status = byId("botDeeRenameStatus");
+    const input = byId("botDeeRenameInput");
+    const title = clipChatTitle(input?.value);
+    if (!renameTarget?.chatId) {
+      setRenameOpen(false);
+      return;
+    }
+    if (!title) {
+      if (status) status.textContent = t("botdee.chatsRenameError", "Could not save that title. Try again.");
+      input?.focus();
+      return;
+    }
+    const chatId = renameTarget.chatId;
+    const fn = callable("renameBotDeeChat");
+    if (!fn) {
+      if (status) status.textContent = t("botdee.chatsRenameError", "Could not save that title. Try again.");
+      return;
+    }
+    try {
+      const data = (await fn({chatId, title, conversationId: chatId}))?.data || {};
+      if (data.chatTitles) applyChatTitles(data.chatTitles);
+      else {
+        chatTitles[chatId] = {title: clipChatTitle(data.title) || title, updatedAtMs: Date.now()};
+      }
+      setRenameOpen(false);
+      renderChatsList();
+    } catch (error) {
+      console.warn("BOT DEE rename failed", error?.message || error);
+      if (status) status.textContent = t("botdee.chatsRenameError", "Could not save that title. Try again.");
+    }
+  }
+
+  function bindRenameDialog() {
+    if (renameDialogBound) return;
+    renameDialogBound = true;
+    byId("botDeeRenameSave")?.addEventListener("click", () => saveRename());
+    byId("botDeeRenameCancel")?.addEventListener("click", () => setRenameOpen(false));
+    byId("botDeeRenameDialog")?.addEventListener("click", event => {
+      if (renameClickShouldSwallow(event)) return;
+      if (event.target === byId("botDeeRenameDialog")) setRenameOpen(false);
+    });
+    byId("botDeeRenameInput")?.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        saveRename();
+      }
     });
   }
 
@@ -1359,13 +1969,27 @@
     const toggle = byId("botDeeChatsToggle");
     const backdrop = byId("botDeeChatsBackdrop");
     toggle?.addEventListener("click", () => setChatsOpen(!chatsOpen));
-    backdrop?.addEventListener("click", () => setChatsOpen(false));
+    backdrop?.addEventListener("click", event => {
+      if (renameClickShouldSwallow(event)) return;
+      setChatsOpen(false);
+    });
+    document.addEventListener("click", event => {
+      renameClickShouldSwallow(event);
+    }, true);
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape" && chatsOpen) {
-        event.preventDefault();
-        setChatsOpen(false);
+      if (event.key === "Escape") {
+        if (!byId("botDeeRenameDialog")?.hidden) {
+          event.preventDefault();
+          setRenameOpen(false);
+          return;
+        }
+        if (chatsOpen) {
+          event.preventDefault();
+          setChatsOpen(false);
+        }
       }
     });
+    bindRenameDialog();
     renderChatsList();
   }
 
@@ -1386,6 +2010,7 @@
           durableEnabled = data.durable === true;
           if (data.idleSeconds) idleSeconds = clampIdleSeconds(data.idleSeconds);
           if (data.threadId) threadId = String(data.threadId);
+          applyChatTitles(data.chatTitles);
           applyHasUsed(data);
           global.FLOQRBotDeePersonalization?.applyFromThread?.(data, true);
           if (durableEnabled && (
@@ -1450,6 +2075,7 @@
     sendMessage,
     openPhotoViewer,
     closePhotoViewer,
+    scrollTranscriptToLatest,
     DEFAULT_IDLE_SECONDS,
     clampIdleSeconds
   };

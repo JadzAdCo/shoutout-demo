@@ -10,6 +10,7 @@ const smart = require("./botdee-smartview-core");
 const tools = require("./bot-dee-tools");
 const people = require("./people-directory-core");
 const cards = require("./botdee-smartcard-core");
+const guard = require("./botdee-privilege-guard");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -61,6 +62,12 @@ async function writeDiagnostic(event) {
   } catch (error) {
     console.warn("SMARTcard diagnostic write failed", error?.message || error);
   }
+}
+
+function sanitizePeopleViews(views) {
+  return (Array.isArray(views) ? views : [])
+    .map(view => guard.stripPrivilegeFromToolResult(view))
+    .filter(view => view && !cards.peopleCardHasPrivilegeField(view));
 }
 
 function viewerLocaleOf(request, viewerData) {
@@ -128,7 +135,7 @@ async function runPeopleSearch({query, page, uiLanguage, viewerUid, request}) {
       classified,
       routed,
       peopleSearch: {...meta, latencyMs: Date.now() - started},
-      smartViews: routed.views,
+      smartViews: sanitizePeopleViews(routed.views),
       reply: cards.fallbackReply(routed.mode)
     };
   }
@@ -155,18 +162,26 @@ async function runPeopleSearch({query, page, uiLanguage, viewerUid, request}) {
         lookupError = true;
       } else {
         const profiles = Array.isArray(looked.profiles) ? looked.profiles : [];
+        let viewerMatch = null;
         for (const row of profiles) {
           if (!row || row.kind !== "user" || !row.id) continue;
-          if (row.id === viewerUid) continue;
+          const isViewer = row.id === viewerUid;
           const loaded = await loadAuthorizedPeopleView({
             viewerUid,
             subjectUid: row.id,
             uiLanguage,
-            allowPrivateSelf: false
+            allowPrivateSelf: isViewer
           });
           if (loaded && loaded.blocked) continue;
           if (loaded && loaded.hidden) continue;
-          if (loaded && loaded.view) matches.push(loaded.view);
+          if (!(loaded && loaded.view)) continue;
+          if (isViewer) viewerMatch = loaded.view;
+          else matches.push(loaded.view);
+        }
+        if (viewerMatch && !matches.length) {
+          selfView = viewerMatch;
+        } else if (viewerMatch) {
+          matches.unshift(viewerMatch);
         }
       }
     }
@@ -196,7 +211,7 @@ async function runPeopleSearch({query, page, uiLanguage, viewerUid, request}) {
       ...meta,
       latencyMs: Date.now() - started
     },
-    smartViews: routed.views,
+    smartViews: sanitizePeopleViews(routed.views),
     reply: cards.fallbackReply(routed.mode)
   };
 }
@@ -221,6 +236,8 @@ async function attachPeopleSearch({query, viewerUid, uiLanguage, request, page})
 exports.attachPeopleSearch = attachPeopleSearch;
 exports.loadAuthorizedPeopleView = loadAuthorizedPeopleView;
 exports.runPeopleSearch = runPeopleSearch;
+exports.classifyPeopleSearchIntent = cards.classifyPeopleSearchIntent;
+exports.canonicalPeopleLookupQuery = cards.canonicalPeopleLookupQuery;
 
 exports.searchPeopleSmartCards = onCall(CALL_OPTS, async request => {
   try {

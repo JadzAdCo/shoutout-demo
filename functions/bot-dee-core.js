@@ -4,6 +4,7 @@
 
 const {Type} = require("@google/genai");
 const classification = require("./data-classification-core");
+const guard = require("./botdee-privilege-guard");
 const BOTDEE_CONTENT = require("./botdee-content-classes.json");
 const SEARCH_CATALOG = require("./bot-dee-search-catalog.json");
 const RESULT_LOCALES = require("./bot-dee-result-locales.json");
@@ -69,10 +70,17 @@ const TOOL_DEFS = [
   {
     name: "startShoutOutCheckout",
     description:
-      "Start Stripe Checkout for a composed ShoutOut. Requires clubLocationId and shoutout payload (templateId, text fields, screenFormatId as collected). Re-validates shoutOut. Returns checkoutUrl — never collect card data.",
+      "Throw a ShoutOut from chat (headless). Pass clubLocationId or locationName plus message/mainText. Optional templateId (default Traditional blackwhite) and screenFormatId. Server fits the copy to the venue LED. Paid templates return checkoutUrl; free boards submit pending (shoutoutId). Never collect card data. Do not invent checkoutUrl. Football Intro, jerseys, Baller's Alert, Heist art, and photo boards return composeHref instead.",
     parameters: obj({
-      clubLocationId: str("Venue location id."),
-      shoutout: {type: Type.OBJECT, description: "ShoutOut compose payload (templateId, message fields, screenFormatId, etc.)."},
+      clubLocationId: str("Venue slug or display name (e.g. Aurelia, decades-washington-dc)."),
+      locationName: str("Optional venue display name."),
+      locationId: str("Alias for clubLocationId."),
+      message: str("Board copy the patron wants on the LED."),
+      mainText: str("Alias for message."),
+      text: str("Alias for message."),
+      templateId: str("Optional template id. Default blackwhite. classicHalloween is paid."),
+      screenFormatId: str("Optional LED size: led-96x48, led-64x48, or led-64x32."),
+      shoutout: {type: Type.OBJECT, description: "Optional full compose payload if already collected."},
       payload: {type: Type.OBJECT, description: "Optional wrapper with clubLocationId + shoutout."},
       returnBase: str("Optional return base URL."),
       correlationId: str("Optional correlation id.")
@@ -409,6 +417,64 @@ function isVersionPrompt(raw) {
   return false;
 }
 
+/** Execute a ShoutOut from chat — not a how-to catalog dump.
+ *  "throw a shoutout" / "send a shoutout at Decades" → product tools.
+ *  "how do I throw a shoutout" stays search (how-to). */
+function isShoutOutExecutePrompt(raw) {
+  const q = normalize(raw);
+  // Venue + board copy can exceed 200 chars (composer 160 + venue). Cap at stored-message size.
+  if (!q || q.length > MAX_MESSAGE_CHARS) return false;
+  if (/\b(?:how|help|what is|where do i|instructions?|explain)\b/.test(q)) return false;
+  if (/\b(?:throw|send|post|compose|buy|pay for)\b.{0,48}\bshout\s*out/.test(q)) return true;
+  if (/^shout\s*out\b/.test(q) && /\b(?:for|at|to|please)\b/.test(q)) return true;
+  return false;
+}
+
+function shoutOutComposeHref(clubLocationId) {
+  const id = String(clubLocationId || "").trim();
+  return id
+    ? `./shoutout-search.html?from=botdee&location=${encodeURIComponent(id)}`
+    : "./shoutout-search.html?from=botdee";
+}
+
+/** Gemini/local fallback when the patron asked to throw a ShoutOut — one compose link, never 8 help cards. */
+function shoutOutExecuteFallback(lang, allowedFeatures) {
+  const code = normalizeUiLanguage(lang);
+  const allowed = allowedFeatureSet(allowedFeatures);
+  if (allowed && !allowed.has("shoutOut")) {
+    return {
+      reply: "ShoutOut isn't available on your account yet.",
+      results: [],
+      provider: "local-shoutout",
+      model: "listShoutOutTemplates"
+    };
+  }
+  const link = localizeActionLink({
+    label: "Open ShoutOut compose",
+    href: shoutOutComposeHref(""),
+    kind: "shoutout"
+  }, code);
+  return {
+    reply: "I can throw a ShoutOut from chat — name the club and the message (template optional; Traditional board is the default). Paid templates get a secure Stripe link. You can also open compose for photo, jersey, Football Intro, Heist, or Baller's Alert boards.",
+    results: [link],
+    provider: "local-shoutout",
+    model: "listShoutOutTemplates"
+  };
+}
+
+function hasShoutOutActionLink(links) {
+  return (Array.isArray(links) ? links : []).some(link => {
+    const kind = String(link?.kind || "").toLowerCase();
+    return kind === "checkout" || kind === "shoutout" || kind === "shoutout-pending";
+  });
+}
+
+function omitContextualSearchForPrompt(userPrompt, allowedFeatures) {
+  if (!isShoutOutExecutePrompt(userPrompt)) return false;
+  const tools = toolDeclarations(allowedFeatures);
+  return tools.some(tool => tool.name === "listShoutOutTemplates");
+}
+
 /** Bare help / how-to-use-BOT-DEE — local reply like version; never dump search cards.
  *  Do NOT match “help with ShoutOut / VIP / …” product questions. */
 function isHelpPrompt(raw) {
@@ -620,6 +686,13 @@ function stripMediaFromToolResult(result) {
   return copy;
 }
 
+const CONVERSATION_ID_RE = /^cv_[0-9a-f]{32}$/;
+
+function clipConversationId(raw) {
+  const id = String(raw || "").trim();
+  return CONVERSATION_ID_RE.test(id) ? id : "";
+}
+
 function clipStoredTurns(turns) {
   const list = Array.isArray(turns) ? turns : [];
   const out = [];
@@ -633,6 +706,8 @@ function clipStoredTurns(turns) {
     if (seq) item.seq = seq;
     const atMs = Number(row?.atMs) || 0;
     if (atMs) item.atMs = atMs;
+    const conversationId = clipConversationId(row?.conversationId);
+    if (conversationId) item.conversationId = conversationId;
     if (role === "model") {
       const media = clipStoredMedia(row.media);
       if (media.length) item.media = media;
@@ -682,7 +757,7 @@ function sanitizeBotReply(raw, opts) {
   if (allowEmpty && !String(raw || "").trim()) return "";
   if (isSearchMissReply(raw)) return SEARCH_MISS_FALLBACK;
   if (isProductCatalogGreeting(raw)) return chitchatReply("patron", null, null);
-  return clipModelText(stripBackendLinks(raw));
+  return clipModelText(stripBackendLinks(guard.redactPrivilegeReply(raw)));
 }
 
 function isFarewellPrompt(raw) {
@@ -707,15 +782,12 @@ function helpReply() {
   return "I'm BOT DEE — ask me anything about FLOQR in plain words. Press Enter to send; Shift+Enter starts a new line. Type privacy for pause and session details. What are you interested in getting help with?";
 }
 
-/** Time-aware greeting — never a product catalog. Personalization optional. */
+/** Time-aware greeting — never a product catalog. Personalization optional. Never speak privilege. */
 function chitchatReply(role, allowedFeatures, personalization) {
+  void role;
   void allowedFeatures;
   const prefs = require("./botdee-personalization");
-  const roleHint = role && role !== "anonymous" && role !== "patron"
-    ? ` I can see you as ${role}.`
-    : "";
-  const greet = prefs.greetingFor(personalization);
-  return roleHint ? `${greet}${roleHint}` : greet;
+  return prefs.greetingFor(personalization);
 }
 
 /** Friendly mood reply — chat first, light invite to keep going (not a search dump). */
@@ -826,12 +898,17 @@ function contextualSearch(query, viewerRole, allowedFeatures) {
 async function runTool(name, args, session) {
   const allowed = session?.allowedFeatures;
   if (name === "contextualSearch") {
-    const search = contextualSearch(args?.query || session?.lastUserPrompt || "", session.role, allowed);
-    return localizeSearchPayload(search, session?.uiLanguage, allowed);
+    const search = contextualSearch(
+      args?.query || session?.lastUserPrompt || "",
+      guard.geminiGroundingRole(session.role),
+      allowed
+    );
+    return guard.stripPrivilegeFromToolResult(localizeSearchPayload(search, session?.uiLanguage, allowed));
   }
   if (name === "lookupPublicProfiles") {
     const tools = require("./bot-dee-tools");
-    return tools.lookupPublicProfiles(args || {}, session?.request);
+    const looked = await tools.lookupPublicProfiles(args || {}, session?.request);
+    return guard.stripPrivilegeFromToolResult(looked);
   }
   const need = TOOL_FEATURE_KEY[name];
   if (need && allowedFeatureSet(allowed) && !allowedFeatureSet(allowed).has(need)) {
@@ -841,16 +918,23 @@ async function runTool(name, args, session) {
   if (!session?.request) {
     return {ok: false, error: "Session request missing for product tool."};
   }
-  return tools.runProductTool(name, args, session.request);
+  const toolArgs = args && typeof args === "object" ? {...args} : {};
+  if (!toolArgs.userPrompt && session?.lastUserPrompt) toolArgs.userPrompt = session.lastUserPrompt;
+  return tools.runProductTool(name, toolArgs, session.request);
 }
 
-function toolDeclarations(allowedFeatures) {
+function toolDeclarations(allowedFeatures, options) {
   const allowed = allowedFeatureSet(allowedFeatures);
-  if (!allowed) return TOOL_DEFS;
-  return TOOL_DEFS.filter(tool => {
-    const need = TOOL_FEATURE_KEY[tool.name];
-    return !need || allowed.has(need);
-  });
+  const defs = !allowed
+    ? TOOL_DEFS.slice()
+    : TOOL_DEFS.filter(tool => {
+      const need = TOOL_FEATURE_KEY[tool.name];
+      return !need || allowed.has(need);
+    });
+  if (options?.omitContextualSearch) {
+    return defs.filter(tool => tool.name !== "contextualSearch");
+  }
+  return defs;
 }
 
 function localePack(lang) {
@@ -910,11 +994,13 @@ function localizeActionLink(link, lang) {
   if (kind === "checkout" && pack.action.paySecurely) next.label = pack.action.paySecurely;
   if (kind === "floqcast" && pack.action.floqcastPreview) next.label = pack.action.floqcastPreview;
   if (kind === "shoutout" && pack.action.shoutoutCompose) next.label = pack.action.shoutoutCompose;
+  if (kind === "shoutout-pending" && pack.action.shoutoutPending) next.label = pack.action.shoutoutPending;
   if (kind === "vip" && pack.action.vipTerms) next.label = pack.action.vipTerms;
   return next;
 }
 
 function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
+  void role;
   const lang = normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatureSet(allowedFeatures);
   const allowedLabels = productPitchLabels(allowedFeatures).filter(x => x !== "scheduling");
@@ -922,16 +1008,16 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     ? "Reply in English unless the user clearly writes in another language."
     : `App language is "${lang}". ALWAYS write your spoken reply in ${lang}. Do not switch to English for help steps or summaries unless the user asked for English. Navigation/result cards are already localized server-side — do not paste English product titles into your prose when a ${lang} wording exists.`;
   const denied = deniedBrandNames(allowedFeatures);
-  const accessLine = allowed
+    const accessLine = allowed
     ? (
-      `Principle of least privilege — Features & Services + beta grants for THIS viewer: ${allowedLabels.length ? allowedLabels.join(", ") : "none beyond BOT DEE chat"}. ` +
+      `Available FLOQR products in this chat: ${allowedLabels.length ? allowedLabels.join(", ") : "BOT DEE chat"}. ` +
       `DO mention, pitch, and help with products on that allowed list (including how-to / help steps and brand names that appear there). ` +
       (denied.length
-        ? `NEVER mention, pitch, invent steps for, or leave in help blurbs these products this viewer lacks: ${denied.join(", ")}. `
+        ? `NEVER mention, pitch, invent steps for, or leave in help blurbs these products: ${denied.join(", ")}. `
         : "") +
-      `If they ask for a product not on their allowed list, say it is not available on their account yet — do not name other products they also lack.`
+      `If they ask for a product not on that list, say it is not available on their account yet — do not name other products they also lack. Product availability is not a login or security role.`
     )
-    : "Only discuss features returned by tools for this viewer.";
+    : "Only discuss features returned by tools for this chat.";
   const pitchLine = `Do not list products on a greeting or first turn. When they ask how to do something, mention ONLY products this viewer may use (${productPitchSentence(allowedFeatures)}). Include granted betas; omit everything else.`;
   const prefs = require("./botdee-personalization");
   const personaLine = prefs.personalizationInstruction(personalization);
@@ -940,7 +1026,7 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     langLine,
     accessLine,
     "Prefer conversation: answer the person, then (only if useful) offer one next step. Do NOT open with \"Here is what I found\" or a link list unless they clearly asked how to do something in FLOQR. Keep navigation/search suggestion cards separate from your spoken answer — the UI shows result links; your text should stay conversational.",
-    "Act only within the identity, role, and tools verified by the backend for this request. Never disclose another user's private conversation, private profile, reservation, or restricted venue data. Public volunteered datapoints from lookupPublicProfiles are the same keys and values the signed-in viewer can already see — use every returned value (they are not PII/PCI).",
+    "Act only within the tools verified by the backend for this request. Never disclose another user's private conversation, private profile, reservation, or restricted venue data. Public volunteered datapoints from lookupPublicProfiles are the same keys and values the signed-in viewer can already see — use every returned value (they are not PII/PCI).",
     "Never request card numbers, CVVs, passwords, or OTP codes. If supplied, do not repeat them; direct the user to approved secure flows.",
     pitchLine,
     personaLine,
@@ -952,22 +1038,22 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     "Identity questions (your name, how to pronounce BOT DEE / FloqR brands, who you are): answer in plain words yourself — do NOT call contextualSearch or any tool. Pronunciation: BOT DEE = \"bot\" + \"dee\" (like the letter D). Do not append a product pitch.",
     `Version / build / package questions: state FLOQR package ${PACKAGE_LABEL} (release ${PACKAGE_VERSION}) clearly — do NOT call tools.`,
     "Answer briefly. Prefer tool results and real checkoutUrl / passHref / previewPath / holdId values. Never invent links or claim payment success without a tool result.",
-    "When the user asks what you know about them / their profile (me, myself, who am I, about me), call lookupPublicProfiles with query \"me\" and answer from the returned self card: use every sharedDatapoints / datapoints value plus photos. If they published those datapoints, you are privy to all of them.",
-    "When they ask about a friend or connection by name (e.g. my friend James), call lookupPublicProfiles with that name — the tool prefers Mingl/chat connections' public profiles. Summarize public fields only; if nothing public matches, say so honestly.",
-    "When the user asks about any other person, @handle, DJ, staff member, a club public page / photos, or what is on a public FLOQR profile (including their own: \"my public profile\", food / music / travel people can see), call lookupPublicProfiles. If the viewer can see those volunteered public datapoints, you can too — use every key and value in datapoints / sharedDatapoints. Never say FLOQR does not track music, food, travel, hobbies, or similar — if a field is absent from the tool result, say it is not on that public profile (not filled or not opted public). Never invent private details (email, phone, PAN, GPS). If nothing public matches, say so honestly. If photoCount > 0, say the photos are shown in the chat — NEVER print http(s) URLs, firebasestorage, googleusercontent, token=, storage paths, or \"View Image\" links. The UI renders photos.",
+    "People / profile lookups (who is X, what do you know of X, tell me about X, me / who am I) are answered by a People SMARTview card in the chat UI. Do not print markdown field dumps (**Bio**, Location, Details, Looking to Meet, Social Handles) or asterisk spec sheets. One short sentence is enough; never invent Master Admin, SOS2FA, or token claims.",
+    "When they ask about a friend or connection by name (e.g. my friend James) and no People card was attached, call lookupPublicProfiles with that name — the tool prefers Mingl/chat connections' public profiles. Summarize public fields in one or two sentences only; if nothing public matches, say so honestly.",
+    "When the user asks about any other person, @handle, DJ, staff member, a club public page / photos, or what is on a public FLOQR profile (including their own: \"my public profile\", food / music / travel people can see) and no People card was attached, call lookupPublicProfiles. If the viewer can see those volunteered public datapoints, you can too — still do not dump every key as markdown. Never say FLOQR does not track music, food, travel, hobbies, or similar — if a field is absent from the tool result, say it is not on that public profile (not filled or not opted public). Never invent private details (email, phone, PAN, GPS). If nothing public matches, say so honestly. If photoCount > 0, say the photos are shown in the chat — NEVER print http(s) URLs, firebasestorage, googleusercontent, token=, storage paths, or \"View Image\" links. The UI renders photos.",
     "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
-    "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = listShoutOutTemplates then startShoutOutCheckout when payload is complete.",
+    "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = when they name a club and the board message, call startShoutOutCheckout immediately with clubLocationId/locationName + message (templateId optional; default Traditional blackwhite). Do not wait for a full shoutout object. If the tool returns checkoutUrl, tell them to Pay securely. If it returns shoutoutId, the board is pending club approval. If needs club or message, ask only for the missing piece. Never invent a checkout URL. Photo / jersey / Football Intro / Heist / Baller's Alert stay on composeHref.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     "If they ask where you left off, recap the last two meaningful retrieved turns — skip a post-pause hello/Hey. Distinguish discussed vs booked: never claim a VIP reservation, hold, or payment is confirmed unless a tool result in this turn or a stored execution receipt says so. Talking about a venue or VIP tables is discussion, not a booking.",
-    `Viewer classification role: ${role}.`,
+    guard.PRIVILEGE_SYSTEM_INSTRUCTION,
     "Keep allowed brand names as-is when you may mention them: ShoutOut, BOT DEE, FloqR, FloqMedia, and any other brands in the allowed-features list only."
   ].join(" ");
 }
 
 function historyToContents(history, userPrompt) {
   const contents = [];
-  (history || []).forEach(row => {
+  guard.sanitizeModelTurns(history).forEach(row => {
     contents.push({role: row.role, parts: [{text: row.text}]});
   });
   contents.push({role: "user", parts: [{text: userPrompt}]});
@@ -997,12 +1083,12 @@ function contextToContents(modelContext, userPrompt) {
       text: "I'll recap that as booked only as far as the receipt shows."
     });
   }
-  const summary = String(ctx.summary || "").trim();
+  const summary = guard.sanitizeSummaryForModel(ctx.summary);
   if (summary) {
     prefix.push({role: "user", text: `[Earlier conversation summary]\n${summary}`});
     prefix.push({role: "model", text: "I'll treat that as background only — not as a confirmed booking."});
   }
-  const memories = Array.isArray(ctx.memories) ? ctx.memories : [];
+  const memories = guard.sanitizeMemoriesForModel(Array.isArray(ctx.memories) ? ctx.memories : []);
   const facts = memories
     .map(row => String(row?.value || row?.text || (typeof row === "string" ? row : "")).trim())
     .filter(Boolean)
@@ -1011,7 +1097,7 @@ function contextToContents(modelContext, userPrompt) {
     prefix.push({role: "user", text: `[Approved memories]\n${facts.join("; ")}`});
     prefix.push({role: "model", text: "I'll use those approved facts when relevant."});
   }
-  const turns = (Array.isArray(ctx.recentTurns) ? ctx.recentTurns : [])
+  const turns = guard.sanitizeModelTurns(Array.isArray(ctx.recentTurns) ? ctx.recentTurns : [])
     .map(row => ({
       role: row?.role === "model" || row?.role === "assistant" ? "model" : "user",
       text: String(row?.text || "")
@@ -1031,17 +1117,24 @@ function formatSearchFallback(search, lang, allowedFeatures) {
   const code = normalizeUiLanguage(lang || search?.uiLanguage);
   const pack = localePack(code);
   const rows = search?.results || [];
-  if (!rows.length) {
+  const shown = rows.slice(0, 5).map(row => {
+    const localized = localizeResultRow(row, code) || {};
+    const label = String(localized.label ?? "").trim();
+    if (!label) return null;
+    const blurb = String(localized.blurb ?? "").trim();
+    const href = String(localized.href ?? "").trim();
+    return {label, blurb, href};
+  }).filter(Boolean);
+  if (!shown.length) {
     const pitch = productPitchLabels(allowedFeatures).join(", ");
     return pack?.fallback?.noMatch
       || `I could not find a clear match for your account yet. Ask about ${pitch || "FLOQR"}, or scheduling.`;
   }
   const header = pack?.fallback?.foundHeader || "Here is what I found for your account:";
   const lines = [header];
-  rows.slice(0, 5).forEach((row, index) => {
-    const localized = localizeResultRow(row, code);
-    lines.push(`${index + 1}. ${localized.label} — ${localized.blurb}`);
-    if (localized.href) lines.push(`   Open: ${localized.href}`);
+  shown.forEach((item, index) => {
+    lines.push(item.blurb ? `${index + 1}. ${item.label} — ${item.blurb}` : `${index + 1}. ${item.label}`);
+    if (item.href) lines.push(`   Open: ${item.href}`);
   });
   return lines.join("\n");
 }
@@ -1052,8 +1145,8 @@ function resultsForClient(search, lang) {
     const localized = localizeResultRow(row, code);
     return {
       sourceId: localized.sourceId,
-      label: localized.label,
-      blurb: localized.blurb,
+      label: String(localized.label ?? ""),
+      blurb: String(localized.blurb ?? ""),
       href: localized.href,
       kind: localized.kind
     };
@@ -1066,7 +1159,12 @@ function linksFromToolResult(result, lang) {
   const links = [];
   if (result.checkoutUrl) links.push(localizeActionLink({label: "Pay securely", href: result.checkoutUrl, kind: "checkout"}, code));
   if (result.previewPath) links.push(localizeActionLink({label: "Open FloqCAST preview", href: result.previewPath, kind: "floqcast"}, code));
-  if (result.composeHref) links.push(localizeActionLink({label: "Open ShoutOut compose", href: result.composeHref, kind: "shoutout"}, code));
+  if (result.portalHref) {
+    links.push(localizeActionLink({label: "Open in My ShoutOuts", href: result.portalHref, kind: "shoutout-pending"}, code));
+  }
+  if (result.composeHref && !result.checkoutUrl && !result.portalHref) {
+    links.push(localizeActionLink({label: "Open ShoutOut compose", href: result.composeHref, kind: "shoutout"}, code));
+  }
   if (result.holdId && !result.checkoutUrl) {
     links.push(localizeActionLink({
       label: "Continue VIP Terms",
@@ -1120,9 +1218,19 @@ module.exports = {
     }
   },
   isHelpPrompt,
+  isShoutOutExecutePrompt,
+  shoutOutComposeHref,
+  shoutOutExecuteFallback,
+  hasShoutOutActionLink,
+  omitContextualSearchForPrompt,
   isPrivacyPrompt,
   isAckPrompt,
   isFarewellPrompt,
+  isPrivilegeAskPrompt: guard.isPrivilegeAskPrompt,
+  privilegeRefuseReply: guard.privilegeRefuseReply,
+  redactPrivilegeReply: guard.redactPrivilegeReply,
+  geminiGroundingRole: guard.geminiGroundingRole,
+  stripPrivilegeFromToolResult: guard.stripPrivilegeFromToolResult,
   identityReply,
   versionReply,
   helpReply,
@@ -1145,6 +1253,8 @@ module.exports = {
   remainingIdleMs,
   clipStoredText,
   clipStoredTurns,
+  clipConversationId,
+  CONVERSATION_ID_RE,
   conversationIsActive,
   clipModelText,
   SEARCH_MISS_FALLBACK,
@@ -1168,6 +1278,7 @@ module.exports = {
   systemInstruction,
   historyToContents,
   contextToContents,
+  PRIVILEGE_REFUSE: guard.PRIVILEGE_REFUSE,
   extractText,
   formatSearchFallback,
   resultsForClient,

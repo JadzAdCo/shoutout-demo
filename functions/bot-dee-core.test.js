@@ -50,6 +50,18 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.equal(bot.isMoodPrompt("Hey"), false);
   assert.equal(bot.isChitchatPrompt("thanks"), true);
   assert.equal(bot.isChitchatPrompt("throw a shoutout"), false);
+  assert.equal(bot.isShoutOutExecutePrompt("throw a shoutout"), true);
+  assert.equal(bot.isShoutOutExecutePrompt("send a shoutout at Decades"), true);
+  assert.equal(bot.isShoutOutExecutePrompt("how do I throw a shoutout"), false);
+  assert.equal(bot.isShoutOutExecutePrompt("help throwing a shoutout"), false);
+  const longBoard = "Happy birthday from the whole table — love you ".repeat(4).trim();
+  const longThrow = `throw a shoutout at Decades Nightclub, Washington, DC that says ${longBoard}`;
+  assert.ok(longThrow.length > 200);
+  assert.ok(longThrow.length <= bot.MAX_MESSAGE_CHARS);
+  assert.ok(longBoard.length >= 160);
+  assert.equal(bot.isShoutOutExecutePrompt(longThrow), true);
+  assert.equal(bot.isShoutOutExecutePrompt("at Decades that says Happy birthday Maya"), false);
+  assert.equal(bot.omitContextualSearchForPrompt(longThrow, ["shoutOut", "botDee"]), true);
   assert.equal(bot.isChitchatPrompt("mail logging"), false);
 
   const heyHits = bot.contextualSearch("Hey", "master");
@@ -59,6 +71,7 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   const reply = bot.chitchatReply("master");
   assert.match(reply, /Good afternoon|Wassup|How can I help|working on/i);
   assert.doesNotMatch(reply, /ShoutOut|VIP|floqCast/i);
+  assert.doesNotMatch(reply, /master|admin|I can see you as/i);
   const dumped = "Hey! I'm BOT DEE, your FLOQR assistant. What can I help you with today — ShoutOut, VIP reserV, or floqCast?";
   assert.equal(bot.isProductCatalogGreeting(dumped), true);
   assert.doesNotMatch(bot.sanitizeBotReply(dumped), /ShoutOut|VIP reserV|floqCast/i);
@@ -236,7 +249,8 @@ test("lookupPublicProfiles tool covers me + friends in description", () => {
   assert.ok(decl);
   assert.match(String(decl.description), /me|myself/i);
   assert.match(String(decl.description), /friend|connection|Mingl/i);
-  assert.match(bot.systemInstruction("patron"), /lookupPublicProfiles with query "me"/i);
+  assert.match(bot.systemInstruction("patron"), /People SMARTview card/i);
+  assert.match(bot.systemInstruction("patron"), /lookupPublicProfiles with that name/i);
   assert.match(bot.systemInstruction("patron"), /friend or connection/i);
 });
 
@@ -340,6 +354,8 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
   assert.match(src, /uiLanguage/);
   assert.doesNotMatch(src, /purchaseVIPReservation/);
   assert.match(read("functions/bot-dee-tools.js"), /startShoutOutCheckout/);
+  assert.match(read("functions/bot-dee-tools.js"), /composeShoutOutPayload/);
+  assert.match(read("functions/commerce-functions.js"), /exports\.createHeadlessShoutOutCheckout/);
   assert.match(read("functions/bot-dee-tools.js"), /createVipHold/);
   assert.match(read("functions/bot-dee-tools.js"), /createFloqCastCheckout/);
   assert.match(read("functions/bot-dee-tools.js"), /lookupPublicProfiles/);
@@ -354,6 +370,56 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
   assert.ok(names.includes("startShoutOutCheckout"));
   assert.ok(names.includes("createVipCheckout"));
   assert.ok(names.includes("createFloqCastRequest"));
+  assert.equal(bot.omitContextualSearchForPrompt("throw a shoutout", ["shoutOut", "botDee"]), true);
+  assert.equal(bot.omitContextualSearchForPrompt("how do I throw a shoutout", ["shoutOut", "botDee"]), false);
+  assert.ok(!bot.toolDeclarations(["shoutOut", "botDee"], {omitContextualSearch: true})
+    .some(t => t.name === "contextualSearch"));
+  assert.ok(bot.toolDeclarations(["shoutOut", "botDee"], {omitContextualSearch: true})
+    .some(t => t.name === "listShoutOutTemplates"));
+  assert.match(src, /omitContextualSearchForPrompt/);
+  assert.match(src, /isShoutOutExecutePrompt\(userPrompt\)/);
+  assert.match(src, /tryHeadlessShoutOut/);
+  const historyChunks = src.split("prefs.appendActionHistory(").slice(1);
+  assert.equal(historyChunks.length, 2);
+  historyChunks.forEach(chunk => {
+    const body = chunk.slice(0, chunk.indexOf("results:"));
+    assert.match(body, /actionLinks/);
+    assert.doesNotMatch(body, /resultCards|truncatedCards|resultsForClient|throwPack\.results/);
+  });
+});
+
+test("throw a shoutout does not dump stacked help cards", () => {
+  const allowed = ["shoutOut", "botDee", "passes"];
+  const helpers = require("./bot-dee-functions").__botDeeHelpers;
+  const local = helpers.localSession("patron", "throw a shoutout", {
+    uiLanguage: "en",
+    allowedFeatures: allowed
+  });
+  assert.equal(local.provider, "local-shoutout");
+  assert.equal(local.results.length, 1);
+  assert.equal(local.results[0].kind, "shoutout");
+  assert.match(local.results[0].href, /shoutout-search\.html\?from=botdee/);
+  assert.doesNotMatch(local.reply, /Here is what I found/i);
+  assert.ok(!local.results.some(row => /Baller's Alert|Black Card|Classic Halloween|Shiloh/i.test(row.label)));
+  const how = helpers.localSession("patron", "how do I throw a shoutout", {
+    uiLanguage: "en",
+    allowedFeatures: allowed
+  });
+  assert.equal(how.provider, "local-fallback");
+  assert.ok(how.results.length > 1);
+  const denied = bot.shoutOutExecuteFallback("en", ["botDee"]);
+  assert.match(denied.reply, /isn't available/i);
+  assert.equal(denied.results.length, 0);
+  const longBoard = "Happy birthday from the whole table — love you ".repeat(4).trim();
+  const longThrow = `throw a shoutout at Decades Nightclub, Washington, DC that says ${longBoard}`;
+  assert.ok(longThrow.length > 200);
+  const longLocal = helpers.localSession("patron", longThrow, {
+    uiLanguage: "en",
+    allowedFeatures: allowed
+  });
+  assert.equal(longLocal.provider, "local-shoutout");
+  assert.equal(longLocal.results.length, 1);
+  assert.doesNotMatch(longLocal.reply, /Here is what I found/i);
 });
 
 test("result cards localize to app language (no English ShoutOut label in German)", () => {
@@ -372,6 +438,9 @@ test("result cards localize to app language (no English ShoutOut label in German
 
   const links = bot.linksFromToolResult({checkoutUrl: "https://pay.example/x"}, "de");
   assert.equal(links[0].label, "Sicher bezahlen");
+  const pending = bot.linksFromToolResult({portalHref: "./patron-portal.html?tab=shoutouts&id=abc"}, "de");
+  assert.equal(pending[0].kind, "shoutout-pending");
+  assert.equal(pending[0].label, "In Meine ShoutOuts öffnen");
 
   assert.match(bot.systemInstruction("patron", "de", ["shoutOut", "botDee"]), /App language is "de"/);
   assert.match(read("bot-dee-chat.js"), /uiLanguage:\s*currentUiLanguage/);
@@ -431,7 +500,8 @@ test("BOT DEE hides gated beta features the viewer cannot access", () => {
   assert.ok(deniedNames.includes("floqCast"));
   assert.ok(deniedNames.includes("VIP reserV"));
   assert.ok(deniedNames.includes("Mingl"));
-  assert.match(bot.systemInstruction("patron", "en", allowed), /least privilege/i);
+  assert.match(bot.systemInstruction("patron", "en", allowed), /Available FLOQR products in this chat/i);
+  assert.doesNotMatch(bot.systemInstruction("master", "en", allowed), /Viewer classification|I can see you as|beta grants/i);
   assert.match(read("functions/bot-dee-functions.js"), /loadAllowedFeatures/);
   assert.match(read("bot-dee-chat.js"), /scrubGatedBrands|accessibleProductPitch/);
   // Local greetings must scrub by access — not discard locale when floqCast/VIP appear in chrome packs.
@@ -467,8 +537,9 @@ test("BOT DEE keeps granted beta features in help/search (least privilege)", () 
   const deniedNames = bot.deniedBrandNames(granted);
   assert.deepEqual(deniedNames, ["Mingl", "RydR", "BartR"]);
   const instr = bot.systemInstruction("patron", "en", granted);
-  assert.match(instr, /THIS viewer: ShoutOut, VIP reserV, floqCast/);
-  assert.match(instr, /this viewer lacks: Mingl, RydR, BartR\./);
+  assert.match(instr, /ShoutOut, VIP reserV, floqCast/);
+  assert.match(instr, /these products: Mingl, RydR, BartR\./);
+  assert.doesNotMatch(instr, /Viewer classification role|beta grants for THIS viewer/i);
 });
 
 test("intent:help-* result cards localize via help pack alias", () => {
@@ -508,6 +579,9 @@ test("durable thread helpers isolate uid and idle window", () => {
     Array.from({length: 20}, (_, i) => ({role: i % 2 ? "model" : "user", text: `t${i}`}))
   );
   assert.equal(clipped.length, bot.MAX_HISTORY);
+  const cid = `cv_${"ab".repeat(16)}`;
+  const withId = bot.clipStoredTurns([{role: "user", text: "hi", conversationId: cid}]);
+  assert.equal(withId[0].conversationId, cid);
   const listed = bot.clipModelText("Here is what I found:\n1. ShoutOut — throw one\n2. VIP reserV — book");
   const userList = bot.clipStoredText("line one\n\nline two", bot.MAX_MESSAGE_CHARS);
   assert.match(userList, /line one\n\nline two/);

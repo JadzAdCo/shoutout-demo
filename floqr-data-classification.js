@@ -105,7 +105,7 @@
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
     ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
-    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1 + personalization + userbotdeelastUsedtime); Functions-write"],
+    ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1 + personalization + userbotdeelastUsedtime + chatTitles); spoken replies privilege-stripped (no Master Admin / Super Admin / SOS2FA / claims / beta-tester / Club Admin status); redaction does not log leaked text; Functions-write"],
     ["botDeeThreads/events", "ownMaster", 1, "Append-only BOT DEE chat events for one uid thread; Functions-write"],
     ["botDeeThreads/archive", "ownMaster", 1, "Opt-in BOT DEE durable messages; survives idle pause; Functions-write; no IP"],
     ["botDeeThreads/memories", "ownMaster", 1, "User-controlled BOT DEE memories; Functions-write; opt-in"],
@@ -157,7 +157,12 @@
     ["shoutoutComplianceLogs", "master", 1, "ShoutOut compliance logs"],
     ["shoutoutComplianceMeta", "master", 0, "ShoutOut compliance settings"],
     ["shoutoutRecommendations", "internal", 0, "ShoutOut suggestions"],
-    ["shoutouts", "ownClubStaff", 1, "ShoutOut requests (board text shows on the venue display)"],
+    ["shoutouts", "ownClubStaff", 1, "ShoutOut requests (board text shows on the venue display); Functions-write for paid Stripe fulfill and headless pending submit"],
+    ["smartVisualAdPolicy", "master", 0, "SMARTvisuals labeled-ad slot policy (AdSense off until separate approval)"],
+    ["smartVisualAuditLogs", "master", 1, "SMARTvisual Studio publish/override/sanitizer denials (actor email; Functions-write)"],
+    ["smartVisualDrafts", "master", 1, "Unpublished SMARTstencil/SMARTbackground drafts; patrons never read"],
+    ["smartVisualOverrides", "master", 0, "Authorized host/admin SMARTvisual asset overrides (Functions-write)"],
+    ["smartVisualSelections", "secret", 0, "Cached classification hash → approved asset IDs (Functions-write; no titles stored)"],
     ["sos2faChallenges", "secret", 1, "SOS2FA sign-in challenges"],
     ["sos2faRecoveryAttempts", "secret", 0, "SOS2FA recovery code attempts"],
     ["sos2faSessions", "secret", 0, "SOS2FA unlocked sessions"],
@@ -250,8 +255,13 @@
     ["botDeeThreads", "personalization.botDeePersonalizationVersion", "ownMaster", 0, "Versioned first-use overlay marker; below current generation still asks name/tone"],
     ["botDeeThreads", "botDeeSessionResetVersion", "ownMaster", 0, "One-shot chat reset per generation; overlay skip does not wipe later turns"],
     ["botDeeThreads", "retrievalFromSeq", "ownMaster", 0, "Transcript cursor after one-shot session reset; events with seq below this stay stored but are not retrieved or painted"],
+    ["botDeeThreads", "chatTitles", "ownMaster", 1, "User-chosen display titles for + Chats rows keyed by minted conversationId (cv_ uuid); Functions-write; owner uid only; never sent to Gemini"],
+    ["botDeeThreads", "currentConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the current slice; minted once; Functions-write"],
+    ["botDeeThreads", "archiveConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the previous slice after idle rotate; Functions-write"],
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
-    ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"]
+    ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"],
+    ["smartVisualDrafts", "svgXml", "master", 0, "Sanitized unpublished SVG markup for Studio Review; patrons never read"],
+    ["smartVisualDrafts", "svgChecksumSha256", "master", 0, "SHA-256 of the sanitized draft SVG"]
   ];
 
   const CATALOG = ROWS.map(presetRow);

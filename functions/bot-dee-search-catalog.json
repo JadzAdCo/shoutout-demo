@@ -685,11 +685,11 @@
       "id": "help-botdee-smartcard",
       "kind": "help",
       "label": "People SMARTcards",
-      "blurb": "When more than one public FLOQR profile matches, BOT DEE shows compact People SMARTcards in the chat: square photo on the left, name, public handles, city, and a 4-line SMARTsummary on the right. Tap a card to open that person’s full SMARTview. Cards use the same public profile a",
+      "blurb": "When more than one public FLOQR profile matches, BOT DEE shows compact People SMARTcards in the chat: full-width photo first, then name and handle, then a compact SMARTsummary with no padded box. Tap a card to open that person’s full SMARTview — same stacked layout. Cards use the",
       "href": "./botdee.html",
       "phrases": [
         "people smartcards",
-        "when more than one public floqr profile matches bot dee shows compact people smartcards in the chat square photo on the left name public handles city and a 4-li",
+        "when more than one public floqr profile matches bot dee shows compact people smartcards in the chat full-width photo first then name and handle then a compact s",
         "smartcard",
         "smart card",
         "people smartcard",
@@ -707,13 +707,17 @@
       "id": "help-botdee-smartcard-search",
       "kind": "help",
       "label": "Ask BOT DEE who someone is",
-      "blurb": "Ask “Who am I?” to open your own SMARTview. Ask “Who is …” plus a name or @handle to look up public FLOQR profiles. One match opens SMARTview. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether",
+      "blurb": "Ask “Who am I?” to open your own SMARTview. Ask “Who is …”, “What do you know of …”, or “What about …” plus a first and last name, display name, or @handle. One match opens a People SMARTview card in the chat — not a markdown list or photo dump. Several matches show SMARTcards to",
       "href": "./botdee.html",
       "phrases": [
         "ask bot dee who someone is",
-        "ask who am i to open your own smartview. ask who is plus a name or @handle to look up public floqr profiles. one match opens smartview. several matches show sma",
+        "ask who am i to open your own smartview. ask who is what do you know of or what about plus a first and last name display name or @handle. one match opens a peop",
         "who am i",
         "who is",
+        "what do you know of",
+        "what about",
+        "tell me about",
+        "display name",
         "find person on floqr",
         "do you know this person",
         "people search bot dee",
@@ -2574,6 +2578,8 @@
         "shoutout venue",
         "nearest shoutout",
         "throw a shoutout",
+        "throw shoutout from chat",
+        "headless shoutout",
         "search shoutout club",
         "display sizes",
         "patron custom shoutout",
@@ -2623,6 +2629,64 @@
         "granted geometry",
         "open si-nema",
         "help-sinema-virtual-set"
+      ]
+    },
+    {
+      "sourceId": "help:help-smartvisuals-notification",
+      "id": "help-smartvisuals-notification",
+      "kind": "help",
+      "label": "Mingl Room SMARTnotification",
+      "blurb": "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come",
+      "href": "./?start=search",
+      "phrases": [
+        "mingl room smartnotification",
+        "a compact mingl room invitation can appear on search. view invitation opens the room smartview. not now dismisses it for this session. art is a smartbackground ",
+        "smartnotification",
+        "smart notification",
+        "mingl room invitation",
+        "view invitation",
+        "cancun trip",
+        "smartvisuals",
+        "smartstencils",
+        "smartbackgrounds",
+        "open search",
+        "help-smartvisuals-notification"
+      ]
+    },
+    {
+      "sourceId": "help:help-smartvisuals-room",
+      "id": "help-smartvisuals-room",
+      "kind": "help",
+      "label": "Room SMARTview with SMARTvisuals",
+      "blurb": "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used t",
+      "href": "./botdee.html",
+      "phrases": [
+        "room smartview with smartvisuals",
+        "room smartview shows the mingl invitation schedule rsvp or live status and join now. smartstencils and smartbackgrounds follow the authorized room title cancun ",
+        "room smartview invitation",
+        "join now mingl",
+        "smartstencils",
+        "smartbackgrounds",
+        "cancun trip room",
+        "bot-dee itinerary",
+        "open bot dee",
+        "help-smartvisuals-room"
+      ]
+    },
+    {
+      "sourceId": "help:help-smartvisuals-studio",
+      "id": "help-smartvisuals-studio",
+      "kind": "help",
+      "label": "SMARTvisual Studio",
+      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads stay a separate labeled slot and a",
+      "href": "./master-admin.html",
+      "phrases": [
+        "smartvisual studio",
+        "smartvisual studio is the master admin library for smartstencils and smartbackgrounds. search and preview packaged art as images. drafts need license sanitizer ",
+        "asset registry",
+        "smartvisuals library",
+        "publish stencil",
+        "help-smartvisuals-studio"
       ]
     },
     {
@@ -4276,6 +4340,42 @@
         "how to throw a shoutout",
         "pick a club choose a template free black white classic or bot dee for paid themes pay if needed and send to the live display.",
         "help-shoutout"
+      ]
+    },
+    {
+      "sourceId": "intent:help-smartvisuals-notification",
+      "id": "help-smartvisuals-notification",
+      "kind": "help",
+      "label": "Mingl Room SMARTnotification",
+      "blurb": "Search can show a compact Mingl Room Invitation. View Invitation opens Room SMARTview. Art is illustration, not a photo.",
+      "href": "./botdee.html",
+      "phrases": [
+        "mingl room smartnotification",
+        "search can show a compact mingl room invitation. view invitation opens room smartview. art is illustration not a photo.",
+        "smartnotification",
+        "mingl room invitation",
+        "view invitation",
+        "cancun trip",
+        "smartvisuals",
+        "smartstencils",
+        "smartbackgrounds",
+        "help-smartvisuals-notification"
+      ]
+    },
+    {
+      "sourceId": "intent:help-smartvisuals-room",
+      "id": "help-smartvisuals-room",
+      "kind": "help",
+      "label": "Room SMARTview with SMARTvisuals",
+      "blurb": "Room SMARTview uses SMARTstencils and SMARTbackgrounds from the authorized room title. Join Now does not create a live room yet.",
+      "href": "./botdee.html",
+      "phrases": [
+        "room smartview with smartvisuals",
+        "room smartview uses smartstencils and smartbackgrounds from the authorized room title. join now does not create a live room yet.",
+        "room smartview invitation",
+        "join now mingl",
+        "cancun trip room",
+        "help-smartvisuals-room"
       ]
     },
     {

@@ -1,0 +1,2416 @@
+{
+  "schemaVersion": "floqr.smartVisuals/1",
+  "revision": 1,
+  "generatedAt": "2026-11-18T22:00:59.010Z",
+  "source": "FLOQR_SMART_Visual_Kit v2",
+  "licenseNote": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+  "counts": {
+    "backgrounds": 34,
+    "stencils": 26
+  },
+  "taxonomy": {
+    "categories": [
+      "art",
+      "beach",
+      "city",
+      "dining",
+      "event",
+      "fashion",
+      "hotel",
+      "media",
+      "meeting",
+      "nightclub",
+      "people",
+      "planning",
+      "restaurant",
+      "service",
+      "shopping",
+      "shoutout",
+      "sports",
+      "travel"
+    ],
+    "placeAliases": {
+      "cancun": {
+        "placeId": "cancun",
+        "backgroundId": "bg-bali",
+        "stencilId": "st-flight",
+        "tags": [
+          "travel",
+          "beach",
+          "destination:cancun"
+        ]
+      },
+      "cancún": {
+        "placeId": "cancun",
+        "backgroundId": "bg-bali",
+        "stencilId": "st-flight",
+        "tags": [
+          "travel",
+          "beach",
+          "destination:cancun"
+        ]
+      },
+      "san dego": {
+        "placeId": "san-diego",
+        "backgroundId": "bg-san-diego",
+        "stencilId": "st-location",
+        "tags": [
+          "city",
+          "destination:san-diego"
+        ]
+      },
+      "san diego": {
+        "placeId": "san-diego",
+        "backgroundId": "bg-san-diego",
+        "stencilId": "st-location",
+        "tags": [
+          "city",
+          "destination:san-diego"
+        ]
+      },
+      "burningman": {
+        "placeId": "burning-man",
+        "backgroundId": "bg-burning-man",
+        "stencilId": "st-celebration",
+        "tags": [
+          "event",
+          "festival"
+        ],
+        "officialAffiliation": false
+      },
+      "burning man": {
+        "placeId": "burning-man",
+        "backgroundId": "bg-burning-man",
+        "stencilId": "st-celebration",
+        "tags": [
+          "event",
+          "festival"
+        ],
+        "officialAffiliation": false
+      }
+    },
+    "collisionRule": "two-or-more-distinct-placeIds-without-travel-connector → ambiguous → neutral",
+    "confidenceThreshold": 0.78,
+    "typoThreshold": 0.86,
+    "geminiOnView": false,
+    "defaultDenyUnapproved": true,
+    "neutral": {
+      "backgroundId": "bg-mingl-room",
+      "stencilId": "st-people",
+      "reasonCode": "neutral-fallback"
+    }
+  },
+  "assets": [
+    {
+      "id": "bg-milan",
+      "type": "background",
+      "name": "Milan",
+      "description": "Milan scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "fashion",
+      "tags": [
+        "milan",
+        "fashion"
+      ],
+      "placeId": "milan",
+      "aliases": [
+        "milan"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/milan.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "ccfb7e65af9298b7d3dd8e62dbc6aa121cfe51276d59604f5869c3a6c2fd0f65",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/milan.svg",
+      "bytes": 900,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "fashion",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-paris",
+      "type": "background",
+      "name": "Paris",
+      "description": "Paris scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "fashion",
+      "tags": [
+        "paris",
+        "fashion"
+      ],
+      "placeId": "paris",
+      "aliases": [
+        "paris"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/paris.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "500ab545fed7208bfe2a46eb98b4398e27b940a8635ed7b95a1cc70e553c0202",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/paris.svg",
+      "bytes": 833,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "fashion",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-london",
+      "type": "background",
+      "name": "London",
+      "description": "London scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "city",
+      "tags": [
+        "london",
+        "city"
+      ],
+      "placeId": "london",
+      "aliases": [
+        "london"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/london.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "611fc46f21f63038ab223a976d6976cec3584a1b0febba6ee304cad8d77e1782",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/london.svg",
+      "bytes": 853,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-ibiza",
+      "type": "background",
+      "name": "Ibiza",
+      "description": "Ibiza scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "nightclub",
+      "tags": [
+        "ibiza",
+        "nightclub",
+        "beach"
+      ],
+      "placeId": "ibiza",
+      "aliases": [],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/ibiza.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "8fffb3912a5f40f48fbf26798859859fab55350401b36d13bd7c6ed14950f95e",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/ibiza.svg",
+      "bytes": 899,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "nightclub",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-mykonos",
+      "type": "background",
+      "name": "Mykonos",
+      "description": "Mykonos scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "beach",
+      "tags": [
+        "mykonos",
+        "beach"
+      ],
+      "placeId": "mykonos",
+      "aliases": [
+        "mykonos"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/mykonos.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "010773dc67272da5a95a1d9e2c5a4d597785c456d86644dff74391f494b28192",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/mykonos.svg",
+      "bytes": 901,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "beach",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-ischia",
+      "type": "background",
+      "name": "Ischia",
+      "description": "Ischia scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "beach",
+      "tags": [
+        "ischia",
+        "beach"
+      ],
+      "placeId": "ischia",
+      "aliases": [
+        "ischia"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/ischia.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "1f395cfefa9033f469c847d8d5820bc24f4c55d0faa2abe7121cef7ee8292020",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/ischia.svg",
+      "bytes": 900,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "beach",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-barcelona",
+      "type": "background",
+      "name": "Barcelona",
+      "description": "Barcelona scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "city",
+      "tags": [
+        "barcelona",
+        "city"
+      ],
+      "placeId": "barcelona",
+      "aliases": [
+        "barcelona"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/barcelona.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "51d251133758b929870222797c471a45b53ea5127ac106bb0e3606e9df45af86",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/barcelona.svg",
+      "bytes": 852,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-madrid",
+      "type": "background",
+      "name": "Madrid",
+      "description": "Madrid scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "city",
+      "tags": [
+        "madrid",
+        "city"
+      ],
+      "placeId": "madrid",
+      "aliases": [
+        "madrid"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/madrid.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "48c8f1a4fe3f52eee875ee72fbc90e26ca5b5eeb39d6256acb2247859f09fff1",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/madrid.svg",
+      "bytes": 823,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-washington-dc",
+      "type": "background",
+      "name": "Washington, DC",
+      "description": "Washington, DC scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "city",
+      "tags": [
+        "washington-dc",
+        "city"
+      ],
+      "placeId": "washington-dc",
+      "aliases": [
+        "washington, dc"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/washington-dc.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "abb40024a9c1e6ac85b604e5b66d97c36ee7e047349c2317ba3072d04f2a32f7",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/washington-dc.svg",
+      "bytes": 820,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-new-york",
+      "type": "background",
+      "name": "New York",
+      "description": "New York scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "city",
+      "tags": [
+        "new-york",
+        "city"
+      ],
+      "placeId": "new-york",
+      "aliases": [
+        "new york"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/new-york.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "78cbc6ebae007fd3bd2f97070a31b0c0269140407b72f804320cc954512d54a5",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/new-york.svg",
+      "bytes": 880,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-atlanta",
+      "type": "background",
+      "name": "Atlanta",
+      "description": "Atlanta scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "city",
+      "tags": [
+        "atlanta",
+        "city"
+      ],
+      "placeId": "atlanta",
+      "aliases": [
+        "atlanta"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/atlanta.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "69eb62b8bca94354f029acb91281f11ade4c44b68912c9d476ac58fcd812c084",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/atlanta.svg",
+      "bytes": 879,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-lisbon",
+      "type": "background",
+      "name": "Lisbon",
+      "description": "Lisbon scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "city",
+      "tags": [
+        "lisbon",
+        "city"
+      ],
+      "placeId": "lisbon",
+      "aliases": [
+        "lisbon"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/lisbon.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "3fdc872591e98f448c661f488122ad31b676179e3fb72961c95cd0be9f0660c6",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/lisbon.svg",
+      "bytes": 853,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-bali",
+      "type": "background",
+      "name": "Bali",
+      "description": "Bali scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "beach",
+      "tags": [
+        "bali",
+        "beach",
+        "tropical",
+        "travel"
+      ],
+      "placeId": "bali",
+      "aliases": [
+        "cancun",
+        "caribbean"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/bali.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "26dd32c792d99efd2b0524cd57cc77fc54b63c46f5845bd823f5864ee886fab4",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/bali.svg",
+      "bytes": 867,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "beach",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-thailand",
+      "type": "background",
+      "name": "Thailand",
+      "description": "Thailand scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "beach",
+      "tags": [
+        "thailand",
+        "beach",
+        "tropical",
+        "travel"
+      ],
+      "placeId": "thailand",
+      "aliases": [],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/thailand.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "eb4ff8cd00b04a574765b02d59fa4c7a318f61172e899a6fa452da64b2d5ce86",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/thailand.svg",
+      "bytes": 871,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "beach",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-los-angeles",
+      "type": "background",
+      "name": "Los Angeles",
+      "description": "Los Angeles scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "city",
+      "tags": [
+        "los-angeles",
+        "city"
+      ],
+      "placeId": "los-angeles",
+      "aliases": [
+        "los angeles"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/los-angeles.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "189c8c6e1108f7a82d7277cc8346f82e6e4bd6d285f903d4fc8bc10bc50db37d",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/los-angeles.svg",
+      "bytes": 870,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-seattle",
+      "type": "background",
+      "name": "Seattle",
+      "description": "Seattle scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "city",
+      "tags": [
+        "seattle",
+        "city"
+      ],
+      "placeId": "seattle",
+      "aliases": [
+        "seattle"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/seattle.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "8d9ffb9b81a27420d79493f84c380f39ef6d52b163249229dd595558fa5c50f6",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/seattle.svg",
+      "bytes": 847,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-san-diego",
+      "type": "background",
+      "name": "San Diego",
+      "description": "San Diego scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "beach",
+      "tags": [
+        "san-diego",
+        "beach"
+      ],
+      "placeId": "san-diego",
+      "aliases": [
+        "san diego"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/san-diego.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "8d19edbfce5e2960ae117d45df0d34458efc8d6a6892756f31ba23a84c3d58d3",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/san-diego.svg",
+      "bytes": 868,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "beach",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-burning-man",
+      "type": "background",
+      "name": "Burning Man",
+      "description": "Burning Man scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "event",
+      "tags": [
+        "burning-man",
+        "festival",
+        "event"
+      ],
+      "placeId": "burning-man",
+      "aliases": [
+        "burningman"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/burning-man.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "dd037041f817eda2215cd245a681434bae2a3238d60f3834ef7d74a5665652da",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/burning-man.svg",
+      "bytes": 871,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": false
+    },
+    {
+      "id": "bg-miami",
+      "type": "background",
+      "name": "Miami",
+      "description": "Miami scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "beach",
+      "tags": [
+        "miami",
+        "beach",
+        "city"
+      ],
+      "placeId": "miami",
+      "aliases": [],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/miami.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "2f94a93142d848634626a8269c87d52710975659f917fc8ca4f837686bf6410f",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/miami.svg",
+      "bytes": 864,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "beach",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-milan-fashion-week",
+      "type": "background",
+      "name": "Milan Fashion Week",
+      "description": "Milan Fashion Week scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "fashion",
+      "tags": [
+        "milan",
+        "fashion",
+        "event",
+        "runway"
+      ],
+      "placeId": "milan",
+      "aliases": [
+        "mfw"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/milan-fashion-week.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "2b1ed2e2610dc0a6f9759105a700c5bde62a92ce9d5806b96e451b1702588007",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/milan-fashion-week.svg",
+      "bytes": 853,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "fashion",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-paris-fashion-week",
+      "type": "background",
+      "name": "Paris Fashion Week",
+      "description": "Paris Fashion Week scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "fashion",
+      "tags": [
+        "paris",
+        "fashion",
+        "event",
+        "runway"
+      ],
+      "placeId": "paris",
+      "aliases": [
+        "pfw",
+        "paris fashion week"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/paris-fashion-week.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "943c2f998825911e33b6d14fd84a0b378b6c4bff6418a55c32c7ff3a85de1348",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/paris-fashion-week.svg",
+      "bytes": 853,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "fashion",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-new-york-fashion-week",
+      "type": "background",
+      "name": "New York Fashion Week",
+      "description": "New York Fashion Week scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "fashion",
+      "tags": [
+        "new-york",
+        "fashion",
+        "event",
+        "runway"
+      ],
+      "placeId": "new-york",
+      "aliases": [
+        "nyfw"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/new-york-fashion-week.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "ca8e28ff6f189794162321dfdacbd4c0f95af63e92139de11aa84edd87733be6",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/new-york-fashion-week.svg",
+      "bytes": 856,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "fashion",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-london-fashion-week",
+      "type": "background",
+      "name": "London Fashion Week",
+      "description": "London Fashion Week scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "fashion",
+      "tags": [
+        "london",
+        "fashion",
+        "event",
+        "runway"
+      ],
+      "placeId": "london",
+      "aliases": [
+        "lfw"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/london-fashion-week.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "54478c6a574eb0b0567f915e902be42a1a4f864abbeff8d6c2f8b78b3d4eaa9e",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/london-fashion-week.svg",
+      "bytes": 854,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "fashion",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-flight",
+      "type": "background",
+      "name": "Flights",
+      "description": "Flights scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "travel",
+      "tags": [
+        "flight",
+        "travel",
+        "airplane"
+      ],
+      "placeId": null,
+      "aliases": [
+        "plane",
+        "airport"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/flight.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "7fcd4f513664eded9738959de42af1e620cc1d12eb6ff78624e6dab3245f418a",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/flight.svg",
+      "bytes": 832,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-train",
+      "type": "background",
+      "name": "Trains",
+      "description": "Trains scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "travel",
+      "tags": [
+        "train",
+        "travel"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/train.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "63dd3f78181f265a9b5e6a0e678bf2f785a2c4ca3b7c8a4ac69864b6e345856d",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/train.svg",
+      "bytes": 868,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-road-trip",
+      "type": "background",
+      "name": "Road Trips",
+      "description": "Road Trips scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "travel",
+      "tags": [
+        "road-trip",
+        "travel",
+        "car"
+      ],
+      "placeId": null,
+      "aliases": [
+        "roadtrip",
+        "drive"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/road-trip.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "8424415f748c1c32c413476b1069679578761edef4ef9edf2e0c488b39b37edb",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/road-trip.svg",
+      "bytes": 828,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-cruise",
+      "type": "background",
+      "name": "Cruises",
+      "description": "Cruises scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "travel",
+      "tags": [
+        "cruise",
+        "travel"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/cruise.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "b141ae66b736cb28a5c7ac6d505a823a499bfca51eb6b6b6d6af68ce7174c8fb",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/cruise.svg",
+      "bytes": 821,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-vip-nightlife",
+      "type": "background",
+      "name": "VIP Nightlife",
+      "description": "VIP Nightlife scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "nightclub",
+      "tags": [
+        "vip",
+        "nightlife",
+        "nightclub"
+      ],
+      "placeId": null,
+      "aliases": [
+        "vip reserv"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/vip-nightlife.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "18d1b464acdc7fd0fed9a72df9745bb131b680bbf2aefe500dd796fc6e2e5a9e",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/vip-nightlife.svg",
+      "bytes": 840,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "nightclub",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-dining",
+      "type": "background",
+      "name": "Dining",
+      "description": "Dining scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "restaurant",
+      "tags": [
+        "dining",
+        "restaurant"
+      ],
+      "placeId": null,
+      "aliases": [
+        "dinner",
+        "food"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/dining.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "14fa1e55f88aa5f4cbac3771128f6ab8241912e16ba17742dda6218b866507c1",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/dining.svg",
+      "bytes": 832,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "restaurant",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-concert",
+      "type": "background",
+      "name": "Concert",
+      "description": "Concert scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "event",
+      "tags": [
+        "concert",
+        "event",
+        "music"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/concert.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "646729a0647b4221b217bbe4da941eeecebbee70f0e1eb1ce205d165aba64ac7",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/concert.svg",
+      "bytes": 836,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "location",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-sports-event",
+      "type": "background",
+      "name": "Sports",
+      "description": "Sports scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "sports",
+      "tags": [
+        "sports",
+        "event"
+      ],
+      "placeId": null,
+      "aliases": [
+        "game"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/sports-event.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "36e3802825cba5ac41fed7ce6f02e82561568c22e0b8bd153cb73f13265e1d3d",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/sports-event.svg",
+      "bytes": 850,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "sports",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-hotel-stay",
+      "type": "background",
+      "name": "Hotel Stay",
+      "description": "Hotel Stay scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "hotel",
+      "tags": [
+        "hotel",
+        "stay"
+      ],
+      "placeId": null,
+      "aliases": [
+        "lodging"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/hotel-stay.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "49632ec623427566218c8b75c4ca4655773a4638c11a05c2c608b674031c12de",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/hotel-stay.svg",
+      "bytes": 871,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "hotel",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-shoutout",
+      "type": "background",
+      "name": "ShoutOut",
+      "description": "ShoutOut scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "shoutout",
+      "tags": [
+        "shoutout"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/shoutout.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "58358a6973b399d62665df8e56d39616f485fb7f4591fa7f91da2a8965d76f49",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/shoutout.svg",
+      "bytes": 837,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "shoutout",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "bg-mingl-room",
+      "type": "background",
+      "name": "Mingl Room",
+      "description": "Mingl Room scenic SMARTbackground. Original illustration — not a photograph or official destination graphic.",
+      "category": "people",
+      "tags": [
+        "mingl",
+        "people",
+        "room",
+        "neutral"
+      ],
+      "placeId": null,
+      "aliases": [
+        "group chat"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/backgrounds/mingl-room.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "a1f1b78b740aee4bdea8966557e11fa509990524d93cc7a9e9eb20286c15da25",
+      "dimensions": {
+        "width": 800,
+        "height": 450
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/backgrounds/mingl-room.svg",
+      "bytes": 970,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": "people",
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-flight",
+      "type": "stencil",
+      "name": "Flight",
+      "description": "Flight SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "travel",
+      "tags": [
+        "flight",
+        "travel",
+        "airplane",
+        "trip"
+      ],
+      "placeId": null,
+      "aliases": [
+        "plane",
+        "airplane",
+        "airport"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/flight.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "09235394d609dc686a8be8f037b859f463c3446116127b93b524d969d712465c",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/flight.svg",
+      "bytes": 249,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-train",
+      "type": "stencil",
+      "name": "Train",
+      "description": "Train SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "travel",
+      "tags": [
+        "train",
+        "travel",
+        "rail"
+      ],
+      "placeId": null,
+      "aliases": [
+        "railway"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/train.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "e0c996e6ac808aed8492634a0987a4d1f79e4ec750a50b389a84b3f1ca60c696",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/train.svg",
+      "bytes": 270,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-hotel",
+      "type": "stencil",
+      "name": "Hotel",
+      "description": "Hotel SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "hotel",
+      "tags": [
+        "hotel",
+        "stay"
+      ],
+      "placeId": null,
+      "aliases": [
+        "lodging"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/hotel.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "667d0b05a2814191a4f3950a2868d594e590bfb044fca68baacc2b782ca96722",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/hotel.svg",
+      "bytes": 280,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-beach",
+      "type": "stencil",
+      "name": "Beach",
+      "description": "Beach SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "beach",
+      "tags": [
+        "beach",
+        "travel",
+        "tropical"
+      ],
+      "placeId": null,
+      "aliases": [
+        "shore",
+        "coast"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/beach.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "91c89b3bf5d10991ccf3868e30ed64f1e3e9843a1be947bf5c1ba7addc0fca30",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/beach.svg",
+      "bytes": 269,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-restaurant",
+      "type": "stencil",
+      "name": "Dining",
+      "description": "Dining SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "dining",
+      "tags": [
+        "dining",
+        "restaurant",
+        "dinner"
+      ],
+      "placeId": null,
+      "aliases": [
+        "food",
+        "eat"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/restaurant.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "ca088a76b4c9fcb3386d4ae8e78e937012f44f0abf62a86ad9399996914e4222",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/restaurant.svg",
+      "bytes": 273,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-nightclub",
+      "type": "stencil",
+      "name": "Nightclub",
+      "description": "Nightclub SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "nightclub",
+      "tags": [
+        "nightclub",
+        "club",
+        "nightlife"
+      ],
+      "placeId": null,
+      "aliases": [
+        "club",
+        "vip"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/nightclub.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "468efa11835cb0ac75943c42a929c1f4f762f13fd82a0b9d5eb759e9c936f235",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/nightclub.svg",
+      "bytes": 274,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-music",
+      "type": "stencil",
+      "name": "Music",
+      "description": "Music SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "event",
+      "tags": [
+        "music",
+        "concert"
+      ],
+      "placeId": null,
+      "aliases": [
+        "dj"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/music.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "a8d524e6480d28c48e4e0424e558ff5dd9273a7732196bbbab7850f573975f97",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/music.svg",
+      "bytes": 316,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-ticket",
+      "type": "stencil",
+      "name": "Ticket",
+      "description": "Ticket SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "event",
+      "tags": [
+        "ticket",
+        "event"
+      ],
+      "placeId": null,
+      "aliases": [
+        "tickets"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/ticket.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "117f314292afcf9b9c65c3a53867527e3630b4f64cde023a6324076b8b91d6df",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/ticket.svg",
+      "bytes": 257,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-calendar",
+      "type": "stencil",
+      "name": "Calendar",
+      "description": "Calendar SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "planning",
+      "tags": [
+        "calendar",
+        "planning",
+        "schedule"
+      ],
+      "placeId": null,
+      "aliases": [
+        "date"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/calendar.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "20a494c6125e3ee05a4d6b875c7ef96c376a83b40cfa4a88c303d3f5ec3d82e3",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/calendar.svg",
+      "bytes": 255,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-people",
+      "type": "stencil",
+      "name": "People",
+      "description": "People SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "people",
+      "tags": [
+        "people",
+        "mingl",
+        "room"
+      ],
+      "placeId": null,
+      "aliases": [
+        "group",
+        "friends"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/people.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "84df778bd2c3e50d811e76f6b4a5f82599dc68ac863927318e7474fb5ac54cd9",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/people.svg",
+      "bytes": 278,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-reservation",
+      "type": "stencil",
+      "name": "Reservation",
+      "description": "Reservation SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "planning",
+      "tags": [
+        "reservation",
+        "planning"
+      ],
+      "placeId": null,
+      "aliases": [
+        "rsvp",
+        "book"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/reservation.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "c40b141c3f30fc56bc714fe8b5737d748979230ead2e78ab016ecaeab48ac307",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/reservation.svg",
+      "bytes": 272,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-sports",
+      "type": "stencil",
+      "name": "Sports",
+      "description": "Sports SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "sports",
+      "tags": [
+        "sports",
+        "game"
+      ],
+      "placeId": null,
+      "aliases": [
+        "match"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/sports.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "a9eae3c82960c9c82b54606b788d11ccd1f03740794d22f6ae2d52a6998874b8",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/sports.svg",
+      "bytes": 296,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-fashion",
+      "type": "stencil",
+      "name": "Fashion",
+      "description": "Fashion SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "fashion",
+      "tags": [
+        "fashion",
+        "runway",
+        "event"
+      ],
+      "placeId": null,
+      "aliases": [
+        "runway",
+        "couture"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/fashion.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "968b40923767f3a305b98e1e030cf4db7792af1b4cca4e520456b8f9576ccfcc",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/fashion.svg",
+      "bytes": 255,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-shopping",
+      "type": "stencil",
+      "name": "Shopping",
+      "description": "Shopping SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "shopping",
+      "tags": [
+        "shopping"
+      ],
+      "placeId": null,
+      "aliases": [
+        "retail"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/shopping.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "837faa5feaf2af9c375f810837fbb76f4d15accf4d8b7752e0c87e7035c83d84",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/shopping.svg",
+      "bytes": 258,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-camera",
+      "type": "stencil",
+      "name": "Camera",
+      "description": "Camera SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "media",
+      "tags": [
+        "camera",
+        "photo"
+      ],
+      "placeId": null,
+      "aliases": [
+        "photos"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/camera.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "d31995af7cb45e156df45528daaa2e2f0d74a219ade9bff3d7337dbe4274301b",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/camera.svg",
+      "bytes": 281,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-car",
+      "type": "stencil",
+      "name": "Car",
+      "description": "Car SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "travel",
+      "tags": [
+        "car",
+        "road-trip",
+        "travel"
+      ],
+      "placeId": null,
+      "aliases": [
+        "drive",
+        "roadtrip"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/car.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "c2e99d0e984291d5432a9c45c6ca360148e147e45b923140170b37ac67ba8754",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/car.svg",
+      "bytes": 264,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-cruise",
+      "type": "stencil",
+      "name": "Cruise",
+      "description": "Cruise SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "travel",
+      "tags": [
+        "cruise",
+        "travel"
+      ],
+      "placeId": null,
+      "aliases": [
+        "ship"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/cruise.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "06dd9929f2414ebcf5ef18c2058c5cbe247e07e7e508fa0ef71838e76281304a",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/cruise.svg",
+      "bytes": 259,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-celebration",
+      "type": "stencil",
+      "name": "Celebration",
+      "description": "Celebration SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "event",
+      "tags": [
+        "celebration",
+        "festival"
+      ],
+      "placeId": null,
+      "aliases": [
+        "party",
+        "festival"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/celebration.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "95afa86f27489ef11ecf981a27d3861d4b2ecf2e1f514255d072b9752d0f2c86",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/celebration.svg",
+      "bytes": 268,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-meeting",
+      "type": "stencil",
+      "name": "Meeting",
+      "description": "Meeting SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "meeting",
+      "tags": [
+        "meeting",
+        "planning"
+      ],
+      "placeId": null,
+      "aliases": [
+        "work",
+        "office"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/meeting.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "357b5148950d77aa3a7dbab3dc80764c424c15d9ca506a8627b9f52f34d99c75",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/meeting.svg",
+      "bytes": 249,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-shoutout",
+      "type": "stencil",
+      "name": "ShoutOut",
+      "description": "ShoutOut SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "shoutout",
+      "tags": [
+        "shoutout"
+      ],
+      "placeId": null,
+      "aliases": [
+        "shout out"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/shoutout.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "972fc681801153125f8392152bb64d4e971b6e8811bac70ab9430f2fd1ab8e15",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/shoutout.svg",
+      "bytes": 261,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-ai",
+      "type": "stencil",
+      "name": "BOT DEE",
+      "description": "BOT DEE SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "service",
+      "tags": [
+        "botdee",
+        "ai"
+      ],
+      "placeId": null,
+      "aliases": [
+        "bot-dee",
+        "floqai"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/ai.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "ce59c4fb9008db98298551ba79606827cfe3091181af016ff76a106335d87023",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/ai.svg",
+      "bytes": 279,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-payments",
+      "type": "stencil",
+      "name": "Payments",
+      "description": "Payments SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "service",
+      "tags": [
+        "payments"
+      ],
+      "placeId": null,
+      "aliases": [
+        "pay"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/payments.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "721e769cb0c0cf3d365ee64ae507a5f541069d9a04255263f3b86969242cc34c",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/payments.svg",
+      "bytes": 249,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-route",
+      "type": "stencil",
+      "name": "Route",
+      "description": "Route SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "travel",
+      "tags": [
+        "route",
+        "travel",
+        "itinerary"
+      ],
+      "placeId": null,
+      "aliases": [
+        "itinerary",
+        "map"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/route.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "1c3a0c6bc46e86288e87ef7e0e66aacd8ca63f96e304c3f6bf3ae0f443bba79a",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/route.svg",
+      "bytes": 275,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-fireworks",
+      "type": "stencil",
+      "name": "Fireworks",
+      "description": "Fireworks SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "event",
+      "tags": [
+        "fireworks",
+        "celebration"
+      ],
+      "placeId": null,
+      "aliases": [],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/fireworks.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "ed910fc77131cb0b6a00a59388507b666627c0a8d0e207cb0aa94dc01f6a97fd",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/fireworks.svg",
+      "bytes": 298,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-art",
+      "type": "stencil",
+      "name": "Art",
+      "description": "Art SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "art",
+      "tags": [
+        "art"
+      ],
+      "placeId": null,
+      "aliases": [
+        "gallery"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/art.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "33409eff28838283d1c95131c75f278c26b6de1a9c5285aeb1d32d9853f726d2",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/art.svg",
+      "bytes": 249,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    },
+    {
+      "id": "st-location",
+      "type": "stencil",
+      "name": "Location",
+      "description": "Location SMARTstencil. Monochrome currentColor icon; not a user identity.",
+      "category": "city",
+      "tags": [
+        "location",
+        "city",
+        "place"
+      ],
+      "placeId": null,
+      "aliases": [
+        "place",
+        "destination"
+      ],
+      "license": "Original FLOQR illustration for project use. Not a photograph, trademark, or official destination graphic.",
+      "creator": "FLOQR SMARTvisuals starter kit",
+      "sourceUrl": "./smartvisuals/stencils/location.svg",
+      "attribution": "original programmatically authored illustration",
+      "approvalStatus": "published",
+      "revision": 1,
+      "checksum": "0f91cf438aa383f632cd5ee430dbcc07fd5486d45f4d1dd000249f6602fd34b1",
+      "dimensions": {
+        "width": 24,
+        "height": 24
+      },
+      "mime": "image/svg+xml",
+      "path": "smartvisuals/stencils/location.svg",
+      "bytes": 296,
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "studioPreview"
+      ],
+      "pairedStencilId": null,
+      "photographic": false,
+      "officialAffiliation": null
+    }
+  ]
+}

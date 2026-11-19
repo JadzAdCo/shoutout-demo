@@ -33,8 +33,10 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.036";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.036";  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.041";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.041";
+  const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
+  const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
   // Previous diagnostics package marker retained for package checks: v28.61-crawler-profile-import
 
@@ -220,6 +222,80 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.041",
+      title: "s3.3.041 — BOT DEE + FloqR headless ShoutOut checkout",
+      checks: [
+        {label:"Compose-from-chat core", file:"functions/headless-shoutout-core.js", includes:["parseShoutOutExecute", "composeShoutOutPayload", "classicHalloween"]},
+        {label:"Flat startShoutOutCheckout", file:"functions/bot-dee-tools.js", includes:["composeShoutOutPayload", "submitFreeHeadlessShoutOut", "args?.mainText || args?.message"]},
+        {label:"FloqR callable", file:"functions/commerce-functions.js", includes:["exports.createHeadlessShoutOutCheckout"]},
+        {label:"Session intercept", file:"functions/bot-dee-functions.js", includes:["tryHeadlessShoutOut"]},
+        {label:"Client helper", file:"payment-service.js", includes:["startHeadlessShoutOut", "createHeadlessShoutOutCheckout"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-041-botdee-headless-checkout"]}
+      ]
+    },
+    {
+      version: "s3.3.040",
+      title: "s3.3.040 — People lookup matches display name, legal name, handle, what-about",
+      checks: [
+        {label:"What-about classifier", file:"functions/botdee-smartcard-core.js", includes:["WHAT_ABOUT", "foldNameChars"]},
+        {label:"Identity aliases", file:"functions/bot-dee-tools.js", includes:["function identityAliases", "function scoreIdentity", "data.firstName, data.lastName"]},
+        {label:"Viewer alias not skipped", file:"functions/botdee-smartcard-functions.js", includes:["allowPrivateSelf: isViewer", "viewerMatch"]},
+        {label:"Chat follow-up prefix", file:"bot-dee-chat.js", includes:["PEOPLE_WHAT_ABOUT", "foldPeopleNameChars"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-040-people-alias-match"]}
+      ]
+    },
+    {
+      version: "s3.3.039",
+      title: "s3.3.039 — People card stacked layout (photo / name+handle / compact SMARTsummary)",
+      checks: [
+        {label:"Stacked people renderer", file:"botdee-smartview.js", includes:["function peopleFactsHtml(", "botdee-sv-id", "peopleHandleHtml"]},
+        {label:"Full-width photo CSS", file:"botdee-smartview.css", includes:["clamp(132px, 38vw, 176px)", "botdee-sv-summary-btn", "min-height: 0", "botdee-sv-facts"]},
+        {label:"Payload bio + lookingToMeet", file:"functions/botdee-smartview-v2-core.js", includes:["bio: snap.bio || \"\"", "lookingToMeet: datingVisible"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-039-people-card-layout"]}
+      ]
+    },
+    {
+      version: "s3.3.038",
+      title: "s3.3.038 — SMARTvisuals kit (stencils, backgrounds, Studio)",
+      checks: [
+        {label:"Resolver + catalog", file:"smartvisuals-resolver.js", includes:["FLOQRSmartVisualsResolver", "geminiAllowed", "private-source-denied"]},
+        {label:"Search overlay host", file:"index.html", includes:["id=\"smartvisualNotificationHost\"", "smartvisuals-view.js?v="]},
+        {label:"Master Admin Studio", file:"master-admin.html", includes:["id=\"smartvisualStudio\"", "data-panel=\"smartvisualStudio\"", "smartvisuals-studio.js?v="]},
+        {label:"Callables", file:"functions/index.js", includes:["classifySmartVisual", "publishSmartVisualDraft", "getSmartVisualAdPolicy"]},
+        {label:"Manual tests", file:"ai-diagnostics-service.js", includes:["s3-3-038-smartvisuals-search-notification", "s3-3-038-smartvisuals-studio"]}
+      ]
+    },
+    {
+      version: "s3.3.038",
+      title: "s3.3.038 — BOT DEE throw a ShoutOut (no stacked help dump)",
+      checks: [
+        {label:"Execute prompt omits search", file:"functions/bot-dee-core.js", includes:["isShoutOutExecutePrompt", "omitContextualSearchForPrompt", "shoutOutExecuteFallback"]},
+        {label:"Gemini throw omits contextualSearch", file:"functions/bot-dee-functions.js", includes:["omitContextualSearchForPrompt", "isShoutOutExecutePrompt(userPrompt)"]},
+        {label:"Privilege as-role required", file:"functions/botdee-privilege-guard.js", includes:["Require a privilege role after \"as\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-038-botdee-throw-shoutout"]}
+      ]
+    },
+    {
+      version: "s3.3.038",
+      title: "s3.3.038 — People lookup paints a People SMARTview card in chat",
+      checks: [
+        {label:"Know-of classifier", file:"functions/botdee-smartcard-core.js", includes:["KNOW_OF", "canonicalPeopleLookupQuery", "peopleCardHasPrivilegeField"]},
+        {label:"Session returns peopleSearch", file:"functions/bot-dee-functions.js", includes:["peopleSearch: outcome.peopleSearch", "classifyPeopleSearchIntent(userPrompt)"]},
+        {label:"Chat mounts People card", file:"bot-dee-chat.js", includes:["ensurePeopleSmartViews", "searchPeopleSmartCards", "looksLikeProfileFieldDump"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-038-people-lookup-chat-card"]}
+      ]
+    },
+    {
+      version: "s3.3.037",
+      title: "s3.3.037 — BOT DEE SMARTview scroll + rename saved chats",
+      checks: [
+        {label:"Chat page stays flex", file:"bot-dee-chat.css", includes:[".page.botdee-chat-page.active", "display: flex !important", "overflow: auto"]},
+        {label:"Rename UI", file:"botdee.html", includes:["id=\"botDeeRenameDialog\"", "bot-dee-chat.js?v="]},
+        {label:"Rename callable", file:"functions/bot-dee-functions.js", includes:["exports.renameBotDeeChat", "Never put them in Gemini"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-037-botdee-smartview-scroll-rename"]}
+      ]
+    },
     {
       version: "s3.3.036",
       title: "s3.3.036 — BOT DEE history collapse + Back to Search",
@@ -3361,6 +3437,78 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-038-smartvisuals-search-notification",
+      area:"Mingl",
+      feature:"Search SMARTnotification + Room SMARTview (Cancun Trip demo)",
+      changed:"s3.3.040 — SMARTvisuals kit: Search can show a compact Mingl Room Invitation with SMARTbackground + SMARTstencils. Demo only via ?smartvisualInvite=cancun (group rooms are not live). Art is illustration (Cancun → tropical bali + flight stencil), not a photo. Ads labeled and empty. Gemini is not called on view.",
+      howToTest:"1) After Pages publish. Open https://jadzadco.github.io/shoutout-demo/?start=search&smartvisualInvite=cancun and hard-refresh until smartvisuals-view.js?v=s3.3.040. Sign in if Search is gated. 2) Expect a compact Mingl Room Invitation over Search — View Invitation + Not Now. Scenic art is illustration; tags include Travel / Planning. 3) Tap View Invitation — Room SMARTview with RSVP/live chips, BOT-DEE capability row, Join Now. Join Now must NOT create a live room or charge. 4) Tap Not Now — card dismisses for this tab (sessionStorage). 5) Open without the query — no fabricated Damon invite. 6) Phone ~390 and desktop ~1280. 7) Mark Succeed/Failed.",
+      expected:"Query-gated invitation card matching the two-phone mock hierarchy. Illustration not photo. Join Now does not create a room. No AdSense. Xibo Display URLs have no ?v=.",
+      troubleshoot:"No card → missing query, dismissed sessionStorage floqr.smartvisual.notifyDismissed, or cached index.html without #smartvisualNotificationHost. Wrong city art → resolver missed Cancun alias (should be bg-bali + st-flight). Card for every patron → overlay must stay query/hash/session gated. Join created a room → stop; this build must only open mingl-chat.html?from=smartvisual."
+    },
+    {
+      id:"s3-3-038-smartvisuals-studio",
+      area:"Master Admin",
+      feature:"SMARTvisual Studio",
+      changed:"s3.3.040 — Master Admin → SMARTvisual Studio lists 26 stencils + 34 backgrounds, tagging examples (Cancun / Paris Fashion Week / Seattle LA / San Dego / Burningman), SVG sanitizer + SOS2FA + reason on draft submit. Ads policy copy only — AdSense not loaded. Drafts never appear on Search.",
+      howToTest:"1) Sign in as Master Admin. Open https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js?v=s3.3.040. 2) Library shows published kit art as images. Search/filter works. 3) Tagging & Resolver: Cancun Trip → travel/flight; Paris Fashion Week → fashion; Seattle LA → collision/neutral; San Dego → San Diego; Burningman → burning-man without official affiliation. 4) Create: upload an SVG with <script> — rejected. Valid SVG + name + license → reason prompt; without SOS2FA, Functions deny and the git registry is unchanged. 5) Ads tab says placement is empty. 6) Preview in Search SMARTnotification opens ?smartvisualInvite=cancun. 7) Mark Succeed/Failed. Studio draft persist needs Functions deploy.",
+      expected:"Studio is Master Admin only. Patrons only see published registry assets. Malicious SVG never publishes. Ads stay off.",
+      troubleshoot:"Empty library → smartvisuals/catalog.json missing on the served origin. Submit succeeded without SOS2FA → stop; publishSmartVisualDraft must assertAdmin. Script SVG accepted → sanitizer not wired. Search overlay missing after Preview → index.html host or smartvisuals-view.js cache."
+    },
+    {
+      id:"s3-3-040-people-alias-match",
+      area:"BOT DEE",
+      feature:"People lookup matches legal name, display name, handle, what-about",
+      changed:"s3.3.040 — Don Banyong / Don Papi / @DonBans all open the stacked People card. What about Don Papi no longer falls through to Gemini prose + photo grid. Accented names and curly apostrophes classify. Viewer looking themselves up by alias is not skipped.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.040. Sign in as Don (First Don, Last Banyong, Display Don Papi, @DonBans, public profile on). 2) Ask What do you know of Don Banyong — stacked People card (photo, Don Papi + @DonBans, SMARTsummary), not “No eligible public profile matched.” 3) Same thread: What about Don Papi — same People card, not Gemini markdown or a photo grid. 4) Ask Who is @DonBans and Who is DonBans — same card. 5) Ask how do I edit my profile and tell me about group reservations — help/Gemini, not a people card. 6) Mark Succeed/Failed.",
+      expected:"Legal name, display name, squeezed DonPapi, and handle with or without @ all paint the s3.3.039 stacked People card. Privilege fields stay off the payload. Display URLs have no ?v=.",
+      troubleshoot:"No match on Don Banyong → Functions executeBotSession / searchPeopleSmartCards not this SHA (identityAliases missing firstName+lastName) or publicProfileVisibility is not public. Gemini photo grid on What about Don Papi → cached bot-dee-chat.js without PEOPLE_WHAT_ABOUT, or attachPeopleSearch still skipped viewerUid. Accent/apostrophe miss → foldNameChars not deployed."
+    },
+    {
+      id:"s3-3-039-people-card-layout",
+      area:"BOT DEE",
+      feature:"People card stacked layout (chat + SMARTview)",
+      changed:"s3.3.039 — Approved People card: (1) full-width photo, (2) name + handle, (3) compact SMARTsummary with no min-height padded box, then compacted Bio / Location / Looking to meet / Socials. Chat People cards and View my SMARTview match.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.039. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — card shows photo full width on top, Don Papi and @handle on the next row, SMARTsummary as inline text (not a tall empty box). 3) Open My Profile → Features & Orders → My BOT DEE → View my SMARTview — same stack. 4) Phone ~390 and desktop ~1280. Empty fields take no height. Display URLs have no ?v=. 5) Mark Succeed/Failed.",
+      expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
+      troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
+    },
+    {
+      id:"s3-3-041-botdee-headless-checkout",
+      area:"BOT DEE",
+      feature:"Headless ShoutOut from BOT DEE + FloqR (no composer)",
+      changed:"s3.3.041 — startShoutOutCheckout accepts club + message (optional template/screen). executeBotSession throws from chat when both are present: paid templates mint Stripe checkoutUrl; free Traditional boards submit pending. FloqR pages call createHeadlessShoutOutCheckout / FLOQRPayments.startHeadlessShoutOut. Photo/jersey/Football Intro/Heist/Baller's Alert still open compose. Functions deploy required ([firebase-deploy-botdee]).",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.041. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout — expect ask for club + message and one compose link, NOT stacked Halloween/Baller's help. 3) Send throw a shoutout at Decades that says Happy birthday Maya — expect pending My ShoutOuts link (free Traditional) OR a Pay securely Stripe URL, never a card-number prompt. 4) Send throw a halloween shoutout at Aurelia that says BOO — Pay securely Stripe (~$15). 5) Send how do I throw a shoutout — help/search cards OK. 6) Mark Succeed/Failed.",
+      expected:"Complete throw (venue + copy) mints checkout or pending submit from chat. Incomplete throw asks. How-to stays search. No card collection in BOT DEE.",
+      troubleshoot:"Still compose-only with a complete throw → executeBotSession / createHeadlessShoutOutCheckout not this SHA (Functions deploy). Still stacked help → cached bot-dee-chat.js or Gemini path not intercepting isShoutOutExecutePrompt. Checkout missing on halloween → STRIPE_SECRET_KEY on executeBotSession / createHeadlessShoutOutCheckout. Free board missing in Club Admin → Functions Admin write to shoutouts; confirm signed-in uid. Club not found → alias (Aurelia → temp-democlub-1, Decades → decades-washington-dc)."
+    },
+    {
+      id:"s3-3-038-botdee-throw-shoutout",
+      area:"BOT DEE",
+      feature:"Throw a ShoutOut from chat (no stacked help dump)",
+      changed:"s3.3.038 — 'throw a shoutout' was Gemini/search fallback: Here is what I found + 8 help cards (Throw a ShoutOut, Baller's Alert, Black Card…). Execute prompts now omit contextualSearch, ask for venue + message, and offer one compose link (shoutout-search.html?from=botdee). startShoutOutCheckout still needs clubLocationId + shoutout payload for a Stripe URL. Privilege filter no longer redacts 'I can see you as wanting to throw a ShoutOut'. Functions deploy required.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.038. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout. Expect a short ask for club + message and/or one Open ShoutOut compose link — NOT a stack of Baller's Alert / Black Card / Halloween help cards and NOT 'Here is what I found for your account'. 3) Name a venue (Aurelia / Decades) and a line of text — BOT DEE may return composeHref or a Stripe checkoutUrl (never a card number prompt). 4) Send how do I throw a shoutout — help/search cards are OK. 5) Mark Succeed/Failed.",
+      expected:"Execute throw = compose/checkout path. How-to = search cards. No privilege-refuse on a throw-help sentence.",
+      troubleshoot:"Still stacked help → executeBotSession not this SHA (Gemini failed → old local-fallback) or cached bot-dee-chat.js. Compose link 404 → shoutout-search.html on Pages. Checkout missing → Gemini has no templateId/text/screenFormatId; headless pay is not a stub without payload. Privilege refuse on throw copy → PRIVILEGE_LEAK_RE still matching 'I can see you as' without a role."
+    },
+    {
+      id:"s3-3-038-people-lookup-chat-card",
+      area:"BOT DEE",
+      feature:"People lookup → People SMARTview card in chat",
+      changed:"s3.3.038 — “What do you know of don banyong” (and tell me about / who is) opens a People SMARTview card in the transcript. Gemini markdown **Bio** / Location / Details dumps are skipped. No match is a short sentence. Several matches are compact cards. Master Admin / SOS2FA / claims never appear on the card. Functions + Pages pending Don.",
+      howToTest:"1) After Pages + Functions deploy (or local static + deployed searchPeopleSmartCards). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.038. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — a People SMARTview card (name, handle, bio/SMARTsummary, location, socials) appears in the bubble. No **Bio** markdown. 3) Ask Who am I? — your card still appears. 4) Ask a name with no public match — short “No eligible public profile matched.” not a help dump. 5) Ask how do I edit my profile and tell me about group reservations — help/Gemini, not a people card. 6) Mark Succeed/Failed.",
+      expected:"Don Banyong lookup shows the People card chrome (Don Papi / @DonBans public fields), not asterisks. Privilege fields are absent. Xibo Display URLs have no ?v=.",
+      troubleshoot:"Still markdown → Functions executeBotSession not on this SHA (classifier still misses know-of) and searchPeopleSmartCards fallback failed; hard-refresh bot-dee-chat.js. Card missing → public profile unpublished or blocked; Who is don banyong should still hit the directory. Help dump → people results were not cleared; confirm ensurePeopleSmartViews. Ordinary Gemini wiped → stripPeopleFieldDump must run only when people intent !== none."
+    },
+    {
+      id:"s3-3-037-botdee-smartview-scroll-rename",
+      area:"BOT DEE",
+      feature:"SMARTview card scroll + rename saved chats",
+      changed:"s3.3.037 — People SMARTview in chat can scroll to View Full Profile and Mingl on phone and desktop. Cause was .page.active{display:block} clipping the transcript. Chats rows get a 44×44 ⋯ (or long-press) to rename; title persists on botDeeThreads.chatTitles; Gemini never sees titles. + / − collapse unchanged.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / bot-dee-chat.css / botdee-smartview.css ?v=s3.3.037. Sign in with BOT DEE access. 2) Ask Who am I? — People SMARTview appears. Scroll the transcript (or the card) until View Full Profile and Mingl are visible. Composer stays pinned. Phone ~390 and desktop ~1280. 3) Tap + — Chats sheet. Each saved row has ⋯ (44×44). Tap ⋯ or long-press the row, type a title, Save. List shows the new title, not only the first-message snippet. 4) Refresh — renamed title still there (after Functions deploy of renameBotDeeChat). 5) + still opens/closes with − / Esc. Display URLs have no ?v=. 6) Mark Succeed/Failed.",
+      expected:"Tall SMARTview is fully reachable by scrolling. Composer stays on screen. Chats can be renamed. History + / − still works. No stacked help dump under the card.",
+      troubleshoot:"Still clipped → cached bot-dee-chat.css before .page.botdee-chat-page.active flex !important, or botdee.html still on s3.3.036. Composer gone → overflow:visible on .botdee-shell (must stay hidden). Rename fails → Functions deploy renameBotDeeChat; owner uid only. Title in Gemini replies → chatTitles leaked into executeBotSession (must not)."
+    },
     {
       id:"s3-3-036-botdee-history-collapse",
       area:"BOT DEE",

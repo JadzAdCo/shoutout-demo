@@ -55,6 +55,8 @@ test("payment callables use the compat App Functions client with the deployment 
   assert.match(source, /refundFloqrCheckoutOrder/);
   assert.match(source, /clearUnpaidFloqrCheckouts/);
   assert.match(source, /purgeFloqrTestPayments/);
+  assert.match(source, /createHeadlessShoutOutCheckout/);
+  assert.match(source, /startHeadlessShoutOut/);
 });
 
 test("lockCriticalButton greys out a checkout button and blocks a second lock", () => {
