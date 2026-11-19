@@ -402,7 +402,10 @@ function snapshotToState(snap, uid, settings, nowMs) {
     currentConversationId: staleGeneration ? "" : clipConversationId(data.currentConversationId),
     archiveConversationId: staleGeneration ? "" : clipConversationId(data.archiveConversationId),
     [prefs.LAST_USED_FIELD]: staleGeneration ? 0 : (Number(data[prefs.LAST_USED_FIELD]) || 0),
-    [prefs.SESSION_RESET_FIELD]: staleGeneration ? 0 : prefs.sessionResetVersionOf(data)
+    [prefs.SESSION_RESET_FIELD]: staleGeneration ? 0 : prefs.sessionResetVersionOf(data),
+    headlessShoutOutDraft: staleGeneration ? null : (data.headlessShoutOutDraft && typeof data.headlessShoutOutDraft === "object"
+      ? data.headlessShoutOutDraft
+      : null)
   };
 }
 
@@ -771,6 +774,25 @@ async function persistArchiveTurns(uid, consent, rows) {
   return {ok: true};
 }
 
+async function persistHeadlessShoutOutDraft(uid, draft) {
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const now = Date.now();
+  if (!draft) {
+    await ref.set({
+      headlessShoutOutDraft: admin.firestore.FieldValue.delete(),
+      updatedAtMs: now
+    }, {merge: true});
+    return {ok: true, cleared: true};
+  }
+  const headless = require("./headless-shoutout-core");
+  await ref.set({
+    headlessShoutOutDraft: headless.clipInteractiveDraft(draft),
+    updatedAtMs: now
+  }, {merge: true});
+  return {ok: true};
+}
+
 async function persistUserTurn(uid, settings, userText, opts) {
   if (!settings?.durableThreads) return {ok: true, skipped: true};
   const ref = threadRef(uid);
@@ -951,6 +973,7 @@ module.exports = {
   loadThreadState,
   persistExchange,
   persistUserTurn,
+  persistHeadlessShoutOutDraft,
   persistModelTurn,
   persistArchiveTurns,
   loadArchiveHistory,

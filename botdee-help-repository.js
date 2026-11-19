@@ -837,6 +837,24 @@
       audiences: ["patron"]
     },
     {
+      id: "help-shoutout-headless-smartview",
+      title: "ShoutOut SMARTpreview",
+      body: "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. Reply in chat or tap a chip. Photo and video boards still open compose. A true headless throw from FloqR or a third party does not use this card — pass venue, message, and optional extras in one request.",
+      searchPhrases: [
+        "headless shoutout smartview", "shoutout smartview", "shoutout smartpreview",
+        "choose shoutout template", "include my handle", "floqr card handle",
+        "throw shoutout photo", "throw shoutout video", "bot dee shoutout preview",
+        "headless shoutout extras", "smartpreview"
+      ],
+      links: [
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},
+        {label: "Open ShoutOut", href: pageUrl("./shoutout-search.html", {from: "botdee"})},
+        {label: "SMARTpreview (Master Admin)", href: pageUrl("./master-admin.html") + "#featuresBotDee-smartpreview"}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "masterAdmin"]
+    },
+    {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
       body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit when the club requires one. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe (or confirm without checkout if the venue does not require a deposit). A table only shows booked/unavailable (isReserved=1) after that payment or no-deposit confirm — a hold alone stays amber. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",

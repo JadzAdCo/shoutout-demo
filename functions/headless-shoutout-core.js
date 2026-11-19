@@ -12,21 +12,48 @@ const SCREEN_LABELS = Object.freeze({
   "led-64x32": "64×32"
 });
 
+const TEXT_LAYOUT_VERSION = "29.08.4";
+
 const CLASSIC_BOARD_CAPS = Object.freeze({
-  "led-96x48": {profileId: "classicBoard", lineCount: 3, perLine: 15, main: 45, sub: 20},
-  "led-64x48": {profileId: "classicBoard", lineCount: 3, perLine: 12, main: 36, sub: 18},
-  "led-64x32": {profileId: "classicBoard", lineCount: 3, perLine: 10, main: 30, sub: 14}
+  "led-96x48": {
+    profileId: "classicBoard", lineCount: 3, perLine: 15, main: 45, sub: 20,
+    mainTextSizePercent: 20.8, subTextSizePercent: 7.8, minimumFontPixels: 0
+  },
+  "led-64x48": {
+    profileId: "classicBoard", lineCount: 3, perLine: 12, main: 36, sub: 18,
+    mainTextSizePercent: 20.8, subTextSizePercent: 7.8, minimumFontPixels: 0
+  },
+  "led-64x32": {
+    profileId: "classicBoard", lineCount: 3, perLine: 10, main: 30, sub: 14,
+    mainTextSizePercent: 20.8, subTextSizePercent: 7.8, minimumFontPixels: 0
+  }
 });
 
+/** Catalog className / name must match shared-data.js or Preview + LED skip classic-bw. */
 const HEADLESS_TEXT_TEMPLATES = Object.freeze({
-  blackwhite: {name: "Traditional", className: "blackwhite", priceCents: 0},
-  birthday: {name: "Birthday", className: "birthday", priceCents: 0},
-  vip: {name: "VIP", className: "vip", priceCents: 0},
-  neon: {name: "Neon", className: "neon", priceCents: 0},
-  gold: {name: "Gold", className: "gold", priceCents: 0},
-  graduation: {name: "Graduation", className: "graduation", priceCents: 0},
-  corporate: {name: "Corporate", className: "corporate", priceCents: 0},
-  classicHalloween: {name: "Classic Halloween", className: "classicHalloween", priceCents: 1500}
+  blackwhite: {
+    name: "Traditional Black and White ShoutOut",
+    className: "classic-bw",
+    priceCents: 0,
+    identityRail: true,
+    identityAnimation: "identity-loop",
+    identityAnimationSeconds: 6
+  },
+  birthday: {name: "Birthday Glow", className: "neon", priceCents: 0, identityRail: true},
+  vip: {name: "VIP Table", className: "gold", priceCents: 0, identityRail: true},
+  neon: {name: "Neon ShoutOut", className: "neon", priceCents: 0, identityRail: true},
+  gold: {name: "Gold Celebration", className: "gold", priceCents: 0, identityRail: true},
+  graduation: {name: "Graduation Night", className: "classic-bw", priceCents: 0, identityRail: true},
+  corporate: {name: "Corporate Event", className: "classic-bw", priceCents: 0, identityRail: true},
+  classicHalloween: {
+    name: "Classic Halloween",
+    className: "classic-bw classic-halloween",
+    priceCents: 1500,
+    identityRail: true,
+    allowEmoji: true,
+    halloweenFinale: true,
+    defaultBackgroundUrl: "./images/halloween/classic-halloween-2x1.svg"
+  }
 });
 
 const TEMPLATE_ALIASES = Object.freeze({
@@ -163,7 +190,13 @@ function pickTemplate(venue = {}, requested = "") {
     templateId: id,
     templateName: chosen.name,
     templateClassName: chosen.className,
-    priceCents: chosen.priceCents || 0
+    priceCents: chosen.priceCents || 0,
+    identityRail: chosen.identityRail !== false,
+    identityAnimation: chosen.identityAnimation || "identity-loop",
+    identityAnimationSeconds: chosen.identityAnimationSeconds || 6,
+    allowEmoji: chosen.allowEmoji === true,
+    halloweenFinale: chosen.halloweenFinale === true,
+    defaultBackgroundUrl: chosen.defaultBackgroundUrl || ""
   };
 }
 
@@ -277,6 +310,7 @@ function extractTemplateHint(raw) {
     return "classicHalloween";
   }
   const named = [
+    ["traditional", "blackwhite"],
     ["birthday", "birthday"],
     ["neon", "neon"],
     ["gold", "gold"],
@@ -301,9 +335,114 @@ function extractScreenHint(raw) {
   return "";
 }
 
+function extractStandaloneTemplate(raw) {
+  const folded = normalizeClubNeedle(raw)
+    .replace(/^(use|pick|choose|go with|make it|i want|please)\s+/, "")
+    .replace(/\s+(please|thanks|template|board|shoutout|shout out)$/, "")
+    .trim();
+  if (!folded) return "";
+  if (HEADLESS_TEXT_TEMPLATES[folded]) return folded;
+  return TEMPLATE_ALIASES[folded] || "";
+}
+
+function parseHandleHint(raw) {
+  const source = String(raw || "");
+  if (/\b(?:no|skip|without|don't include|do not include|dont include)\s+(?:my\s+)?(?:@?handle|attribution|floqr card)\b/i.test(source)) {
+    return {decision: "skip", attribution: ""};
+  }
+  const named = source.match(/\b(?:from|as)\s+@([A-Za-z0-9._]{2,40})\b/);
+  if (named) return {decision: "include", attribution: `@${named[1]}`};
+  const atOnly = source.match(/(?:^|\s)@([A-Za-z0-9._]{2,40})\b/);
+  if (atOnly && !/\b(?:at|@)\s+[A-Za-z]/.test(source.slice(0, 12))) {
+    return {decision: "include", attribution: `@${atOnly[1]}`};
+  }
+  if (/\b(?:with|include|add|put|use)\s+(?:my\s+)?(?:@?handle|floqr card|attribution)\b|\binclude (?:my )?@handle\b|\bwith my handle\b/i.test(source)) {
+    return {decision: "include", attribution: ""};
+  }
+  return {decision: "", attribution: ""};
+}
+
+function parseMediaHint(raw) {
+  const source = String(raw || "");
+  const https = source.match(/\bhttps:\/\/[^\s<>"']+/i);
+  if (https) {
+    return {decision: "url", mediaUrl: https[0].replace(/[),.;]+$/, "")};
+  }
+  if (/\b(?:text only|no photo|no video|skip (?:the )?(?:photo|image|video|media)|without (?:a )?(?:photo|image|video|picture))\b/i.test(source)) {
+    return {decision: "none", mediaUrl: ""};
+  }
+  if (/\b(?:with|add|include)\s+(?:a\s+)?(?:photo|image|video|picture)\b|\b(?:photo|video|picture) board\b|\bopen compose\b/i.test(source)) {
+    return {decision: "compose", mediaUrl: ""};
+  }
+  return {decision: "", mediaUrl: ""};
+}
+
+function isConfirmSubmitPrompt(raw) {
+  return /\b(?:throw it|send it|submit(?: it)?|go ahead|that's all|thats all|just throw(?: it)?|confirm(?: throw)?|yes throw|do it)\b/i.test(String(raw || ""));
+}
+
+function isSkipExtrasPrompt(raw) {
+  return /\b(?:skip(?: the)? extras?|defaults? (?:are )?fine|traditional is fine|just the message|no extras)\b/i.test(String(raw || ""));
+}
+
+function isCancelShoutOutPrompt(raw) {
+  return /\b(?:cancel(?: the)? shoutout|never mind|nevermind|stop (?:the )?shoutout|forget (?:the |this )?shoutout)\b/i.test(String(raw || ""));
+}
+
+function isBareAffirmative(raw) {
+  return /^(yes|yeah|yep|yup|ok|okay|sure)[.!?]*$/i.test(String(raw || "").trim());
+}
+
+function isBareNegative(raw) {
+  return /^(no|nope|nah|skip)[.!?]*$/i.test(String(raw || "").trim());
+}
+
+/** Map a bare yes/no onto the current SMARTpreview step. Never mint on “yes” while extras remain. */
+function applyBareInteractiveReply(draft, parsed, raw) {
+  const next = parsed && typeof parsed === "object" ? parsed : {};
+  if (!draft) return next;
+  const step = interactiveNeeds(draft)[0] || "";
+  if (isBareAffirmative(raw)) {
+    if (step === "handle") next.handleDecision = next.handleDecision || "include";
+    else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
+    else if (step === "template") next.templateId = next.templateId || DEFAULT_TEMPLATE_ID;
+    else if (!step) next.confirmSubmit = true;
+  } else if (isBareNegative(raw)) {
+    if (step === "handle") next.handleDecision = next.handleDecision || "skip";
+    else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
+  }
+  return next;
+}
+
+function parseShoutOutExtras(raw) {
+  const source = String(raw || "").trim();
+  const handle = parseHandleHint(source);
+  const media = parseMediaHint(source);
+  return {
+    templateId: extractTemplateHint(source) || extractStandaloneTemplate(source),
+    screenFormatId: extractScreenHint(source),
+    handleDecision: handle.decision,
+    attribution: handle.attribution,
+    mediaDecision: media.decision,
+    mediaUrl: media.mediaUrl,
+    confirmSubmit: isConfirmSubmitPrompt(source),
+    skipExtras: isSkipExtrasPrompt(source),
+    cancel: isCancelShoutOutPrompt(source)
+  };
+}
+
+function stripExtrasFromMessage(raw) {
+  return stripMessageWrap(String(raw || "")
+    .replace(/\s+(?:with|include|add|put|use)\s+(?:my\s+)?(?:@?handle|floqr card|attribution)\b.*$/i, "")
+    .replace(/\s+(?:text only|with a photo|with a video|with an image|no handle|skip extras)\b.*$/i, ""));
+}
+
 function parseShoutOutExecute(raw) {
   const source = String(raw || "").trim();
-  const message = extractQuotedMessage(source) || extractSaysMessage(source) || extractColonMessage(source);
+  const extras = parseShoutOutExtras(source);
+  const message = stripExtrasFromMessage(
+    extractQuotedMessage(source) || extractSaysMessage(source) || extractColonMessage(source)
+  );
   const prefix = venuePrefix(source, message);
   const atPhrase = extractAtClub(prefix);
   const atClub = extractAliasClub(atPhrase) || atPhrase;
@@ -311,9 +450,127 @@ function parseShoutOutExecute(raw) {
   return {
     clubQuery: atClub || aliasClub,
     message,
-    templateId: extractTemplateHint(prefix),
-    screenFormatId: extractScreenHint(prefix)
+    templateId: extractTemplateHint(prefix) || extras.templateId,
+    screenFormatId: extractScreenHint(prefix) || extras.screenFormatId,
+    handleDecision: extras.handleDecision,
+    attribution: extras.attribution,
+    mediaDecision: extras.mediaDecision,
+    mediaUrl: extras.mediaUrl,
+    confirmSubmit: extras.confirmSubmit,
+    skipExtras: extras.skipExtras,
+    cancel: extras.cancel
   };
+}
+
+function emptyInteractiveDraft() {
+  return {
+    clubQuery: "",
+    message: "",
+    templateId: "",
+    templateChosen: false,
+    screenFormatId: "",
+    handleDecision: "",
+    attribution: "",
+    mediaDecision: "",
+    mediaUrl: "",
+    skipExtras: false
+  };
+}
+
+function clipInteractiveDraft(draft = {}) {
+  const row = draft && typeof draft === "object" ? draft : {};
+  const templateId = resolveTemplateId(row.templateId) || "";
+  const mediaUrl = /^https:\/\//i.test(String(row.mediaUrl || "")) ? text(row.mediaUrl, 500) : "";
+  const handleDecision = row.handleDecision === "include" || row.handleDecision === "skip" ? row.handleDecision : "";
+  let mediaDecision = "";
+  if (row.mediaDecision === "none" || row.mediaDecision === "compose") mediaDecision = row.mediaDecision;
+  else if (mediaUrl) mediaDecision = "url";
+  return {
+    clubQuery: text(row.clubQuery || row.clubLocationId, 120),
+    message: text(row.message || row.mainText, 400),
+    templateId,
+    templateChosen: row.templateChosen === true || !!templateId,
+    screenFormatId: canonicalFormatId(row.screenFormatId),
+    handleDecision,
+    attribution: text(row.attribution, 80),
+    mediaDecision,
+    mediaUrl,
+    skipExtras: row.skipExtras === true
+  };
+}
+
+function mergeInteractiveDraft(previous, parsed = {}, extras = {}) {
+  const club = text(parsed.clubQuery || extras.clubQuery, 120);
+  const message = text(parsed.message || extras.message, 400);
+  const freshThrow = !!(club && message);
+  const base = freshThrow ? emptyInteractiveDraft() : clipInteractiveDraft(previous);
+  const next = {...base};
+  if (club) next.clubQuery = club;
+  if (message) next.message = message;
+  const templateId = resolveTemplateId(parsed.templateId || extras.templateId || "") || "";
+  if (templateId) {
+    next.templateId = templateId;
+    next.templateChosen = true;
+  }
+  const screen = canonicalFormatId(parsed.screenFormatId || extras.screenFormatId);
+  if (screen) next.screenFormatId = screen;
+  const handleDecision = parsed.handleDecision || extras.handleDecision || "";
+  if (handleDecision === "include" || handleDecision === "skip") next.handleDecision = handleDecision;
+  const attribution = text(parsed.attribution || extras.attribution, 80);
+  if (attribution) next.attribution = attribution;
+  const mediaDecision = parsed.mediaDecision || extras.mediaDecision || "";
+  if (mediaDecision === "none" || mediaDecision === "compose" || mediaDecision === "url") {
+    next.mediaDecision = mediaDecision;
+  }
+  const mediaUrl = /^https:\/\//i.test(String(parsed.mediaUrl || extras.mediaUrl || ""))
+    ? text(parsed.mediaUrl || extras.mediaUrl, 500)
+    : "";
+  if (mediaUrl) {
+    next.mediaUrl = mediaUrl;
+    next.mediaDecision = "url";
+  }
+  if (parsed.skipExtras === true || extras.skipExtras === true) next.skipExtras = true;
+  return clipInteractiveDraft(next);
+}
+
+function isInteractiveFollowUp(raw, draft) {
+  const row = clipInteractiveDraft(draft);
+  if (!row.clubQuery || !row.message) return false;
+  const extras = parseShoutOutExtras(raw);
+  if (extras.cancel || extras.confirmSubmit || extras.skipExtras) return true;
+  if (extras.templateId || extras.handleDecision || extras.mediaDecision || extras.screenFormatId) return true;
+  if (isBareAffirmative(raw) || isBareNegative(raw)) return true;
+  return false;
+}
+
+function interactiveNeeds(draft) {
+  const row = clipInteractiveDraft(draft);
+  const needs = [];
+  if (!row.clubQuery) needs.push("club");
+  if (!row.message) needs.push("message");
+  if (row.mediaDecision === "compose") needs.push("compose");
+  if (row.skipExtras) return needs;
+  if (!row.templateChosen) needs.push("template");
+  if (!row.handleDecision || (row.handleDecision === "include" && !row.attribution)) needs.push("handle");
+  if (!row.mediaDecision) needs.push("media");
+  return needs;
+}
+
+function listHeadlessTemplates() {
+  return Object.keys(HEADLESS_TEXT_TEMPLATES).map(id => {
+    const meta = HEADLESS_TEXT_TEMPLATES[id];
+    return {
+      id,
+      name: meta.name,
+      priceCents: meta.priceCents || 0,
+      className: meta.className
+    };
+  });
+}
+
+function formatHandle(value) {
+  const raw = text(value, 80).replace(/^@+/, "");
+  return raw ? `@${raw}` : "";
 }
 
 function shoutOutComposeHref(clubLocationId) {
@@ -329,13 +586,22 @@ function composeShoutOutPayload({
   message,
   templateId,
   screenFormatId,
-  userPrompt
+  userPrompt,
+  includeAttribution,
+  attribution,
+  attributionChoice,
+  mediaUrl,
+  mediaType
 } = {}) {
   const parsed = parseShoutOutExecute(userPrompt || "");
   const club = text(clubLocationId || parsed.clubQuery, 120);
   const main = text(message || parsed.message, 400);
   const requestedTemplate = text(templateId || parsed.templateId, 80);
   const requestedScreen = canonicalFormatId(screenFormatId || parsed.screenFormatId);
+  const wantHandle = includeAttribution === true || includeAttribution === 1 || includeAttribution === "1"
+    || parsed.handleDecision === "include";
+  const skipHandle = includeAttribution === false || parsed.handleDecision === "skip";
+  const handleText = formatHandle(attribution || parsed.attribution);
   const missing = [];
   if (!club) missing.push("club");
   if (!main) missing.push("message");
@@ -363,7 +629,20 @@ function composeShoutOutPayload({
   const caps = textCaps(picked.templateId, screen);
   const locationName = text(venue.locationName || venue.brandName || venue.displayName || club, 160);
   const brandName = text(venue.brandName || venue.locationName || "", 160);
+  const fullAddress = text(
+    venue.fullAddress || venue.locationAddress || venue.formattedAddress || venue.address || "",
+    240
+  );
+  const streetAddress = text(venue.streetAddress || venue.addressLine1 || "", 160);
   const mainText = fitMainText(main, caps);
+  const attributionText = wantHandle && !skipHandle ? handleText : "";
+  const includeHandle = wantHandle && !skipHandle && !!attributionText;
+  const httpsMedia = /^https:\/\//i.test(String(mediaUrl || parsed.mediaUrl || ""))
+    ? text(mediaUrl || parsed.mediaUrl, 500)
+    : "";
+  const mediaKind = httpsMedia
+    ? (String(mediaType || "").toLowerCase() === "video" ? "video" : "image")
+    : "";
   return {
     ok: true,
     missing: [],
@@ -380,17 +659,42 @@ function composeShoutOutPayload({
       locationName,
       brandName,
       clubName: locationName,
+      country: text(venue.country, 80),
+      region: text(venue.region || venue.state || venue.province, 80),
+      city: text(venue.city, 80),
+      streetAddress,
+      postalCode: text(venue.postalCode || venue.zip, 24),
+      fullAddress,
+      locationAddress: fullAddress,
+      locationLabel: text(venue.locationLabel, 160),
       template: picked.templateId,
       templateId: picked.templateId,
       templateName: picked.templateName,
       templateClassName: picked.templateClassName,
+      templateSupportsMedia: !!httpsMedia,
       screenFormatId: screen,
       screenFormatLabel: SCREEN_LABELS[screen] || screen,
+      textLayoutVersion: TEXT_LAYOUT_VERSION,
       textProfileId: caps.profileId,
       maxMainCharacters: caps.main,
       maxSubCharacters: caps.sub,
       lineCount: caps.lineCount,
       maxCharactersPerLine: caps.perLine,
+      minimumFontPixels: caps.minimumFontPixels || 0,
+      mainTextSizePercent: caps.mainTextSizePercent || 20.8,
+      subTextSizePercent: caps.subTextSizePercent || 7.8,
+      identityRail: picked.identityRail !== false,
+      identityAnimation: picked.identityAnimation || "identity-loop",
+      identityAnimationSeconds: picked.identityAnimationSeconds || 6,
+      includeAttribution: includeHandle,
+      attribution: attributionText,
+      attributionChoice: includeHandle ? text(attributionChoice || "displayName", 40) : "none",
+      mediaUrl: httpsMedia,
+      mediaType: mediaKind,
+      allowEmoji: picked.allowEmoji === true,
+      halloweenFinale: picked.halloweenFinale === true,
+      backgroundUrl: picked.defaultBackgroundUrl || "",
+      defaultBackgroundUrl: picked.defaultBackgroundUrl || "",
       mainText,
       subText: "",
       priceCents: picked.priceCents || 0,
@@ -402,11 +706,21 @@ function composeShoutOutPayload({
 
 function missingAsk(needs = []) {
   const set = new Set(needs);
+  if (set.has("compose")) {
+    return "That board needs a photo or video on compose. Open ShoutOut compose to finish it, or reply text only to stay on a letter board.";
+  }
   if (set.has("club") && set.has("message")) {
     return "I can throw the ShoutOut from chat once I have the club and the message. Which venue, and what should it say?";
   }
   if (set.has("club")) return "Which venue should this ShoutOut play on?";
   if (set.has("message")) return "What should the ShoutOut say on the board?";
+  const extras = [];
+  if (set.has("template")) extras.push("a template (Traditional is the default; Neon, Birthday, Gold, VIP, Graduation, Corporate, or Halloween $15)");
+  if (set.has("handle")) extras.push("whether to include your @handle on the FloqR card");
+  if (set.has("media")) extras.push("text only, or a photo/video via compose");
+  if (extras.length) {
+    return `A few ShoutOut details still open: ${extras.join("; ")}. Reply in chat, or say throw it to use Traditional with no handle.`;
+  }
   return "I need a bit more to throw that ShoutOut from chat.";
 }
 
@@ -425,12 +739,17 @@ function portalShoutOutHref(shoutoutId) {
 
 module.exports = {
   DEFAULT_TEMPLATE_ID,
+  TEXT_LAYOUT_VERSION,
   LED_FORMATS,
   SCREEN_LABELS,
   HEADLESS_TEXT_TEMPLATES,
   TEMPLATE_ALIASES,
   CLUB_NAME_ALIASES,
   parseShoutOutExecute,
+  parseShoutOutExtras,
+  parseHandleHint,
+  parseMediaHint,
+  extractStandaloneTemplate,
   composeShoutOutPayload,
   pickScreenFormat,
   pickTemplate,
@@ -443,5 +762,18 @@ module.exports = {
   portalShoutOutHref,
   isComposerOnlyTemplate,
   normalizeClubNeedle,
-  venueSupportsFormat
+  venueSupportsFormat,
+  emptyInteractiveDraft,
+  clipInteractiveDraft,
+  mergeInteractiveDraft,
+  isInteractiveFollowUp,
+  interactiveNeeds,
+  listHeadlessTemplates,
+  formatHandle,
+  isConfirmSubmitPrompt,
+  isSkipExtrasPrompt,
+  isCancelShoutOutPrompt,
+  isBareAffirmative,
+  isBareNegative,
+  applyBareInteractiveReply
 };

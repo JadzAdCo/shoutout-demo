@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.042";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.042";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.044";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.044";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,30 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.044",
+      title: "s3.3.044 — ShoutOut SMARTpreview (template / @handle / media) without coupling core",
+      checks: [
+        {label:"Interactive draft (no SMARTview in core)", file:"functions/headless-shoutout-core.js", includes:["interactiveNeeds", "mergeInteractiveDraft", "parseHandleHint"]},
+        {label:"Optional SMARTview", file:"functions/botdee-shoutout-smartview.js", includes:["botDeeShoutOut", "never require this module"]},
+        {label:"BOT DEE collect-before-mint", file:"functions/bot-dee-functions.js", includes:["buildShoutOutSmartView", "persistHeadlessShoutOutDraft"]},
+        {label:"Client card", file:"botdee-smartview.js", includes:["renderShoutOutCard", "botDeeShoutOut"]},
+        {label:"FloqR one-shot stays SMARTview-free", file:"functions/commerce-functions.js", includes:["exports.createHeadlessShoutOutCheckout"]},
+        {label:"Master Admin SMARTpreview tab", file:"master-admin.html", includes:["data-botdee-page=\"smartpreview\"", "botDeeMasterSmartPreviewDemo", "botDeeMasterLoadSmartPreview"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-044-headless-shoutout-smartview"]}
+      ]
+    },
+    {
+      version: "s3.3.043",
+      title: "s3.3.043 — Headless ShoutOut composer parity (className + club notify + LED)",
+      checks: [
+        {label:"Catalog className", file:"functions/headless-shoutout-core.js", includes:["className: \"classic-bw\"", "classic-bw classic-halloween"]},
+        {label:"Club pending inbox", file:"functions/bot-dee-tools.js", includes:["notifyClubPendingHeadlessShoutOut", "pendingShoutout"]},
+        {label:"Approve catalog className", file:"admin-app.js", includes:["templateClassName: packaged.className || item.templateClassName"]},
+        {label:"Pending link kind", file:"bot-dee-chat.js", includes:["shoutout-pending"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-043-headless-shoutout-complete"]}
+      ]
+    },
     {
       version: "s3.3.041",
       title: "s3.3.041 — BOT DEE + FloqR headless ShoutOut checkout",
@@ -454,9 +478,9 @@
       checks: [
         {label:"Chat-only botdee.html", file:"botdee.html", notIncludes:["botDeeSettingsBubble", "botDeeMemoryPanel", "botdee-upgrade-ui.js"], includes:["botDeeChatForm", "botDeeTranscript"]},
         {label:"My BOT DEE tab", file:"patron-portal.html", includes:["foBotDeePane", "nav.myBotDee", "botdee-upgrade-ui.js", "botDeeKnowsList", "botDeePersonalizationPanel", "botDeePrefName"]},
-        {label:"Master Admin subtabs", file:"master-admin.html", includes:["data-botdee-page=\"pause\"", "data-botdee-page=\"legal\"", "data-botdee-page=\"smartviews\"", "botDeeMasterSmartViewDemo"]},
+        {label:"Master Admin subtabs", file:"master-admin.html", includes:["data-botdee-page=\"pause\"", "data-botdee-page=\"legal\"", "data-botdee-page=\"smartviews\"", "data-botdee-page=\"smartpreview\"", "botDeeMasterSmartViewDemo"]},
         {label:"Save label", file:"master-admin.html", includes:["data-i18n=\"app.save\""], notIncludes:["Save BOT DEE settings"]},
-        {label:"Portal chrome keys", file:"floqr-i18n.js", includes:["nav.myBotDee", "botdee.knowsTitle", "master.botDeeSubSmartviews"], notIncludes:["botdee.settingsBubble"]},
+        {label:"Portal chrome keys", file:"floqr-i18n.js", includes:["nav.myBotDee", "botdee.knowsTitle", "master.botDeeSubSmartviews", "master.botDeeSubSmartpreview"], notIncludes:["botdee.settingsBubble"]},
         {label:"Help knows-of-me", file:"botdee-help-repository.js", includes:["help-botdee-knows-of-me", "Feature & Orders → My BOT DEE"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-022-botdee-portal-mgmt"]},
         {label:"Si-nema Search chrome tile", file:"index.html", includes:["id=\"sinemaBtnCard\"", "data-feature-key=\"sinema\"", "sinema-nightlife.jpg", "sinema-icon-face chrome-photo-face"]},
@@ -3482,6 +3506,24 @@
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.039. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — card shows photo full width on top, Don Papi and @handle on the next row, SMARTsummary as inline text (not a tall empty box). 3) Open My Profile → Features & Orders → My BOT DEE → View my SMARTview — same stack. 4) Phone ~390 and desktop ~1280. Empty fields take no height. Display URLs have no ?v=. 5) Mark Succeed/Failed.",
       expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
       troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
+    },
+    {
+      id:"s3-3-044-headless-shoutout-smartview",
+      area:"BOT DEE",
+      feature:"ShoutOut SMARTpreview collects template, @handle, and media",
+      changed:"s3.3.044 — BOT DEE no longer silently submits Traditional-only. After venue + copy, chat asks template (Traditional default), FloqR-card @handle, and text-only vs photo/video compose. ShoutOut SMARTpreview docks above the composer and follows this chat. Reply Traditional / include my handle / text only / throw it, or tap chips. Core createHeadlessShoutOutCheckout stays a one-shot payload (third-party / FloqR pages do not need the card). LED still waits on Club Admin Approve.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js ?v=s3.3.044. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout at Decades that says Happy birthday Maya — expect ShoutOut SMARTpreview docked above the composer (not only in a scrolled-away bubble), plus a question for template / @handle / photo, NOT an immediate pending submit. 3) Reply yes — should pick Traditional, NOT mint. Then yes again — include @handle. Then text only. Then throw it (or Pay securely if Halloween). 4) Send throw a traditional shoutout at Decades that says Happy birthday Maya with my handle text only — may complete in one turn. 5) FloqR/API one-shot still defaults Traditional without the card. 6) Master Admin → Features Mgmt → BOT DEE → SMARTpreview (or #featuresBotDee-smartpreview) — labeled mock cards (draft / handle / ready / Halloween / submitted) paint like SMARTviews mocks. 7) New chat / resume another chat — SMARTpreview dock clears (Throw it chips must not stay). 8) Mark Succeed/Failed.",
+      expected:"ShoutOut SMARTpreview docks above the composer and follows this chat. Master Admin SMARTpreview tab shows labeled mock cards. Third-party/FloqR headless does not require the card. Photo/video still opens compose. Pending until Club Admin Approve.",
+      troubleshoot:"Immediate pending with no questions → executeBotSession not this SHA (still s3.3.043 one-shot). Card missing → cached botdee-smartview.js. Follow-up Traditional ignored → headlessShoutOutDraft not persisted (Functions deploy [firebase-deploy-botdee]). Third-party now asking questions → createHeadlessShoutOutCheckout must stay startShoutOutCheckout, not tryHeadlessShoutOut. Master tab missing → cached master-admin.html / master-feature-services.js; hash #featuresBotDee-smartpreview."
+    },
+    {
+      id:"s3-3-043-headless-shoutout-complete",
+      area:"BOT DEE",
+      feature:"Headless ShoutOut completes composer + Club Admin + LED path",
+      changed:"s3.3.043 — Free throw from chat writes a composer-parity pending ShoutOut (catalog className classic-bw, venue address, identity rail, layout percents). Club Admin Inbox gets Pending ShoutOut → admin.html?location=&panel=panelQueue. Approve & Push Live uses packaged className so Display 1 matches Traditional. Paid Halloween still Stripe then pending. LED does not play until Approve.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.043. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout at Decades that says Happy birthday Maya — pending My ShoutOuts link (Open in My ShoutOuts), not compose-only. 3) My Profile → Feature & Orders → My ShoutOuts → Pending shows the row; Preview is the Traditional three-line board (classic-bw), not a generic neon stub. 4) Sign in Club Admin for Decades — Pending ShoutOuts queue has the copy; Inbox has Pending ShoutOut. Preview, then Approve & Push Live. 5) display.html?location=decades-washington-dc (no ?v=) plays the message on the Traditional board with FloqR card. 6) Mark Succeed/Failed.",
+      expected:"Chat throw → pending My ShoutOuts. Club Admin sees it, Approve pushes live Traditional LED. Not live until Approve. Halloween still Pay securely first.",
+      troubleshoot:"Pending missing in Club Admin → executeBotSession not this SHA or clubLocationId alias (Decades → decades-washington-dc). LED looks like neon / no letter board → cached admin-app.js (packaged.className) or display-app.js. Inbox missing for club → Functions submitFreeHeadlessShoutOut notify; adminUids empty on the club doc. Still compose-only → Functions deploy [firebase-deploy-botdee]."
     },
     {
       id:"s3-3-041-botdee-headless-checkout",

@@ -219,6 +219,11 @@
       window.__floqrBotDeeFocusId = "botDeeMasterSmartViewDemo";
       return "featuresBotDee";
     }
+    if (raw === "botDeeMasterSmartPreviewDemo") {
+      window.__floqrBotDeeMgmtPage = "smartpreview";
+      window.__floqrBotDeeFocusId = "botDeeMasterSmartPreviewDemo";
+      return "featuresBotDee";
+    }
     const sub = /^featuresBotDee[-_:](\w+)$/.exec(raw);
     if (sub) {
       window.__floqrBotDeeMgmtPage = sub[1];

@@ -75,6 +75,10 @@ test("patron My BOT DEE shows real SMARTview; mocks stay on Master Admin", () =>
   assert.match(master, /id="botDeeMasterLoadSmartViews"/);
   assert.match(master, /botdee\.libraryRefresh/);
   assert.match(master, /data-botdee-page="smartviews"/);
+  assert.match(master, /data-botdee-page="smartpreview"/);
+  assert.match(master, /id="botDeeMasterSmartPreviewDemo"/);
+  assert.match(master, /id="botDeeMasterLoadSmartPreview"/);
+  assert.match(upgrade, /loadSmartPreviewDemos/);
 });
 
 test("smartViewLoadCopy uses sign-in copy only for unauthenticated", () => {

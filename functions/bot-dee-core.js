@@ -70,7 +70,7 @@ const TOOL_DEFS = [
   {
     name: "startShoutOutCheckout",
     description:
-      "Throw a ShoutOut from chat (headless). Pass clubLocationId or locationName plus message/mainText. Optional templateId (default Traditional blackwhite) and screenFormatId. Server fits the copy to the venue LED. Paid templates return checkoutUrl; free boards submit pending (shoutoutId). Never collect card data. Do not invent checkoutUrl. Football Intro, jerseys, Baller's Alert, Heist art, and photo boards return composeHref instead.",
+      "Throw a ShoutOut in one shot (API / third-party). Pass clubLocationId or locationName plus message/mainText. Optional templateId (default Traditional blackwhite), screenFormatId, includeAttribution + attribution (@handle), mediaUrl. Does not use SMARTview. Paid templates return checkoutUrl; free boards submit pending (shoutoutId). Never collect card data. Do not invent checkoutUrl. Football Intro, jerseys, Baller's Alert, Heist art, and photo boards return composeHref instead. BOT DEE chat collects extras interactively before calling this.",
     parameters: obj({
       clubLocationId: str("Venue slug or display name (e.g. Aurelia, decades-washington-dc)."),
       locationName: str("Optional venue display name."),
@@ -80,6 +80,10 @@ const TOOL_DEFS = [
       text: str("Alias for message."),
       templateId: str("Optional template id. Default blackwhite. classicHalloween is paid."),
       screenFormatId: str("Optional LED size: led-96x48, led-64x48, or led-64x32."),
+      includeAttribution: str("Optional 1 to print the FloqR card @handle."),
+      attribution: str("Optional @handle text when includeAttribution is set."),
+      mediaUrl: str("Optional https image/video URL. Photo templates still prefer compose."),
+      mediaType: str("Optional image or video."),
       shoutout: {type: Type.OBJECT, description: "Optional full compose payload if already collected."},
       payload: {type: Type.OBJECT, description: "Optional wrapper with clubLocationId + shoutout."},
       returnBase: str("Optional return base URL."),

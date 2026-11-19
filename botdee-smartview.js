@@ -600,6 +600,212 @@
     return !!(payload && typeof payload === "object" && payload.kind === "botDeeRoom");
   }
 
+  function isShoutOutPayload(payload) {
+    return !!(payload && typeof payload === "object" && payload.kind === "botDeeShoutOut");
+  }
+
+  function shoutNeedLabel(id) {
+    if (id === "template") return t("botdee.so.needTemplate", "Choose a template");
+    if (id === "handle") return t("botdee.so.needHandle", "Include your @handle?");
+    if (id === "media") return t("botdee.so.needMedia", "Text only, or photo/video via compose");
+    if (id === "compose") return t("botdee.so.needCompose", "Open compose for photo/video");
+    return esc(id);
+  }
+
+  function wrapShoutLines(text) {
+    const perLine = 15;
+    const lineCount = 3;
+    const clean = String(text || "").replace(/\s+/g, " ").trim().toUpperCase();
+    if (!clean) return [];
+    const rows = [];
+    let row = [];
+    clean.split(/\s+/).filter(Boolean).forEach(word => {
+      const chunks = [];
+      for (let i = 0; i < word.length; i += perLine) chunks.push(word.slice(i, i + perLine));
+      chunks.forEach(chunk => {
+        const nextLen = row.length ? row.join("").length + 1 + chunk.length : chunk.length;
+        if (nextLen <= perLine) {
+          if (row.length) row.push(" ");
+          row.push(chunk);
+        } else if (rows.length < lineCount) {
+          if (row.length) rows.push(row.join(""));
+          row = [chunk];
+        }
+      });
+    });
+    if (row.length && rows.length < lineCount) rows.push(row.join(""));
+    return rows.slice(0, lineCount);
+  }
+
+  function shoutBoardSkin(templateId) {
+    const id = String(templateId || "blackwhite");
+    if (id === "classicHalloween") return "halloween";
+    if (id === "gold" || id === "vip") return "gold";
+    if (id === "neon" || id === "birthday") return "neon";
+    return "traditional";
+  }
+
+  function shoutStatusKey(view, needs) {
+    if (view.checkoutUrl) return "pay";
+    const mode = String(view.mode || "draft");
+    if (mode === "submitted" || view.shoutoutId || view.portalHref) return "submitted";
+    if (mode === "checkout") return "pay";
+    if (!needs.length) return "ready";
+    return "draft";
+  }
+
+  function shoutStatusCopy(key) {
+    if (key === "ready") return t("botdee.so.statusReady", "Ready");
+    if (key === "submitted") return t("botdee.so.statusSubmitted", "Submitted");
+    if (key === "pay") return t("botdee.so.statusPay", "Pay");
+    return t("botdee.so.statusDraft", "Draft");
+  }
+
+  function shoutChip(prompt, label, pressed) {
+    const value = String(prompt || "").trim();
+    if (!value) return "";
+    return `<button type="button" class="botdee-so-chip" data-so-prompt="${esc(value)}" aria-pressed="${pressed ? "true" : "false"}">${esc(label || value)}</button>`;
+  }
+
+  function renderShoutOutCard(payload) {
+    const view = payload && typeof payload === "object" ? payload : {};
+    const needs = Array.isArray(view.needs) ? view.needs : [];
+    const templates = Array.isArray(view.templates) ? view.templates.slice(0, 8) : [];
+    const compose = resolveSameOriginHref(view.composeHref || "");
+    const portal = resolveSameOriginHref(view.portalHref || "");
+    const checkout = String(view.checkoutUrl || "").trim();
+    const mode = String(view.mode || "draft");
+    const templateId = view.templateId || view.templateSuggestedId || "blackwhite";
+    const skin = view.boardSkin || shoutBoardSkin(templateId);
+    const handleCopy = view.handleDecision === "include"
+      ? (view.attribution || t("botdee.so.handleOn", "FloqR card on"))
+      : (view.handleDecision === "skip"
+        ? t("botdee.so.handleOff", "No @handle")
+        : t("botdee.so.handleUnset", "Not chosen yet"));
+    const mediaCopy = view.mediaDecision === "compose"
+      ? t("botdee.so.photoCompose", "Photo/video — compose")
+      : (view.mediaDecision === "none"
+        ? t("botdee.so.textOnly", "Text only")
+        : (view.mediaUrl ? view.mediaUrl : t("botdee.so.mediaUnset", "Not chosen yet")));
+    const templateCopy = view.templateName
+      || (view.templateId
+        ? view.templateId
+        : t("botdee.so.templateUnset", "Not chosen yet"));
+    const lines = (Array.isArray(view.previewLines) && view.previewLines.length
+      ? view.previewLines
+      : wrapShoutLines(view.mainText)).concat(["", "", ""]).slice(0, 3);
+    const railOn = view.handleDecision === "include";
+    const railAsk = view.handleDecision !== "include" && view.handleDecision !== "skip";
+    const railText = railOn
+      ? (view.attribution || "@")
+      : (railAsk ? t("botdee.so.handleUnset", "Not chosen yet") : t("botdee.so.handleOff", "No @handle"));
+    const status = shoutStatusKey(view, needs);
+    const collecting = mode === "draft" || mode === "ready";
+    const step = view.currentStep || needs[0] || (collecting ? "throw" : "");
+    const venue = view.venueName || view.clubLocationId || "—";
+    const templateChipLabel = {
+      blackwhite: "Traditional",
+      birthday: "Birthday",
+      vip: "VIP",
+      neon: "Neon",
+      gold: "Gold",
+      graduation: "Graduation",
+      corporate: "Corporate",
+      classicHalloween: "Halloween"
+    };
+    const templateChips = templates.map(row => shoutChip(
+      templateChipLabel[row.id] || row.id,
+      templateChipLabel[row.id] || row.id,
+      view.templateId === row.id && !!view.templateName
+    )).join("");
+    const handleChips = [
+      shoutChip("include my handle", "include my handle", view.handleDecision === "include"),
+      shoutChip("no handle", "no handle", view.handleDecision === "skip")
+    ].join("");
+    const mediaChips = [
+      shoutChip("text only", "text only", view.mediaDecision === "none"),
+      shoutChip("with a photo", "with a photo", view.mediaDecision === "compose")
+    ].join("");
+    const row = (label, value) => `<div class="botdee-so-row"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`;
+    return `<article class="botdee-sv-shoutout" data-kind="botDeeShoutOut" data-so-mode="${esc(mode)}" data-so-step="${esc(step)}" data-so-status="${esc(status)}" data-so-surface="${esc(view.surface || "bubble")}">
+      <h2 class="botdee-so-title"><span class="botdee-so-spark" aria-hidden="true">✦</span>${esc(t("botdee.so.title", "ShoutOut SMARTpreview"))}</h2>
+      <div class="botdee-so-id">
+        <div class="botdee-so-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="botdee-so-id-copy">
+          <strong>ShoutOut</strong>
+          <p class="botdee-so-sub">${esc(venue)} · ${esc(t("botdee.so.subtitle", "BOT DEE collection"))}</p>
+        </div>
+        <span class="botdee-so-pill" data-status="${esc(status)}">${esc(shoutStatusCopy(status))}</span>
+      </div>
+      <div class="botdee-so-board" data-skin="${esc(skin)}" data-media="${esc(view.mediaDecision || "")}" role="img" aria-label="${esc(t("botdee.so.preview", "ShoutOut preview"))}">
+        <div class="botdee-so-board-frame">
+          <div class="botdee-so-board-plate">
+            <b>${esc(lines[0] || " ")}</b>
+            <b>${esc(lines[1] || " ")}</b>
+            <b>${esc(lines[2] || " ")}</b>
+          </div>
+          <div class="botdee-so-board-rail" data-handle="${esc(railOn ? "on" : (railAsk ? "ask" : "off"))}">
+            <span>FloqR</span>
+            <span>${esc(railText)}</span>
+          </div>
+        </div>
+      </div>
+      <p class="botdee-so-hint">${esc(t("botdee.so.hint", "ShoutOut SMARTpreview stays with this chat. Reply here or tap a chip. A third-party headless throw does not need this card."))}</p>
+      <div class="botdee-so-rows">
+        ${row(t("botdee.so.venue", "Venue"), venue)}
+        ${row(t("botdee.so.message", "Message"), view.mainText || "—")}
+        ${row(t("botdee.so.template", "Template"), templateCopy)}
+        ${row(t("botdee.so.handle", "@handle"), handleCopy)}
+        ${row(t("botdee.so.media", "Photo / video"), mediaCopy)}
+      </div>
+      ${needs.length ? `<div class="botdee-so-needed"><h3>${esc(t("botdee.so.stillNeeded", "Still needed"))}</h3><ol>${needs.map(id => `<li>${esc(shoutNeedLabel(id))}</li>`).join("")}</ol></div>` : ""}
+      ${collecting ? `<section class="botdee-so-step${step === "template" ? " is-current" : ""}" data-step="template">
+        <h3>${esc(t("botdee.so.template", "Template"))}</h3>
+        <div class="botdee-so-chips" role="group">${templateChips}</div>
+      </section>
+      <section class="botdee-so-step${step === "handle" ? " is-current" : ""}" data-step="handle">
+        <h3>${esc(t("botdee.so.floqrCard", "FloqR card"))}</h3>
+        <div class="botdee-so-chips" role="group">${handleChips}</div>
+      </section>
+      <section class="botdee-so-step${step === "media" || step === "compose" ? " is-current" : ""}" data-step="media">
+        <h3>${esc(t("botdee.so.board", "Board"))}</h3>
+        <div class="botdee-so-chips" role="group">${mediaChips}</div>
+      </section>` : ""}
+      <div class="botdee-so-actions">
+        ${collecting && !checkout ? shoutChip("throw it", t("botdee.so.throwIt", "Throw it"), false).replace("botdee-so-chip", "botdee-so-chip botdee-so-throw") : ""}
+        ${checkout ? `<a class="botdee-sv-action botdee-sv-action-main" href="${esc(checkout)}" rel="noopener">${esc(t("botdee.so.pay", "Pay securely"))}</a>` : ""}
+        ${portal ? `<a class="botdee-sv-action" href="${esc(portal)}">${esc(t("botdee.so.portal", "Open in My ShoutOuts"))}</a>` : ""}
+        ${compose && (view.mediaDecision === "compose" || needs.includes("compose")) ? `<a class="botdee-sv-action" href="${esc(compose)}">${esc(t("botdee.so.compose", "Open compose"))}</a>` : ""}
+      </div>
+      <div class="botdee-so-foot">
+        <span>${esc(t("botdee.so.foot", "BOT DEE · ShoutOut SMARTpreview"))}</span>
+        <span>${esc(t("botdee.so.footPending", "Pending until Club Admin approves"))}</span>
+      </div>
+    </article>`;
+  }
+
+  function bindShoutOutCard(card) {
+    if (!card || card.dataset.soBound === "1") return;
+    card.dataset.soBound = "1";
+    card.querySelectorAll("[data-so-prompt]").forEach(btn => {
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        const prompt = String(btn.getAttribute("data-so-prompt") || "").trim();
+        if (!prompt) return;
+        if (typeof global.FLOQRBotDeeChat?.sendMessage === "function") {
+          global.FLOQRBotDeeChat.sendMessage(prompt);
+          return;
+        }
+        const input = global.document?.getElementById("botDeeChatInput");
+        const form = global.document?.getElementById("botDeeChatForm");
+        if (input) {
+          input.value = prompt;
+          form?.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}));
+        }
+      });
+    });
+  }
+
   function rememberRoomDecline(key) {
     const token = String(key || "").slice(0, 80);
     if (!token) return;
@@ -768,6 +974,7 @@
     if (!payload || typeof payload !== "object") return "";
     if (isVersionPayload(payload)) return renderVersionCard(payload);
     if (isRoomPayload(payload)) return renderRoomCard(payload);
+    if (isShoutOutPayload(payload)) return renderShoutOutCard(payload);
     if (isCompactCard(payload)) return renderCompactPeopleCard(payload);
     if (peopleOf(payload)) return renderPeopleCard(payload);
     const mock = payload.sources && payload.sources.some(s => s.provider === "mock" || s.reuseRights === "unknown");
@@ -1335,6 +1542,56 @@
     paint(false);
   }
 
+  function shoutPreviewHost() {
+    return global.document?.getElementById("botDeeShoutOutPreviewDock") || null;
+  }
+
+  function isLiveShoutPreview(view) {
+    if (!isShoutOutPayload(view)) return false;
+    const mode = String(view.mode || "draft");
+    return mode === "draft" || mode === "checkout" || mode === "ready";
+  }
+
+  function clearShoutOutPreviewDock() {
+    const el = shoutPreviewHost();
+    if (!el) return;
+    stopLive(el);
+    el.hidden = true;
+    el.classList.remove("is-open");
+    el.innerHTML = "";
+    el.__floqrSmartViews = [];
+    global.document?.body?.classList.remove("botdee-so-dock-open");
+  }
+
+  function dockShoutOutPreview(view) {
+    const el = shoutPreviewHost();
+    if (!el || !isLiveShoutPreview(view)) {
+      if (!isLiveShoutPreview(view)) clearShoutOutPreviewDock();
+      return false;
+    }
+    el.hidden = false;
+    el.classList.add("is-open");
+    global.document?.body?.classList.add("botdee-so-dock-open");
+    mount(el, [{...view, surface: "dock"}]);
+    return true;
+  }
+
+  function applyShoutOutPreviewFromViews(views) {
+    const list = Array.isArray(views) ? views : [];
+    const shouts = list.filter(isShoutOutPayload);
+    const live = shouts.find(isLiveShoutPreview);
+    if (live) {
+      dockShoutOutPreview(live);
+      return {docked: true, inline: list.filter(row => !isShoutOutPayload(row))};
+    }
+    if (shouts.some(row => String(row.mode || "") === "submitted" || row.shoutoutId)) {
+      clearShoutOutPreviewDock();
+      return {docked: false, inline: list};
+    }
+    if (shouts.length) clearShoutOutPreviewDock();
+    return {docked: false, inline: list};
+  }
+
   function paintHost(el, list, peopleSearch) {
     stopLive(el);
     el.__floqrSmartViews = list;
@@ -1347,6 +1604,7 @@
     wireActionLinks(el);
     el.querySelectorAll(".botdee-sv-version").forEach(card => bindVersionCard(card));
     el.querySelectorAll(".botdee-sv-room").forEach(card => bindRoomCard(card));
+    el.querySelectorAll(".botdee-sv-shoutout").forEach(card => bindShoutOutCard(card));
     const cards = el.querySelectorAll(".botdee-sv-people");
     let index = 0;
     list.forEach(payload => {
@@ -1382,6 +1640,12 @@
     renderRoomCard,
     isVersionPayload,
     isRoomPayload,
+    isShoutOutPayload,
+    renderShoutOutCard,
+    dockShoutOutPreview,
+    clearShoutOutPreviewDock,
+    applyShoutOutPreviewFromViews,
+    isLiveShoutPreview,
     localVersionPayload,
     peopleHeroMedia,
     isCompactCard,

@@ -135,6 +135,7 @@
       checkout: "botdee.link.paySecurely",
       floqcast: "botdee.link.floqcastPreview",
       shoutout: "botdee.link.shoutoutCompose",
+      "shoutout-pending": "botdee.link.shoutoutPending",
       vip: "botdee.link.vipTerms"
     };
     return (results || []).filter(row => {
@@ -496,7 +497,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.042";
+    return "s3.3.044";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -1125,11 +1126,16 @@
       });
       article.appendChild(list);
     }
-    if (!isUser && Array.isArray(smartViews) && smartViews.length && global.FLOQRBotDeeSmartView?.mount) {
+    let inlineViews = Array.isArray(smartViews) ? smartViews : [];
+    if (!isUser && global.FLOQRBotDeeSmartView?.applyShoutOutPreviewFromViews) {
+      const split = global.FLOQRBotDeeSmartView.applyShoutOutPreviewFromViews(inlineViews);
+      inlineViews = Array.isArray(split?.inline) ? split.inline : inlineViews;
+    }
+    if (!isUser && inlineViews.length && global.FLOQRBotDeeSmartView?.mount) {
       const host = document.createElement("div");
       host.className = "botdee-sv-host";
       article.appendChild(host);
-      global.FLOQRBotDeeSmartView.mount(host, smartViews, peopleSearch);
+      global.FLOQRBotDeeSmartView.mount(host, inlineViews, peopleSearch);
     }
     row.appendChild(article);
     log.appendChild(row);
@@ -1140,7 +1146,7 @@
     const log = byId("botDeeTranscript");
     if (!log) return;
     const last = log.lastElementChild;
-    const card = last?.querySelector(".botdee-sv-people, .botdee-sv-version, .botdee-sv-room");
+    const card = last?.querySelector(".botdee-sv-people, .botdee-sv-version, .botdee-sv-room, .botdee-sv-shoutout");
     if (last && card && card.scrollHeight > log.clientHeight * 0.85) {
       const logBox = log.getBoundingClientRect();
       const lastBox = last.getBoundingClientRect();
@@ -1344,6 +1350,9 @@
             : (peopleCard && looksLikeProfileFieldDump(data.reply)
               ? t("botdee.sc.oneResult", "Here is their SMARTview.")
               : displayReply(data.reply));
+      if (data.shoutOutPreview === "closed") {
+        global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
+      }
       appendBubble("bot", reply, localizeResults(peopleCard ? [] : data.results), media, views, peopleSearch);
       pushHistory("model", reply);
       if (reply) visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
@@ -1591,6 +1600,7 @@
   }
 
   function restoreTurns(turns) {
+    global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
     const log = byId("botDeeTranscript");
     if (log) log.innerHTML = "";
     history.length = 0;
@@ -1610,6 +1620,7 @@
   }
 
   function landCollapsed(data) {
+    global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
     const turns = cloneTurns(data.turns);
     const archive = cloneTurns(data.archiveTurns);
     storedTurns = turns.length ? turns : archive;
@@ -1703,6 +1714,7 @@
   }
 
   function startNewChat() {
+    global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
     const log = byId("botDeeTranscript");
     if (log) log.innerHTML = "";
     setChatsOpen(false);

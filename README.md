@@ -1,5 +1,7 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.042 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.044 (stable)
 
+- s3.3.044: BOT DEE ShoutOut SMARTpreview collects template/@handle/media; core stays one-shot
+- s3.3.043: Headless ShoutOut composer parity (classic-bw + Club Admin inbox + LED)
 - s3.3.042: Mingl Search chrome from v3 white/teal/purple vector
 - s3.3.041: BOT DEE + FloqR headless ShoutOut (club + message → Stripe or pending)
 - s3.3.040: People lookup matches legal name, display name, handle, what-about

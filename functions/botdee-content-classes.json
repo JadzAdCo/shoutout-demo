@@ -450,6 +450,10 @@
     "help-shoutout-choose-venue": [
       "patron"
     ],
+    "help-shoutout-headless-smartview": [
+      "masterAdmin",
+      "patron"
+    ],
     "help-shoutout-recommendations": [
       "patron"
     ],

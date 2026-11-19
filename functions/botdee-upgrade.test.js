@@ -271,6 +271,8 @@ test("wiring: new callables exported and rules classified collections exist", ()
   assert.match(read("botdee-upgrade-ui.js"), /function loadKnows/);
   assert.match(read("master-admin.html"), /data-botdee-page="smartviews"/);
   assert.match(read("master-admin.html"), /id="botDeeMasterSmartViewDemo"/);
+  assert.match(read("master-admin.html"), /data-botdee-page="smartpreview"/);
+  assert.match(read("master-admin.html"), /id="botDeeMasterSmartPreviewDemo"/);
   assert.doesNotMatch(read("master-admin.html"), /Save BOT DEE settings/);
   assert.match(read("master-feature-services.js"), /showBotDeeMgmtPage/);
   assert.match(

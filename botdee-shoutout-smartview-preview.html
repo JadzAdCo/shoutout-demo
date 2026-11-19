@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>ShoutOut SMARTpreview draft</title>
+  <script>
+    try{
+      var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
+      var __floqrChromeRaw=localStorage.getItem("floqr.isSiteChrome");
+      var __floqrChrome=__floqrChromeMap[__floqrChromeRaw];
+      if(!__floqrChrome){
+        var __legacy=String(localStorage.getItem("floqr.uiChrome")||"").trim();
+        if(__legacy==="traditional"||__legacy==="nightlife"||__legacy==="blackTiffany"||__legacy==="whiteBlack"||__legacy==="blackDarkGreen"||__legacy==="purpleWhite") __floqrChrome=__legacy;
+      }
+      if(!__floqrChrome) __floqrChrome="nightlife";
+      var __shot=new URLSearchParams(location.search).get("chrome");
+      if(__shot) __floqrChrome=__shot;
+      document.documentElement.setAttribute("data-floqr-chrome",__floqrChrome);
+    }catch(_){}
+  </script>
+  <link rel="stylesheet" href="./styles.css?v=s3.3.044"/>
+  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.044"/>
+  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.044"/>
+  <style>
+    body { margin: 0; max-width: 430px; margin-inline: auto; padding: 12px 14px 88px; }
+    .preview-note { font-size: 12px; opacity: 0.75; margin: 0 0 10px; line-height: 1.4; }
+    .chrome-row, .state-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+    .chrome-row button, .state-row button {
+      min-height: 36px;
+      width: auto !important;
+      flex: 1 1 auto;
+      padding: 6px 8px;
+      font-size: 11px;
+    }
+    .preview-user { align-self: flex-end; margin-left: auto; max-width: 70%; }
+    .preview-composer {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 0 6px;
+      background: color-mix(in srgb, var(--floqr-ink, #05080a) 88%, transparent);
+    }
+    .preview-composer input {
+      flex: 1;
+      min-width: 0;
+      border-radius: 28px;
+      padding: 12px 15px;
+    }
+    .preview-send {
+      height: 42px;
+      min-height: 42px;
+      width: 42px !important;
+      border-radius: 50%;
+      padding: 0;
+      background: var(--accent, #00d4fe);
+      color: var(--floqr-ink, #001617);
+      border: 0;
+      font-size: 18px;
+    }
+    html[data-shot] .preview-note,
+    html[data-shot] .chrome-row,
+    html[data-shot] .state-row { display: none; }
+  </style>
+</head>
+<body class="botdee-page" data-floqr-public>
+  <p class="preview-note">Local design draft — ShoutOut SMARTpreview docks above the composer and follows this chat. Headless API / third-party throws do not use this card. Switch Site Chrome and states.</p>
+  <div class="chrome-row" id="chromeRow"></div>
+  <div class="state-row" id="stateRow"></div>
+  <div class="botdee-bubble botdee-bubble-user preview-user" id="userBubble">
+    <div class="botdee-bubble-text" id="userText"></div>
+  </div>
+  <div class="botdee-bubble botdee-bubble-bot">
+    <div class="botdee-bubble-text" id="botText"></div>
+  </div>
+  <div id="botDeeShoutOutPreviewDock" class="botdee-so-dock" hidden></div>
+  <form class="preview-composer" id="composer">
+    <input id="message" aria-label="Message BOT DEE" placeholder="Message BOT DEE..."/>
+    <button class="preview-send" type="submit" aria-label="Send">➤</button>
+  </form>
+  <script src="./floqr-i18n.js?v=s3.3.044"></script>
+  <script src="./floqr-nav.js?v=s3.3.044"></script>
+  <script src="./floqr-chrome-scheme.js?v=s3.3.044"></script>
+  <script src="./botdee-smartview.js?v=s3.3.044"></script>
+  <script>
+    if (new URLSearchParams(location.search).has("shot")) {
+      document.documentElement.setAttribute("data-shot", "1");
+    }
+    const themes = ["nightlife","traditional","blackTiffany","whiteBlack","purpleWhite","blackDarkGreen"];
+    const row = document.getElementById("chromeRow");
+    themes.forEach((id, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = id;
+      b.addEventListener("click", () => {
+        document.documentElement.setAttribute("data-floqr-chrome", id);
+        localStorage.setItem("floqr.isSiteChrome", String(i));
+      });
+      row.appendChild(b);
+    });
+
+    const TEMPLATES = [
+      {id:"blackwhite", name:"Traditional Black and White ShoutOut"},
+      {id:"birthday", name:"Birthday Glow"},
+      {id:"vip", name:"VIP Table"},
+      {id:"neon", name:"Neon ShoutOut"},
+      {id:"gold", name:"Gold Celebration"},
+      {id:"graduation", name:"Graduation Night"},
+      {id:"corporate", name:"Corporate Event"},
+      {id:"classicHalloween", name:"Classic Halloween"}
+    ];
+    const SUGGESTIONS = [
+      {id:"blackwhite", prompt:"Traditional", group:"template"},
+      {id:"includeHandle", prompt:"include my handle", group:"handle"},
+      {id:"skipHandle", prompt:"no handle", group:"handle"},
+      {id:"textOnly", prompt:"text only", group:"media"},
+      {id:"photoCompose", prompt:"with a photo", group:"media"},
+      {id:"throwIt", prompt:"throw it", group:"throw"}
+    ];
+    function base(extra) {
+      return Object.assign({
+        schemaVersion: "floqr.botDeeShoutOutSmartView/1",
+        kind: "botDeeShoutOut",
+        generatedAtIso: new Date().toISOString(),
+        title: "ShoutOut",
+        venueName: "Decades",
+        clubLocationId: "decades-washington-dc",
+        mainText: "Happy birthday Maya",
+        previewLines: ["HAPPY BIRTHDAY", "MAYA"],
+        screenFormatId: "led-96x48",
+        templates: TEMPLATES,
+        suggestions: SUGGESTIONS,
+        composeHref: "./shoutout-search.html?location=decades-washington-dc",
+        priceCents: 0
+      }, extra);
+    }
+    const STATES = {
+      ask: {
+        user: "throw a shoutout at Decades that says Happy birthday Maya",
+        bot: "I can throw that at Decades. Pick a template, then say whether to print your @handle on the FloqR card, and whether this is text only or needs a photo.",
+        view: base({
+          mode: "draft",
+          templateId: "",
+          templateName: "",
+          templateSuggestedId: "blackwhite",
+          templateSuggestedName: "Traditional Black and White ShoutOut",
+          boardSkin: "traditional",
+          handleDecision: "",
+          mediaDecision: "",
+          needs: ["template", "handle", "media"],
+          currentStep: "template"
+        })
+      },
+      handle: {
+        user: "Traditional",
+        bot: "Traditional is on the board. Include your @handle on the FloqR card?",
+        view: base({
+          mode: "draft",
+          templateId: "blackwhite",
+          templateName: "Traditional Black and White ShoutOut",
+          boardSkin: "traditional",
+          handleDecision: "",
+          mediaDecision: "",
+          needs: ["handle", "media"],
+          currentStep: "handle"
+        })
+      },
+      ready: {
+        user: "include my handle · text only",
+        bot: "Draft is complete. Reply throw it to submit. Club Admin still has to Approve & Push Live.",
+        view: base({
+          mode: "draft",
+          templateId: "blackwhite",
+          templateName: "Traditional Black and White ShoutOut",
+          boardSkin: "traditional",
+          handleDecision: "include",
+          attribution: "@Maya",
+          includeAttribution: true,
+          mediaDecision: "none",
+          needs: [],
+          currentStep: "throw"
+        })
+      },
+      halloween: {
+        user: "Halloween with my handle text only",
+        bot: "Classic Halloween is $15. Pay securely, then Club Admin approves before the LED.",
+        view: base({
+          mode: "checkout",
+          templateId: "classicHalloween",
+          templateName: "Classic Halloween",
+          boardSkin: "halloween",
+          handleDecision: "include",
+          attribution: "@Maya",
+          includeAttribution: true,
+          mediaDecision: "none",
+          needs: [],
+          currentStep: "",
+          checkoutUrl: "https://checkout.stripe.com/c/pay/cs_test_preview",
+          priceCents: 1500
+        })
+      }
+    };
+
+    const params = new URLSearchParams(location.search);
+    let current = params.get("state") || "ask";
+    if (!STATES[current]) current = "ask";
+
+    function paint(id) {
+      current = id;
+      const state = STATES[id];
+      document.getElementById("userText").textContent = state.user;
+      document.getElementById("botText").textContent = state.bot;
+      FLOQRBotDeeSmartView.applyShoutOutPreviewFromViews([state.view]);
+      document.querySelectorAll("[data-so-state]").forEach(btn => {
+        btn.setAttribute("aria-pressed", btn.getAttribute("data-so-state") === id ? "true" : "false");
+      });
+    }
+
+    const stateRow = document.getElementById("stateRow");
+    [
+      ["ask", "1 · First ask"],
+      ["handle", "2 · Handle"],
+      ["ready", "3 · Ready"],
+      ["halloween", "4 · Halloween pay"]
+    ].forEach(([id, label]) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = label;
+      b.setAttribute("data-so-state", id);
+      b.addEventListener("click", () => paint(id));
+      stateRow.appendChild(b);
+    });
+
+    paint(current);
+    document.getElementById("composer").addEventListener("submit", event => {
+      event.preventDefault();
+    });
+  </script>
+</body>
+</html>
