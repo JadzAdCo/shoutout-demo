@@ -493,6 +493,6 @@
   },
   "help-shoutout-headless-smartview": {
     "title": "ShoutOut SMARTpreview",
-    "body": "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. Reply in chat or tap a chip. Photo and video boards still open compose. A true headless throw from FloqR or a third party does not use this card — pass venue, message, and optional extras in one request."
+    "body": "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. The dock shows the live LED template (the same Display 1 composer preview) and updates when you pick a template, @handle, or text vs photo. Reply in chat or tap a chip. Photo and video boards still open compose. A true headless throw from FloqR or a third party does not use this card — pass venue, message, and optional extras in one request."
   }
 }

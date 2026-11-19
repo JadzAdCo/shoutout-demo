@@ -645,6 +645,73 @@
     return "traditional";
   }
 
+  const SHOUT_TEMPLATE_PROMPTS = {
+    Traditional: "blackwhite",
+    Neon: "neon",
+    Birthday: "birthday",
+    Gold: "gold",
+    VIP: "vip",
+    Graduation: "graduation",
+    Corporate: "corporate",
+    Halloween: "classicHalloween"
+  };
+
+  /** Composer LED preview only. Do not use the Xibo location-only helper (that strips template/main). Never cache-bust display URLs. */
+  function sanitizeShoutOutPreviewHref(href) {
+    const raw = String(href || "").trim();
+    if (!raw) return "";
+    try {
+      const url = new URL(raw, "https://floqr.local/");
+      const file = String(url.pathname.split("/").pop() || "").toLowerCase();
+      if (file !== "display.html") return "";
+      url.searchParams.delete("v");
+      url.searchParams.set("preview", "1");
+      return `./display.html?${url.searchParams.toString()}`;
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function shoutOutLedSrc(view) {
+    const fromHref = sanitizeShoutOutPreviewHref(view && view.previewHref);
+    if (fromHref) return fromHref;
+    const row = view && typeof view === "object" ? view : {};
+    const params = new URLSearchParams();
+    const loc = String(row.clubLocationId || "").trim();
+    if (loc) params.set("location", loc);
+    params.set("template", String(row.templateId || row.templateSuggestedId || "blackwhite"));
+    if (row.mainText) params.set("main", String(row.mainText));
+    if (row.includeAttribution || row.handleDecision === "include") {
+      params.set("includeAttribution", "1");
+      if (row.attribution) params.set("attribution", String(row.attribution));
+    }
+    if (row.screenFormatId) params.set("screen", String(row.screenFormatId));
+    params.set("preview", "1");
+    return `./display.html?${params.toString()}`;
+  }
+
+  function patchShoutOutLedSrc(src, patch) {
+    const href = sanitizeShoutOutPreviewHref(src) || sanitizeShoutOutPreviewHref(shoutOutLedSrc({previewHref: src}));
+    if (!href) return "";
+    try {
+      const url = new URL(href, "https://floqr.local/");
+      const next = patch && typeof patch === "object" ? patch : {};
+      if (next.templateId) url.searchParams.set("template", String(next.templateId));
+      if (next.handle === "include") {
+        url.searchParams.set("includeAttribution", "1");
+        if (next.attribution) url.searchParams.set("attribution", String(next.attribution));
+      } else if (next.handle === "skip") {
+        url.searchParams.delete("includeAttribution");
+        url.searchParams.delete("attribution");
+      }
+      url.searchParams.delete("v");
+      url.searchParams.set("preview", "1");
+      return `./display.html?${url.searchParams.toString()}`;
+    } catch (_) {
+      return href;
+    }
+  }
+
   function shoutStatusKey(view, needs) {
     if (view.checkoutUrl) return "pay";
     const mode = String(view.mode || "draft");
@@ -727,6 +794,7 @@
       shoutChip("with a photo", "with a photo", view.mediaDecision === "compose")
     ].join("");
     const row = (label, value) => `<div class="botdee-so-row"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`;
+    const ledSrc = shoutOutLedSrc(view);
     return `<article class="botdee-sv-shoutout" data-kind="botDeeShoutOut" data-so-mode="${esc(mode)}" data-so-step="${esc(step)}" data-so-status="${esc(status)}" data-so-surface="${esc(view.surface || "bubble")}">
       <h2 class="botdee-so-title"><span class="botdee-so-spark" aria-hidden="true">✦</span>${esc(t("botdee.so.title", "ShoutOut SMARTpreview"))}</h2>
       <div class="botdee-so-id">
@@ -737,16 +805,19 @@
         </div>
         <span class="botdee-so-pill" data-status="${esc(status)}">${esc(shoutStatusCopy(status))}</span>
       </div>
-      <div class="botdee-so-board" data-skin="${esc(skin)}" data-media="${esc(view.mediaDecision || "")}" role="img" aria-label="${esc(t("botdee.so.preview", "ShoutOut preview"))}">
-        <div class="botdee-so-board-frame">
-          <div class="botdee-so-board-plate">
-            <b>${esc(lines[0] || " ")}</b>
-            <b>${esc(lines[1] || " ")}</b>
-            <b>${esc(lines[2] || " ")}</b>
-          </div>
-          <div class="botdee-so-board-rail" data-handle="${esc(railOn ? "on" : (railAsk ? "ask" : "off"))}">
-            <span>FloqR</span>
-            <span>${esc(railText)}</span>
+      <div class="botdee-so-board" data-skin="${esc(skin)}" data-media="${esc(view.mediaDecision || "")}" data-template="${esc(templateId)}" role="img" aria-label="${esc(t("botdee.so.preview", "ShoutOut preview"))}">
+        ${ledSrc ? `<iframe class="botdee-so-led" title="${esc(t("botdee.so.preview", "ShoutOut preview"))}" src="${esc(ledSrc)}" data-so-attribution="${esc(view.attribution || "")}" loading="eager" referrerpolicy="no-referrer" tabindex="-1"></iframe>` : ""}
+        <div class="botdee-so-board-fallback">
+          <div class="botdee-so-board-frame">
+            <div class="botdee-so-board-plate">
+              <b>${esc(lines[0] || " ")}</b>
+              <b>${esc(lines[1] || " ")}</b>
+              <b>${esc(lines[2] || " ")}</b>
+            </div>
+            <div class="botdee-so-board-rail" data-handle="${esc(railOn ? "on" : (railAsk ? "ask" : "off"))}">
+              <span>FloqR</span>
+              <span>${esc(railText)}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -787,11 +858,26 @@
   function bindShoutOutCard(card) {
     if (!card || card.dataset.soBound === "1") return;
     card.dataset.soBound = "1";
+    const board = card.querySelector(".botdee-so-board");
+    const iframe = card.querySelector(".botdee-so-led");
+    const markLedReady = () => board?.classList.add("is-led-ready");
+    iframe?.addEventListener("load", markLedReady);
     card.querySelectorAll("[data-so-prompt]").forEach(btn => {
       btn.addEventListener("click", event => {
         event.preventDefault();
         const prompt = String(btn.getAttribute("data-so-prompt") || "").trim();
         if (!prompt) return;
+        const templateId = SHOUT_TEMPLATE_PROMPTS[prompt] || "";
+        const handle = prompt === "include my handle" ? "include" : (prompt === "no handle" ? "skip" : "");
+        if (iframe && (templateId || handle)) {
+          board?.classList.remove("is-led-ready");
+          const next = patchShoutOutLedSrc(iframe.getAttribute("src") || "", {
+            templateId,
+            handle,
+            attribution: iframe.getAttribute("data-so-attribution") || ""
+          });
+          if (next && next !== iframe.getAttribute("src")) iframe.setAttribute("src", next);
+        }
         if (typeof global.FLOQRBotDeeChat?.sendMessage === "function") {
           global.FLOQRBotDeeChat.sendMessage(prompt);
           return;
@@ -1642,6 +1728,8 @@
     isRoomPayload,
     isShoutOutPayload,
     renderShoutOutCard,
+    shoutOutLedSrc,
+    patchShoutOutLedSrc,
     dockShoutOutPreview,
     clearShoutOutPreviewDock,
     applyShoutOutPreviewFromViews,
