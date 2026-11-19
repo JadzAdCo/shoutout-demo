@@ -2,397 +2,417 @@
 
 **Product:** RydR (FloqR mobility)  
 **Audience:** Tesla Robotaxi partnership / business development  
-**Classification:** Partner briefing — not a live booking-API claim  
+**Emphasis:** Eventbrite + Ticketmaster event graph, club and entertainment venues  
+**Classification:** Partner briefing — not a live Tesla booking-API claim  
 **Date:** 19 November 2026
 
 ---
 
 ## 1. Executive summary
 
-Tesla Robotaxi is a vehicle, routing, and safety network. What it does not yet have, at nightlife scale, is **intent**: who is going out, to which club, on which night, with how many people, when the room actually empties, and which curb is legal to use.
+Tesla Robotaxi is a vehicle, routing, and safety network. What it does not have is a **live entertainment demand graph**: which club, comedy room, concert, or ticketed night is actually filling, at which address, at which door time, and when the crowd lets out.
 
-**FloqR** is a nightlife operating system. Patrons use it to find venues, book tables, join guest lists, message friends, pay for in-club experiences, and hail a ride. **RydR** is FloqR’s mobility product. It is already designed around Tesla Robotaxi as the primary autonomous path (with an Ultra Luxury chauffeur path as a complementary premium tier).
+**FloqR** is that graph. It is a nightlife and live-entertainment operating system for **clubs, lounges, rooftops, beach clubs, dinner theaters, comedy, concerts, promoter nights, and other entertainment venues**. Two industry rails already feed it:
 
-The partnership thesis is simple:
+| Rail | What FloqR uses it for |
+|---|---|
+| **Ticketmaster** | Concert, comedy, and ticketed-show discovery; venue + artist + start time; outbound ticket links; path to Partner / distribution for reserve and order confirmation |
+| **Eventbrite** | Promoter-created nights, club takeovers, comedy, daytime entertainment; event pages, attendees/orders, webhooks, checkout customization |
 
-> FloqR supplies **verified nightlife demand, destinations, party composition, and predicted surge**. Tesla supplies **autonomous vehicles, dispatch, and in-trip safety**. RydR is the product surface that joins the two.
+The ticket is the **intent**. The onboarded club or entertainment venue is the **destination**. **RydR** is FloqR’s mobility product — designed around Tesla Robotaxi — that turns “I have a ticket / I have a table / I am on the guest list” into a consented inbound hail and a predicted outbound surge.
 
-Nightlife is one of the hardest mobility problems Tesla will face: late hours, clustered demand, curb congestion, mixed party sizes, age-restricted venues, and “get me home after last call” spikes that generic hail apps see only after they happen. FloqR sees those trips **forming** — in Search, VIP holds, guest lists, event calendars, and friend groups — hours before a patron opens a ride app.
+The partnership thesis:
 
-This brief describes FloqR, the RydR product, the datapoints already in the platform, and the concrete ways those datapoints can **augment Tesla Robotaxi** rather than compete with it.
+> FloqR sits between **Ticketmaster / Eventbrite / the venue** and **Tesla Robotaxi**. Tesla does not need to become a ticketing company or a club CRM. FloqR already binds the show to a verified curb. RydR asks Tesla to move the people.
+
+Generic ride-hail sees a pin after someone opens an app. FloqR sees the trip **forming** when the Eventbrite order is placed, the Ticketmaster show is listed, the club publishes Friday 11 p.m., or a VIP hold is taken — hours before last call.
 
 ---
 
-## 2. What FloqR is
+## 2. What FloqR is (venues first, tickets attached)
 
-FloqR (brand: **FloqR**) is a consumer and venue platform for nightlife, lounges, clubs, and live events. It is not a generic super-app. Every product sits on the same identity, venue, event, notification, and billing core:
+FloqR is not a generic super-app. It is built so every night out has a **venue of record** and, when the night is ticketed, an **official ticket URL** on that same event.
 
-| Product | Role | Why it matters to Robotaxi |
+### 2.1 Club and entertainment venues FloqR already classifies
+
+Venues and dated shows are first-class objects (`clubLocations` + `events`), not search snippets. Types Tesla would treat as Robotaxi POIs:
+
+**Venues (the building / curb)**
+
+| Class | Examples |
+|---|---|
+| Nightclub | Weekly DJ nights, 21+ door, late close |
+| Lounge / rooftop lounge / rooftop bar | Timed occupancy, valet, street vs rooftop entrance |
+| Beach club / day club | Day-to-night dwell, different let-out than a 2 a.m. club |
+| Bar / dinner theater | SAX-style entertainment rooms, earlier curtain |
+| Club brand with many nights | Recurring Thu/Fri/Sat programming at one address |
+
+**Entertainment events (the show, always tied to a venue)**
+
+| Class | Typical ticket rail |
+|---|---|
+| Concert / ticketed show | Ticketmaster Discovery (and Partner when licensed) |
+| Comedy show | Ticketmaster or Eventbrite detail page |
+| Promoter event / club takeover | Eventbrite, Posh, Dice, Shotgun, venue box office |
+| Daytime entertainment (festival, market, brunch party, pool party) | Eventbrite + official venue page |
+
+FloqR never treats a Ticketmaster *search results* URL or an Eventbrite *directory* URL as the event. Operators (and crawlers) must land on **one event or venue detail page**. That is how Tesla gets a real address and a real start time instead of a search query.
+
+### 2.2 What gets stored on every club / venue
+
+Club Admin and discovery onboard a **complete public profile**, not a name pin:
+
+| Group | Datapoints Tesla can use |
+|---|---|
+| Identity | Stable `locationId`, brand, location name, type, categories, tagline |
+| Place | Street, city, region, postal, country, coordinates, time zone |
+| Contact | Phone, email, official website, Instagram / Facebook |
+| Door | Age policy, dress code, amenities (valet, bottle service, private events) |
+| Clock | Structured weekly hours, exceptions, activity dates |
+| Programming | Genres, DJs / artists, promoters, featured staff |
+| Screens | In-room LED estate (dwell / “still in the building” signal) |
+
+**Augmentation:** Tesla receives a **named entertainment POI** with hours and door rules, not “drop pin on nightlife.”
+
+### 2.3 What gets stored on every night / ticketed show
+
+FloqR does not ship thin stubs (title + day). Each event is meant to carry everything the venue or ticket page publishes:
+
+| Field | Why it matters to Robotaxi |
+|---|---|
+| `eventName`, description | In-car / receipt label (“Robotaxi to Sueño at Decades”) |
+| `eventDate` / recurring, `eventDay`, `eventTime`, start ISO | Inbound window (doors) and outbound window (let-out) |
+| `genres`, `artists`, `featuredDjs` | Demand intensity (headline vs resident night) |
+| `presentedBy`, `promoters` | Who is packing the room (Eventbrite organizer / TM attraction) |
+| `agePolicy`, `entryCutoffNotes` | Do not hail a rider the door will turn away |
+| `venueSpace` | Rooftop vs main room vs beach — different curb |
+| **`ticketUrl`** | Canonical Eventbrite / Ticketmaster / Posh / venue box-office link |
+| **`externalTicketProvider`** | `eventbrite`, `ticketmaster`, `posh`, … |
+| `vipPassUrl`, `bottleServiceUrl` | Higher show-up, later outbound |
+| `flyerUrl`, `eventsPageUrl`, `sourceUrls[]` | Provenance — which official page the extract came from |
+
+If a club weekly page links out to Eventbrite or Ticketmaster (or Posh), that URL is stored on **the club’s event** and in club `sourceUrls`. The ticket is never an orphaned tab; it belongs to the same `locationId` Tesla would dispatch to.
+
+---
+
+## 3. Eventbrite and Ticketmaster — FloqR’s entertainment rails
+
+This is the layer Tesla should care about. Clubs tell FloqR *where* and *when*. Ticketmaster and Eventbrite tell FloqR *that people have already committed to be there*.
+
+### 3.1 Why ticketing is a Robotaxi input
+
+A paid ticket is a **high-confidence trip**. Compared with a random hail:
+
+- Destination is the **listed venue**, not a guessed address.  
+- Start time is **published**. Doors and let-out are inferable.  
+- Headcount is **order volume** (Eventbrite attendees / TM inventory), not a guess from cell-tower density.  
+- No-show risk is lower than an unpaid “maybe I’ll go.”  
+- Cancelled or postponed shows (TM / Eventbrite status) can **kill inbound hails** before a car moves.
+
+FloqR’s job is to **join that ticket to the venue curb** and offer RydR at the two moments that matter: **arrive on time** and **leave safely**.
+
+### 3.2 Ticketmaster
+
+FloqR’s ticketing architecture treats Ticketmaster as three complementary capabilities (Master Admin already tracks them as partner slots):
+
+| Capability | What FloqR takes | What Tesla gets |
 |---|---|---|
-| **Search / BOT DEE** | “I want a ride,” “take me to the club,” venue discovery | Natural-language ride intent + nearest nightlife destinations |
-| **RydR** | Mobility: Robotaxi hail + Ultra Luxury chauffeur | Tesla-facing demand and trip context |
-| **VIP reserV** | Table / booth booking with party size, deposit, night | Known occupancy and timed arrivals |
-| **Guest lists** | Night-of entry campaigns | Headcount and show-up windows |
-| **ShoutOut** | Paid messages on in-venue LED boards | In-room activity and dwell signal |
-| **floqCast** | Patron live video on the venue’s secondary LED | Peak-energy / still-in-room signal |
-| **Mingl** | Patron social graph and chat | Shared rides among known companions |
-| **BartR** | In-app commerce | Pre- and post-night spend adjacency |
-| **Club Admin** | Hours, events, staff schedules, door ops | Official curb, close time, staffing |
+| **Discovery API** | Events, venues, attractions, images, start times, outbound ticket links | Metro-scale **show calendar** at real venues |
+| **Affiliate / distribution** | Tracked outbound ticket links (Impact) | Proof of paid intent without FloqR selling the ticket |
+| **Partner API** | Official distribution: reserve, purchase, ticket/event retrieval | **Order-confirmed** occupancy — the strongest staging signal |
 
-Venues onboard with a **verified street address**, hours, age policy, dress code, genres, DJs, promoters, amenities, and weekly events. Patrons onboard with a signed-in identity, structured home/pickup address, language, and (optionally) friends and reservations.
+Discovery answers *what is on tonight*. Partner / order confirmation answers *how many people will actually be at that curb at 10:05 p.m. and 11:40 p.m.*
 
-FloqR already operates a **provider-adapter** model for mobility. RydR is not trying to become a second Tesla app. It is trying to become the **nightlife channel** that sends Tesla high-quality, consented trip requests with destination and party context Tesla would otherwise have to guess.
+Comedy, concerts, and ticketed entertainment are first-class FloqR event types (`comedyShow`, `concert`, `ticketedShow`). Publishing rules for those types require **date, time, and artist** — the same fields a Robotaxi quote needs.
+
+### 3.3 Eventbrite
+
+Eventbrite is how **promoters and clubs** put a night on sale when it is not a Ticketmaster arena show:
+
+| Capability | What FloqR takes | What Tesla gets |
+|---|---|---|
+| Public event pages + JSON-LD | Title, date, time, venue address, ticket URL, categories | Structured show record tied to a club POI |
+| Eventbrite API (events, attendees, orders, webhooks) | Organizer-created inventory; checkout and attendee updates | Live **order and check-in** counts |
+| Checkout customization | FloqR can remain in the nightlife session | Offer “add a Robotaxi” next to the ticket, not after the fact |
+
+This is the weekly club takeover, the comedy room, the brunch party, the rooftop, the promoter Eventbrite that **is** the night. Those shows dump onto the same streets as resident club nights — often the same `locationId`.
+
+### 3.4 How FloqR actually binds a ticket to a club
+
+Three paths, all designed so Tesla never has to scrape Eventbrite or Ticketmaster:
+
+1. **Club-owned events.** The venue (or FloqR onboarding) publishes the weekly night and **must** attach the live ticket URL the patrons use. Destination for RydR is the club’s verified address.  
+2. **Source detail extraction.** Master Admin (and server extract `aiExtractPublicSourceUrl`) paste or fetch **one** Eventbrite, Ticketmaster, venue, or comedy **detail** page — not a search list. FloqR parses JSON-LD / metadata: date, time, address, ticket URL, source URL, categories, missing-datapoint status. Search-results URLs are rejected.  
+3. **Trusted ticket hosts.** Ticketmaster, Eventbrite, Posh, Dice, Shotgun, RA are treated as trusted event sources when the URL is a detail page. Aggregator chrome is not allowed to replace the official venue.
+
+BOT DEE / accounts profile already names the vendor slots: `BOTDEE_TICKETMASTER_DISCOVERY_API_KEY`, `BOTDEE_TICKETMASTER_PARTNER_API_KEY`, `BOTDEE_EVENTBRITE_API_KEY`. Live vendor HTTP is turned on when the commercial relationship and secret are in place. The **data model and venue join are already built** so Tesla does not wait on a greenfield schema.
+
+### 3.5 What FloqR does *not* ask Tesla to do
+
+Tesla should not integrate Eventbrite or Ticketmaster. FloqR already does. Tesla should accept a **ride request that already knows**:
+
+- `clubLocationId` + verified address + curb zone  
+- `eventId` + start / end / door cutoff  
+- `externalTicketProvider` + `ticketUrl` (provenance, not for Tesla to scrape)  
+- occupancy hint (party size, shared companions, optional ticketed headcount)  
+- inbound vs outbound (`arrive` vs `leave`)
 
 ---
 
-## 3. What RydR is today
+## 4. RydR — the Tesla-facing product on top of that graph
 
-**RydR** (casing: RydR) is FloqR’s mobility product. Search phrases such as “book a ride,” “hail,” “robotaxi,” or “get me there” route into RydR.
+**RydR** is FloqR mobility. Search phrases such as “book a ride,” “hail,” “robotaxi,” or “get me to the show” land here. Destination is filled from the **venue’s verified address** (club or entertainment room), not free-typed by the patron.
 
-Two modes are productized:
+Two modes:
 
-1. **Robotaxi** — autonomous hail, designed for Tesla Robotaxi (Model Y class in the current experience).
-2. **Ultra Luxury** — chauffeur-class arrivals (preview; complements Robotaxi for bottle-service / VIP drop-offs that still want a human chauffeur).
+1. **Robotaxi** — autonomous hail, designed for Tesla Robotaxi.  
+2. **Ultra Luxury** — chauffeur-class arrivals (preview), for bottle-service doors that still want a human at inbound; Robotaxi still wins the late outbound.
 
-### Honest current state (important for Tesla)
-
-RydR is a **hybrid prototype**, not a live Tesla dispatch:
+### Honest current state (Tesla dispatch)
 
 | Layer | Status |
 |---|---|
-| Patron identity, venue destination, structured pickup address | **Live** in FloqR |
+| Venue + event graph, ticket URLs, structured pickup | **In product** |
 | Four booking modes (on-demand, scheduled, for another patron, shared) | **Built** |
-| Trip-fare checkout (Stripe, FloqR merchant of record) | **Live in demo** |
-| Vehicle matching, map, ETA, charge, tag/plate confirmation | **Simulated**, clearly labeled |
-| Tesla third-party booking API | **Not public.** FloqR records a handoff to [tesla.com/robotaxi](https://www.tesla.com/robotaxi) |
-| Production adapter | **Specified** — swap simulation for a Tesla-approved API without changing the patron product |
+| Trip-fare checkout (Stripe) | **Live in demo** |
+| Vehicle matching / map / ETA | **Simulated**, labeled |
+| Tesla third-party booking API | **Not public.** Handoff to [tesla.com/robotaxi](https://www.tesla.com/robotaxi) |
+| Production adapter | **Specified** — swap simulation for a Tesla-approved API |
 
-FloqR does **not** use Tesla Fleet API as a ride-hailing API. Fleet API is vehicle access and commands. RydR is a **booking / quote / state** integration, which Tesla would need to authorize commercially.
+FloqR does not use Tesla Fleet API as ride-hailing. RydR needs a **quote / accept / state** API Tesla would authorize.
 
-That gap is the partnership. The product, datapoints, and ride state machine are already shaped for it.
+### Booking modes (now with a ticketed event attached)
 
-### Booking modes Tesla would receive
-
-| Mode | Patron job | What Tesla gets |
+| Mode | Patron job | Tesla payload |
 |---|---|---|
-| **On-demand** | “Take me to the club now.” | Pickup + verified venue drop-off, now |
-| **Scheduled** | “Pick me up at 10:40 for a 11:00 reservation.” | Future pickup locked to a night / table hold |
-| **For another FloqR** | Promoter, host, or friend sends a car | Recipient identity + who pays |
-| **Shared** | 2–4 patrons, optional separate drop-offs | Occupancy, multi-stop, split or organizer pay |
+| **On-demand** | “Take me to the Eventbrite night / the club now.” | Pickup + venue POI + `eventId` |
+| **Scheduled** | “Pick us up 35 minutes before doors.” | Future pickup locked to TM / Eventbrite start |
+| **For another FloqR** | Promoter sends a car to a ticketed guest | Recipient + who pays |
+| **Shared** | 2–4 patrons, optional extra drop-offs after the show | Occupancy, multi-stop |
 
-Payment arrangements already exist: organizer pays, recipient pays, recipient approves and pays, split evenly, or each rider pays their route leg. Tesla can remain the **trip operator**; FloqR can remain the **nightlife merchant and identity layer**, or Tesla can take fare — that is a commercial choice, not a product blocker.
+Payment: organizer, recipient, approve-and-pay, split, or per-leg. Tesla can operate the trip; FloqR can remain nightlife merchant of record — commercial choice.
 
-### Ride states (designed for a provider webhook)
-
-Canonical order:
-
-`quote` → `payment` → `vehicle assigned` → `en route` → `arriving` → `waiting at pickup` → `rider verified` → `in trip` → `completed`
-
-Terminal: cancelled, provider declined, payment failed, no-show, safety hold.
-
-RydR already shows Tesla-class confidence fields **before boarding**: model, vehicle tag, plate, color, charge %, estimated range, seats, accessibility notes, pickup ETA, trip ETA, driving mode, remote safety contact. Exact live vehicle position is withheld until a ride is confirmed — a privacy rule FloqR is willing to keep in production.
+Ride states: `quote` → `payment` → `vehicle assigned` → `en route` → `arriving` → `waiting` → `rider verified` → `in trip` → `completed` (plus cancelled, declined, no-show, safety hold). Pre-board confidence fields already match Tesla-class UX: model, tag, plate, color, charge, range, seats, accessibility, remote safety contact. Live vehicle position is withheld until confirm.
 
 ---
 
-## 4. Why nightlife is a Robotaxi problem Tesla should want solved
+## 5. Datapoints that augment Tesla Robotaxi
 
-Generic ride-hailing treats a club drop-off like any other pin. Nightlife is different:
+Sharing with Tesla is **consented, minimized, purpose-limited** (§9).
 
-- **Demand is event-shaped**, not uniform. Friday 23:30–01:00 inbound; 02:30–04:30 outbound.
-- **Destinations are clustered.** Dupont, U Street, Ivy City, a beach-club corridor — many parties, few curbs.
-- **Party size is the product.** A VIP table of six is not six independent Ubers.
-- **The destination is a venue with rules.** 21+, dress code, guest list cutoff, valet, “no ride-hail in the front drive.”
-- **The return trip is the valuable one.** Patrons are tired, possibly impaired, and least willing to hunt for a car. Autonomous, no-driver Robotaxi is a **safety story** here, not only a cost story.
-- **Staff go home on a schedule.** DJs, bottle service, security, and hosts end shifts together.
+### 5.1 Ticket + show clock (Eventbrite / Ticketmaster)
 
-Tesla’s network optimization improves if it knows *which blocks will surge at 2:40 a.m.*, *which curb is the club’s official drop-off*, and *whether the rider is a party of one or four*. FloqR already stores those facts as **venue and event datapoints**, not as after-the-fact GPS traces.
-
----
-
-## 5. FloqR datapoints that augment Robotaxi
-
-All of the following exist in FloqR’s model today. Sharing with Tesla would be **consented, purpose-limited, and minimized** (see §8). The value is the *existence* of the data in a nightlife graph Tesla does not have.
-
-### 5.1 Verified destinations (venues)
-
-Every onboarded club/location carries a canonical identity Tesla can treat as a **named POI**, not a raw geocode:
-
-| Datapoint | Example | Robotaxi use |
+| Signal | Source | Robotaxi use |
 |---|---|---|
-| `locationId` (stable slug) | `decades-washington-dc` | Durable POI key across nights |
-| Brand + location name | Decades, Onyx Rooftop Lounge | In-car destination label |
-| Full street address, city, region, postal, country | 1815 M Street NW, Washington, DC 20036 | Routing + geocode QA |
-| Coordinates (stored or city-resolved) | lat/lng | Dispatch radius, deadhead |
-| Telephone, website, Instagram | ops / rider confirm | Exception handling |
-| Venue type / categories | rooftop, beach club, lounge, dinner theater | Curb class, dwell time |
-| Time zone | America/New_York | Schedule vs local close |
+| Start ISO / `eventTime` / doors | TM Discovery, Eventbrite page/API, club calendar | Stage inbound 20–40 min before doors |
+| Let-out / close / `entryCutoffNotes` | Venue hours + event | Stage outbound before the surge |
+| Ticket URL + provider | `ticketUrl`, `externalTicketProvider` | Paid-intent flag; cancel hail if listing is cancelled |
+| Artist / headliner | TM attraction, Eventbrite title, club `artists` | Weight demand (arena comedy vs resident DJ) |
+| Promoter / `presentedBy` | Eventbrite organizer, club event | Recurring nights at the same curb |
+| Age on the listing | TM / Eventbrite / club `agePolicy` | Skip illegal or door-reject trips |
+| Attendee / order counts (API) | Eventbrite orders; TM Partner | **How many cars**, not only where |
 
-**Augmentation:** Tesla stops treating “the club” as an address string. It becomes a **known drop-off node** with hours, age rules, and a preferred curb.
+### 5.2 Venue POI and curb
 
-### 5.2 When the room is actually open (hours and events)
-
-| Datapoint | Robotaxi use |
+| Signal | Robotaxi use |
 |---|---|
-| Hours summary + **structured weekly hours** (`hoursStructured`) | Pre-position vehicles before open; stop inbound after last entry |
-| Hour exceptions (holidays, takeovers) | Avoid false demand on dark nights |
-| Recurring nights (`eventDay`, `eventTime`, `eventDate`) | Thursday vs Saturday fleet plans |
-| Event name, description, genres, DJs, promoters | Demand intensity (headline DJ ≠ quiet lounge) |
-| Age policy (`18+` / `21+`) | Do not dispatch a minor to a 21+ door |
-| Dress code | Not a routing input; useful for Ultra Luxury vs Robotaxi mix |
-| Entry cutoff notes | Inbound hail cutoff (“doors close 1:30”) |
-| Ticket / VIP / bottle URLs | Paid intent = higher show-up probability |
+| `locationId`, brand, full address, lat/lng | Durable destination node |
+| Venue class (club vs comedy vs rooftop vs beach) | Dwell time and let-out shape |
+| Amenities: valet, private events | Avoid valet stack; use ride-hail lane |
+| `venueSpace` (rooftop / main / beach) | Correct entrance |
+| Club-approved geofence (RydR target) | Legal curb polygon |
+| Time zone + structured hours | No inbound after last entry |
 
-**Augmentation:** Tesla can **forecast inbound and outbound windows per venue**, not city-wide. End-of-night surge is a first-class FloqR target: ride requests with *venue event context*.
+### 5.3 Patron origin
 
-### 5.3 Curb and site operations (what generic maps miss)
+Structured pickup (street #, street, city, region, ZIP/postal) → `taxiPickupAddress`. Saved labels: Home, **Preferred Home Pickup**, Work, Other. Private (not social). GPS for nearby venues only; **IP never stored**.
 
-Nightlife venues have unofficial rules that break autonomous drop-off:
+### 5.4 Party and ticketed occupancy
 
-- Valet vs ride-hail lane
-- Rooftop vs street-level entrance
-- “Use the alley / garage / K Street side”
-- Emergency exits and fire lanes that must never be a pin
-
-FloqR’s venue profile already stores **amenities** (valet, bottle service, private events), **venue space** on events (rooftop / main / beach), and Club Admin as the operator who can designate a **geofenced pickup/drop-off zone**. Target RydR architecture: one official zone per venue, published to the provider.
-
-**Augmentation:** Tesla gets a **club-approved curb polygon** instead of dropping a Robotaxi in the valet stack or on a crosswalk. That is operational safety and neighborhood goodwill.
-
-### 5.4 Patron identity and pickup (the origin)
-
-RydR pickup is a **structured address**, not a single text box — street number, street name, city, state/province, ZIP or postal — composed into `taxiPickupAddress`. Saved labels already exist:
-
-- Home  
-- Preferred Home Pickup (the curb the robotaxi should actually use)  
-- Work  
-- Other  
-
-Locale follows the patron’s country (US ZIP vs Canada/other postal). Height, phone (E.164), language, and UI language live on the same profile. Pickup address is **private** (not a social datapoint).
-
-GPS is used for “venues near me” with foreground disclosure; **client IP is never stored**.
-
-**Augmentation:** Tesla receives a **repeatable, structured origin** and a preferred-home-pickup that may differ from mailing address (apartment rear alley, hotel porte-cochère). Fewer failed pickups, fewer “walk to the pin” disputes.
-
-### 5.5 Party composition (occupancy is the product)
-
-| Source | Signal | Robotaxi use |
-|---|---|---|
-| RydR shared ride (up to 3 companions + organizer) | Occupancy 2–4, optional **separate drop-offs** | Seat check, multi-stop routing, fare legs |
-| VIP reserV | `partySize`, `maxCapacity`, `includedGuests`, table/section, night | Arrival window; outbound party of N at close |
-| Guest list requests | Headcount for a named night | Soft demand; no-show risk |
-| Mingl connections | Consented companions | Shared hail without exchanging phone numbers |
-| “For a FloqR” | Ride gifted to another patron | Promoter / host / parent-of-group flows |
-
-Vehicle snapshot in RydR already includes **seats (4)** and accessibility: service-animal ready, foldable wheelchair storage. That maps to Tesla Robotaxi cabin constraints.
-
-**Augmentation:** Tesla can **reject or upsize** before dispatch (party of 5 → two vehicles or luxury path), and can **batch compatible drop-offs** toward the same corridor at closing time.
-
-### 5.6 In-venue liveness (dwell and exit prediction)
-
-FloqR is unique among ride apps because the patron is **still in the product** after they arrive:
-
-| Signal | Meaning for dispatch |
+| Source | Signal |
 |---|---|
-| VIP table still held / checked in | Party is in-house; outbound hail is later |
-| Door scan (`vip-door`) check-in / no-show | Arrival confirmed vs wasted inbound |
-| ShoutOut approved and playing on the LED | Patron is in the room *now* |
-| floqCast live on Display 2 | Peak energy; do not pull cars to the curb yet |
+| RydR shared (up to 3 companions) | Seats, multi-stop after the show |
+| VIP reserV `partySize` / table | Arrival window for bottle-service nights |
+| Guest list | Soft headcount for free/reduced entry nights |
+| Eventbrite attendee / TM order (when licensed) | Building-level occupancy |
+| Mingl companions | Shared hail without exchanging phones |
+
+Vehicle card already: 4 seats, service-animal, foldable wheelchair storage.
+
+### 5.5 In-venue liveness (after the ticket is scanned)
+
+FloqR stays open **inside** the club — something Ticketmaster and Eventbrite do not see:
+
+| Signal | Dispatch meaning |
+|---|---|
+| Door / VIP check-in vs no-show | Arrival confirmed; cancel unused inbound |
+| ShoutOut on the LED / floqCast live | Still in the room — delay outbound staging |
 | Guest list redeemed | Through the door |
-| Staff Work Calendar shift end | Employee outbound wave (predictable to the minute) |
-| Last-call / hours end | Start staging vehicles 20–40 minutes prior |
+| Staff Work Calendar shift end | Talent and security outbound, timed |
+| Hours / last call | Start staging 20–40 min prior |
 
-FloqR’s technical target explicitly includes **predicting end-of-night ride demand** from these signals.
-
-**Augmentation:** Tesla pre-positions Robotaxis on the right block **before** the surge hits the public network — the same advantage airlines have when they know gate close times.
-
-### 5.7 Commerce and willingness to pay
-
-RydR already runs **real trip-fare checkout**. Adjacent FloqR payments (VIP deposits, ShoutOuts, guest products) are a **propensity** signal: a patron who prepaid a table is more likely to keep a scheduled hail and less likely to no-show.
-
-Receipts already carry venue, night, amount, and last-4 card — the same descriptive style Tesla would want for a Robotaxi trip receipt (“Robotaxi to Decades, Fri 11:00 p.m.”).
-
-**Augmentation:** Higher **show-up rate** on scheduled trips; optional FloqR-billed fare so Tesla is paid without the patron leaving the nightlife app.
-
-### 5.8 Language, market, and accessibility
-
-FloqR chrome ships in **11 languages** (en, de, fr, es, it, pt, ru, el, pl, nl, ar). Pickup locale follows country. Accessibility notes are already on the vehicle card.
-
-**Augmentation:** Tesla Robotaxi in-car and pre-trip copy can inherit the patron’s FloqR language. Accessibility flags can be a **dispatch constraint**, not a post-arrival surprise.
-
-### 5.9 Advertising and in-car / pre-trip moments (optional)
-
-RydR already has a **sponsored interstitial** before hail (FloqR Media slot, 8-second hold, skip allowed). Club campaigns can target the RydR surface (“hail, then throw a ShoutOut”).
-
-This is not required for a Tesla partnership. It is a **revenue adjacency**: Tesla could decline ads in-car (FloqR recommendation: keep the Robotaxi cabin ad-free) while FloqR keeps the pre-hail sponsor slot on the phone.
+Predicting **end-of-night ride demand** from event context is an explicit FloqR target.
 
 ---
 
-## 6. Use cases (how FloqR + Tesla should work together)
+## 6. Use cases (tickets + venues + Robotaxi)
 
-### Use case A — “Take me to the club” (inbound, on-demand)
+### A — Ticketmaster concert / comedy let-out
 
-**Today in FloqR:** Patron is signed in → Search or BOT DEE → RydR → destination **locked to the club’s verified address** → structured pickup → pay → (today: simulated) hail.
+A Ticketmaster comedy or concert listing is onboarded to a FloqR entertainment venue (address, door time, artist). Show ends ~11:20 p.m. FloqR stages outbound RydR to **Preferred Home Pickup** for patrons who opted in.
 
-**With Tesla:** Quote from Tesla network using FloqR origin + venue POI. Vehicle assigned with tag/plate/color/charge. Patron confirms curb and vehicle. Tesla drives; FloqR shows status.
+**Tesla gain:** Arena/club let-out is the classic failed hail. FloqR gives Tesla **when** and **which curb** from the TM clock, not from watching the map go red.
 
-**Tesla gain:** High-intent nightlife trips with a **clean destination** and a **repeat origin**.
+### B — Eventbrite promoter night at a club
 
-### Use case B — Scheduled hail tied to a VIP table
+A promoter sells Saturday on Eventbrite at an onboarded nightclub. `ticketUrl` lives on the club’s event. Patrons in FloqR see “Hail RydR — doors 10:30.” Shared ride for a party of three.
 
-Patron holds table C10 at Decades for Friday, party of four, doors 10 p.m. RydR offers “Pick us up at 10:25” from Preferred Home Pickup.
+**Tesla gain:** **Weekly, repeating, ticketed demand** at the same POI — better than one-off pins. Eventbrite order webhooks can raise/lower staging.
 
-**Tesla gain:** **Reservable utilization** instead of random inbound. If the hold expires or the table is cancelled, FloqR can cancel the hail before a car moves.
+### C — Club resident night with no TM page
 
-### Use case C — Shared ride among Mingl friends
+Decades-style weekly night: club calendar + optional Posh/Eventbrite ticket link, VIP tables, guest list. Destination still the verified club address. Inbound scheduled to the table hold; outbound from close.
 
-Three patrons going to the same lounge, one continuing to a second afterparty. RydR shared mode already collects companions and per-person drop-offs, with organizer / split / per-leg pay.
+**Tesla gain:** The **un-ticketed majority** of nightlife still has a FloqR clock (hours, VIP, guest list) Tesla would otherwise miss.
 
-**Tesla gain:** **Occupancy** and a **multi-stop** that is socially consented (not a stranger pool). Better than anonymous ride-share for safety optics.
+### D — “Add a Robotaxi” on the ticket path
 
-### Use case D — Promoter or host sends a car (“For a FloqR”)
+Patron completes Eventbrite checkout (or follows a TM outbound link) inside the FloqR session. RydR offers a **scheduled hail** to the same `eventId` before they close the phone.
 
-A promoter pays for a guest’s inbound Robotaxi. Recipient approves in FloqR Inbox. Tesla still verifies the rider at the door of the car.
+**Tesla gain:** Capture the trip at **purchase**, not at 1:55 a.m. in the rain.
 
-**Tesla gain:** **B2B nightlife spend** (promoters, tables, brands) without Tesla building promoter tooling.
+### E — Cancelled or postponed listing
 
-### Use case E — End-of-night surge (the core Robotaxi nightlife loop)
+TM / Eventbrite marks the show cancelled. FloqR cancels scheduled Robotaxis and does not stage the curb.
 
-Club Admin hours say Saturday close 3:00 a.m. VIP check-ins and ShoutOut volume show a full room. At 2:20 a.m. FloqR predicts outbound demand of *N* parties of 1–4 within a three-block radius.
+**Tesla gain:** Deadhead avoided. Generic apps still send cars to a dark marquee.
 
-**Tesla gain:** **Staging**, not chasing. Cars wait on the club-approved curb polygon. Patrons tap “RydR home” with Home / Preferred Home Pickup already filled. Impaired driving alternative is the safety narrative.
+### F — Age-gated club vs all-ages Ticketmaster
 
-### Use case F — Staff and talent shift-end
+Club event is 21+. Comedy listing is all-ages. FloqR applies the **event** age policy to the hail.
 
-Work Calendar publishes when security, bartenders, and DJs end. Those trips are **punctual, clustered, and recurring**.
+**Tesla gain:** Fewer door turn-aways after a paid autonomous trip.
 
-**Tesla gain:** A second, reliable nighttime demand class — employees, not only patrons — with known destinations (often the same metro nodes).
+### G — Shared post-show drop-offs
 
-### Use case G — Age-gated and no-show hygiene
+Four Eventbrite guests; two go home, one to an afterparty at a second FloqR venue. RydR shared + per-leg pay.
 
-Venue is 21+. FloqR can refuse to send a Robotaxi to that door for a profile that cannot meet policy (where age is verified). Guest-list no-shows and VIP no-shows cancel inbound hails.
+**Tesla gain:** Occupancy and a **second entertainment POI** on the same paid night.
 
-**Tesla gain:** Fewer **wasted deadheads** to doors that will turn the rider away.
+### H — Promoter pays the car (“For a FloqR”)
 
-### Use case H — Official Tesla app handoff (if Tesla prefers to own the cabin)
+Promoter or table host pays inbound Robotaxi for a ticketed guest. Recipient confirms in Inbox. Tesla still verifies the rider at the vehicle.
 
-If Tesla does not open a third-party booking API, FloqR still helps: it collects **intent, party, and POI**, then deep-links into Tesla’s official Robotaxi app with those fields. That is the current honest fallback (`provider-handoff-required`).
+**Tesla gain:** B2B entertainment spend without Tesla building promoter tools.
 
-**Tesla gain:** FloqR becomes a **demand-gen and destination-quality** channel even without dispatch control.
+### I — Staff and talent after a ticketed night
 
-### Use case I — Ultra Luxury vs Robotaxi mix
+DJ, security, and hosts have Work Calendar end times after the Eventbrite close.
 
-Bottle-service arrivals may still want a chauffeur; the same patron wants Robotaxi home at 3:15 a.m. FloqR can split the night: luxury inbound, Robotaxi outbound.
+**Tesla gain:** A second, punctual outbound wave at the same curb.
 
-**Tesla gain:** Robotaxi wins the **highest-volume, safety-sensitive leg** without fighting the valet brand at the door.
+### J — Tesla app handoff (if Tesla keeps the cabin)
 
----
+FloqR still packages venue POI + event clock + party, then deep-links Tesla’s official Robotaxi app. Current honest fallback.
 
-## 7. Proposed technical partnership (adapter, not a fork)
-
-FloqR’s specified production shape:
-
-- Provider id: `tesla-robotaxi`
-- FLOQR Pickup API (quotes, rides, payment authorizations, companions, cancel)
-- Tesla → FloqR webhooks: vehicle assigned, location, ETA, arriving, waiting, started, completed, cancelled, safety hold, charge warning
-- HMAC-signed events, idempotency keys, simulation vs `providerConfirmed` flags so mock and live never mix
-
-**What FloqR is asking Tesla for (commercial + API):**
-
-1. A **ride-booking API** (quote, accept, cancel, state) distinct from Fleet API.  
-2. Permission to show **Tesla Robotaxi** as the RydR autonomous vehicle class.  
-3. Ability to pass **named venue POIs** and **curb geofences**.  
-4. Occupancy / accessibility constraints on quote.  
-5. Optional: Tesla takes dispatch + fare; FloqR remains identity and nightlife context — or FloqR remains merchant of record and remits Tesla.
-
-**What Tesla would not have to build:** nightlife CRM, guest lists, VIP maps, club admin hours, promoter pay-for-guest, 11-language patron chrome, or in-venue dwell signals.
+**Tesla gain:** FloqR remains **demand-gen and destination quality** even without dispatch control.
 
 ---
 
-## 8. Privacy, safety, and trust (non-negotiable)
+## 7. Proposed partnership (who integrates whom)
 
-Nightlife data is sensitive. A Tesla partnership should be **narrower** than “share the FloqR graph.”
+```
+Ticketmaster ──┐
+Eventbrite  ───┼──►  FloqR venue + event graph  ──►  RydR  ──►  Tesla Robotaxi
+Club Admin  ───┘         (POI, curb, clock, party)
+```
 
-Proposed rules:
+**FloqR integrates Eventbrite and Ticketmaster** (discovery, detail extract, ticket URL on the club event; API / Partner / attendee webhooks as credentials allow).  
+**FloqR asks Tesla** only for ride quote, assign, state, and optional fare.
 
-- **Consent.** Location and ride sharing are purpose-limited. Pickup addresses stay off social profiles.  
-- **Minimize.** Tesla gets origin, destination POI, occupancy, accessibility, schedule — not Mingl chat, not ShoutOut copy, not card PAN.  
-- **No stored client IP** on patron records (FloqR policy today).  
-- **Do not expose live vehicle position** until the ride is confirmed.  
-- **Rider verification** at the car remains Tesla’s. FloqR identity is a complement, not a replacement for Tesla’s safety stack.  
-- **EU/UK patron PII** is designed to be hostable in-region (GDPR residency is a FloqR compliance track; US-central is the live default, not the end state).  
-- **Impaired driving.** RydR’s job is a safe autonomous alternative after last call — not a surveillance feed of who was in which club.
+Tesla-facing adapter (already specified): provider `tesla-robotaxi`; quotes; rides; companions; HMAC webhooks (`vehicle_assigned`, `eta_updated`, `arriving`, `started`, `completed`, `cancelled`, `safety_hold`, `charge_warning`). Simulation vs `providerConfirmed` never mix.
 
-Remote safety specialist (Tesla’s model) maps cleanly onto RydR’s existing “remote safety contact” slot in the rider UI.
+**Ask of Tesla:**
+
+1. Ride-booking API or structured official-app deep link.  
+2. Accept **named venue POIs + event ids + curb geofences** from FloqR.  
+3. Occupancy / accessibility on quote.  
+4. Optional: Tesla takes fare; FloqR remains entertainment context — or FloqR MoR remits Tesla.
+
+**Tesla does not build:** Ticketmaster/Eventbrite connectors, club CRM, guest lists, VIP maps, promoter pay-for-guest, 11-language nightlife chrome, in-room dwell.
 
 ---
 
-## 9. Commercial sketch (for discussion, not a term sheet)
+## 8. First-market sketch (entertainment venues, not only clubs)
 
-Possible models (not mutually exclusive):
+Washington, DC nightlife graph is already onboarded (clubs, rooftops, lounges, dinner theater) with addresses, hours, and ticketed nights. A Tesla pilot can be:
 
-| Model | Who the patron pays | Tesla role | FloqR role |
+1. **Ticketed entertainment:** comedy / concert / promoter Eventbrite at FloqR venues — inbound scheduled to doors, outbound at let-out.  
+2. **Club resident nights:** same curbs, hours-driven surge.  
+3. Shared rides only among **known FloqR companions**.  
+4. KPIs: show-up vs generic hail, deadhead into entertainment clusters, pickup time at let-out, cancelled-show deadhead avoided, 2–4 a.m. safety vs human ride-hail.
+
+No public “live Tesla dispatch” claim until Tesla authorizes the API.
+
+---
+
+## 9. Privacy, safety, and trust
+
+- Tesla gets origin, venue POI, event clock, occupancy, accessibility — **not** chat, ShoutOut copy, or card PAN.  
+- Ticket URLs are provenance; Tesla need not receive attendee PII from Eventbrite/TM.  
+- Pickup addresses stay private. No stored client IP.  
+- Live vehicle position only after confirm.  
+- Rider verification at the car remains Tesla’s.  
+- EU/UK patron PII is designed to be hostable in-region.  
+- RydR’s nightlife story is a **safe autonomous alternative after the show** — not a feed of who was in which room.
+
+---
+
+## 10. Commercial sketch (discussion, not a term sheet)
+
+| Model | Patron pays | Tesla | FloqR |
 |---|---|---|---|
-| **A. Channel** | Tesla app | Dispatch + fare | Demand, POI, deep link |
-| **B. Merchant** | FloqR (Stripe), as in the current demo | Dispatch API, invoice FloqR | Checkout, receipts, nightlife UX |
-| **C. Scheduled capacity** | Either | Guaranteed vehicles in a geofence at close | Forecast + venue contracts |
-| **D. Venue fleet** | Club or promoter | Dedicated Robotaxis for a night | Club Admin booking |
+| **A. Channel** | Tesla app | Dispatch + fare | Eventbrite/TM/venue demand + POI + deep link |
+| **B. Merchant** | FloqR Stripe | Dispatch, invoice FloqR | Nightlife checkout + receipts |
+| **C. Show capacity** | Either | Guaranteed vehicles at doors / let-out | Forecast from ticketed occupancy |
+| **D. Venue night** | Club or promoter | Dedicated Robotaxis for a listing | Club Admin + Eventbrite organizer |
 
-Nightlife fares are short, high-frequency, and peak at hours when airport and commute demand is low. That is **complementary utilization** for a Robotaxi network, not a cannibal of Tesla’s daytime trips.
+Entertainment trips peak when airport and commute demand is low. Ticketed **let-out** is complementary utilization, not a cannibal of Tesla daytime.
 
----
-
-## 10. What success looks like (first market)
-
-A concrete first slice, using FloqR’s existing Washington, DC nightlife graph (clubs such as Decades, rooftops, lounges — already onboarded with addresses, hours, and nights):
-
-1. Tesla enables a **booking or handoff** path for RydR in one metro.  
-2. Inbound: on-demand + scheduled-to-VIP.  
-3. Outbound: end-of-night staging at **club-approved curbs**.  
-4. Shared rides limited to **known FloqR companions** (not open pooling).  
-5. KPIs Tesla and FloqR can share: show-up rate vs generic hail, deadhead miles into nightlife clusters, time-to-pickup at 2–4 a.m., no-show rate on scheduled VIP hails, safety incidents vs human ride-hail.
-
-No public claim of a live Tesla dispatch should be made until Tesla authorizes the API. FloqR’s current UI already refuses to fake that claim.
+Affiliate note: FloqR’s near-term Ticketmaster path is outbound ticket links, then Impact tracking, then Partner checkout. **VIP / table / guest list** stay FloqR-owned (higher-margin venue transactions). Robotaxi is the last mile on all of those, not a ticket reseller.
 
 ---
 
 ## 11. Ask
 
-FloqR is requesting a **Robotaxi partnership conversation** with Tesla to:
+FloqR is requesting a Robotaxi conversation with Tesla to:
 
-1. Confirm whether a **third-party ride-booking API** (or official-app deep link with structured fields) will exist for licensed nightlife channels.  
-2. Pilot RydR as a **demand and destination layer** in one US nightlife market.  
-3. Align on **POI + curb geofence** data Tesla will accept from venues.  
-4. Align on **privacy minimization** and rider-verification boundaries.
+1. Confirm a **booking API or structured deep link** for an entertainment channel that already joins **Eventbrite, Ticketmaster, and club venues**.  
+2. Pilot RydR in one US market against **ticketed let-out + club close**.  
+3. Align on POI / event-id / curb fields Tesla will accept.  
+4. Align on privacy minimization (no TM/Eventbrite PII dump into Tesla).
 
-RydR is built so that when Tesla is ready, FloqR replaces a simulation adapter — it does not reinvent the patron product.
+RydR is built so Tesla replaces a simulation adapter. The venue and ticketing graph does not get reinvented.
 
 ---
 
-## Appendix A — RydR fields Tesla would see on a quote/ride
+## Appendix A — Payload Tesla would see
 
-From the current FloqR pickup contract (simulation today; production adapter tomorrow):
+- `bookingMode`, structured `pickup`, destination = venue address + `clubLocationId`  
+- `eventId`, `eventStart`, `eventEnd` / close, `arrive|leave`  
+- `externalTicketProvider` (`ticketmaster` | `eventbrite` | `posh` | …), `ticketUrl` (optional provenance)  
+- `scheduledFor`, companions + drop-offs, payment arrangement  
+- Vehicle + autonomous mode + remote safety contact  
+- ETA, distance, seats, accessibility  
 
-- `bookingMode`: onDemand | scheduled | forAnother | shared  
-- `pickup` structured address + optional saved label  
-- `destination` = club verified address + `clubLocationId`  
-- `scheduledFor` + time zone (scheduled mode)  
-- `companions[]` with optional per-person `dropoff`  
-- `paymentArrangement` / payer  
-- Vehicle: provider vehicle id, model (Tesla Model Y Robotaxi), tag, plate, color, charge, range, seats, accessibility  
-- Operation: autonomous driving mode, remote safety contact  
-- ETA: pickup minutes, trip minutes, distance  
-- Status machine and webhook events listed in §3  
+## Appendix B — FloqR products (one line)
 
-## Appendix B — FloqR products in one sentence each
+- **FloqR** — identity, **club & entertainment venues**, **Eventbrite/Ticketmaster-linked events**, payments, notify.  
+- **RydR** — Robotaxi-first mobility to and from those venues.  
+- **VIP reserV** — table/section for a night, party size.  
+- **ShoutOut / floqCast** — in-room presence on venue LEDs.  
+- **Mingl / BOT DEE / BartR** — friends, “book a ride,” adjacent commerce.
 
-- **FloqR** — nightlife identity, venues, events, payments, and notifications.  
-- **RydR** — get patrons and staff to and from the venue; Robotaxi-first.  
-- **VIP reserV** — book a specific table/section for a night, with party size.  
-- **ShoutOut** — paid LED messages in the room.  
-- **floqCast** — patron live camera on the venue’s secondary board.  
-- **Mingl** — friends and chat inside FloqR.  
-- **BOT DEE** — plain-language help and routing (“book a ride”).  
-- **BartR** — marketplace adjacent to the night out.
+## Appendix C — Sources
 
-## Appendix C — Source of this brief
-
-Grounded in FloqR product behavior and contracts: RydR / Pickup (`rydr.html`, `pickup.html`), Tesla simulation API note (`TESLA-ROBOTAXI-SIMULATION-API.md`), venue datapoints (`floqr-venue-datapoints.js`), patron pickup locale, VIP party-size model, and FloqR Technical Bible §2.5 (RydR target: event-aware rides, geofenced zones, end-of-night surge, Tesla adapter).
+RydR / Pickup product, `TESLA-ROBOTAXI-SIMULATION-API.md`, venue datapoints, event onboarding (ticket URL + `externalTicketProvider` on the club event), AI discovery Source Detail Extraction (Eventbrite / Ticketmaster **detail** pages, JSON-LD), ticketing partner notes (Discovery, Affiliate, Partner, Eventbrite API), FloqR Technical Bible §2.5 (event-aware rides, geofenced zones, end-of-night surge, Tesla adapter).
