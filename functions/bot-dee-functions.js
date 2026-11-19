@@ -1,7 +1,8 @@
 /* BOT DEE — executeBotSession callable (Auth + botDee gate + classification → Gemini + tools).
    Tools: contextualSearch + VIP / ShoutOut / FloqCAST / checkout (each re-validates role).
    Durable threads: getBotDeeThread + persist under botDeeThreads/{uid}.
-   Master Admin: setBotDeeSettings (idle pause) under SOS2FA. */
+   Master Admin: setBotDeeSettings (idle pause) under SOS2FA.
+   s3.3.046: headless VIP + Room join (CI deploy retrigger). */
 "use strict";
 
 const admin = require("firebase-admin");
