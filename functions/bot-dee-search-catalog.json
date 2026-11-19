@@ -2593,7 +2593,7 @@
       "id": "help-shoutout-headless-smartview",
       "kind": "help",
       "label": "ShoutOut SMARTpreview",
-      "blurb": "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. Repl",
+      "blurb": "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. The ",
       "href": "./botdee.html?from=botdee",
       "phrases": [
         "shoutout smartpreview",

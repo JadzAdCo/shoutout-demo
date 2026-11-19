@@ -481,11 +481,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Antworten Sie im Chat oder tippen Sie einen Chip. Foto/Video bleibt Compose. E"
+          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Das Dock zeigt die echte LED-Vorlage (dieselbe Display-1-Composer-Vorschau) un"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Antworten Sie im Chat oder tippen Sie einen Chip. Foto/Video bleibt Compose. E"
+          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Das Dock zeigt die echte LED-Vorlage (dieselbe Display-1-Composer-Vorschau) un"
         },
         "help:help-vip-book-table": {
           "label": "VIP-Tisch buchen (VIP reserV)",
@@ -1544,11 +1544,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Répondez dans le chat"
+          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Le dock affiche le vr"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Répondez dans le chat"
+          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Le dock affiche le vr"
         },
         "help:help-vip-book-table": {
           "label": "Réserver une table VIP (VIP reserV)",
@@ -2607,11 +2607,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. Responda en el chat o toque un chip. Foto y vídeo siguen en com"
+          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. El dock muestra la plantilla LED real (la misma vista previa de"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. Responda en el chat o toque un chip. Foto y vídeo siguen en com"
+          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. El dock muestra la plantilla LED real (la misma vista previa de"
         },
         "help:help-vip-book-table": {
           "label": "Reservar mesa VIP (VIP reserV)",
@@ -3670,11 +3670,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Rispondi in chat o tocca un chip. Foto e video restano su compose. U"
+          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Il dock mostra il vero template LED (la stessa anteprima composer di"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Rispondi in chat o tocca un chip. Foto e video restano su compose. U"
+          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Il dock mostra il vero template LED (la stessa anteprima composer di"
         },
         "help:help-vip-book-table": {
           "label": "Prenota un tavolo VIP (VIP reserV)",
@@ -4733,11 +4733,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. Responda no chat ou toque num chip. Foto e vídeo continuam no compose. Um envio he"
+          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. O dock mostra o modelo LED real (a mesma pré-visualização do compositor Display 1)"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. Responda no chat ou toque num chip. Foto e vídeo continuam no compose. Um envio he"
+          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. O dock mostra o modelo LED real (a mesma pré-visualização do compositor Display 1)"
         },
         "help:help-vip-book-table": {
           "label": "Reservar mesa VIP (VIP reserV)",
@@ -5796,11 +5796,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Ответьте в чате или нажмите чип. Фото и видео по-прежнему через compose. Настоящий headle"
+          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Док показывает живой LED-шаблон (тот же предпросмотр Display 1) и обновляется при выборе "
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Ответьте в чате или нажмите чип. Фото и видео по-прежнему через compose. Настоящий headle"
+          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Док показывает живой LED-шаблон (тот же предпросмотр Display 1) и обновляется при выборе "
         },
         "help:help-vip-book-table": {
           "label": "Забронировать VIP-стол (VIP reserV)",
@@ -6859,11 +6859,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Απαντήστε στη συνομιλία ή πατήστε chip. Φωτογραφία/βίντεο μένουν στο compos"
+          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Το dock δείχνει το πραγματικό LED πρότυπο (την ίδια προεπισκόπηση Display 1"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Απαντήστε στη συνομιλία ή πατήστε chip. Φωτογραφία/βίντεο μένουν στο compos"
+          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Το dock δείχνει το πραγματικό LED πρότυπο (την ίδια προεπισκόπηση Display 1"
         },
         "help:help-vip-book-table": {
           "label": "Κράτηση VIP τραπεζιού (VIP reserV)",
@@ -7922,11 +7922,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Odpowiedz na czacie albo stuknij chip. Zdjęcie i wideo nadal przez compos"
+          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Dock pokazuje żywy szablon LED (ten sam podgląd Display 1) i odświeża się"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Odpowiedz na czacie albo stuknij chip. Zdjęcie i wideo nadal przez compos"
+          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Dock pokazuje żywy szablon LED (ten sam podgląd Display 1) i odświeża się"
         },
         "help:help-vip-book-table": {
           "label": "Zarezerwuj stolik VIP (VIP reserV)",
@@ -8985,11 +8985,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Antwoord in de chat of tik een chip. Foto en video blijven compose. Een echte headless th"
+          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Het dock toont het echte LED-sjabloon (dezelfde Display 1-composervoorvertoning) en werkt"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Antwoord in de chat of tik een chip. Foto en video blijven compose. Een echte headless th"
+          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Het dock toont het echte LED-sjabloon (dezelfde Display 1-composervoorvertoning) en werkt"
         },
         "help:help-vip-book-table": {
           "label": "VIP-tafel boeken (VIP reserV)",
@@ -10048,11 +10048,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. أجب في الدردشة أو اضغط شريحة. الصورة والفيديو ما زالا عبر compose. الرمي headless الحقيقي من FloqR أو طرف ثالث "
+          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. يعرض الإرساء قالب LED الحي (نفس معاينة Display 1) ويتحدّث عند اختيار القالب أو @handle أو نص مقابل صورة. أجب في"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. أجب في الدردشة أو اضغط شريحة. الصورة والفيديو ما زالا عبر compose. الرمي headless الحقيقي من FloqR أو طرف ثالث "
+          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. يعرض الإرساء قالب LED الحي (نفس معاينة Display 1) ويتحدّث عند اختيار القالب أو @handle أو نص مقابل صورة. أجب في"
         },
         "help:help-vip-book-table": {
           "label": "حجز طاولة VIP (VIP reserV)",
