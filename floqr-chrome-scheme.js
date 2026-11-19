@@ -46,7 +46,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.3.041";  /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
+  const ICON_V = "s3.3.042";  /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   /* s3.2.62 — rounded-square feature icons (Search tiles / product heroes). Settings stay circular. */
   const NIGHTLIFE_ICONS = {
@@ -57,7 +57,8 @@
     settings: "./images/chrome/settings-nightlife.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-nightlife.png?v=" + ICON_V,
     rydR: "./images/chrome/rydr-nightlife.png?v=" + ICON_V,
-    sinema: "./images/chrome/sinema-nightlife.jpg?v=" + ICON_V
+    sinema: "./images/chrome/sinema-nightlife.jpg?v=" + ICON_V,
+    mingl: "./images/chrome/mingl-nightlife.jpg?v=" + ICON_V
   };
   const TRADITIONAL_ICONS = {
     floqCast: "./images/chrome/floqcast-traditional.jpg?v=" + ICON_V,
@@ -67,7 +68,8 @@
     settings: "./images/chrome/settings-traditional.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-traditional.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-traditional.jpg?v=" + ICON_V,
-    sinema: "./images/chrome/sinema-traditional.jpg?v=" + ICON_V
+    sinema: "./images/chrome/sinema-traditional.jpg?v=" + ICON_V,
+    mingl: "./images/chrome/mingl-traditional.jpg?v=" + ICON_V
   };
   const BLACK_TIFFANY_ICONS = {
     floqCast: "./images/chrome/floqcast-blacktiffany.jpg?v=" + ICON_V,
@@ -77,7 +79,8 @@
     settings: "./images/chrome/settings-blacktiffany.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-blacktiffany.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-blacktiffany.jpg?v=" + ICON_V,
-    sinema: "./images/chrome/sinema-blacktiffany.jpg?v=" + ICON_V
+    sinema: "./images/chrome/sinema-blacktiffany.jpg?v=" + ICON_V,
+    mingl: "./images/chrome/mingl-blacktiffany.jpg?v=" + ICON_V
   };
   const PURPLE_WHITE_ICONS = {
     floqCast: "./images/chrome/floqcast-purplewhite.jpg?v=" + ICON_V,
@@ -87,7 +90,8 @@
     settings: "./images/chrome/settings-purplewhite.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-purplewhite.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-purplewhite.jpg?v=" + ICON_V,
-    sinema: "./images/chrome/sinema-purplewhite.jpg?v=" + ICON_V
+    sinema: "./images/chrome/sinema-purplewhite.jpg?v=" + ICON_V,
+    mingl: "./images/chrome/mingl-purplewhite.jpg?v=" + ICON_V
   };
   /* Accents use Settings \"tings\" green #5ac783 (see scripts/build-blackdarkgreen-icons.py). */
   const BLACK_DARK_GREEN_ICONS = {
@@ -98,7 +102,8 @@
     settings: "./images/chrome/settings-blackdarkgreen.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-blackdarkgreen.png?v=" + ICON_V,
     rydR: "./images/chrome/rydr-blackdarkgreen.png?v=" + ICON_V,
-    sinema: "./images/chrome/sinema-blackdarkgreen.jpg?v=" + ICON_V
+    sinema: "./images/chrome/sinema-blackdarkgreen.jpg?v=" + ICON_V,
+    mingl: "./images/chrome/mingl-blackdarkgreen.jpg?v=" + ICON_V
   };
   const WHITE_BLACK_ICONS = {
     floqCast: "./images/chrome/floqcast-whiteblack.png?v=" + ICON_V,
@@ -108,7 +113,8 @@
     settings: "./images/chrome/settings-whiteblack.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-whiteblack.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-whiteblack.jpg?v=" + ICON_V,
-    sinema: "./images/chrome/sinema-whiteblack.jpg?v=" + ICON_V
+    sinema: "./images/chrome/sinema-whiteblack.jpg?v=" + ICON_V,
+    mingl: "./images/chrome/mingl-whiteblack.jpg?v=" + ICON_V
   };
   const ICON_PACK = {
     traditional: TRADITIONAL_ICONS,
