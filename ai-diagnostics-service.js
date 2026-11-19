@@ -283,7 +283,7 @@
       title: "s3.3.039 — Spatial Studio plan trace HTTP (floqmediaPlanTrace)",
       checks: [
         {label:"Plan trace HTTP export", file:"functions/floqmedia-plan-trace-functions.js", includes:["exports.floqmediaPlanTrace", "defineSecret(\"GEMINI_API_KEY\")", "GoogleGenAI"]},
-        {label:"Floor-plan prompt + CORS list", file:"functions/floqmedia-plan-trace-core.js", includes:["studio.localhost:3000", "PLAN_TRACE_PROMPT", "spatial-plan-trace"]},
+        {label:"Floor-plan prompt + CORS list", file:"functions/floqmedia-plan-trace-core.js", includes:["studio.localhost:3000", "PLAN_TRACE_PROMPT", "spatial-plan-trace", "X-Firebase-AppCheck"]},
         {label:"Index + spatial deploy tag", file:"functions/index.js", includes:["floqmediaPlanTrace"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-039-floqmedia-plan-trace"]}
       ]
@@ -3726,10 +3726,10 @@
       id:"s3-3-039-floqmedia-plan-trace",
       area:"Si-nema / identity",
       feature:"Spatial Studio plan trace (floqmediaPlanTrace)",
-      changed:"HTTP floqmediaPlanTrace traces a guest PDF/SVG/image into a Spatial Studio proposal. Same Gemini engine as SmartView/BOT DEE, floor-plan prompt only. No FloqR session. CORS is the Spatial Studio origin list. FloqR does not store the drawing. Deploy with [firebase-deploy-spatial].",
-      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a [firebase-deploy-spatial] commit. 2) On Spatial Studio /start (studio.floqmedia.com or localhost:3000), import a still image or PDF that is not a Spatial Studio SVG/project. 3) The proposal card appears; Open this plan saves locally in the browser only. 4) A 13 MB file is refused. 5) Mark Succeed/Failed. Do not deploy firestore.rules.",
-      expected:"A readable plan returns {ok:true, trace} with meters or null sizes + estimated/inferred. Failures return a short error. No spatialGrantRefs or project row is written on FloqR.",
-      troubleshoot:"CORS error → origin is not studio.floqmedia.com / www / apex / localhost:3000 / 127.0.0.1:3000 / studio.localhost:3000. 404 → Functions CI did not include floqmediaPlanTrace. Unreadable → GEMINI_API_KEY not bound on that function; check Application Logging category gemini operation spatial-plan-trace. Do not retarget Display 1."
+      changed:"HTTP floqmediaPlanTrace traces a guest PDF/SVG/image into a Spatial Studio proposal. Same Gemini engine as SmartView/BOT DEE, floor-plan prompt only. No FloqR session. CORS allows Content-Type, Authorization, and X-Firebase-AppCheck. App Check is monitor mode (FLOQR_APP_CHECK_ENFORCE is not 1): a missing pass is logged and the trace still runs. FloqR does not store the drawing or the pass. Deploy with [firebase-deploy-spatial].",
+      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a [firebase-deploy] [firebase-deploy-spatial] commit. 2) OPTIONS from https://studio.floqmedia.com is 204 and Access-Control-Allow-Headers includes X-Firebase-AppCheck. 3) On Spatial Studio /start (studio.floqmedia.com or localhost:3000), import a still image or PDF that is not a Spatial Studio SVG/project — a post with no App Check pass still returns a trace or a normal plan error, not 401. 4) The proposal card appears; Open this plan saves locally in the browser only. 5) A 13 MB file is refused. 6) Mark Succeed/Failed. Do not set FLOQR_APP_CHECK_ENFORCE. Do not turn on console enforcement. Do not deploy firestore.rules.",
+      expected:"A readable plan returns {ok:true, trace} with meters or null sizes + estimated/inferred. A missing pass in monitor mode still traces. Failures return a short error. No spatialGrantRefs or project row is written on FloqR. The pass is not stored.",
+      troubleshoot:"CORS error on X-Firebase-AppCheck → Allow-Headers is missing that name; redeploy floqmediaPlanTrace. 401 FloqR could not read that plan → FLOQR_APP_CHECK_ENFORCE is 1; this deploy must leave it unset. CORS origin error → origin is not studio.floqmedia.com / www / apex / localhost:3000 / 127.0.0.1:3000 / studio.localhost:3000. 404 → Functions CI did not include floqmediaPlanTrace. Unreadable → GEMINI_API_KEY not bound on that function; check Application Logging category gemini operation spatial-plan-trace (app_check_missing / app_check_invalid). Do not retarget Display 1."
     },
     {
       id:"s3-3-020-ai-crawl-workspace",

@@ -10,6 +10,10 @@ const OPERATION = "spatial-plan-trace";
 const UNREADABLE_ERROR = "That file could not be read as a floor plan.";
 const OVERSIZE_ERROR = "That file is too large. Use a file under 12 MB.";
 const ORIGIN_ERROR = "That request is not allowed from this site.";
+const APP_CHECK_ERROR = "FloqR could not read that plan.";
+const ALLOW_HEADERS = "Content-Type, Authorization, X-Firebase-AppCheck";
+const APP_CHECK_HEADER = "X-Firebase-AppCheck";
+const MAX_APP_CHECK_CHARS = 8192;
 const MAX_FILE_BYTES = 12 * 1024 * 1024;
 const MAX_BASE64_CHARS = Math.ceil(MAX_FILE_BYTES * 4 / 3) + 128;
 const MAX_OBJECTS = 200;
@@ -127,7 +131,7 @@ function applyCors(res, origin) {
     res.set("Access-Control-Allow-Origin", origin);
     res.set("Vary", "Origin");
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.set("Access-Control-Allow-Headers", ALLOW_HEADERS);
     res.set("Access-Control-Max-Age", "3600");
     return;
   }
@@ -135,7 +139,7 @@ function applyCors(res, origin) {
     "Access-Control-Allow-Origin": origin,
     Vary: "Origin",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Headers": ALLOW_HEADERS,
     "Access-Control-Max-Age": "3600"
   });
 }
@@ -364,6 +368,32 @@ function validateTrace(raw) {
   };
 }
 
+function appCheckEnforced(deps = {}) {
+  const env = deps.env || process.env;
+  return String(env.FLOQR_APP_CHECK_ENFORCE || "") === "1";
+}
+
+async function defaultVerifyAppCheck(token, options) {
+  const {getAppCheck} = require("firebase-admin/app-check");
+  return getAppCheck().verifyToken(token, options);
+}
+
+async function inspectAppCheck(req, deps) {
+  const token = String(header(req, APP_CHECK_HEADER) || "").trim();
+  if (!token) return {ok: false, failureReason: "app_check_missing"};
+  if (token.length > MAX_APP_CHECK_CHARS) return {ok: false, failureReason: "app_check_invalid"};
+  const verify = typeof deps.verifyAppCheck === "function" ? deps.verifyAppCheck : defaultVerifyAppCheck;
+  try {
+    const decoded = await verify(token, {consume: true});
+    if (!decoded || decoded.alreadyConsumed === true) {
+      return {ok: false, failureReason: "app_check_invalid"};
+    }
+    return {ok: true};
+  } catch (_error) {
+    return {ok: false, failureReason: "app_check_invalid"};
+  }
+}
+
 async function safeLog(logAccess, entry) {
   if (typeof logAccess !== "function") return;
   try {
@@ -397,6 +427,21 @@ async function handlePlanTraceRequest(req, res, deps = {}) {
     return {ok: false, status: 405};
   }
 
+  const model = text(deps.model, 80) || TEXT_MODEL;
+  const appCheck = await inspectAppCheck(req, deps);
+  if (!appCheck.ok) {
+    await safeLog(deps.logAccess, {
+      ok: false,
+      model,
+      failureReason: appCheck.failureReason,
+      details: {totalTokens: 0}
+    });
+    if (appCheckEnforced(deps)) {
+      sendJson(res, 401, {ok: false, error: APP_CHECK_ERROR});
+      return {ok: false, status: 401, error: APP_CHECK_ERROR};
+    }
+  }
+
   const body = readBody(req);
   if (!body) {
     sendJson(res, 400, {ok: false, error: UNREADABLE_ERROR});
@@ -409,7 +454,6 @@ async function handlePlanTraceRequest(req, res, deps = {}) {
   }
 
   const generateContent = deps.generateContent;
-  const model = text(deps.model, 80) || TEXT_MODEL;
   if (typeof generateContent !== "function") {
     await safeLog(deps.logAccess, {ok: false, model, failureReason: "gemini_unconfigured", details: {totalTokens: 0}});
     sendJson(res, 200, {ok: false, error: UNREADABLE_ERROR});
@@ -466,6 +510,8 @@ module.exports = {
   UNREADABLE_ERROR,
   OVERSIZE_ERROR,
   ORIGIN_ERROR,
+  APP_CHECK_ERROR,
+  ALLOW_HEADERS,
   MAX_FILE_BYTES,
   MAX_OBJECTS,
   STUDIO_ORIGINS,

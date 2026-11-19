@@ -1,6 +1,8 @@
 /* HTTP floqmediaPlanTrace — Spatial Studio posts a drawing; Gemini returns a
    proposal. Guest-allowed. Deploy with [firebase-deploy-spatial].
-   Do not store the file, the trace, a project, or a grant. */
+   App Check (X-Firebase-AppCheck) is verified with consume:true. Monitor mode
+   is the default: FLOQR_APP_CHECK_ENFORCE is not set here and is not "1".
+   Do not store the file, the trace, a project, a grant, or the pass. */
 "use strict";
 
 const admin = require("firebase-admin");
