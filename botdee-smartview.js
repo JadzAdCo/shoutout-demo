@@ -700,7 +700,8 @@
       ? (view.attribution || "@")
       : (railAsk ? t("botdee.so.handleUnset", "Not chosen yet") : t("botdee.so.handleOff", "No @handle"));
     const status = shoutStatusKey(view, needs);
-    const step = view.currentStep || needs[0] || (mode === "draft" ? "throw" : "");
+    const collecting = mode === "draft" || mode === "ready";
+    const step = view.currentStep || needs[0] || (collecting ? "throw" : "");
     const venue = view.venueName || view.clubLocationId || "—";
     const templateChipLabel = {
       blackwhite: "Traditional",
@@ -758,7 +759,7 @@
         ${row(t("botdee.so.media", "Photo / video"), mediaCopy)}
       </div>
       ${needs.length ? `<div class="botdee-so-needed"><h3>${esc(t("botdee.so.stillNeeded", "Still needed"))}</h3><ol>${needs.map(id => `<li>${esc(shoutNeedLabel(id))}</li>`).join("")}</ol></div>` : ""}
-      ${mode === "draft" ? `<section class="botdee-so-step${step === "template" ? " is-current" : ""}" data-step="template">
+      ${collecting ? `<section class="botdee-so-step${step === "template" ? " is-current" : ""}" data-step="template">
         <h3>${esc(t("botdee.so.template", "Template"))}</h3>
         <div class="botdee-so-chips" role="group">${templateChips}</div>
       </section>
@@ -771,7 +772,7 @@
         <div class="botdee-so-chips" role="group">${mediaChips}</div>
       </section>` : ""}
       <div class="botdee-so-actions">
-        ${mode === "draft" && !checkout ? shoutChip("throw it", t("botdee.so.throwIt", "Throw it"), false).replace("botdee-so-chip", "botdee-so-chip botdee-so-throw") : ""}
+        ${collecting && !checkout ? shoutChip("throw it", t("botdee.so.throwIt", "Throw it"), false).replace("botdee-so-chip", "botdee-so-chip botdee-so-throw") : ""}
         ${checkout ? `<a class="botdee-sv-action botdee-sv-action-main" href="${esc(checkout)}" rel="noopener">${esc(t("botdee.so.pay", "Pay securely"))}</a>` : ""}
         ${portal ? `<a class="botdee-sv-action" href="${esc(portal)}">${esc(t("botdee.so.portal", "Open in My ShoutOuts"))}</a>` : ""}
         ${compose && (view.mediaDecision === "compose" || needs.includes("compose")) ? `<a class="botdee-sv-action" href="${esc(compose)}">${esc(t("botdee.so.compose", "Open compose"))}</a>` : ""}

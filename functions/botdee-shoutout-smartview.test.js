@@ -211,8 +211,9 @@ test("BOT DEE session collects extras before mint; FloqR callable stays one-shot
   assert.doesNotMatch(commerce, /interactiveNeeds/);
   assert.match(commerce, /notifyClubPendingHeadlessShoutOut/);
   assert.match(commerce, /headlessClubInboxAt/);
-  assert.match(commerce, /fulfillmentStatus === "submitted-for-club-approval"/);
+  assert.doesNotMatch(commerce, /fulfillmentStatus === "submitted-for-club-approval"/);
   const client = read("botdee-smartview.js");
   assert.match(client, /botDeeShoutOut/);
   assert.match(client, /renderShoutOutCard/);
+  assert.match(client, /mode === "draft" \|\| mode === "ready"/);
 });

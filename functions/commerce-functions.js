@@ -2232,8 +2232,7 @@ async function finalizePaidOrder(orderId, session) {
       ...testFields
     }, {merge:true});
     try {
-      const alreadyNotified = !!(order.headlessClubInboxAt
-        || order.fulfillmentStatus === "submitted-for-club-approval");
+      const alreadyNotified = !!order.headlessClubInboxAt;
       if (!alreadyNotified && (shoutout.headless === true || shoutout.source === "headless")) {
         const tools = require("./bot-dee-tools");
         const locId = text(order.clubLocationId || shoutout.clubLocationId || shoutout.location, 120);
