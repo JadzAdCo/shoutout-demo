@@ -18,7 +18,6 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "images/chrome"
 SOURCE = ROOT / "images/chrome/official/si-nema-blacktiffany.webp"
 S = 1024
-TIFFANY = np.array([0, 212, 254], dtype=np.float32)
 
 
 def load_official() -> np.ndarray:
@@ -84,13 +83,10 @@ def save_jpg(arr: np.ndarray, path: Path) -> None:
     print(f"  wrote {path.name}")
 
 
-def morph(mask: np.ndarray, *, open_k: int = 0, close_k: int = 0) -> np.ndarray:
-    img = Image.fromarray((mask.astype(np.uint8) * 255), "L")
-    if open_k:
-        img = img.filter(ImageFilter.MinFilter(open_k)).filter(ImageFilter.MaxFilter(open_k))
-    if close_k:
-        img = img.filter(ImageFilter.MaxFilter(close_k)).filter(ImageFilter.MinFilter(close_k))
-    return np.array(img) > 127
+INK = np.array([16, 16, 18], dtype=np.float32)
+FIELD_RGB = np.array([248, 248, 250], dtype=np.float32)
+# Official wordmark lives below the film wrap (Si- top ≈ y 764).
+TYPE_Y = 756
 
 
 def dilate(mask: np.ndarray, k: int = 5) -> np.ndarray:
@@ -103,21 +99,24 @@ def dilate(mask: np.ndarray, k: int = 5) -> np.ndarray:
     )
 
 
-def connected_border_field(black: np.ndarray) -> np.ndarray:
-    """Outer black around the clapper — never seed inside the hanging filmstrip."""
+def morph_close(mask: np.ndarray, k: int) -> np.ndarray:
+    """Seal sprocket gaps without fattening the outer clapper silhouette."""
+    k = max(3, k | 1)
+    im = Image.fromarray((mask.astype(np.uint8) * 255), "L")
+    im = im.filter(ImageFilter.MaxFilter(k)).filter(ImageFilter.MinFilter(k))
+    return np.array(im) > 127
+
+
+def flood_outer_field(wall: np.ndarray) -> np.ndarray:
+    """Flood the white field from inside the rim. `wall` is the sealed clapper."""
     canvas = np.zeros((S, S, 3), dtype=np.uint8)
-    canvas[black] = (255, 255, 255)
+    canvas[~wall] = (255, 255, 255)
     img = Image.fromarray(canvas, "RGB")
     seeds = []
-    # Above the clapper.
-    for x in range(80, S - 80, 16):
-        seeds.append((x, 88))
-        seeds.append((x, 758))  # gap between filmstrip and wordmark
-        seeds.append((x, 980))
-    # Sides — stop above the filmstrip (film starts ~y 600).
-    for y in range(88, 560, 16):
-        seeds.append((80, y))
-        seeds.append((S - 80, y))
+    for x in range(64, S - 64, 8):
+        seeds.extend(((x, 64), (x, 748)))
+    for y in range(64, 750, 8):
+        seeds.extend(((64, y), (S - 64, y)))
     for pt in seeds:
         if img.getpixel(pt)[0] > 200:
             ImageDraw.floodfill(img, pt, (255, 0, 0), thresh=8)
@@ -125,127 +124,76 @@ def connected_border_field(black: np.ndarray) -> np.ndarray:
     return (out[..., 0] > 200) & (out[..., 1] < 40)
 
 
-def grow_field_into_glow(
-    field: np.ndarray, lum: np.ndarray, protect: np.ndarray
-) -> np.ndarray:
-    """Eat only the soft halo. Do not nibble film rails or letter ink."""
-    grown = field.copy()
-    for _ in range(4):
-        dil = np.array(
-            Image.fromarray((grown.astype(np.uint8) * 255), "L").filter(ImageFilter.MaxFilter(3))
-        ) > 127
-        extra = dil & ~grown & ~protect & (lum < 36)
-        if not extra.any():
-            break
-        grown |= extra
-    return grown
-
-
-def film_bottom_cut(xx: np.ndarray) -> np.ndarray:
-    """Clip dangling sprocket cells; slightly higher at the far left/right."""
-    t = np.clip(np.abs((xx - 500.0) / 360.0), 0.0, 1.0)
-    return 712.0 * (1.0 - t * t) + 700.0 * (t * t)
-
-
-def tighten_hanging_film(clapper: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Clip tongues; fill punched interiors in the bottom sprocket band only."""
-    yy = np.arange(S, dtype=np.float32)[:, None]
-    xx = np.arange(S, dtype=np.float32)[None, :]
-    y_cut = film_bottom_cut(xx)
-    film_band = (yy >= 640) & (yy < 790)
-    kept = np.where(film_band, clapper & (yy <= y_cut), clapper)
-    holes = np.zeros_like(clapper)
-    for x in range(110, 930):
-        if not kept[640:760, x].any():
-            continue
-        yc = int(round(float(y_cut[0, x])))
-        band = slice(yc - 38, yc + 1)
-        holes[band, x] = ~kept[band, x]
-        kept[band, x] = True
-    return kept, holes
-
-
-def keep_connected_to(mask: np.ndarray, seed: tuple[int, int]) -> np.ndarray:
-    """Drop isolated glow islands; keep the clapper + filmstrip."""
-    canvas = np.zeros((S, S, 3), dtype=np.uint8)
-    canvas[mask] = (255, 255, 255)
-    img = Image.fromarray(canvas, "RGB")
-    if img.getpixel(seed)[0] < 200:
-        return mask
-    ImageDraw.floodfill(img, seed, (255, 0, 0), thresh=8)
-    out = np.array(img)
-    return (out[..., 0] > 200) & (out[..., 1] < 40)
-
-
-def paint_solid_letters(
-    out: np.ndarray,
-    src: np.ndarray,
-    word: np.ndarray,
-    field_rgb: np.ndarray,
-    ink: np.ndarray,
-) -> np.ndarray:
-    """Solid **Si-** ink + Tiffany **nema**. Dilate cores so Search-size S keeps its bowl."""
-    lum = src.max(axis=-1)
-    cyan = is_cyan(src)
-    white_core = word & (lum > 80) & ~cyan
-    cyan_core = word & cyan
-    # 11×11 dilate (~5 px) keeps the italic S bowl at Search / share-sheet size.
-    si = dilate(white_core, 11) & word
-    nema = dilate(cyan_core, 9) & word
-    si &= ~nema
-    out[si] = ink
-    out[nema] = TIFFANY
-    return out
-
-
 def build_whiteblack(src: np.ndarray, rim_src: Path | None = None) -> np.ndarray:
-    """White field, black **Si-**, Tiffany **nema**, sharp clapper (no glow halo)."""
-    field_rgb = np.array([248, 248, 250], dtype=np.float32)
-    ink = np.array([16, 16, 18], dtype=np.float32)
+    """White/Black Si-nema from the official mark — not an invert, not a font redraw.
+
+    Clapper (play, AI, sticks, screws, film) stays official RGB on a white
+    field. **Si-** is the official letter matte, recolored to ink; **nema**
+    keeps official Tiffany. Dilating/redrawing letters is what chopped the S.
+    """
+    del rim_src
     yy = np.arange(S)[:, None]
     xx = np.arange(S)[None, :]
     rim = (yy < 54) | (yy > S - 54) | (xx < 54) | (xx > S - 54)
-    word = (yy > 790) & (yy < S - 54) & (xx > 70) & (xx < 980)
-    film = (yy >= 560) & (yy < 790) & (xx > 90) & (xx < 960)
-
     lum = src.max(axis=-1)
-    black = is_near_black(src, 34)
-    field = connected_border_field(black)
-    # Never grow into the filmstrip — that ate the hanging bottom rail.
-    field = grow_field_into_glow(field, lum, word | film)
-    clapper = ~field & (yy < 790) & ~rim
-    clapper = morph(clapper, open_k=0, close_k=3)
-    clapper = keep_connected_to(clapper, (512, 470))
-    # Re-attach hanging film pixels the flood may still have dropped.
-    # Closed silhouette so sprocket interiors stay official-dark, not punched white.
+    ch = chroma(src)
     cyan = is_cyan(src)
-    film_sil = film & ~rim & ((lum > 32) | cyan)
-    film_sil = morph(film_sil, open_k=0, close_k=11)
-    clapper |= film_sil
-    clapper, holes = tighten_hanging_film(clapper)
+    graphic = np.zeros((S, S), dtype=bool)
+    graphic[:TYPE_Y, :] = True
 
-    out = np.broadcast_to(field_rgb, src.shape).copy()
-    sharp = np.array(
-        Image.fromarray(np.clip(src, 0, 255).astype(np.uint8), "RGB").filter(
-            ImageFilter.UnsharpMask(radius=1.4, percent=140, threshold=2)
-        ),
-        dtype=np.float32,
+    # Metal + cyan only — skip the soft black glow so it floods to white.
+    core = (cyan | (lum > 88) | ((ch > 45) & (lum > 70))) & graphic
+    wall = morph_close(core, 37) | rim | ~graphic
+    field = flood_outer_field(wall)
+    # Enclosed teal void above the open clap lid (flood cannot enter).
+    near_metal = dilate((lum > 100) | cyan, 15)
+    field |= graphic & (yy < 340) & (lum < 78) & ~near_metal & ~rim
+    protect = cyan | ((lum > 100) & graphic) | rim
+    field = (field | ((~rim) & ~graphic)) & ~protect
+
+    fa = (
+        np.array(
+            Image.fromarray((field.astype(np.uint8) * 255), "L").filter(
+                ImageFilter.GaussianBlur(0.5)
+            ),
+            dtype=np.float32,
+        )
+        / 255.0
     )
-    out[clapper] = sharp[clapper]
-    # Punched sprocket interiors → navy so WB doesn't show a white bite.
-    if holes.any():
-        out[holes] = np.array([8, 22, 28], dtype=np.float32)
+    fa[rim] = 0.0
+    out = src * (1.0 - fa[..., None]) + FIELD_RGB * fa[..., None]
+    out[cyan] = src[cyan]
+    metal = graphic & (lum > 108)
+    out[metal] = src[metal]
 
-    sat_rim = rim & (chroma(src) > 38) & (lum > 40)
+    sat_rim = rim & (ch > 38) & (lum > 40)
     out[sat_rim] = np.array([22, 22, 24], dtype=np.float32)
     mag = is_magenta(src) & rim
     if mag.any():
         out[mag] = src[mag]
 
-    out = paint_solid_letters(out, src, word, field_rgb, ink)
-    stray = (yy > 900) & (xx > 900) & is_cyan(out)
-    if stray.any():
-        out[stray] = field_rgb
+    # Official **Si-** coverage (white-on-black) → ink on the white field.
+    band = ~graphic & ~rim
+    gray = ch < 55
+    si_cov = np.clip((lum - 20) / 185.0, 0, 1) * band * gray * ~cyan
+    si_cov = (
+        np.array(
+            Image.fromarray((si_cov * 255).astype(np.uint8), "L").filter(
+                ImageFilter.GaussianBlur(0.3)
+            ),
+            dtype=np.float32,
+        )
+        / 255.0
+    )
+    out = out * (1.0 - si_cov[..., None]) + INK * si_cov[..., None]
+
+    img = Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
+    sharp = np.array(
+        img.filter(ImageFilter.UnsharpMask(radius=1.25, percent=130, threshold=2)),
+        dtype=np.float32,
+    )
+    obj = graphic & ~field & ~rim
+    out[obj] = sharp[obj]
     return out
 
 
