@@ -1013,7 +1013,7 @@ When adding a section, use this skeleton:
 
 ## Search category icon row (spots)
 
-Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** (BOT DEE feature key `botDee`). Hidden: Mingl / BartR / RydR (Mingl is still a **text** `#minglBtnCard`, not a chrome photo tile). Stored Mingl SVG kit (not live): `images/chrome/mingl-svg/` — recommend Search icon `icons/mingl-orbit.svg`, FloqMedia lockup `logos/mingl-by-floqr.svg`. See that folder’s `FLOQR.md`. Resume `@mingl-icon$`.
+Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** · **6 Si-nema**. Hidden until Features & Services: **Mingl** (`#minglBtnCard` chrome photo tile, `data-floqr-chrome-icon="mingl"`), BartR, RydR. Mingl face: v3 clean vector `images/chrome/mingl-svg/logos/mingl-color-master.svg` → transparent PNGs + `mingl-*.jpg` chrome tiles (`scripts/build-mingl-v3-logo.py`). Colorless SVG kit remains in `images/chrome/mingl-svg/` for compact / FloqMedia lockups. Resume `@mingl-icon$`.
 
 ## Chrome icon drafts (nightlife / traditional review)
 
@@ -1022,12 +1022,12 @@ Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2
 | **Rule / recipe** | `.cursor/rules/icon-chrome-build.mdc` (always) — type, ring layers, sizes, FIX PROMPT |
 | **Builder** | `scripts/build-chrome-icons.py` — modular: ring once → graphic layers → type under/over → assemble |
 | **Saved layers** | `images/chrome/layers/` — `ring-nightlife.png`, `floqcast-graphic.png`, `djbot-graphic.png`, `vip-graphic.png` (no type; reuse when only type moves) |
-| **Review UI** | `icon-review-v4-chrome-compare.html`, `icon-review-square-green-halo.html` |
+| **Review UI** | `icon-review-v4-chrome-compare.html`, `icon-review-square-green-halo.html`, `icon-review-mingl-chrome.html` |
 | **FloqCAST** | Image 2 / V4 full mark: `images/chrome/floqcast-nightlife.jpg` (+ traditional / traditional-green). White/Black Search uses `floqcast-whiteblack.png`: **Image-2 geometry** on white (full-width FloqCAST via `place_floqcast_q_kiss`, ring `R=490`, dark ink + Tiffany T + tip halo) — same proportions as Nightlife chrome, WB palette only. Review SVGs: `images/review/floqcast-icon-{nightlife,traditional,whiteblack}.svg`. Search: `data-floqr-chrome-icon="floqCast"` → ICON_PACK (`ICON_V` s3.2.50). Display2 idle: `FLOQCAST_LOGO` → nightlife JPG (no `?v=`). |
 | **BOT DEE** | `build_botdee_only()` / `--botdee-only` → `botdee-nightlife.jpg` / `-traditional.jpg` / `-whiteblack.jpg`; Search tile `data-floqr-chrome-icon="botDee"` (`ICON_V` s3.2.13). Centered headphones bot ×1.30 (no turntable / signal tray); stacked thin-border `BOT` (white) / `DEE` (tiffany) ≈ ShoutOut type size. Legacy `streetbot-*` + `floqbot-*` still written. |
 | **djBOT** | `images/chrome/floqbot-nightlife.png` + `-spin.gif`; trad `floqbot-traditional*.png` (mirrors BOT DEE face) |
 | **VIP reserVIP** | `images/chrome/vip-nightlife.jpg` / `vip-traditional.jpg`; actual `images/review/actual-icons/vip-reserv-actual.png` |
-| **Mingl SVG kit (stored, not live)** | `images/chrome/mingl-svg/` colorless `currentColor` vectors. Recommend Search tile `icons/mingl-orbit.svg` + FloqMedia logo `logos/mingl-by-floqr.svg`. Live Mingl still `images/mingl-chrome-logo.png`. Do not wire `ICON_PACK.mingl` until a chrome raster pass. `FLOQR.md` in that folder. |
+| **Mingl Search chrome (s3.3.040)** | Owner pack `Mingl_Cursor_Logo_White_Teal_Purple_v3` → clean vector `images/chrome/mingl-svg/logos/mingl-color-master.svg` (white glossy people, teal/purple trim, no orbit / no outer square) + `mingl-chrome-monochrome.svg` (`currentColor`). PNG 128/256/512/1024 in `mingl-svg/exports/`. Search tiles `images/chrome/mingl-*.jpg` composite that transparent mark onto Site Chrome squares (`scripts/build-mingl-v3-logo.py`; `build-mingl-chrome-icons.py` delegates). Brand keeps white/teal/purple on dark chromes; White/Black inverts. **Mingl™** is outlined Noto Sans Display Bold Italic: **Min** white, **gl** teal. `ICON_PACK.mingl` (`ICON_V` s3.3.040). `#minglBtnCard` stays hidden until Features & Services. Same CSS inset as peer tiles. Colorless compact kit unchanged (SMARTview). |
 | **Layers** | bg → under-ring letters → ring → over-ring letters (Fl/d/reser+V under; T/IP over) |
 | **Type** | NotoSansDisplay-Bold, shear 0.286, ×1.10 height; tiffany `(0,212,254)` accents |
 | **Placement** | 2D search (left+top); reject any ink with max radial `> R-2`; tips target `R-10` |

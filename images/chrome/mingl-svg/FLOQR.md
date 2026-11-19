@@ -1,28 +1,45 @@
-# Mingl SVG kit — FLOQR placement (stored, not live)
+# Mingl SVG kit — FLOQR placement
 
-Owner kit (18 Nov 2026): colorless `currentColor` vectors. **Not Search production until explicitly wired.** Live Mingl still uses raster `images/mingl-chrome-logo.png` / `mingl-pink-logo.png` / `mingl-blue-logo.png`. Resume: `@mingl-icon$`.
+Owner pack (19 Nov 2026): **Mingl_Cursor_Logo_White_Teal_Purple_v3**. Resume: `@mingl-icon$`.
+
+## Live Search chrome (v3 vector)
+
+| Piece | Path |
+|---|---|
+| Color master (transparent, no tile) | `logos/mingl-color-master.svg` |
+| Monochrome `currentColor` | `logos/mingl-chrome-monochrome.svg` |
+| PNG exports | `exports/mingl-logo-{128,256,512,1024}.png` |
+| Owner reference pack | `images/chrome/mingl-logo-v3/` (noisy PNG + starter + prompt) |
+| Search tiles | `images/chrome/mingl-*.jpg` — Site Chrome owns the enclosing tile |
+| Builder | `scripts/build-mingl-v3-logo.py` (`build-mingl-chrome-icons.py` delegates) |
+
+Approved composition: three glossy white people (center purple trim, sides teal), white bubble, **Min** white / **gl** teal + TM. No filmstrip, no orbit, no outer square on the brand mark.
+
+Typography is outlined **Noto Sans Display Bold Italic** (permitted FLOQR family) — approximation of the unknown heavy italic in the noisy reference PNG.
+
+Search `#minglBtnCard` is a hidden chrome photo tile (`data-floqr-chrome-icon="mingl"`). Click still splash → Mingl landing. Tile stays hidden until Features & Services enables Mingl.
 
 ## Recommended first uses (owner)
 
 | Surface | File | Why |
 |---|---|---|
-| **Search page icon** | `icons/mingl-orbit.svg` | Feature-card identity at ~96 px. Search today shows Mingl as a **text** `category-card` (`#minglBtnCard`), not a chrome photo tile like ShoutOut / BOT DEE / VIP. Promote it to `.search-icon-row` with `data-floqr-chrome-icon="mingl"` **after** a 1024 chrome raster pack exists (or inline SVG inheriting Site Chrome `color`). Compact fallback for 24–32 px: `icons/mingl-compact-mark.svg`. |
-| **FloqMedia Mingl logo** | `logos/mingl-by-floqr.svg` | Promotional lockup **Mingl by FLOQR**. Use on FloqMedia partner / studio / chrome-review surfaces. Header lockup on FLOQR product pages: `logos/mingl-horizontal.svg` (orbit mark + **Mingl** word). |
-
-Do **not** drop a raw SVG onto the Search tile as the only face without Site Chrome. Other feature icons go through `floqr-chrome-scheme.js` `ICON_PACK` (nightlife / traditional / blackTiffany / whiteBlack / purpleWhite / blackDarkGreen). This kit has no palette: paint it with `color: var(--floqr-ink)` / `--accent`, then rasterize into those six packs the same way Si-nema / VIP do.
+| **Search page icon** | `images/chrome/mingl-nightlife.jpg` (and Site Chrome peers) | Wired. Master SVG is frameless; chrome JPGs add the tile. |
+| **FloqMedia Mingl logo** | `logos/mingl-by-floqr.svg` | Promotional lockup **Mingl by FLOQR**. Not required for this Search pass. |
+| **People SMARTview Mingl CTA** | `icons/mingl-compact-mark.svg` | Unchanged this pass. Inline `currentColor`. |
 
 ## Do not
 
-- Hardcode cyan, purple, white, black, or gradients into production marks.
-- Put the FloqR parent logo beside the Mingl feature icon on a feature landing (`design-notes-feature-landing-pages.mdc`).
+- Wrap the noisy reference PNG in an `<image>` and call it vector.
+- Put an outer square / filmstrip / orbit on the brand master.
 - Translate **Mingl**, **Mingl by FLOQR**, or **Room SMARTview**.
-- Replace live PNG logos until the owner approves the Search icon + FloqMedia lockup pass.
-- Deploy Pages / Functions for this ingest.
+- Alter Room SMARTview or invitation logic in this pass.
+- Deploy Pages / Functions until the owner approves.
 
 ## Inventory
 
 - `icons/` — compact, orbit, people, chat, conversation-dots, interlock-m, chat-people
-- `logos/` — wordmark, horizontal, by-floqr, chat-plan-share
+- `logos/` — color master, chrome monochrome, wordmark, horizontal, by-floqr, chat-plan-share
+- `exports/` — transparent PNG 128 / 256 / 512 / 1024
 - `components/` — bubble, orbit, person-center, three-people
-- `examples/preview.html` — contact sheet (`http://127.0.0.1:<port>/images/chrome/mingl-svg/examples/preview.html`)
-- Kit notes: `README.md`, `CURSOR_IMPLEMENTATION.md`
+- `examples/preview.html` — contact sheet
+- Owner pack: `images/chrome/mingl-logo-v3/`

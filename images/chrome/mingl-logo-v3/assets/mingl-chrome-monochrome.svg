@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mingl logo" fill="currentColor">
+ <path d="M142 34H370a54 54 0 0 1 0 108H241l-42 37 7-37h-64a54 54 0 0 1 0-108Z"/>
+ <g fill="var(--mingl-cutout, #000)"><circle cx="210" cy="89" r="11"/><circle cx="256" cy="89" r="11"/><circle cx="302" cy="89" r="11"/></g>
+ <circle cx="151" cy="216" r="42"/><circle cx="361" cy="216" r="42"/>
+ <path d="M55 339c0-59 43-91 96-91s96 32 96 91v12H55ZM265 339c0-59 43-91 96-91s96 32 96 91v12H265Z"/>
+ <circle cx="256" cy="240" r="46"/><path d="M148 363c0-64 47-97 108-97s108 33 108 97v13H148Z"/>
+ <text x="250" y="476" font-family="Arial,Helvetica,sans-serif" font-size="92" font-style="italic" font-weight="900" text-anchor="middle" letter-spacing="-6">Mingl</text>
+</svg>
