@@ -24,7 +24,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 from fontTools.misc.transform import Transform
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
@@ -402,13 +402,41 @@ def recolor(src: np.ndarray, *, mag, cyan, black=None) -> np.ndarray:
     return out
 
 
+def _dilate_bool(mask: np.ndarray, k: int = 3) -> np.ndarray:
+    img = Image.fromarray((mask.astype(np.uint8) * 255), "L")
+    return np.array(img.filter(ImageFilter.MaxFilter(k))) > 127
+
+
 def invert_mark(mark: Image.Image) -> Image.Image:
-    """Luma-invert RGB, keep alpha — White/Black chrome on a light field."""
+    """White/Black: invert people / Min to ink, keep teal **gl** as Tiffany.
+
+    A full luma invert turns teal into grey, which is why live WB Mingl lost
+    the same Tiffany split FloqCAST / BOT DEE keep.
+    """
     arr = np.array(mark).astype(np.float32)
     rgb, a = arr[..., :3], arr[..., 3]
-    y = 0.299 * rgb[..., 0] + 0.587 * rgb[..., 1] + 0.114 * rgb[..., 2]
+    r, g, bch = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    y = 0.299 * r + 0.587 * g + 0.114 * bch
+    # Wordmark band only — people teal trim must invert, not become Tiffany blobs.
+    yy = np.arange(arr.shape[0], dtype=np.int32)[:, None]
+    word = yy > int(arr.shape[0] * 0.68)
+    cyan = (
+        word
+        & (bch > 130)
+        & (g > 118)
+        & (r < 165)
+        & (bch > r + 16)
+        & (g > r + 6)
+        & (a > 36)
+    )
     inv = np.clip((255.0 - y - 8.0) * 1.06, 0, 255)
-    return Image.fromarray(np.dstack([inv, inv, inv, a]).astype(np.uint8), "RGBA")
+    out_rgb = np.stack([inv, inv, inv], axis=-1)
+    tiff = np.array(TIFFANY, dtype=np.float32)
+    out_rgb[cyan] = tiff
+    # Keep the dark outline on **gl** (inverted stroke would halo Tiffany).
+    ink = (y < 78) & (a > 70) & _dilate_bool(cyan, 5) & ~cyan
+    out_rgb[ink] = np.array([22, 24, 28], dtype=np.float32)
+    return Image.fromarray(np.dstack([out_rgb, a]).astype(np.uint8), "RGBA")
 
 
 def save_jpg(arr: np.ndarray, path: Path) -> None:
@@ -422,7 +450,7 @@ def save_jpg(arr: np.ndarray, path: Path) -> None:
 
 def write_chrome_packs(mark: Image.Image) -> None:
     """Brand accents stay white/teal/purple on dark chromes. Only the tile field + rim change.
-    White/Black inverts the mark so it reads on a light field."""
+    White/Black inverts people / Min and keeps **gl** Tiffany."""
     nightlife = composite_on_field(mark, (0, 0, 0), CHROME / "sinema-nightlife.jpg")
     save_jpg(nightlife, CHROME / "mingl-nightlife.jpg")
     save_jpg(
