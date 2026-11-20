@@ -231,6 +231,7 @@
         {label:"Tonight becomes ISO night", file:"functions/bot-dee-tools.js", includes:["parseNight", "That table could not be held"]},
         {label:"Hold it CTA on dock", file:"botdee-smartview.js", includes:["botdee.vip.holdIt", "data-vip-prompt=\"hold it\""]},
         {label:"iOS keyboard uses layout height", file:"bot-dee-chat.js", includes:["documentElement.clientHeight"]},
+        {label:"VIP dock shrinks with keyboard", file:"bot-dee-chat.css", includes:[".botdee-vip-dock.is-open", "--botdee-kb"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-051-headless-vip-ux"]}
       ]
     },

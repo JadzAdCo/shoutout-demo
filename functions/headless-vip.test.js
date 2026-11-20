@@ -118,4 +118,7 @@ test("VIP dock has a Hold it CTA and strips the demo slug", () => {
   assert.match(css, /\.botdee-sv-vip \.botdee-sv-action-main/);
   const chat = read("bot-dee-chat.js");
   assert.match(chat, /documentElement\.clientHeight/);
+  const dockCss = read("bot-dee-chat.css");
+  assert.match(dockCss, /\.botdee-vip-dock\.is-open[\s\S]{0,180}--botdee-kb/);
+  assert.doesNotMatch(dockCss, /\.botdee-vip-dock\.is-open[\s\S]{0,80}flex:\s*0 0 auto/);
 });
