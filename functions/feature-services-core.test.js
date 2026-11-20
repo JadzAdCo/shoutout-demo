@@ -293,6 +293,7 @@ test("Search tiles: ShoutOut visible, every other feature hidden until Features 
   assert.match(html, /floqr-feature-services\.js\?v=s3\.\d+\.\d+/);
   const app = read("patron-app.js");
   assert.match(app, /FLOQRFeatureServices\?\.applySearchUi/);
+  assert.doesNotMatch(app, /patronMayUse\("mingl"/, "Mingl landing follows Features & Services, not the legacy patron gate");
   assert.match(app, /intentSearchPage"\)\?\.classList\.contains\("active"\) && !featureServiceAllows\("botDee"\)/, "start=intent must not bypass the botDee gate");
   assert.match(read("floqr-feature-services.js"), /searchVisible\(/);
 });
