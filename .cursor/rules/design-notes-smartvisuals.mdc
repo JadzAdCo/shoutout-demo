@@ -28,7 +28,7 @@ Default-deny: unpublished / unlicensed / unsanitized assets never resolve for pa
 ## Surfaces
 
 1. **Search SMARTnotification** — `index.html` `#smartvisualNotificationHost`. Demo only: `?smartvisualInvite=cancun`. View Invitation / Not Now. No fabricated live rooms for all patrons.
-2. **Room SMARTview** — overlay + BOT DEE card hero from `authorizedTitle` / `authorizedDescription` on the request payload (current utterance; never private thread). `botdee.html` loads `smartvisuals/catalog.json` via `ensureCatalog()`.
+2. **Room SMARTview** — overlay + BOT DEE card hero from `authorizedTitle` / `authorizedDescription` on the request payload (current utterance; never private thread). `botdee.html` loads `smartvisuals/catalog.json` via `ensureCatalog()`. Natural Cancun trip talk (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends) must mount the same card as **Open Room SMARTview Cancun Trip** (title Cancun Trip, travel tags, `bg-bali` + `st-flight`, mock Ad Travel partner / Fly to Cancun). Not live flight booking. Do not hijack nightlife-only asks (VIP tables tonight).
 3. **Master Admin SMARTvisual Studio** — `#smartvisualStudio`. SOS2FA + `FLOQRReasonPrompt` to submit drafts. Ads tab previews mock fill from `getSmartVisualAdPolicy` / `selectAd`.
 
 Join Now uses `FLOQRNav` (no `?v=`). Display URLs unchanged.

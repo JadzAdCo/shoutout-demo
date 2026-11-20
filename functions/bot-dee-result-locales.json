@@ -137,11 +137,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Sage im BOT DEE-Chat Open Room SMARTview oder Start a group chat. Confirm öffnet eine Sitzung. Lade nur Mingl-Freunde ein — Gastgeber plus 7 Gäste. Gäste dürfen auch einladen. Beitreten ist keine Zahlung und öffnet keinen gemeinsamen Tab. BOT DEE nimmt niemals Kartennummern. Priv"
+          "blurb": "Sage im BOT DEE-Chat Open Room SMARTview, Start a group chat oder plane eine Cancun-Reise in normalen Worten (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Das ist dieselbe Room SMARTview wie Open Room SMARTview Cancun Trip — Travel-Illustration und ein Muster-Ad Trav"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Sage im BOT DEE-Chat Open Room SMARTview oder Start a group chat. Confirm öffnet eine Sitzung. Lade nur Mingl-Freunde ein — Gastgeber plus 7 Gäste. Gäste dürfen auch einladen. Beitreten ist keine Zahlung und öffnet keinen gemeinsamen Tab. BOT DEE nimmt niemals Kartennummern. Priv"
+          "blurb": "Sage im BOT DEE-Chat Open Room SMARTview, Start a group chat oder plane eine Cancun-Reise in normalen Worten (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Das ist dieselbe Room SMARTview wie Open Room SMARTview Cancun Trip — Travel-Illustration und ein Muster-Ad Trav"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Mingl-Freunde einladen",
@@ -1208,11 +1208,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Dans le chat BOT DEE, dites Open Room SMARTview ou Start a group chat. Confirm ouvre une session. Invitez uniquement des amis Mingl — hôte plus 7 invités. Les invités peuvent aussi inviter. Rejoindre n’est pas un paiement et n’ouvre pas d’addition partagée. BOT DEE ne prend jamai"
+          "blurb": "Dans le chat BOT DEE, dites Open Room SMARTview, Start a group chat, ou planifiez un voyage à Cancun en mots simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). C’est le même Room SMARTview que Open Room SMARTview Cancun Trip — illustration travel et un Ad échantil"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Dans le chat BOT DEE, dites Open Room SMARTview ou Start a group chat. Confirm ouvre une session. Invitez uniquement des amis Mingl — hôte plus 7 invités. Les invités peuvent aussi inviter. Rejoindre n’est pas un paiement et n’ouvre pas d’addition partagée. BOT DEE ne prend jamai"
+          "blurb": "Dans le chat BOT DEE, dites Open Room SMARTview, Start a group chat, ou planifiez un voyage à Cancun en mots simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). C’est le même Room SMARTview que Open Room SMARTview Cancun Trip — illustration travel et un Ad échantil"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Inviter des amis Mingl",
@@ -2279,11 +2279,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "En el chat BOT DEE di Open Room SMARTview o Start a group chat. Confirm abre una sesión. Invita solo amigos Mingl — anfitrión más 7 invitados. Los invitados también pueden invitar. Unirse no es un pago y no abre una cuenta compartida. BOT DEE nunca toma números de tarjeta. Los me"
+          "blurb": "En el chat BOT DEE di Open Room SMARTview, Start a group chat o planea un viaje a Cancun en palabras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Es el mismo Room SMARTview que Open Room SMARTview Cancun Trip — ilustración travel y un Ad de muestra Travel pa"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "En el chat BOT DEE di Open Room SMARTview o Start a group chat. Confirm abre una sesión. Invita solo amigos Mingl — anfitrión más 7 invitados. Los invitados también pueden invitar. Unirse no es un pago y no abre una cuenta compartida. BOT DEE nunca toma números de tarjeta. Los me"
+          "blurb": "En el chat BOT DEE di Open Room SMARTview, Start a group chat o planea un viaje a Cancun en palabras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Es el mismo Room SMARTview que Open Room SMARTview Cancun Trip — ilustración travel y un Ad de muestra Travel pa"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Invitar amigos Mingl",
@@ -3350,11 +3350,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Nella chat BOT DEE di’ Open Room SMARTview o Start a group chat. Confirm apre una sessione. Invita solo amici Mingl — host più 7 ospiti. Anche gli ospiti possono invitare. Entrare non è un pagamento e non apre un conto condiviso. BOT DEE non prende mai numeri di carta. I messaggi"
+          "blurb": "Nella chat BOT DEE di’ Open Room SMARTview, Start a group chat o pianifica un viaggio a Cancun in parole semplici (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). È lo stesso Room SMARTview di Open Room SMARTview Cancun Trip — illustrazione travel e un Ad campione Trave"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Nella chat BOT DEE di’ Open Room SMARTview o Start a group chat. Confirm apre una sessione. Invita solo amici Mingl — host più 7 ospiti. Anche gli ospiti possono invitare. Entrare non è un pagamento e non apre un conto condiviso. BOT DEE non prende mai numeri di carta. I messaggi"
+          "blurb": "Nella chat BOT DEE di’ Open Room SMARTview, Start a group chat o pianifica un viaggio a Cancun in parole semplici (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). È lo stesso Room SMARTview di Open Room SMARTview Cancun Trip — illustrazione travel e un Ad campione Trave"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Invita amici Mingl",
@@ -4421,11 +4421,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "No chat BOT DEE diga Open Room SMARTview ou Start a group chat. Confirm abre uma sessão. Convide só amigos Mingl — anfitrião mais 7 convidados. Convidados também podem convidar. Entrar não é pagamento e não abre conta partilhada. BOT DEE nunca pega números de cartão. Mensagens pr"
+          "blurb": "No chat BOT DEE diga Open Room SMARTview, Start a group chat ou planeie uma viagem a Cancun em palavras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). É o mesmo Room SMARTview que Open Room SMARTview Cancun Trip — ilustração travel e um Ad de amostra Travel pa"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "No chat BOT DEE diga Open Room SMARTview ou Start a group chat. Confirm abre uma sessão. Convide só amigos Mingl — anfitrião mais 7 convidados. Convidados também podem convidar. Entrar não é pagamento e não abre conta partilhada. BOT DEE nunca pega números de cartão. Mensagens pr"
+          "blurb": "No chat BOT DEE diga Open Room SMARTview, Start a group chat ou planeie uma viagem a Cancun em palavras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). É o mesmo Room SMARTview que Open Room SMARTview Cancun Trip — ilustração travel e um Ad de amostra Travel pa"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Convidar amigos Mingl",
@@ -5492,11 +5492,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "В чате BOT DEE скажите Open Room SMARTview или Start a group chat. Confirm открывает сессию. Приглашайте только друзей Mingl — хост плюс 7 гостей. Гости тоже могут приглашать. Вход — не платёж и не общий счёт. BOT DEE никогда не берёт номера карт. Личные сообщения остаются личным"
+          "blurb": "В чате BOT DEE скажите Open Room SMARTview, Start a group chat или простыми словами запланируйте поездку в Cancun (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Это тот же Room SMARTview, что Open Room SMARTview Cancun Trip — travel-иллюстрация и образец Ad Travel par"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "В чате BOT DEE скажите Open Room SMARTview или Start a group chat. Confirm открывает сессию. Приглашайте только друзей Mingl — хост плюс 7 гостей. Гости тоже могут приглашать. Вход — не платёж и не общий счёт. BOT DEE никогда не берёт номера карт. Личные сообщения остаются личным"
+          "blurb": "В чате BOT DEE скажите Open Room SMARTview, Start a group chat или простыми словами запланируйте поездку в Cancun (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Это тот же Room SMARTview, что Open Room SMARTview Cancun Trip — travel-иллюстрация и образец Ad Travel par"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Пригласить друзей Mingl",
@@ -6563,11 +6563,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Στη συνομιλία BOT DEE πείτε Open Room SMARTview ή Start a group chat. Confirm ανοίγει συνεδρία. Προσκαλέστε μόνο φίλους Mingl — οικοδεσπότης συν 7 επισκέπτες. Οι επισκέπτες μπορούν επίσης να προσκαλούν. Η συμμετοχή δεν είναι πληρωμή και δεν ανοίγει κοινό λογαριασμό. Το BOT DEE δε"
+          "blurb": "Στη συνομιλία BOT DEE πείτε Open Room SMARTview, Start a group chat ή σχεδιάστε ένα ταξίδι Cancun με απλά λόγια (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Είναι το ίδιο Room SMARTview με Open Room SMARTview Cancun Trip — travel εικονογράφηση και δείγμα Ad Travel p"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Στη συνομιλία BOT DEE πείτε Open Room SMARTview ή Start a group chat. Confirm ανοίγει συνεδρία. Προσκαλέστε μόνο φίλους Mingl — οικοδεσπότης συν 7 επισκέπτες. Οι επισκέπτες μπορούν επίσης να προσκαλούν. Η συμμετοχή δεν είναι πληρωμή και δεν ανοίγει κοινό λογαριασμό. Το BOT DEE δε"
+          "blurb": "Στη συνομιλία BOT DEE πείτε Open Room SMARTview, Start a group chat ή σχεδιάστε ένα ταξίδι Cancun με απλά λόγια (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Είναι το ίδιο Room SMARTview με Open Room SMARTview Cancun Trip — travel εικονογράφηση και δείγμα Ad Travel p"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Πρόσκληση φίλων Mingl",
@@ -7634,11 +7634,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "W czacie BOT DEE powiedz Open Room SMARTview lub Start a group chat. Confirm otwiera sesję. Zaproś tylko znajomych Mingl — gospodarz plus 7 gości. Goście też mogą zapraszać. Dołączenie nie jest płatnością i nie otwiera wspólnego rachunku. BOT DEE nigdy nie bierze numerów kart. Pr"
+          "blurb": "W czacie BOT DEE powiedz Open Room SMARTview, Start a group chat albo zaplanuj wyjazd do Cancun zwykłymi słowami (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). To ten sam Room SMARTview co Open Room SMARTview Cancun Trip — ilustracja travel i przykładowy Ad Travel par"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "W czacie BOT DEE powiedz Open Room SMARTview lub Start a group chat. Confirm otwiera sesję. Zaproś tylko znajomych Mingl — gospodarz plus 7 gości. Goście też mogą zapraszać. Dołączenie nie jest płatnością i nie otwiera wspólnego rachunku. BOT DEE nigdy nie bierze numerów kart. Pr"
+          "blurb": "W czacie BOT DEE powiedz Open Room SMARTview, Start a group chat albo zaplanuj wyjazd do Cancun zwykłymi słowami (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). To ten sam Room SMARTview co Open Room SMARTview Cancun Trip — ilustracja travel i przykładowy Ad Travel par"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Zaproś znajomych Mingl",
@@ -8705,11 +8705,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Zeg in BOT DEE-chat Open Room SMARTview of Start a group chat. Confirm opent een sessie. Nodig alleen Mingl-vrienden uit — host plus 7 gasten. Gasten mogen ook uitnodigen. Deelnemen is geen betaling en opent geen gedeelde tab. BOT DEE neemt nooit kaartnummers. Privéberichten blij"
+          "blurb": "Zeg in BOT DEE-chat Open Room SMARTview, Start a group chat, of plan in gewone woorden een Cancun-trip (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Dat opent dezelfde Room SMARTview als Open Room SMARTview Cancun Trip — travel-illustratie en een sample Ad Travel par"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Zeg in BOT DEE-chat Open Room SMARTview of Start a group chat. Confirm opent een sessie. Nodig alleen Mingl-vrienden uit — host plus 7 gasten. Gasten mogen ook uitnodigen. Deelnemen is geen betaling en opent geen gedeelde tab. BOT DEE neemt nooit kaartnummers. Privéberichten blij"
+          "blurb": "Zeg in BOT DEE-chat Open Room SMARTview, Start a group chat, of plan in gewone woorden een Cancun-trip (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Dat opent dezelfde Room SMARTview als Open Room SMARTview Cancun Trip — travel-illustratie en een sample Ad Travel par"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Mingl-vrienden uitnodigen",
@@ -9776,11 +9776,11 @@
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat. Confirm يفتح جلسة. ادعُ أصدقاء Mingl فقط — المضيف مع 7 ضيوف. يمكن للضيوف الدعوة أيضاً. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً. BOT DEE لا يأخذ أرقام البطاقات أبداً. الرسائل الخاصة تبقى خاصة. Site Chrome يتبع Appe"
+          "blurb": "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat أو خطّط رحلة Cancun بكلام عادي (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). هذه نفس Room SMARTview مثل Open Room SMARTview Cancun Trip — رسم travel وعينة Ad Travel partner / Fly to Cancun وليست حجز رحلات"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat. Confirm يفتح جلسة. ادعُ أصدقاء Mingl فقط — المضيف مع 7 ضيوف. يمكن للضيوف الدعوة أيضاً. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً. BOT DEE لا يأخذ أرقام البطاقات أبداً. الرسائل الخاصة تبقى خاصة. Site Chrome يتبع Appe"
+          "blurb": "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat أو خطّط رحلة Cancun بكلام عادي (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). هذه نفس Room SMARTview مثل Open Room SMARTview Cancun Trip — رسم travel وعينة Ad Travel partner / Fly to Cancun وليست حجز رحلات"
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "دعوة أصدقاء Mingl",
