@@ -2059,14 +2059,27 @@
     {
       id: "help-profile-mobile",
       title: "Mobile",
-      body: "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format so messages can reach you. Incomplete numbers cannot be saved.",
+      body: "Mobile is required. FLOQR uses this number to recognize you — one mobile means one FLOQR account. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format (E.164) so SMS and WhatsApp can reach you. If this number is already on another FLOQR sign-in, you will be asked to use that account instead of creating a second one.",
       searchPhrases: [
-        "mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code"
+        "mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code",
+        "required phone", "same phone", "duplicate account", "E.164"
       ],
       links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "patron-portal.html"
+    },
+    {
+      id: "help-patron-account-merge",
+      title: "Patron account merge",
+      body: "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted until Don confirms. New sign-ups refuse a second account when the mobile is already claimed.",
+      searchPhrases: [
+        "merge accounts", "duplicate patron", "same phone", "MsLorna", "Lorna", "phone unifier"
+      ],
+      links: [{label: "Duplicate Records", href: pageUrl("./master-admin.html", {from: "botdee"})}],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html"
     },
     {
       id: "help-prior-travels",

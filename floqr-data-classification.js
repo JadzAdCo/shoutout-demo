@@ -149,6 +149,7 @@
     ["passes", "ownMaster", 1, "Digital pass / QR tokens (VIP and event check-in)"],
     ["patronTemplateVariants", "ownMaster", 0, "A patron's saved templates"],
     ["paymentLedger", "clubAdmin", 1, "Payments and payouts"],
+    ["phoneIndex", "secret", 1, "E.164 mobile → uid uniqueness index (doc id p{digits}); Functions-write; same phone = same person; no IP"],
     ["pickupRequests", "ownMaster", 1, "RydR pickup requests"],
     ["platformSettings", "public", 0, "Public platform settings"],
     ["privacyConsents", "ownMaster", 1, "Privacy consent records"],
@@ -234,7 +235,16 @@
   const FIELD_ROWS = [
     ["users", "marketingMediaConsent", "ownClubAdmin", 1, "Staff consent to appear in a club's marketing media (Club Admins of the affiliated club)"],
     ["users", "email", "ownMaster", 1, "Account email"],
-    ["users", "phone", "ownMaster", 1, "Account phone number"],
+    ["users", "phone", "ownMaster", 1, "Account phone number (client-visible; claimPatronPhone also writes E.164)"],
+    ["users", "phoneE164", "ownMaster", 1, "Normalized E.164 mobile; Functions-write via claimPatronPhone / mergePatronAccounts; no IP"],
+    ["users", "phoneNormalized", "ownMaster", 1, "Alias of phoneE164; Functions-write"],
+    ["users", "mergedInto", "ownMaster", 0, "Survivor uid when this Auth account was merged; Functions-write; Auth is not deleted"],
+    ["users", "mergedFromUids", "ownMaster", 0, "Auth uids merged into this survivor"],
+    ["users", "accountStatus", "ownMaster", 0, "active | merged; Functions-write"],
+    ["users", "linkedEmails", "ownMaster", 1, "Emails collected across merged Auth accounts"],
+    ["users", "linkedAuthUids", "ownMaster", 0, "Auth uids linked by Master Admin merge"],
+    ["phoneIndex", "uid", "secret", 0, "Owner uid of this mobile"],
+    ["phoneIndex", "phoneE164", "secret", 1, "Normalized E.164 stored on the uniqueness index"],
     ["users", "countryCode", "ownMaster", 0, "ISO country from the static in-page catalog"],
     ["users", "regionCode", "ownMaster", 0, "State / province / region code for taxi pickup"],
     ["users", "taxiPickupAddress", "ownMaster", 1, "Private RydR pickup line (composed street + city + ZIP/postal)"],
@@ -628,7 +638,8 @@
     masterAdminRollup: {purpose: "Precompute Master Admin panel summary counts every 5 minutes", collections: ["masterAdminRollups", "users", "shoutouts", "liveContent", "guestListRequests", "messages", "inboxNotifications", "clubLocations", "clubLocationAliases", "events", "templates", "minglConnections", "minglAudit", "chatRooms", "chatMessages", "roleRequests", "clubEmployeeDesignations", "patronTemplateVariants", "aiIndex", "aiUserNotificationPreferences", "aiSearchLogs", "aiRecommendations", "aiDiscoverySources", "aiDiscoveryQueue", "aiDiscoveryRatingCriteria", "aiCrawlRuns", "aiCrawlerSchedules", "aiDiagnosticsReports", "serviceOrders", "audienceCampaigns", "pickupRequests", "shoutoutRecommendations"]},
     peopleDirectory: {purpose: "Show other members' profiles without private fields; club contacts only to that club's admins", collections: ["users", "clubLocations", "clubAdminAssignments", "clubEmployeeDesignations", "workerAssociationRequests", "minglConnections", "chatRooms"]},
     botDeeSession: {purpose: "Mingl-friends BOT DEE rooms, invites, shared thread, itinerary, and FloqR Stripe tab", collections: ["botDeeRooms", "botDeeRoomMembers", "botDeeRoomInvites", "botDeeRoomTabs", "botDeeRoomAudit", "botDeeRoomInviteThrottle", "botDeeRoomTurnThrottle", "minglConnections", "userBlocks", "users", "inboxNotifications"]},
-    shoutoutStories: {purpose: "Show approved ShoutOuts as Mingl Gist stories without the submitter's contact details", collections: ["shoutouts"]}
+    shoutoutStories: {purpose: "Show approved ShoutOuts as Mingl Gist stories without the submitter's contact details", collections: ["shoutouts"]},
+    patronAccountUnifier: {purpose: "Claim a required mobile as the patron record unifier and merge duplicate Auth accounts without deleting Auth or storing client IP", collections: ["users", "phoneIndex", "betaTesters", "minglConnections", "inboxNotifications", "botDeeThreads", "botDeeRooms", "botDeeRoomMembers", "botDeeRoomInvites", "userBlocks", "usercharacter_analysis", "featureServiceAuditLogs", "featureServiceAuditHead"]}
   };
 
   function systemJob(job, collection) {

@@ -2116,6 +2116,38 @@
         </div>
       </section>
 
+        <div class="card" id="patronAccountMerge">
+          <h2 class="help-label">
+            <span class="help-label-text" data-i18n="master.accountMerge.title">Patron accounts (same mobile)</span>
+            <details class="help-popout inline-help-popout" data-floqr-help-id="help-patron-account-merge">
+              <summary>?</summary>
+              <div>Same mobile means the same person. Look up both Auth/Firestore accounts, preview, then merge into one uid. Mingl friends, beta grants, Inbox, and BOT DEE follow the surviving uid. Firebase Auth is not deleted until Don confirms.</div>
+            </details>
+          </h2>
+          <p class="sub small" data-i18n="master.accountMerge.sub">Same mobile means the same person. Preview, then merge into one uid. Firebase Auth is not deleted until Don confirms.</p>
+          <p class="sub small" data-i18n="master.accountMerge.authKept">Auth users stay until Don confirms a live Auth delete.</p>
+          <div class="profile-grid">
+            <label data-i18n="master.accountMerge.survivor">Keep this uid
+              <input id="patronMergeSurvivorQuery" placeholder="email, @handle, uid, or +E.164"/>
+              <input id="patronMergeSurvivorUid" placeholder="survivor uid"/>
+            </label>
+            <label data-i18n="master.accountMerge.duplicate">Merge this uid away
+              <input id="patronMergeDuplicateQuery" placeholder="email, @handle, uid, or +E.164"/>
+              <input id="patronMergeDuplicateUid" placeholder="duplicate uid"/>
+            </label>
+          </div>
+          <div class="queue-actions">
+            <button id="patronMergeLookupSurvivorBtn" type="button" data-i18n="master.accountMerge.lookup">Find patron</button>
+            <button id="patronMergeLookupDuplicateBtn" type="button" data-i18n="master.accountMerge.lookup">Find patron</button>
+            <button id="patronMergePreviewBtn" type="button" data-i18n="master.accountMerge.preview">Preview merge</button>
+            <button id="patronMergeRunBtn" class="primary" type="button" data-i18n="master.accountMerge.merge">Merge patron accounts</button>
+          </div>
+          <p id="patronAccountMergeStatus" class="status"></p>
+          <div id="patronMergeSurvivorResults" class="report-block"></div>
+          <div id="patronMergeDuplicateResults" class="report-block"></div>
+          <div id="patronAccountMergePreview" class="report-block"></div>
+        </div>
+
       <section id="diagnostics" class="admin-panel-section">
         <div class="card">
           <p class="eyebrow">Diagnostics · not security</p>
@@ -2381,6 +2413,7 @@
 <script src="./ai-diagnostics-service.js?v=s3.3.053"></script>
 <script src="./master-admin-rollup.js?v=s3.3.053"></script>
 <script src="./duplicate-record-service.js?v=s3.3.053"></script>
+<script src="./patron-account-merge.js?v=s3.3.053"></script>
 <script src="./floqr-logger.js?v=s3.3.053"></script>
 <script src="./payment-service.js?v=s3.3.053"></script>
 <script src="./floqr-access-notice.js?v=s3.3.053"></script>

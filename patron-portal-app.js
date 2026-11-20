@@ -2404,14 +2404,14 @@
       setText("portalStatus", pickupCheck.error);
       return;
     }
-    const phoneCheck = editGeoCtl?.validateMobile?.({required: false})
+    const phoneCheck = editGeoCtl?.validateMobile?.({required: true})
       || window.FLOQRGeoCatalog?.validateMobile?.(
         byId("editCountry")?.value,
         byId("editPhoneNational")?.value,
-        {required: false}
+        {required: true}
       );
     if (phoneCheck && !phoneCheck.ok) {
-      setText("portalStatus", phoneCheck.error || (window.FLOQRI18n?.t?.("portal.phone.invalid") || "Enter a valid mobile number for SMS and WhatsApp."));
+      setText("portalStatus", phoneCheck.error || (window.FLOQRI18n?.t?.("profile.phone.required") || "Mobile is required. Enter your mobile number in international format."));
       const hint = byId("editPhoneHint");
       if (hint) {
         hint.textContent = phoneCheck.error || hint.textContent;
@@ -2492,6 +2492,13 @@
     }
     if (updates.accountType === "business" && !updates.businessName) {
       setText("portalStatus", "Add a business name when electing a business account.");
+      return;
+    }
+    const claimed = await window.FLOQRAccountUnifier?.claimRequiredPhone?.(updates.phone, byId("portalStatus"));
+    if (!claimed?.ok) {
+      if (!window.FLOQRAccountUnifier) {
+        setText("portalStatus", window.FLOQRI18n?.t?.("profile.phone.required") || "Mobile is required. Enter your mobile number in international format.");
+      }
       return;
     }
     await db.collection("users").doc(user.uid).set(updates, {merge:true});

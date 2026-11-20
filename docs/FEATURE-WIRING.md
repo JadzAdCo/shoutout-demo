@@ -41,6 +41,26 @@ Resume: `@gdpr$` / `$residency$`. Rule: `.cursor/rules/gdpr-data-residency.mdc`.
 
 ---
 
+## Patron phone unifier + account merge (s3.3.052)
+
+**Purpose:** One mobile = one person. Duplicate Auth/Firestore patrons (e.g. MsLorna vs another Lorna Gmail) are merged by Master Admin. New sign-up / profile complete refuses a second account when the E.164 mobile is already claimed. **Do not run the live Lorna merge or delete Auth until Don asks.**
+
+| Layer | Wiring |
+|---|---|
+| Unifier | Normalized E.164 on `phoneIndex/{p{digits}}` + `users.phoneE164`. Client `phone` remains writable; E.164 / merge fields are backend-only. |
+| Patron | Search + My Profile require mobile (`validateMobile({required:true})`). `claimPatronPhone` before `users` save. `phone_in_use` signs out and returns to `./?profileRequired=sign-in&phoneInUse=1`. Merged docs (`accountStatus: merged` / `mergedInto`) bounce to existing sign-in. Helper `floqr-account-unifier.js`. |
+| Master Admin | Duplicate Records → **Patron accounts (same mobile)**. SOS2FA + `FLOQRReasonPrompt`. Callables `lookupPatronAccounts`, `previewPatronAccountMerge`, `mergePatronAccounts`. Moves Mingl connections, beta `features` union (incl. `mingl`), Inbox `recipientUid`, BOT DEE rooms/threads, blocks. **Never deletes Firebase Auth** (`authDeleted: false`). |
+| Audit | Chained `account.merged` on `featureServiceAuditLogs`. Unchained `account.phone_claimed` / `account.phone_denied`. Agent clients stamp `actorEmail: "agent"`. No client IP on `users` or `phoneIndex`. |
+| Rules | `phoneIndex` Functions-only. `mergedInto`, `mergedFromUids`, `accountStatus`, `linkedAuthUids`, `phoneE164`, `phoneNormalized` in `hasBackendOnlyIdentityFields`. |
+| Deploy | Functions subset tag `[firebase-deploy-accounts]` (claim/lookup/preview/merge). **Do not tag or deploy until Don asks.** Pages cache-bust s3.3.052. |
+| Help | `help-profile-mobile` (patron, required mobile) · `help-patron-account-merge` (masterAdmin, English). |
+| Classification | `phoneIndex` secret PII; `users` merge/E.164 fields; system job `patronAccountUnifier`. Movable in-region; no stored IP. |
+| Tests | `functions/account-unifier.test.js`, rules `phoneIndex` block, i18n chrome +12 keys × 11 langs. |
+
+Mingl Search tile for Lorna is a separate change (`floqr-feature-services.js`). After Don confirms the live merge, the surviving uid must keep `betaTesters.features.mingl=1`.
+
+---
+
 ## Height unit + RydR pickup locale (s3.3.012)
 
 Unit-first height and structured taxi pickup. Profile country wins; if empty, IP country (never stored) from `FLOQRGeoSearch.ipLocation`.

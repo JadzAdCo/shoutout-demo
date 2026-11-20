@@ -202,6 +202,11 @@ jobs:
             add_fns setFeatureServiceFlags seedFeatureServices findBetaPatron setBetaTesterFeatures
             echo "Features & Services catalog deploy tagged"
           fi
+          if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-accounts\]'; then
+            SUBSET=1
+            add_fns claimPatronPhone lookupPatronAccounts previewPatronAccountMerge mergePatronAccounts
+            echo "Patron account unifier deploy tagged"
+          fi
           if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-crawl\]'; then
             SUBSET=1
             add_fns \

@@ -755,12 +755,12 @@
       id: "help-profile-mobile",
       kind: "help",
       label: "Mobile",
-      blurb: "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States.",
+      blurb: "Mobile is required. One mobile means one FLOQR account. Country fills the calling code, for example (+1) for the United States.",
       links: [
         {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}
       ],
-      searchPhrases: ["mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code"],
-      patterns: [/\bmobile\b/, /\bphone\s+number\b/, /\bcountry\s+code\b/, /\(\+1\)/]
+      searchPhrases: ["mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code", "required phone", "same phone", "duplicate account"],
+      patterns: [/\bmobile\b/, /\bphone\s+number\b/, /\bcountry\s+code\b/, /\(\+1\)/, /same\s+phone/, /duplicate\s+account/]
     },
     {
       id: "help-prior-travels",
