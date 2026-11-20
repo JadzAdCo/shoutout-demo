@@ -2317,6 +2317,26 @@
       ]
     },
     {
+      "sourceId": "help:help-patron-account-merge",
+      "id": "help-patron-account-merge",
+      "kind": "help",
+      "label": "Patron account merge",
+      "blurb": "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted unti",
+      "href": "./master-admin.html?from=botdee",
+      "phrases": [
+        "patron account merge",
+        "mslorna and another lorna gmail can be the same person with two auth uids. master admin looks up both accounts previews then merges firestore into one surviving",
+        "merge accounts",
+        "duplicate patron",
+        "same phone",
+        "mslorna",
+        "lorna",
+        "phone unifier",
+        "duplicate records",
+        "help-patron-account-merge"
+      ]
+    },
+    {
       "sourceId": "help:help-prior-travels",
       "id": "help-prior-travels",
       "kind": "help",
@@ -2402,17 +2422,21 @@
       "id": "help-profile-mobile",
       "kind": "help",
       "label": "Mobile",
-      "blurb": "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format so messages can reach you. Incomplete numbers cannot be saved.",
+      "blurb": "Mobile is required. FLOQR uses this number to recognize you — one mobile means one FLOQR account. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format (E.164) so SMS and WhatsApp can",
       "href": "./patron-portal.html?from=botdee&tab=profile",
       "phrases": [
         "mobile",
-        "floqr uses this number for sms and whatsapp. country fills the calling code for example 1 for the united states. enter only the rest of your mobile number. we s",
+        "mobile is required. floqr uses this number to recognize you one mobile means one floqr account. country fills the calling code for example 1 for the united stat",
         "phone number",
         "sms",
         "whatsapp",
         "country code",
         "1",
         "calling code",
+        "required phone",
+        "same phone",
+        "duplicate account",
+        "e.164",
         "profile settings",
         "help-profile-mobile"
       ]
@@ -4279,17 +4303,20 @@
       "id": "help-profile-mobile",
       "kind": "help",
       "label": "Mobile",
-      "blurb": "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States.",
+      "blurb": "Mobile is required. One mobile means one FLOQR account. Country fills the calling code, for example (+1) for the United States.",
       "href": "./botdee.html",
       "phrases": [
         "mobile",
-        "floqr uses this number for sms and whatsapp. country fills the calling code for example 1 for the united states.",
+        "mobile is required. one mobile means one floqr account. country fills the calling code for example 1 for the united states.",
         "phone number",
         "sms",
         "whatsapp",
         "country code",
         "1",
         "calling code",
+        "required phone",
+        "same phone",
+        "duplicate account",
         "help-profile-mobile"
       ]
     },

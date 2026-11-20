@@ -408,6 +408,9 @@
     "help-onboarding": [
       "masterAdmin"
     ],
+    "help-patron-account-merge": [
+      "masterAdmin"
+    ],
     "help-prior-travels": [
       "patron"
     ],

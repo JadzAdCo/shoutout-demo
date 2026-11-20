@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.3.047-botdee-mingl-session
+// FLOQR FIRESTORE RULES VERSION: s3.3.052-patron-phone-unifier
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.3.047-botdee-mingl-session
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.3.046-headless-vip-rooms
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.3.040-smartvisuals
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.2.40-floqr-admin-and-club-owned-tags
@@ -26,6 +27,7 @@ rules_version = '2';
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
+// - s3.3.052: phoneIndex Functions-only; users mergedInto/accountStatus/phoneE164 backend-only; no IP
 // - s3.3.047: BOT DEE Mingl session invites (botDeeRoomMembers/Invites/Tabs/Audit); member-read; invites Functions-only; no IP
 // - s3.3.046: botDeeRooms member-read, Functions-write (Room SMARTview join; no IP; shared tab/charge off)
 // - s3.3.032: usercharacter_analysis signed-in read when publicWithinFloqr==1 and the pair is not blocked (People SMARTcard live listen)
@@ -169,7 +171,13 @@ service cloud.firestore {
  "stripeConnectCapabilityStatus",
  "stripeConnectLivemode",
  "stripeConnectUpdatedAt",
- "usercharacter_analysis"
+ "usercharacter_analysis",
+ "mergedInto",
+ "mergedFromUids",
+ "accountStatus",
+ "linkedAuthUids",
+ "phoneE164",
+ "phoneNormalized"
  ]);
  }
 
@@ -187,7 +195,13 @@ service cloud.firestore {
  "stripeConnectCapabilityStatus",
  "stripeConnectLivemode",
  "stripeConnectUpdatedAt",
- "usercharacter_analysis"
+ "usercharacter_analysis",
+ "mergedInto",
+ "mergedFromUids",
+ "accountStatus",
+ "linkedAuthUids",
+ "phoneE164",
+ "phoneNormalized"
  ]);
  }
 
@@ -717,6 +731,11 @@ service cloud.firestore {
  match /betaInvites/{inviteId} {
  allow read: if isMasterAdmin();
  allow write: if false;
+ }
+
+ // E.164 mobile → uid. Same phone = same person. Functions-write only.
+ match /phoneIndex/{phoneId} {
+ allow read, write: if false;
  }
 
  match /featureServiceAuditLogs/{eventId} {

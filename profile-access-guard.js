@@ -49,8 +49,14 @@
       if (!user) { redirect("sign-in"); return; }
       try {
         const snap = await db.collection("users").doc(user.uid).get();
-        if (!snap.exists || snap.data()?.profileCompleted !== true) { redirect("create-profile"); return; }
-        release(snap.data());
+        const profile = snap.exists ? snap.data() : {};
+        if (profile.mergedInto || profile.accountStatus === "merged") {
+          try { await auth.signOut(); } catch (_) {}
+          redirect("sign-in");
+          return;
+        }
+        if (!snap.exists || profile.profileCompleted !== true) { redirect("create-profile"); return; }
+        release(profile);
       } catch (error) {
         blocker.querySelector("strong").textContent = "We could not verify your profile";
         blocker.querySelector("p").textContent = "Return to FLOQR and sign in again. Your existing profile data was not changed.";

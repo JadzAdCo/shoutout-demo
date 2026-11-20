@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.051 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.052 (stable)
 
+- s3.3.052: Required mobile is the FLOQR account unifier; Master Admin can merge duplicate patrons without deleting Auth
 - s3.3.051: BOT DEE natural Cancun trip talk opens Room SMARTview (same card as Open Room SMARTview Cancun Trip)
 - s3.3.050: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab
 - s3.3.049: Beta Find patron by email; tester Save no longer waits on Audit Trail

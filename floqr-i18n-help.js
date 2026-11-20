@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.051";
+  const VERSION = "s3.3.052";
   const packs = {
     "ru": {
       "help-smartvisuals-notification": {
@@ -375,7 +375,7 @@
       },
       "help-profile-mobile": {
         title: "Мобильный",
-        body: "FLOQR использует этот номер для SMS и WhatsApp. Страна подставляет код, например (+1) для США. Введите остальную часть мобильного номера. Мы сохраняем его в международном формате, чтобы сообщения доходили."
+        body: "Мобильный обязателен. FLOQR узнаёт вас по этому номеру — один мобильный означает один аккаунт. Страна подставляет код, например (+1) для США. Введите остальную часть номера. Мы сохраняем его в международном формате (E.164), чтобы доходили SMS и WhatsApp. Если номер уже на другом входе FLOQR, вас попросят использовать тот аккаунт, а не создавать второй."
       },
       "help-taxi-pickup-address": {
         title: "Адрес подачи такси",
@@ -877,7 +877,7 @@
       },
       "help-profile-mobile": {
         title: "Mobiel",
-        body: "FLOQR gebruikt dit nummer voor SMS en WhatsApp. Land vult de landcode, bijvoorbeeld (+1) voor de Verenigde Staten. Vul alleen de rest van je mobiele nummer in. We slaan het internationaal op zodat berichten aankomen."
+        body: "Mobiel is verplicht. FLOQR herkent je met dit nummer — één mobiel is één account. Land vult de landcode, bijvoorbeeld (+1) voor de Verenigde Staten. Vul alleen de rest van je nummer in. We slaan het internationaal op (E.164) zodat SMS en WhatsApp aankomen. Staat dit nummer al op een andere FLOQR-aanmelding, dan moet je dat account gebruiken in plaats van een tweede te maken."
       },
       "help-taxi-pickup-address": {
         title: "Taxi-ophaaladres",
@@ -1379,7 +1379,7 @@
       },
       "help-profile-mobile": {
         title: "Mobile",
-        body: "FLOQR utilise ce numéro pour SMS et WhatsApp. Le pays remplit l’indicatif, par exemple (+1) pour les États-Unis. Saisissez seulement le reste du numéro mobile. Nous le stockons au format international pour que les messages arrivent."
+        body: "Le mobile est obligatoire. FLOQR vous reconnaît avec ce numéro — un mobile signifie un compte. Le pays remplit l’indicatif, par exemple (+1) pour les États-Unis. Saisissez seulement le reste du numéro. Nous le stockons au format international (E.164) pour SMS et WhatsApp. S’il est déjà sur une autre connexion FLOQR, vous devrez utiliser ce compte au lieu d’en créer un second."
       },
       "help-taxi-pickup-address": {
         title: "Adresse de prise en charge taxi",
@@ -1881,7 +1881,7 @@
       },
       "help-profile-mobile": {
         title: "Mobil",
-        body: "FLOQR nutzt diese Nummer für SMS und WhatsApp. Das Land füllt die Vorwahl, zum Beispiel (+1) für die Vereinigten Staaten. Geben Sie nur den Rest der Mobilnummer ein. Wir speichern sie im internationalen Format, damit Nachrichten ankommen."
+        body: "Mobilnummer ist Pflicht. FLOQR erkennt Sie an dieser Nummer — eine Mobilnummer bedeutet ein Konto. Das Land füllt die Vorwahl, zum Beispiel (+1) für die Vereinigten Staaten. Geben Sie nur den Rest der Nummer ein. Wir speichern sie international (E.164), damit SMS und WhatsApp ankommen. Ist die Nummer schon bei einer anderen FLOQR-Anmeldung, müssen Sie dieses Konto nutzen statt ein zweites anzulegen."
       },
       "help-taxi-pickup-address": {
         title: "Taxi-Abholadresse",
@@ -2383,7 +2383,7 @@
       },
       "help-profile-mobile": {
         title: "Móvil",
-        body: "FLOQR usa este número para SMS y WhatsApp. El país rellena el código, por ejemplo (+1) para Estados Unidos. Introduce solo el resto del número móvil. Lo guardamos en formato internacional para que lleguen los mensajes."
+        body: "El móvil es obligatorio. FLOQR te reconoce con este número: un móvil es una cuenta. El país rellena el código, por ejemplo (+1) para Estados Unidos. Introduce solo el resto del número. Lo guardamos en formato internacional (E.164) para SMS y WhatsApp. Si ya está en otro acceso FLOQR, deberás usar esa cuenta en lugar de crear una segunda."
       },
       "help-taxi-pickup-address": {
         title: "Dirección de recogida de taxi",
@@ -2885,7 +2885,7 @@
       },
       "help-profile-mobile": {
         title: "Cellulare",
-        body: "FLOQR usa questo numero per SMS e WhatsApp. Il paese inserisce il prefisso, ad esempio (+1) per gli Stati Uniti. Inserisci solo il resto del numero. Lo salviamo in formato internazionale così i messaggi arrivano."
+        body: "Il cellulare è obbligatorio. FLOQR ti riconosce con questo numero: un cellulare è un account. Il Paese riempie il prefisso, ad esempio (+1) per gli Stati Uniti. Inserisci solo il resto del numero. Lo salviamo in formato internazionale (E.164) per SMS e WhatsApp. Se è già su un altro accesso FLOQR, dovrai usare quell’account invece di crearne un secondo."
       },
       "help-taxi-pickup-address": {
         title: "Indirizzo di ritiro taxi",
@@ -3387,7 +3387,7 @@
       },
       "help-profile-mobile": {
         title: "Telemóvel",
-        body: "A FLOQR usa este número para SMS e WhatsApp. O país preenche o indicativo, por exemplo (+1) para os Estados Unidos. Introduza só o resto do número. Guardamo-lo em formato internacional para as mensagens chegarem."
+        body: "O telemóvel é obrigatório. A FLOQR reconhece-o com este número — um telemóvel é uma conta. O país preenche o indicativo, por exemplo (+1) para os Estados Unidos. Introduza só o resto do número. Guardamos no formato internacional (E.164) para SMS e WhatsApp. Se já estiver noutro acesso FLOQR, use essa conta em vez de criar uma segunda."
       },
       "help-taxi-pickup-address": {
         title: "Morada de recolha de táxi",
@@ -3889,7 +3889,7 @@
       },
       "help-profile-mobile": {
         title: "Κινητό",
-        body: "Το FLOQR χρησιμοποιεί αυτόν τον αριθμό για SMS και WhatsApp. Η χώρα συμπληρώνει τον κωδικό, π.χ. (+1) για τις Ηνωμένες Πολιτείες. Εισαγάγετε μόνο το υπόλοιπο του κινητού. Το αποθηκεύουμε σε διεθνή μορφή ώστε να φτάνουν τα μηνύματα."
+        body: "Το κινητό είναι υποχρεωτικό. Το FLOQR σας αναγνωρίζει με αυτόν τον αριθμό — ένα κινητό είναι ένας λογαριασμός. Η χώρα συμπληρώνει τον κωδικό, π.χ. (+1) για τις ΗΠΑ. Εισαγάγετε μόνο το υπόλοιπο του αριθμού. Τον αποθηκεύουμε διεθνώς (E.164) για SMS και WhatsApp. Αν υπάρχει ήδη σε άλλη είσοδο FLOQR, θα χρησιμοποιήσετε εκείνον τον λογαριασμό αντί για δεύτερο."
       },
       "help-taxi-pickup-address": {
         title: "Διεύθυνση παραλαβής ταξί",
@@ -4391,7 +4391,7 @@
       },
       "help-profile-mobile": {
         title: "Telefon komórkowy",
-        body: "FLOQR używa tego numeru do SMS i WhatsApp. Kraj uzupełnia kierunkowy, np. (+1) dla Stanów Zjednoczonych. Wpisz tylko resztę numeru. Zapisujemy go w formacie międzynarodowym, żeby wiadomości dochodziły."
+        body: "Numer komórkowy jest wymagany. FLOQR rozpoznaje Cię po tym numerze — jeden numer to jedno konto. Kraj uzupełnia numer kierunkowy, np. (+1) dla USA. Wpisz tylko resztę numeru. Zapisujemy go w formacie międzynarodowym (E.164), aby działały SMS i WhatsApp. Jeśli numer jest już na innym logowaniu FLOQR, użyj tego konta zamiast zakładać drugie."
       },
       "help-taxi-pickup-address": {
         title: "Adres odbioru taksówki",
@@ -4893,7 +4893,7 @@
       },
       "help-profile-mobile": {
         title: "الجوّال",
-        body: "تستخدم FLOQR هذا الرقم لـ SMS و WhatsApp. البلد يملأ رمز الاتصال، مثل (+1) للولايات المتحدة. أدخل بقية رقم الجوّال فقط. نخزّنه بالصيغة الدولية حتى تصل الرسائل."
+        body: "الجوال مطلوب. يتعرّف FLOQR عليك بهذا الرقم — جوال واحد يعني حسابًا واحدًا. تملأ الدولة رمز الاتصال، مثل (+1) للولايات المتحدة. أدخل بقية الرقم فقط. نخزّنه بالصيغة الدولية (E.164) ليصلك SMS و WhatsApp. إذا كان الرقم على دخول FLOQR آخر فستُطلب منك استخدام ذلك الحساب بدل إنشاء حساب ثانٍ."
       },
       "help-taxi-pickup-address": {
         title: "عنوان التقاط سيارة الأجرة",

@@ -4,6 +4,7 @@ const sos2faFns = require("./sos2fa-functions");
 const twilioDebuggerFns = require("./twilio-debugger-webhook");
 const mailLogFns = require("./mail-log-functions");
 const featureServiceFns = require("./feature-services-functions");
+const accountUnifierFns = require("./account-unifier-functions");
 const adFns = require("./ad-functions");
 
 module.exports = {
@@ -101,6 +102,10 @@ module.exports = {
   revokeBetaInvite: featureServiceFns.revokeBetaInvite,
   setBetaTesterFeatures: featureServiceFns.setBetaTesterFeatures,
   findBetaPatron: featureServiceFns.findBetaPatron,
+  claimPatronPhone: accountUnifierFns.claimPatronPhone,
+  lookupPatronAccounts: accountUnifierFns.lookupPatronAccounts,
+  previewPatronAccountMerge: accountUnifierFns.previewPatronAccountMerge,
+  mergePatronAccounts: accountUnifierFns.mergePatronAccounts,
   logFeatureAccessAttempt: featureServiceFns.logFeatureAccessAttempt,
   logFeatureCodePromotion: featureServiceFns.logFeatureCodePromotion,
   verifyFeatureServiceAuditChain: featureServiceFns.verifyFeatureServiceAuditChain,

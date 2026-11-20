@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.051";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.051";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.052";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.052";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.052",
+      title: "s3.3.052 — Required mobile unifier + Master Admin patron merge",
+      checks: [
+        {label:"Phone index Functions-only", file:"firestore.rules", includes:["match /phoneIndex/{phoneId}", "allow read, write: if false;"]},
+        {label:"Merge callables", file:"functions/account-unifier-functions.js", includes:["exports.claimPatronPhone", "exports.mergePatronAccounts", "authDeleted: false"]},
+        {label:"Index exports", file:"functions/index.js", includes:["claimPatronPhone: accountUnifierFns.claimPatronPhone", "mergePatronAccounts: accountUnifierFns.mergePatronAccounts"]},
+        {label:"Required phone on create", file:"patron-app.js", includes:["required: true", "claimRequiredPhone"]},
+        {label:"Required phone on My Profile", file:"patron-portal-app.js", includes:["required: true", "claimRequiredPhone"]},
+        {label:"Master Admin merge card", file:"master-admin.html", includes:["id=\"patronAccountMerge\"", "patron-account-merge.js"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-052-patron-phone-unifier"]}
+      ]
+    },
     {
       version: "s3.3.051",
       title: "s3.3.051 — Natural Cancun trip talk opens Room SMARTview",
@@ -3546,6 +3559,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-052-patron-phone-unifier",
+      area:"Accounts",
+      feature:"Required mobile unifies patrons; Master Admin merge does not delete Auth",
+      changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Do not run the live Lorna merge until Don asks.",
+      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.052. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until Don asks. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Mobile required. Duplicate phone cannot create a second live profile. Preview shows both uids and does not delete Auth. Merge is Master Admin + SOS2FA + reason only.",
+      troubleshoot:"Save still optional phone → cached patron-app.js / patron-portal-app.js. Second account created → Functions claimPatronPhone / phoneIndex rules not this SHA. Merge button works without SOS2FA → stop; lookupPatronAccounts must assertSos2faSession. Auth user vanished → mergePatronAccounts must not call deleteUser; revert and wait for Don."
+    },
     {
       id:"botdee-whats-new-catalog",
       area:"BOT DEE",
