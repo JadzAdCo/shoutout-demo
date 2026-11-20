@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.046";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.046";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.047";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.047";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.047",
+      title: "s3.3.047 — floqmediaPlanTrace App Check enforcement",
+      checks: [
+        {label:"Unset enforces", file:"functions/floqmedia-plan-trace-core.js", includes:["!== \"0\""]},
+        {label:"Deployed value is 1", file:"functions/floqmedia-plan-trace-functions.js", includes:["FLOQR_APP_CHECK_ENFORCE: \"1\""], notIncludes:["FLOQR_APP_CHECK_ENFORCE: \"0\""]},
+        {label:"Merge keeps other env and sets 1", file:"functions/scripts/set-floqmedia-plan-trace-app-check-env.js", includes:["next[KEY] = \"1\""], notIncludes:["next[KEY] = \"0\""]},
+        {label:"Manual test expects 401", file:"ai-diagnostics-service.js", includes:["s3-3-046-app-check-master-logs", "FLOQR_APP_CHECK_ENFORCE is 1, not 0"]}
+      ]
+    },
     {
       version: "s3.3.046",
       title: "s3.3.046 — People SMARTview chip gaps + headless VIP reserV + Room join",
@@ -3496,10 +3506,10 @@
       id:"s3-3-046-app-check-master-logs",
       area:"Master Admin",
       feature:"App Check logs on Application Logging and Security Logs",
-      changed:"Spatial Studio plan trace verifies App Check in monitor mode and writes both results to appLogs. Diagnostics category app-check action spatial-plan-trace. Rejected passes also use category security action app-check on Security Logs → App Check. Enforcement stays off. A missing pass in monitor mode does not send a Security System Message and does not flash the Gemini failure light.",
-      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a commit whose message contains [firebase-deploy] and [firebase-deploy-spatial]. 2) Hard-refresh Master Admin → Diagnostics → Application Logging. Category filter placeholder includes app-check. 3) Security → Security Logs still lists venue display allow/deny above a new App Check subsection. 4) A Spatial Studio import with no pass still returns a trace while enforcement is off, and Application Logging shows a warn row category app-check (not gemini, not critical). 5) Mark Succeed/Failed.",
-      expected:"Venue display log is unchanged and still uses displayAccessLogs. App Check rows are appLogs only. Verified is info. Missing while enforcement is off is warn and does not flash Application Logging. Invalid or reused passes appear under Security Logs → App Check. FLOQR_APP_CHECK_ENFORCE is not 1.",
-      troubleshoot:"No App Check subsection → hard-refresh master-admin.html and master-display-security.js. Gemini tab flashes on a missing pass → the row was written category gemini or severity critical; it must be category app-check. Trace refused with no enforcement → FLOQR_APP_CHECK_ENFORCE was set to 1; leave it unset. 404 on floqmediaPlanTrace → spatial subset deploy did not finish."
+      changed:"Spatial Studio plan trace enforces App Check and writes both results to appLogs. Diagnostics category app-check action spatial-plan-trace. Rejected passes also use category security action app-check on Security Logs → App Check. A missing, invalid, or reused pass returns 401 and does not call Gemini. FLOQR_APP_CHECK_ENFORCE is 1. Unset still enforces. 0 is monitor mode for tests only.",
+      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a commit whose message contains [firebase-deploy] and [firebase-deploy-spatial]. 2) Hard-refresh Master Admin → Diagnostics → Application Logging. Category filter placeholder includes app-check. 3) Security → Security Logs still lists venue display allow/deny above App Check. 4) POST floqmediaPlanTrace from https://studio.floqmedia.com with no X-Firebase-AppCheck header. Expect HTTP 401 and no floor-plan trace. Application Logging shows category app-check (not gemini, not critical) and Security Logs → App Check shows the rejection. 5) Mark Succeed/Failed.",
+      expected:"Venue display log is unchanged and still uses displayAccessLogs. App Check rows are appLogs only. Verified is info. A missing pass is 401, category app-check plus category security, and does not flash Application Logging as a Gemini failure. FLOQR_APP_CHECK_ENFORCE is 1, not 0.",
+      troubleshoot:"No App Check subsection → hard-refresh master-admin.html and master-display-security.js. Gemini tab flashes on a missing pass → the row was written category gemini or severity critical; it must be category app-check. A missing pass still returns a trace → enforcement is off; FLOQR_APP_CHECK_ENFORCE must not be 0 and the function code default must reject. 404 on floqmediaPlanTrace → spatial subset deploy did not finish."
     },
     {
       id:"s3-3-038-smartvisuals-search-notification",
@@ -3756,10 +3766,10 @@
       id:"s3-3-039-floqmedia-plan-trace",
       area:"Si-nema / identity",
       feature:"Spatial Studio plan trace (floqmediaPlanTrace)",
-      changed:"HTTP floqmediaPlanTrace traces a guest PDF/SVG/image into a Spatial Studio proposal. Same Gemini engine as SmartView/BOT DEE, floor-plan prompt only. No FloqR session. CORS allows Content-Type, Authorization, and X-Firebase-AppCheck. App Check is monitor mode (FLOQR_APP_CHECK_ENFORCE is not 1): a missing pass is logged and the trace still runs. FloqR does not store the drawing or the pass. Deploy with [firebase-deploy-spatial].",
-      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a [firebase-deploy] [firebase-deploy-spatial] commit. 2) OPTIONS from https://studio.floqmedia.com is 204 and Access-Control-Allow-Headers includes X-Firebase-AppCheck. 3) On Spatial Studio /start (studio.floqmedia.com or localhost:3000), import a still image or PDF that is not a Spatial Studio SVG/project — a post with no App Check pass still returns a trace or a normal plan error, not 401. 4) The proposal card appears; Open this plan saves locally in the browser only. 5) A 13 MB file is refused. 6) Mark Succeed/Failed. Do not set FLOQR_APP_CHECK_ENFORCE. Do not turn on console enforcement. Do not deploy firestore.rules.",
-      expected:"A readable plan returns {ok:true, trace} with meters or null sizes + estimated/inferred. A missing pass in monitor mode still traces. Failures return a short error. No spatialGrantRefs or project row is written on FloqR. The pass is not stored.",
-      troubleshoot:"CORS error on X-Firebase-AppCheck → Allow-Headers is missing that name; redeploy floqmediaPlanTrace. 401 FloqR could not read that plan → FLOQR_APP_CHECK_ENFORCE is 1; this deploy must leave it unset. CORS origin error → origin is not studio.floqmedia.com / www / apex / localhost:3000 / 127.0.0.1:3000 / studio.localhost:3000. 404 → Functions CI did not include floqmediaPlanTrace. Unreadable → GEMINI_API_KEY not bound on that function; check Application Logging category gemini operation spatial-plan-trace (app_check_missing / app_check_invalid). Do not retarget Display 1."
+      changed:"HTTP floqmediaPlanTrace traces a guest PDF/SVG/image into a Spatial Studio proposal. Same Gemini engine as SmartView/BOT DEE, floor-plan prompt only. No FloqR session. CORS allows Content-Type, Authorization, and X-Firebase-AppCheck. App Check is enforced: a missing, invalid, or reused pass returns 401 and Gemini does not run. FLOQR_APP_CHECK_ENFORCE is 1. Unset still enforces. FloqR does not store the drawing or the pass. Deploy with [firebase-deploy-spatial].",
+      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a [firebase-deploy] [firebase-deploy-spatial] commit. 2) OPTIONS from https://studio.floqmedia.com is 204 and Access-Control-Allow-Headers includes X-Firebase-AppCheck. 3) POST the same origin with a small image and no X-Firebase-AppCheck header. Expect HTTP 401 and {ok:false, error:\"This request was not accepted.\"} with no trace. 4) On Spatial Studio /start, import a still image or PDF that is not a Spatial Studio SVG/project. The page sends a limited-use pass. A verified pass returns a trace or a normal plan error, not 401. 5) The proposal card appears; Open this plan saves locally in the browser only. 6) A 13 MB file is refused. 7) Mark Succeed/Failed. Do not set FLOQR_APP_CHECK_ENFORCE to 0. Do not turn on Firebase console enforcement. Do not edit firestore.rules.",
+      expected:"A readable plan with a verified pass returns {ok:true, trace} with meters or null sizes + estimated/inferred. A missing pass returns 401 and no trace. Failures return a short error. No spatialGrantRefs or project row is written on FloqR. The pass is not stored. FLOQR_APP_CHECK_ENFORCE is not 0.",
+      troubleshoot:"CORS error on X-Firebase-AppCheck → Allow-Headers is missing that name; redeploy floqmediaPlanTrace. 401 on a request that included a fresh pass → the pass was missing, invalid, reused, or for the wrong app. A missing pass returns a trace → enforcement is off; FLOQR_APP_CHECK_ENFORCE must not be 0. CORS origin error → origin is not studio.floqmedia.com / www / apex / localhost:3000 / 127.0.0.1:3000 / studio.localhost:3000. 404 → Functions CI did not include floqmediaPlanTrace. Unreadable with a verified pass → GEMINI_API_KEY not bound on that function; check Application Logging category gemini operation spatial-plan-trace. Do not retarget Display 1."
     },
     {
       id:"s3-3-020-ai-crawl-workspace",

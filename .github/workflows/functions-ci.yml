@@ -337,3 +337,12 @@ jobs:
             fi
           done
           echo "All ${#FNS[@]} functions deployed."
+
+      - name: Set FLOQR_APP_CHECK_ENFORCE=1 on floqmediaPlanTrace
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"
+        run: |
+          set -euo pipefail
+          export NODE_PATH="$(npm root -g)"
+          node functions/scripts/set-floqmedia-plan-trace-app-check-env.js
