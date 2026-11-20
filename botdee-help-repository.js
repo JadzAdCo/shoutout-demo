@@ -857,10 +857,11 @@
     {
       id: "help-botdee-headless-vip",
       title: "VIP reserV from BOT DEE chat",
-      body: "Say VIP reserV, I want a reservation at Aurelia, or hold a VIP table in BOT DEE. Name the club, night, and table or area. Mezzanine is an area — BOT DEE lists V1–V4 and AURELIA SUITE so you can pick a table, then tap Hold it, tap I agree to Terms, and pay if a deposit is required. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment.",
+      body: "Say book a table at Aurelia, hold a table, or I want a reservation in BOT DEE. The VIP reserV card shows nights, the 2D floor areas (Mezzanine, West Booths, Dance Floor, Bar Lounge), and tables. Tap a night, tap an area, tap a table (V1–V4 or AURELIA SUITE on the mezzanine), then Hold it, I agree to Terms, and pay if a deposit is required. Open VIP reserV map is the full pinch-zoom plan. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment.",
       searchPhrases: [
-        "headless vip", "vip from chat", "hold a vip table at aurelia", "mezzanine",
-        "vip reserv bot dee", "book vip in bot dee", "v1 aurelia", "hold it vip"
+        "headless vip", "vip from chat", "hold a table at aurelia", "book a table",
+        "do a reservation", "mezzanine", "vip reserv bot dee", "book vip in bot dee",
+        "v1 aurelia", "hold it vip", "floor plan bot dee"
       ],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},

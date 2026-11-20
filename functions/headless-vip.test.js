@@ -30,13 +30,37 @@ test("Mezzanine at Aurelia lists V1–V4 and AURELIA SUITE, not a miss", () => {
 
 test("VIP execute prompts vs how-to", () => {
   assert.equal(vip.isVipExecutePrompt("VIP reserV"), true);
-  assert.equal(vip.isVipExecutePrompt("hold a VIP table at Aurelia"), true);
-  assert.equal(vip.isVipExecutePrompt("book a table at Decades for 4"), true);
-  assert.equal(vip.isVipExecutePrompt("Do a visit reservation at Aurelia"), true);
+  assert.equal(vip.isVipExecutePrompt("hold a table at Aurelia"), true);
+  assert.equal(vip.isVipExecutePrompt("book a table"), true);
+  assert.equal(vip.isVipExecutePrompt("do a reservation"), true);
   assert.equal(vip.isVipExecutePrompt("I want a reservation at Aurelia"), true);
+  assert.equal(vip.isVipExecutePrompt("Do a visit reservation at Aurelia"), true);
   assert.equal(vip.isVipExecutePrompt("VIP reserv at Aurelia"), true);
   assert.equal(vip.isVipExecutePrompt("how do I book a VIP table"), false);
   assert.equal(vip.isVipExecutePrompt("throw a shoutout at Aurelia"), false);
+});
+
+test("VIP card nights and 2D area map", () => {
+  const nights = vip.nightOptions(vip.tonightIso());
+  assert.ok(nights.length >= 7);
+  assert.equal(nights[0].prompt, "tonight");
+  assert.equal(nights[0].label, "Tonight");
+  assert.equal(nights[1].iso, vip.addDaysIso(vip.tonightIso(), 1));
+  const parsed = vip.parseVipExecute("book a table at Aurelia");
+  let draft = vip.mergeInteractiveDraft(null, parsed);
+  const overview = vip.mapLiteForClub(draft.clubQuery, draft);
+  assert.ok(overview);
+  assert.match(overview.imageUrl, /aurelia-floor-map/);
+  assert.equal(overview.selectedAreaId, "");
+  assert.ok(overview.areas.some(row => /mezzanine/i.test(row.name)));
+  draft = vip.applySectionMatch(draft, "Mezzanine").draft;
+  const mezz = vip.mapLiteForClub(draft.clubQuery, draft);
+  assert.ok(/mezzanine/i.test(mezz.selectedAreaName));
+  assert.ok(mezz.tables.some(row => row.label === "V1"));
+  assert.equal(vip.isOverviewPrompt("all areas"), true);
+  assert.equal(vip.isFloorNavPrompt("Floor", {clubQuery: "decades-washington-dc"}), true);
+  assert.equal(vip.isInteractiveFollowUp("Floor", {clubQuery: "decades-washington-dc"}), true);
+  assert.equal(vip.isInteractiveFollowUp("hello", {clubQuery: "temp-democlub-1"}), false);
 });
 
 test("Aurelia display name hides demo slug", () => {
@@ -111,6 +135,8 @@ test("VIP follow-up does not swallow people lookup or hello", () => {
 test("VIP dock has a Hold it CTA and strips the demo slug", () => {
   const smart = read("botdee-smartview.js");
   assert.match(smart, /botdee\.vip\.holdIt/);
+  assert.match(smart, /botdee-vip-map/);
+  assert.match(smart, /botdee-vip-rail/);
   assert.match(smart, /data-vip-prompt="hold it"/);
   assert.match(smart, /data-vip-prompt="I agree"/);
   assert.match(smart, /temp-democlub-1/i);

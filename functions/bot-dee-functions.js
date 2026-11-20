@@ -432,8 +432,22 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
     });
   }
   let merged = headless.mergeInteractiveDraft(previousDraft, parsed);
-  if (parsed.sectionQuery) {
+  if (headless.isOverviewPrompt(userPrompt)) {
+    merged.sectionId = "";
+    merged.sectionLabel = "";
+    merged.sectionQuery = "";
+    merged.matches = [];
+  } else if (parsed.sectionQuery) {
     merged = headless.applySectionMatch(merged, parsed.sectionQuery).draft;
+  } else if (
+    !parsed.confirmHold
+    && !parsed.acceptTerms
+    && !parsed.cancel
+    && !parsed.night
+    && !parsed.partySize
+    && headless.isFloorNavPrompt(userPrompt, merged)
+  ) {
+    merged = headless.applySectionMatch(merged, userPrompt).draft;
   }
   if (headless.isBareAffirmative(userPrompt) && merged.matches.length === 1 && !merged.sectionId) {
     merged.sectionId = merged.matches[0].id;

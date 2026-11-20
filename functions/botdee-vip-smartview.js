@@ -55,6 +55,8 @@ function buildVipSmartView(opts = {}) {
     passHref: text(options.passHref, 200),
     needs,
     matches: draft.matches || [],
+    nights: vip.nightOptions(draft.night),
+    map: vip.mapLiteForClub(draft.clubQuery, draft),
     suggestions: suggestionPrompts(draft),
     vipHref: draft.clubQuery
       ? `./vip.html?from=botdee&location=${encodeURIComponent(draft.clubQuery)}`

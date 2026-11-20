@@ -1213,28 +1213,65 @@
     return `<button type="button" class="botdee-sv-tag botdee-vip-chip${selected ? " is-on" : ""}" data-vip-prompt="${esc(prompt)}">${esc(label || prompt)}</button>`;
   }
 
+  function vipMapHtml(map) {
+    if (!map || typeof map !== "object" || !map.imageUrl) return "";
+    const vb = map.viewBox && typeof map.viewBox === "object" ? map.viewBox : {x: 0, y: 0, w: 1, h: 1};
+    const vw = Math.max(0.08, Number(vb.w) || 1);
+    const vh = Math.max(0.08, Number(vb.h) || 1);
+    const sizeX = (1 / vw) * 100;
+    const sizeY = (1 / vh) * 100;
+    const posX = -(Number(vb.x) || 0) / vw * 100;
+    const posY = -(Number(vb.y) || 0) / vh * 100;
+    const tables = (Array.isArray(map.tables) ? map.tables : []).map(table => {
+      const r = table.rect || {};
+      const left = ((Number(r.x) - Number(vb.x || 0)) / vw) * 100;
+      const top = ((Number(r.y) - Number(vb.y || 0)) / vh) * 100;
+      const tw = (Number(r.w) / vw) * 100;
+      const th = (Number(r.h) / vh) * 100;
+      return `<button type="button" class="botdee-vip-seat${table.selected ? " is-on" : ""}" style="left:${left}%;top:${top}%;width:${Math.max(tw, 8)}%;height:${Math.max(th, 10)}%" data-vip-prompt="${esc(table.prompt || table.label)}">${esc(table.label)}</button>`;
+    }).join("");
+    return `<div class="botdee-vip-map" style="background-image:url('${esc(map.imageUrl)}');background-size:${sizeX}% ${sizeY}%;background-position:${posX}% ${posY}%" role="group" aria-label="${esc(t("botdee.vip.openMap", "Open VIP reserV map"))}">${tables}</div>`;
+  }
+
   function renderVipCard(payload) {
     const view = payload && typeof payload === "object" ? payload : {};
     const mode = String(view.mode || "draft");
+    const map = view.map && typeof view.map === "object" ? view.map : null;
+    const nights = Array.isArray(view.nights) ? view.nights : [];
+    const areas = Array.isArray(map?.areas) ? map.areas : [];
     const matches = Array.isArray(view.matches) ? view.matches : [];
-    const chips = matches.length
-      ? matches.slice(0, 8).map(row => vipChip(row.label || row.id, row.id === view.sectionId)).join("")
-      : (Array.isArray(view.suggestions) ? view.suggestions.filter(s => s.group === "section").slice(0, 6).map(s => vipChip(s.prompt, false)).join("") : "");
+    const tableChips = (matches.length ? matches : (map?.tables || [])).slice(0, 8)
+      .map(row => vipChip(row.label || row.prompt || row.id, row.id === view.sectionId || row.selected))
+      .join("");
+    const nightChips = nights.map(row => vipChip(row.prompt, !!row.selected, row.label)).join("");
+    const areaChips = areas.map(row => vipChip(row.prompt, row.id === map.selectedAreaId, row.name)).join("");
     const vipHref = resolveSameOriginHref(view.vipHref || "./vip.html?from=botdee");
     const payHref = resolveSameOriginHref(view.checkoutUrl || "");
     const venue = String(view.venueName || "").replace(/temp-democlub-1/i, "Aurelia").trim();
+    const party = Math.max(1, Math.floor(Number(view.partySize) || 2));
     const cta = payHref
       ? `<a class="botdee-sv-action botdee-sv-action-main" href="${esc(payHref)}">${esc(t("botdee.vip.pay", "Pay securely"))}</a>`
       : (mode === "hold"
         ? `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-prompt="I agree">${esc(t("botdee.vip.agree", "I agree"))}</button>`
         : `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-prompt="hold it">${esc(t("botdee.vip.holdIt", "Hold it"))}</button>`);
+    const areaNav = map?.selectedAreaId
+      ? `${vipChip("all areas", false, t("botdee.vip.allAreas", "All areas"))}${areaChips}`
+      : areaChips;
     return `<article class="botdee-sv-vip" data-kind="botDeeVip" data-vip-mode="${esc(mode)}">
       <h2 class="botdee-so-title">${esc(t("botdee.vip.title", "VIP reserV"))}</h2>
       <p class="botdee-so-sub">${esc(venue || t("botdee.vip.hint", "Hold a table from this chat. Joining a room is not a payment."))}</p>
-      <div class="botdee-so-row"><span>${esc(t("botdee.vip.night", "Night"))}</span><strong>${esc(view.night || "—")}</strong></div>
-      <div class="botdee-so-row"><span>${esc(t("botdee.vip.section", "Table"))}</span><strong>${esc(view.sectionLabel || view.sectionId || "—")}</strong></div>
-      <div class="botdee-so-row"><span>${esc(t("botdee.vip.party", "Party"))}</span><strong>${esc(String(view.partySize || "—"))}</strong></div>
-      <div class="botdee-sv-tags">${chips}${vipChip("tonight")}</div>
+      <p class="botdee-vip-kicker">${esc(t("botdee.vip.mapHint", "Tap a night, then an area, then a table."))}</p>
+      <div class="botdee-vip-rail" aria-label="${esc(t("botdee.vip.night", "Night"))}">${nightChips || vipChip("tonight", true, t("botdee.vip.tonight", "Tonight"))}</div>
+      <div class="botdee-vip-rail" aria-label="${esc(t("botdee.vip.pickArea", "Area"))}">${areaNav}</div>
+      ${vipMapHtml(map)}
+      <div class="botdee-so-row"><span>${esc(t("botdee.vip.section", "Table"))}</span><strong>${esc(view.sectionLabel || view.sectionId || (map?.selectedAreaName || "—"))}</strong></div>
+      <div class="botdee-sv-tags">${tableChips}</div>
+      <div class="botdee-vip-party">
+        <span>${esc(t("botdee.vip.party", "Party"))}</span>
+        <button type="button" class="botdee-vip-step" data-vip-prompt="${Math.max(1, party - 1)} guests" aria-label="-">−</button>
+        <strong>${esc(String(party))}</strong>
+        <button type="button" class="botdee-vip-step" data-vip-prompt="${Math.min(40, party + 1)} guests" aria-label="+">+</button>
+      </div>
       <div class="botdee-sv-people-actions">
         ${cta}
         <a class="botdee-sv-action" href="${esc(vipHref)}">${esc(t("botdee.vip.openMap", "Open VIP reserV map"))}</a>

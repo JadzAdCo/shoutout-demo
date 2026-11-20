@@ -137,11 +137,13 @@
       href: pageUrl("./vip.html", {from: "botdee"}),
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
+        "do a reservation", "hold a table", "hold a table at aurelia",
         "table reservation", "vip booth", "bottle service reservation", "floor map booking",
-        "headless vip", "hold a vip table at aurelia", "mezzanine"
+        "headless vip", "mezzanine"
       ],
       patterns: [
         /vip\s*reserv/, /vipreserv/, /vip\s*table/, /book\s+(a\s+)?(vip\s+)?table/,
+        /hold\s+(a\s+)?(vip\s+)?table/, /do\s+(a\s+)?reservation/,
         /reserve\s+(a\s+)?(vip\s+)?table/, /table\s+reservation/, /vip\s*booth/,
         /bottle\s+service\s+(book|reserv)/, /floor\s*map\s+(book|reserv)/
       ]

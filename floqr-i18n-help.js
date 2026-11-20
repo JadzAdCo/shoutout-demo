@@ -235,7 +235,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV из чата BOT DEE",
-        body: "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview — не платёж."
+        body: "Скажите book a table at Aurelia, hold a table или I want a reservation в BOT DEE. Карточка VIP reserV показывает вечера, 2D-зоны зала (Mezzanine, West Booths, Dance Floor, Bar Lounge) и столы. Нажмите вечер, зону, стол (V1–V4 или AURELIA SUITE на mezzanine), затем Hold it, I agree к Terms и оплатите, если нужен депозит. Open VIP reserV map — полный план. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview — не платёж."
       },
       "help-vip-book-table": {
         title: "Забронировать VIP-стол (VIP reserV)",
@@ -737,7 +737,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV vanuit BOT DEE-chat",
-        body: "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Room SMARTview is geen betaling."
+        body: "Zeg book a table at Aurelia, hold a table of I want a reservation in BOT DEE. De VIP reserV-kaart toont avonden, 2D-zones (Mezzanine, West Booths, Dance Floor, Bar Lounge) en tafels. Tik een avond, een zone, een tafel (V1–V4 of AURELIA SUITE op de mezzanine), daarna Hold it, I agree bij Terms, en betaal als er een deposit nodig is. Open VIP reserV map is het volledige plan. BOT DEE neemt nooit kaartnummers. Deelnemen aan Room SMARTview is geen betaling."
       },
       "help-vip-book-table": {
         title: "VIP-tafel boeken (VIP reserV)",
@@ -1239,7 +1239,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV depuis le chat BOT DEE",
-        body: "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de carte. Rejoindre un Room SMARTview n’est pas un paiement."
+        body: "Dites book a table at Aurelia, hold a table ou I want a reservation dans BOT DEE. La carte VIP reserV montre les soirs, les zones 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) et les tables. Touchez un soir, une zone, une table (V1–V4 ou AURELIA SUITE sur la mezzanine), puis Hold it, I agree aux Terms, et payez si un dépôt est requis. Open VIP reserV map est le plan complet. BOT DEE ne prend jamais de numéros de carte. Rejoindre un Room SMARTview n’est pas un paiement."
       },
       "help-vip-book-table": {
         title: "Réserver une table VIP (VIP reserV)",
@@ -1741,7 +1741,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV aus dem BOT DEE-Chat",
-        body: "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennummern. Room SMARTview beitreten ist keine Zahlung."
+        body: "Sagen Sie book a table at Aurelia, hold a table oder I want a reservation in BOT DEE. Die VIP reserV-Karte zeigt Abende, 2D-Bereiche (Mezzanine, West Booths, Dance Floor, Bar Lounge) und Tische. Tippen Sie Abend, Bereich, Tisch (V1–V4 oder AURELIA SUITE auf der Mezzanine), dann Hold it, I agree zu Terms, und zahlen Sie, wenn eine Kaution nötig ist. Open VIP reserV map ist der volle Plan. BOT DEE nimmt nie Kartennummern. Room SMARTview beitreten ist keine Zahlung."
       },
       "help-vip-book-table": {
         title: "VIP-Tisch buchen (VIP reserV)",
@@ -2243,7 +2243,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV desde el chat de BOT DEE",
-        body: "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no es un pago."
+        body: "Di book a table at Aurelia, hold a table o I want a reservation en BOT DEE. La tarjeta VIP reserV muestra noches, zonas 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) y mesas. Toca una noche, una zona, una mesa (V1–V4 o AURELIA SUITE en el mezzanine), luego Hold it, I agree a Terms, y paga si hay depósito. Open VIP reserV map es el plano completo. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no es un pago."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -2745,7 +2745,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV dalla chat BOT DEE",
-        body: "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview non è un pagamento."
+        body: "Di’ book a table at Aurelia, hold a table o I want a reservation in BOT DEE. La scheda VIP reserV mostra serate, zone 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) e tavoli. Tocca una serata, una zona, un tavolo (V1–V4 o AURELIA SUITE sul mezzanine), poi Hold it, I agree ai Terms, e paga se serve un deposito. Open VIP reserV map è la mappa completa. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview non è un pagamento."
       },
       "help-vip-book-table": {
         title: "Prenota un tavolo VIP (VIP reserV)",
@@ -3247,7 +3247,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV a partir do chat BOT DEE",
-        body: "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SMARTview não é um pagamento."
+        body: "Diga book a table at Aurelia, hold a table ou I want a reservation no BOT DEE. O cartão VIP reserV mostra noites, zonas 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) e mesas. Toque numa noite, numa zona, numa mesa (V1–V4 ou AURELIA SUITE no mezzanine), depois Hold it, I agree aos Terms, e pague se houver depósito. Open VIP reserV map é o plano completo. BOT DEE nunca pede números de cartão. Entrar num Room SMARTview não é um pagamento."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -3749,7 +3749,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV από τη συνομιλία BOT DEE",
-        body: "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Η είσοδος σε Room SMARTview δεν είναι πληρωμή."
+        body: "Πείτε book a table at Aurelia, hold a table ή I want a reservation στο BOT DEE. Η κάρτα VIP reserV δείχνει βραδιές, ζώνες 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) και τραπέζια. Πατήστε βραδιά, ζώνη, τραπέζι (V1–V4 ή AURELIA SUITE στο mezzanine), μετά Hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Open VIP reserV map είναι το πλήρες σχέδιο. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Η είσοδος σε Room SMARTview δεν είναι πληρωμή."
       },
       "help-vip-book-table": {
         title: "Κράτηση VIP τραπεζιού (VIP reserV)",
@@ -4251,7 +4251,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV z czatu BOT DEE",
-        body: "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołączenie do Room SMARTview nie jest płatnością."
+        body: "Powiedz book a table at Aurelia, hold a table albo I want a reservation w BOT DEE. Karta VIP reserV pokazuje wieczory, strefy 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) i stoliki. Dotknij wieczoru, strefy, stolika (V1–V4 lub AURELIA SUITE na mezzanine), potem Hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. Open VIP reserV map to pełny plan. BOT DEE nigdy nie bierze numerów kart. Dołączenie do Room SMARTview nie jest płatnością."
       },
       "help-vip-book-table": {
         title: "Zarezerwuj stolik VIP (VIP reserV)",
@@ -4753,7 +4753,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV من محادثة BOT DEE",
-        body: "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
+        body: "قل book a table at Aurelia أو hold a table أو I want a reservation في BOT DEE. بطاقة VIP reserV تعرض الليالي ومناطق الخريطة ثنائية الأبعاد (Mezzanine وWest Booths وDance Floor وBar Lounge) والطاولات. اضغط الليلة ثم المنطقة ثم الطاولة (V1–V4 أو AURELIA SUITE في mezzanine) ثم Hold it وI agree لـ Terms وادفع إن لزم عربون. Open VIP reserV map هي الخطة الكاملة. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
       },
       "help-vip-book-table": {
         title: "حجز طاولة VIP (VIP reserV)",
