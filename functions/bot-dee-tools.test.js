@@ -306,6 +306,28 @@ test("signed-in Don searching Who is Don still lists other public Dons, not only
   assert.match(src, /Shared first\/last names include the viewer AND the public directory/);
 });
 
+test("my friend Don does not inject the signed-in viewer named Don", () => {
+  const otherDon = {
+    publicProfileVisibility: "public",
+    firstName: "Don",
+    lastName: "Smith",
+    displayName: "Don Smith",
+    floqrHandle: "donsmith"
+  };
+  const hits = tools.rankPeopleIdentityHits({
+    query: "my friend Don",
+    viewerUid: "viewer-don",
+    viewerData: DON_ALIASES,
+    directory: [{id: "other-don", data: otherDon, relation: "connection"}]
+  });
+  assert.equal(hits.friendContext, true);
+  assert.equal(hits.exclusiveSelf, false);
+  assert.ok(!hits.ids.includes("viewer-don"), "friend search does not inject signed-in Don");
+  assert.ok(hits.ids.includes("other-don"), "friend search keeps the connected Don");
+  const src = require("fs").readFileSync(require("path").join(__dirname, "bot-dee-tools.js"), "utf8");
+  assert.match(src, /!friendContext && matchNeedle/);
+});
+
 test("injectSelfProfile does not send Mingl datapoints from a non-public self profile", () => {
   const privateSelf = {
     ...SAMPLE_PUBLIC,

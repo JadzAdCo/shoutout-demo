@@ -1032,8 +1032,9 @@ function rankPeopleIdentityHits({query, viewerUid, viewerData = {}, directory = 
     .filter(t => t.length > 1 && !PEOPLE_LOOKUP_STOPS.has(t) && !FRIEND_NAME_STOPS.has(t));
   const scored = [];
   const seen = new Set();
-  const selfIdentityHit = !!(viewerUid && viewerData && matchNeedle
+  const selfIdentityHit = !!(viewerUid && viewerData && !friendContext && matchNeedle
     && scorePerson(viewerData, matchNeedle, tokens) >= 8);
+  // Exclusive self, or a shared name on a non-friend lookup. Friend asks stay on connections.
   if (viewerUid && viewerData && (exclusiveSelf || selfIdentityHit)) {
     scored.push(selfProfileCard(viewerUid, viewerData, 100, {relation: "self"}));
     seen.add(viewerUid);
@@ -1238,9 +1239,10 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   const tokens = String(matchNeedle || "")
     .split(/\s+/)
     .filter(t => t.length > 1 && !PEOPLE_LOOKUP_STOPS.has(t) && !FRIEND_NAME_STOPS.has(t));
-  const selfIdentityHit = wantPeople && viewerData && matchNeedle
+  const selfIdentityHit = wantPeople && viewerData && !friendContext && matchNeedle
     && scorePerson(viewerData, matchNeedle, tokens) >= 8;
   // Shared first/last names include the viewer AND the public directory.
+  // Friend asks stay on connections — never inject the signed-in namesake.
   if (wantPeople && viewerData && (exclusiveSelf || selfIdentityHit)) {
     scored.push(selfProfileCard(viewerUid, viewerData, 100, {relation: "self"}));
     seen.add(viewerUid);
