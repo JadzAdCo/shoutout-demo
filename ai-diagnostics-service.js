@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.054";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.054";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.055";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.055";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,19 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.055",
+      title: "s3.3.055 — Headless VIP reserV intercept, Hold it CTA, Aurelia copy",
+      checks: [
+        {label:"Reservation phrasing intercept", file:"functions/headless-vip-core.js", includes:["clubDisplayName", "isRepeatSelectedSection", "reservation"]},
+        {label:"Hold errors stay headless", file:"functions/bot-dee-functions.js", includes:["VIP reserV could not place that hold", "clubDisplayName", "mode: \"cancelled\""]},
+        {label:"Tonight becomes ISO night", file:"functions/bot-dee-tools.js", includes:["parseNight", "That table could not be held"]},
+        {label:"Hold it CTA on dock", file:"botdee-smartview.js", includes:["botdee.vip.holdIt", "data-vip-prompt=\"hold it\"", "botdee-vip-map", "mode === \"cancelled\""]},
+        {label:"iOS keyboard uses layout height", file:"bot-dee-chat.js", includes:["documentElement.clientHeight"]},
+        {label:"VIP dock shrinks with keyboard", file:"bot-dee-chat.css", includes:[".botdee-vip-dock.is-open", "--botdee-kb"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-055-headless-vip-ux"]}
+      ]
+    },
     {
       version: "s3.3.054",
       title: "s3.3.054 — BOT DEE people search is identity-only; compact picker cards",
@@ -3587,6 +3600,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-055-headless-vip-ux",
+      area:"BOT DEE",
+      feature:"Headless VIP reserV from natural reservation phrasing",
+      changed:"s3.3.055 — book a table / hold a table at Aurelia / do a reservation stay on headless VIP. Dock has a night rail, 2D area map (tap Mezzanine then V1), party stepper, and Hold it. Copy says Aurelia. Hold failures return the real club/night error. No card numbers in chat.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / bot-dee-chat.js / floqr-i18n.js ?v=s3.3.055. Sign in with BOT DEE + VIP reserV. New chat. 2) Send book a table at Aurelia (or hold a table / do a reservation) — VIP reserV dock named Aurelia, night chips, area chips, floor thumbnail — not a markdown VIP Tables dump. 3) Tap Mezzanine (or a later night) — map crops to that area; V1–V4 and AURELIA SUITE are tappable. 4) Tap V1 then Hold it. If the night is closed, the reply names that — not a temporary system hiccup. 5) If held, tap I agree. Pay securely opens Stripe; BOT DEE never asks for card numbers. 6) Type cancel — the hold is released and the VIP dock unmounts (Hold it / I agree gone). 7) Open VIP reserV map is the full pinch-zoom plan. 8) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Natural book/hold/reservation phrasing stays on VIP reserV. Dock lets you pick night, area, and table on the 2D plan. Cancel unmounts the dock. Aurelia not the demo slug. Hold errors are real. No card numbers.",
+      troubleshoot:"Still Gemini markdown → executeBotSession not this SHA (isVipExecutePrompt missing reservation). temp-democlub-1 still in copy → cached Functions or botdee-smartview.js. Hold it missing → cached botdee-smartview.js. Cancel still shows Hold it → Functions missing mode cancelled or cached botdee-smartview.js applyVipPreviewFromViews. Hiccup → createVipHold still throwing; confirm parseNight + catch on this SHA. Closed night is expected if Aurelia hoursStructured marks tonight closed — pick another night chip. White gap under composer → cached bot-dee-chat.js without clientHeight keyboard offset. Functions deny vipReservations → Features & Services VIP still off for that account."
+    },
     {
       id:"s3-3-054-people-identity-only",
       area:"BOT DEE",

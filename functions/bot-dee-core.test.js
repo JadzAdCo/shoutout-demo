@@ -63,6 +63,10 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.equal(bot.isShoutOutExecutePrompt("at Decades that says Happy birthday Maya"), false);
   assert.equal(bot.isVipExecutePrompt("VIP reserV"), true);
   assert.equal(bot.isVipExecutePrompt("hold a VIP table at Aurelia"), true);
+  assert.equal(bot.isVipExecutePrompt("do a reservation"), true);
+  assert.equal(bot.isVipExecutePrompt("book a table"), true);
+  assert.equal(bot.isVipExecutePrompt("hold a table at Aurelia"), true);
+  assert.equal(bot.isVipExecutePrompt("I want a reservation at Aurelia"), true);
   assert.equal(bot.isVipExecutePrompt("how do I book a VIP table"), false);
   assert.equal(bot.omitContextualSearchForPrompt("VIP reserV", ["vipReservations", "botDee"]), true);
   assert.equal(bot.omitContextualSearchForPrompt(longThrow, ["shoutOut", "botDee"]), true);

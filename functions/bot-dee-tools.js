@@ -497,13 +497,37 @@ async function createVipHold(args, sessionRequest) {
       sectionQuery: wanted
     };
   }
-  const result = await vip.runCreateVipHold(asRequest(sessionRequest, {
-    clubLocationId,
-    night: args?.night || headlessVip.tonightIso(),
-    sectionId: match.matches[0].id,
-    partySize: args?.partySize || headlessVip.DEFAULT_PARTY
-  }));
-  return {ok: true, tool: "createVipHold", clubLocationId, sectionId: match.matches[0].id, ...result};
+  try {
+    const result = await vip.runCreateVipHold(asRequest(sessionRequest, {
+      clubLocationId,
+      night: headlessVip.parseNight(args?.night) || args?.night || headlessVip.tonightIso(),
+      sectionId: match.matches[0].id,
+      partySize: args?.partySize || headlessVip.DEFAULT_PARTY
+    }));
+    return {ok: true, tool: "createVipHold", clubLocationId, sectionId: match.matches[0].id, ...result};
+  } catch (error) {
+    const message = String(error?.message || error || "").trim()
+      || "That table could not be held. Pick another section.";
+    return {
+      ok: false,
+      tool: "createVipHold",
+      clubLocationId,
+      error: message,
+      sectionId: match.matches[0].id
+    };
+  }
+}
+
+async function releaseVipHold(args, sessionRequest) {
+  const holdId = text(args?.holdId, 120);
+  if (!holdId) return {ok: false, tool: "releaseVipHold", error: "holdId is required."};
+  try {
+    await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
+    const result = await vip.runReleaseVipHold(asRequest(sessionRequest, {holdId}));
+    return {ok: true, tool: "releaseVipHold", ...result};
+  } catch (error) {
+    return toolError(error);
+  }
 }
 
 async function recordVipConsent(args, sessionRequest) {
@@ -1380,6 +1404,7 @@ module.exports = {
   startShoutOutCheckout,
   getVipAvailability,
   createVipHold,
+  releaseVipHold,
   recordVipConsent,
   createVipCheckout,
   createFloqCastRequest,

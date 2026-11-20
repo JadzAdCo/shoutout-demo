@@ -1,5 +1,13 @@
 [
   {
+    "id": "s3.3.055",
+    "text": "s3.3.055: Headless VIP reserV: book/hold a table phrasing, night rail, 2D map, cancel unmounts dock",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.055: book a table / hold a table at Aurelia / do a reservation stay on VIP reserV with a 2D floor dock"
+  },
+  {
     "id": "s3.3.054",
     "text": "s3.3.054: BOT DEE people search is identity-only (not bios) and compact picker cards",
     "audiences": [

@@ -721,6 +721,12 @@ body.botdee-photo-popout-page {
 .botdee-so-dock .botdee-sv-vip {
   margin: 0;
 }
+.botdee-vip-dock.is-open {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: min(52vh, 24rem, calc(100dvh - 12.5rem - var(--botdee-kb, 0px)));
+  overflow: auto;
+}
 .botdee-so-dock .botdee-so-foot {
   display: none;
 }

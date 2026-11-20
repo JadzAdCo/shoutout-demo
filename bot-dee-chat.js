@@ -500,7 +500,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.054";
+    return "s3.3.055";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -1694,7 +1694,8 @@
           document.documentElement.style.setProperty("--botdee-kb", "0px");
           return;
         }
-        const occluded = Math.max(0, (global.innerHeight || 0) - vv.height - (vv.offsetTop || 0));
+        const layout = Math.max(document.documentElement.clientHeight || 0, global.innerHeight || 0);
+        const occluded = Math.max(0, layout - vv.height - (vv.offsetTop || 0));
         document.documentElement.style.setProperty("--botdee-kb", `${Math.round(occluded)}px`);
       } catch (_) {}
     };

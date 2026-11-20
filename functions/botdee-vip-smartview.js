@@ -43,7 +43,7 @@ function buildVipSmartView(opts = {}) {
     kind: KIND,
     generatedAtIso: new Date().toISOString(),
     mode,
-    venueName: text(options.venueName || draft.clubQuery, 80),
+    venueName: text(options.venueName || vip.clubDisplayName(draft.clubQuery) || draft.clubQuery, 80),
     clubLocationId: text(draft.clubQuery, 120),
     night: text(draft.night, 12),
     sectionId: text(draft.sectionId, 80),
@@ -55,6 +55,8 @@ function buildVipSmartView(opts = {}) {
     passHref: text(options.passHref, 200),
     needs,
     matches: draft.matches || [],
+    nights: vip.nightOptions(draft.night),
+    map: vip.mapLiteForClub(draft.clubQuery, draft),
     suggestions: suggestionPrompts(draft),
     vipHref: draft.clubQuery
       ? `./vip.html?from=botdee&location=${encodeURIComponent(draft.clubQuery)}`

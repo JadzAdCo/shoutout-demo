@@ -488,7 +488,7 @@ async function runCreateVipHold(request) {
 exports.createVipHold = onCall(CALL_OPTS, runCreateVipHold);
 
 
-exports.releaseVipHold = onCall(CALL_OPTS, async request => {
+async function runReleaseVipHold(request) {
   await assertFeatureAccess(request.auth, "vipReservations", request);
   const uid = requireAuth(request.auth);
   const holdId = text(request.data?.holdId, 120);
@@ -519,7 +519,9 @@ exports.releaseVipHold = onCall(CALL_OPTS, async request => {
   });
 
   return {ok: true, holdId};
-});
+}
+
+exports.releaseVipHold = onCall(CALL_OPTS, runReleaseVipHold);
 
 async function runRecordVipConsent(request) {
   await assertFeatureAccess(request.auth, "vipReservations", request);
@@ -1364,6 +1366,7 @@ exports.expireVipHolds = onSchedule({
 
 exports.__vipHelpers = {
   runCreateVipHold,
+  runReleaseVipHold,
   runRecordVipConsent,
   runConfirmVipReservationWithoutDeposit,
   fulfillVipReservationOrder,
