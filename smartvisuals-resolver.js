@@ -440,16 +440,257 @@
     return false;
   }
 
+  const EMPTY_WHEN = ["private-source-denied", "prompt-injection-ignored", "private-chat", "privateChat"];
+  const THEMATIC = ["travel", "fashion", "dining", "nightclub", "event", "sports", "hotel"];
+  const PLACE_LABELS = {
+    cancun: "Cancun",
+    paris: "Paris",
+    "washington-dc": "Washington, DC",
+    "new-york": "New York",
+    "los-angeles": "Los Angeles",
+    "san-diego": "San Diego",
+    milan: "Milan",
+    london: "London",
+    miami: "Miami",
+    ibiza: "Ibiza",
+    bali: "Bali",
+    barcelona: "Barcelona",
+    madrid: "Madrid",
+    lisbon: "Lisbon",
+    seattle: "Seattle",
+    atlanta: "Atlanta",
+    "burning-man": "Burning Man"
+  };
+
+  const DEFAULT_AD_POLICY = {
+    adsEnabled: false,
+    adsenseApproved: false,
+    mockFill: true,
+    mockFillKind: "contextual-from-authorized-tags",
+    placement: "below-room-smartview",
+    emptyWhen: EMPTY_WHEN.slice(),
+    targeting: "authorized-title-tags-only",
+    note: "Labeled mock fill from authorized SMARTview tags. Not a live advertiser or booked inventory. AdSense is not loaded."
+  };
+
+  function adPolicy(overrides) {
+    const o = overrides && typeof overrides === "object" ? overrides : {};
+    const emptyWhen = Array.isArray(o.emptyWhen)
+      ? o.emptyWhen.map(v => String(v || "").trim()).filter(Boolean)
+      : EMPTY_WHEN.slice();
+    return {
+      adsEnabled: false,
+      adsenseApproved: false,
+      mockFill: o.mockFill !== false,
+      mockFillKind: "contextual-from-authorized-tags",
+      placement: String(o.placement || DEFAULT_AD_POLICY.placement),
+      emptyWhen,
+      targeting: "authorized-title-tags-only",
+      note: String(o.note || DEFAULT_AD_POLICY.note)
+    };
+  }
+
+  function humanizePlace(placeId) {
+    const id = String(placeId || "").trim();
+    if (!id) return "";
+    if (PLACE_LABELS[id]) return PLACE_LABELS[id];
+    return id.split(/[-_]+/).filter(Boolean).map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+  }
+
+  function emptyAd(reasonCode) {
+    return {
+      fill: false,
+      kind: "none",
+      category: null,
+      placeId: "",
+      placeLabel: "",
+      kickerKey: "",
+      headlineKey: "",
+      headlineVars: {},
+      subKey: "sv.adSubMinglDeals",
+      disclaimerKey: "sv.adMockDisclaimer",
+      backgroundId: "",
+      stencilId: "",
+      reasonCode: reasonCode || "ad-policy-empty",
+      mock: true,
+      liveInventory: false,
+      advertiser: null
+    };
+  }
+
+  function mockAd(category, opts) {
+    const row = opts || {};
+    return {
+      fill: true,
+      kind: "mock-contextual",
+      category,
+      placeId: row.placeId || "",
+      placeLabel: row.placeLabel || "",
+      kickerKey: row.kickerKey,
+      headlineKey: row.headlineKey,
+      headlineVars: row.headlineVars || {},
+      subKey: "sv.adSubMinglDeals",
+      disclaimerKey: "sv.adMockDisclaimer",
+      backgroundId: row.backgroundId || "",
+      stencilId: row.stencilId || "",
+      reasonCode: row.reasonCode,
+      mock: true,
+      liveInventory: false,
+      advertiser: null
+    };
+  }
+
+  function isGeographicPlace(placeId, catalog) {
+    const id = String(placeId || "").trim();
+    if (!id) return false;
+    const aliases = (catalog && catalog.taxonomy && catalog.taxonomy.placeAliases) || {};
+    if (Object.keys(aliases).some(alias => (aliases[alias] && aliases[alias].placeId) === id)) return true;
+    const named = publishedAssets(catalog).find(a => a.type === "background" && a.placeId === id);
+    if (named) return true;
+    const bg = byId(catalog, backgroundIdOf(id));
+    return !!(bg && bg.placeId);
+  }
+
+  function destinationPlace(selection, catalog) {
+    const places = Array.isArray(selection.placeIds) ? selection.placeIds.map(String).filter(Boolean) : [];
+    const tags = Array.isArray(selection.tags) ? selection.tags.map(String) : [];
+    const dest = tags.find(tag => tag.indexOf("destination:") === 0);
+    const raw = places[0] || (dest ? dest.slice("destination:".length) : "");
+    return isGeographicPlace(raw, catalog) ? raw : "";
+  }
+
+  function hasTag(tags, key) {
+    return tags.indexOf(key) >= 0;
+  }
+
+  function thematicOf(category, tags) {
+    if (THEMATIC.indexOf(category) >= 0) return category;
+    for (let i = 0; i < THEMATIC.length; i++) {
+      if (hasTag(tags, THEMATIC[i])) return THEMATIC[i];
+    }
+    return "";
+  }
+
+  function selectAd(selection, policyOpt, catalogOpt) {
+    const policy = adPolicy(policyOpt);
+    const catalog = loadCatalog(catalogOpt);
+    const sel = selection && typeof selection === "object" ? selection : {};
+    const reason = String(sel.reasonCode || "");
+    const source = String(sel.sourceKind || "");
+    if (policy.mockFill !== true) return emptyAd("ad-policy-off");
+    const deny = {};
+    (policy.emptyWhen || []).forEach(key => { deny[key] = true; });
+    if (deny[reason] || deny[source] || sel.injectionIgnored === true) {
+      return emptyAd(sel.injectionIgnored || reason === "prompt-injection-ignored" ? "ad-injection-denied" : "ad-private-denied");
+    }
+    const tags = Array.isArray(sel.tags) ? sel.tags.map(String) : [];
+    const category = String(sel.category || "");
+    const theme = thematicOf(category, tags);
+    const placeId = destinationPlace(sel, catalog);
+    const placeLabel = humanizePlace(placeId);
+    const bg = String(sel.backgroundId || "");
+    const ambiguous = sel.ambiguous === true || reason === "collision";
+    const genericRoom = ambiguous
+      || reason === "no-signal"
+      || reason === "empty-title"
+      || reason === "below-threshold"
+      || hasTag(tags, "neutral")
+      || !theme;
+
+    if (genericRoom) {
+      return mockAd("generic", {
+        kickerKey: "sv.adKickerRoom",
+        headlineKey: "sv.adHeadlineRoom",
+        backgroundId: "bg-mingl-room",
+        stencilId: "st-people",
+        reasonCode: "ad-generic-room"
+      });
+    }
+    if (theme === "fashion") {
+      return mockAd("fashion", {
+        placeId,
+        placeLabel,
+        kickerKey: "sv.adKickerFashion",
+        headlineKey: placeLabel ? "sv.adHeadlineFashionPlace" : "sv.adHeadlineFashion",
+        headlineVars: placeLabel ? {place: placeLabel} : {},
+        backgroundId: bg,
+        stencilId: "st-fashion",
+        reasonCode: placeLabel ? "ad-fashion-place" : "ad-fashion"
+      });
+    }
+    if (theme === "dining") {
+      return mockAd("dining", {
+        placeId,
+        placeLabel,
+        kickerKey: "sv.adKickerDining",
+        headlineKey: "sv.adHeadlineDining",
+        backgroundId: bg || "bg-dining",
+        stencilId: "st-restaurant",
+        reasonCode: "ad-dining"
+      });
+    }
+    if (theme === "nightclub") {
+      return mockAd("nightclub", {
+        kickerKey: "sv.adKickerNightlife",
+        headlineKey: "sv.adHeadlineNightlife",
+        backgroundId: bg,
+        stencilId: "st-nightclub",
+        reasonCode: "ad-nightclub"
+      });
+    }
+    if (theme === "sports") {
+      return mockAd("sports", {
+        kickerKey: "sv.adKickerSports",
+        headlineKey: "sv.adHeadlineSports",
+        backgroundId: bg,
+        stencilId: "st-sports",
+        reasonCode: "ad-sports"
+      });
+    }
+    if (theme === "event") {
+      return mockAd("event", {
+        kickerKey: "sv.adKickerEvent",
+        headlineKey: "sv.adHeadlineEvent",
+        backgroundId: bg,
+        stencilId: "st-ticket",
+        reasonCode: "ad-event"
+      });
+    }
+    if (theme === "hotel") {
+      return mockAd("hotel", {
+        kickerKey: "sv.adKickerHotel",
+        headlineKey: "sv.adHeadlineHotel",
+        backgroundId: bg,
+        stencilId: "st-hotel",
+        reasonCode: "ad-hotel"
+      });
+    }
+    return mockAd("travel", {
+      placeId,
+      placeLabel,
+      kickerKey: "sv.adKickerTravel",
+      headlineKey: placeLabel ? "sv.adHeadlineFlyTo" : "sv.adHeadlineTravel",
+      headlineVars: placeLabel ? {place: placeLabel} : {},
+      backgroundId: bg,
+      stencilId: "st-flight",
+      reasonCode: placeLabel ? "ad-travel-place" : "ad-travel"
+    });
+  }
+
   return {
     SCHEMA,
     CONFIDENCE_THRESHOLD,
     TYPO_THRESHOLD,
+    DEFAULT_AD_POLICY,
     loadCatalog,
     classify,
     resolve,
     urlsFor,
     contentHash,
     geminiAllowed,
+    adPolicy,
+    humanizePlace,
+    selectAd,
     fold,
     similarity
   };

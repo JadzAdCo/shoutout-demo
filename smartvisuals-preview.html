@@ -8,25 +8,92 @@
   <link rel="stylesheet" href="./smartvisuals-view.css?v=s3.3.050"/>
   <style>
     body{margin:0;padding:16px;background:#05070c;color:#f4fbff}
-    .qa-row{display:grid;gap:16px;max-width:860px;margin:0 auto}
+    .qa-block{max-width:920px;margin:0 auto 28px}
+    .qa-row{display:grid;gap:16px}
     @media(min-width:820px){.qa-row{grid-template-columns:1fr 1fr}}
-    h1{font-size:16px;margin:0 0 12px}
+    h1{font-size:18px;margin:0 0 8px}
+    h2{font-size:14px;margin:0 0 10px;color:#9ad}
   </style>
 </head>
 <body data-floqr-public data-floqr-chrome="nightlife">
-  <h1>SMARTvisuals QA — Cancun Trip (synthetic)</h1>
-  <div class="qa-row">
-    <div id="notifyHost"></div>
-    <div id="roomHost"></div>
+  <div class="qa-block">
+    <h1>SMARTvisuals QA — contextual mock ads</h1>
+    <p>Labeled Ad slot is filled from authorized title / tags. AdSense is not loaded. Not live inventory.</p>
   </div>
+  <div class="qa-block">
+    <h2>Cancun Trip — travel partner / Fly to Cancun</h2>
+    <div class="qa-row">
+      <div id="notifyCancun"></div>
+      <div id="roomCancun"></div>
+    </div>
+  </div>
+  <div class="qa-block">
+    <h2>Paris Fashion Week — fashion partner</h2>
+    <div class="qa-row">
+      <div id="notifyParis"></div>
+      <div id="roomParis"></div>
+    </div>
+  </div>
+  <div class="qa-block">
+    <h2>Dining — restaurant partner (no destination)</h2>
+    <div class="qa-row">
+      <div id="notifyDining"></div>
+      <div id="roomDining"></div>
+    </div>
+  </div>
+  <div class="qa-block">
+    <h2>Generic Saturday room — Mingl Room, no destination ad</h2>
+    <div class="qa-row">
+      <div id="notifyGeneric"></div>
+      <div id="roomGeneric"></div>
+    </div>
+  </div>
+  <script src="./floqr-i18n.js?v=s3.3.050"></script>
   <script src="./smartvisuals-resolver.js?v=s3.3.050"></script>
   <script src="./smartvisuals-view.js?v=s3.3.050"></script>
   <script>
     fetch("./smartvisuals/catalog.json").then(r => r.json()).then(catalog => {
       window.FLOQRSmartVisualsCatalog = catalog;
-      const payload = window.FLOQRSmartVisuals.syntheticCancun();
-      window.FLOQRSmartVisuals.mountNotification(document.getElementById("notifyHost"), payload, {});
-      window.FLOQRSmartVisuals.mountRoom(document.getElementById("roomHost"), payload, {});
+      const api = window.FLOQRSmartVisuals;
+      const cancun = api.syntheticCancun();
+      api.mountNotification(document.getElementById("notifyCancun"), cancun, {});
+      api.mountRoom(document.getElementById("roomCancun"), cancun, {});
+      const paris = {
+        demo: true,
+        sourceKind: "authorized-room",
+        title: "Paris Fashion Week",
+        description: "Runway night in Paris.",
+        hostName: "Damon",
+        hostInitials: "D",
+        scheduledLabel: "Tonight",
+        participantCount: 4
+      };
+      api.mountNotification(document.getElementById("notifyParis"), paris, {});
+      api.mountRoom(document.getElementById("roomParis"), paris, {});
+      const dining = {
+        demo: true,
+        sourceKind: "authorized-room",
+        title: "Dinner reservations",
+        description: "Pick a restaurant for Saturday.",
+        hostName: "Damon",
+        hostInitials: "D",
+        scheduledLabel: "Saturday",
+        participantCount: 3
+      };
+      api.mountNotification(document.getElementById("notifyDining"), dining, {});
+      api.mountRoom(document.getElementById("roomDining"), dining, {});
+      const generic = {
+        demo: true,
+        sourceKind: "authorized-room",
+        title: "Saturday",
+        description: "Hang out.",
+        hostName: "Damon",
+        hostInitials: "D",
+        scheduledLabel: "Saturday",
+        participantCount: 2
+      };
+      api.mountNotification(document.getElementById("notifyGeneric"), generic, {});
+      api.mountRoom(document.getElementById("roomGeneric"), generic, {});
     });
   </script>
 </body>

@@ -494,7 +494,7 @@ Optional check-in / geofence presence for discovery boosts (explicit consent).
 
 ### SMARTvisuals (verified)
 
-Shared visual service for Mingl **SMARTnotification** and **Room SMARTview**. Published assets live in git (`smartvisuals/registry.json`); Firestore drafts never reach patrons. Classification uses authorized title/description only — never private BOT DEE history. Optional Gemini classifier is **not enabled**. Independent ad slot stays empty (`adsEnabled: false`). Visual classification does **not** invoke headless tools.
+Shared visual service for Mingl **SMARTnotification** and **Room SMARTview**. Published assets live in git (`smartvisuals/registry.json`); Firestore drafts never reach patrons. Classification uses authorized title/description only — never private BOT DEE history. Optional Gemini classifier is **not enabled**. Independent ad slot is a **labeled mock fill** from authorized tags (`selectAd` + `getSmartVisualAdPolicy.mockFill`); AdSense stays off (`adsEnabled: false`). Empty only for private chat or prompt injection. Visual classification does **not** invoke headless tools.
 
 ```mermaid
 flowchart TD
@@ -508,7 +508,7 @@ flowchart TD
   I --> J[Server authorization / content filtering]
   J --> K[SMARTview + SMARTnotification renderer]
   L[Viewer Site Chrome and i18n] --> K
-  M[Independent ad policy — adsEnabled false] --> N[Labeled Ad slot below card — empty]
+  M[Independent ad policy — mockFill from authorized tags; AdSense off] --> N[Labeled Ad slot below card — contextual mock]
   K --> N
   O[Authorized BOT-DEE headless orchestration] --> P[Partner integrations and audit logs]
   K -. user-confirmed actions only .-> O
@@ -519,7 +519,7 @@ flowchart TD
   DRAFT -.->|not patron-visible until git publish| H
 ```
 
-Verified vs kit proposal: no live Gemini path; no AdSense script; Search overlay is opt-in demo (`?smartvisualInvite=cancun`) because group rooms are not live; Cancun maps to tropical `bg-bali` + `st-flight` (no Cancun photograph in the kit).
+Verified vs kit proposal: no live Gemini path; no AdSense script; Search overlay is opt-in demo (`?smartvisualInvite=cancun`) because group rooms are not live; Cancun maps to tropical `bg-bali` + `st-flight` (no Cancun photograph in the kit). Mock ads: Cancun Trip → Travel partner / Fly to Cancun; Paris Fashion Week → Fashion partner; dining → Dining partner; generic Saturday → Mingl Room (no destination).
 
 ### Moderation / AI suggestions
 

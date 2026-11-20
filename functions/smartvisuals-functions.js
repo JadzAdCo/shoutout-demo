@@ -148,10 +148,15 @@ exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
 
 exports.getSmartVisualAdPolicy = onCall(CALL_OPTS, async request => {
   if (!request.auth) deny("unauthenticated", "Sign in required.");
+  let stored = {};
+  try {
+    const snap = await db.collection(COLLECTIONS.adPolicy).doc("default").get();
+    if (snap.exists) stored = snap.data() || {};
+  } catch (_) {}
+  const policy = resolver.adPolicy(stored);
   return {
+    ...policy,
     adsEnabled: false,
-    adsenseApproved: false,
-    placement: "below-room-smartview",
-    note: "AdSense is not loaded. Placement stays empty until a separate policy review."
+    adsenseApproved: false
   };
 });
