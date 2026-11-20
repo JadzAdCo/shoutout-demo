@@ -1015,14 +1015,16 @@
       "id": "help-botdee-version-smartview-tabs",
       "kind": "help",
       "label": "Version SMARTview tabs",
-      "blurb": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified FLOQR package notes from the current README. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses",
+      "blurb": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified BOT DEE and Gemini changes only — not Master Admin, beta tester tools, or other FLOQR product notes. Help repeats the Ver / Vers / Version command. Switching tabs or expanding d",
       "href": "./botdee.html",
       "phrases": [
         "version smartview tabs",
-        "overview describes bot dee and opens technical details without leaving chat. what s new lists verified floqr package notes from the current readme. help repeats",
+        "overview describes bot dee and opens technical details without leaving chat. what s new lists verified bot dee and gemini changes only not master admin beta tes",
         "version what s new",
         "version overview",
         "technical details bot dee",
+        "bot dee what s new",
+        "gemini what s new",
         "open bot dee",
         "help-botdee-version-smartview-tabs"
       ]

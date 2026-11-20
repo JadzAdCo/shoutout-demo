@@ -229,7 +229,9 @@
         {label:"Cancun trip classifier", file:"functions/botdee-room-smartview.js", includes:["function isCancunTripAsk(", "function isNightlifeOnlyAsk(", "CANCUN_TRIP_TITLE"]},
         {label:"Root classifier matches Functions", file:"botdee-room-smartview.js", includes:["function isCancunTripAsk("]},
         {label:"Intent tests", file:"functions/botdee-room-smartview.test.js", includes:["natural Cancun trip phrases mount the same Room SMARTview", "nightlife-only VIP tonight does not open"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-051-botdee-cancun-trip-natural"]}
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-051-botdee-cancun-trip-natural"]},
+        {label:"What's New catalog", file:"functions/botdee-whats-new-catalog.js", includes:["forVersionWhatsNew", "HARD_EXCLUDE"]},
+        {label:"What's New catalog test", file:"ai-diagnostics-service.js", includes:["botdee-whats-new-catalog"]}
       ]
     },
     {
@@ -3544,6 +3546,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"botdee-whats-new-catalog",
+      area:"BOT DEE",
+      feature:"What's New lists BOT DEE and Gemini only",
+      changed:"Version SMARTview What's New catalogues BOT DEE / Gemini features only. Master Admin beta Find patron, Gray Save, Save busy, and Features SMARTview are not shown. Mixed bullets keep the BOT DEE clauses (People/Room SMARTview, headless VIP) and drop App Check. README still has the full package list. Runtime filter is rules in functions/botdee-whats-new-catalog.js — Ver/Version does not call Gemini.",
+      howToTest:"1) After Functions deploy from origin/main (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until floqr-i18n-help.js ?v=s3.3.051. Sign in with BOT DEE. 2) Type Ver → What's New. Confirm s3.3.051 Cancun trip / s3.3.050 Mingl invites / s3.3.046 People+Room+headless VIP (no App Check) / s3.3.045–044 SMARTpreview are listed. 3) Confirm these are absent: Beta Find patron, tester Save, Save busy, Gray Save, Features SMARTview. 4) Help tab still explains What's New is BOT DEE and Gemini only. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"What's New shows BOT DEE/Gemini bullets only. Master Admin Save/Find-patron/Features SMARTview notes stay off the card. README unchanged.",
+      troubleshoot:"Still seeing Find patron / Gray Save → Functions executeBotSession not this SHA (forVersionWhatsNew missing) or cached botdee-version-changelog.json from an older deploy. Empty What's New → catalog fail-closed every row; check functions/botdee-whats-new-catalog.js. Help still says README package notes → cached floqr-i18n-help.js."
+    },
     {
       id:"s3-3-051-botdee-cancun-trip-natural",
       area:"BOT DEE",

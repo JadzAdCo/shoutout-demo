@@ -536,7 +536,7 @@
         <h3>${esc(t("botdee.vs.whatsNewHeading", "What's New"))}</h3>
         ${changelog.length
           ? `<ul>${changelog.map(item => `<li>${esc(item.text || item.id || "")}</li>`).join("")}</ul>`
-          : `<p>${esc(t("botdee.vs.whatsNewEmpty", "No verified package notes are available for this build."))}</p>`}
+          : `<p>${esc(t("botdee.vs.whatsNewEmpty", "No BOT DEE or Gemini notes are listed for this build."))}</p>`}
       </div>
       <div class="botdee-sv-version-panel" data-vs-panel="help" role="tabpanel" hidden>
         <h3>${esc(t("botdee.vs.helpHeading", "Version command"))}</h3>
