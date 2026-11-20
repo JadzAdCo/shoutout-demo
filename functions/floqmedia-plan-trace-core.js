@@ -373,8 +373,14 @@ function appCheckEnforced(deps = {}) {
   if (deps && Object.prototype.hasOwnProperty.call(deps, "enforce")) {
     return deps.enforce === true || deps.enforce === 1 || deps.enforce === "1";
   }
-  const env = deps.env || process.env;
-  return String(env.FLOQR_APP_CHECK_ENFORCE || "").trim() === "1";
+  const env = (deps && deps.env) || process.env;
+  const raw = env && Object.prototype.hasOwnProperty.call(env, "FLOQR_APP_CHECK_ENFORCE")
+    ? env.FLOQR_APP_CHECK_ENFORCE
+    : "";
+  // Unset enforces. The only off switch is FLOQR_APP_CHECK_ENFORCE=0
+  // (or deps.enforce === false, which the property check above already handles).
+  // Omitting the Cloud Run variable on a later deploy still rejects.
+  return String(raw == null ? "" : raw).trim() !== "0";
 }
 
 /** The one App Check verifier. Callers pass {consume: true}. */
@@ -391,7 +397,7 @@ function appCheckFailureCode(error) {
   return code.slice(0, 80);
 }
 
-/** Monitor mode logs a bad pass and still traces. Enforce rejects before Gemini. */
+/** A bad pass is logged either way. Enforcement rejects before Gemini. Monitor mode does not. */
 async function inspectAppCheck(req, deps = {}) {
   const enforce = appCheckEnforced(deps);
   const token = String(header(req, APP_CHECK_HEADER) || "").trim();
@@ -589,6 +595,7 @@ module.exports = {
   buildGeminiContents,
   extractJsonObject,
   validateTrace,
+  appCheckEnforced,
   inspectAppCheck,
   handlePlanTraceRequest
 };

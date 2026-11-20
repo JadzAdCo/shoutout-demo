@@ -270,9 +270,15 @@ test("oversize body is refused", async () => {
   const res = mockRes();
   const called = {n: 0};
   const result = await core.handlePlanTraceRequest(
-    mockReq({body: {fileName: "huge.png", mime: "image/png", dataBase64: huge}}),
+    mockReq({
+      appCheck: "fresh-pass",
+      body: {fileName: "huge.png", mime: "image/png", dataBase64: huge}
+    }),
     res,
-    {generateContent: async () => { called.n += 1; return {}; }}
+    {
+      verifyAppCheck: acceptingVerifier(),
+      generateContent: async () => { called.n += 1; return {}; }
+    }
   );
   assert.equal(result.ok, false);
   assert.equal(res.statusCode, 413);
@@ -303,13 +309,28 @@ test("localhost studio origins are allowed for a guest with no FloqR session", a
   const result = await core.handlePlanTraceRequest(
     mockReq({
       origin: "http://studio.localhost:3000",
+      appCheck: "fresh-pass",
       body: {fileName: "room.svg", mime: "image/svg+xml", dataBase64: SVG_B64}
     }),
     res,
-    {generateContent: fakeGemini(KNOWN_TRACE)}
+    {verifyAppCheck: acceptingVerifier(), generateContent: fakeGemini(KNOWN_TRACE)}
   );
   assert.equal(result.ok, true);
   assert.equal(res.headers["Access-Control-Allow-Origin"], "http://studio.localhost:3000");
+
+  const denied = mockRes();
+  const called = {n: 0};
+  const missing = await core.handlePlanTraceRequest(
+    mockReq({
+      origin: "http://studio.localhost:3000",
+      body: {fileName: "room.svg", mime: "image/svg+xml", dataBase64: SVG_B64}
+    }),
+    denied,
+    {generateContent: async () => { called.n += 1; return {}; }}
+  );
+  assert.equal(missing.status, 401);
+  assert.equal(denied.body.trace, undefined);
+  assert.equal(called.n, 0);
 });
 
 test("function does not write a project document or a spatialGrantRefs row", async () => {
@@ -344,9 +365,17 @@ test("function does not write a project document or a spatialGrantRefs row", asy
   assert.match(coreSrc, /getAppCheck\(\)\.verifyToken\(token,\s*options\)/);
   assert.match(coreSrc, /\{consume:\s*true\}/);
   assert.match(coreSrc, /X-Firebase-AppCheck/);
-  assert.doesNotMatch(coreSrc, /FLOQR_APP_CHECK_ENFORCE\s*=/);
-  assert.doesNotMatch(fnSrc, /environmentVariables/);
-  assert.doesNotMatch(fnSrc, /FLOQR_APP_CHECK_ENFORCE\s*=/);
+  assert.match(coreSrc, /!== "0"/);
+  assert.doesNotMatch(coreSrc, /FLOQR_APP_CHECK_ENFORCE\s*=\s*["']0["']/);
+  assert.match(fnSrc, /environmentVariables/);
+  assert.match(fnSrc, /FLOQR_APP_CHECK_ENFORCE:\s*"1"/);
+  assert.doesNotMatch(fnSrc, /FLOQR_APP_CHECK_ENFORCE:\s*"0"/);
+  assert.equal(core.appCheckEnforced(), true);
+  assert.equal(core.appCheckEnforced({env: {}}), true);
+  assert.equal(core.appCheckEnforced({env: {FLOQR_APP_CHECK_ENFORCE: "1"}}), true);
+  assert.equal(core.appCheckEnforced({env: {FLOQR_APP_CHECK_ENFORCE: "0"}}), false);
+  assert.equal(core.appCheckEnforced({enforce: false, env: {FLOQR_APP_CHECK_ENFORCE: "1"}}), false);
+  assert.equal(core.appCheckEnforced({enforce: true}), true);
 });
 
 test("preflight stays 204 and allows X-Firebase-AppCheck for the three studio origins", async () => {
@@ -371,8 +400,9 @@ test("preflight stays 204 and allows X-Firebase-AppCheck for the three studio or
   }
 });
 
-test("monitor mode still returns a trace when the App Check pass is missing", async () => {
+test("default path returns 401 and does not call Gemini when the pass is missing", async () => {
   const logs = [];
+  const appChecks = [];
   const called = {n: 0};
   const res = mockRes();
   const result = await core.handlePlanTraceRequest(
@@ -380,6 +410,39 @@ test("monitor mode still returns a trace when the App Check pass is missing", as
     res,
     {
       env: {},
+      generateContent: async () => {
+        called.n += 1;
+        return {
+          text: JSON.stringify(KNOWN_TRACE),
+          usageMetadata: {promptTokenCount: 1, candidatesTokenCount: 1, totalTokens: 2}
+        };
+      },
+      logAccess: async (entry) => logs.push(entry),
+      logAppCheck: async (entry) => appChecks.push(entry)
+    }
+  );
+  assert.equal(result.ok, false);
+  assert.equal(result.status, 401);
+  assert.equal(res.statusCode, 401);
+  assert.deepEqual(res.body, {ok: false, error: core.APP_CHECK_REJECTED});
+  assert.equal(res.body.trace, undefined);
+  assert.equal(called.n, 0);
+  assert.equal(logs.length, 0);
+  assert.equal(appChecks[0].outcome, "app_check_missing");
+  assert.equal(appChecks[0].enforce, true);
+  assert.equal(JSON.stringify(logs).includes(PNG_1X1), false);
+  assert.equal(JSON.stringify(res.body).includes("widthM"), false);
+});
+
+test("monitor mode still returns a trace only when enforce is false or the env is 0", async () => {
+  const logs = [];
+  const called = {n: 0};
+  const res = mockRes();
+  const result = await core.handlePlanTraceRequest(
+    mockReq({body: {fileName: "lobby.png", mime: "image/png", dataBase64: PNG_1X1}}),
+    res,
+    {
+      enforce: false,
       generateContent: async () => {
         called.n += 1;
         return {
@@ -532,17 +595,47 @@ test("a second consume of the same App Check pass is app_check_reused", async ()
       logAppCheck: async (entry) => secondApp.push(entry)
     }
   );
-  assert.equal(second.ok, true);
-  assert.equal(secondRes.statusCode, 200);
-  assert.equal(secondRes.body.ok, true);
-  assert.equal(secondLogs.some((entry) => String(entry.failureReason || "").startsWith("app_check_")), false);
+  assert.equal(second.ok, false);
+  assert.equal(second.status, 401);
+  assert.equal(secondRes.statusCode, 401);
+  assert.deepEqual(secondRes.body, {ok: false, error: core.APP_CHECK_REJECTED});
+  assert.equal(secondRes.body.trace, undefined);
+  assert.equal(secondLogs.length, 0);
   assert.equal(secondApp[0].operation, "spatial-plan-trace");
   assert.equal(secondApp[0].outcome, "app_check_reused");
-  assert.equal(calls.n, 2);
+  assert.equal(secondApp[0].enforce, true);
+  assert.equal(calls.n, 1);
   assert.deepEqual(optionsSeen, [{consume: true}, {consume: true}]);
   assert.equal(JSON.stringify(firstLogs).includes(pass), false);
   assert.equal(JSON.stringify(secondApp).includes(pass), false);
   assert.equal(JSON.stringify(secondLogs).includes(PNG_1X1), false);
+
+  const monitorCalls = {n: 0};
+  const monitorSeen = new Set();
+  const monitorPass = "monitor-pass-once";
+  const monitorVerify = async (token, options) => {
+    if (!options || options.consume !== true) throw new Error("consume required");
+    if (monitorSeen.has(token)) return {alreadyConsumed: true, appId: STUDIO_APP_ID};
+    monitorSeen.add(token);
+    return {alreadyConsumed: false, appId: STUDIO_APP_ID};
+  };
+  const monitorGenerate = async () => {
+    monitorCalls.n += 1;
+    return {text: JSON.stringify(KNOWN_TRACE), usageMetadata: {totalTokenCount: 3}};
+  };
+  const monitorFirst = await core.handlePlanTraceRequest(
+    mockReq({appCheck: monitorPass, body}),
+    mockRes(),
+    {enforce: false, verifyAppCheck: monitorVerify, generateContent: monitorGenerate}
+  );
+  const monitorSecond = await core.handlePlanTraceRequest(
+    mockReq({appCheck: monitorPass, body}),
+    mockRes(),
+    {enforce: false, verifyAppCheck: monitorVerify, generateContent: monitorGenerate}
+  );
+  assert.equal(monitorFirst.ok, true);
+  assert.equal(monitorSecond.ok, true);
+  assert.equal(monitorCalls.n, 2);
 
   const enforcedLogs = [];
   const enforcedApp = [];
@@ -570,9 +663,26 @@ test("HTTP function is exported next to the other spatial functions and tagged f
   assert.match(index, /floqmediaPlanTrace:\s*require\("\.\/floqmedia-plan-trace-functions"\)\.floqmediaPlanTrace/);
   const workflow = read(".github/workflows/functions-ci.yml");
   assert.match(workflow, /floqmediaPlanTrace/);
+  assert.match(workflow, /FLOQR_APP_CHECK_ENFORCE=1/);
+  assert.doesNotMatch(workflow, /FLOQR_APP_CHECK_ENFORCE=0/);
+  const setter = read("functions/scripts/set-floqmedia-plan-trace-app-check-env.js");
+  assert.match(setter, /FLOQR_APP_CHECK_ENFORCE"\] = "1"|KEY\] = "1"/);
+  assert.doesNotMatch(setter, /FLOQR_APP_CHECK_ENFORCE"\] = "0"|KEY\] = "0"/);
   const oidcDoc = read("docs/FLOQR-OIDC-FLOQMEDIA.md");
   assert.match(oidcDoc, /floqmediaPlanTrace/);
   const wiring = read("docs/FEATURE-WIRING.md");
   assert.match(wiring, /floqmediaPlanTrace/);
   assert.match(wiring, /spatial-plan-trace/);
+  const {mergeAppCheckEnv, publicEnvStatus} = require("./scripts/set-floqmedia-plan-trace-app-check-env");
+  const merged = mergeAppCheckEnv({
+    FLOQR_GEMINI_TEXT_MODEL: "gemini-3.6-flash",
+    FLOQR_APP_CHECK_ENFORCE: "0",
+    EVENTARC_CLOUD_EVENT_SOURCE: "projects/demo/services/floqmediaPlanTrace"
+  });
+  assert.equal(merged.FLOQR_APP_CHECK_ENFORCE, "1");
+  assert.equal(merged.FLOQR_GEMINI_TEXT_MODEL, "gemini-3.6-flash");
+  assert.equal(merged.EVENTARC_CLOUD_EVENT_SOURCE, "projects/demo/services/floqmediaPlanTrace");
+  assert.equal(publicEnvStatus(merged).FLOQR_APP_CHECK_ENFORCE, "1");
+  assert.equal(publicEnvStatus(merged).otherKeys, 2);
+  assert.equal(JSON.stringify(publicEnvStatus(merged)).includes("gemini"), false);
 });
