@@ -11,6 +11,8 @@
 .sv-studio-draft{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px solid var(--line,#2b505a)}
 .sv-studio-draft img{max-width:220px}
 .sv-studio-example{display:flex;flex-direction:column;gap:4px;padding:10px 0;border-bottom:1px solid var(--line,#2b505a)}
+.sv-studio-ad-example{margin:12px 0;padding:10px 0;border-bottom:1px solid var(--line,#2b505a)}
+.sv-studio-ad-example h4{margin:0 0 8px;font-size:13px}
 .sv-studio-dl{margin:0;padding-left:18px}
 .sv-studio-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:16px}
 @media (max-width:800px){.sv-studio-layout{grid-template-columns:1fr}}

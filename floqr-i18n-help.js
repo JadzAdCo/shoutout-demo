@@ -7,11 +7,11 @@
     "ru": {
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Реклама, если её одобрят, будет под карточкой с меткой Ad."
+        body: "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Подписанный образец Ad под карточкой следует тегам (Партнёр поездки / Летите в Cancun для Cancun Trip). Это не живой рекламодатель. Личный чат и инъекция оставляют слот пустым."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview и SMARTvisuals",
-        body: "Room SMARTview показывает приглашение Mingl: время, RSVP или эфир и «Присоединиться». SMARTstencils и SMARTbackgrounds следуют разрешённому названию — Cancun Trip даёт travel-иллюстрацию, не фото и не партнёрство. Личный чат BOT DEE не выбирает картинку. Групповые room ещё не в эфире; кнопка ничего не создаёт и не списывает. Слот Ad снизу пуст до отдельного одобрения."
+        body: "Room SMARTview показывает приглашение Mingl: время, RSVP или эфир и «Присоединиться». SMARTstencils и SMARTbackgrounds следуют разрешённому названию — Cancun Trip даёт travel-иллюстрацию, не фото и не партнёрство. Личный чат BOT DEE не выбирает картинку. Групповые room ещё не в эфире; кнопка ничего не создаёт и не списывает. Подписанный Ad снизу — образец из этих тегов (Партнёр поездки / Летите в Cancun). Пусто для личного чата или инъекции; это не живой рекламодатель."
       },
       "help-scheduling-schedule-for": {
         title: "Расписание персонала",
@@ -509,11 +509,11 @@
     "nl": {
       "help-smartvisuals-notification": {
         title: "Mingl Room SMARTnotification",
-        body: "Op Zoeken kan een compacte Mingl Room-uitnodiging verschijnen. Uitnodiging bekijken opent Room SMARTview. Niet nu verbergt hem deze sessie. De art is SMARTbackground-illustratie met SMARTstencils — geen foto en geen officieel merkteken. Namen en RSVP komen alleen uit het room-record. Ads, indien ooit goedgekeurd, zitten eronder en blijven Ad."
+        body: "Op Zoeken kan een compacte Mingl Room-uitnodiging verschijnen. Uitnodiging bekijken opent Room SMARTview. Niet nu verbergt hem deze sessie. De art is SMARTbackground-illustratie met SMARTstencils — geen foto en geen officieel merkteken. Namen en RSVP komen alleen uit het room-record. Een gelabeld Ad-voorbeeld onder de kaart volgt de tags (Reispartner / Vlieg naar Cancun bij Cancun Trip). Geen echte adverteerder. Privéchat en injectie laten het vak leeg."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview met SMARTvisuals",
-        body: "Room SMARTview toont de Mingl-uitnodiging: tijd, RSVP of live, en Nu deelnemen. SMARTstencils en SMARTbackgrounds volgen de goedgekeurde titel — Cancun Trip gebruikt reisart, geen echte foto of officieel partnerschap. Privé BOT DEE-chat kiest geen art. Groepsrooms zijn niet live; Deelnemen maakt niets en rekent niets. Een Ad-slot eronder blijft leeg tot aparte goedkeuring."
+        body: "Room SMARTview toont de Mingl-uitnodiging: tijd, RSVP of live, en Nu deelnemen. SMARTstencils en SMARTbackgrounds volgen de goedgekeurde titel — Cancun Trip gebruikt reisart, geen echte foto of officieel partnerschap. Privé BOT DEE-chat kiest geen art. Groepsrooms zijn niet live; Deelnemen maakt niets en rekent niets. Een gelabelde Ad eronder is een voorbeeld uit die tags (Reispartner / Vlieg naar Cancun). Leeg bij privéchat of injectie; geen echte adverteerder."
       },
       "help-scheduling-schedule-for": {
         title: "Personeelsplanning",
@@ -1011,11 +1011,11 @@
     "fr": {
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Une invitation Mingl Room compacte peut s’afficher dans la Recherche. Voir l’invitation ouvre Room SMARTview. Pas maintenant la masque pour cette session. L’art est une illustration SMARTbackground avec SMARTstencils — pas une photo ni une marque officielle. Les noms et RSVP viennent uniquement du dossier de la room. Les pubs, si un jour approuvées, restent sous la carte avec le libellé Ad."
+        body: "Une invitation Mingl Room compacte peut s’afficher dans la Recherche. Voir l’invitation ouvre Room SMARTview. Pas maintenant la masque pour cette session. L’art est une illustration SMARTbackground avec SMARTstencils — pas une photo ni une marque officielle. Les noms et RSVP viennent uniquement du dossier de la room. Un exemple Ad étiqueté sous la carte suit les tags (Partenaire voyage / Envolez-vous vers Cancun pour Cancun Trip). Ce n’est pas un annonceur réel. Chat privé et injection laissent le slot vide."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview et SMARTvisuals",
-        body: "Room SMARTview montre l’invitation Mingl : horaire, RSVP ou statut live, et Rejoindre. SMARTstencils et SMARTbackgrounds suivent le titre autorisé — Cancun Trip utilise un art voyage, pas une photo réelle ni un partenariat officiel. Le chat BOT DEE privé ne choisit jamais l’art. Les rooms de groupe ne sont pas en ligne ; Rejoindre ne crée rien et ne facture pas. Un slot Ad étiqueté peut rester dessous, vide jusqu’à approbation."
+        body: "Room SMARTview montre l’invitation Mingl : horaire, RSVP ou statut live, et Rejoindre. SMARTstencils et SMARTbackgrounds suivent le titre autorisé — Cancun Trip utilise un art voyage, pas une photo réelle ni un partenariat officiel. Le chat BOT DEE privé ne choisit jamais l’art. Les rooms de groupe ne sont pas en ligne ; Rejoindre ne crée rien et ne facture pas. Un Ad étiqueté dessous est un exemple issu des tags (Partenaire voyage / Envolez-vous vers Cancun). Vide pour chat privé ou injection ; pas un annonceur réel."
       },
       "help-scheduling-schedule-for": {
         title: "Planification du personnel",
@@ -1513,11 +1513,11 @@
     "de": {
       "help-smartvisuals-notification": {
         title: "Mingl Room SMARTnotification",
-        body: "Auf der Suche kann eine kompakte Mingl-Room-Einladung erscheinen. Einladung ansehen öffnet Room SMARTview. Nicht jetzt blendet sie für diese Sitzung aus. Die Grafik ist SMARTbackground-Illustration mit SMARTstencils — kein Foto, kein offizielles Zeichen. Namen und RSVP kommen nur aus dem Room-Datensatz. Anzeigen sitzen darunter und bleiben mit Ad gekennzeichnet."
+        body: "Auf der Suche kann eine kompakte Mingl-Room-Einladung erscheinen. Einladung ansehen öffnet Room SMARTview. Nicht jetzt blendet sie für diese Sitzung aus. Die Grafik ist SMARTbackground-Illustration mit SMARTstencils — kein Foto, kein offizielles Zeichen. Namen und RSVP kommen nur aus dem Room-Datensatz. Ein gekennzeichnetes Ad-Beispiel unter der Karte folgt den Tags (Reisepartner / Fliegen Sie nach Cancun bei Cancun Trip). Kein echter Werbetreibender. Privater Chat und Injection lassen den Slot leer."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview mit SMARTvisuals",
-        body: "Room SMARTview zeigt die Mingl-Einladung: Zeit, RSVP oder Live, Jetzt beitreten. SMARTstencils und SMARTbackgrounds folgen dem freigegebenen Titel — Cancun Trip nutzt Reisekunst, kein echtes Foto, keine Partnerschaft. Privater BOT-DEE-Chat wählt keine Grafik. Gruppenräume sind nicht live; Beitreten erzeugt nichts und belastet nicht. Ein Ad-Slot darunter bleibt leer bis zur Freigabe."
+        body: "Room SMARTview zeigt die Mingl-Einladung: Zeit, RSVP oder Live, Jetzt beitreten. SMARTstencils und SMARTbackgrounds folgen dem freigegebenen Titel — Cancun Trip nutzt Reisekunst, kein echtes Foto, keine Partnerschaft. Privater BOT-DEE-Chat wählt keine Grafik. Gruppenräume sind nicht live; Beitreten erzeugt nichts und belastet nicht. Ein gekennzeichnetes Ad darunter ist ein Beispiel aus den Tags (Reisepartner / Fliegen Sie nach Cancun). Leer bei privatem Chat oder Injection; kein echter Werbetreibender."
       },
       "help-scheduling-schedule-for": {
         title: "Mitarbeiterplanung",
@@ -2015,11 +2015,11 @@
     "es": {
       "help-smartvisuals-notification": {
         title: "SMARTnotification de Mingl Room",
-        body: "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Los anuncios, si se aprueban, van debajo con la etiqueta Ad."
+        body: "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Un anuncio de muestra etiquetado bajo la tarjeta sigue las etiquetas (Socio de viaje / Vuela a Cancun para Cancun Trip). No es un anunciante real. El chat privado y la inyección dejan el hueco vacío."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview con SMARTvisuals",
-        body: "Room SMARTview muestra la invitación Mingl: horario, RSVP o en vivo, y Unirse. SMARTstencils y SMARTbackgrounds siguen el título autorizado — Cancun Trip usa arte de viaje, no foto real ni alianza oficial. El chat privado de BOT DEE no elige el arte. Las rooms de grupo no están en vivo; Unirse no crea ni cobra. Un hueco Ad etiquetado puede quedar debajo, vacío hasta otra aprobación."
+        body: "Room SMARTview muestra la invitación Mingl: horario, RSVP o en vivo, y Unirse. SMARTstencils y SMARTbackgrounds siguen el título autorizado — Cancun Trip usa arte de viaje, no foto real ni alianza oficial. El chat privado de BOT DEE no elige el arte. Las rooms de grupo no están en vivo; Unirse no crea ni cobra. Un anuncio etiquetado debajo es una muestra de esas etiquetas (Socio de viaje / Vuela a Cancun). Vacío en chat privado o inyección; no es un anunciante real."
       },
       "help-scheduling-schedule-for": {
         title: "Planificación del personal",
@@ -2517,11 +2517,11 @@
     "it": {
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Gli ads, se approvati, restano sotto con etichetta Ad."
+        body: "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Un esempio Ad etichettato sotto la carta segue i tag (Partner di viaggio / Vola a Cancun per Cancun Trip). Non è un inserzionista reale. Chat privata e injection lasciano lo slot vuoto."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview con SMARTvisuals",
-        body: "Room SMARTview mostra l’invito Mingl: orario, RSVP o live, e Entra ora. SMARTstencils e SMARTbackgrounds seguono il titolo autorizzato — Cancun Trip usa arte di viaggio, non una foto reale né una partnership. La chat privata BOT DEE non sceglie l’arte. Le room di gruppo non sono live; Entra non crea e non addebita. Uno slot Ad sotto resta vuoto fino ad approvazione."
+        body: "Room SMARTview mostra l’invito Mingl: orario, RSVP o live, e Entra ora. SMARTstencils e SMARTbackgrounds seguono il titolo autorizzato — Cancun Trip usa arte di viaggio, non una foto reale né una partnership. La chat privata BOT DEE non sceglie l’arte. Le room di gruppo non sono live; Entra non crea e non addebita. Un Ad etichettato sotto è un esempio da quei tag (Partner di viaggio / Vola a Cancun). Vuoto per chat privata o injection; non è un inserzionista reale."
       },
       "help-scheduling-schedule-for": {
         title: "Pianificazione del personale",
@@ -3019,11 +3019,11 @@
     "pt": {
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Anúncios, se aprovados, ficam abaixo com a etiqueta Ad."
+        body: "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Um anúncio de amostra rotulado sob o cartão segue as tags (Parceiro de viagem / Voe para Cancun num Cancun Trip). Não é um anunciante real. Chat privado e injeção deixam o espaço vazio."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview com SMARTvisuals",
-        body: "O Room SMARTview mostra o convite Mingl: horário, RSVP ou direto, e Entrar agora. SMARTstencils e SMARTbackgrounds seguem o título autorizado — Cancun Trip usa arte de viagem, não foto real nem parceria oficial. O chat privado BOT DEE não escolhe a arte. Rooms de grupo ainda não estão live; Entrar não cria nem cobra. Um espaço Ad abaixo fica vazio até aprovação à parte."
+        body: "O Room SMARTview mostra o convite Mingl: horário, RSVP ou direto, e Entrar agora. SMARTstencils e SMARTbackgrounds seguem o título autorizado — Cancun Trip usa arte de viagem, não foto real nem parceria oficial. O chat privado BOT DEE não escolhe a arte. Rooms de grupo ainda não estão live; Entrar não cria nem cobra. Um anúncio rotulado abaixo é uma amostra dessas tags (Parceiro de viagem / Voe para Cancun). Vazio para chat privado ou injeção; não é um anunciante real."
       },
       "help-scheduling-schedule-for": {
         title: "Agendamento de pessoal",
@@ -3521,11 +3521,11 @@
     "el": {
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Στην Αναζήτηση μπορεί να εμφανιστεί συμπαγής πρόσκληση Mingl Room. Η προβολή ανοίγει το Room SMARTview. Όχι τώρα την κρύβει σε αυτή τη συνεδρία. Η εικόνα είναι εικονογράφηση SMARTbackground με SMARTstencils — όχι φωτογραφία ούτε επίσημο σήμα. Ονόματα και RSVP μόνο από την εγγραφή room. Οι διαφημίσεις, αν εγκριθούν, μένουν κάτω με ετικέτα Ad."
+        body: "Στην Αναζήτηση μπορεί να εμφανιστεί συμπαγής πρόσκληση Mingl Room. Η προβολή ανοίγει το Room SMARTview. Όχι τώρα την κρύβει σε αυτή τη συνεδρία. Η εικόνα είναι εικονογράφηση SMARTbackground με SMARTstencils — όχι φωτογραφία ούτε επίσημο σήμα. Ονόματα και RSVP μόνο από την εγγραφή room. Ένα επισημασμένο δείγμα Ad κάτω από την κάρτα ακολουθεί τις ετικέτες (Ταξιδιωτικός συνεργάτης / Πτήση για Cancun στο Cancun Trip). Όχι πραγματικός διαφημιζόμενος. Ιδιωτική συνομιλία και injection αφήνουν το κενό."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview με SMARTvisuals",
-        body: "Το Room SMARTview δείχνει την πρόσκληση Mingl: ώρα, RSVP ή ζωντανά, και Συμμετοχή τώρα. SMARTstencils και SMARTbackgrounds ακολουθούν τον εγκεκριμένο τίτλο — το Cancun Trip χρησιμοποιεί ταξιδιωτική τέχνη, όχι πραγματική φωτογραφία ούτε επίσημη συνεργασία. Η ιδιωτική συνομιλία BOT DEE δεν διαλέγει τέχνη. Οι ομαδικές room δεν είναι ζωντανές· η Συμμετοχή δεν δημιουργεί ούτε χρεώνει. Ένα Ad slot από κάτω μένει κενό μέχρι ξεχωριστή έγκριση."
+        body: "Το Room SMARTview δείχνει την πρόσκληση Mingl: ώρα, RSVP ή ζωντανά, και Συμμετοχή τώρα. SMARTstencils και SMARTbackgrounds ακολουθούν τον εγκεκριμένο τίτλο — το Cancun Trip χρησιμοποιεί ταξιδιωτική τέχνη, όχι πραγματική φωτογραφία ούτε επίσημη συνεργασία. Η ιδιωτική συνομιλία BOT DEE δεν διαλέγει τέχνη. Οι ομαδικές room δεν είναι ζωντανές· η Συμμετοχή δεν δημιουργεί ούτε χρεώνει. Ένα επισημασμένο Ad από κάτω είναι δείγμα από αυτές τις ετικέτες (Ταξιδιωτικός συνεργάτης / Πτήση για Cancun). Κενό για ιδιωτική συνομιλία ή injection· όχι πραγματικός διαφημιζόμενος."
       },
       "help-scheduling-schedule-for": {
         title: "Προγραμματισμός προσωπικού",
@@ -4023,11 +4023,11 @@
     "pl": {
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Reklamy, jeśli kiedyś zatwierdzone, zostają pod kartą z etykietą Ad."
+        body: "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Oznakowana próbka Ad pod kartą idzie za tagami (Partner podróży / Leć do Cancun przy Cancun Trip). To nie żywy reklamodawca. Prywatny czat i iniekcja zostawiają slot pusty."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview ze SMARTvisuals",
-        body: "Room SMARTview pokazuje zaproszenie Mingl: czas, RSVP lub na żywo i Dołącz teraz. SMARTstencils i SMARTbackgrounds idą za zatwierdzonym tytułem — Cancun Trip to sztuka podróży, nie zdjęcie i nie partnerstwo. Prywatny czat BOT DEE nie dobiera grafiki. Pokoje grupowe nie są live; Dołącz nic nie tworzy i nie obciąża. Slot Ad poniżej zostaje pusty do osobnej zgody."
+        body: "Room SMARTview pokazuje zaproszenie Mingl: czas, RSVP lub na żywo i Dołącz teraz. SMARTstencils i SMARTbackgrounds idą za zatwierdzonym tytułem — Cancun Trip to sztuka podróży, nie zdjęcie i nie partnerstwo. Prywatny czat BOT DEE nie dobiera grafiki. Pokoje grupowe nie są live; Dołącz nic nie tworzy i nie obciąża. Oznakowane Ad poniżej to próbka z tych tagów (Partner podróży / Leć do Cancun). Puste przy prywatnym czacie lub iniekcji; to nie żywy reklamodawca."
       },
       "help-scheduling-schedule-for": {
         title: "Planowanie personelu",
@@ -4525,11 +4525,11 @@
     "ar": {
       "help-smartvisuals-notification": {
         title: "SMARTnotification لـ Mingl Room",
-        body: "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. الإعلانات إن وُافق عليها تبقى أسفل البطاقة بوسم Ad."
+        body: "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. عيّنة إعلان موسومة أسفل البطاقة تتبع الوسوم (شريك سفر / حلّق إلى Cancun لرحلة Cancun Trip). ليس معلنًا حيًا. الدردشة الخاصة والحقن يُبقيان الموضع فارغًا."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview مع SMARTvisuals",
-        body: "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. موضع Ad الموسوم أسفل البطاقة يبقى فارغًا حتى موافقة منفصلة."
+        body: "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. إعلان موسوم أسفل البطاقة عيّنة من تلك الوسوم (شريك سفر / حلّق إلى Cancun). يبقى فارغًا للدردشة الخاصة أو الحقن وليس معلنًا حيًا."
       },
       "help-scheduling-schedule-for": {
         title: "جداول الموظفين",

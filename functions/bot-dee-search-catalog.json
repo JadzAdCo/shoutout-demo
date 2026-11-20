@@ -2703,6 +2703,9 @@
         "smartvisuals",
         "smartstencils",
         "smartbackgrounds",
+        "travel partner",
+        "fly to cancun",
+        "labeled ad",
         "open search",
         "help-smartvisuals-notification"
       ]
@@ -2723,6 +2726,8 @@
         "smartbackgrounds",
         "cancun trip room",
         "bot-dee itinerary",
+        "travel partner",
+        "exclusive mingl room deals",
         "open bot dee",
         "help-smartvisuals-room"
       ]
@@ -2732,7 +2737,7 @@
       "id": "help-smartvisuals-studio",
       "kind": "help",
       "label": "SMARTvisual Studio",
-      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads stay a separate labeled slot and a",
+      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads are a separate labeled slot filled",
       "href": "./master-admin.html",
       "phrases": [
         "smartvisual studio",

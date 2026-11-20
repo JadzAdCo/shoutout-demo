@@ -2175,11 +2175,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification de Mingl Room",
-          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Los anuncios, si se a"
+          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Un anuncio de muestra"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification de Mingl Room",
-          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Los anuncios, si se a"
+          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Un anuncio de muestra"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview con SMARTvisuals",
@@ -3246,11 +3246,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Gli ad"
+          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Un ese"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Gli ad"
+          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Un ese"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview con SMARTvisuals",
@@ -4317,11 +4317,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Anúncios, se aprovados, fic"
+          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Um anúncio de amostra rotul"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Anúncios, se aprovados, fic"
+          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Um anúncio de amostra rotul"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview com SMARTvisuals",
@@ -5388,11 +5388,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Реклама"
+          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Подписа"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Реклама"
+          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Подписа"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview и SMARTvisuals",
@@ -7530,11 +7530,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Reklamy, jeśli kiedyś"
+          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Oznakowana próbka Ad "
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Reklamy, jeśli kiedyś"
+          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Oznakowana próbka Ad "
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview ze SMARTvisuals",
@@ -9672,19 +9672,19 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification لـ Mingl Room",
-          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. الإعلانات إن وُافق عليها تبقى أسفل البطاقة بوسم Ad."
+          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. عيّنة إعلان موسومة أسفل البطاقة تتبع الوسوم (شريك سفر / حلّق إلى Cancun لر"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification لـ Mingl Room",
-          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. الإعلانات إن وُافق عليها تبقى أسفل البطاقة بوسم Ad."
+          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. عيّنة إعلان موسومة أسفل البطاقة تتبع الوسوم (شريك سفر / حلّق إلى Cancun لر"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview مع SMARTvisuals",
-          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. موضع Ad "
+          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. إعلان مو"
         },
         "intent:help-smartvisuals-room": {
           "label": "Room SMARTview مع SMARTvisuals",
-          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. موضع Ad "
+          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. إعلان مو"
         },
         "help:help-scheduling-schedule-for": {
           "label": "جداول الموظفين",

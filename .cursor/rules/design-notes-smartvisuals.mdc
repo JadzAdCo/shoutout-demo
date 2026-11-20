@@ -29,16 +29,16 @@ Default-deny: unpublished / unlicensed / unsanitized assets never resolve for pa
 
 1. **Search SMARTnotification** — `index.html` `#smartvisualNotificationHost`. Demo only: `?smartvisualInvite=cancun`. View Invitation / Not Now. No fabricated live rooms for all patrons.
 2. **Room SMARTview** — overlay + BOT DEE card hero from `authorizedTitle` / `authorizedDescription` on the request payload (current utterance; never private thread). `botdee.html` loads `smartvisuals/catalog.json` via `ensureCatalog()`.
-3. **Master Admin SMARTvisual Studio** — `#smartvisualStudio`. SOS2FA + `FLOQRReasonPrompt` to submit drafts. Ads tab documents the empty labeled slot.
+3. **Master Admin SMARTvisual Studio** — `#smartvisualStudio`. SOS2FA + `FLOQRReasonPrompt` to submit drafts. Ads tab previews mock fill from `getSmartVisualAdPolicy` / `selectAd`.
 
 Join Now uses `FLOQRNav` (no `?v=`). Display URLs unchanged.
 
 ## Ads / headless
 
-Labeled slot below the card. AdSense **never loaded** until a separate policy review. Visual classification must **not** invoke headless partner tools.
+Labeled slot below Search SMARTnotification and Room SMARTview (BOT DEE + preview). Fill is a **mock sample** from authorized title / description / SMARTstencils / SMARTbackgrounds tags via `resolver.selectAd` + `getSmartVisualAdPolicy` (`mockFill: true`, `adsEnabled: false`). Cancun Trip → Travel partner / Fly to Cancun; Paris Fashion Week → fashion; dining → restaurant; generic room → Mingl Room (no destination). Empty only for private chat or prompt injection. Never invent a real advertiser or live inventory. AdSense **never loaded**. Visual classification must **not** invoke headless partner tools.
 
 ## FIX PROMPT
 
 ```
-SMARTvisuals: git registry is published truth; Firestore drafts stay off patrons. Resolver deterministic, Gemini off on view. Search overlay only via ?smartvisualInvite=cancun. Cancun → bg-bali + st-flight. Private chat never classifies public art. Ads labeled and empty. Studio SOS2FA + reason. Resume @smartvisuals$.
+SMARTvisuals: git registry is published truth; Firestore drafts stay off patrons. Resolver deterministic, Gemini off on view. Search overlay only via ?smartvisualInvite=cancun. Cancun → bg-bali + st-flight. Private chat never classifies public art. Labeled Ad is a mock from authorized tags (selectAd + getSmartVisualAdPolicy); empty only for private/injection; AdSense off. Studio SOS2FA + reason. Resume @smartvisuals$.
 ```
