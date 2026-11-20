@@ -55,7 +55,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Вкладки Version SMARTview",
-        body: "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового — проверенные заметки пакета FLOQR из текущего README. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ваш Site Chrome — второй темы нет."
+        body: "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового показывает только проверенные изменения BOT DEE и Gemini — не Master Admin, не инструменты бета-тестеров и не другие заметки продуктов FLOQR. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ваш Site Chrome — второй темы нет."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
@@ -557,7 +557,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Version SMARTview-tabbladen",
-        body: "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont geverifieerde FLOQR-packagenotities uit de huidige README. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaart gebruikt jouw Site Chrome — er is geen tweede thema."
+        body: "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont alleen geverifieerde BOT DEE- en Gemini-wijzigingen — geen Master Admin, bèta-testertools of andere FLOQR-productnotities. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaart gebruikt jouw Site Chrome — er is geen tweede thema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
@@ -1059,7 +1059,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Onglets Version SMARTview",
-        body: "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés liste les notes de package FLOQR vérifiées du README actuel. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte utilise votre Site Chrome — pas de second thème."
+        body: "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés n’affiche que les changements BOT DEE et Gemini vérifiés — pas Master Admin, les outils bêta-testeur, ni les autres notes produit FLOQR. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte utilise votre Site Chrome — pas de second thème."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
@@ -1561,7 +1561,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Version-SMARTview-Reiter",
-        body: "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet geprüfte FLOQR-Package-Hinweise aus der aktuellen README. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und den Scroll. Die Karte nutzt Ihr Site Chrome — kein zweites Thema."
+        body: "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet nur geprüfte BOT-DEE- und Gemini-Änderungen — nicht Master Admin, Beta-Tester-Werkzeuge oder andere FLOQR-Produkthinweise. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und den Scroll. Die Karte nutzt Ihr Site Chrome — kein zweites Thema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
@@ -2063,7 +2063,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Pestañas de Version SMARTview",
-        body: "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista notas de paquete FLOQR verificadas del README actual. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su Site Chrome — no hay un segundo tema."
+        body: "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista solo cambios verificados de BOT DEE y Gemini — no Master Admin, herramientas de beta testers ni otras notas de producto FLOQR. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su Site Chrome — no hay un segundo tema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
@@ -2565,7 +2565,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Schede Version SMARTview",
-        body: "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca note di package FLOQR verificate dal README attuale. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il tuo Site Chrome — non c’è un secondo tema."
+        body: "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca solo i cambiamenti verificati di BOT DEE e Gemini — non Master Admin, strumenti beta tester o altre note di prodotto FLOQR. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il tuo Site Chrome — non c’è un secondo tema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
@@ -3067,7 +3067,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Abas do Version SMARTview",
-        body: "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista notas de pacote FLOQR verificadas do README atual. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site Chrome — não há um segundo tema."
+        body: "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista só mudanças verificadas de BOT DEE e Gemini — não Master Admin, ferramentas de beta tester nem outras notas de produto FLOQR. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site Chrome — não há um segundo tema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
@@ -3569,7 +3569,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Καρτέλες Version SMARTview",
-        body: "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει επαληθευμένες σημειώσεις πακέτου FLOQR από το τρέχον README. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο πρόχειρο και την κύλιση. Η κάρτα χρησιμοποιεί το Site Chrome σας — δεν υπάρχει δεύτερο θέμα."
+        body: "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει μόνο επαληθευμένες αλλαγές BOT DEE και Gemini — όχι Master Admin, εργαλεία beta tester ή άλλες σημειώσεις προϊόντος FLOQR. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο πρόχειρο και την κύλιση. Η κάρτα χρησιμοποιεί το Site Chrome σας — δεν υπάρχει δεύτερο θέμα."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
@@ -4071,7 +4071,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Karty Version SMARTview",
-        body: "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje zweryfikowane notatki pakietu FLOQR z bieżącego README. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa Twojego Site Chrome — nie ma drugiego motywu."
+        body: "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje tylko zweryfikowane zmiany BOT DEE i Gemini — nie Master Admin, narzędzia beta testerów ani inne notatki produktów FLOQR. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa Twojego Site Chrome — nie ma drugiego motywu."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
@@ -4573,7 +4573,7 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "علامات Version SMARTview",
-        body: "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض ملاحظات حزمة FLOQR الموثّقة من README الحالي. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظهر ثانٍ."
+        body: "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض تغييرات BOT DEE وGemini الموثّقة فقط — وليس Master Admin أو أدوات مختبري بيتا أو ملاحظات منتجات FLOQR الأخرى. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظهر ثانٍ."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",

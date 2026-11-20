@@ -6,6 +6,7 @@
 const fs = require("fs");
 const path = require("path");
 const manifest = require("./botdee-upgrade-manifest");
+const whatsNewCatalog = require("./botdee-whats-new-catalog");
 
 const SCHEMA_VERSION = "floqr.botDeeVersionSmartView/1";
 const KIND = "botDeeVersion";
@@ -29,7 +30,7 @@ function parseChangelogText(text) {
   const seen = new Set();
   const re = /^- (s3\.\d+\.\d+):\s*(.+)$/gm;
   let match;
-  while ((match = re.exec(String(text || ""))) && items.length < 8) {
+  while ((match = re.exec(String(text || ""))) && items.length < 40) {
     const id = match[1];
     if (seen.has(id)) continue;
     seen.add(id);
@@ -43,13 +44,19 @@ function parseChangelogText(text) {
 
 function changelogFromBundle() {
   try {
-    // Live What's New head is functions/botdee-version-changelog.json (s3.3.035+).
+    // Live package notes: functions/botdee-version-changelog.json (s3.3.035+).
+    // What's New tab filters through botdee-whats-new-catalog.js (BOT DEE/Gemini only).
     const rows = require("./botdee-version-changelog.json");
     if (!Array.isArray(rows)) return [];
-    return rows.slice(0, 8).filter(row => row && row.id && row.text).map(row => ({
-      id: String(row.id),
-      text: String(row.text).slice(0, 280)
-    }));
+    return rows.filter(row => row && row.id && row.text).map(row => {
+      const next = {
+        id: String(row.id),
+        text: String(row.text).slice(0, 280)
+      };
+      if (Array.isArray(row.audiences) && row.audiences.length) next.audiences = row.audiences.slice();
+      if (row.whatsNewText) next.whatsNewText = String(row.whatsNewText).slice(0, 280);
+      return next;
+    });
   } catch (_) {
     return [];
   }
@@ -66,8 +73,8 @@ function changelogFromReadme(rootDir) {
 
 function changelogItems(rootDir) {
   const bundled = changelogFromBundle();
-  if (bundled.length) return bundled;
-  return changelogFromReadme(rootDir);
+  const source = bundled.length ? bundled : changelogFromReadme(rootDir);
+  return whatsNewCatalog.forVersionWhatsNew(source);
 }
 
 /** Probe this Version request. Never a static Not checked label.
