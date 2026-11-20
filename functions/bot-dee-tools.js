@@ -635,26 +635,69 @@ function squeezeNeedle(value) {
   return normalizeNeedle(value).replace(/\s+/g, "");
 }
 
-function identityAliases(data = {}) {
-  const handle = String(data.floqrHandle || data.username || data.minglHandle || "").replace(/^@+/, "").trim();
+/** People search identity keys only — never bio, likes, drinks, genres, or SMARTview tags. */
+const PEOPLE_IDENTITY_HANDLE_KEYS = Object.freeze([
+  "floqrHandle", "minglHandle", "username",
+  "instagram", "instagramHandle",
+  "tiktok", "tiktokHandle",
+  "xHandle", "twitter", "x",
+  "facebook", "facebookHandle"
+]);
+
+function identityNameValues(data = {}) {
   const first = String(data.firstName || "").trim();
   const last = String(data.lastName || "").trim();
-  const legal = [first, last].filter(Boolean).join(" ");
-  const names = [
-    data.displayName, data.publicName, data.fullName, legal, handle
+  return [
+    first,
+    last,
+    [first, last].filter(Boolean).join(" "),
+    data.displayName,
+    data.publicName,
+    data.fullName
   ].map(value => String(value || "").trim()).filter(Boolean);
+}
+
+function identityHandleValues(data = {}) {
+  return PEOPLE_IDENTITY_HANDLE_KEYS
+    .map(key => String(data[key] || "").replace(/^@+/, "").trim())
+    .filter(Boolean);
+}
+
+function pushIdentityAlias(out, seen, raw) {
+  const folded = normalizeNeedle(raw);
+  const squeezed = squeezeNeedle(raw);
+  [folded, squeezed].forEach(alias => {
+    if (!alias || seen.has(alias)) return;
+    seen.add(alias);
+    out.push(alias);
+  });
+}
+
+function identityAliases(data = {}) {
   const out = [];
   const seen = new Set();
-  names.forEach(raw => {
+  identityNameValues(data).forEach(raw => pushIdentityAlias(out, seen, raw));
+  identityHandleValues(data).forEach(raw => pushIdentityAlias(out, seen, raw));
+  return out;
+}
+
+function identityNameTokens(data = {}) {
+  const tokens = new Set();
+  identityNameValues(data).forEach(raw => {
+    normalizeNeedle(raw).split(/\s+/).filter(token => token.length > 1).forEach(token => tokens.add(token));
+  });
+  return tokens;
+}
+
+function identityHandleSet(data = {}) {
+  const set = new Set();
+  identityHandleValues(data).forEach(raw => {
     const folded = normalizeNeedle(raw);
     const squeezed = squeezeNeedle(raw);
-    [folded, squeezed].forEach(alias => {
-      if (!alias || seen.has(alias)) return;
-      seen.add(alias);
-      out.push(alias);
-    });
+    if (folded) set.add(folded);
+    if (squeezed) set.add(squeezed);
   });
-  return out;
+  return set;
 }
 
 function scoreIdentity(data, needle, tokens) {
@@ -665,22 +708,27 @@ function scoreIdentity(data, needle, tokens) {
   let points = 0;
   aliases.forEach(alias => {
     if (alias === n || (squeezed && alias === squeezed)) {
-      points = Math.max(points, alias.length >= 4 || alias.includes(" ") ? 50 : 6);
-    } else if (n.length >= 4 && alias.includes(n)) {
-      points = Math.max(points, 24);
+      points = Math.max(points, alias.length >= 4 || alias.includes(" ") ? 50 : 16);
     }
   });
-  const hay = aliases.join(" ");
-  const hits = (Array.isArray(tokens) ? tokens : []).filter(token => token.length > 1 && hay.includes(token));
-  if (hits.length && hits.length === tokens.length) {
-    if (tokens.length >= 2) points = Math.max(points, 40);
-    else if (tokens[0] && tokens[0].length >= 4) points = Math.max(points, 12);
+  const queryTokens = (Array.isArray(tokens) && tokens.length
+    ? tokens
+    : n.split(/\s+/)).map(token => normalizeNeedle(token).replace(/^@+/, "")).filter(token => token.length > 1);
+  if (!queryTokens.length) return points;
+  const nameTokens = identityNameTokens(data);
+  const handles = identityHandleSet(data);
+  if (queryTokens.every(token => nameTokens.has(token))) {
+    points = Math.max(points, queryTokens.length >= 2 ? 40 : 16);
+  }
+  if (queryTokens.length === 1 && (handles.has(queryTokens[0]) || handles.has(squeezed))) {
+    points = Math.max(points, queryTokens[0].length >= 4 || squeezed.length >= 4 ? 50 : 16);
   }
   return points;
 }
 
+/** People lookup: identity fields only. Bios / likes / drinks never score. */
 function scorePerson(data, needle, tokens) {
-  return Math.max(scoreIdentity(data, needle, tokens), scoreHay(userHaystack(data), needle, tokens));
+  return scoreIdentity(data, needle, tokens);
 }
 
 function scoreHay(hay, needle, tokens) {
@@ -1066,6 +1114,7 @@ function publicClubCard(id, data = {}, score) {
   };
 }
 
+/** Interest/bio blob for volunteered datapoints — NOT used to find people. */
 function userHaystack(data = {}) {
   const parts = [
     data.displayName, data.publicName, data.fullName, data.firstName, data.lastName,
@@ -1109,7 +1158,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   }
   const kind = String(args.kind || "any").trim().toLowerCase();
   const limit = Math.min(PUBLIC_PROFILE_MAX, Math.max(1, Number(args.limit) || 5));
-  const stop = new Set(["my", "friend", "buddy", "mate", "about", "know", "what", "you", "the", "do", "me", "named", "connection", "mingl"]);
+  const stop = new Set(["my", "friend", "buddy", "mate", "about", "know", "what", "who", "is", "are", "was", "were", "this", "person", "you", "the", "do", "me", "named", "connection", "mingl"]);
   const viewerUid = sessionRequest.auth.uid;
   const scored = [];
   const seen = new Set();
@@ -1153,7 +1202,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         // Connections: public profiles only — never private fields.
         if (!people.isPublic(data)) return;
         const base = scorePerson(data, matchNeedle, tokens);
-        // Require a real name/handle match (threshold 8). No free pass for “friend” alone.
+        // Require a real name/handle match (threshold 8). Identity-only. No free pass for “friend” alone.
         if (base < 8) return;
         const points = base + (friendContext ? 12 : 6);
         scored.push(publicUserCard(doc.id, data, points, {relation: "connection"}));
@@ -1176,7 +1225,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         const data = doc.data() || {};
         if (!people.isPublic(data)) return;
         const base = scorePerson(data, matchNeedle, tokens);
-        // Must match the query first — connection boost must not invent hits.
+        // Identity-only — bios / likes / drinks never invent hits.
         if (base < 8) return;
         const points = base + (connected.has(doc.id) ? 10 : 0);
         scored.push(publicUserCard(doc.id, data, points, {
@@ -1284,7 +1333,10 @@ module.exports = {
   publicMinglKeys,
   datapointAllowed,
   userHaystack,
+  PEOPLE_IDENTITY_HANDLE_KEYS,
   identityAliases,
+  identityNameValues,
+  identityHandleValues,
   scoreIdentity,
   scorePerson,
   normalizeNeedle,

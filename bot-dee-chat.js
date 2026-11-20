@@ -397,6 +397,7 @@
   }
 
   async function ensurePeopleSmartViews(text, data) {
+    /* People matches come from searchPeopleSmartCards (identity fields only). Never haystack bios. */
     const classified = classifyPeopleSearchIntent(text);
     const session = data && typeof data === "object" ? data : {};
     if (classified.intent === "none") return session;
@@ -499,7 +500,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.053";
+    return "s3.3.054";
   }
 
   function isVersionSmartViewAlias(raw) {

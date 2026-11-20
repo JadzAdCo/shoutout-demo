@@ -150,7 +150,7 @@ test("publicUserCard omits datapoints the patron opted out of", () => {
   assert.ok(card.imageUrls.length);
 });
 
-test("userHaystack matches Mingl public interests so BOT DEE can find by food/music/travel", () => {
+test("userHaystack still lists Mingl interests but people search does not use it", () => {
   const hay = tools.userHaystack(SAMPLE_PUBLIC).toLowerCase();
   assert.match(hay, /afro house/);
   assert.match(hay, /jollof/);
@@ -158,6 +158,9 @@ test("userHaystack matches Mingl public interests so BOT DEE can find by food/mu
   const optedOut = tools.userHaystack({...SAMPLE_PUBLIC, publicMinglDatapoints: ["location"]});
   assert.doesNotMatch(optedOut.toLowerCase(), /jollof/);
   assert.match(optedOut, /Washington/);
+  const src = require("fs").readFileSync(require("path").join(__dirname, "bot-dee-tools.js"), "utf8");
+  assert.match(src, /People lookup: identity fields only/);
+  assert.doesNotMatch(src, /scoreHay\(userHaystack\(data\)/);
 });
 
 test("isSelfQuery recognizes my public profile and the viewer's handle/name", () => {
@@ -188,6 +191,7 @@ test("people lookup matches first+last, display name, squeezed alias, and handle
   assert.ok(aliases.includes("don papi"));
   assert.ok(aliases.includes("donpapi"));
   assert.ok(aliases.includes("donbans"));
+  assert.ok(aliases.includes("don"), "firstName is an identity alias");
   ["don banyong", "Don Papi", "DonPapi", "@DonBans", "DonBans"].forEach(needle => {
     assert.ok(tools.scoreIdentity(DON_ALIASES, needle, needle.toLowerCase().replace(/^@/, "").split(/\s+/)) >= 8, needle);
     assert.equal(tools.isSelfQuery(needle, DON_ALIASES), true, needle);
@@ -209,6 +213,43 @@ test("identity fold matches accented names and curly apostrophes", () => {
   assert.ok(tools.scoreIdentity(row, "José", ["jose"]) >= 8);
   assert.equal(tools.normalizeNeedle("O’Brien"), "obrien");
   assert.equal(tools.normalizeNeedle("José"), "jose");
+});
+
+test("Who is Don / query Don matches identity keys only — not bio Don Julio", () => {
+  const anna = {
+    firstName: "Anna",
+    lastName: "Feline",
+    displayName: "Anna Feline",
+    floqrHandle: "annafeline_",
+    instagramHandle: "annafeline_",
+    publicBio: "likes Don Julio",
+    bio: "Anna Feline disfruta Afrobeat. likes Don Julio.",
+    tagline: "Don Julio nights",
+    favoriteBeverages: ["Don Julio"],
+    musicInterests: ["Afrobeat"],
+    headline: "I like Don"
+  };
+  const donQuery = tools.normalizeNeedle("Don");
+  const donTokens = ["don"];
+  assert.ok(tools.scorePerson(anna, donQuery, donTokens) < 8, "bio Don Julio must not match Don");
+  assert.ok(tools.scoreIdentity(anna, "Who is Don", ["don"]) < 8);
+  assert.ok(tools.scorePerson(anna, tools.normalizeNeedle("Who is Don"), ["who", "is", "don"]) < 8);
+
+  const byFirst = {firstName: "Don", lastName: "Smith", displayName: "D Smith", publicBio: "hello"};
+  assert.ok(tools.scorePerson(byFirst, donQuery, donTokens) >= 8, "firstName Don matches");
+
+  const byHandle = {displayName: "Alex", floqrHandle: "don", publicBio: "nope"};
+  assert.ok(tools.scorePerson(byHandle, donQuery, donTokens) >= 8, "handle @don matches");
+  assert.ok(tools.scorePerson(byHandle, tools.normalizeNeedle("@don"), ["don"]) >= 8);
+
+  const byDisplay = {firstName: "Alex", displayName: "Don", publicBio: "likes tequila"};
+  assert.ok(tools.scorePerson(byDisplay, donQuery, donTokens) >= 8, "displayName Don matches");
+
+  const byInstagram = {displayName: "Alex", instagram: "don", publicBio: "Don Julio fan"};
+  assert.ok(tools.scorePerson(byInstagram, donQuery, donTokens) >= 8, "Instagram handle don matches");
+
+  const underscoredDon = {displayName: "Alex", instagramHandle: "the_don_4ld", publicBio: "x"};
+  assert.ok(tools.scorePerson(underscoredDon, donQuery, donTokens) < 8, "the_don_4ld is not identity Don");
 });
 
 test("injectSelfProfile does not send Mingl datapoints from a non-public self profile", () => {

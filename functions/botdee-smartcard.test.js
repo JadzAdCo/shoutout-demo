@@ -400,12 +400,20 @@ test("client compact cards inherit Site Chrome tokens; no hardcoded Tiffany; no 
   assert.match(client, /let sawReadable = false/);
   assert.match(client, /if \(!sawReadable\) return;/);
   assert.match(client, /getPeopleSmartView decides/);
+  assert.match(client, /botdee-sc-id botdee-sv-id/);
+  assert.doesNotMatch(client, /botdee-sc-thumb botdee-sv-portrait/);
   const css = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.css"), "utf8");
   assert.match(css, /\.botdee-sc-card/);
   assert.match(css, /var\(--accent/);
   assert.match(css, /-webkit-line-clamp: 4/);
+  assert.match(css, /\.botdee-sc-body\s*\{[^}]*flex:\s*0 0 auto/s);
+  assert.match(css, /\.botdee-sc-card \.botdee-sv-id/);
+  assert.match(css, /No empty band under the photo/);
   assert.doesNotMatch(css, /#20d9d8/);
   assert.doesNotMatch(client, /display\.html\?location=[^"' ]+[?&]v=/);
+  const chat = fs.readFileSync(path.join(__dirname, "..", "bot-dee-chat.js"), "utf8");
+  assert.match(chat, /identity fields only/);
+  assert.doesNotMatch(chat, /publicBio|userHaystack|favoriteBeverages/);
 });
 
 test("diagnostics never log the private query text", () => {

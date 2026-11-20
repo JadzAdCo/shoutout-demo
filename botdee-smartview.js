@@ -330,11 +330,11 @@
         : `<span class="botdee-sc-thumb-empty" aria-hidden="true"></span>`);
     return `<article class="botdee-sv-people botdee-sc-card" data-kind="patron" data-presentation="peopleSmartCard" data-subject-uid="${esc(uid)}" role="button" tabindex="0" aria-label="${esc(t("botdee.sc.openSMARTview", "Open SMARTview"))}">
       <div class="botdee-sc-row">
-        <div class="botdee-sc-thumb botdee-sv-portrait" aria-hidden="${hasMedia ? "false" : "true"}">
+        <div class="botdee-sc-thumb" aria-hidden="${hasMedia ? "false" : "true"}">
           ${thumb}
         </div>
         <div class="botdee-sc-body">
-          <div class="botdee-sv-id">
+          <div class="botdee-sc-id botdee-sv-id">
             <div class="botdee-sc-name botdee-sv-name">${peopleNameHtml(people, payload)}</div>
             ${peopleHandleHtml(people)}
           </div>

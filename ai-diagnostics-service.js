@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.053";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.053";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.054";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.054";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,10 +223,21 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.054",
+      title: "s3.3.054 — BOT DEE people search is identity-only; compact picker cards",
+      checks: [
+        {label:"Identity-only scorePerson", file:"functions/bot-dee-tools.js", includes:["People lookup: identity fields only", "PEOPLE_IDENTITY_HANDLE_KEYS"], notIncludes:["scoreHay(userHaystack(data)"]},
+        {label:"Don Julio bio test", file:"functions/bot-dee-tools.test.js", includes:["bio Don Julio must not match Don", "firstName Don matches", "handle @don matches"]},
+        {label:"Compact picker stack", file:"botdee-smartview.css", includes:["No empty band under the photo", ".botdee-sc-card .botdee-sv-id", "flex: 0 0 auto"]},
+        {label:"Chat does not haystack bios", file:"bot-dee-chat.js", includes:["identity fields only"], notIncludes:["publicBio"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-054-people-identity-only"]}
+      ]
+    },
+    {
       version: "s3.3.053",
       title: "s3.3.053 — Vector Si-nema Site Chrome fills + White/Black PNG",
       checks: [
-        {label:"White/Black PNG path", file:"floqr-chrome-scheme.js", includes:["sinema-whiteblack.png", "ICON_V = \"s3.3.053\""]},
+        {label:"White/Black PNG path", file:"floqr-chrome-scheme.js", includes:["sinema-whiteblack.png", "ICON_V = \""]},
         {label:"Vector builder", file:"scripts/build-sinema-chrome-icons.py", includes:["si-nema-blacktiffany.webp", "approved FloqMedia official mark", "never painted black"]},
         {label:"Vector SVG master", file:"images/chrome/sinema-svg/logos/sinema-color-master.svg", includes:["aria-label=\"Si-nema logo\"", "Transparent canvas", "no black fills"]},
         {label:"Search White/Black PNG", file:"images/chrome/sinema-whiteblack.png", includes:[]},
@@ -3576,6 +3587,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-054-people-identity-only",
+      area:"BOT DEE",
+      feature:"People search identity-only + compact picker card",
+      changed:"s3.3.054 — Who is Don matches first name, last name, display name, and handles only. A bio that likes Don Julio (Anna Feline) is not a hit. Compact picker: photo, then name+handle tight, then bio — no empty band under the photo.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.css ?v=s3.3.054. Sign in with BOT DEE. 2) Ask Who is Don — do not get Anna Feline from a Don Julio bio. A firstName Don / @don / displayName Don public profile still matches. 3) If several identity matches: compact cards with photo immediately above name+handle, bio tight under the name, no empty rows. 4) Ask Who is Don Banyong / @DonBans — still the stacked People card. 5) Mark Succeed/Failed.",
+      expected:"Don Julio in a bio never opens that person’s picker card. Identity hits still work. Compact cards have no empty band under the photo. Display URLs have no ?v=.",
+      troubleshoot:"Anna still appears → Functions executeBotSession / searchPeopleSmartCards not this SHA (scorePerson still uses userHaystack). Empty band under photo → cached botdee-smartview.css before s3.3.054. No Don match on a real firstName Don → publicProfileVisibility not public, or identityAliases missing firstName."
+    },
     {
       id:"s3-3-053-sinema-vector-chrome",
       area:"Search",
