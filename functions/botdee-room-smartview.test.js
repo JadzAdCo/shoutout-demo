@@ -247,7 +247,7 @@ test("chat wires Room SMARTview join without charging", () => {
   assert.doesNotMatch(read("functions/botdee-room-smartview.js"), /createBotDeeRoom|botDeeRooms/);
   assert.match(read("functions/botdee-room-live.js"), /botDeeRooms/);
   assert.doesNotMatch(read("functions/botdee-room-live.js"), /charge:\s*true/);
-  assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom/);
+  assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom\b/);
   assert.match(read("botdee-smartview.js"), /confirm room smartview/);
   assert.match(read("botdee.html"), /botdee-room-smartview\.js/);
   assert.equal(room.classifyRoomIntent("confirm room smartview").route, "confirm");

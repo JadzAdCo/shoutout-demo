@@ -1,5 +1,9 @@
 [
   {
+    "id": "s3.3.047",
+    "text": "s3.3.047: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab"
+  },
+  {
     "id": "s3.3.046",
     "text": "s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join; App Check plan-trace logs to Master Admin (enforcement off)"
   },

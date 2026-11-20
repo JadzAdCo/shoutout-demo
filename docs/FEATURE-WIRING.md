@@ -827,21 +827,21 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
-## Room SMARTview intent routing (s3.3.033 / join live s3.3.046)
+## Room SMARTview + Mingl session invites (s3.3.033 / join s3.3.046 / Mingl invites s3.3.047)
 
-**Purpose:** BOT DEE recognizes Room SMARTview intents (explicit / strong invite / contextual collaborate / existing-room commands) and opens an inline **Room SMARTview** confirmation card. Official name is **Room SMARTview** (never “Mingl Room SmartView”). **s3.3.046:** Confirm sends `confirm room smartview` (bare `confirm` is VIP hold, not a new room). Join is **not** a payment and does **not** open a shared tab. A second Confirm rotates the host token on the **same** room. Leave / End / New chat clear `joinedRoomId`. Failed `?join=` replies instead of opening setup. Shared tab / charge stay off. Distinct from Version SMARTview and People SMARTview.
+**Purpose:** BOT DEE recognizes Room SMARTview intents and opens an inline **Room SMARTview** card. Official name is **Room SMARTview** (never “Mingl Room SmartView”). **s3.3.047:** Confirm creates a Mingl-friends-only session (host plus 7 guests). Guests can invite. Invite tokens are SHA-256 only, bound to `targetUid`, Inbox `type: botDeeRoomInvite` (**Review BOT DEE invite**, not a ShoutOut CTA). Join is **not** a payment. Shared tab is a later opt-in + FloqR Stripe (`orderType: botDeeRoomTab`). Beta gates: `botDee` on chat, `mingl` on invite/join/create/tab. Distinct from Version SMARTview and People SMARTview.
 
 | Layer | Wiring |
 |---|---|
-| UI | Card in the BOT DEE bubble (`bot-dee-chat.js` → `FLOQRBotDeeSmartView.mount`). Setup / offer / share-preview / command / deny. Participants 0/8, itinerary / tab / permissions rows, Confirm and Not now. Composer, draft, and scroll stay. Site Chrome tokens only. Confirm sends `confirm room smartview`. `?join=` is stripped after the client posts `joinToken`. |
-| Client | `botdee-room-smartview.js` (UMD, same file as Functions — classifier stays Firestore-free). `botdee-smartview.js` `renderRoomCard` / `bindRoomCard`. Chrome keys `botdee.rs.*` (`joinLink`, `confirmedLive`, `joined`). Decline keys in `sessionStorage floqr.roomSmartView.declined` and `executeBotSession.roomSmartViewDeclined`. Idle timer re-arms while `data-rs-active=1`. |
-| Backend | `functions/botdee-room-smartview.js` `classifyRoomIntent` / `buildRoomSession` (`ROOMS_LIVE=true`). Live writes in `functions/botdee-room-live.js` (`createRoom` / `joinRoom` / `rotateJoinToken` / `leaveRoom` / `endRoom` / `appendTurn`). `executeBotSession` runs join token → ShoutOut → VIP → room → people → Gemini. VIP/ShoutOut/people turns are **not** written to the room. Closed rooms refuse `appendTurn` / `loadTurns`. Host End/Leave clears `joinedRoomId` for **every** member; a non-host End does not unjoin them. Joined Gemini context uses **room turns only** (private thread is not copied). |
-| Data | `botDeeRooms/{roomId}` + `turns` (Functions-write; member-read; `joinTokenHash` SHA-256; `memberUids` cap 8; **no IP**; `charge` false). Thread pointer `botDeeThreads.joinedRoomId` + `joinedRoomConversationId` (cleared when the conversation changes). Classification rows in `data-classification-core.js`. |
-| URL / contract | `botdee.html?join=<token>` (no `?v=`). Display boards never get `?v=`. |
-| Security | Same `assertFeatureAccess(botDee)` as chat. Classifier cannot grant membership. Join hashes the token server-side. Shared tab / checkout never open from join. Prompt-injection asking for host memory is denied. |
-| Observability | Manual Feature Tests `s3-3-033-room-smartview-intent`, `s3-3-046-people-gaps-headless-vip-rooms`. |
-| Help | `help-botdee-room-smartview`, `-invite`, `-join`, `-end`, `-tab`, `-who-pays`, `-kick`, `-share`. BOT DEE intent `help-botdee-room-smartview`. |
-| Deploy | Pages + Functions (`executeBotSession`) + Firestore rules `s3.3.046-headless-vip-rooms`. `[firebase-deploy] [firebase-deploy-botdee]`. |
+| UI | Card in the BOT DEE bubble (`bot-dee-chat.js` → `FLOQRBotDeeSmartView.mount`). Invite picker is Mingl friends only. Participants cap 8, itinerary / tab / members / Invite / End. Confirm sends `confirm room smartview`. `?room=&t=` (legacy `?join=`) stripped after capture. Satellite `FLOQRSessionShell` on `botdee.html`. |
+| Client | `botdee-room-smartview.js` (UMD, byte-identical to Functions). `botdee-smartview.js` `renderRoomCard` / `bindRoomCard` (`listBotDeeRoomFriends`, `createBotDeeRoomInvite`, `optInBotDeeRoomTab`, `endBotDeeRoom`). Chrome `botdee.rs.*` + `botdee.room.*`. Inbox `inboxLinkLabel` → Review BOT DEE invite. |
+| Backend | Classifier `functions/botdee-room-smartview.js`. Live I/O `functions/botdee-session-store.js` + thin `botdee-room-live.js` (`joinRoom` = `acceptInvite`). Callables in `functions/botdee-session-functions.js` (`createBotDeeRoomInvite` / `acceptBotDeeRoomInvite` / `inviteBotDeeRoomGuest` / kick / end / tab). `executeBotSession` join token or already-member `roomId` → persist `joinedRoomId`. Gemini context = **room events only** (private thread / memories not copied). Checkout `createFloqrCheckoutSession` `botDeeRoomTab` as paying uid; `last4` on payer receipt only. |
+| Data | `botDeeRooms` + `turns`/`events` (member-read). `botDeeRoomMembers`, `botDeeRoomInvites` (Functions-only, SHA-256), `botDeeRoomTabs` + `lines` (no card last4), `botDeeRoomAudit`, invite/turn throttles. **No IP.** Classification in `data-classification-core.js` job `botDeeSession`. |
+| URL / contract | `botdee.html?room=<id>&t=<token>` (no `?v=`). Display boards never get `?v=`. |
+| Security | `assertFeatureAccess(botDee)` + `mingl` on session callables and tab checkout. Token bound to `targetUid`; wrong account / expired / revoked / non-friend / cap 8 refuse. Kicked uid removed from `memberUids` (cannot read events). Agent probes `actorRole: agent`. |
+| Observability | Manual Feature Tests `s3-3-047-botdee-mingl-session-invite`. |
+| Help | `help-botdee-room-smartview`, `-invite`, `-join`, `-end`, `-tab`, `-who-pays`, `-kick`, `-share` (11 langs). |
+| Deploy | **PR only until Don asks.** Pages + Functions + Firestore rules `s3.3.047-botdee-mingl-session`. `[firebase-deploy] [firebase-deploy-botdee]` when Don deploys. |
 
 ---
 
