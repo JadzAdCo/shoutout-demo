@@ -252,6 +252,60 @@ test("Who is Don / query Don matches identity keys only — not bio Don Julio", 
   assert.ok(tools.scorePerson(underscoredDon, donQuery, donTokens) < 8, "the_don_4ld is not identity Don");
 });
 
+test("signed-in Don searching Who is Don still lists other public Dons, not only self", () => {
+  assert.equal(tools.isExclusiveSelfQuery("Who is Don"), false);
+  assert.equal(tools.isExclusiveSelfQuery("Don"), false);
+  assert.equal(tools.isExclusiveSelfQuery("who am I"), true);
+  assert.equal(tools.isExclusiveSelfQuery("my public profile"), true);
+  assert.equal(tools.isSelfQuery("Don", DON_ALIASES), true, "firstName Don is an identity self-hit");
+  assert.equal(tools.isSelfQuery("Who is Don", DON_ALIASES), false);
+
+  const otherDon = {
+    publicProfileVisibility: "public",
+    firstName: "Don",
+    lastName: "Smith",
+    displayName: "Don Smith",
+    floqrHandle: "donsmith"
+  };
+  const anna = {
+    publicProfileVisibility: "public",
+    firstName: "Anna",
+    lastName: "Feline",
+    displayName: "Anna Feline",
+    floqrHandle: "annafeline_",
+    publicBio: "likes Don Julio"
+  };
+  const directory = [
+    {id: "other-don", data: otherDon},
+    {id: "anna-feline", data: anna}
+  ];
+  ["Who is Don", "Don"].forEach(query => {
+    const hits = tools.rankPeopleIdentityHits({
+      query,
+      viewerUid: "viewer-don",
+      viewerData: DON_ALIASES,
+      directory
+    });
+    assert.equal(hits.exclusiveSelf, false, query);
+    assert.ok(hits.ids.includes("viewer-don"), `${query} includes signed-in Don`);
+    assert.ok(hits.ids.includes("other-don"), `${query} includes other public Don`);
+    assert.ok(!hits.ids.includes("anna-feline"), `${query} still ignores bio Don Julio`);
+  });
+
+  const meOnly = tools.rankPeopleIdentityHits({
+    query: "Who am I",
+    viewerUid: "viewer-don",
+    viewerData: DON_ALIASES,
+    directory
+  });
+  assert.equal(meOnly.exclusiveSelf, true);
+  assert.deepEqual(meOnly.ids, ["viewer-don"]);
+
+  const src = require("fs").readFileSync(require("path").join(__dirname, "bot-dee-tools.js"), "utf8");
+  assert.match(src, /!exclusiveSelf && !friendContext && matchNeedle/);
+  assert.match(src, /Shared first\/last names include the viewer AND the public directory/);
+});
+
 test("injectSelfProfile does not send Mingl datapoints from a non-public self profile", () => {
   const privateSelf = {
     ...SAMPLE_PUBLIC,
