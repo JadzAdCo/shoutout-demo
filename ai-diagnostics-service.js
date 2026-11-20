@@ -3511,7 +3511,7 @@
       area:"Master Admin",
       feature:"Features SMARTview (eight products, Status not verified)",
       changed:"Master Admin → Features Mgmt → BOT DEE → SMARTviews → Show Features SMARTview. Catalog is evidence-backed: packaged flags only, Si-tube marked not in repo, no invented Beta-since dates. Live Firestore flags not verified this run.",
-      howToTest:"1) Hard-refresh Master Admin (`master-admin.html?v=s3.3.047`). 2) Features Mgmt → BOT DEE → SMARTviews. 3) Click Show Features SMARTview. 4) Confirm eight cards: FloqR, BOT DEE, Mingl, ShoutOut, VIP reserV, floqCast, Si-nema, Si-tube. 5) Every badge says Status not verified. Si-tube says Not in this repository.",
+      howToTest:"1) Hard-refresh Master Admin. 2) Features Mgmt → BOT DEE (`#featuresBotDee`) → SMARTviews. 3) Click Show Features SMARTview. 4) Confirm eight cards: FloqR, BOT DEE, Mingl, ShoutOut, VIP reserV, floqCast, Si-nema, Si-tube. 5) Every badge says Status not verified. Si-tube says Not in this repository.",
       expected:"No BOT-DEE / FloqCAST misspellings. No Try action on Si-tube. No fabricated release dates.",
       troubleshoot:"Button missing → master-admin.html host + floqr-features-smartview.js. Catalog 404 → features-smartview/catalog.json not on Pages. Live availability still unknown until Firebase flags are read."
     },

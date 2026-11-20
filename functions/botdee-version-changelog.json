@@ -1,5 +1,9 @@
 [
   {
+    "id": "s3.3.047",
+    "text": "s3.3.047: Gray Save after command received; Features SMARTview first slice on Master Admin BOT DEE SMARTviews"
+  },
+  {
     "id": "s3.3.046",
     "text": "s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join; App Check plan-trace logs to Master Admin (enforcement off)"
   },
