@@ -53,16 +53,38 @@
     return { role: isMasterAdmin ? "masterAdmin" : "patron", canAccessKeys, isMasterAdmin };
   }
 
+  function productIdsFromPayload(payload) {
+    if (payload && payload.productId) return [String(payload.productId)];
+    return ((payload && payload.products) || []).map(row => row && row.id).filter(Boolean);
+  }
+
   function catalogFor(host) {
-    if (host && host.__fsvSnapshot) return host.__fsvSnapshot;
-    if (catalog) return catalog;
-    return null;
+    const ids = host && Array.isArray(host.__fsvProductIds) ? host.__fsvProductIds.filter(Boolean) : [];
+    if (catalog) {
+      if (!ids.length) return catalog;
+      const want = new Set(ids);
+      return {
+        schemaVersion: catalog.schemaVersion,
+        catalogVersion: catalog.catalogVersion || 1,
+        warning: (host && host.__fsvWarning) || catalog.warning || "",
+        products: (catalog.products || []).filter(row => want.has(row.id)),
+        features: (catalog.features || []).filter(row => want.has(row.productId))
+      };
+    }
+    return (host && host.__fsvSnapshot) || null;
   }
 
   function projection(host) {
     const source = catalogFor(host);
     if (!source) return {products: [], features: [], warning: ""};
-    return core().publicProjection(source, viewerAccess());
+    if (catalog) return core().publicProjection(source, viewerAccess());
+    return {
+      schemaVersion: source.schemaVersion,
+      catalogVersion: source.catalogVersion || 1,
+      warning: source.warning || "",
+      products: source.products || [],
+      features: source.features || []
+    };
   }
 
   function stateFrom(host) {
@@ -403,12 +425,18 @@
     if (!host || !payload) return;
     lastHost = host;
     host.classList.add("floqr-fsv-mount");
-    // Per-host snapshot only. A retrieve payload is product-filtered and capped at 12;
-    // never assign it to the module-wide catalog used by later cards in this session.
+    // Scope the card to this retrieve's product(s). Rows come from the full catalog
+    // (all tabs for that product), never a view-filtered retrieve slice and never
+    // the six-product module catalog.
+    host.__fsvProductIds = productIdsFromPayload(payload);
+    host.__fsvWarning = payload.warning || "";
     host.__fsvSnapshot = snapshotFromPayload(payload);
     if (payload.productId) host.setAttribute("data-fsv-product", payload.productId);
     if (payload.view) host.setAttribute("data-fsv-view", payload.view);
     render(host);
+    if (!catalog) {
+      loadCatalog().then(() => render(host)).catch(() => {});
+    }
   }
 
   root.FLOQRFeaturesSmartView = {

@@ -192,6 +192,7 @@ function fakeHost() {
     textContent: "",
     classList: {add() {}},
     __jumps: [],
+    __tabs: [],
     getAttribute(name) {
       return Object.prototype.hasOwnProperty.call(host.attributes, name) ? host.attributes[name] : "";
     },
@@ -202,18 +203,28 @@ function fakeHost() {
       return null;
     },
     querySelectorAll(sel) {
-      if (sel !== "[data-fsv-view-jump]") return [];
+      let attr = "";
+      let bucket = "";
+      if (sel === "[data-fsv-view-jump]") {
+        attr = "data-fsv-view-jump";
+        bucket = "__jumps";
+      } else if (sel === "[data-fsv-view]") {
+        attr = "data-fsv-view";
+        bucket = "__tabs";
+      } else {
+        return [];
+      }
       const buttons = [];
-      const re = /data-fsv-view-jump="([^"]+)"/g;
+      const re = new RegExp(attr + '="([^"]+)"', "g");
       let match;
       while ((match = re.exec(host.innerHTML))) {
         const view = match[1];
         buttons.push({
           getAttribute(name) {
-            return name === "data-fsv-view-jump" ? view : null;
+            return name === attr ? view : null;
           },
           addEventListener(type, fn) {
-            if (type === "click") host.__jumps.push({view, fn});
+            if (type === "click") host[bucket].push({view, fn});
           }
         });
       }
@@ -257,22 +268,67 @@ test("mountPayload keeps retrieve payloads per host and does not poison the modu
   assert.equal(sandbox.__FLOQR_FEATURES_SMARTVIEW_CATALOG.products.length, 6);
 });
 
-test("host snapshot wins after loadCatalog so a Mingl card does not show other product chips", async () => {
+test("Mingl What's New card stays product-scoped and All Features lists Mingl rows after loadCatalog", async () => {
   const sandbox = loadUiSandbox();
   const loaded = await sandbox.FLOQRFeaturesSmartView.loadCatalog();
   assert.equal(loaded.products.length, 6);
-  const mingl = sandbox.FLOQRFeaturesSmartViewCore.retrieve(catalog, "What can Mingl do?", {role: "patron"});
-  assert.equal(mingl.productName, "Mingl");
+  const payload = sandbox.FLOQRFeaturesSmartViewCore.retrieve(catalog, "What's new in Mingl", {role: "patron"});
+  assert.equal(payload.view, "whatsNew");
+  assert.equal(payload.productName, "Mingl");
+  assert.equal(payload.features.length, 0);
   const host = fakeHost();
-  sandbox.FLOQRFeaturesSmartView.mountPayload(host, mingl);
+  sandbox.FLOQRFeaturesSmartView.mountPayload(host, payload);
+  assert.equal(host.getAttribute("data-fsv-view"), "whatsNew");
   assert.match(host.innerHTML, /data-fsv-product="mingl"/);
   assert.match(host.innerHTML, /Mingl/);
+  assert.match(host.innerHTML, /approved, verified releases/i);
   assert.doesNotMatch(host.innerHTML, /data-fsv-product="shoutout"/);
   assert.doesNotMatch(host.innerHTML, /data-fsv-product="vip-reserv"/);
   assert.doesNotMatch(host.innerHTML, /data-fsv-product="si-nema"/);
   assert.doesNotMatch(host.innerHTML, /data-fsv-product="bot-dee"/);
   assert.doesNotMatch(host.innerHTML, /ShoutOut/);
   assert.doesNotMatch(host.innerHTML, /VIP reserV/);
+  const allTab = host.__tabs.find(row => row.view === "all");
+  assert.ok(allTab, "All Features tab is wired");
+  allTab.fn();
+  assert.equal(host.getAttribute("data-fsv-view"), "all");
+  assert.match(host.innerHTML, /Mutual connections and chat/);
+  assert.match(host.innerHTML, /Room SMARTview collaboration/);
+  assert.doesNotMatch(host.innerHTML, /No catalog features match/);
+  assert.doesNotMatch(host.innerHTML, /ShoutOut/);
+});
+
+test("scoped catalog rows are projected once so verified release fields survive", async () => {
+  const live = JSON.parse(JSON.stringify(catalog));
+  const row = live.features.find(item => item.id === "mingl.connections");
+  Object.assign(row, {
+    lifecycle: "released",
+    statusVerified: true,
+    availability: "public",
+    releaseDateVerified: true,
+    releasedAt: "2026-12-01",
+    publicCopyApproved: true,
+    sourceEvidence: [{kind: "deployment", visibility: "internal", observedAt: "2026-12-01", note: "Pages"}]
+  });
+  const sandbox = {
+    URL,
+    URLSearchParams,
+    fetch: async () => ({ok: true, json: async () => live}),
+    location: {href: "https://jadzadco.github.io/shoutout-demo/botdee.html", search: ""}
+  };
+  sandbox.window = sandbox;
+  sandbox.globalThis = sandbox;
+  sandbox.self = sandbox;
+  vm.runInNewContext(read("features-smartview-core.js"), sandbox);
+  vm.runInNewContext(read("floqr-features-smartview.js"), sandbox);
+  await sandbox.FLOQRFeaturesSmartView.loadCatalog();
+  const payload = sandbox.FLOQRFeaturesSmartViewCore.retrieve(live, "What's new in Mingl", {role: "patron"});
+  assert.equal(payload.view, "whatsNew");
+  const host = fakeHost();
+  sandbox.FLOQRFeaturesSmartView.mountPayload(host, payload);
+  assert.match(host.innerHTML, /Mutual connections and chat/);
+  assert.match(host.innerHTML, /2026-12-01/);
+  assert.doesNotMatch(host.innerHTML, /ShoutOut/);
 });
 
 test("Read changes honors data-fsv-view-jump instead of always opening Feature Journey", () => {
