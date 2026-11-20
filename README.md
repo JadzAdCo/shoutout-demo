@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.050 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.051 (stable)
 
+- s3.3.051: Headless VIP reserV: intercept visit/I want a reservation, Aurelia copy, Hold it CTA, real hold errors
 - s3.3.050: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab
 - s3.3.049: Beta Find patron by email; tester Save no longer waits on Audit Trail
 - s3.3.048: Save busy ignores unrelated writes and reason-prompt logs

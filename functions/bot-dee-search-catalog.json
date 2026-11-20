@@ -403,11 +403,11 @@
       "id": "help-botdee-headless-vip",
       "kind": "help",
       "label": "VIP reserV from BOT DEE chat",
-      "blurb": "Say VIP reserV or hold a VIP table at Aurelia in BOT DEE. Name the club, night, and table or area. Mezzanine is an area — BOT DEE lists V1–V4 and AURELIA SUITE so you can pick a table, then hold it, reply I agree to Terms, and pay if a deposit is required. BOT DEE never takes car",
+      "blurb": "Say VIP reserV, I want a reservation at Aurelia, or hold a VIP table in BOT DEE. Name the club, night, and table or area. Mezzanine is an area — BOT DEE lists V1–V4 and AURELIA SUITE so you can pick a table, then tap Hold it, tap I agree to Terms, and pay if a deposit is required",
       "href": "./botdee.html?from=botdee",
       "phrases": [
         "vip reserv from bot dee chat",
-        "say vip reserv or hold a vip table at aurelia in bot dee. name the club night and table or area. mezzanine is an area bot dee lists v1 v4 and aurelia suite so y",
+        "say vip reserv i want a reservation at aurelia or hold a vip table in bot dee. name the club night and table or area. mezzanine is an area bot dee lists v1 v4 a",
         "headless vip",
         "vip from chat",
         "hold a vip table at aurelia",

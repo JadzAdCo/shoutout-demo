@@ -40,6 +40,14 @@ function tonightIso(nowMs = Date.now()) {
   }).format(new Date(nowMs));
 }
 
+function clubDisplayName(clubLocationId) {
+  const id = text(clubLocationId, 120);
+  if (!id) return "";
+  const named = text(betaCatalog[id]?.venueName, 80);
+  if (named) return named.replace(/\s*\((?:Demo Club|demo)\)\s*$/i, "").trim() || named;
+  return id;
+}
+
 function resolveClubQuery(raw) {
   const folded = fold(raw);
   if (!folded) return "";
@@ -217,10 +225,24 @@ function isVipExecutePrompt(raw) {
   if (/\b(?:how|help|what is|where do i|instructions?|explain)\b/.test(q)) return false;
   if (/\b(?:throw|send|post)\b.{0,24}\bshout\s*out/.test(q)) return false;
   if (/\bvip\s*reserv/.test(q) || /\breserv\s*v\b/.test(q)) return true;
-  if (/\b(?:book|hold|reserve)\b.{0,40}\b(?:vip|table|booth|section)\b/.test(q)) return true;
+  if (/\b(?:book|hold|reserve|reserv)\b.{0,40}\b(?:vip|table|booth|section|mezzanine)\b/.test(q)) return true;
   if (/\b(?:vip)\b.{0,40}\b(?:table|booth|mezzanine|section)\b/.test(q)) return true;
   if (/\bheadless\s+vip\b/.test(q)) return true;
+  if (/\b(?:reservation|reservations)\b/.test(q)) {
+    if (resolveClubQuery(raw) || /\b(?:vip|table|booth|club|visit|night|aurelia|decades|lima)\b/.test(q)) return true;
+  }
   return false;
+}
+
+function isRepeatSelectedSection(raw, draft) {
+  const row = clipInteractiveDraft(draft);
+  if (!row.sectionId) return false;
+  const needle = fold(extractSectionNeedle(raw) || raw);
+  if (!needle || needle.length > 24) return false;
+  const label = fold(row.sectionLabel);
+  const id = fold(row.sectionId);
+  const last = id.split("-").pop();
+  return needle === label || needle === id || (last && needle === last);
 }
 
 function isConfirmHoldPrompt(raw) {
@@ -366,6 +388,7 @@ module.exports = {
   text,
   fold,
   tonightIso,
+  clubDisplayName,
   resolveClubQuery,
   loadPlan,
   sectionsForClub,
@@ -381,6 +404,7 @@ module.exports = {
   isCancelVipPrompt,
   isAcceptTermsPrompt,
   isBareAffirmative,
+  isRepeatSelectedSection,
   emptyDraft,
   clipInteractiveDraft,
   mergeInteractiveDraft,

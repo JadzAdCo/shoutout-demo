@@ -14,6 +14,8 @@ const KEYS = {
     "botdee.vip.party": "Party",
     "botdee.vip.pay": "Pay securely",
     "botdee.vip.openMap": "Open VIP reserV map",
+    "botdee.vip.holdIt": "Hold it",
+    "botdee.vip.agree": "I agree",
     "botdee.rs.joinLink": "Join this Room SMARTview",
     "botdee.rs.confirmedLive": "Room SMARTview is open. Share the join link so friends can talk with BOT DEE here. Joining is not a payment.",
     "botdee.rs.joined": "You're in this Room SMARTview. Joining is not a payment and does not open a shared tab."
@@ -26,6 +28,8 @@ const KEYS = {
     "botdee.vip.party": "Groupe",
     "botdee.vip.pay": "Payer en sécurité",
     "botdee.vip.openMap": "Ouvrir la carte VIP reserV",
+    "botdee.vip.holdIt": "Réserver",
+    "botdee.vip.agree": "J'accepte",
     "botdee.rs.joinLink": "Rejoindre ce Room SMARTview",
     "botdee.rs.confirmedLive": "Room SMARTview est ouvert. Partagez le lien pour que vos amis parlent avec BOT DEE ici. Rejoindre n’est pas un paiement.",
     "botdee.rs.joined": "Vous êtes dans ce Room SMARTview. Rejoindre n’est pas un paiement et n’ouvre pas un compte partagé."
@@ -38,6 +42,8 @@ const KEYS = {
     "botdee.vip.party": "Gruppe",
     "botdee.vip.pay": "Sicher bezahlen",
     "botdee.vip.openMap": "VIP reserV-Karte öffnen",
+    "botdee.vip.holdIt": "Halten",
+    "botdee.vip.agree": "Ich stimme zu",
     "botdee.rs.joinLink": "Diesem Room SMARTview beitreten",
     "botdee.rs.confirmedLive": "Room SMARTview ist offen. Teilen Sie den Link, damit Freunde hier mit BOT DEE sprechen. Beitreten ist keine Zahlung.",
     "botdee.rs.joined": "Sie sind in diesem Room SMARTview. Beitreten ist keine Zahlung und öffnet kein Shared Tab."
@@ -50,6 +56,8 @@ const KEYS = {
     "botdee.vip.party": "Grupo",
     "botdee.vip.pay": "Pagar de forma segura",
     "botdee.vip.openMap": "Abrir el mapa VIP reserV",
+    "botdee.vip.holdIt": "Reservar",
+    "botdee.vip.agree": "Acepto",
     "botdee.rs.joinLink": "Unirse a este Room SMARTview",
     "botdee.rs.confirmedLive": "Room SMARTview está abierto. Comparte el enlace para que tus amigos hablen con BOT DEE aquí. Unirse no es un pago.",
     "botdee.rs.joined": "Estás en este Room SMARTview. Unirse no es un pago y no abre una cuenta compartida."
@@ -62,6 +70,8 @@ const KEYS = {
     "botdee.vip.party": "Gruppo",
     "botdee.vip.pay": "Paga in sicurezza",
     "botdee.vip.openMap": "Apri la mappa VIP reserV",
+    "botdee.vip.holdIt": "Tieni",
+    "botdee.vip.agree": "Accetto",
     "botdee.rs.joinLink": "Entra in questo Room SMARTview",
     "botdee.rs.confirmedLive": "Room SMARTview è aperto. Condividi il link così gli amici parlano con BOT DEE qui. Entrare non è un pagamento.",
     "botdee.rs.joined": "Sei in questo Room SMARTview. Entrare non è un pagamento e non apre un tab condiviso."
@@ -74,6 +84,8 @@ const KEYS = {
     "botdee.vip.party": "Grupo",
     "botdee.vip.pay": "Pagar com segurança",
     "botdee.vip.openMap": "Abrir o mapa VIP reserV",
+    "botdee.vip.holdIt": "Reservar",
+    "botdee.vip.agree": "Concordo",
     "botdee.rs.joinLink": "Entrar neste Room SMARTview",
     "botdee.rs.confirmedLive": "Room SMARTview está aberto. Partilhe o link para os amigos falarem com BOT DEE aqui. Entrar não é um pagamento.",
     "botdee.rs.joined": "Está neste Room SMARTview. Entrar não é um pagamento e não abre um tab partilhado."
@@ -86,6 +98,8 @@ const KEYS = {
     "botdee.vip.party": "Groep",
     "botdee.vip.pay": "Veilig betalen",
     "botdee.vip.openMap": "VIP reserV-kaart openen",
+    "botdee.vip.holdIt": "Houd vast",
+    "botdee.vip.agree": "Ik ga akkoord",
     "botdee.rs.joinLink": "Deelnemen aan dit Room SMARTview",
     "botdee.rs.confirmedLive": "Room SMARTview is open. Deel de join-link zodat vrienden hier met BOT DEE praten. Deelnemen is geen betaling.",
     "botdee.rs.joined": "Je zit in dit Room SMARTview. Deelnemen is geen betaling en opent geen shared tab."
@@ -98,6 +112,8 @@ const KEYS = {
     "botdee.vip.party": "Компания",
     "botdee.vip.pay": "Оплатить безопасно",
     "botdee.vip.openMap": "Открыть карту VIP reserV",
+    "botdee.vip.holdIt": "Удержать",
+    "botdee.vip.agree": "Согласен",
     "botdee.rs.joinLink": "Войти в этот Room SMARTview",
     "botdee.rs.confirmedLive": "Room SMARTview открыт. Поделитесь ссылкой, чтобы друзья говорили с BOT DEE здесь. Вход — не платёж.",
     "botdee.rs.joined": "Вы в этом Room SMARTview. Вход — не платёж и не открывает общий счёт."
@@ -110,6 +126,8 @@ const KEYS = {
     "botdee.vip.party": "Παρέα",
     "botdee.vip.pay": "Πληρωμή με ασφάλεια",
     "botdee.vip.openMap": "Άνοιγμα χάρτη VIP reserV",
+    "botdee.vip.holdIt": "Κράτηση",
+    "botdee.vip.agree": "Συμφωνώ",
     "botdee.rs.joinLink": "Μπείτε σε αυτό το Room SMARTview",
     "botdee.rs.confirmedLive": "Το Room SMARTview είναι ανοιχτό. Μοιραστείτε τον σύνδεσμο ώστε οι φίλοι να μιλούν με BOT DEE εδώ. Η είσοδος δεν είναι πληρωμή.",
     "botdee.rs.joined": "Είστε σε αυτό το Room SMARTview. Η είσοδος δεν είναι πληρωμή και δεν ανοίγει κοινό λογαριασμό."
@@ -122,6 +140,8 @@ const KEYS = {
     "botdee.vip.party": "Grupa",
     "botdee.vip.pay": "Zapłać bezpiecznie",
     "botdee.vip.openMap": "Otwórz mapę VIP reserV",
+    "botdee.vip.holdIt": "Zatrzymaj",
+    "botdee.vip.agree": "Zgadzam się",
     "botdee.rs.joinLink": "Dołącz do tego Room SMARTview",
     "botdee.rs.confirmedLive": "Room SMARTview jest otwarty. Udostępnij link, aby znajomi rozmawiali tu z BOT DEE. Dołączenie nie jest płatnością.",
     "botdee.rs.joined": "Jesteś w tym Room SMARTview. Dołączenie nie jest płatnością i nie otwiera wspólnego rachunku."
@@ -134,6 +154,8 @@ const KEYS = {
     "botdee.vip.party": "العدد",
     "botdee.vip.pay": "ادفع بأمان",
     "botdee.vip.openMap": "افتح خريطة VIP reserV",
+    "botdee.vip.holdIt": "احجز",
+    "botdee.vip.agree": "أوافق",
     "botdee.rs.joinLink": "انضم إلى Room SMARTview هذا",
     "botdee.rs.confirmedLive": "Room SMARTview مفتوح. شارك رابط الانضمام ليتحدث الأصدقاء مع BOT DEE هنا. الانضمام ليس دفعاً.",
     "botdee.rs.joined": "أنت في Room SMARTview هذا. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً."
@@ -185,6 +207,13 @@ if (!src.includes('"botdee.rs.joinLink"')) {
     src,
     /"botdee\.rs\.confirmedNotLive": [^\n]+\n/,
     ["botdee.rs.joinLink", "botdee.rs.confirmedLive", "botdee.rs.joined"]
+  );
+}
+if (!src.includes('"botdee.vip.holdIt"')) {
+  src = injectAfter(
+    src,
+    /"botdee\.vip\.openMap": [^\n]+\n/,
+    ["botdee.vip.holdIt", "botdee.vip.agree"]
   );
 }
 fs.writeFileSync(file, src);

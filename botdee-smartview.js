@@ -1209,27 +1209,34 @@
     return !!(payload && typeof payload === "object" && payload.kind === "botDeeVip");
   }
 
-  function vipChip(prompt, selected) {
-    return `<button type="button" class="botdee-sv-tag botdee-vip-chip${selected ? " is-on" : ""}" data-vip-prompt="${esc(prompt)}">${esc(prompt)}</button>`;
+  function vipChip(prompt, selected, label) {
+    return `<button type="button" class="botdee-sv-tag botdee-vip-chip${selected ? " is-on" : ""}" data-vip-prompt="${esc(prompt)}">${esc(label || prompt)}</button>`;
   }
 
   function renderVipCard(payload) {
     const view = payload && typeof payload === "object" ? payload : {};
+    const mode = String(view.mode || "draft");
     const matches = Array.isArray(view.matches) ? view.matches : [];
     const chips = matches.length
       ? matches.slice(0, 8).map(row => vipChip(row.label || row.id, row.id === view.sectionId)).join("")
       : (Array.isArray(view.suggestions) ? view.suggestions.filter(s => s.group === "section").slice(0, 6).map(s => vipChip(s.prompt, false)).join("") : "");
     const vipHref = resolveSameOriginHref(view.vipHref || "./vip.html?from=botdee");
     const payHref = resolveSameOriginHref(view.checkoutUrl || "");
-    return `<article class="botdee-sv-vip" data-kind="botDeeVip" data-vip-mode="${esc(view.mode || "draft")}">
+    const venue = String(view.venueName || "").replace(/temp-democlub-1/i, "Aurelia").trim();
+    const cta = payHref
+      ? `<a class="botdee-sv-action botdee-sv-action-main" href="${esc(payHref)}">${esc(t("botdee.vip.pay", "Pay securely"))}</a>`
+      : (mode === "hold"
+        ? `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-prompt="I agree">${esc(t("botdee.vip.agree", "I agree"))}</button>`
+        : `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-prompt="hold it">${esc(t("botdee.vip.holdIt", "Hold it"))}</button>`);
+    return `<article class="botdee-sv-vip" data-kind="botDeeVip" data-vip-mode="${esc(mode)}">
       <h2 class="botdee-so-title">${esc(t("botdee.vip.title", "VIP reserV"))}</h2>
-      <p class="botdee-so-sub">${esc(view.venueName || t("botdee.vip.hint", "Hold a table from this chat. Joining a room is not a payment."))}</p>
+      <p class="botdee-so-sub">${esc(venue || t("botdee.vip.hint", "Hold a table from this chat. Joining a room is not a payment."))}</p>
       <div class="botdee-so-row"><span>${esc(t("botdee.vip.night", "Night"))}</span><strong>${esc(view.night || "—")}</strong></div>
       <div class="botdee-so-row"><span>${esc(t("botdee.vip.section", "Table"))}</span><strong>${esc(view.sectionLabel || view.sectionId || "—")}</strong></div>
       <div class="botdee-so-row"><span>${esc(t("botdee.vip.party", "Party"))}</span><strong>${esc(String(view.partySize || "—"))}</strong></div>
-      <div class="botdee-sv-tags">${chips}${vipChip("tonight")}${vipChip("hold it")}${vipChip("I agree")}</div>
+      <div class="botdee-sv-tags">${chips}${vipChip("tonight")}</div>
       <div class="botdee-sv-people-actions">
-        ${payHref ? `<a class="botdee-sv-action botdee-sv-action-main" href="${esc(payHref)}">${esc(t("botdee.vip.pay", "Pay securely"))}</a>` : ""}
+        ${cta}
         <a class="botdee-sv-action" href="${esc(vipHref)}">${esc(t("botdee.vip.openMap", "Open VIP reserV map"))}</a>
       </div>
     </article>`;

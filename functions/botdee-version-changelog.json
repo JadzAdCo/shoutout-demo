@@ -1,5 +1,9 @@
 [
   {
+    "id": "s3.3.051",
+    "text": "s3.3.051: Headless VIP reserV: intercept visit/I want a reservation, Aurelia copy, Hold it CTA, real hold errors"
+  },
+  {
     "id": "s3.3.050",
     "text": "s3.3.050: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab"
   },

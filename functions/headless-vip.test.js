@@ -32,8 +32,29 @@ test("VIP execute prompts vs how-to", () => {
   assert.equal(vip.isVipExecutePrompt("VIP reserV"), true);
   assert.equal(vip.isVipExecutePrompt("hold a VIP table at Aurelia"), true);
   assert.equal(vip.isVipExecutePrompt("book a table at Decades for 4"), true);
+  assert.equal(vip.isVipExecutePrompt("Do a visit reservation at Aurelia"), true);
+  assert.equal(vip.isVipExecutePrompt("I want a reservation at Aurelia"), true);
+  assert.equal(vip.isVipExecutePrompt("VIP reserv at Aurelia"), true);
   assert.equal(vip.isVipExecutePrompt("how do I book a VIP table"), false);
   assert.equal(vip.isVipExecutePrompt("throw a shoutout at Aurelia"), false);
+});
+
+test("Aurelia display name hides demo slug", () => {
+  assert.equal(vip.clubDisplayName("temp-democlub-1"), "Aurelia");
+  assert.equal(vip.parseNight("tonight (Nov 19)"), vip.tonightIso());
+  const parsed = vip.parseVipExecute("v2, 4 people");
+  assert.equal(parsed.sectionQuery.toLowerCase(), "v2");
+  assert.equal(parsed.partySize, 4);
+});
+
+test("repeating the selected table is a hold, not a no-op", () => {
+  const parsed = vip.parseVipExecute("VIP reserV at Aurelia");
+  let draft = vip.mergeInteractiveDraft(null, parsed);
+  draft = vip.applySectionMatch(draft, "V1").draft;
+  assert.equal(draft.sectionId, "aurelia-v1");
+  assert.equal(vip.isRepeatSelectedSection("V1", draft), true);
+  assert.equal(vip.isRepeatSelectedSection("v1", draft), true);
+  assert.equal(vip.isRepeatSelectedSection("Mezzanine", draft), false);
 });
 
 test("Mezzanine follow-up after a VIP draft", () => {
@@ -55,6 +76,10 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   assert.match(session, /headlessVipDraft/);
   assert.match(session, /if \(!merged\.holdId\)/);
   assert.match(session, /wantsTerms/);
+  assert.match(session, /isRepeatSelectedSection/);
+  assert.match(session, /clubDisplayName/);
+  assert.match(session, /Tap Hold it/);
+  assert.match(session, /VIP reserV could not place that hold/);
   const shoutIdx = session.indexOf("} else if (shoutExecute) {");
   const vipIdx = session.indexOf("} else if (vipExecute) {");
   const roomIdx = session.indexOf("} else if (roomAttached.handled) {");
@@ -62,6 +87,8 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   const tools = read("functions/bot-dee-tools.js");
   assert.match(tools, /resolveSectionQuery/);
   assert.match(tools, /getVipAvailability/);
+  assert.match(tools, /parseNight/);
+  assert.match(tools, /That table could not be held/);
   const core = read("functions/bot-dee-core.js");
   assert.match(core, /getVipAvailability/);
   assert.match(core, /isVipExecutePrompt/);
@@ -79,4 +106,16 @@ test("VIP follow-up does not swallow people lookup or hello", () => {
   assert.equal(vip.isInteractiveFollowUp("hold it", draft), true);
   assert.equal(vip.isInteractiveFollowUp("confirm room smartview", draft), false);
   assert.equal(vip.isConfirmHoldPrompt("confirm"), true);
+});
+
+test("VIP dock has a Hold it CTA and strips the demo slug", () => {
+  const smart = read("botdee-smartview.js");
+  assert.match(smart, /botdee\.vip\.holdIt/);
+  assert.match(smart, /data-vip-prompt="hold it"/);
+  assert.match(smart, /data-vip-prompt="I agree"/);
+  assert.match(smart, /temp-democlub-1/i);
+  const css = read("botdee-smartview.css");
+  assert.match(css, /\.botdee-sv-vip \.botdee-sv-action-main/);
+  const chat = read("bot-dee-chat.js");
+  assert.match(chat, /documentElement\.clientHeight/);
 });

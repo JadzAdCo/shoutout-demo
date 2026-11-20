@@ -497,13 +497,25 @@ async function createVipHold(args, sessionRequest) {
       sectionQuery: wanted
     };
   }
-  const result = await vip.runCreateVipHold(asRequest(sessionRequest, {
-    clubLocationId,
-    night: args?.night || headlessVip.tonightIso(),
-    sectionId: match.matches[0].id,
-    partySize: args?.partySize || headlessVip.DEFAULT_PARTY
-  }));
-  return {ok: true, tool: "createVipHold", clubLocationId, sectionId: match.matches[0].id, ...result};
+  try {
+    const result = await vip.runCreateVipHold(asRequest(sessionRequest, {
+      clubLocationId,
+      night: headlessVip.parseNight(args?.night) || args?.night || headlessVip.tonightIso(),
+      sectionId: match.matches[0].id,
+      partySize: args?.partySize || headlessVip.DEFAULT_PARTY
+    }));
+    return {ok: true, tool: "createVipHold", clubLocationId, sectionId: match.matches[0].id, ...result};
+  } catch (error) {
+    const message = String(error?.message || error || "").trim()
+      || "That table could not be held. Pick another section.";
+    return {
+      ok: false,
+      tool: "createVipHold",
+      clubLocationId,
+      error: message,
+      sectionId: match.matches[0].id
+    };
+  }
 }
 
 async function recordVipConsent(args, sessionRequest) {

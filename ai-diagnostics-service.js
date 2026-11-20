@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.050";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.050";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.051";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.051";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.051",
+      title: "s3.3.051 — Headless VIP reserV intercept, Hold it CTA, Aurelia copy",
+      checks: [
+        {label:"Reservation phrasing intercept", file:"functions/headless-vip-core.js", includes:["clubDisplayName", "isRepeatSelectedSection", "reservation"]},
+        {label:"Hold errors stay headless", file:"functions/bot-dee-functions.js", includes:["VIP reserV could not place that hold", "clubDisplayName"]},
+        {label:"Tonight becomes ISO night", file:"functions/bot-dee-tools.js", includes:["parseNight", "That table could not be held"]},
+        {label:"Hold it CTA on dock", file:"botdee-smartview.js", includes:["botdee.vip.holdIt", "data-vip-prompt=\"hold it\""]},
+        {label:"iOS keyboard uses layout height", file:"bot-dee-chat.js", includes:["documentElement.clientHeight"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-051-headless-vip-ux"]}
+      ]
+    },
     {
       version: "s3.3.050",
       title: "s3.3.050 — BOT DEE Mingl session invites + shared tab",
@@ -3534,6 +3546,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-051-headless-vip-ux",
+      area:"BOT DEE",
+      feature:"Headless VIP reserV from natural reservation phrasing",
+      changed:"s3.3.051 — Do a visit reservation / I want a reservation at Aurelia stay on headless VIP (no Gemini markdown dump). Copy says Aurelia, not temp-democlub-1. Dock shows Table, Party, and a Hold it / I agree button. Repeating V1 holds. Hold failures return the real club/night error instead of a system hiccup. No card numbers in chat.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / bot-dee-chat.js / floqr-i18n.js ?v=s3.3.051. Sign in with BOT DEE + VIP reserV. New chat. 2) Send Do a visit reservation at Aurelia — expect a VIP reserV dock named Aurelia (not temp-democlub-1) asking for a table, not a markdown VIP Tables dump. 3) Send Mezzanine — list V1–V4 and AURELIA SUITE. 4) Send V1 then tap Hold it (or send hold it). If the night is closed, the reply names that — not a temporary system hiccup. 5) If held, tap I agree. Pay securely opens Stripe; BOT DEE never asks for card numbers. 6) Send I want a reservation at Aurelia in the same or a new chat — still headless, not Gemini. 7) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Natural reservation phrasing stays on VIP reserV. Dock shows table/party + Hold it. Aurelia not the demo slug. Hold errors are real. No card numbers. iOS keyboard does not hide the dock behind a white gap.",
+      troubleshoot:"Still Gemini markdown → executeBotSession not this SHA (isVipExecutePrompt missing reservation). temp-democlub-1 still in copy → cached Functions or botdee-smartview.js. Hold it missing → cached botdee-smartview.js. Hiccup → createVipHold still throwing; confirm parseNight + catch on this SHA. Closed night is expected if Aurelia hoursStructured marks tonight closed — pick another night chip. White gap under composer → cached bot-dee-chat.js without clientHeight keyboard offset. Functions deny vipReservations → Features & Services VIP still off for that account."
+    },
     {
       id:"s3-3-050-botdee-mingl-session-invite",
       area:"BOT DEE",

@@ -450,7 +450,8 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
     });
   }
   const needs = headless.interactiveNeeds(merged);
-  const viewBase = {draft: merged, needs, venueName: merged.clubQuery};
+  const venueName = headless.clubDisplayName(merged.clubQuery) || merged.clubQuery;
+  const viewBase = {draft: merged, needs, venueName};
   if (needs.length) {
     try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
     const view = vipView.buildVipSmartView({...viewBase, mode: "draft"});
@@ -460,13 +461,16 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
       smartViews: [view]
     });
   }
-  const wantsHold = parsed.confirmHold || headless.isBareAffirmative(userPrompt);
+  const repeatingTable = !!(previousDraft && previousDraft.sectionId
+    && previousDraft.sectionId === merged.sectionId
+    && headless.isRepeatSelectedSection(userPrompt, merged));
+  const wantsHold = parsed.confirmHold || headless.isBareAffirmative(userPrompt) || repeatingTable;
   const wantsTerms = parsed.acceptTerms || headless.isAcceptTermsPrompt(userPrompt);
   if (!merged.holdId && !wantsHold && !wantsTerms) {
     try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
     const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
     return vipSmartOutcome(
-      `VIP reserV at ${merged.clubQuery}: ${merged.sectionLabel || merged.sectionId} on ${merged.night} for ${merged.partySize}. Reply hold it to reserve 30 minutes, or pick another table.`,
+      `VIP reserV at ${venueName}: ${merged.sectionLabel || merged.sectionId} on ${merged.night} for ${merged.partySize}. Tap Hold it to reserve 30 minutes, or pick another table.`,
       lang,
       {model: "headless-draft", toolRounds: 0, smartViews: [view]}
     );
@@ -528,7 +532,7 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
   try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
   const view = vipView.buildVipSmartView({...viewBase, mode: "hold", draft: merged});
   return vipSmartOutcome(
-    `Held ${merged.sectionLabel || merged.sectionId} at ${merged.clubQuery} for 30 minutes. Reply I agree to accept VIP Terms, then pay if a deposit is required.`,
+    `Held ${merged.sectionLabel || merged.sectionId} at ${venueName} for 30 minutes. Tap I agree to accept VIP Terms, then pay if a deposit is required.`,
     lang,
     {results: holdLinks, smartViews: [view]}
   );
@@ -978,14 +982,11 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         );
       } catch (error) {
         console.warn("BOT DEE headless VIP failed", error?.message || error);
-        outcome = null;
-      }
-      if (!outcome) {
-        outcome = localSession(role, userPrompt, {
-          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
-          functionsReachable: true,
-          geminiConfigured: !!apiKey
-        });
+        outcome = vipSmartOutcome(
+          error?.message || "VIP reserV could not place that hold. Pick another table or night.",
+          uiLanguage,
+          {model: "headless-draft", toolRounds: 0, smartViews: []}
+        );
       }
     } else if (roomAttached.handled) {
       const classified = roomAttached.classified || {};
