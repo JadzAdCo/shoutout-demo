@@ -37,7 +37,7 @@ state        = IsFeatureEnabled != 1 ? "off" : (IsTestFeature == 1 ? "test" : "l
 hasBetaGrant = !isMasterAdmin && betaTesters/{uid}.IsBetaTester==1 && status=="active" && features[key]==1
 canAccess    = off → false · live → true · test → isMasterAdmin || hasBetaGrant      (pages + server)
 searchVisible= off → false · live → true · test → isMasterAdmin || hasBetaGrant      (Search tiles; Master Admins see Beta tiles for QA)
-Search tile shown = searchVisible && legacy patronFeatureGates.patronMayUse
+Search tile shown = searchVisible (linkState). Legacy patronFeatureGates.patronMayUse is a kill switch for **live** features only — test tiles follow the beta grant / Master Admin QA rule. Mingl keeps patronGate "mingl"; VIP and Si-nema have an empty patronGate so they already skipped the legacy AND.
 ```
 
 Server: `featureState` / `canAccessFeature` / `searchTileVisible` / `betaGrantsFrom` in `functions/feature-services-core.js`. Client mirror: `stateOf` / `canAccess` / `searchVisible` / `hasBetaGrant` / `betaGrantsFrom` in `floqr-feature-services.js`. `feature-services-core.test.js` runs the full matrix against **both** (server + vm-loaded client).

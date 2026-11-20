@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.051";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.051";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.052";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.052";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.052",
+      title: "s3.3.052 — Mingl Search tile follows Features & Services beta grant",
+      checks: [
+        {label:"Test tiles skip legacy patron gate", file:"floqr-feature-services.js", includes:["stateOf(features[canonicalizeFeatureKey(base.key)]) === \"test\") return true"]},
+        {label:"Link fields re-derived from flags", file:"floqr-feature-services.js", includes:["enableFeatureLink: derived.enableFeatureLink"]},
+        {label:"Mingl tile after ShoutOut", file:"index.html", includes:["id=\"minglBtnCard\"", "data-feature-key=\"mingl\"", "id=\"intentSearchBtnCard\""]},
+        {label:"Profile and Search share F&S helper", file:"floqr-feature-services.js", includes:["function featureLinkAllowed(", "function applyFeatureLinks("]},
+        {label:"Search avatar Mingl link", file:"patron-app.js", includes:["data-floqr-feature-link=\"mingl\"", "fs.applyFeatureLinks(menu)"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-052-mingl-search-tile"]}
+      ]
+    },
     {
       version: "s3.3.051",
       title: "s3.3.051 — Natural Cancun trip talk opens Room SMARTview",
@@ -3546,6 +3558,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-052-mingl-search-tile",
+      area:"Search",
+      feature:"Mingl Search tile for granted beta testers",
+      changed:"s3.3.052 — Search shows Mingl like BOT DEE/VIP when featureServices/mingl is Enabled+Test and betaTesters/{signed-in uid}.features.mingl==1. Test tiles no longer AND platformSettings/patronFeatureGates.mingl. Tile sits next to ShoutOut (not after Cinema). Duplicate Lorna Auth accounts: tick Mingl + Save feature access on both uids until merge.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ until floqr-feature-services.js?v=s3.3.052. 2) Sign in as the same Auth user Master Admin ticked (check the email on the tester row — MsLorna and the other Lorna @gmail.com are different uids until merged). 3) Search should show Mingl with a Beta pill beside ShoutOut / BOT DEE / VIP. 4) Open the avatar / profile card — Mingl Chat must appear (data-floqr-feature-link=mingl via applyFeatureLinks). 5) Master Admin → Features Mgmt: Mingl Enable Feature 1 + Enable Beta 1. For each Lorna uid, Mingl checked → Save feature access. 6) Mark Succeed/Failed.",
+      expected:"Granted tester sees Mingl on Search and on the profile avatar menu. Cinema (Si-nema) is a different tile. Signing in as the other Lorna uid without mingl:1 still hides Mingl on both surfaces.",
+      troubleshoot:"No Mingl on Search or the profile card → confirm the signed-in email matches the tester row, then tick Mingl on THAT uid and Save. Tile still missing after grant → cached index.html / floqr-feature-services.js / patron-app.js before s3.3.052. Cinema showing instead → that is sinemaBtnCard, not a Mingl mixup. Enable Feature still 0 → packaged default is Off; Save Mingl on Release Control first."
+    },
     {
       id:"botdee-whats-new-catalog",
       area:"BOT DEE",
