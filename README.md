@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.052 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.053 (stable)
 
+- s3.3.053: Si-nema Search chrome is a vector mark with Site Chrome fills and transparent voids (White/Black PNG)
 - s3.3.052: Required mobile is the FLOQR account unifier; Master Admin can merge duplicate patrons without deleting Auth
 - s3.3.052: Mingl Search tile + profile avatar Mingl Chat follow Features & Services beta grant (legacy patron gate is live-only)
 - s3.3.051: BOT DEE natural Cancun trip talk opens Room SMARTview (same card as Open Room SMARTview Cancun Trip)

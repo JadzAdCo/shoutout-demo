@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.052";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.052";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.053";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.053";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.053",
+      title: "s3.3.053 — Vector Si-nema Site Chrome fills + White/Black PNG",
+      checks: [
+        {label:"White/Black PNG path", file:"floqr-chrome-scheme.js", includes:["sinema-whiteblack.png", "ICON_V = \"s3.3.053\""]},
+        {label:"Vector builder", file:"scripts/build-sinema-chrome-icons.py", includes:["si-nema-blacktiffany.webp", "approved FloqMedia official mark", "never painted black"]},
+        {label:"Vector SVG master", file:"images/chrome/sinema-svg/logos/sinema-color-master.svg", includes:["aria-label=\"Si-nema logo\"", "Transparent canvas", "no black fills"]},
+        {label:"Search White/Black PNG", file:"images/chrome/sinema-whiteblack.png", includes:[]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-053-sinema-vector-chrome"]}
+      ]
+    },
     {
       version: "s3.3.052",
       title: "s3.3.052 — Required mobile unifier + Mingl Search tile for granted testers",
@@ -3566,11 +3577,20 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-053-sinema-vector-chrome",
+      area:"Search",
+      feature:"Si-nema vector Site Chrome (fills + transparent voids)",
+      changed:"s3.3.053 — Search Si-nema tiles use a vector clapper + film + wordmark (`scripts/build-sinema-chrome-icons.py`). Ink / accent / metal take each Site Chrome palette. Screen, sprocket holes, lid-stripe gaps, and hinge centers are transparent (never painted black). White/Black is `sinema-whiteblack.png` (true alpha; Search tile owns the square). Mingl White/Black Tiffany gl is unchanged. Official 3D webp is layout reference only.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ until floqr-chrome-scheme.js?v=s3.3.053. 2) Sign in as Master Admin (Si-nema is a test feature — Search tile + Beta pill). 3) White/Black Site Chrome: Si-nema tile shows a complete italic S, Tiffany nema, metal clapper, empty (tile-field) screen and sprocket holes, no hanging film teeth. 4) Cycle Nightlife / Black+Tiffany / Traditional / Purple / Dark Green — fills follow the pack; holes stay the tile field. 5) Open https://jadzadco.github.io/shoutout-demo/images/chrome/sinema-whiteblack.png?v=s3.3.053 — PNG with holes, not a black fill. 6) Mark Succeed/Failed on Manual Feature Tests.",
+      expected:"All six Site Chrome packs show the same vector mark with that pack's fills. S is complete. Screen and sprockets are holes (field shows through), not black paint. White/Black PNG is frameless. Cached s3.3.042 JPGs must not appear.",
+      troubleshoot:"Old photo clapper / chopped S → cached index.html or floqr-chrome-scheme.js before s3.3.053 (hard-refresh; ICON_V must be s3.3.053). Black rectangle in the screen → live asset is still the JPG punch, not this PNG. Tile missing → Features & Services sinema Enable Feature 1 + Enable Beta 1; Master Admin sees the Beta pill. Holes look grey on White/Black → PNG alpha vs tile wash; confirm the file is PNG not JPG."
+    },
+    {
       id:"s3-3-052-patron-phone-unifier",
       area:"Accounts",
       feature:"Required mobile unifies patrons; Master Admin merge does not delete Auth",
       changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Live Lorna merge waits for a separate Don confirmation after deploy.",
-      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.052. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until Don separately confirms after deploy. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
+      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.053. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until Don separately confirms after deploy. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
       expected:"Mobile required. Duplicate phone cannot create a second live profile. Preview shows both uids and does not delete Auth. Merge is Master Admin + SOS2FA + reason only.",
       troubleshoot:"Save still optional phone → cached patron-app.js / patron-portal-app.js. Second account created → Functions claimPatronPhone / phoneIndex rules not this SHA. Merge button works without SOS2FA → stop; lookupPatronAccounts must assertSos2faSession. Auth user vanished → mergePatronAccounts must not call deleteUser; revert and wait for Don."
     },
