@@ -379,6 +379,7 @@ function appCheckEnforced(deps = {}) {
     : "";
   // Unset enforces. The only off switch is FLOQR_APP_CHECK_ENFORCE=0
   // (or deps.enforce === false, which the property check above already handles).
+  // Omitting the Cloud Run variable on a later deploy still rejects.
   return String(raw == null ? "" : raw).trim() !== "0";
 }
 

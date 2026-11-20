@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.047";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.047";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.046";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.046";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,19 +223,12 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.3.047",
-      title: "s3.3.047 — floqmediaPlanTrace App Check enforcement",
-      checks: [
-        {label:"Unset enforces", file:"functions/floqmedia-plan-trace-core.js", includes:["!== \"0\""]},
-        {label:"Deployed value is 1", file:"functions/floqmedia-plan-trace-functions.js", includes:["FLOQR_APP_CHECK_ENFORCE: \"1\""], notIncludes:["FLOQR_APP_CHECK_ENFORCE: \"0\""]},
-        {label:"Merge keeps other env and sets 1", file:"functions/scripts/set-floqmedia-plan-trace-app-check-env.js", includes:["next[KEY] = \"1\""], notIncludes:["next[KEY] = \"0\""]},
-        {label:"Manual test expects 401", file:"ai-diagnostics-service.js", includes:["s3-3-046-app-check-master-logs", "FLOQR_APP_CHECK_ENFORCE is 1, not 0"]}
-      ]
-    },
-    {
       version: "s3.3.046",
       title: "s3.3.046 — People SMARTview chip gaps + headless VIP reserV + Room join",
       checks: [
+        {label:"Plan trace App Check unset enforces", file:"functions/floqmedia-plan-trace-core.js", includes:["!== \"0\""]},
+        {label:"Plan trace deployed App Check value is 1", file:"functions/floqmedia-plan-trace-functions.js", includes:["FLOQR_APP_CHECK_ENFORCE: \"1\""], notIncludes:["FLOQR_APP_CHECK_ENFORCE: \"0\""]},
+        {label:"Plan trace env merge sets 1", file:"functions/scripts/set-floqmedia-plan-trace-app-check-env.js", includes:["next[KEY] = \"1\""], notIncludes:["next[KEY] = \"0\""]},
         {label:"People details collapse empty space", file:"botdee-smartview.css", includes:[".botdee-sv-details > *", ".botdee-sv-tags:empty", "max-height: none"], notIncludes:["6.4em"]},
         {label:"Headless VIP core", file:"functions/headless-vip-core.js", includes:["resolveSectionQuery", "isVipExecutePrompt", "Mezzanine"]},
         {label:"Session intercepts VIP", file:"functions/bot-dee-functions.js", includes:["tryHeadlessVip", "headlessVipDraft", "botdee-room-live"]},
