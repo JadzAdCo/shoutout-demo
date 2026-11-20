@@ -122,6 +122,7 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   assert.match(session, /if \(!merged\.holdId\)/);
   assert.match(session, /detachStaleHold/);
   assert.match(session, /releaseVipHold/);
+  assert.match(session, /holdGone/);
   assert.match(session, /wantsTerms/);
   assert.match(session, /isRepeatSelectedSection/);
   assert.match(session, /clubDisplayName/);
@@ -136,6 +137,8 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   assert.match(tools, /getVipAvailability/);
   assert.match(tools, /parseNight/);
   assert.match(tools, /That table could not be held/);
+  assert.match(tools, /async function releaseVipHold/);
+  assert.match(tools, /return toolError\(error\)/);
   const core = read("functions/bot-dee-core.js");
   assert.match(core, /getVipAvailability/);
   assert.match(core, /isVipExecutePrompt/);

@@ -456,7 +456,27 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
   const priorHoldId = String(previousDraft?.holdId || "").trim();
   merged = headless.detachStaleHold(previousDraft, merged);
   if (priorHoldId && priorHoldId !== merged.holdId) {
-    try { await tools.releaseVipHold({holdId: priorHoldId}, session.request); } catch (_) {}
+    const released = await tools.releaseVipHold({holdId: priorHoldId}, session.request);
+    const holdGone = !!(released?.ok || released?.code === "not-found");
+    if (!holdGone) {
+      merged = headless.clipInteractiveDraft({...previousDraft, holdId: priorHoldId});
+      const stillVenue = headless.clubDisplayName(merged.clubQuery) || merged.clubQuery;
+      try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+      const view = vipView.buildVipSmartView({
+        draft: merged,
+        needs: [],
+        venueName: stillVenue,
+        mode: "hold"
+      });
+      const table = merged.sectionLabel || merged.sectionId || "that table";
+      return vipSmartOutcome(
+        released?.error
+          ? `VIP reserV is still holding ${table}. ${released.error} Finish I agree, or say cancel, before picking another.`
+          : `VIP reserV is still holding ${table}. Finish I agree, or say cancel, before picking another.`,
+        lang,
+        {model: "headless-draft", toolRounds: 1, smartViews: [view]}
+      );
+    }
   }
   try {
     if (merged.clubQuery) merged.clubQuery = await tools.requireClubLocationId(merged.clubQuery);

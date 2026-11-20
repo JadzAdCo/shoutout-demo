@@ -519,10 +519,10 @@ async function createVipHold(args, sessionRequest) {
 }
 
 async function releaseVipHold(args, sessionRequest) {
-  await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
   const holdId = text(args?.holdId, 120);
   if (!holdId) return {ok: false, tool: "releaseVipHold", error: "holdId is required."};
   try {
+    await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
     const result = await vip.runReleaseVipHold(asRequest(sessionRequest, {holdId}));
     return {ok: true, tool: "releaseVipHold", ...result};
   } catch (error) {
