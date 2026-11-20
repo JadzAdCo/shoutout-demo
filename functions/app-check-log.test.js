@@ -135,9 +135,8 @@ function harness(db) {
   return {
     db,
     geminiLogs,
-    deps(verify, {enforce = false} = {}) {
-      return {
-        enforce,
+    deps(verify, options = {}) {
+      const out = {
         verifyAppCheck: verify,
         generateContent: geminiDouble(),
         logAccess: async (entry) => geminiLogs.push(entry),
@@ -146,6 +145,8 @@ function harness(db) {
         }),
         model: "gemini-3.6-flash"
       };
+      if (Object.prototype.hasOwnProperty.call(options, "enforce")) out.enforce = options.enforce;
+      return out;
     }
   };
 }
@@ -176,7 +177,7 @@ test("monitor mode missing pass logs a warning and still returns a trace", async
   const db = fakeDb();
   const box = harness(db);
   const verify = verifier("verified");
-  const deps = box.deps(verify);
+  const deps = box.deps(verify, {enforce: false});
   const {res, result} = await post(deps);
   assert.equal(result.ok, true);
   assert.equal(res.statusCode, 200);
@@ -203,7 +204,7 @@ test("monitor mode invalid pass writes both categories and still traces", async 
   const db = fakeDb();
   const box = harness(db);
   const verify = verifier("invalid");
-  const deps = box.deps(verify);
+  const deps = box.deps(verify, {enforce: false});
   const {res, result} = await post(deps, {appCheck: TOKEN});
   assert.equal(result.ok, true);
   assert.equal(res.body.ok, true);
@@ -234,7 +235,7 @@ test("monitor mode invalid pass writes both categories and still traces", async 
 test("monitor mode reused pass is a security row and the trace still returns", async () => {
   const db = fakeDb();
   const box = harness(db);
-  const deps = box.deps(verifier("reused"));
+  const deps = box.deps(verifier("reused"), {enforce: false});
   const {result} = await post(deps, {appCheck: TOKEN});
   assert.equal(result.ok, true);
   assert.equal(deps.generateContent.calls.length, 1);
@@ -279,7 +280,7 @@ test("enforced rejection does not call Gemini and sends one security message", a
 test("enforced missing pass does not call Gemini; monitor missing does not message", async () => {
   const enforced = fakeDb();
   const enforcedBox = harness(enforced);
-  const enforcedDeps = enforcedBox.deps(verifier("verified"), {enforce: true});
+  const enforcedDeps = enforcedBox.deps(verifier("verified"));
   const denied = await post(enforcedDeps);
   assert.equal(denied.result.status, 401);
   assert.equal(enforcedDeps.generateContent.calls.length, 0);
@@ -318,7 +319,7 @@ test("verified pass is an info diagnostic row with token counts and no security 
   assert.equal(dump(db).includes(TOKEN), false);
 });
 
-test("helper and Master Admin surfaces use the two categories and leave enforcement off", () => {
+test("helper and Master Admin surfaces use the two categories and enforce by default", () => {
   const helper = read("functions/app-check-log.js");
   const plan = read("functions/floqmedia-plan-trace-core.js");
   const fn = read("functions/floqmedia-plan-trace-functions.js");
@@ -334,8 +335,10 @@ test("helper and Master Admin surfaces use the two categories and leave enforcem
   assert.equal((fn.match(/verifyToken\s*\(/g) || []).length, 0);
   assert.match(fn, /logAppCheckResult/);
   assert.doesNotMatch(fn, /enforceAppCheck:\s*true/);
-  assert.doesNotMatch(fn, /FLOQR_APP_CHECK_ENFORCE\s*=/);
-  assert.doesNotMatch(plan, /FLOQR_APP_CHECK_ENFORCE\s*=\s*["']1["']/);
+  assert.match(fn, /FLOQR_APP_CHECK_ENFORCE:\s*"1"/);
+  assert.doesNotMatch(fn, /FLOQR_APP_CHECK_ENFORCE:\s*"0"/);
+  assert.match(plan, /!== "0"/);
+  assert.doesNotMatch(plan, /FLOQR_APP_CHECK_ENFORCE\s*=\s*["']0["']/);
   assert.match(helper, /category: DIAGNOSTIC_CATEGORY/);
   assert.match(helper, /category: SECURITY_CATEGORY/);
   assert.equal(appCheckLog.DIAGNOSTIC_CATEGORY, "app-check");
