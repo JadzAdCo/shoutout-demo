@@ -83,6 +83,29 @@ test("Gemini cannot force a hard-excluded Master Admin Save bullet onto What's N
   assert.equal(invented[0].keep, false);
 });
 
+test("override cannot launder INCLUDE tokens out of a hard-excluded bullet", () => {
+  const raw = {
+    id: "s3.3.047",
+    text: "s3.3.047: Gray Save after command received; Features SMARTview first slice on Master Admin BOT DEE SMARTviews"
+  };
+  const sliced = catalog.classifyItem({
+    ...raw,
+    whatsNewText: "s3.3.047: BOT DEE SMARTviews"
+  });
+  assert.equal(sliced.keep, false);
+  const gemini = catalog.mergeGeminiProposal([raw], {
+    items: [{id: "s3.3.047", keep: true, audience: "botDee", whatsNewText: "s3.3.047: BOT DEE SMARTviews"}]
+  });
+  assert.equal(gemini[0].keep, false);
+  const mixed = catalog.classifyItem({
+    id: "s3.3.046",
+    text: "s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join; App Check plan-trace logs to Master Admin (enforcement off)",
+    whatsNewText: "s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join"
+  });
+  assert.equal(mixed.keep, true);
+  assert.doesNotMatch(mixed.text, /App Check/);
+});
+
 test("Version SMARTview payload uses catalogued What's New only", () => {
   const payload = vs.buildVersionSmartView({role: "patron", functionsReachable: true, geminiConfigured: true});
   assert.equal(payload.changelog.length, catalog.WHATS_NEW_LIMIT);

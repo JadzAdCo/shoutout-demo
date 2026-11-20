@@ -123,11 +123,12 @@ function explicitAudiences(row) {
 }
 
 function overrideFromSource(sourceText, overrideText) {
-  const source = stripId(sourceText).toLowerCase();
-  if (!source || !overrideText) return [];
+  const keepClauses = splitClauses(sourceText).filter(part => classifyClause(part).keep);
+  if (!keepClauses.length || !overrideText) return [];
+  const allowed = keepClauses.join("; ").toLowerCase();
   return splitClauses(overrideText).filter(part => {
     const clause = stripId(part).toLowerCase();
-    return clause && source.includes(clause) && classifyClause(part).keep;
+    return clause && allowed.includes(clause) && classifyClause(part).keep;
   });
 }
 
