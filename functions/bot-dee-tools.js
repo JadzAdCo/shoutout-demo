@@ -518,6 +518,18 @@ async function createVipHold(args, sessionRequest) {
   }
 }
 
+async function releaseVipHold(args, sessionRequest) {
+  await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
+  const holdId = text(args?.holdId, 120);
+  if (!holdId) return {ok: false, tool: "releaseVipHold", error: "holdId is required."};
+  try {
+    const result = await vip.runReleaseVipHold(asRequest(sessionRequest, {holdId}));
+    return {ok: true, tool: "releaseVipHold", ...result};
+  } catch (error) {
+    return toolError(error);
+  }
+}
+
 async function recordVipConsent(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
   const result = await vip.runRecordVipConsent(asRequest(sessionRequest, {
@@ -1280,6 +1292,7 @@ module.exports = {
   startShoutOutCheckout,
   getVipAvailability,
   createVipHold,
+  releaseVipHold,
   recordVipConsent,
   createVipCheckout,
   createFloqCastRequest,

@@ -506,6 +506,24 @@ function missingAsk(needs, draft) {
   return "VIP reserV is ready — say hold it to reserve, or pick another table.";
 }
 
+function detachStaleHold(previous, draft) {
+  const next = clipInteractiveDraft(draft);
+  const prev = clipInteractiveDraft(previous);
+  if (!prev.holdId) return next;
+  const sameTable = !!(
+    next.clubQuery
+    && next.clubQuery === prev.clubQuery
+    && next.night === prev.night
+    && next.sectionId
+    && next.sectionId === prev.sectionId
+    && next.partySize === prev.partySize
+  );
+  if (sameTable) return next;
+  next.holdId = "";
+  next.consentId = "";
+  return next;
+}
+
 function applySectionMatch(draft, query) {
   const next = clipInteractiveDraft(draft);
   const club = next.clubQuery;
@@ -558,5 +576,6 @@ module.exports = {
   interactiveNeeds,
   isInteractiveFollowUp,
   missingAsk,
+  detachStaleHold,
   applySectionMatch
 };

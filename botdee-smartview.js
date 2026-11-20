@@ -1224,13 +1224,13 @@
     const posY = -(Number(vb.y) || 0) / vh * 100;
     const tables = (Array.isArray(map.tables) ? map.tables : []).map(table => {
       const r = table.rect || {};
-      const left = ((Number(r.x) - Number(vb.x || 0)) / vw) * 100;
-      const top = ((Number(r.y) - Number(vb.y || 0)) / vh) * 100;
-      const tw = (Number(r.w) / vw) * 100;
-      const th = (Number(r.h) / vh) * 100;
-      return `<button type="button" class="botdee-vip-seat${table.selected ? " is-on" : ""}" style="left:${left}%;top:${top}%;width:${Math.max(tw, 8)}%;height:${Math.max(th, 10)}%" data-vip-prompt="${esc(table.prompt || table.label)}">${esc(table.label)}</button>`;
+      const left = (Number(r.x) || 0) * 100;
+      const top = (Number(r.y) || 0) * 100;
+      const tw = (Number(r.w) || 0) * 100;
+      const th = (Number(r.h) || 0) * 100;
+      return `<button type="button" class="botdee-vip-seat${table.selected ? " is-on" : ""}" style="left:${left}%;top:${top}%;width:${tw}%;height:${th}%" data-vip-prompt="${esc(table.prompt || table.label)}">${esc(table.label)}</button>`;
     }).join("");
-    return `<div class="botdee-vip-map" style="background-image:url('${esc(map.imageUrl)}');background-size:${sizeX}% ${sizeY}%;background-position:${posX}% ${posY}%" role="group" aria-label="${esc(t("botdee.vip.openMap", "Open VIP reserV map"))}">${tables}</div>`;
+    return `<div class="botdee-vip-map" role="group" aria-label="${esc(t("botdee.vip.openMap", "Open VIP reserV map"))}"><div class="botdee-vip-map-stage" style="width:${sizeX}%;height:${sizeY}%;left:${posX}%;top:${posY}%;background-image:url('${esc(map.imageUrl)}')">${tables}</div></div>`;
   }
 
   function renderVipCard(payload) {

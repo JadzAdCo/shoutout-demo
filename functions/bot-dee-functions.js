@@ -453,6 +453,11 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
     merged.sectionId = merged.matches[0].id;
     merged.sectionLabel = merged.matches[0].label;
   }
+  const priorHoldId = String(previousDraft?.holdId || "").trim();
+  merged = headless.detachStaleHold(previousDraft, merged);
+  if (priorHoldId && priorHoldId !== merged.holdId) {
+    try { await tools.releaseVipHold({holdId: priorHoldId}, session.request); } catch (_) {}
+  }
   try {
     if (merged.clubQuery) merged.clubQuery = await tools.requireClubLocationId(merged.clubQuery);
   } catch (error) {

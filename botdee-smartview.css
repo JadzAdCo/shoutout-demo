@@ -1290,8 +1290,13 @@ body.botdee-sv-overlay-open { overflow: hidden; }
   border-radius: 12px;
   overflow: hidden;
   background-color: #111;
-  background-repeat: no-repeat;
   border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 35%, transparent);
+}
+.botdee-vip-map-stage {
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 100% 100%;
 }
 .botdee-vip-seat {
   position: absolute;

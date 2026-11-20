@@ -63,6 +63,27 @@ test("VIP card nights and 2D area map", () => {
   assert.equal(vip.isInteractiveFollowUp("hello", {clubQuery: "temp-democlub-1"}), false);
 });
 
+test("changing area or table drops a stale hold", () => {
+  const held = {
+    clubQuery: "temp-democlub-1",
+    night: vip.tonightIso(),
+    sectionId: "aurelia-v1",
+    sectionLabel: "V1",
+    partySize: 2,
+    holdId: "hold-v1",
+    consentId: "consent-v1"
+  };
+  const same = vip.detachStaleHold(held, held);
+  assert.equal(same.holdId, "hold-v1");
+  const overview = vip.detachStaleHold(held, {...held, sectionId: "", sectionLabel: "", matches: []});
+  assert.equal(overview.holdId, "");
+  assert.equal(overview.consentId, "");
+  const otherTable = vip.detachStaleHold(held, {...held, sectionId: "aurelia-v2", sectionLabel: "V2"});
+  assert.equal(otherTable.holdId, "");
+  const otherNight = vip.detachStaleHold(held, {...held, night: vip.addDaysIso(held.night, 1)});
+  assert.equal(otherNight.holdId, "");
+});
+
 test("Aurelia display name hides demo slug", () => {
   assert.equal(vip.clubDisplayName("temp-democlub-1"), "Aurelia");
   assert.equal(vip.parseNight("tonight (Nov 19)"), vip.tonightIso());
@@ -99,6 +120,8 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   assert.match(session, /isVipExecutePrompt/);
   assert.match(session, /headlessVipDraft/);
   assert.match(session, /if \(!merged\.holdId\)/);
+  assert.match(session, /detachStaleHold/);
+  assert.match(session, /releaseVipHold/);
   assert.match(session, /wantsTerms/);
   assert.match(session, /isRepeatSelectedSection/);
   assert.match(session, /clubDisplayName/);
@@ -136,6 +159,8 @@ test("VIP dock has a Hold it CTA and strips the demo slug", () => {
   const smart = read("botdee-smartview.js");
   assert.match(smart, /botdee\.vip\.holdIt/);
   assert.match(smart, /botdee-vip-map/);
+  assert.match(smart, /botdee-vip-map-stage/);
+  assert.doesNotMatch(smart, /background-position:\$\{posX\}/);
   assert.match(smart, /botdee-vip-rail/);
   assert.match(smart, /data-vip-prompt="hold it"/);
   assert.match(smart, /data-vip-prompt="I agree"/);
