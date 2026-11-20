@@ -113,7 +113,7 @@ test("Version SMARTview payload uses catalogued What's New only", () => {
   payload.changelog.forEach(row => {
     assert.equal(catalog.classifyItem(row).keep, true, row.id);
   });
-  assert.equal(payload.changelog[0].id, bundled[0].id);
+  assert.equal(payload.changelog[0].id, whatsNew[0].id);
   assert.match(
     fs.readFileSync(path.join(__dirname, "botdee-version-smartview.js"), "utf8"),
     /forVersionWhatsNew/
