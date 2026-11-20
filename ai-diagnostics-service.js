@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.047";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.047";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.048";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.048";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -3577,8 +3577,8 @@
         id:"s3-3-046-mingl-chat-site-chrome",
         area:"Mingl / Site chrome",
         feature:"Mingl Chat follows Appearance Site chrome",
-        changed:"mingl-chat.html (and Mingl Gist) early-paints data-floqr-chrome, loads floqr-chrome-scheme.js + floqr-chrome-audit.js, hydrates users.isSiteChrome, and swaps the Mingl chrome icon. Compose/bubbles use chrome tokens instead of Nightlife navy. Cache-bust s3.3.047.",
-        howToTest:"1) Sign in, open My Profile → Appearance, pick White / Black (or Traditional). 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/mingl-chat.html until mingl-chat.html / styles.css / mingl-chat-app.js / mingl-chat-chrome.css ?v=s3.3.047. 3) Body, cards, title, Mingl icon, compose bar, and bubbles must match that chrome — not Nightlife pink/cyan navy. 4) Switch Nightlife and reload — Mingl Chat returns to neon navy. 5) Repeat Mingl Gist (mingl-gist.html) for the page chrome (story viewer stays dark). 6) Mark Succeed/Failed.",
+        changed:"mingl-chat.html (and Mingl Gist) early-paints data-floqr-chrome, loads floqr-chrome-scheme.js + floqr-chrome-audit.js, hydrates users.isSiteChrome, and swaps the Mingl chrome icon. Compose/bubbles use chrome tokens instead of Nightlife navy. Cache-bust s3.3.048.",
+        howToTest:"1) Sign in, open My Profile → Appearance, pick White / Black (or Traditional). 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/mingl-chat.html until mingl-chat.html / styles.css / mingl-chat-app.js / mingl-chat-chrome.css ?v=s3.3.048. 3) Body, cards, title, Mingl icon, compose bar, and bubbles must match that chrome — not Nightlife pink/cyan navy. 4) Switch Nightlife and reload — Mingl Chat returns to neon navy. 5) Repeat Mingl Gist (mingl-gist.html) for the page chrome (story viewer stays dark). 6) Mark Succeed/Failed.",
         expected:"Mingl Chat paints the active Site chrome on first load and after sign-in hydrate. Icon and compose follow the scheme. Display URLs stay without ?v=.",
         troubleshoot:"Still Nightlife → cached mingl-chat.html missing floqr.isSiteChrome early-paint or floqr-chrome-scheme.js. Icon stuck on nightlife.jpg → data-floqr-chrome-icon=mingl + applyDocument. Compose still navy on White/Black → cached styles.css before --floqr-ink compose. Signed-in wrong chrome → hydrateSiteChrome / users.isSiteChrome."
       },
