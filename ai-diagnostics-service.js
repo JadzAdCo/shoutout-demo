@@ -224,7 +224,7 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.047",
-      title: "s3.3.047 — Save busy + Features SMARTview (workspace, unpublished)",
+      title: "s3.3.047 — Save busy + Features SMARTview",
       checks: [
         {label:"Save busy module", file:"floqr-save-busy.js", includes:["FLOQRSaveBusy", "Command received", "app.saveReceived"]},
         {label:"Save busy on Master Admin", file:"master-admin.html", includes:["floqr-save-busy.js"]},
