@@ -10,12 +10,14 @@
   const SCHEMA_VERSION = "floqr.featuresSmartView/1";
   const KIND = "featuresSmartView";
   const PRODUCT_IDS = Object.freeze([
-    "bot-dee", "mingl", "shoutout", "vip-reserv", "si-nema", "si-tube"
+    "bot-dee", "mingl", "shoutout", "rydr", "floqcast", "vip-reserv", "si-nema", "si-tube"
   ]);
   const DISPLAY_NAMES = Object.freeze({
     "bot-dee": "BOT-DEE",
     mingl: "Mingl",
     shoutout: "ShoutOut",
+    rydr: "RydR",
+    floqcast: "floqCast",
     "vip-reserv": "VIP reserV",
     "si-nema": "Si-nema",
     "si-tube": "Si-tube"
@@ -32,8 +34,19 @@
     deprecated: "Deprecated",
     retired: "Retired"
   });
-  const STATUS_NOT_VERIFIED = "Status not verified";
+  const STATUS_TESTING = "Testing";
+  const STATUS_BETA = "Beta";
+  const STATUS_IN_DEVELOPMENT = "In development";
   const DATE_NOT_VERIFIED = "Not verified";
+  const PACKAGED_FEATURE_FLAGS = Object.freeze({
+    botDee: Object.freeze({IsFeatureEnabled: 1, IsTestFeature: 1}),
+    mingl: Object.freeze({IsFeatureEnabled: 0, IsTestFeature: 1}),
+    shoutOut: Object.freeze({IsFeatureEnabled: 1, IsTestFeature: 0}),
+    rydr: Object.freeze({IsFeatureEnabled: 0, IsTestFeature: 1}),
+    floqCast: Object.freeze({IsFeatureEnabled: 0, IsTestFeature: 1}),
+    vipReservations: Object.freeze({IsFeatureEnabled: 0, IsTestFeature: 1}),
+    sinema: Object.freeze({IsFeatureEnabled: 0, IsTestFeature: 1})
+  });
   const VIEWS = Object.freeze([
     "overview", "whatsNew", "journey", "all", "comingSoon", "past"
   ]);
@@ -41,6 +54,8 @@
     "bot-dee": "botDee",
     mingl: "mingl",
     shoutout: "shoutOut",
+    rydr: "rydr",
+    floqcast: "floqCast",
     "vip-reserv": "vipReservations",
     "si-nema": "sinema",
     "si-tube": ""
@@ -49,6 +64,8 @@
     "bot-dee": "./botdee.html",
     mingl: "./mingl-chat.html",
     shoutout: "./",
+    rydr: "./rydr.html",
+    floqcast: "./floqcast-search.html",
     "vip-reserv": "./vip.html",
     "si-nema": "./sinema.html",
     "si-tube": ""
@@ -73,9 +90,40 @@
     return DISPLAY_NAMES[productId] || "";
   }
 
-  function lifecycleLabel(lifecycle, statusVerified) {
-    if (!statusVerified) return STATUS_NOT_VERIFIED;
-    return LIFECYCLE_LABELS[lifecycle] || STATUS_NOT_VERIFIED;
+  function flag01(value) {
+    return value === true || value === 1 || value === "1" ? 1 : 0;
+  }
+
+  /** Patron badge from Features & Services flags. Never invents a release date. */
+  function flagStatusLabel(enabled, test) {
+    if (flag01(enabled) === 1 && flag01(test) === 1) return STATUS_TESTING;
+    if (flag01(test) === 1) return STATUS_BETA;
+    return STATUS_IN_DEVELOPMENT;
+  }
+
+  function flagsForKey(key, access) {
+    const canon = String(key || "");
+    const fromAccess = access && access.featureFlags && access.featureFlags[canon];
+    if (fromAccess && typeof fromAccess === "object") {
+      return {
+        IsFeatureEnabled: flag01(fromAccess.IsFeatureEnabled),
+        IsTestFeature: flag01(fromAccess.IsTestFeature)
+      };
+    }
+    const packaged = PACKAGED_FEATURE_FLAGS[canon];
+    if (packaged) {
+      return {IsFeatureEnabled: packaged.IsFeatureEnabled, IsTestFeature: packaged.IsTestFeature};
+    }
+    return {IsFeatureEnabled: 0, IsTestFeature: 0};
+  }
+
+  function flagsForProductId(productId, access) {
+    return flagsForKey(FEATURE_KEYS[productId] || "", access);
+  }
+
+  function lifecycleLabel(lifecycle, statusVerified, flags) {
+    if (statusVerified) return LIFECYCLE_LABELS[lifecycle] || STATUS_IN_DEVELOPMENT;
+    return flagStatusLabel(flags && flags.IsFeatureEnabled, flags && flags.IsTestFeature);
   }
 
   function implementedLabel(record) {
@@ -113,6 +161,8 @@
     if (/\bsi[\s-]?tube\b|\bsitube\b/.test(q)) return "si-tube";
     if (/\bsi[\s-]?nema\b|\bsinema\b|\bspatial studio\b/.test(q)) return "si-nema";
     if (/\bvip\s*reserv\b|\bvip reserv\b|\breserv\b|\bvip tables?\b|\bvip\b/.test(q)) return "vip-reserv";
+    if (/\bfloq\s*cast\b|\bfloqcast\b/.test(q)) return "floqcast";
+    if (/\brydr\b|\bryd\s*r\b/.test(q)) return "rydr";
     if (/\bshout\s*out\b|\bshoutout\b/.test(q)) return "shoutout";
     if (/\bmingl\b|\bmingel\b/.test(q)) return "mingl";
     if (/\bbot[\s-]*dee\b|\bbotdee\b/.test(q)) return "bot-dee";
@@ -138,8 +188,8 @@
     if (/\bwhen (?:was|is|did)\b.{0,40}\b(implement|release|available|ship)/.test(q)) return true;
     if (/\bwhat is coming\b|\bcoming soon\b|\bplanned for\b/.test(q)) return true;
     if (/\bfeature journey\b|\ball features\b|\bfeatures smartview\b/.test(q)) return true;
-    if (/\bwhat (?:is|does)\b.{0,32}\b(bot-?dee|mingl|shout\s*out|vip|si-?nema|si-?tube)\b/.test(q)) return true;
-    if (/\btell me about\b.{0,24}\b(bot-?dee|mingl|shout\s*out|vip reser|si-?nema|si-?tube)\b/.test(q)) return true;
+    if (/\bwhat (?:is|does)\b.{0,32}\b(bot-?dee|mingl|shout\s*out|rydr|floq\s*cast|vip|si-?nema|si-?tube)\b/.test(q)) return true;
+    if (/\btell me about\b.{0,24}\b(bot-?dee|mingl|shout\s*out|rydr|floq\s*cast|vip reser|si-?nema|si-?tube)\b/.test(q)) return true;
     return false;
   }
 
@@ -185,7 +235,7 @@
     if (!catalog || catalog.schemaVersion !== SCHEMA_VERSION) errors.push("schemaVersion");
     const products = Array.isArray(catalog.products) ? catalog.products : [];
     const names = products.map(row => row.displayName);
-    if (names.length !== 6) errors.push("product-count");
+    if (names.length !== 8) errors.push("product-count");
     PRODUCT_IDS.forEach((id, idx) => {
       if (!products[idx] || products[idx].id !== id) errors.push("product-order:" + id);
       if (!products[idx] || products[idx].displayName !== DISPLAY_NAMES[id]) errors.push("displayName:" + id);
@@ -214,6 +264,7 @@
     const verified = !!record.statusVerified;
     const releasedOk = canMarkReleased(record);
     const tryOk = tryFeatureAllowed(record, access);
+    const flags = flagsForProductId(record.productId, access);
     return {
       id: record.id,
       productId: record.productId,
@@ -227,7 +278,7 @@
       currentBehavior: record.publicCopyApproved ? (record.currentBehavior || "") : "",
       proposedBehavior: record.publicCopyApproved ? (record.proposedBehavior || "") : "",
       lifecycle: record.lifecycle,
-      lifecycleLabel: lifecycleLabel(record.lifecycle, verified),
+      lifecycleLabel: lifecycleLabel(record.lifecycle, verified, flags),
       statusVerified: verified,
       availability: record.availability || "unknown",
       audienceRoles: Array.isArray(record.audienceRoles) ? record.audienceRoles.slice() : [],
@@ -256,11 +307,12 @@
       .filter(row => row.releaseDateVerified && row.releasedAt)
       .map(row => row.releasedAt)
       .sort();
+    const flags = flagsForProductId(product.id, access);
     return {
       id: product.id,
       displayName: product.displayName,
       mission: product.mission || "",
-      lifecycleLabel: lifecycleLabel(product.lifecycle, !!product.statusVerified),
+      lifecycleLabel: lifecycleLabel(product.lifecycle, !!product.statusVerified, flags),
       statusVerified: !!product.statusVerified,
       availableCount: rows.filter(row => row.statusVerified && (row.availability === "public" || row.availability === "limited_beta")).length,
       latestRelease: verifiedReleaseDates.length ? verifiedReleaseDates[verifiedReleaseDates.length - 1] : DATE_NOT_VERIFIED,
@@ -276,10 +328,21 @@
     (raw && raw.canAccessKeys ? Object.keys(raw.canAccessKeys) : []).forEach(key => {
       canAccessKeys[key] = raw.canAccessKeys[key] === true;
     });
+    const featureFlags = {};
+    const incoming = raw && raw.featureFlags && typeof raw.featureFlags === "object" ? raw.featureFlags : {};
+    Object.keys(incoming).forEach(key => {
+      const row = incoming[key];
+      if (!row || typeof row !== "object") return;
+      featureFlags[key] = {
+        IsFeatureEnabled: flag01(row.IsFeatureEnabled),
+        IsTestFeature: flag01(row.IsTestFeature)
+      };
+    });
     return {
       role: text(raw && raw.role, 40) || "patron",
       canAccessKeys,
-      isMasterAdmin: raw && raw.isMasterAdmin === true
+      isMasterAdmin: raw && raw.isMasterAdmin === true,
+      featureFlags
     };
   }
 
@@ -374,8 +437,10 @@
   function buildSmartView(catalog, prompt, accessRaw) {
     const payload = retrieve(catalog, prompt, accessRaw);
     const productName = payload.productName || "FLOQR";
+    const flags = flagsForProductId(payload.productId, accessRaw);
+    const status = flagStatusLabel(flags.IsFeatureEnabled, flags.IsTestFeature);
     let reply = payload.admitUncertainty
-      ? productName + " feature status is not verified from live availability evidence. I will not treat a plan as shipped."
+      ? productName + " is " + status + ". Dates are not verified. I will not treat a plan as shipped."
       : "Here is the published Features SMARTview for " + productName + ".";
     if (!payload.features.length && payload.view === "whatsNew") {
       reply = "What's New lists only approved, verified releases. None are published for " + (productName || "this product") + " yet.";
@@ -454,13 +519,20 @@
     DISPLAY_NAMES,
     LIFECYCLES,
     LIFECYCLE_LABELS,
-    STATUS_NOT_VERIFIED,
+    STATUS_TESTING,
+    STATUS_BETA,
+    STATUS_IN_DEVELOPMENT,
     DATE_NOT_VERIFIED,
+    PACKAGED_FEATURE_FLAGS,
     VIEWS,
     FEATURE_KEYS,
     TRY_ROUTES,
     text,
     productDisplayName,
+    flag01,
+    flagStatusLabel,
+    flagsForKey,
+    flagsForProductId,
     lifecycleLabel,
     implementedLabel,
     sanitizeUntrustedText,

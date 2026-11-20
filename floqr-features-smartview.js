@@ -37,6 +37,7 @@
     const services = root.FLOQRFeatureServices;
     const keys = core().FEATURE_KEYS;
     const canAccessKeys = {};
+    const featureFlags = {};
     Object.keys(keys).forEach(productId => {
       const key = keys[productId];
       if (!key) return;
@@ -45,12 +46,22 @@
       } catch (_) {
         canAccessKeys[key] = false;
       }
+      try {
+        const rows = services && services.getFeatures && services.getFeatures();
+        const row = rows && rows[key];
+        if (row) {
+          featureFlags[key] = {
+            IsFeatureEnabled: row.IsFeatureEnabled,
+            IsTestFeature: row.IsTestFeature
+          };
+        }
+      } catch (_) {}
     });
     let isMasterAdmin = false;
     try {
       isMasterAdmin = !!(root.FLOQRFeatureGates && root.FLOQRFeatureGates.isMasterAdmin && root.FLOQRFeatureGates.isMasterAdmin());
     } catch (_) {}
-    return { role: isMasterAdmin ? "masterAdmin" : "patron", canAccessKeys, isMasterAdmin };
+    return { role: isMasterAdmin ? "masterAdmin" : "patron", canAccessKeys, isMasterAdmin, featureFlags };
   }
 
   function productIdsFromPayload(payload) {
@@ -107,13 +118,20 @@
   }
 
   function badgeClass(label) {
-    if (label === core().STATUS_NOT_VERIFIED) return "is-unknown";
+    if (label === "Testing") return "is-testing";
     if (label === "Released") return "is-released";
     if (label === "Beta") return "is-beta";
     if (label === "In development") return "is-dev";
     if (label === "Planned" || label === "Concept") return "is-plan";
     if (label === "Deprecated" || label === "Retired") return "is-past";
     return "is-unknown";
+  }
+
+  function badgeText(label) {
+    if (label === "Testing") return t("fsv.statusTesting", "Testing");
+    if (label === "Beta") return t("fsv.lifecycle.beta", "Beta");
+    if (label === "In development") return t("fsv.lifecycle.in_development", "In development");
+    return label;
   }
 
   function compactCard(row, opts) {
@@ -124,7 +142,7 @@
     return `<article class="floqr-fsv-card" data-fsv-open="${esc(row.id)}">
       <p class="floqr-fsv-kicker">${esc(row.productName)}</p>
       <h4 class="floqr-fsv-name">${esc(row.title)}</h4>
-      <span class="floqr-fsv-badge ${badgeClass(row.lifecycleLabel)}">${esc(row.lifecycleLabel)}</span>
+      <span class="floqr-fsv-badge ${badgeClass(row.lifecycleLabel)}">${esc(badgeText(row.lifecycleLabel))}</span>
       <p class="floqr-fsv-mission">${esc(row.accomplishment || row.shortDescription)}</p>
       <p class="floqr-fsv-note">${esc(t("fsv.dateImplemented", "Date implemented"))}: ${esc(row.implementedLabel)}</p>
       ${opts && opts.actions === false ? "" : `<div class="floqr-fsv-actions">
@@ -187,7 +205,7 @@
       <button type="button" class="floqr-fsv-close" data-fsv-close>${esc(t("fsv.close", "Close"))}</button>
       <p class="floqr-fsv-kicker">${esc(row.productName)}</p>
       <h4 id="fsvDetailTitle" class="floqr-fsv-name">${esc(row.title)}</h4>
-      <span class="floqr-fsv-badge ${badgeClass(row.lifecycleLabel)}">${esc(row.lifecycleLabel)}</span>
+      <span class="floqr-fsv-badge ${badgeClass(row.lifecycleLabel)}">${esc(badgeText(row.lifecycleLabel))}</span>
       <dl class="floqr-fsv-dl">
         <dt>${esc(t("fsv.accomplishment", "What it accomplishes"))}</dt><dd>${esc(row.accomplishment)}</dd>
         <dt>${esc(t("fsv.before", "Before"))}</dt><dd>${esc(row.previousBehavior || t("fsv.dateNotVerified", "Not verified"))}</dd>
@@ -215,7 +233,7 @@
         const label = t("fsv.lifecycle." + step, core().LIFECYCLE_LABELS[step]);
         return `<li>
           <strong>${esc(label)}</strong>
-          ${hits.length ? hits.map(row => `<span class="floqr-fsv-badge ${badgeClass(row.lifecycleLabel)}">${esc(row.title)} · ${esc(row.lifecycleLabel)}</span>`).join(" ") : `<span class="floqr-fsv-note">${esc(t("fsv.dateNotVerified", "Not verified"))}</span>`}
+          ${hits.length ? hits.map(row => `<span class="floqr-fsv-badge ${badgeClass(row.lifecycleLabel)}">${esc(row.title)} · ${esc(badgeText(row.lifecycleLabel))}</span>`).join(" ") : `<span class="floqr-fsv-note">${esc(t("fsv.dateNotVerified", "Not verified"))}</span>`}
         </li>`;
       }).join("")}
     </ol>`;
@@ -251,7 +269,7 @@
         const sample = proj.features.find(row => row.productId === prod.id);
         return `<article class="floqr-fsv-card" data-fsv-product="${esc(prod.id)}">
           <h4 class="floqr-fsv-name">${esc(prod.displayName)}</h4>
-          <span class="floqr-fsv-badge ${badgeClass(prod.lifecycleLabel)}">${esc(prod.lifecycleLabel)}</span>
+          <span class="floqr-fsv-badge ${badgeClass(prod.lifecycleLabel)}">${esc(badgeText(prod.lifecycleLabel))}</span>
           <p class="floqr-fsv-mission">${esc(prod.mission)}</p>
           <p class="floqr-fsv-note">${esc(t("fsv.dateImplemented", "Date implemented"))}: ${esc(prod.latestRelease)}</p>
           ${prod.presentInRepo === false ? `<p class="floqr-fsv-note">${esc(t("fsv.notAvailable", "Not in this repository. No Try action."))}</p>` : ""}
@@ -427,7 +445,7 @@
     host.classList.add("floqr-fsv-mount");
     // Scope the card to this retrieve's product(s). Rows come from the full catalog
     // (all tabs for that product), never a view-filtered retrieve slice and never
-    // the six-product module catalog.
+    // the eight-product module catalog.
     host.__fsvProductIds = productIdsFromPayload(payload);
     host.__fsvWarning = payload.warning || "";
     host.__fsvSnapshot = snapshotFromPayload(payload);
@@ -445,9 +463,10 @@
     loadCatalog,
     badge: function (product) {
       const api = core();
-      if (!api) return "Status not verified";
-      if (product && product.presentInRepo === false) return api.STATUS_NOT_VERIFIED;
-      return api.lifecycleLabel(product && product.lifecycle, !!(product && product.statusVerified));
+      if (!api) return "In development";
+      if (product && product.lifecycleLabel) return product.lifecycleLabel;
+      const flags = api.flagsForProductId(product && product.id, viewerAccess());
+      return api.lifecycleLabel(product && product.lifecycle, !!(product && product.statusVerified), flags);
     },
     _fsvFull: true
   };

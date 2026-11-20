@@ -583,47 +583,47 @@ const HELP = {
   "help-features-smartview": {
     en: {
       title: "Features SMARTview",
-      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status stays Status not verified until availability is evidenced. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview and not Version SMARTview. Plans are never treated as shipped."
+      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status stays Status not verified until availability is evidenced. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview and not Version SMARTview. Plans are never treated as shipped."
     },
     fr: {
       title: "Features SMARTview",
-      body: "Features SMARTview est le catalogue produits de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema et Si-tube. Ouvrez Aperçu, Nouveautés, Parcours, Toutes les fonctions, Bientôt ou Passé/retiré. Le statut reste Status not verified tant que la disponibilité n’est pas prouvée. Nouveautés reste vide jusqu’à l’approbation d’une version vérifiée. Ce n’est pas Room SMARTview ni Version SMARTview. Les plans ne sont jamais traités comme livrés."
+      body: "Features SMARTview est le catalogue produits de BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema et Si-tube. Ouvrez Aperçu, Nouveautés, Parcours, Toutes les fonctions, Bientôt ou Passé/retiré. Le statut reste Status not verified tant que la disponibilité n’est pas prouvée. Nouveautés reste vide jusqu’à l’approbation d’une version vérifiée. Ce n’est pas Room SMARTview ni Version SMARTview. Les plans ne sont jamais traités comme livrés."
     },
     de: {
       title: "Features SMARTview",
-      body: "Features SMARTview ist der Produktkatalog für BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema und Si-tube. Öffne Überblick, Neuigkeiten, Feature-Reise, Alle Features, Demnächst oder Vergangen/Retired. Der Status bleibt Status not verified, bis Verfügbarkeit belegt ist. Neuigkeiten bleibt leer, bis ein Reviewer ein geprüftes Release freigibt. Das ist nicht Room SMARTview und nicht Version SMARTview. Pläne gelten nie als ausgeliefert."
+      body: "Features SMARTview ist der Produktkatalog für BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema und Si-tube. Öffne Überblick, Neuigkeiten, Feature-Reise, Alle Features, Demnächst oder Vergangen/Retired. Der Status bleibt Status not verified, bis Verfügbarkeit belegt ist. Neuigkeiten bleibt leer, bis ein Reviewer ein geprüftes Release freigibt. Das ist nicht Room SMARTview und nicht Version SMARTview. Pläne gelten nie als ausgeliefert."
     },
     es: {
       title: "Features SMARTview",
-      body: "Features SMARTview es el catálogo de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema y Si-tube. Abre Resumen, Novedades, Recorrido, Todas las funciones, Próximamente o Pasado/Retired. El estado permanece Status not verified hasta que haya evidencia de disponibilidad. Novedades queda vacío hasta que un revisor apruebe una versión verificada. No es Room SMARTview ni Version SMARTview. Los planes nunca se tratan como entregados."
+      body: "Features SMARTview es el catálogo de BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema y Si-tube. Abre Resumen, Novedades, Recorrido, Todas las funciones, Próximamente o Pasado/Retired. El estado permanece Status not verified hasta que haya evidencia de disponibilidad. Novedades queda vacío hasta que un revisor apruebe una versión verificada. No es Room SMARTview ni Version SMARTview. Los planes nunca se tratan como entregados."
     },
     nl: {
       title: "Features SMARTview",
-      body: "Features SMARTview is de productcatalogus voor BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema en Si-tube. Open Overzicht, Nieuw, Feature-reis, Alle features, Binnenkort of Verleden/Retired. Status blijft Status not verified tot beschikbaarheid is bewezen. Nieuw blijft leeg tot een reviewer een geverifieerde release goedkeurt. Dit is niet Room SMARTview en niet Version SMARTview. Plannen gelden nooit als geleverd."
+      body: "Features SMARTview is de productcatalogus voor BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema en Si-tube. Open Overzicht, Nieuw, Feature-reis, Alle features, Binnenkort of Verleden/Retired. Status blijft Status not verified tot beschikbaarheid is bewezen. Nieuw blijft leeg tot een reviewer een geverifieerde release goedkeurt. Dit is niet Room SMARTview en niet Version SMARTview. Plannen gelden nooit als geleverd."
     },
     ru: {
       title: "Features SMARTview",
-      body: "Features SMARTview — каталог продуктов BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema и Si-tube. Откройте Обзор, Что нового, Путь функции, Все функции, Скоро или Прошлое/Retired. Статус остаётся Status not verified, пока нет доказательств доступности. «Что нового» пусто, пока рецензент не одобрит проверенный релиз. Это не Room SMARTview и не Version SMARTview. Планы никогда не считаются выпущенными."
+      body: "Features SMARTview — каталог продуктов BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema и Si-tube. Откройте Обзор, Что нового, Путь функции, Все функции, Скоро или Прошлое/Retired. Статус остаётся Status not verified, пока нет доказательств доступности. «Что нового» пусто, пока рецензент не одобрит проверенный релиз. Это не Room SMARTview и не Version SMARTview. Планы никогда не считаются выпущенными."
     },
     it: {
       title: "Features SMARTview",
-      body: "Features SMARTview è il catalogo prodotti di BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema e Si-tube. Apri Panoramica, Novità, Percorso, Tutte le funzioni, Prossimamente o Passato/Retired. Lo stato resta Status not verified finché la disponibilità non è evidenziata. Novità resta vuoto finché un revisore non approva una release verificata. Non è Room SMARTview né Version SMARTview. I piani non sono mai trattati come rilasciati."
+      body: "Features SMARTview è il catalogo prodotti di BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema e Si-tube. Apri Panoramica, Novità, Percorso, Tutte le funzioni, Prossimamente o Passato/Retired. Lo stato resta Status not verified finché la disponibilità non è evidenziata. Novità resta vuoto finché un revisore non approva una release verificata. Non è Room SMARTview né Version SMARTview. I piani non sono mai trattati come rilasciati."
     },
     pt: {
       title: "Features SMARTview",
-      body: "Features SMARTview é o catálogo de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema e Si-tube. Abra Visão geral, Novidades, Jornada, Todas as funções, Em breve ou Passado/Retired. O estado permanece Status not verified até haver evidência de disponibilidade. Novidades fica vazio até um revisor aprovar uma versão verificada. Não é Room SMARTview nem Version SMARTview. Planos nunca são tratados como entregues."
+      body: "Features SMARTview é o catálogo de BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema e Si-tube. Abra Visão geral, Novidades, Jornada, Todas as funções, Em breve ou Passado/Retired. O estado permanece Status not verified até haver evidência de disponibilidade. Novidades fica vazio até um revisor aprovar uma versão verificada. Não é Room SMARTview nem Version SMARTview. Planos nunca são tratados como entregues."
     },
     el: {
       title: "Features SMARTview",
-      body: "Το Features SMARTview είναι ο κατάλογος προϊόντων για BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema και Si-tube. Ανοίξτε Επισκόπηση, Νέα, Διαδρομή, Όλες τις λειτουργίες, Σύντομα ή Παρελθόν/Retired. Η κατάσταση μένει Status not verified μέχρι να τεκμηριωθεί η διαθεσιμότητα. Τα Νέα μένουν κενά μέχρι να εγκριθεί επαληθευμένη έκδοση. Δεν είναι Room SMARTview ούτε Version SMARTview. Τα σχέδια δεν θεωρούνται ποτέ παραδομένα."
+      body: "Το Features SMARTview είναι ο κατάλογος προϊόντων για BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema και Si-tube. Ανοίξτε Επισκόπηση, Νέα, Διαδρομή, Όλες τις λειτουργίες, Σύντομα ή Παρελθόν/Retired. Η κατάσταση μένει Status not verified μέχρι να τεκμηριωθεί η διαθεσιμότητα. Τα Νέα μένουν κενά μέχρι να εγκριθεί επαληθευμένη έκδοση. Δεν είναι Room SMARTview ούτε Version SMARTview. Τα σχέδια δεν θεωρούνται ποτέ παραδομένα."
     },
     pl: {
       title: "Features SMARTview",
-      body: "Features SMARTview to katalog produktów BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema i Si-tube. Otwórz Przegląd, Nowości, Ścieżkę, Wszystkie funkcje, Wkrótce lub Przeszłość/Retired. Status zostaje Status not verified, dopóki dostępność nie ma dowodu. Nowości zostają puste, aż recenzent zatwierdzi zweryfikowane wydanie. To nie Room SMARTview i nie Version SMARTview. Planów nigdy nie traktujemy jako dostarczonych."
+      body: "Features SMARTview to katalog produktów BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema i Si-tube. Otwórz Przegląd, Nowości, Ścieżkę, Wszystkie funkcje, Wkrótce lub Przeszłość/Retired. Status zostaje Status not verified, dopóki dostępność nie ma dowodu. Nowości zostają puste, aż recenzent zatwierdzi zweryfikowane wydanie. To nie Room SMARTview i nie Version SMARTview. Planów nigdy nie traktujemy jako dostarczonych."
     },
     ar: {
       title: "Features SMARTview",
-      body: "Features SMARTview هو كتالوج منتجات BOT-DEE وMingl وShoutOut وVIP reserV وSi-nema وSi-tube. افتح نظرة عامة أو ما الجديد أو رحلة الميزة أو كل الميزات أو قريبًا أو السابق/Retired. تبقى الحالة Status not verified حتى يثبت التوفر. ما الجديد يبقى فارغًا حتى يوافق مراجع على إصدار موثّق. هذا ليس Room SMARTview وليس Version SMARTview. لا تُعامل الخطط كأنها أُطلقت."
+      body: "Features SMARTview هو كتالوج منتجات BOT-DEE وMingl وShoutOut وRydR وfloqCast وVIP reserV وSi-nema وSi-tube. افتح نظرة عامة أو ما الجديد أو رحلة الميزة أو كل الميزات أو قريبًا أو السابق/Retired. تبقى الحالة Status not verified حتى يثبت التوفر. ما الجديد يبقى فارغًا حتى يوافق مراجع على إصدار موثّق. هذا ليس Room SMARTview وليس Version SMARTview. لا تُعامل الخطط كأنها أُطلقت."
     }
   },
   "help-features-smartview-status": {

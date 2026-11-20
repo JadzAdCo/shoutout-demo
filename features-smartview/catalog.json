@@ -1,7 +1,7 @@
 {
   "schemaVersion": "floqr.featuresSmartView/1",
   "catalogVersion": 2,
-  "warning": "Packaged catalog only. Live flags and availability dates are not verified. Plans are not treated as shipped.",
+  "warning": "Status is Testing, Beta, or In development from Features & Services flags. Dates are not verified. Plans are not treated as shipped.",
   "auditedAt": "2026-11-20",
   "defaultBranchSha": "868bec33e874e57ab33b73f6127641df67edec66",
   "products": [
@@ -30,6 +30,24 @@
       "statusVerified": false,
       "mission": "Paid LED messages at a venue.",
       "packaged": { "featureKey": "shoutOut", "IsFeatureEnabled": 1, "IsTestFeature": 0 },
+      "presentInRepo": true
+    },
+    {
+      "id": "rydr",
+      "displayName": "RydR",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "mission": "Venue pickup requests when the club and account allow RydR.",
+      "packaged": { "featureKey": "rydr", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "presentInRepo": true
+    },
+    {
+      "id": "floqcast",
+      "displayName": "floqCast",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "mission": "Live phone camera to the venue floqCast board on display2.",
+      "packaged": { "featureKey": "floqCast", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
       "presentInRepo": true
     },
     {
@@ -299,6 +317,70 @@
         {
           "kind": "doc",
           "note": "Headless ShoutOut SMARTpreview on main; not a dated public release",
+          "observedAt": "2026-11-20",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "rydr.pickup",
+      "productId": "rydr",
+      "title": "Venue pickup request",
+      "category": "rides",
+      "shortDescription": "Request a venue pickup when RydR is enabled for the club and your account. Packaged rydr is Beta.",
+      "accomplishment": "Satellite pickup.html reuses the Search session for a signed-in pickup request.",
+      "patronBenefit": "You can start a pickup from a club without a second login — when RydR is available to you.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Packaged rydr {0,1}. Live Firestore flags were not read this run.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "verificationNotes": "Packaged featureServices/rydr {0,1}. Do not invent a first-available date.",
+      "audienceRoles": ["betaTester", "masterAdmin"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "mergedAt": "",
+      "releasedAt": "",
+      "releaseDateVerified": false,
+      "featureFlags": ["rydr"],
+      "sourceEvidence": [
+        {
+          "kind": "feature_flag",
+          "note": "Packaged default IsFeatureEnabled 0 IsTestFeature 1. Pages hosts pickup.html.",
+          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
+          "observedAt": "2026-11-20",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "floqcast.live",
+      "productId": "floqcast",
+      "title": "Live phone to display2",
+      "category": "live",
+      "shortDescription": "Search a venue, preview, pay, Club Admin approve, then go live on display2 only. Packaged floqCast is Beta.",
+      "accomplishment": "Phone camera can appear on the secondary LED after pay and club approve.",
+      "patronBenefit": "You can go live on the venue floqCast board when the club and your account allow it.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Packaged floqCast {0,1}. Live pointer is locationId__secondary. Live Firestore flags were not read this run.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "verificationNotes": "Packaged featureServices/floqCast {0,1}. Brand is floqCast. Display 1 is never the live board. Do not invent a first-available date.",
+      "audienceRoles": ["betaTester", "masterAdmin"],
+      "supportedPlatforms": ["web", "led"],
+      "availability": "unknown",
+      "mergedAt": "",
+      "releasedAt": "",
+      "releaseDateVerified": false,
+      "featureFlags": ["floqCast"],
+      "sourceEvidence": [
+        {
+          "kind": "feature_flag",
+          "note": "Packaged default IsFeatureEnabled 0 IsTestFeature 1. Pages hosts floqcast-search.html.",
+          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
           "observedAt": "2026-11-20",
           "visibility": "internal"
         }

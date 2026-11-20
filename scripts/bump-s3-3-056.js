@@ -58,7 +58,7 @@ function run(root) {
       id: NEXT,
       text: `${NEXT}: ${NOTE}`,
       audiences: ["botDee"],
-      whatsNewText: `${NEXT}: Features SMARTview catalog for BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, Si-tube. Status stays not verified until availability evidence. Not Room SMARTview and not Version SMARTview.`
+      whatsNewText: `${NEXT}: Features SMARTview catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, Si-tube. Status stays not verified until availability evidence. Not Room SMARTview and not Version SMARTview.`
     });
     return `${JSON.stringify(rows, null, 2)}\n`;
   });

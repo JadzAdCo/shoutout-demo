@@ -224,10 +224,10 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.056",
-      title: "s3.3.056 — Features SMARTview six-product catalog + BOT DEE retrieval",
+      title: "s3.3.056 — Features SMARTview eight-product catalog + BOT DEE retrieval",
       checks: [
-        {label:"Six product display names", file:"features-smartview/catalog.json", includes:["BOT-DEE", "Mingl", "ShoutOut", "VIP reserV", "Si-nema", "Si-tube"], notIncludes:["floqCast"]},
-        {label:"Core byte-identical", file:"features-smartview-core.js", includes:["STATUS_NOT_VERIFIED", "isFeaturesSmartViewPrompt", "publicProjection"]},
+        {label:"Eight product display names", file:"features-smartview/catalog.json", includes:["BOT-DEE", "Mingl", "ShoutOut", "RydR", "floqCast", "VIP reserV", "Si-nema", "Si-tube"]},
+        {label:"Core byte-identical", file:"features-smartview-core.js", includes:["STATUS_TESTING", "flagStatusLabel", "isFeaturesSmartViewPrompt", "publicProjection"]},
         {label:"Satellite session shell", file:"features-smartview.html", includes:["FLOQRSessionShell.bind", "features-smartview-core.js"]},
         {label:"Editorial callables", file:"functions/features-smartview-functions.js", includes:["approveFeaturesSmartViewCopy", "rollbackFeaturesSmartViewCopy"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-056-features-smartview"]}
@@ -3695,19 +3695,19 @@
     {
       id:"s3-3-056-features-smartview",
       area:"BOT DEE / Features SMARTview",
-      feature:"Features SMARTview six-product catalog (Status not verified)",
-      changed:"s3.3.056 replaces the eight-badge stub with six kit products (BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, Si-tube), six views, compact+detail cards, BOT DEE retrieval with citations, and editorial approve/rollback callables. No feature is Released. What's New is empty. Do not merge/deploy without Don's approval.",
-      howToTest:"1) After Pages publish (not this PR unless Don approves): hard-refresh features-smartview.html until features-smartview-core.js?v=s3.3.056. 2) Sign in on Search first. 3) Confirm six product chips and Status not verified on every card. 4) What's New empty. 5) Si-tube has no Try. 6) In BOT DEE say What can Mingl do — Features card, not Version, not Room. 7) Master Admin → Features Mgmt → BOT DEE → Show Features SMARTview. 8) Mark Succeed/Failed. Display URLs have no ?v=.",
-      expected:"Six names exact. No floqCast / FloqR product cards. No Try. BOT DEE admits not verified and will not treat a plan as shipped.",
+      feature:"Features SMARTview eight-product catalog (Testing / Beta / In development)",
+      changed:"s3.3.056 catalog products: BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, Si-tube. Exact display names RydR and floqCast. Six views, compact+detail cards, BOT DEE retrieval with citations, editorial approve/rollback callables. Patron badges are Testing (Enable Feature + Enable Beta Feature), Beta (Enable Beta Feature only), or In development (neither). Dates stay Not verified. What's New is empty. Do not merge/deploy without Don's approval.",
+      howToTest:"1) After Pages publish (not this PR unless Don approves): hard-refresh features-smartview.html until features-smartview-core.js?v=s3.3.056. 2) Sign in on Search first. 3) Confirm eight product chips. Packaged badges: BOT-DEE Testing, Mingl/RydR/floqCast/VIP/Si-nema Beta, ShoutOut and Si-tube In development. 4) What's New empty. Dates Not verified. 5) Si-tube has no Try. 6) In BOT DEE say What can Mingl do and What can floqCast do — Features cards, not Version, not Room. 7) Master Admin → Features Mgmt → BOT DEE → Show Features SMARTview. 8) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Eight names exact (RydR, floqCast spelling). No FloqR product card. No invented release dates. BOT DEE names Testing/Beta/In development and will not treat a plan as shipped.",
       troubleshoot:"Eight old badges → cached s3.3.047 catalog. Version card instead of Features → prompt was Ver, not a product question. Room card → Open Room SMARTview / Cancun trip. Functions 404 on approve → this PR is Pages+code only until Don deploys."
     },
     {
       id:"s3-3-047-features-smartview-master",
       area:"Master Admin",
-      feature:"Features SMARTview (six products as of s3.3.056, Status not verified)",
-      changed:"Master Admin → Features Mgmt → BOT DEE → SMARTviews → Show Features SMARTview. Catalog is evidence-backed: packaged flags only, Si-tube marked not in repo, no invented Beta-since dates. Live Firestore flags not verified this run. s3.3.056 dropped FloqR and floqCast from this catalog.",
-      howToTest:"1) Hard-refresh Master Admin. 2) Features Mgmt → BOT DEE (`#featuresBotDee`) → SMARTviews. 3) Click Show Features SMARTview. 4) Confirm six cards: BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, Si-tube. 5) Every badge says Status not verified. Si-tube says Not in this repository.",
-      expected:"Exact kit display names. No Try action on Si-tube. No fabricated release dates. FloqR and floqCast are not Features SMARTview products.",
+      feature:"Features SMARTview (eight products, Testing / Beta / In development)",
+      changed:"Master Admin → Features Mgmt → BOT DEE → SMARTviews → Show Features SMARTview. Catalog is evidence-backed: packaged flags map to Testing/Beta/In development, Si-tube marked not in repo, no invented release dates. Catalog includes RydR and floqCast (brand spelling floqCast). FloqR is not a product card.",
+      howToTest:"1) Hard-refresh Master Admin. 2) Features Mgmt → BOT DEE (`#featuresBotDee`) → SMARTviews. 3) Click Show Features SMARTview. 4) Confirm eight cards: BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, Si-tube. 5) Badges are Testing, Beta, or In development — never an invented release date. Si-tube says Not in this repository.",
+      expected:"Exact display names including RydR and floqCast. No Try action on Si-tube. No fabricated release dates. FloqR is not a Features SMARTview product.",
       troubleshoot:"Button missing → master-admin.html host + floqr-features-smartview.js. Catalog 404 → features-smartview/catalog.json not on Pages. Live availability still unknown until Firebase flags are read."
     },
     {

@@ -239,15 +239,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Features SMARTview — каталог продуктов BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema и Si-tube. Откройте Обзор, Что нового, Путь функции, Все функции, Скоро или Прошлое/Retired. Статус остаётся Status not verified, пока нет доказательств доступности. «Что нового» пусто, пока рецензент не одобрит проверенный релиз. Это не Room SMARTview и не Version SMARTview. Планы никогда не считаются выпущенными."
+        body: "Features SMARTview — каталог продуктов BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema и Si-tube. Откройте Обзор, Что нового, Путь функции, Все функции, Скоро или Прошлое/Retired. Статус остаётся Testing, Beta, or In development, пока нет доказательств доступности. «Что нового» пусто, пока рецензент не одобрит проверенный релиз. Это не Room SMARTview и не Version SMARTview. Планы никогда не считаются выпущенными."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "Features SMARTview показывает Status not verified, если живые флаги, выкладка Pages или даты доступности для patron не проверялись. Merged on — время слияния pull request, не Available since. Released только при доказательстве деплоя или доступности. Строки SAMPLE и слова из разговора не доказывают живой релиз."
+        title: "Testing, Beta, In development",
+        body: "Features SMARTview показывает Testing, Beta, or In development, если живые флаги, выкладка Pages или даты доступности для patron не проверялись. Merged on — время слияния pull request, не Available since. Released только при доказательстве деплоя или доступности. Строки SAMPLE и слова из разговора не доказывают живой релиз."
       },
       "help-features-smartview-botdee": {
         title: "Спросить BOT DEE о продукте",
-        body: "В BOT DEE скажите What can Mingl do, What changed in ShoutOut, What is coming to Si-nema или When was VIP reserV implemented. BOT DEE отвечает из каталога Features со ссылками. Он признаёт Status not verified и не считает план выпущенным. Введите Ver для Version SMARTview. Введите Open Room SMARTview для общей комнаты. Это другие карточки."
+        body: "В BOT DEE скажите What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema или When was VIP reserV implemented. BOT DEE отвечает из каталога Features со ссылками. Он признаёт Testing, Beta, or In development и не считает план выпущенным. Введите Ver для Version SMARTview. Введите Open Room SMARTview для общей комнаты. Это другие карточки."
       },
       "help-vip-book-table": {
         title: "Забронировать VIP-стол (VIP reserV)",
@@ -753,15 +753,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Features SMARTview is de productcatalogus voor BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema en Si-tube. Open Overzicht, Nieuw, Feature-reis, Alle features, Binnenkort of Verleden/Retired. Status blijft Status not verified tot beschikbaarheid is bewezen. Nieuw blijft leeg tot een reviewer een geverifieerde release goedkeurt. Dit is niet Room SMARTview en niet Version SMARTview. Plannen gelden nooit als geleverd."
+        body: "Features SMARTview is de productcatalogus voor BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema en Si-tube. Open Overzicht, Nieuw, Feature-reis, Alle features, Binnenkort of Verleden/Retired. Status blijft Testing, Beta, or In development tot beschikbaarheid is bewezen. Nieuw blijft leeg tot een reviewer een geverifieerde release goedkeurt. Dit is niet Room SMARTview en niet Version SMARTview. Plannen gelden nooit als geleverd."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "Features SMARTview toont Status not verified wanneer live flags, Pages-uitrol of patron-beschikbaarheidsdata niet zijn gecontroleerd. Merged on is een pull-request-mergetijd, niet Available since. Released verschijnt alleen met deploy- of beschikbaarheidsbewijs. SAMPLE-rijen en gesprekclaims bewijzen geen live release."
+        title: "Testing, Beta, In development",
+        body: "Features SMARTview toont Testing, Beta, or In development wanneer live flags, Pages-uitrol of patron-beschikbaarheidsdata niet zijn gecontroleerd. Merged on is een pull-request-mergetijd, niet Available since. Released verschijnt alleen met deploy- of beschikbaarheidsbewijs. SAMPLE-rijen en gesprekclaims bewijzen geen live release."
       },
       "help-features-smartview-botdee": {
         title: "BOT DEE over een product vragen",
-        body: "Zeg in BOT DEE What can Mingl do, What changed in ShoutOut, What is coming to Si-nema of When was VIP reserV implemented. BOT DEE antwoordt uit de Features-catalogus met citaten. Het geeft Status not verified toe en behandelt een plan niet als geleverd. Typ Ver voor Version SMARTview. Typ Open Room SMARTview voor een gedeelde ruimte. Dat zijn andere kaarten."
+        body: "Zeg in BOT DEE What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema of When was VIP reserV implemented. BOT DEE antwoordt uit de Features-catalogus met citaten. Het geeft Testing, Beta, or In development toe en behandelt een plan niet als geleverd. Typ Ver voor Version SMARTview. Typ Open Room SMARTview voor een gedeelde ruimte. Dat zijn andere kaarten."
       },
       "help-vip-book-table": {
         title: "VIP-tafel boeken (VIP reserV)",
@@ -1267,15 +1267,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Features SMARTview est le catalogue produits de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema et Si-tube. Ouvrez Aperçu, Nouveautés, Parcours, Toutes les fonctions, Bientôt ou Passé/retiré. Le statut reste Status not verified tant que la disponibilité n’est pas prouvée. Nouveautés reste vide jusqu’à l’approbation d’une version vérifiée. Ce n’est pas Room SMARTview ni Version SMARTview. Les plans ne sont jamais traités comme livrés."
+        body: "Features SMARTview est le catalogue produits de BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema et Si-tube. Ouvrez Aperçu, Nouveautés, Parcours, Toutes les fonctions, Bientôt ou Passé/retiré. Le statut reste Testing, Beta, or In development tant que la disponibilité n’est pas prouvée. Nouveautés reste vide jusqu’à l’approbation d’une version vérifiée. Ce n’est pas Room SMARTview ni Version SMARTview. Les plans ne sont jamais traités comme livrés."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "Features SMARTview affiche Status not verified lorsque les flags live, le déploiement Pages ou les dates de disponibilité patrons n’ont pas été vérifiés. Merged on est une heure de fusion de pull request, pas Available since. Released n’apparaît qu’avec une preuve de déploiement ou de disponibilité. Les lignes SAMPLE et les propos de conversation ne prouvent pas une version live."
+        title: "Testing, Beta, In development",
+        body: "Features SMARTview affiche Testing, Beta, or In development lorsque les flags live, le déploiement Pages ou les dates de disponibilité patrons n’ont pas été vérifiés. Merged on est une heure de fusion de pull request, pas Available since. Released n’apparaît qu’avec une preuve de déploiement ou de disponibilité. Les lignes SAMPLE et les propos de conversation ne prouvent pas une version live."
       },
       "help-features-smartview-botdee": {
         title: "Demander à BOT DEE un produit",
-        body: "Dans BOT DEE dites What can Mingl do, What changed in ShoutOut, What is coming to Si-nema ou When was VIP reserV implemented. BOT DEE répond depuis le catalogue Features avec des citations. Il admet Status not verified et ne traitera pas un plan comme livré. Tapez Ver pour Version SMARTview. Tapez Open Room SMARTview pour une salle partagée. Ce sont d’autres cartes."
+        body: "Dans BOT DEE dites What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema ou When was VIP reserV implemented. BOT DEE répond depuis le catalogue Features avec des citations. Il admet Testing, Beta, or In development et ne traitera pas un plan comme livré. Tapez Ver pour Version SMARTview. Tapez Open Room SMARTview pour une salle partagée. Ce sont d’autres cartes."
       },
       "help-vip-book-table": {
         title: "Réserver une table VIP (VIP reserV)",
@@ -1781,15 +1781,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Features SMARTview ist der Produktkatalog für BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema und Si-tube. Öffne Überblick, Neuigkeiten, Feature-Reise, Alle Features, Demnächst oder Vergangen/Retired. Der Status bleibt Status not verified, bis Verfügbarkeit belegt ist. Neuigkeiten bleibt leer, bis ein Reviewer ein geprüftes Release freigibt. Das ist nicht Room SMARTview und nicht Version SMARTview. Pläne gelten nie als ausgeliefert."
+        body: "Features SMARTview ist der Produktkatalog für BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema und Si-tube. Öffne Überblick, Neuigkeiten, Feature-Reise, Alle Features, Demnächst oder Vergangen/Retired. Der Status bleibt Testing, Beta, or In development, bis Verfügbarkeit belegt ist. Neuigkeiten bleibt leer, bis ein Reviewer ein geprüftes Release freigibt. Das ist nicht Room SMARTview und nicht Version SMARTview. Pläne gelten nie als ausgeliefert."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "Features SMARTview zeigt Status not verified, wenn Live-Flags, Pages-Rollout oder Patron-Verfügbarkeitsdaten nicht geprüft wurden. Merged on ist eine Pull-Request-Merge-Zeit, nicht Available since. Released erscheint nur mit Deploy- oder Verfügbarkeitsbeleg. SAMPLE-Zeilen und Gesprächsbehauptungen beweisen kein Live-Release."
+        title: "Testing, Beta, In development",
+        body: "Features SMARTview zeigt Testing, Beta, or In development, wenn Live-Flags, Pages-Rollout oder Patron-Verfügbarkeitsdaten nicht geprüft wurden. Merged on ist eine Pull-Request-Merge-Zeit, nicht Available since. Released erscheint nur mit Deploy- oder Verfügbarkeitsbeleg. SAMPLE-Zeilen und Gesprächsbehauptungen beweisen kein Live-Release."
       },
       "help-features-smartview-botdee": {
         title: "BOT DEE zu einem Produkt fragen",
-        body: "Sage in BOT DEE What can Mingl do, What changed in ShoutOut, What is coming to Si-nema oder When was VIP reserV implemented. BOT DEE antwortet aus dem Features-Katalog mit Zitaten. Es gibt Status not verified zu und behandelt einen Plan nicht als ausgeliefert. Tippe Ver für Version SMARTview. Tippe Open Room SMARTview für einen gemeinsamen Raum. Das sind andere Karten."
+        body: "Sage in BOT DEE What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema oder When was VIP reserV implemented. BOT DEE antwortet aus dem Features-Katalog mit Zitaten. Es gibt Testing, Beta, or In development zu und behandelt einen Plan nicht als ausgeliefert. Tippe Ver für Version SMARTview. Tippe Open Room SMARTview für einen gemeinsamen Raum. Das sind andere Karten."
       },
       "help-vip-book-table": {
         title: "VIP-Tisch buchen (VIP reserV)",
@@ -2295,15 +2295,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Features SMARTview es el catálogo de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema y Si-tube. Abre Resumen, Novedades, Recorrido, Todas las funciones, Próximamente o Pasado/Retired. El estado permanece Status not verified hasta que haya evidencia de disponibilidad. Novedades queda vacío hasta que un revisor apruebe una versión verificada. No es Room SMARTview ni Version SMARTview. Los planes nunca se tratan como entregados."
+        body: "Features SMARTview es el catálogo de BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema y Si-tube. Abre Resumen, Novedades, Recorrido, Todas las funciones, Próximamente o Pasado/Retired. El estado permanece Testing, Beta, or In development hasta que haya evidencia de disponibilidad. Novedades queda vacío hasta que un revisor apruebe una versión verificada. No es Room SMARTview ni Version SMARTview. Los planes nunca se tratan como entregados."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "Features SMARTview muestra Status not verified cuando no se comprobaron flags en vivo, el despliegue de Pages o las fechas de disponibilidad para patrons. Merged on es la hora de fusión de un pull request, no Available since. Released solo aparece con evidencia de despliegue o disponibilidad. Filas SAMPLE y afirmaciones de conversación no prueban una versión en vivo."
+        title: "Testing, Beta, In development",
+        body: "Features SMARTview muestra Testing, Beta, or In development cuando no se comprobaron flags en vivo, el despliegue de Pages o las fechas de disponibilidad para patrons. Merged on es la hora de fusión de un pull request, no Available since. Released solo aparece con evidencia de despliegue o disponibilidad. Filas SAMPLE y afirmaciones de conversación no prueban una versión en vivo."
       },
       "help-features-smartview-botdee": {
         title: "Preguntar a BOT DEE por un producto",
-        body: "En BOT DEE di What can Mingl do, What changed in ShoutOut, What is coming to Si-nema o When was VIP reserV implemented. BOT DEE responde desde el catálogo Features con citas. Admite Status not verified y no trata un plan como entregado. Escribe Ver para Version SMARTview. Escribe Open Room SMARTview para una sala compartida. Son otras tarjetas."
+        body: "En BOT DEE di What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema o When was VIP reserV implemented. BOT DEE responde desde el catálogo Features con citas. Admite Testing, Beta, or In development y no trata un plan como entregado. Escribe Ver para Version SMARTview. Escribe Open Room SMARTview para una sala compartida. Son otras tarjetas."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -2809,15 +2809,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Features SMARTview è il catalogo prodotti di BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema e Si-tube. Apri Panoramica, Novità, Percorso, Tutte le funzioni, Prossimamente o Passato/Retired. Lo stato resta Status not verified finché la disponibilità non è evidenziata. Novità resta vuoto finché un revisore non approva una release verificata. Non è Room SMARTview né Version SMARTview. I piani non sono mai trattati come rilasciati."
+        body: "Features SMARTview è il catalogo prodotti di BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema e Si-tube. Apri Panoramica, Novità, Percorso, Tutte le funzioni, Prossimamente o Passato/Retired. Lo stato resta Testing, Beta, or In development finché la disponibilità non è evidenziata. Novità resta vuoto finché un revisore non approva una release verificata. Non è Room SMARTview né Version SMARTview. I piani non sono mai trattati come rilasciati."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "Features SMARTview mostra Status not verified quando flag live, rollout Pages o date di disponibilità patron non sono stati controllati. Merged on è l’ora di merge di una pull request, non Available since. Released compare solo con evidenza di deploy o disponibilità. Righe SAMPLE e affermazioni in chat non provano una release live."
+        title: "Testing, Beta, In development",
+        body: "Features SMARTview mostra Testing, Beta, or In development quando flag live, rollout Pages o date di disponibilità patron non sono stati controllati. Merged on è l’ora di merge di una pull request, non Available since. Released compare solo con evidenza di deploy o disponibilità. Righe SAMPLE e affermazioni in chat non provano una release live."
       },
       "help-features-smartview-botdee": {
         title: "Chiedere a BOT DEE un prodotto",
-        body: "In BOT DEE di’ What can Mingl do, What changed in ShoutOut, What is coming to Si-nema o When was VIP reserV implemented. BOT DEE risponde dal catalogo Features con citazioni. Ammette Status not verified e non tratta un piano come rilasciato. Digita Ver per Version SMARTview. Digita Open Room SMARTview per una stanza condivisa. Sono altre schede."
+        body: "In BOT DEE di’ What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema o When was VIP reserV implemented. BOT DEE risponde dal catalogo Features con citazioni. Ammette Testing, Beta, or In development e non tratta un piano come rilasciato. Digita Ver per Version SMARTview. Digita Open Room SMARTview per una stanza condivisa. Sono altre schede."
       },
       "help-vip-book-table": {
         title: "Prenota un tavolo VIP (VIP reserV)",
@@ -3323,15 +3323,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Features SMARTview é o catálogo de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema e Si-tube. Abra Visão geral, Novidades, Jornada, Todas as funções, Em breve ou Passado/Retired. O estado permanece Status not verified até haver evidência de disponibilidade. Novidades fica vazio até um revisor aprovar uma versão verificada. Não é Room SMARTview nem Version SMARTview. Planos nunca são tratados como entregues."
+        body: "Features SMARTview é o catálogo de BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema e Si-tube. Abra Visão geral, Novidades, Jornada, Todas as funções, Em breve ou Passado/Retired. O estado permanece Testing, Beta, or In development até haver evidência de disponibilidade. Novidades fica vazio até um revisor aprovar uma versão verificada. Não é Room SMARTview nem Version SMARTview. Planos nunca são tratados como entregues."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "Features SMARTview mostra Status not verified quando flags ao vivo, o rollout Pages ou datas de disponibilidade para patrons não foram checados. Merged on é o horário de merge de um pull request, não Available since. Released só aparece com evidência de deploy ou disponibilidade. Linhas SAMPLE e afirmações de conversa não provam um lançamento ao vivo."
+        title: "Testing, Beta, In development",
+        body: "Features SMARTview mostra Testing, Beta, or In development quando flags ao vivo, o rollout Pages ou datas de disponibilidade para patrons não foram checados. Merged on é o horário de merge de um pull request, não Available since. Released só aparece com evidência de deploy ou disponibilidade. Linhas SAMPLE e afirmações de conversa não provam um lançamento ao vivo."
       },
       "help-features-smartview-botdee": {
         title: "Perguntar ao BOT DEE sobre um produto",
-        body: "No BOT DEE diga What can Mingl do, What changed in ShoutOut, What is coming to Si-nema ou When was VIP reserV implemented. BOT DEE responde pelo catálogo Features com citações. Admite Status not verified e não trata um plano como entregue. Digite Ver para Version SMARTview. Digite Open Room SMARTview para uma sala compartilhada. São outros cartões."
+        body: "No BOT DEE diga What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema ou When was VIP reserV implemented. BOT DEE responde pelo catálogo Features com citações. Admite Testing, Beta, or In development e não trata um plano como entregue. Digite Ver para Version SMARTview. Digite Open Room SMARTview para uma sala compartilhada. São outros cartões."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -3837,15 +3837,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Το Features SMARTview είναι ο κατάλογος προϊόντων για BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema και Si-tube. Ανοίξτε Επισκόπηση, Νέα, Διαδρομή, Όλες τις λειτουργίες, Σύντομα ή Παρελθόν/Retired. Η κατάσταση μένει Status not verified μέχρι να τεκμηριωθεί η διαθεσιμότητα. Τα Νέα μένουν κενά μέχρι να εγκριθεί επαληθευμένη έκδοση. Δεν είναι Room SMARTview ούτε Version SMARTview. Τα σχέδια δεν θεωρούνται ποτέ παραδομένα."
+        body: "Το Features SMARTview είναι ο κατάλογος προϊόντων για BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema και Si-tube. Ανοίξτε Επισκόπηση, Νέα, Διαδρομή, Όλες τις λειτουργίες, Σύντομα ή Παρελθόν/Retired. Η κατάσταση μένει Testing, Beta, or In development μέχρι να τεκμηριωθεί η διαθεσιμότητα. Τα Νέα μένουν κενά μέχρι να εγκριθεί επαληθευμένη έκδοση. Δεν είναι Room SMARTview ούτε Version SMARTview. Τα σχέδια δεν θεωρούνται ποτέ παραδομένα."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "Το Features SMARTview δείχνει Status not verified όταν δεν ελέγχθηκαν ζωντανά flags, το rollout Pages ή ημερομηνίες διαθεσιμότητας για patrons. Το Merged on είναι ώρα συγχώνευσης pull request, όχι Available since. Το Released εμφανίζεται μόνο με τεκμήριο deploy ή διαθεσιμότητας. Γραμμές SAMPLE και ισχυρισμοί συνομιλίας δεν αποδεικνύουν ζωντανή έκδοση."
+        title: "Testing, Beta, In development",
+        body: "Το Features SMARTview δείχνει Testing, Beta, or In development όταν δεν ελέγχθηκαν ζωντανά flags, το rollout Pages ή ημερομηνίες διαθεσιμότητας για patrons. Το Merged on είναι ώρα συγχώνευσης pull request, όχι Available since. Το Released εμφανίζεται μόνο με τεκμήριο deploy ή διαθεσιμότητας. Γραμμές SAMPLE και ισχυρισμοί συνομιλίας δεν αποδεικνύουν ζωντανή έκδοση."
       },
       "help-features-smartview-botdee": {
         title: "Ρώτα τον BOT DEE για ένα προϊόν",
-        body: "Στο BOT DEE πες What can Mingl do, What changed in ShoutOut, What is coming to Si-nema ή When was VIP reserV implemented. Ο BOT DEE απαντά από τον κατάλογο Features με παραπομπές. Παραδέχεται Status not verified και δεν θεωρεί σχέδιο παραδομένο. Πληκτρολόγησε Ver για Version SMARTview. Πληκτρολόγησε Open Room SMARTview για κοινό δωμάτιο. Είναι άλλες κάρτες."
+        body: "Στο BOT DEE πες What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema ή When was VIP reserV implemented. Ο BOT DEE απαντά από τον κατάλογο Features με παραπομπές. Παραδέχεται Testing, Beta, or In development και δεν θεωρεί σχέδιο παραδομένο. Πληκτρολόγησε Ver για Version SMARTview. Πληκτρολόγησε Open Room SMARTview για κοινό δωμάτιο. Είναι άλλες κάρτες."
       },
       "help-vip-book-table": {
         title: "Κράτηση VIP τραπεζιού (VIP reserV)",
@@ -4351,15 +4351,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Features SMARTview to katalog produktów BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema i Si-tube. Otwórz Przegląd, Nowości, Ścieżkę, Wszystkie funkcje, Wkrótce lub Przeszłość/Retired. Status zostaje Status not verified, dopóki dostępność nie ma dowodu. Nowości zostają puste, aż recenzent zatwierdzi zweryfikowane wydanie. To nie Room SMARTview i nie Version SMARTview. Planów nigdy nie traktujemy jako dostarczonych."
+        body: "Features SMARTview to katalog produktów BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema i Si-tube. Otwórz Przegląd, Nowości, Ścieżkę, Wszystkie funkcje, Wkrótce lub Przeszłość/Retired. Status zostaje Testing, Beta, or In development, dopóki dostępność nie ma dowodu. Nowości zostają puste, aż recenzent zatwierdzi zweryfikowane wydanie. To nie Room SMARTview i nie Version SMARTview. Planów nigdy nie traktujemy jako dostarczonych."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "Features SMARTview pokazuje Status not verified, gdy nie sprawdzono flag na żywo, wdrożenia Pages ani dat dostępności dla patronów. Merged on to czas scalenia pull request, nie Available since. Released pojawia się tylko z dowodem wdrożenia lub dostępności. Wiersze SAMPLE i twierdzenia z rozmowy nie dowodzą wydania na żywo."
+        title: "Testing, Beta, In development",
+        body: "Features SMARTview pokazuje Testing, Beta, or In development, gdy nie sprawdzono flag na żywo, wdrożenia Pages ani dat dostępności dla patronów. Merged on to czas scalenia pull request, nie Available since. Released pojawia się tylko z dowodem wdrożenia lub dostępności. Wiersze SAMPLE i twierdzenia z rozmowy nie dowodzą wydania na żywo."
       },
       "help-features-smartview-botdee": {
         title: "Zapytaj BOT DEE o produkt",
-        body: "W BOT DEE powiedz What can Mingl do, What changed in ShoutOut, What is coming to Si-nema albo When was VIP reserV implemented. BOT DEE odpowiada z katalogu Features z cytatami. Przyznaje Status not verified i nie traktuje planu jako dostarczonego. Wpisz Ver dla Version SMARTview. Wpisz Open Room SMARTview dla wspólnego pokoju. To inne karty."
+        body: "W BOT DEE powiedz What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema albo When was VIP reserV implemented. BOT DEE odpowiada z katalogu Features z cytatami. Przyznaje Testing, Beta, or In development i nie traktuje planu jako dostarczonego. Wpisz Ver dla Version SMARTview. Wpisz Open Room SMARTview dla wspólnego pokoju. To inne karty."
       },
       "help-vip-book-table": {
         title: "Zarezerwuj stolik VIP (VIP reserV)",
@@ -4865,15 +4865,15 @@
       },
       "help-features-smartview": {
         title: "Features SMARTview",
-        body: "Features SMARTview هو كتالوج منتجات BOT-DEE وMingl وShoutOut وVIP reserV وSi-nema وSi-tube. افتح نظرة عامة أو ما الجديد أو رحلة الميزة أو كل الميزات أو قريبًا أو السابق/Retired. تبقى الحالة Status not verified حتى يثبت التوفر. ما الجديد يبقى فارغًا حتى يوافق مراجع على إصدار موثّق. هذا ليس Room SMARTview وليس Version SMARTview. لا تُعامل الخطط كأنها أُطلقت."
+        body: "Features SMARTview هو كتالوج منتجات BOT-DEE وMingl وShoutOut وRydR وfloqCast وVIP reserV وSi-nema وSi-tube. افتح نظرة عامة أو ما الجديد أو رحلة الميزة أو كل الميزات أو قريبًا أو السابق/Retired. تبقى الحالة Testing, Beta, or In development حتى يثبت التوفر. ما الجديد يبقى فارغًا حتى يوافق مراجع على إصدار موثّق. هذا ليس Room SMARTview وليس Version SMARTview. لا تُعامل الخطط كأنها أُطلقت."
       },
       "help-features-smartview-status": {
-        title: "Status not verified",
-        body: "يعرض Features SMARTview الحالة Status not verified عندما لم تُفحص الأعلام الحية أو طرح Pages أو تواريخ توفر الـ patron. Merged on وقت دمج طلب سحب، وليس Available since. Released يظهر فقط مع دليل نشر أو توفر. صفوف SAMPLE وادّعاءات المحادثة ليست إثباتًا لإصدار حي."
+        title: "Testing, Beta, In development",
+        body: "يعرض Features SMARTview الحالة Testing, Beta, or In development عندما لم تُفحص الأعلام الحية أو طرح Pages أو تواريخ توفر الـ patron. Merged on وقت دمج طلب سحب، وليس Available since. Released يظهر فقط مع دليل نشر أو توفر. صفوف SAMPLE وادّعاءات المحادثة ليست إثباتًا لإصدار حي."
       },
       "help-features-smartview-botdee": {
         title: "اسأل BOT DEE عن منتج",
-        body: "في BOT DEE قل What can Mingl do أو What changed in ShoutOut أو What is coming to Si-nema أو When was VIP reserV implemented. يجيب BOT DEE من كتالوج Features مع استشهادات. يعترف بـ Status not verified ولن يعامل خطة كأنها أُطلقت. اكتب Ver لـ Version SMARTview. اكتب Open Room SMARTview لغرفة مشتركة. تلك بطاقات مختلفة."
+        body: "في BOT DEE قل What can Mingl do, What can RydR do, What can floqCast do أو What changed in ShoutOut أو What is coming to Si-nema أو When was VIP reserV implemented. يجيب BOT DEE من كتالوج Features مع استشهادات. يعترف بـ Testing, Beta, or In development ولن يعامل خطة كأنها أُطلقت. اكتب Ver لـ Version SMARTview. اكتب Open Room SMARTview لغرفة مشتركة. تلك بطاقات مختلفة."
       },
       "help-vip-book-table": {
         title: "حجز طاولة VIP (VIP reserV)",

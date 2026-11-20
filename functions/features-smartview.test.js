@@ -16,9 +16,9 @@ test("core module is byte-identical in Pages and Functions", () => {
   assert.equal(read("features-smartview/catalog.json"), read("functions/features-smartview/catalog.json"));
 });
 
-test("six product SMARTviews use exact display names", () => {
+test("eight product SMARTviews use exact display names", () => {
   assert.deepEqual(catalog.products.map(row => row.displayName), [
-    "BOT-DEE", "Mingl", "ShoutOut", "VIP reserV", "Si-nema", "Si-tube"
+    "BOT-DEE", "Mingl", "ShoutOut", "RydR", "floqCast", "VIP reserV", "Si-nema", "Si-tube"
   ]);
   assert.deepEqual(catalog.products.map(row => row.id), core.PRODUCT_IDS);
   assert.equal(core.validateCatalog(catalog).join(","), "");
@@ -77,7 +77,7 @@ test("public projection strips PR links, secrets, and unapproved What's New", ()
   const news = core.filterFeatures(pub.features, {view: "whatsNew"});
   assert.equal(news.length, 0);
   pub.features.forEach(row => {
-    assert.equal(row.lifecycleLabel, core.STATUS_NOT_VERIFIED);
+    assert.ok(["Testing", "Beta", "In development"].includes(row.lifecycleLabel), row.id);
     assert.equal(row.implementedLabel, core.DATE_NOT_VERIFIED);
     assert.equal(row.tryAllowed, false);
   });
@@ -114,13 +114,56 @@ test("ingest pagination is idempotent", () => {
   assert.equal(empty.complete, true);
 });
 
+test("patron status maps Testing, Beta, and In development from feature flags", () => {
+  assert.equal(core.flagStatusLabel(1, 1), "Testing");
+  assert.equal(core.flagStatusLabel(0, 1), "Beta");
+  assert.equal(core.flagStatusLabel(1, 0), "In development");
+  assert.equal(core.flagStatusLabel(0, 0), "In development");
+  const testing = core.publicProjection(catalog, {
+    featureFlags: {botDee: {IsFeatureEnabled: 1, IsTestFeature: 1}}
+  });
+  testing.features.filter(row => row.productId === "bot-dee").forEach(row => {
+    assert.equal(row.lifecycleLabel, "Testing");
+    assert.equal(row.implementedLabel, core.DATE_NOT_VERIFIED);
+  });
+  const beta = core.publicProjection(catalog, {
+    featureFlags: {mingl: {IsFeatureEnabled: 0, IsTestFeature: 1}}
+  });
+  beta.features.filter(row => row.productId === "mingl").forEach(row => {
+    assert.equal(row.lifecycleLabel, "Beta");
+    assert.equal(row.implementedLabel, core.DATE_NOT_VERIFIED);
+  });
+  const developing = core.publicProjection(catalog, {
+    featureFlags: {shoutOut: {IsFeatureEnabled: 1, IsTestFeature: 0}}
+  });
+  developing.features.filter(row => row.productId === "shoutout").forEach(row => {
+    assert.equal(row.lifecycleLabel, "In development");
+    assert.equal(row.implementedLabel, core.DATE_NOT_VERIFIED);
+  });
+  const packaged = core.publicProjection(catalog, {role: "patron"});
+  assert.equal(packaged.products.find(row => row.id === "bot-dee").lifecycleLabel, "Testing");
+  assert.equal(packaged.products.find(row => row.id === "mingl").lifecycleLabel, "Beta");
+  assert.equal(packaged.products.find(row => row.id === "shoutout").lifecycleLabel, "In development");
+  assert.equal(packaged.products.find(row => row.id === "rydr").lifecycleLabel, "Beta");
+  assert.equal(packaged.products.find(row => row.id === "floqcast").lifecycleLabel, "Beta");
+  assert.equal(packaged.products.find(row => row.id === "vip-reserv").lifecycleLabel, "Beta");
+  assert.equal(packaged.products.find(row => row.id === "si-nema").lifecycleLabel, "Beta");
+  assert.equal(packaged.products.find(row => row.id === "si-tube").lifecycleLabel, "In development");
+  packaged.features.forEach(row => {
+    assert.equal(row.implementedLabel, core.DATE_NOT_VERIFIED);
+    assert.notEqual(row.lifecycleLabel, "Released");
+  });
+});
+
 test("BOT DEE retrieval cites catalog records and admits uncertainty", () => {
   const mingl = core.buildSmartView(catalog, "What can Mingl do?", {role: "patron"});
   assert.equal(mingl.handled, true);
   assert.equal(mingl.smartViews[0].kind, "featuresSmartView");
   assert.equal(mingl.smartViews[0].productName, "Mingl");
   assert.equal(mingl.smartViews[0].admitUncertainty, true);
-  assert.match(mingl.reply, /not verified|will not treat a plan as shipped/i);
+  assert.match(mingl.reply, /Mingl is Beta/);
+  assert.match(mingl.reply, /Dates are not verified/);
+  assert.match(mingl.reply, /will not treat a plan as shipped/i);
   assert.ok(mingl.smartViews[0].citations.every(row => String(row.href).includes("features-smartview.html")));
   const shout = core.retrieve(catalog, "What changed in ShoutOut?", {});
   assert.equal(shout.view, "whatsNew");
@@ -134,6 +177,16 @@ test("BOT DEE retrieval cites catalog records and admits uncertainty", () => {
   cinema.features.forEach(row => {
     assert.notEqual(row.lifecycle, "released");
   });
+  const rydr = core.buildSmartView(catalog, "What can RydR do?", {role: "patron"});
+  assert.equal(rydr.handled, true);
+  assert.equal(rydr.smartViews[0].productName, "RydR");
+  assert.match(rydr.reply, /RydR is Beta/);
+  const floq = core.buildSmartView(catalog, "What can floqCast do?", {role: "patron"});
+  assert.equal(floq.handled, true);
+  assert.equal(floq.smartViews[0].productName, "floqCast");
+  assert.match(floq.reply, /floqCast is Beta/);
+  assert.equal(core.detectProductId("What can floqCast do?"), "floqcast");
+  assert.equal(core.detectProductId("What can RydR do?"), "rydr");
   assert.equal(core.isFeaturesSmartViewPrompt("Ver"), false);
   assert.equal(core.isFeaturesSmartViewPrompt("Open Room SMARTview"), false);
   assert.equal(core.isFeaturesSmartViewPrompt("plan a Cancun trip"), false);
@@ -159,7 +212,8 @@ test("Try feature stays off without authorization and availability", () => {
 
 test("UI, BOT DEE, and Master Admin hosts are wired without hardcoded nav versions", () => {
   const js = read("floqr-features-smartview.js");
-  assert.match(js, /Status not verified/);
+  assert.match(js, /Testing/);
+  assert.doesNotMatch(js, /Status not verified/);
   assert.match(js, /What's New/);
   assert.match(js, /Feature Journey/);
   assert.match(js, /Coming Soon/);
@@ -264,14 +318,14 @@ test("mountPayload keeps retrieve payloads per host and does not poison the modu
   assert.match(host2.innerHTML, /ShoutOut/);
   assert.doesNotMatch(host2.innerHTML, />Mingl</);
   const loaded = await sandbox.FLOQRFeaturesSmartView.loadCatalog();
-  assert.equal(loaded.products.length, 6);
-  assert.equal(sandbox.__FLOQR_FEATURES_SMARTVIEW_CATALOG.products.length, 6);
+  assert.equal(loaded.products.length, 8);
+  assert.equal(sandbox.__FLOQR_FEATURES_SMARTVIEW_CATALOG.products.length, 8);
 });
 
 test("Mingl What's New card stays product-scoped and All Features lists Mingl rows after loadCatalog", async () => {
   const sandbox = loadUiSandbox();
   const loaded = await sandbox.FLOQRFeaturesSmartView.loadCatalog();
-  assert.equal(loaded.products.length, 6);
+  assert.equal(loaded.products.length, 8);
   const payload = sandbox.FLOQRFeaturesSmartViewCore.retrieve(catalog, "What's new in Mingl", {role: "patron"});
   assert.equal(payload.view, "whatsNew");
   assert.equal(payload.productName, "Mingl");
@@ -286,8 +340,12 @@ test("Mingl What's New card stays product-scoped and All Features lists Mingl ro
   assert.doesNotMatch(host.innerHTML, /data-fsv-product="vip-reserv"/);
   assert.doesNotMatch(host.innerHTML, /data-fsv-product="si-nema"/);
   assert.doesNotMatch(host.innerHTML, /data-fsv-product="bot-dee"/);
+  assert.doesNotMatch(host.innerHTML, /data-fsv-product="rydr"/);
+  assert.doesNotMatch(host.innerHTML, /data-fsv-product="floqcast"/);
   assert.doesNotMatch(host.innerHTML, /ShoutOut/);
   assert.doesNotMatch(host.innerHTML, /VIP reserV/);
+  assert.doesNotMatch(host.innerHTML, /RydR/);
+  assert.doesNotMatch(host.innerHTML, /floqCast/);
   const allTab = host.__tabs.find(row => row.view === "all");
   assert.ok(allTab, "All Features tab is wired");
   allTab.fn();
