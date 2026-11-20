@@ -124,6 +124,57 @@ function canInviteMore(row, actorUid, memberRow) {
   return {ok: true, reason: ""};
 }
 
+function inviteeAllowed({friendsWithInviter, blockedWithHost} = {}) {
+  if (blockedWithHost) return {ok: false, reason: "not_friend"};
+  if (!friendsWithInviter) return {ok: false, reason: "not_friend"};
+  return {ok: true, reason: ""};
+}
+
+function admitMember(row, uid) {
+  const members = currentMembers(row);
+  const id = text(uid, 80);
+  if (!id) return {ok: false, reason: "not_found", alreadyMember: false, memberUids: members};
+  if (members.includes(id)) return {ok: true, alreadyMember: true, memberUids: members};
+  if (members.length >= MEMBER_CAP) return {ok: false, reason: "full", alreadyMember: false, memberUids: members};
+  return {ok: true, alreadyMember: false, memberUids: members.concat([id])};
+}
+
+function matchGuests(members, hostUid, needles) {
+  const host = text(hostUid, 80);
+  const names = (Array.isArray(needles) ? needles : [])
+    .map(row => text(row && (row.displayName || row), 40).toLowerCase())
+    .filter(Boolean);
+  if (!names.length) return [];
+  return (Array.isArray(members) ? members : []).filter(row => {
+    if (!row || text(row.uid, 80) === host) return false;
+    const hay = `${text(row.displayName, 80)} ${text(row.handle, 40)}`.toLowerCase();
+    return names.some(name => hay.includes(name));
+  });
+}
+
+function canSetTabLineStatus({tab, line, uid, status, hostUid} = {}) {
+  const actor = text(uid, 80);
+  const next = text(status, 20);
+  const current = text(line?.status, 20);
+  if (!actor) return {ok: false, reason: "not_member"};
+  if (current === "paid") return {ok: false, reason: "tab_closed"};
+  if (next === "accepted") {
+    if (current === "void") return {ok: false, reason: "tab_closed"};
+    const assigned = text(line?.assignedUid || line?.addedByUid, 80);
+    if (actor !== assigned) return {ok: false, reason: "not_assignee"};
+    return canAttachLine(tab, assigned);
+  }
+  if (next === "void") {
+    if (text(tab?.status, 20) === "paid") return {ok: false, reason: "tab_closed"};
+    const assigned = text(line?.assignedUid, 80);
+    const addedBy = text(line?.addedByUid, 80);
+    const host = text(hostUid, 80);
+    if (actor !== assigned && actor !== addedBy && actor !== host) return {ok: false, reason: "not_host"};
+    return {ok: true, reason: ""};
+  }
+  return {ok: false, reason: "tab_closed"};
+}
+
 function publicPerson(uid, user) {
   const row = user && typeof user === "object" ? user : {};
   return {
@@ -301,6 +352,7 @@ function denialMessage(reason) {
     full: "This BOT DEE session is full (host plus 7 guests).",
     closed: "This BOT DEE session has ended.",
     not_member: "You are not in this BOT DEE session.",
+    not_assignee: "Only the person on that tab line can accept it.",
     not_host: "Only the host can do that.",
     invite_disabled: "The host turned off invites for your seat.",
     no_opt_in: "Opt in to the shared tab before a line can attach to you. Nobody is charged without that OK.",
@@ -339,6 +391,10 @@ module.exports = {
   currentMembers,
   isCurrentMember,
   canInviteMore,
+  inviteeAllowed,
+  admitMember,
+  matchGuests,
+  canSetTabLineStatus,
   publicPerson,
   stripPrivateSignals,
   sanitizeRoomTurns,

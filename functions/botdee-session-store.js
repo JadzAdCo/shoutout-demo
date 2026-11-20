@@ -244,7 +244,15 @@ async function createInvite({roomId, actorUid, targetUid, actorEmail, actorRole,
   if (!inviteOk.ok) return {ok: false, error: inviteOk.reason};
   if (core.isCurrentMember(row, targetUid)) return {ok: false, error: "used"};
   const friends = await friendGate(actorUid, targetUid);
-  if (!friends.ok) return {ok: false, error: friends.reason};
+  const hostUid = core.text(row.hostUid, 80);
+  const blockedHost = hostUid && hostUid !== core.text(targetUid, 80)
+    ? await isBlockedPair(hostUid, targetUid)
+    : false;
+  const admit = core.inviteeAllowed({
+    friendsWithInviter: friends.ok,
+    blockedWithHost: blockedHost
+  });
+  if (!admit.ok) return {ok: false, error: admit.reason};
   const limited = await consumeRate("invite", actorUid, {
     nowMs: now,
     windowMs: 60 * 60 * 1000,
@@ -323,32 +331,82 @@ async function acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs}) 
   const live = await loadRoom(invite.roomId);
   if (!live || !core.roomIsOpen(live.data, now)) return {ok: false, error: "closed"};
   const friends = await friendGate(invite.invitedByUid, uid);
-  if (!friends.ok) return {ok: false, error: friends.reason};
+  const hostUid = core.text(live.data.hostUid, 80);
+  const blockedHost = hostUid && hostUid !== core.text(uid, 80)
+    ? await isBlockedPair(hostUid, uid)
+    : false;
+  const admitGate = core.inviteeAllowed({
+    friendsWithInviter: friends.ok,
+    blockedWithHost: blockedHost
+  });
+  if (!admitGate.ok) return {ok: false, error: admitGate.reason};
   if (core.currentMembers(live.data).length >= core.MEMBER_CAP && !core.isCurrentMember(live.data, uid)) {
     return {ok: false, error: "full"};
   }
-  const members = core.currentMembers(live.data);
-  if (!members.includes(uid)) members.push(uid);
-  await db().runTransaction(async tx => {
-    tx.update(inviteSnap.ref, {
-      status: "accepted",
-      usesRemaining: 0,
-      acceptedAtMs: now,
-      acceptedUid: uid
+  let members = core.currentMembers(live.data);
+  try {
+    await db().runTransaction(async tx => {
+      const invDoc = await tx.get(inviteSnap.ref);
+      const roomDoc = await tx.get(roomRef(live.id));
+      const inviteData = invDoc.exists ? invDoc.data() : null;
+      const verdictTx = core.evaluateInvite(inviteData, {uid, nowMs: now, roomId});
+      if (!verdictTx.ok) {
+        const err = new Error(verdictTx.reason);
+        err.code = verdictTx.reason;
+        throw err;
+      }
+      if (!roomDoc.exists) {
+        const err = new Error("not_found");
+        err.code = "not_found";
+        throw err;
+      }
+      const roomData = roomDoc.data() || {};
+      if (!core.roomIsOpen(roomData, now)) {
+        const err = new Error("closed");
+        err.code = "closed";
+        throw err;
+      }
+      const admitted = core.admitMember(roomData, uid);
+      if (!admitted.ok) {
+        const err = new Error(admitted.reason);
+        err.code = admitted.reason;
+        throw err;
+      }
+      members = admitted.memberUids;
+      tx.update(invDoc.ref, {
+        status: "accepted",
+        usesRemaining: 0,
+        acceptedAtMs: now,
+        acceptedUid: uid
+      });
+      if (!admitted.alreadyMember) {
+        tx.set(roomDoc.ref, {
+          memberUids: members,
+          updatedAtMs: now
+        }, {merge: true});
+      }
+      tx.set(memberRef(live.id, uid), {
+        roomId: live.id,
+        uid,
+        role: core.text(roomData.hostUid, 80) === uid ? "host" : "guest",
+        canInvite: true,
+        joinedAtMs: now,
+        leftAtMs: null
+      }, {merge: true});
     });
-    tx.set(roomRef(live.id), {
-      memberUids: members,
-      updatedAtMs: now
-    }, {merge: true});
-    tx.set(memberRef(live.id, uid), {
-      roomId: live.id,
-      uid,
-      role: core.text(live.data.hostUid, 80) === uid ? "host" : "guest",
-      canInvite: true,
-      joinedAtMs: now,
-      leftAtMs: null
-    }, {merge: true});
-  });
+  } catch (error) {
+    const reason = String((error && (error.code || error.message)) || "");
+    if (reason === "used") {
+      const latest = await loadRoom(live.id);
+      if (latest && core.isCurrentMember(latest.data, uid)) {
+        return {ok: true, alreadyMember: true, room: core.publicRoom(latest.id, latest.data)};
+      }
+    }
+    if (["full", "closed", "used", "expired", "revoked", "wrong_account", "not_found"].includes(reason)) {
+      return {ok: false, error: reason};
+    }
+    throw error;
+  }
   await appendSystemEvent(live.id, uid, `${uid} joined this BOT DEE session.`);
   await writeAudit({
     eventType: "botdee.room_joined",
@@ -535,10 +593,15 @@ async function setTabLineStatus({uid, roomId, lineId, status}) {
   const snap = await lineRef.get();
   if (!snap.exists) return {ok: false, error: "not_found"};
   const line = snap.data() || {};
-  if (st === "accepted") {
-    const attach = core.canAttachLine({...((await loadTab(live.id)).tab || {}), status: "open"}, line.assignedUid || line.addedByUid);
-    if (!attach.ok) return {ok: false, error: attach.reason};
-  }
+  const loaded = await loadTab(live.id);
+  const allowed = core.canSetTabLineStatus({
+    tab: loaded.tab,
+    line,
+    uid,
+    status: st,
+    hostUid: live.data.hostUid
+  });
+  if (!allowed.ok) return {ok: false, error: allowed.reason};
   await lineRef.set({status: st, updatedAtMs: Date.now()}, {merge: true});
   const next = await loadTab(live.id);
   return {ok: true, tab: core.publicTab(next.tab, next.lines, uid)};

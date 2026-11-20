@@ -926,7 +926,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     }
     const roomAttached = roomMod.buildRoomSession(userPrompt, {
       hasActiveRoom: !!stored.joinedRoomId,
-      declinedKeys: roomDeclined
+      declinedKeys: roomDeclined,
+      roomId: stored.joinedRoomId || ""
     });
     const previousShoutDraft = stored.headlessShoutOutDraft || null;
     const shoutFollowUp = !!(previousShoutDraft
@@ -991,6 +992,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       const confirmRoom = classified.command === "confirm" || classified.route === "confirm";
       const leaveRoom = classified.command === "leave" || classified.command === "make_private";
       const endRoom = classified.command === "end";
+      const kickRoom = classified.command === "kick";
       if (leaveRoom && stored.joinedRoomId) {
         try {
           const left = await roomLive.leaveRoom({uid, roomId: stored.joinedRoomId});
@@ -1058,6 +1060,62 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         } catch (error) {
           console.warn("BOT DEE room end failed", error?.message || error);
         }
+      } else if (kickRoom && stored.joinedRoomId) {
+        try {
+          const resolved = await roomLive.resolveKickTarget({
+            roomId: stored.joinedRoomId,
+            needles: classified.namedNeedles
+          });
+          const target = resolved.hits && resolved.hits.length === 1 ? resolved.hits[0] : null;
+          if (!target) {
+            outcome = {
+              reply: "Name the guest to remove, or use Remove on the members panel. Only the host can kick.",
+              results: [],
+              provider: "local-room-smartview",
+              model: "roomKick",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: roomAttached.smartViews || [],
+              replyKey: "botdee.room.commandKick",
+              geminiOnView: false
+            };
+          } else {
+            const kicked = await roomLive.kickMember({
+              hostUid: uid,
+              roomId: stored.joinedRoomId,
+              targetUid: target.uid
+            });
+            if (kicked && kicked.ok) {
+              outcome = {
+                reply: "That guest was removed from this BOT DEE session. They cannot read further room messages.",
+                results: [],
+                provider: "local-room-smartview",
+                model: "roomKick",
+                toolRounds: 0,
+                uiLanguage,
+                smartViews: roomAttached.smartViews || [],
+                replyKey: "botdee.room.kicked",
+                geminiOnView: false
+              };
+            } else {
+              outcome = {
+                reply: kicked && kicked.error === "not_host"
+                  ? "Only the host can remove a guest. Kicked friends cannot read further room messages."
+                  : "Could not remove that guest.",
+                results: [],
+                provider: "local-room-smartview",
+                model: "roomKickDenied",
+                toolRounds: 0,
+                uiLanguage,
+                smartViews: roomAttached.smartViews || [],
+                replyKey: kicked && kicked.error === "not_host" ? "botdee.room.commandKick" : "botdee.room.kickFailed",
+                geminiOnView: false
+              };
+            }
+          }
+        } catch (error) {
+          console.warn("BOT DEE room kick failed", error?.message || error);
+        }
       } else if (confirmRoom) {
         try {
           await audit.assertFeatureAccess(request.auth, "mingl", request);
@@ -1090,6 +1148,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
                 view.lifecycle = "active";
                 view.needsConfirmation = false;
                 view.participantCount = existing.participantCount;
+                view.roomId = existing.roomId;
                 outcome.smartViews = [view];
               }
             }

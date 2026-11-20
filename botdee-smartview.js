@@ -1084,7 +1084,27 @@
       try {
         const data = await call("getBotDeeRoom", {roomId});
         const members = Array.isArray(data.members) ? data.members : [];
-        host.innerHTML = members.map(row => `<div>${esc(row.displayName || row.handle || row.uid)} · ${esc(row.uid === data.room?.hostUid ? t("botdee.room.host", "host") : t("botdee.room.guest", "guest"))}</div>`).join("");
+        const hostUid = data.room?.hostUid || "";
+        const viewerIsHost = data.viewerIsHost === true;
+        host.innerHTML = members.map(row => {
+          const role = row.uid === hostUid ? t("botdee.room.host", "host") : t("botdee.room.guest", "guest");
+          const kick = viewerIsHost && row.uid && row.uid !== hostUid
+            ? ` <button type="button" class="botdee-sv-room-btn botdee-sv-room-danger" data-rs-kick-uid="${esc(row.uid)}">${esc(t("botdee.room.removeGuest", "Remove"))}</button>`
+            : "";
+          return `<div>${esc(row.displayName || row.handle || row.uid)} · ${esc(role)}${kick}</div>`;
+        }).join("");
+        host.querySelectorAll("[data-rs-kick-uid]").forEach(btn => {
+          btn.addEventListener("click", async event => {
+            event.preventDefault();
+            try {
+              await call("kickBotDeeRoomMember", {roomId, targetUid: btn.getAttribute("data-rs-kick-uid")});
+              showToast(t("botdee.room.kicked", "Guest removed from this session."));
+              fillMembers();
+            } catch (error) {
+              showToast(error?.message || t("botdee.room.kickFailed", "Could not remove that guest."));
+            }
+          });
+        });
       } catch (_) {
         host.textContent = t("botdee.room.membersLive", "Members of this BOT DEE session. Display names only — no emails.");
       }

@@ -2099,20 +2099,33 @@
   }
 
   async function acceptPendingInvite() {
-    if (!pendingJoinToken) return false;
+    if (!pendingJoinToken) return {ok: false, message: ""};
     const fn = callable("acceptBotDeeRoomInvite");
-    if (!fn) return false;
+    if (!fn) {
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
+      return {ok: false, message: t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")};
+    }
     try {
       const data = (await fn({
         token: pendingJoinToken,
         roomId: pendingJoinRoomId || undefined
       }))?.data || {};
-      if (data.ok) {
-        pendingJoinToken = "";
-        return true;
-      }
-    } catch (_) {}
-    return false;
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
+      if (data.ok) return {ok: true, message: ""};
+      return {
+        ok: false,
+        message: data.error || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")
+      };
+    } catch (error) {
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
+      return {
+        ok: false,
+        message: error?.message || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")
+      };
+    }
   }
 
   function bind(opts = {}) {
@@ -2128,10 +2141,13 @@
     }
     restoreOrWelcome();
     if (pendingJoinToken) {
-      setTimeout(() => {
-        acceptPendingInvite().finally(() => {
+      setTimeout(async () => {
+        const joined = await acceptPendingInvite();
+        if (joined && joined.ok) {
           sendMessage("I joined this Room SMARTview");
-        });
+          return;
+        }
+        appendBubble("bot", (joined && joined.message) || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."));
       }, 400);
     }
     return {sendMessage, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};

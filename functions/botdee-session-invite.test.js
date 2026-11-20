@@ -68,18 +68,25 @@ test("Mingl friends only; blocked pairs cannot invite", () => {
   assert.equal(core.isMutualConnection(pending, "host-1", "stranger"), false);
   assert.equal(core.isBlockedRow({participants: ["host-1", "blocked"], active: true}, "host-1", "blocked"), true);
   assert.equal(core.isBlockedRow({blockedBy: "host-1", blockedUid: "blocked"}, "host-1", "blocked"), true);
+  assert.equal(core.inviteeAllowed({friendsWithInviter: true, blockedWithHost: true}).reason, "not_friend");
+  assert.equal(core.inviteeAllowed({friendsWithInviter: false, blockedWithHost: false}).reason, "not_friend");
+  assert.equal(core.inviteeAllowed({friendsWithInviter: true, blockedWithHost: false}).ok, true);
 });
 
 test("cap is host plus 7; guests can invite unless host disables", () => {
   const full = room({memberUids: ["host-1", "g1", "g2", "g3", "g4", "g5", "g6", "g7"]});
   assert.equal(core.currentMembers(full).length, 8);
   assert.equal(core.canInviteMore(full, "host-1", {canInvite: true}).reason, "full");
+  assert.equal(core.admitMember(full, "late-1").reason, "full");
   const open = room({memberUids: ["host-1", "guest-1"]});
   assert.equal(core.canInviteMore(open, "guest-1", {canInvite: true}).ok, true);
   assert.equal(core.canInviteMore(open, "guest-1", {canInvite: false}).reason, "invite_disabled");
   assert.equal(core.canInviteMore(open, "host-1", {canInvite: false}).ok, true);
   assert.equal(core.canInviteMore(open, "stranger", {canInvite: true}).reason, "not_member");
   assert.equal(core.canInviteMore(room({status: "ended"}), "host-1", {canInvite: true}).reason, "closed");
+  const admitted = core.admitMember(open, "guest-2");
+  assert.deepEqual(admitted.memberUids, ["host-1", "guest-1", "guest-2"]);
+  assert.equal(core.admitMember(open, "guest-1").alreadyMember, true);
 });
 
 test("host kick removes membership; kicked uid is not a current member", () => {
@@ -87,6 +94,13 @@ test("host kick removes membership; kicked uid is not a current member", () => {
   const next = core.currentMembers(live).filter(id => id !== "guest-1");
   assert.equal(core.isCurrentMember({...live, memberUids: next}, "guest-1"), false);
   assert.equal(core.isCurrentMember({...live, memberUids: next}, "guest-2"), true);
+  const hits = core.matchGuests(
+    [{uid: "host-1", displayName: "Host"}, {uid: "guest-1", displayName: "Jalen", handle: "jalen"}],
+    "host-1",
+    [{displayName: "Jalen"}]
+  );
+  assert.deepEqual(hits.map(row => row.uid), ["guest-1"]);
+  assert.equal(core.matchGuests([{uid: "host-1", displayName: "Jalen"}], "host-1", [{displayName: "Jalen"}]).length, 0);
 });
 
 test("private PII is stripped from room Gemini payload", () => {
@@ -136,6 +150,12 @@ test("tab never charges without opt-in; split only confirming uids; last4 hidden
   assert.equal(payerView.paidByUid, "host-1");
   assert.equal(core.unpaidTabBlocksDelete(opted, lines), true);
   assert.equal(core.unpaidTabBlocksDelete({status: "paid"}, lines), false);
+  const lineA = {lineId: "l1", assignedUid: "guest-1", addedByUid: "host-1", status: "proposed"};
+  assert.equal(core.canSetTabLineStatus({tab: opted, line: lineA, uid: "host-1", status: "accepted", hostUid: "host-1"}).reason, "not_assignee");
+  assert.equal(core.canSetTabLineStatus({tab: opted, line: lineA, uid: "guest-1", status: "accepted", hostUid: "host-1"}).ok, true);
+  assert.equal(core.canSetTabLineStatus({tab: {...opted, status: "closing"}, line: lineA, uid: "guest-1", status: "accepted", hostUid: "host-1"}).reason, "tab_closed");
+  assert.equal(core.canSetTabLineStatus({tab: opted, line: lineA, uid: "guest-2", status: "void", hostUid: "host-1"}).reason, "not_host");
+  assert.equal(core.canSetTabLineStatus({tab: opted, line: lineA, uid: "host-1", status: "void", hostUid: "host-1"}).ok, true);
 });
 
 test("Firestore: invites Functions-only; events member-read; no IP", () => {
@@ -157,11 +177,15 @@ test("client join captures room=&t= and Inbox is not a ShoutOut CTA", () => {
   assert.match(chat, /searchParams\.get\("t"\)/);
   assert.match(chat, /searchParams\.get\("room"\)/);
   assert.match(chat, /joinToken/);
+  assert.doesNotMatch(chat, /acceptPendingInvite\(\)\.finally/);
+  assert.match(chat, /if \(joined && joined\.ok\)/);
   assert.match(read("patron-portal-app.js"), /Review BOT DEE invite/);
   assert.match(read("patron-portal-app.js"), /botdeeroominvite/);
   assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom\b/);
   assert.match(read("botdee-smartview.js"), /createBotDeeRoomInvite/);
   assert.match(read("botdee-smartview.js"), /listBotDeeRoomFriends/);
+  assert.match(read("botdee-smartview.js"), /data-rs-kick-uid/);
+  assert.match(read("botdee-smartview.js"), /kickBotDeeRoomMember/);
   assert.match(read("functions/index.js"), /acceptBotDeeRoomInvite/);
   assert.match(read("functions/commerce-functions.js"), /botDeeRoomTab/);
   assert.match(read("functions/commerce-functions.js"), /assertFeatureAccess\(request\.auth, "mingl"/);
@@ -174,6 +198,17 @@ test("callables re-check botDee + mingl; guests cannot end", () => {
   assert.match(fns, /inviteBotDeeRoomGuest/);
   assert.match(fns, /kickBotDeeRoomMember/);
   assert.match(fns, /endBotDeeRoom/);
+  assert.match(fns, /viewerIsHost/);
   assert.match(read("functions/botdee-session-store.js"), /not_host/);
   assert.match(read("functions/botdee-session-store.js"), /unpaid_tab/);
+  const store = read("functions/botdee-session-store.js");
+  assert.match(store, /tx\.get\(inviteSnap\.ref\)/);
+  assert.match(store, /tx\.get\(roomRef\(live\.id\)\)/);
+  assert.match(store, /admitMember/);
+  assert.match(store, /isBlockedPair\(hostUid/);
+  assert.match(store, /canSetTabLineStatus/);
+  assert.match(read("functions/bot-dee-functions.js"), /roomId: stored\.joinedRoomId/);
+  assert.match(read("functions/bot-dee-functions.js"), /kickRoom && stored\.joinedRoomId/);
+  assert.match(read("functions/botdee-room-live.js"), /function kickMember/);
+  assert.match(read("functions/botdee-room-live.js"), /resolveKickTarget/);
 });

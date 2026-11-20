@@ -69,6 +69,22 @@ async function endRoom({uid, roomId}) {
   return store.endRoom({uid, roomId});
 }
 
+async function kickMember({hostUid, roomId, targetUid, actorEmail, actorRole}) {
+  return store.kickMember({hostUid, roomId, targetUid, actorEmail, actorRole});
+}
+
+async function resolveKickTarget({roomId, needles}) {
+  const live = await store.loadRoom(roomId);
+  if (!live) return {ok: false, error: "not_found", hits: []};
+  const members = await store.publicMemberList(live.data);
+  return {
+    ok: true,
+    hits: core.matchGuests(members, live.data.hostUid, needles),
+    hostUid: core.text(live.data.hostUid, 80),
+    room: publicRoom(live.id, live.data)
+  };
+}
+
 module.exports = {
   COLLECTION,
   MEMBER_CAP,
@@ -84,5 +100,7 @@ module.exports = {
   memberOf,
   rotateJoinToken,
   leaveRoom,
-  endRoom
+  endRoom,
+  kickMember,
+  resolveKickTarget
 };

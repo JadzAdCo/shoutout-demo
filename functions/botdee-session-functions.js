@@ -36,7 +36,7 @@ async function requireSessionAuth(request) {
 
 function fail(reason) {
   const code = reason === "rate_limited" ? "resource-exhausted"
-    : reason === "wrong_account" || reason === "not_host" || reason === "not_member" ? "permission-denied"
+    : reason === "wrong_account" || reason === "not_host" || reason === "not_member" || reason === "not_assignee" ? "permission-denied"
       : reason === "full" || reason === "closed" || reason === "unpaid_tab" || reason === "no_opt_in" || reason === "not_friend" || reason === "invite_disabled" || reason === "expired" || reason === "revoked" || reason === "used" ? "failed-precondition"
         : "not-found";
   throw new HttpsError(code, core.denialMessage(reason));
@@ -171,6 +171,7 @@ exports.getBotDeeRoom = onCall(CALL_OPTS, async request => {
       ok: true,
       room: core.publicRoom(live.id, live.data),
       members,
+      viewerIsHost: core.text(live.data.hostUid, 80) === uid,
       tab: loadedTab.tab ? core.publicTab(loadedTab.tab, loadedTab.lines, uid) : null
     };
   } catch (error) {
