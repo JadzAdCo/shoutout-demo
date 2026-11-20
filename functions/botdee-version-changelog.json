@@ -1,11 +1,18 @@
 [
   {
+    "id": "s3.3.056",
+    "text": "s3.3.056: Plain language on the BOT DEE version card",
+    "audiences": [
+      "other"
+    ]
+  },
+  {
     "id": "s3.3.055",
     "text": "s3.3.055: Headless VIP reserV: book/hold a table phrasing, night rail, 2D map, cancel unmounts dock",
     "audiences": [
       "botDee"
     ],
-    "whatsNewText": "s3.3.055: book a table / hold a table at Aurelia / do a reservation stay on VIP reserV with a 2D floor dock"
+    "whatsNewText": "s3.3.055: VIP reserV — book or hold a table interactively with BOT DEE, including the night you want, the 2D floor map, and cancel, which removes the booking panel."
   },
   {
     "id": "s3.3.054",
@@ -13,7 +20,7 @@
     "audiences": [
       "botDee"
     ],
-    "whatsNewText": "s3.3.054: People search matches names and handles only — not bios — and compact picker cards"
+    "whatsNewText": "s3.3.054: BOT DEE people search matches names and handles only, not bios, and shows smaller cards when several people match."
   },
   {
     "id": "s3.3.053",
@@ -29,7 +36,7 @@
     "audiences": [
       "botDee"
     ],
-    "whatsNewText": "s3.3.051: BOT DEE natural Cancun trip talk opens Room SMARTview (same card as Open Room SMARTview Cancun Trip)"
+    "whatsNewText": "s3.3.051: Talk about a Cancun trip with BOT DEE and Room SMARTview opens — the same card as Open Room SMARTview Cancun Trip."
   },
   {
     "id": "s3.3.050",
@@ -66,7 +73,7 @@
     "audiences": [
       "botDee"
     ],
-    "whatsNewText": "s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join"
+    "whatsNewText": "s3.3.046: People SMARTview spacing is tighter, you can book VIP reserV from BOT DEE chat, and you can join a Room SMARTview."
   },
   {
     "id": "s3.3.045",
@@ -82,7 +89,7 @@
     "audiences": [
       "botDee"
     ],
-    "whatsNewText": "s3.3.044: BOT DEE ShoutOut SMARTpreview collects template/@handle/media"
+    "whatsNewText": "s3.3.044: ShoutOut SMARTpreview in BOT DEE asks for the template, the @handle, and a photo or video."
   },
   {
     "id": "s3.3.043",
@@ -90,7 +97,7 @@
     "audiences": [
       "botDee"
     ],
-    "whatsNewText": "s3.3.043: Headless ShoutOut composer parity (classic-bw + Club Admin inbox + LED)"
+    "whatsNewText": "s3.3.043: Throw a ShoutOut in BOT DEE chat. It uses the same ShoutOut page, Club Admin inbox, and LED."
   },
   {
     "id": "s3.3.042",

@@ -1,9 +1,11 @@
 /* BOT DEE / Gemini What's New catalog.
    Version SMARTview shows only BOT DEE or Gemini notes. Runtime is rules —
    never a live Gemini call (Ver/Version must not invent release notes).
-   Optional Gemini review is catalog-time only (scripts/catalog-botdee-whats-new.js). */
+   Patron wording is a checked-in whatsNewText from the authoring Gemini pass
+   (scripts/catalog-botdee-whats-new.js --patron). */
 "use strict";
 
+const patron = require("./botdee-patron-language");
 const SCHEMA_VERSION = "floqr.botDeeWhatsNewCatalog/1";
 const WHATS_NEW_LIMIT = 8;
 const TEXT_LIMIT = 280;
@@ -149,17 +151,22 @@ function classifyItem(row) {
   }
   const clauses = splitClauses(sourceText).map(text => ({text, ...classifyClause(text)}));
   const kept = clauses.filter(clause => clause.keep).map(clause => clause.text);
+  const overrideBody = stripId(overrideText);
+  const overrideClean = !!(kept.length && overrideBody
+    && !patron.internalTokenHits(overrideBody).length
+    && classifyClause(overrideBody).keep);
   const overrideKeep = overrideFromSource(sourceText, overrideText);
-  if (overrideKeep.length) {
-    const audience = overrideKeep.some(part => classifyClause(part).audience === AUDIENCE.gemini)
+  const shown = overrideClean ? [overrideBody] : (overrideKeep.length ? overrideKeep : kept);
+  if (overrideClean || overrideKeep.length) {
+    const audience = shown.some(part => classifyClause(part).audience === AUDIENCE.gemini)
       ? AUDIENCE.gemini
       : AUDIENCE.botDee;
     return {
       keep: true,
       id,
-      text: formatWhatsNewText(id, overrideKeep),
+      text: formatWhatsNewText(id, shown),
       audience,
-      reason: kept.length ? "include" : "gemini-split",
+      reason: overrideClean ? "patron-language" : (kept.length ? "include" : "gemini-split"),
       clauses
     };
   }
@@ -201,10 +208,33 @@ function geminiCatalogPrompt(rows) {
     "KEEP only BOT DEE chat features or Gemini model features (SMARTview/SMARTcard/SMARTpreview/SMARTsummary in BOT DEE, headless ShoutOut/VIP from chat, Ver/Vers/Version, memory/recall, Room SMARTview, People cards, Gemini model id).",
     "DROP Master Admin, beta Find patron, tester/Gray/busy Save, Features SMARTview, App Check, AI crawl, Mingl Search chrome, Appearance/native select, other product notes.",
     "Mixed bullets: keep BOT DEE/Gemini clauses; drop the rest. Do not invent features. Do not translate brands (BOT DEE, Gemini, SMARTview, ShoutOut, Mingl, VIP reserV, FloqR).",
+    "whatsNewText must be plain patron language. Never use unmount, headless, six-phase, night rail, identity-only, compact picker, chat dump, or executeBotSession.",
     "Rules in code are the runtime source of truth. Your output is a review proposal only.",
     "Bullets:",
     bullets
   ].join("\n");
+}
+
+function applyPatronProposal(rows, proposal) {
+  const byId = new Map();
+  const items = proposal && Array.isArray(proposal.items) ? proposal.items : [];
+  items.forEach(item => {
+    const id = String((item && item.id) || "").trim();
+    if (id) byId.set(id, item);
+  });
+  return (Array.isArray(rows) ? rows : []).map(row => {
+    const sourceOnly = classifyItem({...row, whatsNewText: ""});
+    if (!sourceOnly.keep) return row;
+    const suggestion = byId.get(sourceOnly.id);
+    const raw = suggestion && (suggestion.patronText || suggestion.whatsNewText);
+    if (!raw) return row;
+    const body = stripId(raw);
+    if (!body || patron.internalTokenHits(body).length || !classifyClause(body).keep) return row;
+    const audiences = Array.isArray(row.audiences) && row.audiences.length
+      ? row.audiences.slice()
+      : [sourceOnly.audience];
+    return {...row, audiences, whatsNewText: formatWhatsNewText(sourceOnly.id, [body])};
+  });
 }
 
 function mergeGeminiProposal(rows, proposal) {
@@ -239,5 +269,6 @@ module.exports = {
   classifyItem,
   forVersionWhatsNew,
   geminiCatalogPrompt,
-  mergeGeminiProposal
+  mergeGeminiProposal,
+  applyPatronProposal
 };

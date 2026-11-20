@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.055 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.056 (stable)
 
+- s3.3.056: Plain language on the BOT DEE version card
 - s3.3.055: Headless VIP reserV: book/hold a table phrasing, night rail, 2D map, cancel unmounts dock
 - s3.3.054: BOT DEE people search is identity-only (not bios) and compact picker cards
 - s3.3.053: Si-nema Search chrome is a vector mark with Site Chrome fills and transparent voids (White/Black PNG)

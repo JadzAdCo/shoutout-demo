@@ -488,6 +488,13 @@
     </div>`;
   }
 
+  function whatsNewLine(item) {
+    const id = String(item && item.id || "").trim();
+    const localized = id ? t(`botdee.vs.note.${id}`, "") : "";
+    if (localized) return localized;
+    return String((item && (item.text || item.id)) || "");
+  }
+
   function renderVersionCard(payload) {
     const view = overlayFrontendPackage(payload);
     const unavailable = t("botdee.vs.unavailable", "Unavailable");
@@ -535,12 +542,12 @@
       <div class="botdee-sv-version-panel" data-vs-panel="updates" role="tabpanel" hidden>
         <h3>${esc(t("botdee.vs.whatsNewHeading", "What's New"))}</h3>
         ${changelog.length
-          ? `<ul>${changelog.map(item => `<li>${esc(item.text || item.id || "")}</li>`).join("")}</ul>`
+          ? `<ul>${changelog.map(item => `<li>${esc(whatsNewLine(item))}</li>`).join("")}</ul>`
           : `<p>${esc(t("botdee.vs.whatsNewEmpty", "No BOT DEE or Gemini notes are listed for this build."))}</p>`}
       </div>
       <div class="botdee-sv-version-panel" data-vs-panel="help" role="tabpanel" hidden>
         <h3>${esc(t("botdee.vs.helpHeading", "Version command"))}</h3>
-        <p>${esc(t("botdee.vs.helpBody", "Enter Ver, Vers, or Version to display this SMARTview. The command is case-insensitive. Longer questions like “what is your version?” still get a text answer plus this card."))}</p>
+        <p>${esc(t("botdee.vs.helpBody", "Type Ver, Vers, or Version — capitals do not matter. BOT DEE shows the version card. A longer question like “what is your version?” still shows that card."))}</p>
       </div>
       <div class="botdee-sv-version-foot">
         <span>${esc(t("botdee.vs.footBrand", "FLOQR · System Information"))}</span>

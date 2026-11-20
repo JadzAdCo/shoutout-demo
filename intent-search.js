@@ -184,7 +184,7 @@
       id: "help-botdee-version-smartview",
       kind: "help",
       label: "Version SMARTview",
-      blurb: "Type Ver, Vers, or Version in BOT DEE chat for a Version SMARTview card. Live package stamps and honest service status — not the numbers from a design picture.",
+      blurb: "Type Ver, Vers, or Version. BOT DEE shows the version card. A longer question like “what is your version?” still shows that card.",
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
       searchPhrases: [
         "version smartview", "ver command", "vers command", "version command",
