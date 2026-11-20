@@ -55,6 +55,18 @@ test("Mingl Gist wires Site chrome early paint + scheme + hydrate", () => {
   assert.match(app, /hydrateSiteChrome/);
 });
 
+test("Mingl Gist CTA label stays readable on White/Black", () => {
+  const gist = read("mingl-gist.css");
+  const overlay = read("mingl-chat-chrome.css");
+  assert.match(gist, /html\[data-floqr-chrome="whiteBlack"\] a\.mingl-gist-cta/);
+  assert.match(gist, /html\[data-floqr-chrome\] a\.mingl-gist-cta/);
+  assert.match(gist, /html\[data-floqr-chrome="whiteBlack"\] \.mingl-gist-tap-zones button/);
+  assert.match(gist, /\.mingl-gist-viewer h2[\s\S]*color: #fff !important/);
+  assert.match(overlay, /html\[data-floqr-chrome="whiteBlack"\] a\.mingl-gist-cta/);
+  assert.match(overlay, /color:#0a0a0a/);
+  assert.match(overlay, /html\[data-floqr-chrome="whiteBlack"\] \.mingl-gist-tap-zones button/);
+});
+
 test("Mingl compose and bubbles use chrome tokens instead of Nightlife navy", () => {
   const css = read("styles.css");
   const overlay = read("mingl-chat-chrome.css");

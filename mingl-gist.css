@@ -292,7 +292,8 @@
   color: #ffd45a;
 }
 
-.mingl-gist-cta {
+.mingl-gist-cta,
+html[data-floqr-chrome] a.mingl-gist-cta {
   pointer-events: auto;
   display: inline-flex;
   align-items: center;
@@ -306,6 +307,44 @@
   font-weight: 1000;
   text-decoration: none;
   width: fit-content;
+}
+
+/* Beat `html[data-floqr-chrome="whiteBlack"] a { color:#111 }` — black label on a black pill. */
+html[data-floqr-chrome="whiteBlack"] a.mingl-gist-cta {
+  background: #fff;
+  color: #0a0a0a;
+  border: 2px solid #0a0a0a;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset, 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Story viewer stays a dark overlay — do not inherit White/Black form button chrome. */
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-viewer {
+  background: #05070f;
+  color: #fff;
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-viewer h2,
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-viewer strong {
+  color: #fff !important;
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-copy p {
+  color: rgba(255, 255, 255, 0.92);
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-viewer-meta small {
+  color: rgba(255, 255, 255, 0.7);
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-close {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 0;
+  box-shadow: none;
+  text-shadow: none;
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-tap-zones button {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: transparent;
+  text-shadow: none;
 }
 
 .mingl-gist-tap-zones {

@@ -50,3 +50,40 @@ html[data-floqr-chrome="whiteBlack"] .mingl-message{background:#fff;color:#0a0a0
 html[data-floqr-chrome="whiteBlack"] .mingl-message.mine{background:#f2f2f2}
 html[data-floqr-chrome="whiteBlack"] .mingl-compose-menu summary{color:#fff}
 html[data-floqr-chrome="whiteBlack"] .mingl-chat-avatar{color:#fff}
+
+html[data-floqr-chrome] a.mingl-gist-cta{
+  color:var(--floqr-ink);
+  background:linear-gradient(90deg,var(--hot),var(--accent));
+  text-decoration:none;
+}
+html[data-floqr-chrome="whiteBlack"] a.mingl-gist-cta{
+  background:#fff;
+  color:#0a0a0a;
+  border:2px solid #0a0a0a;
+  box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 2px 8px rgba(0,0,0,.12);
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-viewer{
+  background:#05070f;
+  color:#fff;
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-viewer h2,
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-viewer strong{
+  color:#fff!important;
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-copy p{
+  color:rgba(255,255,255,.92);
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-close{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  border:0;
+  box-shadow:none;
+  text-shadow:none;
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-gist-tap-zones button{
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  color:transparent;
+  text-shadow:none;
+}
