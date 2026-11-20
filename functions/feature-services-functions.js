@@ -588,7 +588,7 @@ exports.revokeBetaInvite = onCall(CALL_OPTS, async request => {
 });
 
 /** Master Admin Find patron: Auth email (case-insensitive) then users email / handle equality. Never scans 120 fat users docs. */
-/* s3.3.049 CI deploy marker — retrigger Features subset after [firebase-deploy-features] skipped the job */
+/* s3.3.049 CI deploy marker — retrigger Features subset on main after the first tagged job was cancelled */
 exports.findBetaPatron = onCall(CALL_OPTS, async request => {
   await assertAdmin(request, "beta.find");
   const query = text(request.data?.query, 200);
