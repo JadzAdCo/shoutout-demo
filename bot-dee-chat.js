@@ -30,6 +30,8 @@
   let storedLastMessageAtMs = 0;
   let visitLiveTurns = [];
   let chatsUiBound = false;
+  let pendingJoinToken = "";
+  let pendingJoinRoomId = "";
   let chatTitles = {};
   let liveConversationId = "";
   let storedConversationId = "";
@@ -135,6 +137,7 @@
       checkout: "botdee.link.paySecurely",
       floqcast: "botdee.link.floqcastPreview",
       shoutout: "botdee.link.shoutoutCompose",
+      "shoutout-pending": "botdee.link.shoutoutPending",
       vip: "botdee.link.vipTerms"
     };
     return (results || []).filter(row => {
@@ -496,7 +499,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.042";
+    return "s3.3.051";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -1125,11 +1128,20 @@
       });
       article.appendChild(list);
     }
-    if (!isUser && Array.isArray(smartViews) && smartViews.length && global.FLOQRBotDeeSmartView?.mount) {
+    let inlineViews = Array.isArray(smartViews) ? smartViews : [];
+    if (!isUser && global.FLOQRBotDeeSmartView?.applyShoutOutPreviewFromViews) {
+      const split = global.FLOQRBotDeeSmartView.applyShoutOutPreviewFromViews(inlineViews);
+      inlineViews = Array.isArray(split?.inline) ? split.inline : inlineViews;
+    }
+    if (!isUser && global.FLOQRBotDeeSmartView?.applyVipPreviewFromViews) {
+      const split = global.FLOQRBotDeeSmartView.applyVipPreviewFromViews(inlineViews);
+      inlineViews = Array.isArray(split?.inline) ? split.inline : inlineViews;
+    }
+    if (!isUser && inlineViews.length && global.FLOQRBotDeeSmartView?.mount) {
       const host = document.createElement("div");
       host.className = "botdee-sv-host";
       article.appendChild(host);
-      global.FLOQRBotDeeSmartView.mount(host, smartViews, peopleSearch);
+      global.FLOQRBotDeeSmartView.mount(host, inlineViews, peopleSearch);
     }
     row.appendChild(article);
     log.appendChild(row);
@@ -1140,7 +1152,7 @@
     const log = byId("botDeeTranscript");
     if (!log) return;
     const last = log.lastElementChild;
-    const card = last?.querySelector(".botdee-sv-people, .botdee-sv-version, .botdee-sv-room");
+    const card = last?.querySelector(".botdee-sv-people, .botdee-sv-version, .botdee-sv-room, .botdee-sv-shoutout");
     if (last && card && card.scrollHeight > log.clientHeight * 0.85) {
       const logBox = log.getBoundingClientRect();
       const lastBox = last.getBoundingClientRect();
@@ -1191,6 +1203,17 @@
     }
   }
 
+  function hasOpenWorkflow() {
+    const shout = byId("botDeeShoutOutPreviewDock");
+    if (shout && !shout.hidden && shout.querySelector(".botdee-sv-shoutout")) return true;
+    const vip = byId("botDeeVipPreviewDock");
+    if (vip && !vip.hidden && vip.querySelector(".botdee-sv-vip")) return true;
+    try {
+      if (document.querySelector(".botdee-sv-room[data-rs-active='1']")) return true;
+    } catch (_) {}
+    return false;
+  }
+
   function armIdleTimer(overrideMs) {
     clearIdleTimer();
     // fresh (welcome painted) and active both idle-out; ended stays quiet.
@@ -1198,7 +1221,13 @@
     const ms = overrideMs != null
       ? Math.max(0, Number(overrideMs) || 0)
       : clampIdleSeconds(idleSeconds) * 1000;
-    idleTimer = setTimeout(() => endConversation("idle"), ms);
+    idleTimer = setTimeout(() => {
+      if (hasOpenWorkflow()) {
+        armIdleTimer();
+        return;
+      }
+      endConversation("idle");
+    }, ms);
   }
 
   function markActive() {
@@ -1321,9 +1350,13 @@
         threadId: threadId || undefined,
         conversationId: liveConversationId || undefined,
         uiLanguage: currentUiLanguage(),
-        roomSmartViewDeclined: loadRoomDeclined()
+        roomSmartViewDeclined: loadRoomDeclined(),
+        joinToken: pendingJoinToken || undefined,
+        roomId: pendingJoinRoomId || undefined
       };
       const rawData = (await fn(payload))?.data || {};
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
       applyHasUsed(rawData, 1);
       const data = await ensurePeopleSmartViews(text, rawData);
       const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
@@ -1344,6 +1377,9 @@
             : (peopleCard && looksLikeProfileFieldDump(data.reply)
               ? t("botdee.sc.oneResult", "Here is their SMARTview.")
               : displayReply(data.reply));
+      if (data.shoutOutPreview === "closed") {
+        global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
+      }
       appendBubble("bot", reply, localizeResults(peopleCard ? [] : data.results), media, views, peopleSearch);
       pushHistory("model", reply);
       if (reply) visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
@@ -1591,6 +1627,7 @@
   }
 
   function restoreTurns(turns) {
+    global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
     const log = byId("botDeeTranscript");
     if (log) log.innerHTML = "";
     history.length = 0;
@@ -1610,6 +1647,7 @@
   }
 
   function landCollapsed(data) {
+    global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
     const turns = cloneTurns(data.turns);
     const archive = cloneTurns(data.archiveTurns);
     storedTurns = turns.length ? turns : archive;
@@ -1703,6 +1741,7 @@
   }
 
   function startNewChat() {
+    global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
     const log = byId("botDeeTranscript");
     if (log) log.innerHTML = "";
     setChatsOpen(false);
@@ -2044,17 +2083,73 @@
     appendBubble("bot", `${t("botdee.recapLead", "Last time:")} ${recap}`);
   }
 
+  function captureJoinToken() {
+    try {
+      const url = new URL(location.href);
+      const token = String(url.searchParams.get("t") || url.searchParams.get("join") || "").trim();
+      const roomId = String(url.searchParams.get("room") || "").trim();
+      if (!token) return;
+      pendingJoinToken = token;
+      if (roomId) pendingJoinRoomId = roomId;
+      url.searchParams.delete("join");
+      url.searchParams.delete("t");
+      url.searchParams.delete("room");
+      history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    } catch (_) {}
+  }
+
+  async function acceptPendingInvite() {
+    if (!pendingJoinToken) return {ok: false, message: ""};
+    const fn = callable("acceptBotDeeRoomInvite");
+    if (!fn) {
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
+      return {ok: false, message: t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")};
+    }
+    try {
+      const data = (await fn({
+        token: pendingJoinToken,
+        roomId: pendingJoinRoomId || undefined
+      }))?.data || {};
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
+      if (data.ok) return {ok: true, message: ""};
+      return {
+        ok: false,
+        message: data.error || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")
+      };
+    } catch (error) {
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
+      return {
+        ok: false,
+        message: error?.message || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")
+      };
+    }
+  }
+
   function bind(opts = {}) {
     bindForm();
     bindChatsUi();
     pinComposerToViewport();
     global.FLOQRBotDeePersonalization?.bind?.();
+    captureJoinToken();
     const q = opts.q || new URL(location.href).searchParams.get("q");
     if (q) {
       const input = byId("botDeeChatInput");
       if (input) input.value = String(q).slice(0, 200);
     }
     restoreOrWelcome();
+    if (pendingJoinToken) {
+      setTimeout(async () => {
+        const joined = await acceptPendingInvite();
+        if (joined && joined.ok) {
+          sendMessage("I joined this Room SMARTview");
+          return;
+        }
+        appendBubble("bot", (joined && joined.message) || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."));
+      }, 400);
+    }
     return {sendMessage, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};
   }
 

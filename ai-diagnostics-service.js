@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.042";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.042";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.052";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.052";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,6 +223,117 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.052",
+      title: "s3.3.052 — Mingl Search tile follows Features & Services beta grant",
+      checks: [
+        {label:"Test tiles skip legacy patron gate", file:"floqr-feature-services.js", includes:["stateOf(features[canonicalizeFeatureKey(base.key)]) === \"test\") return true"]},
+        {label:"Link fields re-derived from flags", file:"floqr-feature-services.js", includes:["enableFeatureLink: derived.enableFeatureLink"]},
+        {label:"Mingl tile after ShoutOut", file:"index.html", includes:["id=\"minglBtnCard\"", "data-feature-key=\"mingl\"", "id=\"intentSearchBtnCard\""]},
+        {label:"Profile and Search share F&S helper", file:"floqr-feature-services.js", includes:["function featureLinkAllowed(", "function applyFeatureLinks("]},
+        {label:"Search avatar Mingl link", file:"patron-app.js", includes:["data-floqr-feature-link=\"mingl\"", "fs.applyFeatureLinks(menu)"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-052-mingl-search-tile"]}
+      ]
+    },
+    {
+      version: "s3.3.051",
+      title: "s3.3.051 — Natural Cancun trip talk opens Room SMARTview",
+      checks: [
+        {label:"Cancun trip classifier", file:"functions/botdee-room-smartview.js", includes:["function isCancunTripAsk(", "function isNightlifeOnlyAsk(", "CANCUN_TRIP_TITLE"]},
+        {label:"Root classifier matches Functions", file:"botdee-room-smartview.js", includes:["function isCancunTripAsk("]},
+        {label:"Intent tests", file:"functions/botdee-room-smartview.test.js", includes:["natural Cancun trip phrases mount the same Room SMARTview", "nightlife-only VIP tonight does not open"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-051-botdee-cancun-trip-natural"]},
+        {label:"What's New catalog", file:"functions/botdee-whats-new-catalog.js", includes:["forVersionWhatsNew", "HARD_EXCLUDE"]},
+        {label:"What's New catalog test", file:"ai-diagnostics-service.js", includes:["botdee-whats-new-catalog"]}
+      ]
+    },
+    {
+      version: "s3.3.050",
+      title: "s3.3.050 — BOT DEE Mingl session invites + shared tab",
+      checks: [
+        {label:"Mingl invite core", file:"functions/botdee-session-core.js", includes:["evaluateInvite", "inviteHref", "minglFriendsOnly", "host plus 7"]},
+        {label:"Session callables", file:"functions/botdee-session-functions.js", includes:["createBotDeeRoomInvite", "acceptBotDeeRoomInvite", "assertFeatureAccess(request.auth, \"mingl\""]},
+        {label:"Join captures room and t", file:"bot-dee-chat.js", includes:["acceptBotDeeRoomInvite", "searchParams.get(\"t\")", "searchParams.get(\"room\")"]},
+        {label:"Inbox Review BOT DEE invite", file:"patron-portal-app.js", includes:["botdeeroominvite", "Review BOT DEE invite"]},
+        {label:"Tab checkout mingl gate", file:"functions/commerce-functions.js", includes:["botDeeRoomTab", "assertFeatureAccess(request.auth, \"mingl\""]},
+        {label:"Invites Functions-only", file:"firestore.rules", includes:["match /botDeeRoomInvites/{inviteId}", "allow read, write: if false;"]},
+        {label:"BOT DEE subset deploys session callables", file:".github/workflows/functions-ci.yml", includes:["createBotDeeRoomInvite", "acceptBotDeeRoomInvite", "createFloqrCheckoutSession"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-050-botdee-mingl-session-invite"]}
+      ]
+    },
+    {
+      version: "s3.3.049",
+      title: "s3.3.049 — Beta Find patron email lookup + Save without Audit hang",
+      checks: [
+        {label:"Find patron callable", file:"functions/feature-services-functions.js", includes:["exports.findBetaPatron", "getUserByEmail"]},
+        {label:"Nothing-changed before audit lock", file:"functions/feature-services-functions.js", includes:["Nothing changed — the tester already has that access."]},
+        {label:"Beta Save does not await audit", file:"master-feature-services.js", includes:["call(\"findBetaPatron\"", "loadBeta({keepVisible: true})"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-049-lorna-mingl-beta-save"]}
+      ]
+    },
+    {
+      version: "s3.3.047",
+      title: "s3.3.047 — Save busy + Features SMARTview",
+      checks: [
+        {label:"Save busy module", file:"floqr-save-busy.js", includes:["FLOQRSaveBusy", "Command received", "app.saveReceived"]},
+        {label:"Save busy on Master Admin", file:"master-admin.html", includes:["floqr-save-busy.js"]},
+        {label:"Features SMARTview catalog", file:"features-smartview/catalog.json", includes:["Si-tube", "BOT DEE", "floqCast", "statusVerified"]},
+        {label:"Features SMARTview host", file:"master-admin.html", includes:["botDeeMasterLoadFeaturesSmartView", "botDeeMasterFeaturesSmartView"]},
+        {label:"Manual tests", file:"ai-diagnostics-service.js", includes:["s3-3-047-save-busy-command-received", "s3-3-047-features-smartview-master"]}
+      ]
+    },
+    {
+      version: "s3.3.046",
+      title: "s3.3.046 — People SMARTview chip gaps + headless VIP reserV + Room join",
+      checks: [
+        {label:"Plan trace App Check unset enforces", file:"functions/floqmedia-plan-trace-core.js", includes:["!== \"0\""]},
+        {label:"Plan trace deployed App Check value is 1", file:"functions/floqmedia-plan-trace-functions.js", includes:["FLOQR_APP_CHECK_ENFORCE: \"1\""], notIncludes:["FLOQR_APP_CHECK_ENFORCE: \"0\""]},
+        {label:"Plan trace env merge sets 1", file:"functions/scripts/set-floqmedia-plan-trace-app-check-env.js", includes:["next[KEY] = \"1\""], notIncludes:["next[KEY] = \"0\""]},
+        {label:"People details collapse empty space", file:"botdee-smartview.css", includes:[".botdee-sv-details > *", ".botdee-sv-tags:empty", "max-height: none"], notIncludes:["6.4em"]},
+        {label:"Headless VIP core", file:"functions/headless-vip-core.js", includes:["resolveSectionQuery", "isVipExecutePrompt", "Mezzanine"]},
+        {label:"Session intercepts VIP", file:"functions/bot-dee-functions.js", includes:["tryHeadlessVip", "headlessVipDraft", "botdee-room-live"]},
+        {label:"Room join live", file:"functions/botdee-room-live.js", includes:["botDeeRooms", "joinTokenHash", "charge: false"]},
+        {label:"Idle skip while docks/room open", file:"bot-dee-chat.js", includes:["hasOpenWorkflow", "botDeeVipPreviewDock", "data-rs-active"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-046-people-gaps-headless-vip-rooms"]},
+        {label:"Mingl Chat Site chrome", file:"mingl-chat.html", includes:["floqr.isSiteChrome", "floqr-chrome-scheme.js", "data-floqr-chrome-icon=\"mingl\"", "mingl-chat-chrome.css"]},
+        {label:"Mingl Chat hydrates chrome", file:"mingl-chat-app.js", includes:["hydrateSiteChrome", "hydrateFromProfile"]},
+        {label:"Mingl Gist Site chrome", file:"mingl-gist.html", includes:["floqr.isSiteChrome", "floqr-chrome-scheme.js", "data-floqr-chrome-icon=\"mingl\""]},
+        {label:"Mingl chrome overlay tokens", file:"mingl-chat-chrome.css", includes:["var(--floqr-ink)", "whiteBlack"]}
+      ]
+    },
+    {
+      version: "s3.3.045",
+      title: "s3.3.045 — ShoutOut SMARTpreview live LED template (display.html preview=1)",
+      checks: [
+        {label:"Live LED iframe", file:"botdee-smartview.js", includes:["shoutOutLedSrc", "botdee-so-led", "patchShoutOutLedSrc"]},
+        {label:"Composer preview not Xibo URL", file:"botdee-smartview.js", includes:["sanitizeShoutOutPreviewHref", "preview", "1"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-045-smartpreview-live-led"]}
+      ]
+    },
+    {
+      version: "s3.3.044",
+      title: "s3.3.044 — ShoutOut SMARTpreview (template / @handle / media) without coupling core",
+      checks: [
+        {label:"Interactive draft (no SMARTview in core)", file:"functions/headless-shoutout-core.js", includes:["interactiveNeeds", "mergeInteractiveDraft", "parseHandleHint"]},
+        {label:"Optional SMARTview", file:"functions/botdee-shoutout-smartview.js", includes:["botDeeShoutOut", "never require this module"]},
+        {label:"BOT DEE collect-before-mint", file:"functions/bot-dee-functions.js", includes:["buildShoutOutSmartView", "persistHeadlessShoutOutDraft"]},
+        {label:"Client card", file:"botdee-smartview.js", includes:["renderShoutOutCard", "botDeeShoutOut"]},
+        {label:"FloqR one-shot stays SMARTview-free", file:"functions/commerce-functions.js", includes:["exports.createHeadlessShoutOutCheckout"]},
+        {label:"Master Admin SMARTpreview tab", file:"master-admin.html", includes:["data-botdee-page=\"smartpreview\"", "botDeeMasterSmartPreviewDemo", "botDeeMasterLoadSmartPreview"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-044-headless-shoutout-smartview"]}
+      ]
+    },
+    {
+      version: "s3.3.043",
+      title: "s3.3.043 — Headless ShoutOut composer parity (className + club notify + LED)",
+      checks: [
+        {label:"Catalog className", file:"functions/headless-shoutout-core.js", includes:["className: \"classic-bw\"", "classic-bw classic-halloween"]},
+        {label:"Club pending inbox", file:"functions/bot-dee-tools.js", includes:["notifyClubPendingHeadlessShoutOut", "pendingShoutout"]},
+        {label:"Approve catalog className", file:"admin-app.js", includes:["templateClassName: packaged.className || item.templateClassName"]},
+        {label:"Pending link kind", file:"bot-dee-chat.js", includes:["shoutout-pending"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-043-headless-shoutout-complete"]}
+      ]
+    },
+    {
       version: "s3.3.041",
       title: "s3.3.041 — BOT DEE + FloqR headless ShoutOut checkout",
       checks: [
@@ -247,6 +358,16 @@
     },
     {
       version: "s3.3.039",
+      title: "s3.3.039 — Spatial Studio plan trace HTTP (floqmediaPlanTrace)",
+      checks: [
+        {label:"Plan trace HTTP export", file:"functions/floqmedia-plan-trace-functions.js", includes:["exports.floqmediaPlanTrace", "defineSecret(\"GEMINI_API_KEY\")", "GoogleGenAI"]},
+        {label:"Floor-plan prompt + CORS list", file:"functions/floqmedia-plan-trace-core.js", includes:["studio.localhost:3000", "PLAN_TRACE_PROMPT", "spatial-plan-trace", "X-Firebase-AppCheck"]},
+        {label:"Index + spatial deploy tag", file:"functions/index.js", includes:["floqmediaPlanTrace"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-039-floqmedia-plan-trace"]}
+      ]
+    },
+    {
+      version: "s3.3.039",
       title: "s3.3.039 — People card stacked layout (photo / name+handle / compact SMARTsummary)",
       checks: [
         {label:"Stacked people renderer", file:"botdee-smartview.js", includes:["function peopleFactsHtml(", "botdee-sv-id", "peopleHandleHtml"]},
@@ -259,7 +380,7 @@
       version: "s3.3.038",
       title: "s3.3.038 — SMARTvisuals kit (stencils, backgrounds, Studio)",
       checks: [
-        {label:"Resolver + catalog", file:"smartvisuals-resolver.js", includes:["FLOQRSmartVisualsResolver", "geminiAllowed", "private-source-denied"]},
+        {label:"Resolver + catalog", file:"smartvisuals-resolver.js", includes:["FLOQRSmartVisualsResolver", "geminiAllowed", "private-source-denied", "selectAd", "mockFill"]},
         {label:"Search overlay host", file:"index.html", includes:["id=\"smartvisualNotificationHost\"", "smartvisuals-view.js?v="]},
         {label:"Master Admin Studio", file:"master-admin.html", includes:["id=\"smartvisualStudio\"", "data-panel=\"smartvisualStudio\"", "smartvisuals-studio.js?v="]},
         {label:"Callables", file:"functions/index.js", includes:["classifySmartVisual", "publishSmartVisualDraft", "getSmartVisualAdPolicy"]},
@@ -444,9 +565,9 @@
       checks: [
         {label:"Chat-only botdee.html", file:"botdee.html", notIncludes:["botDeeSettingsBubble", "botDeeMemoryPanel", "botdee-upgrade-ui.js"], includes:["botDeeChatForm", "botDeeTranscript"]},
         {label:"My BOT DEE tab", file:"patron-portal.html", includes:["foBotDeePane", "nav.myBotDee", "botdee-upgrade-ui.js", "botDeeKnowsList", "botDeePersonalizationPanel", "botDeePrefName"]},
-        {label:"Master Admin subtabs", file:"master-admin.html", includes:["data-botdee-page=\"pause\"", "data-botdee-page=\"legal\"", "data-botdee-page=\"smartviews\"", "botDeeMasterSmartViewDemo"]},
+        {label:"Master Admin subtabs", file:"master-admin.html", includes:["data-botdee-page=\"pause\"", "data-botdee-page=\"legal\"", "data-botdee-page=\"smartviews\"", "data-botdee-page=\"smartpreview\"", "botDeeMasterSmartViewDemo"]},
         {label:"Save label", file:"master-admin.html", includes:["data-i18n=\"app.save\""], notIncludes:["Save BOT DEE settings"]},
-        {label:"Portal chrome keys", file:"floqr-i18n.js", includes:["nav.myBotDee", "botdee.knowsTitle", "master.botDeeSubSmartviews"], notIncludes:["botdee.settingsBubble"]},
+        {label:"Portal chrome keys", file:"floqr-i18n.js", includes:["nav.myBotDee", "botdee.knowsTitle", "master.botDeeSubSmartviews", "master.botDeeSubSmartpreview"], notIncludes:["botdee.settingsBubble"]},
         {label:"Help knows-of-me", file:"botdee-help-repository.js", includes:["help-botdee-knows-of-me", "Feature & Orders → My BOT DEE"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-022-botdee-portal-mgmt"]},
         {label:"Si-nema Search chrome tile", file:"index.html", includes:["id=\"sinemaBtnCard\"", "data-feature-key=\"sinema\"", "sinema-nightlife.jpg", "sinema-icon-face chrome-photo-face"]},
@@ -3136,7 +3257,7 @@
       checks: [
         {label:"Access matrix", file:"floqr-feature-services.js", includes:["function stateOf(", "function searchVisible(", "function hasBetaGrant(", "logFeatureAccessAttempt"]},
         {label:"Server access matrix", file:"functions/feature-services-core.js", includes:["function featureState(", "function searchTileVisible(", "function validateBetaFeatures("]},
-        {label:"Beta feature callables", file:"functions/feature-services-functions.js", includes:["exports.setBetaTesterFeatures", "exports.logFeatureAccessAttempt", "beta.invite_denied"]},
+        {label:"Beta feature callables", file:"functions/feature-services-functions.js", includes:["exports.setBetaTesterFeatures", "exports.findBetaPatron", "exports.logFeatureAccessAttempt", "beta.invite_denied"]},
         {label:"Sign-in redirect", file:"floqr-session-shell.js", includes:["function redirectToLogin(", "profileRequired=sign-in", "function requireSignIn("]},
         {label:"Welcome buttons", file:"index.html", includes:["Continue with SMS OTP (US &amp; Canada Only)", "mail-icon", "sms-icon"]},
         {label:"Unified button gradient", file:"styles.css", includes:["#loginActions .signin{background:linear-gradient(90deg,#1f8fff"]},
@@ -3438,22 +3559,94 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-052-mingl-search-tile",
+      area:"Search",
+      feature:"Mingl Search tile for granted beta testers",
+      changed:"s3.3.052 — Search shows Mingl like BOT DEE/VIP when featureServices/mingl is Enabled+Test and betaTesters/{signed-in uid}.features.mingl==1. Test tiles no longer AND platformSettings/patronFeatureGates.mingl. Tile sits next to ShoutOut (not after Cinema). Duplicate Lorna Auth accounts: tick Mingl + Save feature access on both uids until merge.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ until floqr-feature-services.js?v=s3.3.052. 2) Sign in as the same Auth user Master Admin ticked (check the email on the tester row — MsLorna and the other Lorna @gmail.com are different uids until merged). 3) Search should show Mingl with a Beta pill beside ShoutOut / BOT DEE / VIP. 4) Open the avatar / profile card — Mingl Chat must appear (data-floqr-feature-link=mingl via applyFeatureLinks). 5) Master Admin → Features Mgmt: Mingl Enable Feature 1 + Enable Beta 1. For each Lorna uid, Mingl checked → Save feature access. 6) Mark Succeed/Failed.",
+      expected:"Granted tester sees Mingl on Search and on the profile avatar menu. Cinema (Si-nema) is a different tile. Signing in as the other Lorna uid without mingl:1 still hides Mingl on both surfaces.",
+      troubleshoot:"No Mingl on Search or the profile card → confirm the signed-in email matches the tester row, then tick Mingl on THAT uid and Save. Tile still missing after grant → cached index.html / floqr-feature-services.js / patron-app.js before s3.3.052. Cinema showing instead → that is sinemaBtnCard, not a Mingl mixup. Enable Feature still 0 → packaged default is Off; Save Mingl on Release Control first."
+    },
+    {
+      id:"botdee-whats-new-catalog",
+      area:"BOT DEE",
+      feature:"What's New lists BOT DEE and Gemini only",
+      changed:"Version SMARTview What's New catalogues BOT DEE / Gemini features only. Master Admin beta Find patron, Gray Save, Save busy, and Features SMARTview are not shown. Mixed bullets keep the BOT DEE clauses (People/Room SMARTview, headless VIP) and drop App Check. README still has the full package list. Runtime filter is rules in functions/botdee-whats-new-catalog.js — Ver/Version does not call Gemini.",
+      howToTest:"1) After Functions deploy from origin/main (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until floqr-i18n-help.js ?v=s3.3.051. Sign in with BOT DEE. 2) Type Ver → What's New. Confirm s3.3.051 Cancun trip / s3.3.050 Mingl invites / s3.3.046 People+Room+headless VIP (no App Check) / s3.3.045–044 SMARTpreview are listed. 3) Confirm these are absent: Beta Find patron, tester Save, Save busy, Gray Save, Features SMARTview. 4) Help tab still explains What's New is BOT DEE and Gemini only. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"What's New shows BOT DEE/Gemini bullets only. Master Admin Save/Find-patron/Features SMARTview notes stay off the card. README unchanged.",
+      troubleshoot:"Still seeing Find patron / Gray Save → Functions executeBotSession not this SHA (forVersionWhatsNew missing) or cached botdee-version-changelog.json from an older deploy. Empty What's New → catalog fail-closed every row; check functions/botdee-whats-new-catalog.js. Help still says README package notes → cached floqr-i18n-help.js."
+    },
+    {
+      id:"s3-3-051-botdee-cancun-trip-natural",
+      area:"BOT DEE",
+      feature:"Natural Cancun trip talk opens Room SMARTview",
+      changed:"s3.3.051 — Let’s plan our Cancun trip / Let’s plan a trip to Cancun / plan a Cancun trip / Cancun trip with friends mount the same Room SMARTview as Open Room SMARTview Cancun Trip: Cancun Trip title, travel kit art, labeled mock Ad Travel partner / Fly to Cancun. BOT DEE does not book live flights or hotels. VIP tables tonight stays nightlife, not a trip card.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-room-smartview.js ?v=s3.3.051. Sign in with BOT DEE. 2) Say Let’s plan our Cancun trip — Room SMARTview card with travel illustration (bali + flight stencil) and Travel partner / Fly to Cancun Ad. Not a VIP/ShoutOut/floqCast pitch and not a live booking claim. 3) New turn: Let’s plan a trip to Cancun — same card. 4) Also try plan a Cancun trip and Cancun trip with friends. 5) Say VIP tables tonight — must NOT open the Cancun trip Room SMARTview. 6) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Cancun trip phrasing opens Room SMARTview with Cancun Trip art + mock travel Ad. Nightlife-only VIP tonight does not. No live flight booking claim. Brands untranslated.",
+      troubleshoot:"Still ‘cannot book flights’ + VIP tiles → Functions executeBotSession not this SHA (isCancunTripAsk missing) or cached botdee-room-smartview.js. Empty Ad → selectAd/mockFill. VIP tonight opened a trip card → nightlife veto failed. Wrong art → authorizedTitle must canonicalize to Cancun Trip (bg-bali + st-flight)."
+    },
+    {
+      id:"s3-3-050-botdee-mingl-session-invite",
+      area:"BOT DEE",
+      feature:"Mingl friends invite into a BOT DEE session + shared tab",
+      changed:"s3.3.050 — Confirm Room SMARTview opens a Mingl-friends-only session (host plus 7 guests). Invite picker is Mingl connections, not a public join link. Inbox type botDeeRoomInvite → Review BOT DEE invite. Guests can invite. Shared tab is opt-in then FloqR Stripe split/one payer. Beta Mingl + BOT DEE gates.",
+      howToTest:"1) After Pages + Functions + rules deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js ?v=s3.3.050. Sign in with BOT DEE + Mingl (beta if test). 2) Say Open Room SMARTview → Confirm. Invite is enabled; no public join URL. 3) Invite a Mingl friend — they get Inbox Review BOT DEE invite. Wrong account opening botdee.html?room=&t= refuses. 4) Friend joins while signed in as that account — they see the shared card; private BOT DEE history is not copied. 5) Guest can Invite another Mingl friend until 8 people. Host End closes the room. 6) Shared tab: Opt in → add a line → I'll pay the tab opens Stripe on that uid only. Other members do not see card last4. 7) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Mingl-only invites, cap 8, guests can invite, join is not a payment, tab opt-in required, receipts on payer only. Beta gates hide the path when Mingl/BOT DEE is off.",
+      troubleshoot:"Invite still a public ?join= link → cached botdee-smartview.js / Functions not this SHA (acceptInvite). Inbox says Open Related ShoutOut → cached patron-portal-app.js inboxLinkLabel. Wrong account joins → token not bound to targetUid. Tab charges without opt-in → stop; canAttachLine must refuse. last4 on another member → publicTabLine leak. Functions deny mingl → Features & Services Mingl still test/off for that account. 404 on createBotDeeRoomInvite → BOT DEE subset list missing session names; redeploy from origin/main with [firebase-deploy-botdee]."
+    },
+    {
+      id:"s3-3-049-lorna-mingl-beta-save",
+      area:"Master Admin",
+      feature:"Beta tester Save (Mingl) does not hang on Audit Trail",
+      changed:"Master Admin using Mingl as a beta feature means live featureServices/mingl is Enabled+Test — the checkbox is not Off. Find patron looks up the sign-in email (findBetaPatron / email equality). Tester-table Save returns immediately after setBetaTesterFeatures; the tester list stays visible while it refreshes. Unchanged grants fail before the audit-head lock. Audit Trail is not loaded from the Beta tab Save.",
+      howToTest:"1) Hard-refresh Master Admin → Features Mgmt → SOS2FA → Beta & Testing. 2) Confirm Mingl is ticked/enabled on Release Control (Enable Feature 1 + Enable Beta 1). 3) In the active testers table, tick Mingl for Lorna and Save with a reason. Status should read Beta feature access saved without replacing the table with Loading for tens of seconds. 4) If grants already match, the error is immediate (Nothing changed) — not a hang. 5) Find patron with her full Gmail; she appears without scanning the first 120 users.",
+      expected:"Mingl checkbox is usable. Save either writes mingl:1 or says Nothing changed quickly. The tester table does not sit on Loading beta testers while Audit Trail resolves patron labels.",
+      troubleshoot:"Mingl still disabled → Reload Release Control so live featureServices/mingl loads (packaged default is Off). Save hangs after Command received… → Functions still on the old setBetaTesterFeatures that takes the audit-head lock for unchanged grants; wait for [firebase-deploy-features]. Find misses her email → paste the exact Auth sign-in email; callable must be deployed. She is not an active tester → Invite first, she must accept beta-invite.html."
+    },
+    {
+      id:"s3-3-047-features-smartview-master",
+      area:"Master Admin",
+      feature:"Features SMARTview (eight products, Status not verified)",
+      changed:"Master Admin → Features Mgmt → BOT DEE → SMARTviews → Show Features SMARTview. Catalog is evidence-backed: packaged flags only, Si-tube marked not in repo, no invented Beta-since dates. Live Firestore flags not verified this run.",
+      howToTest:"1) Hard-refresh Master Admin. 2) Features Mgmt → BOT DEE (`#featuresBotDee`) → SMARTviews. 3) Click Show Features SMARTview. 4) Confirm eight cards: FloqR, BOT DEE, Mingl, ShoutOut, VIP reserV, floqCast, Si-nema, Si-tube. 5) Every badge says Status not verified. Si-tube says Not in this repository.",
+      expected:"No BOT-DEE / FloqCAST misspellings. No Try action on Si-tube. No fabricated release dates.",
+      troubleshoot:"Button missing → master-admin.html host + floqr-features-smartview.js. Catalog 404 → features-smartview/catalog.json not on Pages. Live availability still unknown until Firebase flags are read."
+    },
+    {
+      id:"s3-3-047-save-busy-command-received",
+      area:"Master Admin / Club Admin / My Profile",
+      feature:"Save buttons gray out once the save command is received",
+      changed:"Shared floqr-save-busy.js. Clicking Save greys the button (Saving…). When the callable or Firestore write starts, label becomes Command received…. Cancelled reason prompt or failed/finished save restores the button. Blocks double-clicks on Features Mgmt Mingl beta Save.",
+      howToTest:"1) Master Admin → Features Mgmt → SOS2FA. 2) On a feature row or an active beta tester, press Save. Button greys immediately. 3) After the reason window Save, label reads Command received… until the callable returns. 4) Cancel the reason window — original Save restores. 5) Repeat on My Profile language Save if signed in.",
+      expected:"No second Save click while busy. Gray + Command received… after the server command is sent. Restores after success or error.",
+      troubleshoot:"Still clickable twice → hard-refresh so floqr-save-busy.js loads after floqr-nav.js. Reason cancel leaves it gray → idle restore is 1.6s if no callable; wait or reload. Invite as beta tester is not a Save button by design."
+    },
+    {
+      id:"s3-3-046-app-check-master-logs",
+      area:"Master Admin",
+      feature:"App Check logs on Application Logging and Security Logs",
+      changed:"Spatial Studio plan trace enforces App Check and writes both results to appLogs. Diagnostics category app-check action spatial-plan-trace. Rejected passes also use category security action app-check on Security Logs → App Check. A missing, invalid, or reused pass returns 401 and does not call Gemini. FLOQR_APP_CHECK_ENFORCE is 1. Unset still enforces. 0 is monitor mode for tests only.",
+      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a commit whose message contains [firebase-deploy] and [firebase-deploy-spatial]. 2) Hard-refresh Master Admin → Diagnostics → Application Logging. Category filter placeholder includes app-check. 3) Security → Security Logs still lists venue display allow/deny above App Check. 4) POST floqmediaPlanTrace from https://studio.floqmedia.com with no X-Firebase-AppCheck header. Expect HTTP 401 and no floor-plan trace. Application Logging shows category app-check (not gemini, not critical) and Security Logs → App Check shows the rejection. 5) Mark Succeed/Failed.",
+      expected:"Venue display log is unchanged and still uses displayAccessLogs. App Check rows are appLogs only. Verified is info. A missing pass is 401, category app-check plus category security, and does not flash Application Logging as a Gemini failure. FLOQR_APP_CHECK_ENFORCE is 1, not 0.",
+      troubleshoot:"No App Check subsection → hard-refresh master-admin.html and master-display-security.js. Gemini tab flashes on a missing pass → the row was written category gemini or severity critical; it must be category app-check. A missing pass still returns a trace → enforcement is off; FLOQR_APP_CHECK_ENFORCE must not be 0 and the function code default must reject. 404 on floqmediaPlanTrace → spatial subset deploy did not finish."
+    },
+    {
       id:"s3-3-038-smartvisuals-search-notification",
       area:"Mingl",
       feature:"Search SMARTnotification + Room SMARTview (Cancun Trip demo)",
-      changed:"s3.3.040 — SMARTvisuals kit: Search can show a compact Mingl Room Invitation with SMARTbackground + SMARTstencils. Demo only via ?smartvisualInvite=cancun (group rooms are not live). Art is illustration (Cancun → tropical bali + flight stencil), not a photo. Ads labeled and empty. Gemini is not called on view.",
-      howToTest:"1) After Pages publish. Open https://jadzadco.github.io/shoutout-demo/?start=search&smartvisualInvite=cancun and hard-refresh until smartvisuals-view.js?v=s3.3.040. Sign in if Search is gated. 2) Expect a compact Mingl Room Invitation over Search — View Invitation + Not Now. Scenic art is illustration; tags include Travel / Planning. 3) Tap View Invitation — Room SMARTview with RSVP/live chips, BOT-DEE capability row, Join Now. Join Now must NOT create a live room or charge. 4) Tap Not Now — card dismisses for this tab (sessionStorage). 5) Open without the query — no fabricated Damon invite. 6) Phone ~390 and desktop ~1280. 7) Mark Succeed/Failed.",
-      expected:"Query-gated invitation card matching the two-phone mock hierarchy. Illustration not photo. Join Now does not create a room. No AdSense. Xibo Display URLs have no ?v=.",
-      troubleshoot:"No card → missing query, dismissed sessionStorage floqr.smartvisual.notifyDismissed, or cached index.html without #smartvisualNotificationHost. Wrong city art → resolver missed Cancun alias (should be bg-bali + st-flight). Card for every patron → overlay must stay query/hash/session gated. Join created a room → stop; this build must only open mingl-chat.html?from=smartvisual."
+      changed:"SMARTvisuals kit: Search can show a compact Mingl Room Invitation with SMARTbackground + SMARTstencils. Demo only via ?smartvisualInvite=cancun (group rooms are not live). Art is illustration (Cancun → tropical bali + flight stencil), not a photo. Labeled Ad is a mock from tags (Travel partner / Fly to Cancun). Gemini is not called on view.",
+      howToTest:"1) After Pages publish. Open https://jadzadco.github.io/shoutout-demo/?start=search&smartvisualInvite=cancun and hard-refresh. Sign in if Search is gated. 2) Expect a compact Mingl Room Invitation over Search — View Invitation + Not Now, plus a labeled Ad sample. Scenic art is illustration; tags include Travel / Planning. 3) Tap View Invitation — Room SMARTview with RSVP/live chips, BOT-DEE capability row, Join Now, and Travel partner / Fly to Cancun Ad. Join Now must NOT create a live room or charge. 4) Tap Not Now — card dismisses for this tab (sessionStorage). 5) Open without the query — no fabricated Damon invite. 6) Phone ~390 and desktop ~1280. 7) Mark Succeed/Failed.",
+      expected:"Query-gated invitation card matching the two-phone mock hierarchy. Illustration not photo. Labeled Ad shows Travel partner / Fly to Cancun as a sample, not a live advertiser. Join Now does not create a room. No AdSense. Xibo Display URLs have no ?v=.",
+      troubleshoot:"No card → missing query, dismissed sessionStorage floqr.smartvisual.notifyDismissed, or cached index.html without #smartvisualNotificationHost. Wrong city art → resolver missed Cancun alias (should be bg-bali + st-flight). Empty Ad chrome → selectAd/mockFill missing. Card for every patron → overlay must stay query/hash/session gated. Join created a room → stop; this build must only open mingl-chat.html?from=smartvisual."
     },
     {
       id:"s3-3-038-smartvisuals-studio",
       area:"Master Admin",
       feature:"SMARTvisual Studio",
-      changed:"s3.3.040 — Master Admin → SMARTvisual Studio lists 26 stencils + 34 backgrounds, tagging examples (Cancun / Paris Fashion Week / Seattle LA / San Dego / Burningman), SVG sanitizer + SOS2FA + reason on draft submit. Ads policy copy only — AdSense not loaded. Drafts never appear on Search.",
-      howToTest:"1) Sign in as Master Admin. Open https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js?v=s3.3.040. 2) Library shows published kit art as images. Search/filter works. 3) Tagging & Resolver: Cancun Trip → travel/flight; Paris Fashion Week → fashion; Seattle LA → collision/neutral; San Dego → San Diego; Burningman → burning-man without official affiliation. 4) Create: upload an SVG with <script> — rejected. Valid SVG + name + license → reason prompt; without SOS2FA, Functions deny and the git registry is unchanged. 5) Ads tab says placement is empty. 6) Preview in Search SMARTnotification opens ?smartvisualInvite=cancun. 7) Mark Succeed/Failed. Studio draft persist needs Functions deploy.",
-      expected:"Studio is Master Admin only. Patrons only see published registry assets. Malicious SVG never publishes. Ads stay off.",
-      troubleshoot:"Empty library → smartvisuals/catalog.json missing on the served origin. Submit succeeded without SOS2FA → stop; publishSmartVisualDraft must assertAdmin. Script SVG accepted → sanitizer not wired. Search overlay missing after Preview → index.html host or smartvisuals-view.js cache."
+      changed:"Master Admin → SMARTvisual Studio lists 26 stencils + 34 backgrounds, tagging examples (Cancun / Paris Fashion Week / dining / Seattle LA / San Dego / Burningman), SVG sanitizer + SOS2FA + reason on draft submit. Ads tab previews mock fill from authorized tags; AdSense not loaded. Drafts never appear on Search.",
+      howToTest:"1) Sign in as Master Admin. Open https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio. 2) Library shows published kit art as images. Search/filter works. 3) Tagging & Resolver: Cancun Trip → travel/flight + Fly to Cancun ad; Paris Fashion Week → fashion; Dinner reservations → dining; Seattle LA → collision/neutral generic ad; San Dego → San Diego; Burningman → burning-man without official affiliation. 4) Create: upload an SVG with <script> — rejected. Valid SVG + name + license → reason prompt; without SOS2FA, Functions deny and the git registry is unchanged. 5) Ads tab shows mockFill true, AdSense off, and sample banners. 6) Preview in Search SMARTnotification opens ?smartvisualInvite=cancun. 7) Mark Succeed/Failed. Studio draft persist needs Functions deploy.",
+      expected:"Studio is Master Admin only. Patrons only see published registry assets. Malicious SVG never publishes. Ads are labeled mock samples, not AdSense.",
+      troubleshoot:"Empty library → smartvisuals/catalog.json missing on the served origin. Submit succeeded without SOS2FA → stop; publishSmartVisualDraft must assertAdmin. Script SVG accepted → sanitizer not wired. Search overlay missing after Preview → index.html host or smartvisuals-view.js cache. Blank Ad chrome → selectAd not wired."
     },
     {
       id:"s3-3-040-people-alias-match",
@@ -3472,6 +3665,51 @@
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.039. Sign in with BOT DEE access. 2) Ask What do you know of don banyong — card shows photo full width on top, Don Papi and @handle on the next row, SMARTsummary as inline text (not a tall empty box). 3) Open My Profile → Features & Orders → My BOT DEE → View my SMARTview — same stack. 4) Phone ~390 and desktop ~1280. Empty fields take no height. Display URLs have no ?v=. 5) Mark Succeed/Failed.",
       expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
       troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
+    },
+      {
+        id:"s3-3-046-mingl-chat-site-chrome",
+        area:"Mingl / Site chrome",
+        feature:"Mingl Chat follows Appearance Site chrome",
+        changed:"mingl-chat.html (and Mingl Gist) early-paints data-floqr-chrome, loads floqr-chrome-scheme.js + floqr-chrome-audit.js, hydrates users.isSiteChrome, and swaps the Mingl chrome icon. Compose/bubbles use chrome tokens instead of Nightlife navy. Cache-bust s3.3.048.",
+        howToTest:"1) Sign in, open My Profile → Appearance, pick White / Black (or Traditional). 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/mingl-chat.html until mingl-chat.html / styles.css / mingl-chat-app.js / mingl-chat-chrome.css ?v=s3.3.048. 3) Body, cards, title, Mingl icon, compose bar, and bubbles must match that chrome — not Nightlife pink/cyan navy. 4) Switch Nightlife and reload — Mingl Chat returns to neon navy. 5) Repeat Mingl Gist (mingl-gist.html) for the page chrome (story viewer stays dark). 6) Mark Succeed/Failed.",
+        expected:"Mingl Chat paints the active Site chrome on first load and after sign-in hydrate. Icon and compose follow the scheme. Display URLs stay without ?v=.",
+        troubleshoot:"Still Nightlife → cached mingl-chat.html missing floqr.isSiteChrome early-paint or floqr-chrome-scheme.js. Icon stuck on nightlife.jpg → data-floqr-chrome-icon=mingl + applyDocument. Compose still navy on White/Black → cached styles.css before --floqr-ink compose. Signed-in wrong chrome → hydrateSiteChrome / users.isSiteChrome."
+      },
+      {
+        id:"s3-3-046-people-gaps-headless-vip-rooms",
+      area:"BOT DEE",
+      feature:"People SMARTview spacing + headless VIP reserV + joined Room SMARTview",
+      changed:"s3.3.046 — People SMARTview details box no longer reserves empty bands around Music/Nightlife chips and genre tags. Headless VIP reserV from chat: Mezzanine at Aurelia lists V1–V4 + AURELIA SUITE instead of “section wasn’t found.” Confirm Room SMARTview mints a join link; joining is not a payment. Idle pause does not fire while a ShoutOut/VIP dock or active room is open.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.css / bot-dee-chat.js ?v=s3.3.046. Sign in with BOT DEE + VIP reserV. 2) Ask Who is Don Banyong — People SMARTview details box hugs Music / Nightlife / Sports / Events and Hip hop tags; no empty bands above, between, or below those chips. 3) New chat: VIP reserV at Aurelia → Mezzanine. Expect a table list (V1–V4, AURELIA SUITE), not “section wasn’t found.” Reply V1 then hold it. I agree must not ask for card numbers. 4) Open Room SMARTview → Confirm — join link appears. Opening botdee.html?join= while signed in joins without charging. Session must not pause with “I’ll pause here for now” while the VIP dock or room card is open. 5) Throw a shoutout still works in the same chat. 6) Mark Succeed/Failed.",
+      expected:"Tight People card. Headless VIP lists Mezzanine tables and can hold V1. Room Confirm mints a join link. Idle does not drop an in-progress VIP/room/shoutout. No card numbers in chat. Display URLs have no ?v=.",
+      troubleshoot:"Empty chip bands remain → cached botdee-smartview.css still has 6.4em tag height. Mezzanine miss → Functions executeBotSession not this SHA (tryHeadlessVip / resolveSectionQuery missing). Idle pause mid-VIP → cached bot-dee-chat.js without hasOpenWorkflow. Confirm still “not live” → ROOMS_LIVE false or botdee-room-live not deployed. Join 404 → Firestore rules botDeeRooms not published."
+    },
+    {
+      id:"s3-3-045-smartpreview-live-led",
+      area:"BOT DEE",
+      feature:"ShoutOut SMARTpreview shows the live LED template",
+      changed:"s3.3.045 — The dock paints the actual Display 1 composer preview (display.html?preview=1&template=&main=) so Traditional, Halloween, Neon, Gold, handle rail, and copy match the LED. Tapping a template or @handle chip updates the iframe immediately, then BOT DEE remounts from the draft. Fallback replica stays until the iframe loads. Xibo URLs stay display.html?location= only (no ?v=).",
+      howToTest:"1) After Pages publish. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js ?v=s3.3.045. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout at Decades that says Happy birthday Maya — docked SMARTpreview LED should look like Traditional (classic-bw letter board + FloqR rail), not a generic tinted box. 3) Tap Halloween — LED should switch to Classic Halloween (graveyard art, orange board) before or as BOT DEE replies. 4) Tap include my handle — FloqR card shows @handle. 5) Master Admin → Features Mgmt → BOT DEE → SMARTpreview — mock cards also show the live LED. 6) Mark Succeed/Failed.",
+      expected:"SMARTpreview LED matches the chosen template and updates as template / @handle / copy change. Not a static color replica. Display 1 Xibo URL unchanged.",
+      troubleshoot:"Still a red-frame replica with no graveyard/neon → cached botdee-smartview.js before iframe. LED is idle/club default → iframe src lost preview=1 (stableDisplayUrl stripped it; this SHA must use shoutOutLedSrc). Black iframe → display.html 404 or preview blocked; fallback replica should still show three lines. Template chip does not change art → bindShoutOutCard patchShoutOutLedSrc."
+    },
+    {
+      id:"s3-3-044-headless-shoutout-smartview",
+      area:"BOT DEE",
+      feature:"ShoutOut SMARTpreview collects template, @handle, and media",
+      changed:"s3.3.044 — BOT DEE no longer silently submits Traditional-only. After venue + copy, chat asks template (Traditional default), FloqR-card @handle, and text-only vs photo/video compose. ShoutOut SMARTpreview docks above the composer and follows this chat. Reply Traditional / include my handle / text only / throw it, or tap chips. Core createHeadlessShoutOutCheckout stays a one-shot payload (third-party / FloqR pages do not need the card). LED still waits on Club Admin Approve.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js ?v=s3.3.044. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout at Decades that says Happy birthday Maya — expect ShoutOut SMARTpreview docked above the composer (not only in a scrolled-away bubble), plus a question for template / @handle / photo, NOT an immediate pending submit. 3) Reply yes — should pick Traditional, NOT mint. Then yes again — include @handle. Then text only. Then throw it (or Pay securely if Halloween). 4) Send throw a traditional shoutout at Decades that says Happy birthday Maya with my handle text only — may complete in one turn. 5) FloqR/API one-shot still defaults Traditional without the card. 6) Master Admin → Features Mgmt → BOT DEE → SMARTpreview (or #featuresBotDee-smartpreview) — labeled mock cards (draft / handle / ready / Halloween / submitted) paint like SMARTviews mocks. 7) New chat / resume another chat — SMARTpreview dock clears (Throw it chips must not stay). 8) Mark Succeed/Failed.",
+      expected:"ShoutOut SMARTpreview docks above the composer and follows this chat. Master Admin SMARTpreview tab shows labeled mock cards. Third-party/FloqR headless does not require the card. Photo/video still opens compose. Pending until Club Admin Approve.",
+      troubleshoot:"Immediate pending with no questions → executeBotSession not this SHA (still s3.3.043 one-shot). Card missing → cached botdee-smartview.js. Follow-up Traditional ignored → headlessShoutOutDraft not persisted (Functions deploy [firebase-deploy-botdee]). Third-party now asking questions → createHeadlessShoutOutCheckout must stay startShoutOutCheckout, not tryHeadlessShoutOut. Master tab missing → cached master-admin.html / master-feature-services.js; hash #featuresBotDee-smartpreview."
+    },
+    {
+      id:"s3-3-043-headless-shoutout-complete",
+      area:"BOT DEE",
+      feature:"Headless ShoutOut completes composer + Club Admin + LED path",
+      changed:"s3.3.043 — Free throw from chat writes a composer-parity pending ShoutOut (catalog className classic-bw, venue address, identity rail, layout percents). Club Admin Inbox gets Pending ShoutOut → admin.html?location=&panel=panelQueue. Approve & Push Live uses packaged className so Display 1 matches Traditional. Paid Halloween still Stripe then pending. LED does not play until Approve.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js ?v=s3.3.043. Sign in with BOT DEE + ShoutOut. 2) Send throw a shoutout at Decades that says Happy birthday Maya — pending My ShoutOuts link (Open in My ShoutOuts), not compose-only. 3) My Profile → Feature & Orders → My ShoutOuts → Pending shows the row; Preview is the Traditional three-line board (classic-bw), not a generic neon stub. 4) Sign in Club Admin for Decades — Pending ShoutOuts queue has the copy; Inbox has Pending ShoutOut. Preview, then Approve & Push Live. 5) display.html?location=decades-washington-dc (no ?v=) plays the message on the Traditional board with FloqR card. 6) Mark Succeed/Failed.",
+      expected:"Chat throw → pending My ShoutOuts. Club Admin sees it, Approve pushes live Traditional LED. Not live until Approve. Halloween still Pay securely first.",
+      troubleshoot:"Pending missing in Club Admin → executeBotSession not this SHA or clubLocationId alias (Decades → decades-washington-dc). LED looks like neon / no letter board → cached admin-app.js (packaged.className) or display-app.js. Inbox missing for club → Functions submitFreeHeadlessShoutOut notify; adminUids empty on the club doc. Still compose-only → Functions deploy [firebase-deploy-botdee]."
     },
     {
       id:"s3-3-041-botdee-headless-checkout",
@@ -3651,6 +3889,15 @@
       howToTest:"1) Hard-refresh floqr-oidc-authorize.html from Spatial Studio (live github.io URL with client_id + PKCE query). 2) Signed out → Search general sign-in (returnTo), not a second signup. 3) Signed in as Don Papi → Continue greys to Sending you to Spatial Studio… then redirects to FloqMedia callback with code=. A failure must show a sentence in the card (not a one-word internal). 4) Master Admin → Features Mgmt → Si-nema: Enable Feature 1, Enable Beta Feature 1, Save, reason ≥8. Hard-refresh Search — the approved Si-nema clapper chrome icon sits on today's Search row with a Beta pill (same size as FloqCAST, not hidden). 5) Open sinema.html — satellite shell, same approved Si-nema hero, no FloqR parent logo. 6) Confirm VIP reserV floor map and ShoutOut composer still load. 7) Mark Succeed/Failed. Do not deploy firestore.rules.",
       expected:"Continue is busy while issueFloqrOidcAuthCode runs, then FloqMedia receives the auth code. After Enable Feature=1, Master Admin Search shows the approved Si-nema clapper icon with a Beta pill on the same row as the other chrome tiles. VIP/ShoutOut unchanged. Token HMAC uses Secret Manager FLOQR_OIDC_JWT_SECRET.",
       troubleshoot:"Continue still does nothing → hard-refresh floqr-oidc-authorize.js; status must not stay blank. Status says not live → Functions CI [firebase-deploy-spatial] not finished. Redirect then FloqMedia token fails → CI Ensure FLOQR_OIDC_JWT_SECRET / [firebase-deploy-spatial]. redirect_uri_denied → FloqMedia must send https://studio.floqmedia.com/auth/callback. Si-nema Save says Unknown feature → [firebase-deploy-features] for setFeatureServiceFlags. Google-only card → missing floqr-session-shell.js."
+    },
+    {
+      id:"s3-3-039-floqmedia-plan-trace",
+      area:"Si-nema / identity",
+      feature:"Spatial Studio plan trace (floqmediaPlanTrace)",
+      changed:"HTTP floqmediaPlanTrace traces a guest PDF/SVG/image into a Spatial Studio proposal. Same Gemini engine as SmartView/BOT DEE, floor-plan prompt only. No FloqR session. CORS allows Content-Type, Authorization, and X-Firebase-AppCheck. App Check is enforced: a missing, invalid, or reused pass returns 401 and Gemini does not run. FLOQR_APP_CHECK_ENFORCE is 1. Unset still enforces. FloqR does not store the drawing or the pass. Deploy with [firebase-deploy-spatial].",
+      howToTest:"1) After Functions CI deploys floqmediaPlanTrace from a [firebase-deploy] [firebase-deploy-spatial] commit. 2) OPTIONS from https://studio.floqmedia.com is 204 and Access-Control-Allow-Headers includes X-Firebase-AppCheck. 3) POST the same origin with a small image and no X-Firebase-AppCheck header. Expect HTTP 401 and {ok:false, error:\"This request was not accepted.\"} with no trace. 4) On Spatial Studio /start, import a still image or PDF that is not a Spatial Studio SVG/project. The page sends a limited-use pass. A verified pass returns a trace or a normal plan error, not 401. 5) The proposal card appears; Open this plan saves locally in the browser only. 6) A 13 MB file is refused. 7) Mark Succeed/Failed. Do not set FLOQR_APP_CHECK_ENFORCE to 0. Do not turn on Firebase console enforcement. Do not edit firestore.rules.",
+      expected:"A readable plan with a verified pass returns {ok:true, trace} with meters or null sizes + estimated/inferred. A missing pass returns 401 and no trace. Failures return a short error. No spatialGrantRefs or project row is written on FloqR. The pass is not stored. FLOQR_APP_CHECK_ENFORCE is not 0.",
+      troubleshoot:"CORS error on X-Firebase-AppCheck → Allow-Headers is missing that name; redeploy floqmediaPlanTrace. 401 on a request that included a fresh pass → the pass was missing, invalid, reused, or for the wrong app. A missing pass returns a trace → enforcement is off; FLOQR_APP_CHECK_ENFORCE must not be 0. CORS origin error → origin is not studio.floqmedia.com / www / apex / localhost:3000 / 127.0.0.1:3000 / studio.localhost:3000. 404 → Functions CI did not include floqmediaPlanTrace. Unreadable with a verified pass → GEMINI_API_KEY not bound on that function; check Application Logging category gemini operation spatial-plan-trace. Do not retarget Display 1."
     },
     {
       id:"s3-3-020-ai-crawl-workspace",

@@ -15,7 +15,6 @@
   const MIN_IDLE_SECONDS = 15;
   const MAX_IDLE_SECONDS = 600;
   const AUDIT_LIMIT = 40;
-  const USER_SCAN_LIMIT = 120;
   const RESULT_LIMIT = 20;
   const REASON_MIN = 8;
   const LOAD_TIMEOUT_MS = 20000;
@@ -23,7 +22,6 @@
 
   let bound = false;
   let seededOnce = false;
-  let userCache = null;
   let features = {};
   /** Last Features Mgmt sub-tab mounted (for SOS2FA re-entry). */
   let activePanelId = "featuresReleaseControl";
@@ -336,49 +334,56 @@
     };
   }
 
-  async function loadUsers() {
-    if (userCache) return userCache;
-    /* Prefer Network Dashboard lean cache when present — avoids a second fat users scan. */
-    const shared = root.networkUsers;
-    if (Array.isArray(shared) && shared.length) {
-      userCache = shared.map(row => ({
-        uid: row.uid || row.id,
-        displayName: row.displayName || "",
-        fullName: row.fullName || "",
-        floqrHandle: row.floqrHandle || "",
-        email: row.email || "",
-        phone: row.phone || row.phoneNumber || ""
-      }));
-      return userCache;
-    }
-    const snap = await withTimeout(db().collection("users").limit(USER_SCAN_LIMIT).get(), "Patron search");
-    userCache = snap.docs.map(leanUser);
-    return userCache;
-  }
-
   function userLabel(user) {
     return user.displayName || user.fullName || user.floqrHandle || user.email || user.uid;
   }
 
+  function renderPatronHits(hits) {
+    return hits.map(user => {
+      const already = user.isActiveBetaTester ? " <small>Already a beta tester — use Save in the table below.</small>" : "";
+      return `<label class="queue-item beta-patron-pick"><input type="radio" name="betaInvitePick" value="${esc(user.uid)}"/> <span><strong>${esc(userLabel(user))}</strong> <small>${esc(user.email || "")}</small>${already}</span></label>`;
+    }).join("");
+  }
+
+  async function searchPatronsByEmailFallback(raw) {
+    const emails = [...new Set([raw, raw.toLowerCase()])];
+    const snaps = await Promise.all(emails.map(email => db().collection("users").where("email", "==", email).limit(5).get()));
+    const seen = new Set();
+    const hits = [];
+    snaps.forEach(snap => {
+      snap.docs.forEach(doc => {
+        if (seen.has(doc.id)) return;
+        seen.add(doc.id);
+        hits.push(leanUser(doc));
+      });
+    });
+    return hits.slice(0, RESULT_LIMIT);
+  }
+
   async function searchPatrons() {
-    const query = String(byId("betaPatronSearch")?.value || "").trim().toLowerCase();
+    const raw = String(byId("betaPatronSearch")?.value || "").trim();
     const out = byId("betaPatronResults");
     if (!out) return;
     selectedInviteUid = "";
     syncInviteFeaturesVisibility();
     syncInviteSubmitState();
-    if (query.length < 2) {
+    if (raw.length < 2) {
       out.innerHTML = "<p class=\"sub small\">Type at least 2 characters.</p>";
       return;
     }
     out.innerHTML = "<p class=\"sub small\">Searching…</p>";
     try {
-      const users = await loadUsers();
-      const hits = users.filter(user => [user.displayName, user.fullName, user.floqrHandle, user.email, user.phone, user.uid]
-        .some(value => String(value || "").toLowerCase().includes(query))).slice(0, RESULT_LIMIT);
+      let hits = [];
+      try {
+        const result = await withTimeout(call("findBetaPatron", {query: raw}), "Patron search");
+        hits = Array.isArray(result.people) ? result.people.slice(0, RESULT_LIMIT) : [];
+      } catch (error) {
+        if (!raw.includes("@")) throw error;
+        hits = await withTimeout(searchPatronsByEmailFallback(raw), "Patron search");
+      }
       out.innerHTML = hits.length
-        ? hits.map(user => `<label class="queue-item beta-patron-pick"><input type="radio" name="betaInvitePick" value="${esc(user.uid)}"/> <span><strong>${esc(userLabel(user))}</strong> <small>${esc(user.email || "")}</small></span></label>`).join("")
-        : "<p class=\"sub small\">No patrons match in the first search window. Try a more specific email.</p>";
+        ? renderPatronHits(hits)
+        : "<p class=\"sub small\">No patrons match that email or FLOQR handle. Paste the full sign-in email.</p>";
     } catch (error) {
       out.innerHTML = `<p class="sub small">${esc(errorText(error))}</p>`;
     }
@@ -422,18 +427,18 @@
       if (byId("betaInviteNote")) byId("betaInviteNote").value = "";
       syncInviteFeaturesVisibility();
       syncInviteSubmitState();
-      await loadBeta();
-      await loadAudit();
+      loadBeta({keepVisible: true}).catch(error => setStatus("betaInviteStatus", errorText(error)));
     } catch (error) {
       setStatus("betaInviteStatus", errorText(error));
     }
   }
 
-  async function loadBeta() {
+  async function loadBeta(options = {}) {
     const testersEl = byId("betaTesterList");
     const invitesEl = byId("betaInviteList");
-    if (testersEl) testersEl.innerHTML = "<p class=\"sub small\">Loading beta testers…</p>";
-    if (invitesEl) invitesEl.innerHTML = "<p class=\"sub small\">Loading pending invites…</p>";
+    const keepVisible = options.keepVisible === true;
+    if (testersEl && !(keepVisible && testersEl.querySelector("table"))) testersEl.innerHTML = "<p class=\"sub small\">Loading beta testers…</p>";
+    if (invitesEl && !(keepVisible && invitesEl.querySelector(".queue-item, p"))) invitesEl.innerHTML = "<p class=\"sub small\">Loading pending invites…</p>";
     const [testersResult, invitesResult] = await Promise.allSettled([
       withTimeout(db().collection("betaTesters").where("status", "==", "active").limit(100).get(), "Beta testers"),
       withTimeout(db().collection("betaInvites").where("status", "==", "pending").limit(100).get(), "Pending invites")
@@ -495,8 +500,7 @@
     try {
       await call("revokeBetaTester", {targetUid: uid, reason});
       setStatus("betaInviteStatus", "Beta access revoked.");
-      await loadBeta();
-      await loadAudit();
+      loadBeta({keepVisible: true}).catch(error => setStatus("betaInviteStatus", errorText(error)));
     } catch (error) {
       setStatus("betaInviteStatus", errorText(error));
     }
@@ -513,8 +517,7 @@
     try {
       await call("setBetaTesterFeatures", {targetUid: uid, featureKeys, reason});
       setStatus("betaInviteStatus", "Beta feature access saved.");
-      await loadBeta();
-      await loadAudit();
+      loadBeta({keepVisible: true}).catch(error => setStatus("betaInviteStatus", errorText(error)));
     } catch (error) {
       setStatus("betaInviteStatus", errorText(error));
     }
@@ -524,8 +527,7 @@
     try {
       await call("revokeBetaInvite", {inviteId});
       setStatus("betaInviteStatus", "Invitation revoked.");
-      await loadBeta();
-      await loadAudit();
+      loadBeta({keepVisible: true}).catch(error => setStatus("betaInviteStatus", errorText(error)));
     } catch (error) {
       setStatus("betaInviteStatus", errorText(error));
     }
@@ -541,7 +543,6 @@
       const result = await call("logFeatureCodePromotion", {reason, featureKeys: testKeys});
       setStatus("featurePromotionStatus", `Promotion recorded (audit ${String(result.eventId || "").slice(0, 8)}). In GitHub, click Run workflow on the page that just opened.`);
       if (result.workflowUrl) root.open(result.workflowUrl, "_blank", "noopener");
-      await loadAudit();
     } catch (error) {
       setStatus("featurePromotionStatus", errorText(error));
     }
@@ -593,14 +594,14 @@
         .filter(row => String(row.targetType || "") === "patron" && row.targetId)
         .map(row => String(row.targetId))
     )].slice(0, AUDIT_LIMIT);
-    await Promise.all(patronUids.map(async uid => {
+    await withTimeout(Promise.all(patronUids.map(async uid => {
       try {
         const snap = await db().collection("users").doc(uid).get();
         labels[uid] = patronLabelFromDoc(snap.exists ? snap.data() : {}, uid);
       } catch (_) {
         labels[uid] = `uid ${uid.slice(0, 10)}…`;
       }
-    }));
+    })), "Audit patron labels", 8000).catch(() => {});
     return labels;
   }
 
@@ -717,6 +718,9 @@
     byId("botDeeManifestReload")?.addEventListener("click", () => loadBotDeeManifest());
     byId("botDeeLegalSave")?.addEventListener("click", () => saveBotDeeLegalGate());
     byId("botDeeSlotSave")?.addEventListener("click", () => saveBotDeeProviderSlot());
+    byId("botDeeMasterLoadFeaturesSmartView")?.addEventListener("click", () => {
+      root.FLOQRFeaturesSmartView?.mount?.("botDeeMasterFeaturesSmartView");
+    });
     if (typeof window.matchMedia === "function") {
       const mq = window.matchMedia("(max-width: 1024px)");
       const onMq = () => syncInviteFeaturesVisibility();
@@ -734,7 +738,8 @@
 
   /** Ensure catalog flags are in memory (needed for beta feature checkboxes). */
   async function ensureFeaturesLoaded() {
-    if (Object.keys(features).length) return;
+    const persisted = Object.values(features).some(row => row && row.persisted);
+    if (persisted) return;
     await withTimeout(loadFeatures(), "Feature catalog");
     renderInviteFeatures();
   }
@@ -810,6 +815,10 @@
     if (key === "smartviews") {
       root.FLOQRBotDeeUpgradeUi?.bind?.();
       root.FLOQRBotDeeUpgradeUi?.loadDemos?.("botDeeMasterSmartViewDemo");
+    }
+    if (key === "smartpreview") {
+      root.FLOQRBotDeeUpgradeUi?.bind?.();
+      root.FLOQRBotDeeUpgradeUi?.loadSmartPreviewDemos?.("botDeeMasterSmartPreviewDemo");
     }
     if (key === "pause") loadBotDeeSettings();
   }

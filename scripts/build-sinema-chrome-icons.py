@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Si-nema Search chrome — vector mark, Site Chrome fills, transparent voids.
 
-Official 3D render (`images/chrome/official/si-nema-blacktiffany.webp`) is the
-layout reference only. This script draws a real SVG clapper + film + wordmark
+Approved FloqMedia official mark (`images/chrome/official/si-nema-blacktiffany.webp`)
+is the layout reference only. This script draws a real SVG clapper + film + wordmark
 so every graphic and letter can take a Site Chrome fill. Former black regions
 (screen, sprocket holes, lid/jaw stripe gaps, hinge centers, hanging film,
 outer field) stay transparent — never painted black.

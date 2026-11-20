@@ -219,6 +219,11 @@
       window.__floqrBotDeeFocusId = "botDeeMasterSmartViewDemo";
       return "featuresBotDee";
     }
+    if (raw === "botDeeMasterSmartPreviewDemo") {
+      window.__floqrBotDeeMgmtPage = "smartpreview";
+      window.__floqrBotDeeFocusId = "botDeeMasterSmartPreviewDemo";
+      return "featuresBotDee";
+    }
     const sub = /^featuresBotDee[-_:](\w+)$/.exec(raw);
     if (sub) {
       window.__floqrBotDeeMgmtPage = sub[1];
@@ -351,7 +356,10 @@
       }
       if (panelId === "networkDashboard") loadNetworkReports({force: false});
       if (panelId === "networkReconciliation") loadNetworkPaymentLedger();
-      if (panelId === "securityLogs") window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
+      if (panelId === "securityLogs") {
+        window.FLOQRDisplaySecurity?.loadDisplayAccessLogs?.();
+        window.FLOQRDisplaySecurity?.loadAppCheckSecurityLogs?.();
+      }
       if (panelId === "securitySystemMessages") window.FLOQRDisplaySecurity?.focusSecurityMessages?.();
       if (panelId === "displaySecurity") window.FLOQRDisplaySecurity?.populateClubList?.();
       if (panelId === "shoutoutCompletedLog" || panelId === "shoutoutRetention") {

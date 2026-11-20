@@ -449,23 +449,23 @@
   },
   "help-botdee-version-smartview-tabs": {
     "title": "Version SMARTview tabs",
-    "body": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified FLOQR package notes from the current README. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme."
+    "body": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified BOT DEE and Gemini changes only — not Master Admin, beta tester tools, or other FLOQR product notes. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme."
   },
   "help-botdee-room-smartview": {
     "title": "Room SMARTview",
-    "body": "In BOT DEE chat, say Open Room SMARTview or Start a group chat. A Room SMARTview card opens in the same bubble. Confirm before anything is created. Private BOT DEE messages stay private. Group rooms, invites, and a shared tab are not live yet — Confirm does not create a room, send an invite, or charge anyone. Site Chrome follows your Appearance theme."
+    "body": "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm mints a join link friends can open while signed in. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme."
   },
   "help-botdee-room-smartview-invite": {
     "title": "Room SMARTview invite",
-    "body": "Invite others from Room SMARTview after you confirm. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Wrong-account, blocked, and non-friend invites will refuse when group rooms ship. Nothing is sent today; group rooms are not live."
+    "body": "After you confirm Room SMARTview, share the join link. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Joining is not a payment and does not open a shared tab."
   },
   "help-botdee-room-smartview-join": {
     "title": "Join a Room SMARTview",
-    "body": "Joining a Room SMARTview is not the same as joining a shared tab or approving a payment. When rooms ship, you will sign in and accept a bound invite. Opening a link does not join you automatically."
+    "body": "Open a Room SMARTview join link while signed in, or paste it in BOT DEE. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers."
   },
   "help-botdee-room-smartview-end": {
     "title": "End Room SMARTview",
-    "body": "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats. There is no live room to close yet."
+    "body": "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats."
   },
   "help-botdee-room-smartview-tab": {
     "title": "Room SMARTview shared tab",
@@ -485,10 +485,18 @@
   },
   "help-smartvisuals-notification": {
     "title": "Mingl Room SMARTnotification",
-    "body": "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come only from the room record. Ads, if ever approved, sit below the card and stay labeled Ad."
+    "body": "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come only from the room record. A labeled Ad sample under the card follows the room tags (Travel partner / Fly to Cancun for a Cancun Trip). It is not a live advertiser. Private chat and prompt injection keep the slot empty."
   },
   "help-smartvisuals-room": {
     "title": "Room SMARTview with SMARTvisuals",
-    "body": "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used to pick art. Group rooms are not live yet, so Join Now does not create a room or charge. A labeled Ad slot may sit below; it is empty until separately approved."
+    "body": "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used to pick art. Group rooms are not live yet, so Join Now does not create a room or charge. A labeled Ad below is a sample from those tags (Travel partner / Fly to Cancun). It stays empty for private chat or injection and is not a live advertiser."
+  },
+  "help-shoutout-headless-smartview": {
+    "title": "ShoutOut SMARTpreview",
+    "body": "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. The dock shows the live LED template (the same Display 1 composer preview) and updates when you pick a template, @handle, or text vs photo. Reply in chat or tap a chip. Photo and video boards still open compose. A true headless throw from FloqR or a third party does not use this card — pass venue, message, and optional extras in one request."
+  },
+  "help-botdee-headless-vip": {
+    "title": "VIP reserV from BOT DEE chat",
+    "body": "Say VIP reserV or hold a VIP table at Aurelia in BOT DEE. Name the club, night, and table or area. Mezzanine is an area — BOT DEE lists V1–V4 and AURELIA SUITE so you can pick a table, then hold it, reply I agree to Terms, and pay if a deposit is required. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment."
   }
 }

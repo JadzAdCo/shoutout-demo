@@ -51,3 +51,15 @@ HMAC secret: Firebase Secret Manager `FLOQR_OIDC_JWT_SECRET` (`defineSecret` on 
 `Authorization: Bearer <id_token>`
 
 Body is a grant **reference** only (`projectId`, destination, permissions, `pinRevisionId`). `editableUntil` is always `null` on the grant. Files stay on FloqMedia.
+
+## Plan trace (guest import)
+
+Spatial Studio posts a PDF, SVG, or still image from `/start`. Guests are allowed. FloqR does not store the file, the trace, a project, or a grant.
+
+`POST https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/floqmediaPlanTrace`
+
+```json
+{ "fileName": "lobby.png", "mime": "image/png", "dataBase64": "..." }
+```
+
+CORS origins: `https://studio.floqmedia.com`, `https://www.floqmedia.com`, `https://floqmedia.com`, `http://localhost:3000`, `http://127.0.0.1:3000`, `http://studio.localhost:3000`. Allow-headers: `Content-Type`, `Authorization`, `X-Firebase-AppCheck`. Spatial Studio sends a limited-use App Check pass on that header. FloqR verifies it once with `verifyToken(token, {consume:true})` and does not store the pass. Enforcement is the default: a missing, invalid, or reused pass returns 401 `{ok:false, error:"This request was not accepted."}` and Gemini is not called. Unset `FLOQR_APP_CHECK_ENFORCE` still enforces. `FLOQR_APP_CHECK_ENFORCE=0` is monitor mode for tests only. The deployed function is `1`. Every outcome is an `appLogs` row category `app-check`, and a rejected pass is also category `security`. Deploy with `[firebase-deploy-spatial]`. Do not turn on Firebase console enforcement for this function. Gemini secret is `GEMINI_API_KEY` (same as SmartView / BOT DEE). The prompt is floor-plan only. The Gemini access log records success/failure, model, and token counts only when Gemini ran — never the pass, `dataBase64`, or the SVG.

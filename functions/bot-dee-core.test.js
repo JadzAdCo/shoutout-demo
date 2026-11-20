@@ -61,6 +61,10 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.ok(longBoard.length >= 160);
   assert.equal(bot.isShoutOutExecutePrompt(longThrow), true);
   assert.equal(bot.isShoutOutExecutePrompt("at Decades that says Happy birthday Maya"), false);
+  assert.equal(bot.isVipExecutePrompt("VIP reserV"), true);
+  assert.equal(bot.isVipExecutePrompt("hold a VIP table at Aurelia"), true);
+  assert.equal(bot.isVipExecutePrompt("how do I book a VIP table"), false);
+  assert.equal(bot.omitContextualSearchForPrompt("VIP reserV", ["vipReservations", "botDee"]), true);
   assert.equal(bot.omitContextualSearchForPrompt(longThrow, ["shoutOut", "botDee"]), true);
   assert.equal(bot.isChitchatPrompt("mail logging"), false);
 
@@ -374,11 +378,16 @@ test("executeBotSession wiring exports tools including VIP/ShoutOut/FloqCAST che
   assert.equal(bot.omitContextualSearchForPrompt("how do I throw a shoutout", ["shoutOut", "botDee"]), false);
   assert.ok(!bot.toolDeclarations(["shoutOut", "botDee"], {omitContextualSearch: true})
     .some(t => t.name === "contextualSearch"));
+  assert.equal(bot.omitContextualSearchForPrompt("hold a VIP table at Aurelia", ["vipReservations", "botDee"]), true);
+  assert.ok(bot.toolDeclarations(["vipReservations", "botDee"], {omitContextualSearch: true})
+    .some(tool => tool.name === "getVipAvailability"));
   assert.ok(bot.toolDeclarations(["shoutOut", "botDee"], {omitContextualSearch: true})
     .some(t => t.name === "listShoutOutTemplates"));
   assert.match(src, /omitContextualSearchForPrompt/);
   assert.match(src, /isShoutOutExecutePrompt\(userPrompt\)/);
   assert.match(src, /tryHeadlessShoutOut/);
+  assert.match(src, /tryHeadlessVip/);
+  assert.match(read("functions/bot-dee-tools.js"), /getVipAvailability/);
   const historyChunks = src.split("prefs.appendActionHistory(").slice(1);
   assert.equal(historyChunks.length, 2);
   historyChunks.forEach(chunk => {
@@ -532,6 +541,7 @@ test("BOT DEE keeps granted beta features in help/search (least privilege)", () 
   const tools = bot.toolDeclarations(granted).map(t => t.name);
   assert.ok(tools.includes("createFloqCastRequest"));
   assert.ok(tools.includes("createVipHold"));
+  assert.ok(tools.includes("getVipAvailability"));
 
   // Bugbot: NEVER list must omit granted brands (only siblings this viewer lacks).
   const deniedNames = bot.deniedBrandNames(granted);

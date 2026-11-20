@@ -122,7 +122,7 @@ test("existing-room commands do not create or charge; kick/end need confirm", ()
     assert.equal(classified.command, command);
     const view = room.buildRoomSmartView({classified});
     assert.equal(view.hasActiveRoom, false);
-    assert.equal(view.roomsLive, false);
+    assert.equal(view.roomsLive, true);
     assert.equal(view.actions.create, false);
     assert.equal(view.actions.charge, false);
     assert.equal(view.participantCount, 0);
@@ -146,7 +146,7 @@ test("localSession attaches Room SMARTview and still attaches Version SMARTview"
   assert.equal(setup.provider, "local-room-smartview");
   assert.equal(setup.smartViews[0].kind, "botDeeRoom");
   assert.equal(setup.smartViews[0].mode, "setup");
-  assert.equal(setup.smartViews[0].roomsLive, false);
+  assert.equal(setup.smartViews[0].roomsLive, true);
   const version = fns.__botDeeHelpers.localSession("patron", "Ver");
   assert.equal(version.provider, "local-version");
   assert.equal(version.smartViews[0].kind, "botDeeVersion");
@@ -196,6 +196,84 @@ test("client renderer paints Room SMARTview with Site Chrome tokens; no Mingl Ro
   assert.doesNotMatch(read("botdee-smartview.js"), /display\.html\?[^"']*v=/);
 });
 
+test("natural Cancun trip phrases mount the same Room SMARTview as Open Room SMARTview Cancun Trip", () => {
+  const phrases = [
+    "Let's plan our Cancun trip",
+    "Let’s plan our Cancun trip",
+    "Let's plan a trip to Cancun",
+    "Let’s plan a trip to Cancun",
+    "plan a Cancun trip",
+    "Cancun trip with friends",
+    "Open Room SMARTview Cancun Trip"
+  ];
+  const explicit = room.buildRoomSmartView({utterance: "Open Room SMARTview Cancun Trip"});
+  phrases.forEach(q => {
+    const classified = room.classifyRoomIntent(q);
+    assert.equal(classified.handled, true, q);
+    assert.equal(classified.route, "setup", q);
+    assert.equal(classified.level, "explicit", q);
+    const view = room.buildRoomSmartView({utterance: q});
+    assert.equal(view.kind, "botDeeRoom", q);
+    assert.equal(view.mode, "setup", q);
+    assert.equal(view.authorizedTitle, "Cancun Trip", q);
+    assert.match(view.authorizedDescription, /Cancun/i, q);
+    assert.doesNotMatch(view.replyKey || "", /book/, q);
+    const visual = resolver.resolve({
+      title: view.authorizedTitle,
+      description: view.authorizedDescription,
+      sourceKind: "authorized-room"
+    }, catalog);
+    assert.equal(visual.category, "travel", q);
+    assert.equal(visual.stencilId, "st-flight", q);
+    assert.equal(visual.backgroundId, "bg-bali", q);
+    assert.ok(visual.tags.includes("travel") || visual.tags.includes("destination:cancun"), q);
+    const ad = resolver.selectAd(visual);
+    assert.equal(ad.fill, true, q);
+    assert.equal(ad.category, "travel", q);
+    assert.equal(ad.placeLabel, "Cancun", q);
+    assert.equal(ad.kickerKey, "sv.adKickerTravel", q);
+    assert.equal(ad.headlineKey, "sv.adHeadlineFlyTo", q);
+    assert.equal(ad.liveInventory, false, q);
+    assert.equal(ad.advertiser, null, q);
+    assert.equal(view.authorizedTitle, explicit.authorizedTitle, q);
+    const session = room.buildRoomSession(q);
+    assert.equal(session.handled, true, q);
+    assert.equal(session.provider, "local-room-smartview", q);
+    assert.doesNotMatch(session.reply, /book (?:flights?|hotels?)/i, q);
+  });
+  const fns = require("./bot-dee-functions");
+  const local = fns.__botDeeHelpers.localSession("patron", "Let's plan our Cancun trip");
+  assert.equal(local.provider, "local-room-smartview");
+  assert.equal(local.smartViews[0].authorizedTitle, "Cancun Trip");
+  const tripTo = fns.__botDeeHelpers.localSession("patron", "Let's plan a trip to Cancun");
+  assert.equal(tripTo.provider, "local-room-smartview");
+  assert.equal(tripTo.smartViews[0].kind, "botDeeRoom");
+});
+
+test("nightlife-only VIP tonight does not open a Cancun trip Room SMARTview", () => {
+  const nightlife = [
+    "VIP tables tonight",
+    "vip tables tonight",
+    "Book VIP tables tonight",
+    "hold a VIP table at Aurelia tonight"
+  ];
+  nightlife.forEach(q => {
+    const classified = room.classifyRoomIntent(q);
+    assert.equal(classified.handled, false, q);
+    assert.equal(classified.route, "none", q);
+    assert.equal(room.isCancunTripAsk(room.normalizeUtterance(q)), false, q);
+    const session = room.buildRoomSession(q);
+    assert.equal(session.handled, false, q);
+  });
+  const together = room.classifyRoomIntent("can we book a vip table together");
+  assert.equal(together.handled, true);
+  assert.notEqual(together.route, "none");
+  const fns = require("./bot-dee-functions");
+  const vip = fns.__botDeeHelpers.localSession("patron", "VIP tables tonight");
+  assert.notEqual(vip.provider, "local-room-smartview");
+  assert.ok(!vip.smartViews || !vip.smartViews.some(row => row && row.kind === "botDeeRoom"));
+});
+
 test("BOT DEE Room SMARTview Cancun and Paris resolve to kit art when catalog is loaded", () => {
   const ctx = createContext({
     window: null,
@@ -212,6 +290,14 @@ test("BOT DEE Room SMARTview Cancun and Paris resolve to kit art when catalog is
         const selection = resolver.resolve(payload, catalog);
         const urls = resolver.urlsFor(selection, catalog);
         return {...selection, ...urls};
+      },
+      renderAdSlot(payload, visual) {
+        const selection = visual || resolver.resolve(payload, catalog);
+        const ad = resolver.selectAd(selection);
+        if (!ad || ad.fill !== true) return "";
+        const kicker = ad.category === "travel" ? "Travel partner" : "Ad";
+        const headline = ad.placeLabel ? `Fly to ${ad.placeLabel}` : "";
+        return `<aside class="sv-ad" data-sv-ad-cat="${ad.category || ""}">${kicker} ${headline}</aside>`;
       }
     }
   });
@@ -224,6 +310,15 @@ test("BOT DEE Room SMARTview Cancun and Paris resolve to kit art when catalog is
   assert.match(cancunHtml, /data-sv-bg="bg-bali"/);
   assert.match(cancunHtml, /data-sv-st="st-flight"/);
   assert.match(cancunHtml, /smartvisuals\/backgrounds\/bali\.svg/);
+  assert.match(cancunHtml, /Travel partner/);
+  assert.match(cancunHtml, /Fly to Cancun/);
+  const naturalHtml = ctx.FLOQRBotDeeSmartView.renderCard(room.buildRoomSmartView({
+    utterance: "Let's plan a trip to Cancun"
+  }));
+  assert.match(naturalHtml, /data-sv-bg="bg-bali"/);
+  assert.match(naturalHtml, /data-sv-st="st-flight"/);
+  assert.match(naturalHtml, /Travel partner/);
+  assert.match(naturalHtml, /Fly to Cancun/);
   const parisHtml = ctx.FLOQRBotDeeSmartView.renderCard(room.buildRoomSmartView({
     utterance: "Open Room SMARTview for Paris Fashion Week"
   }));
@@ -236,13 +331,38 @@ test("BOT DEE Room SMARTview Cancun and Paris resolve to kit art when catalog is
   assert.match(generic, /data-sv-bg="bg-mingl-room"/);
 });
 
-test("chat wires Room SMARTview without new Firestore collections or create callables", () => {
+test("chat wires Room SMARTview join without charging", () => {
   const chat = read("bot-dee-chat.js");
   assert.match(chat, /roomSmartViewDeclined/);
   assert.match(chat, /ensureRoomSmartViews/);
+  assert.match(chat, /joinToken/);
   assert.match(read("functions/bot-dee-functions.js"), /buildRoomSession/);
   assert.match(read("functions/bot-dee-functions.js"), /roomAttached\.handled/);
+  assert.match(read("functions/bot-dee-functions.js"), /botdee-room-live/);
   assert.doesNotMatch(read("functions/botdee-room-smartview.js"), /createBotDeeRoom|botDeeRooms/);
-  assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom/);
+  assert.match(read("functions/botdee-room-live.js"), /botDeeRooms/);
+  assert.doesNotMatch(read("functions/botdee-room-live.js"), /charge:\s*true/);
+  assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom\b/);
+  assert.match(read("botdee-smartview.js"), /confirm room smartview/);
   assert.match(read("botdee.html"), /botdee-room-smartview\.js/);
+  assert.equal(room.classifyRoomIntent("confirm room smartview").route, "confirm");
+  assert.equal(room.classifyRoomIntent("confirm room").route, "confirm");
+  assert.notEqual(room.classifyRoomIntent("confirm").route, "confirm");
+  assert.equal(room.classifyRoomIntent("confirm").handled, false);
+  const session = read("functions/bot-dee-functions.js");
+  assert.match(session, /joinFailureOutcome/);
+  assert.match(session, /isPrivateBotDeeOutcome/);
+  assert.match(session, /rotateJoinToken/);
+  assert.match(session, /persistJoinedRoomId\(uid, null\)/);
+  assert.match(read("functions/botdee-room-live.js"), /function leaveRoom/);
+  assert.match(read("functions/botdee-room-live.js"), /function endRoom/);
+  assert.match(read("functions/botdee-room-live.js"), /function kickMember/);
+  assert.match(session, /ended\.ok/);
+  assert.match(session, /roomEndDenied/);
+  assert.match(session, /kickRoom && stored\.joinedRoomId/);
+  assert.match(session, /memberUids/);
+  assert.match(session, /roomId: stored\.joinedRoomId/);
+  assert.match(read("functions/botdee-room-live.js"), /!== "open"/);
+  const liveCard = room.buildRoomSession("Who is in this room?", {hasActiveRoom: true, roomId: "br_live"});
+  assert.equal(liveCard.smartViews[0].roomId, "br_live");
 });

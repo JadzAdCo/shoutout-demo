@@ -585,8 +585,11 @@ test("Master Admin SMARTviews subtab preserved", () => {
   assert.match(master, /data-botdee-page="smartviews"/);
   assert.match(master, /id="botDeeMasterSmartViewDemo"/);
   assert.match(master, /id="botDeeMasterLoadSmartViews"/);
+  assert.match(master, /data-botdee-page="smartpreview"/);
+  assert.match(master, /id="botDeeMasterSmartPreviewDemo"/);
   const app = fs.readFileSync(path.join(__dirname, "..", "master-admin-app.js"), "utf8");
   assert.match(app, /botDeeMasterSmartViewDemo/);
+  assert.match(app, /botDeeMasterSmartPreviewDemo/);
   assert.match(app, /featuresBotDee\[-_:\]/);
 });
 
@@ -716,6 +719,15 @@ test("people-directory photoOf prefers public-page slot 0 over Auth photoURL", (
     photoURL: "https://lh3.googleusercontent.com/a/auth",
     profileMediaSlots: [{type: "image", url: ""}, {type: "image", url: hero}]
   }), hero);
+});
+
+test("people SMARTview details do not reserve empty chip space", () => {
+  const css = fs.readFileSync(path.join(__dirname, "..", "botdee-smartview.css"), "utf8");
+  assert.doesNotMatch(css, /6\.4em/);
+  assert.match(css, /\.botdee-sv-details > \*/);
+  assert.match(css, /\.botdee-sv-tags:empty/);
+  assert.match(css, /\.botdee-sv-note:empty/);
+  assert.match(css, /\.botdee-sv-vip/);
 });
 
 test("chrome and help use SMARTview spelling, not SmartView", () => {

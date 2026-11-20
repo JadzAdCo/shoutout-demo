@@ -329,6 +329,7 @@ test("production rules stay unpublished; OIDC Functions deploy is the Continue p
   assert.ok(workflow.includes('if echo "$COMMIT_MSG" | grep -q \'\\[firebase-deploy-features\\]\''), "features tag is an independent if");
   assert.ok(!workflow.includes('elif echo "$COMMIT_MSG" | grep -q \'\\[firebase-deploy-spatial\\]\''), "spatial is not elif-chained");
   assert.match(workflow, /issueFloqrOidcAuthCode/);
+  assert.match(workflow, /floqmediaPlanTrace/);
   const oidc = read("functions/floqr-oidc-functions.js");
   const grant = read("functions/spatial-grant-functions.js");
   assert.match(oidc, /invoker:\s*"public"/);

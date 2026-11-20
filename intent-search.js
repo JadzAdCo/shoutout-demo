@@ -51,7 +51,8 @@
       blurb: "Send a live message to a FloqR display.",
       href: pageUrl("./", {start: "search"}),
       action: "shoutout",
-      patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/, /christine/, /zebbies\s*garden/]
+      searchPhrases: ["headless shoutout", "shoutout smartview", "shoutout smartpreview", "include my handle", "throw shoutout from chat"],
+      patterns: [/shout/, /display/, /led/, /message\s*board/, /birthday/, /congrats/, /announce/, /christine/, /zebbies\s*garden/, /headless\s*shout/]
     },
     {
       id: "football-intro",
@@ -136,7 +137,8 @@
       href: pageUrl("./vip.html", {from: "botdee"}),
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
-        "table reservation", "vip booth", "bottle service reservation", "floor map booking"
+        "table reservation", "vip booth", "bottle service reservation", "floor map booking",
+        "headless vip", "hold a vip table at aurelia", "mezzanine"
       ],
       patterns: [
         /vip\s*reserv/, /vipreserv/, /vip\s*table/, /book\s+(a\s+)?(vip\s+)?table/,
@@ -198,17 +200,22 @@
       id: "help-botdee-room-smartview",
       kind: "help",
       label: "Room SMARTview",
-      blurb: "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm before anything is created. Private chat stays private. Group rooms are not live yet.",
+      blurb: "Type Open Room SMARTview, Start a group chat, or plan a Cancun trip in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
-        "invite others to this chat", "share this conversation"
+        "invite others to this chat", "invite mingl friends", "share this conversation",
+        "join room smartview", "joined bot dee session", "confirm room smartview",
+        "review bot dee invite", "let's plan our cancun trip", "let's plan a trip to cancun",
+        "plan a cancun trip", "cancun trip with friends"
       ],
       patterns: [
         /room\s*smart\s*view/,
         /start\s+a\s+group\s+chat/,
         /open\s+room\s+smartview/,
-        /share\s+this\s+conversation/
+        /share\s+this\s+conversation/,
+        /plan\s+(?:our\s+|a\s+)?(?:trip\s+to\s+)?cancun/,
+        /cancun\s+trip/
       ]
     },
     {
@@ -1099,6 +1106,7 @@
     "help-botdee-room-smartview": ["patron"], "help-botdee-room-smartview-invite": ["patron"], "help-botdee-room-smartview-join": ["patron"],
     "help-botdee-room-smartview-end": ["patron"], "help-botdee-room-smartview-tab": ["patron"], "help-botdee-room-smartview-who-pays": ["patron"],
     "help-botdee-room-smartview-kick": ["patron"], "help-botdee-room-smartview-share": ["patron"],
+    "help-botdee-headless-vip": ["patron"],
     "help-smartvisuals-notification": ["patron"], "help-smartvisuals-room": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-profile-account-type": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],

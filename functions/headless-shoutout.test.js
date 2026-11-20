@@ -56,6 +56,8 @@ test("composeShoutOutPayload defaults Traditional board and venue LED", () => {
   const venue = {
     locationName: "Decades",
     brandName: "Decades",
+    city: "Washington",
+    fullAddress: "1215 U St NW, Washington, DC",
     VenueSupports96x48: 1,
     VenueSupports64x48: 1,
     VenueSupports64x32: 0,
@@ -72,6 +74,12 @@ test("composeShoutOutPayload defaults Traditional board and venue LED", () => {
   assert.equal(composed.priceCents, 0);
   assert.ok(composed.shoutout.mainText.length <= 36);
   assert.equal(composed.shoutout.headless, true);
+  assert.equal(composed.shoutout.templateClassName, "classic-bw");
+  assert.equal(composed.shoutout.templateName, "Traditional Black and White ShoutOut");
+  assert.equal(composed.shoutout.identityRail, true);
+  assert.equal(composed.shoutout.textLayoutVersion, headless.TEXT_LAYOUT_VERSION);
+  assert.equal(composed.shoutout.city, "Washington");
+  assert.equal(composed.shoutout.fullAddress, "1215 U St NW, Washington, DC");
 
   const paid = headless.composeShoutOutPayload({
     clubLocationId: "decades-washington-dc",
@@ -82,6 +90,9 @@ test("composeShoutOutPayload defaults Traditional board and venue LED", () => {
   assert.equal(paid.ok, true);
   assert.equal(paid.priceCents, 1500);
   assert.equal(paid.templateId, "classicHalloween");
+  assert.equal(paid.shoutout.templateClassName, "classic-bw classic-halloween");
+  assert.equal(paid.shoutout.halloweenFinale, true);
+  assert.match(paid.shoutout.backgroundUrl, /classic-halloween/);
 
   const halloweenCopy = headless.composeShoutOutPayload({
     venue,
@@ -118,8 +129,20 @@ test("startShoutOutCheckout and FloqR callable accept flat club + message", () =
   const tools = read("functions/bot-dee-tools.js");
   assert.match(tools, /composeShoutOutPayload/);
   assert.match(tools, /submitFreeHeadlessShoutOut/);
+  assert.match(tools, /notifyClubPendingHeadlessShoutOut/);
+  assert.match(tools, /panel=panelQueue/);
+  assert.doesNotMatch(tools, /tab=queue/);
+  assert.match(tools, /pendingShoutout_\$\{uid\}_\$\{id\}/);
+  assert.match(tools, /\.set\(note, \{merge: true\}\)/);
   assert.match(tools, /args\?\.mainText \|\| args\?\.message/);
   assert.match(tools, /does not submit as a free board/);
+  assert.match(tools, /userPrompt/);
+  const adminApp = read("admin-app.js");
+  assert.match(adminApp, /templateClassName: packaged\.className \|\| item\.templateClassName/);
+  const portal = read("patron-portal-app.js");
+  assert.match(portal, /type === "pendingshoutout"/);
+  const chat = read("bot-dee-chat.js");
+  assert.match(chat, /"shoutout-pending": "botdee.link.shoutoutPending"/);
   assert.doesNotMatch(tools, /existing\.priceCents \|\| payload\.priceCents/);
   assert.doesNotMatch(tools, /needs clubLocationId and shoutout payload/);
 

@@ -124,18 +124,43 @@
 .sv-join-or{font-size:12px;color:var(--sv-muted)}
 .sv-scheduled{font-size:12px;color:var(--sv-muted)}
 .sv-ad{
-  margin-top:12px;border-radius:14px;overflow:hidden;position:relative;
-  border:1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
-  min-height:56px;background:rgba(8,20,32,.65)
+  margin-top:12px;border-radius:16px;overflow:hidden;position:relative;
+  display:grid;grid-template-columns:88px minmax(0,1fr);align-items:stretch;
+  min-height:72px;
+  border:1px solid color-mix(in srgb, var(--accent, #34d9df) 55%, transparent);
+  background:
+    linear-gradient(90deg, rgba(8,28,48,.2), rgba(8,16,32,.88) 42%),
+    #0a2236;
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--hot, #ff4fd8) 35%, transparent)
 }
 .sv-ad[hidden],.sv-ad.is-empty{display:none}
 .sv-ad-label{
-  position:absolute;top:8px;right:8px;font-size:10px;font-weight:800;letter-spacing:.06em;
-  text-transform:uppercase;padding:2px 6px;border-radius:6px;
-  background:rgba(0,0,0,.55);color:#fff
+  position:absolute;top:8px;right:8px;z-index:2;font-size:10px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;padding:3px 7px;border-radius:8px;
+  background:rgba(0,0,0,.62);color:#fff;border:1px solid rgba(255,255,255,.28)
 }
-.sv-ad-body{padding:12px 14px;font-size:13px}
-.sv-ad-body small{display:block;color:var(--sv-muted)}
+.sv-ad-art{position:relative;min-height:72px;overflow:hidden}
+.sv-ad-art .sv-ad-bg{display:block;width:100%;height:100%;object-fit:cover;min-height:72px}
+.sv-ad-art .sv-ad-stencil{
+  position:absolute;left:8px;bottom:8px;width:28px;height:28px;padding:5px;border-radius:999px;
+  background:rgba(4,16,28,.55);border:1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  filter:brightness(0) invert(1)
+}
+.sv-ad-body{
+  padding:10px 40px 10px 12px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0
+}
+.sv-ad-kicker{
+  font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:color-mix(in srgb, var(--accent, #34d9df) 85%, #fff)
+}
+.sv-ad-headline{font-size:18px;line-height:1.1;font-weight:800;color:#fff}
+.sv-ad-sub{font-size:12px;font-weight:700;color:var(--sv-muted)}
+.sv-ad-disclaimer{display:block;font-size:9px;color:rgba(244,251,255,.62);font-weight:600}
+.sv-ad.is-compact{min-height:56px;grid-template-columns:64px minmax(0,1fr);margin-top:10px}
+.sv-ad.is-compact .sv-ad-art,.sv-ad.is-compact .sv-ad-art .sv-ad-bg{min-height:56px}
+.sv-ad.is-compact .sv-ad-headline{font-size:15px}
+.sv-ad.is-compact .sv-ad-disclaimer{display:none}
+.botdee-sv-room .sv-ad{margin:12px 0 0}
 .sv-demo-flag{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
 .sv-room-overlay{
   position:fixed;inset:0;z-index:80;background:rgba(2,8,14,.72);

@@ -26,7 +26,12 @@
   function publishGeminiCriticalBlink(failureRows = []) {
     const blink = window.FLOQRCriticalLogBlink;
     if (!blink) return;
-    const summary = blink.summarizeCriticalRows(failureRows, {treatFailureAsCritical: true});
+    const geminiOnly = (failureRows || []).filter((row) =>
+      row.category !== "app-check"
+      && row.category !== "security"
+      && row.action !== "app-check"
+    );
+    const summary = blink.summarizeCriticalRows(geminiOnly, {treatFailureAsCritical: true});
     if (summary.count > 0) {
       blink.set(blink.SOURCE_IDS.geminiApiAccess || GEMINI_CRITICAL_SOURCE, {
         tabId: "appLoggingTab",
@@ -65,6 +70,7 @@
     const category = (byId("appLogCategoryFilter")?.value || "").trim().toLowerCase();
     const query = (byId("appLogSearch")?.value || "").trim().toLowerCase();
     return logs.filter(row => {
+      if (row.category === "security" && row.action === "app-check") return false;
       if (level && row.level !== level) return false;
       if (category && !String(row.category || "").toLowerCase().includes(category)) return false;
       if (!query) return true;

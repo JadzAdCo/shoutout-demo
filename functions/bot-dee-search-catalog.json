@@ -399,6 +399,29 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-headless-vip",
+      "id": "help-botdee-headless-vip",
+      "kind": "help",
+      "label": "VIP reserV from BOT DEE chat",
+      "blurb": "Say VIP reserV or hold a VIP table at Aurelia in BOT DEE. Name the club, night, and table or area. Mezzanine is an area — BOT DEE lists V1–V4 and AURELIA SUITE so you can pick a table, then hold it, reply I agree to Terms, and pay if a deposit is required. BOT DEE never takes car",
+      "href": "./botdee.html?from=botdee",
+      "phrases": [
+        "vip reserv from bot dee chat",
+        "say vip reserv or hold a vip table at aurelia in bot dee. name the club night and table or area. mezzanine is an area bot dee lists v1 v4 and aurelia suite so y",
+        "headless vip",
+        "vip from chat",
+        "hold a vip table at aurelia",
+        "mezzanine",
+        "vip reserv bot dee",
+        "book vip in bot dee",
+        "v1 aurelia",
+        "hold it vip",
+        "open bot dee",
+        "open vip reserv",
+        "help-botdee-headless-vip"
+      ]
+    },
+    {
       "sourceId": "help:help-botdee-knows-of-me",
       "id": "help-botdee-knows-of-me",
       "kind": "help",
@@ -547,16 +570,21 @@
       "id": "help-botdee-room-smartview",
       "kind": "help",
       "label": "Room SMARTview",
-      "blurb": "In BOT DEE chat, say Open Room SMARTview or Start a group chat. A Room SMARTview card opens in the same bubble. Confirm before anything is created. Private BOT DEE messages stay private. Group rooms, invites, and a shared tab are not live yet — Confirm does not create a room, sen",
+      "blurb": "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends). That opens the same Room SMARTview as Open Room SMARTview Cancun Trip — trav",
       "href": "./botdee.html",
       "phrases": [
         "room smartview",
-        "in bot dee chat say open room smartview or start a group chat. a room smartview card opens in the same bubble. confirm before anything is created. private bot d",
+        "in bot dee chat say open room smartview start a group chat or plan a cancun trip in plain words let s plan our cancun trip let s plan a trip to cancun plan a ca",
         "start a group chat",
         "open room smartview",
         "create a room",
         "group chat bot dee",
         "talk to bot dee together",
+        "invite mingl friends",
+        "let s plan our cancun trip",
+        "let s plan a trip to cancun",
+        "plan a cancun trip",
+        "cancun trip with friends",
         "open bot dee",
         "help-botdee-room-smartview"
       ]
@@ -566,11 +594,11 @@
       "id": "help-botdee-room-smartview-end",
       "kind": "help",
       "label": "End Room SMARTview",
-      "blurb": "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats. There is no live room to close yet.",
+      "blurb": "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first.",
       "href": "./botdee.html",
       "phrases": [
         "end room smartview",
-        "only the host can end a room and only after confirm. ending does not charge anyone or erase other people s private chats. there is no live room to close yet.",
+        "only the host can end a room. ending does not charge anyone or erase other people s private chats. an unpaid shared tab must be paid or voided first.",
         "end this room",
         "close room smartview",
         "end group chat bot dee",
@@ -582,15 +610,16 @@
       "sourceId": "help:help-botdee-room-smartview-invite",
       "id": "help-botdee-room-smartview-invite",
       "kind": "help",
-      "label": "Room SMARTview invite",
-      "blurb": "Invite others from Room SMARTview after you confirm. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Wrong-account, blocked, and non-friend invites will refuse when group rooms ship. Nothing is sent today; group rooms a",
+      "label": "Invite Mingl friends",
+      "blurb": "After you confirm Room SMARTview, Invite shows your Mingl friends only. Each invite is bound to that friend and lands in Inbox as Review BOT DEE invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not",
       "href": "./botdee.html",
       "phrases": [
-        "room smartview invite",
-        "invite others from room smartview after you confirm. named people are not looked up just because you typed a name floqr will not say whether an account exists. ",
+        "invite mingl friends",
+        "after you confirm room smartview invite shows your mingl friends only. each invite is bound to that friend and lands in inbox as review bot dee invite. not a pu",
         "invite others to this chat",
         "invite friends bot dee",
         "bring my friends into this conversation",
+        "review bot dee invite",
         "open bot dee",
         "help-botdee-room-smartview-invite"
       ]
@@ -599,12 +628,12 @@
       "sourceId": "help:help-botdee-room-smartview-join",
       "id": "help-botdee-room-smartview-join",
       "kind": "help",
-      "label": "Join a Room SMARTview",
-      "blurb": "Joining a Room SMARTview is not the same as joining a shared tab or approving a payment. When rooms ship, you will sign in and accept a bound invite. Opening a link does not join you automatically.",
+      "label": "Join a BOT DEE session",
+      "blurb": "Open the Inbox invite while signed in as the Mingl friend it was sent to. Wrong account, expired, or revoked invites refuse. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
       "href": "./botdee.html",
       "phrases": [
-        "join a room smartview",
-        "joining a room smartview is not the same as joining a shared tab or approving a payment. when rooms ship you will sign in and accept a bound invite. opening a l",
+        "join a bot dee session",
+        "open the inbox invite while signed in as the mingl friend it was sent to. wrong account expired or revoked invites refuse. joining the room is not joining a sha",
         "join room smartview",
         "join this bot dee chat",
         "can my friends join us",
@@ -617,11 +646,11 @@
       "id": "help-botdee-room-smartview-kick",
       "kind": "help",
       "label": "Remove someone from Room SMARTview",
-      "blurb": "Only a verified host can remove a member, and only after confirm. A model reply cannot kick anyone. There is no live room to change yet.",
+      "blurb": "Only the host can remove a guest. A kicked friend cannot read further room messages. A model reply cannot kick anyone.",
       "href": "./botdee.html",
       "phrases": [
         "remove someone from room smartview",
-        "only a verified host can remove a member and only after confirm. a model reply cannot kick anyone. there is no live room to change yet.",
+        "only the host can remove a guest. a kicked friend cannot read further room messages. a model reply cannot kick anyone.",
         "remove from room",
         "kick from room smartview",
         "remove jalen",
@@ -634,7 +663,7 @@
       "id": "help-botdee-room-smartview-share",
       "kind": "help",
       "label": "Share into Room SMARTview",
-      "blurb": "Share this conversation never copies your private BOT DEE thread. BOT DEE shows a preview of selected shareable facts from this message, marked tentative. You can edit or drop facts. Nothing is published until rooms are live and you approve.",
+      "blurb": "Share this conversation never copies your private BOT DEE thread. BOT DEE shows a preview of selected shareable facts from this message, marked tentative. You can edit or drop facts. Private profiles and SMARTsummary stay out.",
       "href": "./botdee.html",
       "phrases": [
         "share into room smartview",
@@ -651,11 +680,11 @@
       "id": "help-botdee-room-smartview-tab",
       "kind": "help",
       "label": "Room SMARTview shared tab",
-      "blurb": "A shared tab is a later opt-in. Joining the room does not join a tab. Joining a tab does not approve a payment. BOT DEE never takes card numbers. Split-the-bill talk is not a charge.",
+      "blurb": "Opt in first. Then add a line. Close as one payer or split. Only confirming uids are charged, via FloqR Stripe. Joining the room does not join a tab. BOT DEE never takes card numbers. Club POS is later.",
       "href": "./botdee.html",
       "phrases": [
         "room smartview shared tab",
-        "a shared tab is a later opt-in. joining the room does not join a tab. joining a tab does not approve a payment. bot dee never takes card numbers. split-the-bill",
+        "opt in first. then add a line. close as one payer or split. only confirming uids are charged via floqr stripe. joining the room does not join a tab. bot dee nev",
         "shared tab",
         "split the bill",
         "who is paying room",
@@ -669,11 +698,11 @@
       "id": "help-botdee-room-smartview-who-pays",
       "kind": "help",
       "label": "Who is paying",
-      "blurb": "Ask Who’s paying in a Room SMARTview to see privacy-filtered opt-in status when tabs ship. Nobody is charged because someone said buy. Card last four stay on the payer’s own receipt.",
+      "blurb": "Ask Who’s paying in a Room SMARTview to see opt-in status. Nobody is charged because someone said buy. Card last four stay on the payer’s own receipt.",
       "href": "./botdee.html",
       "phrases": [
         "who is paying",
-        "ask who s paying in a room smartview to see privacy-filtered opt-in status when tabs ship. nobody is charged because someone said buy. card last four stay on th",
+        "ask who s paying in a room smartview to see opt-in status. nobody is charged because someone said buy. card last four stay on the payer s own receipt.",
         "who s paying",
         "who pays in the room",
         "open bot dee",
@@ -986,14 +1015,16 @@
       "id": "help-botdee-version-smartview-tabs",
       "kind": "help",
       "label": "Version SMARTview tabs",
-      "blurb": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified FLOQR package notes from the current README. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses",
+      "blurb": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified BOT DEE and Gemini changes only — not Master Admin, beta tester tools, or other FLOQR product notes. Help repeats the Ver / Vers / Version command. Switching tabs or expanding d",
       "href": "./botdee.html",
       "phrases": [
         "version smartview tabs",
-        "overview describes bot dee and opens technical details without leaving chat. what s new lists verified floqr package notes from the current readme. help repeats",
+        "overview describes bot dee and opens technical details without leaving chat. what s new lists verified bot dee and gemini changes only not master admin beta tes",
         "version what s new",
         "version overview",
         "technical details bot dee",
+        "bot dee what s new",
+        "gemini what s new",
         "open bot dee",
         "help-botdee-version-smartview-tabs"
       ]
@@ -2589,6 +2620,32 @@
       ]
     },
     {
+      "sourceId": "help:help-shoutout-headless-smartview",
+      "id": "help-shoutout-headless-smartview",
+      "kind": "help",
+      "label": "ShoutOut SMARTpreview",
+      "blurb": "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. The ",
+      "href": "./botdee.html?from=botdee",
+      "phrases": [
+        "shoutout smartpreview",
+        "when you throw a shoutout in bot dee chat bot dee asks for the template whether to print your @handle on the floqr card and whether the board is text-only or ne",
+        "headless shoutout smartview",
+        "shoutout smartview",
+        "choose shoutout template",
+        "include my handle",
+        "floqr card handle",
+        "throw shoutout photo",
+        "throw shoutout video",
+        "bot dee shoutout preview",
+        "headless shoutout extras",
+        "smartpreview",
+        "open bot dee",
+        "open shoutout",
+        "smartpreview master admin",
+        "help-shoutout-headless-smartview"
+      ]
+    },
+    {
       "sourceId": "help:help-shoutout-recommendations",
       "id": "help-shoutout-recommendations",
       "kind": "help",
@@ -2649,6 +2706,9 @@
         "smartvisuals",
         "smartstencils",
         "smartbackgrounds",
+        "travel partner",
+        "fly to cancun",
+        "labeled ad",
         "open search",
         "help-smartvisuals-notification"
       ]
@@ -2669,6 +2729,8 @@
         "smartbackgrounds",
         "cancun trip room",
         "bot-dee itinerary",
+        "travel partner",
+        "exclusive mingl room deals",
         "open bot dee",
         "help-smartvisuals-room"
       ]
@@ -2678,7 +2740,7 @@
       "id": "help-smartvisuals-studio",
       "kind": "help",
       "label": "SMARTvisual Studio",
-      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads stay a separate labeled slot and a",
+      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads are a separate labeled slot filled",
       "href": "./master-admin.html",
       "phrases": [
         "smartvisual studio",
@@ -3234,9 +3296,9 @@
         "3d walk-through",
         "search a vip reserv club",
         "isreserved",
-        "open vip reserv",
-        "aurelia 3d walk-through",
-        "help-vip-book-table"
+        "headless vip",
+        "vip from chat",
+        "mezzanine"
       ]
     },
     {
@@ -3673,16 +3735,25 @@
       "id": "help-botdee-room-smartview",
       "kind": "help",
       "label": "Room SMARTview",
-      "blurb": "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm before anything is created. Private chat stays private. Group rooms are not live yet.",
+      "blurb": "Type Open Room SMARTview, Start a group chat, or plan a Cancun trip in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
       "href": "./botdee.html",
       "phrases": [
         "room smartview",
-        "type open room smartview or start a group chat in bot dee. confirm before anything is created. private chat stays private. group rooms are not live yet.",
+        "type open room smartview start a group chat or plan a cancun trip in bot dee. confirm then invite mingl friends. joining is not a payment and does not open a sh",
         "start a group chat",
         "open room smartview",
         "create a room",
         "invite others to this chat",
+        "invite mingl friends",
         "share this conversation",
+        "join room smartview",
+        "joined bot dee session",
+        "confirm room smartview",
+        "review bot dee invite",
+        "let s plan our cancun trip",
+        "let s plan a trip to cancun",
+        "plan a cancun trip",
+        "cancun trip with friends",
         "help-botdee-room-smartview"
       ]
     },
@@ -4643,6 +4714,11 @@
       "phrases": [
         "throw a shoutout",
         "send a live message to a floqr display.",
+        "headless shoutout",
+        "shoutout smartview",
+        "shoutout smartpreview",
+        "include my handle",
+        "throw shoutout from chat",
         "shoutout"
       ]
     },
@@ -4719,6 +4795,9 @@
         "vip booth",
         "bottle service reservation",
         "floor map booking",
+        "headless vip",
+        "hold a vip table at aurelia",
+        "mezzanine",
         "vip-reserv"
       ]
     }

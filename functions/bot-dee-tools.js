@@ -157,7 +157,77 @@ async function listShoutOutTemplates(args, sessionRequest) {
   };
 }
 
-async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth} = {}) {
+function clientIpFromRequest(sessionRequest) {
+  const req = sessionRequest?.rawRequest || {};
+  const headers = req.headers || {};
+  const xf = String(headers["x-forwarded-for"] || "").split(",")[0].trim();
+  const real = String(headers["x-real-ip"] || "").trim();
+  let ip = xf || real || req.ip || req.socket?.remoteAddress || req.connection?.remoteAddress || "";
+  if (ip.startsWith("::ffff:")) ip = ip.slice(7);
+  return String(ip || "").trim().slice(0, 80);
+}
+
+async function notifyClubPendingHeadlessShoutOut({
+  clubLocationId,
+  venue = {},
+  shoutoutId,
+  mainText,
+  referenceNumber,
+  locationName
+} = {}) {
+  const uids = new Set([
+    ...(Array.isArray(venue.adminUids) ? venue.adminUids : []),
+    ...(Array.isArray(venue.masterAdminUids) ? venue.masterAdminUids : [])
+  ].map(value => text(value, 160)).filter(Boolean));
+  try {
+    const snap = await db.collection("clubEmployeeDesignations")
+      .where("clubLocationId", "==", clubLocationId)
+      .limit(80)
+      .get();
+    snap.forEach(doc => {
+      const row = doc.data() || {};
+      if (text(row.status, 40).toLowerCase() === "rejected") return;
+      const roles = `${row.roleElectionType || ""} ${(row.workerRoles || []).join(" ")}`;
+      if (/club\s*admin/i.test(roles) && row.workerUid) uids.add(text(row.workerUid, 160));
+    });
+  } catch (_error) {
+    /* designation query optional */
+  }
+  const recipients = [...uids];
+  if (!recipients.length) return {ok: false, skipped: "no-admin-recipients"};
+  const snippet = text(mainText, 80);
+  const body = [
+    `FloqR: ShoutOut pending at ${locationName || clubLocationId}.`,
+    snippet ? `"${snippet}"` : "",
+    `Ref ${referenceNumber || shoutoutId}.`,
+    "Open Club Admin → Pending ShoutOuts to Approve & Push Live."
+  ].filter(Boolean).join(" ");
+  const link = `./admin.html?location=${encodeURIComponent(clubLocationId)}&panel=panelQueue`;
+  const id = text(shoutoutId, 120);
+  await Promise.all(recipients.map(uid => {
+    const note = {
+      type: "pendingShoutout",
+      title: "Pending ShoutOut",
+      body,
+      clubLocationId,
+      locationName: locationName || clubLocationId,
+      shoutoutId: id,
+      referenceNumber: referenceNumber || "",
+      senderUid: "system",
+      senderName: "System Message",
+      messageCategory: "system",
+      read: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      link,
+      recipientUid: uid
+    };
+    if (!id) return db.collection("inboxNotifications").add(note);
+    return db.collection("inboxNotifications").doc(`pendingShoutout_${uid}_${id}`).set(note, {merge: true});
+  }));
+  return {ok: true, recipients: recipients.length};
+}
+
+async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth, sessionRequest} = {}) {
   const uid = text(auth?.uid, 120);
   if (!uid) throw new HttpsError("unauthenticated", "Sign in required.");
   const templateId = text(shoutout?.template || shoutout?.templateId, 80);
@@ -167,6 +237,22 @@ async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth
   const email = text(auth?.token?.email || shoutout.submittedBy, 200).toLowerCase();
   const referenceNumber = headless.newReferenceNumber();
   const locationName = text(shoutout.locationName || venue?.locationName || clubLocationId, 160);
+  let profile = {};
+  try {
+    const userSnap = await db.collection("users").doc(uid).get();
+    profile = userSnap.exists ? userSnap.data() || {} : {};
+  } catch (_error) {
+    profile = {};
+  }
+  const clientIp = clientIpFromRequest(sessionRequest);
+  const actor = require("./shoutout-compliance-functions").actorFieldsFromSources({
+    submittedByUid: uid,
+    submittedBy: email,
+    actorEmail: email,
+    clientIp,
+    ipSource: clientIp ? "headless-submit" : ""
+  }, profile);
+  const now = admin.firestore.FieldValue.serverTimestamp();
   const doc = {
     ...shoutout,
     clubLocationId,
@@ -181,10 +267,16 @@ async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth
     source: "headless",
     onboardingSource: "headless-shoutout",
     submittedByUid: uid,
-    submittedBy: email,
-    actorEmail: email,
+    submittedBy: actor.submittedBy || email,
+    actorEmail: actor.actorEmail || email,
+    actorPhone: actor.actorPhone || "",
+    actorIdentifier: actor.actorIdentifier || email,
+    clientIp: actor.clientIp || "",
+    ipSource: actor.ipSource || "",
     referenceNumber,
-    submittedAt: admin.firestore.FieldValue.serverTimestamp()
+    createdAt: now,
+    submittedAt: now,
+    updatedAt: now
   };
   const ref = await db.collection("shoutouts").add(doc);
   await db.collection("shoutoutAudit").add({
@@ -193,10 +285,24 @@ async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth
     referenceNumber,
     ownerUid: uid,
     actorUid: uid,
-    actorEmail: email,
+    actorEmail: actor.actorEmail || email,
+    clientIp: actor.clientIp || "",
+    ipSource: actor.ipSource || "",
     source: "headless",
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
+    createdAt: now
   });
+  try {
+    await notifyClubPendingHeadlessShoutOut({
+      clubLocationId,
+      venue,
+      shoutoutId: ref.id,
+      mainText: text(shoutout.mainText, 200),
+      referenceNumber,
+      locationName
+    });
+  } catch (error) {
+    console.warn("headless pending club inbox skipped", error?.message || error);
+  }
   return {
     shoutoutId: ref.id,
     referenceNumber,
@@ -206,6 +312,16 @@ async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth
     screenFormatId: text(shoutout.screenFormatId, 40),
     mainText: text(shoutout.mainText, 200)
   };
+}
+
+async function loadPatronShoutOutAttribution(uid) {
+  const id = text(uid, 80);
+  if (!id) return "";
+  const snap = await db.collection("users").doc(id).get();
+  const data = snap.exists ? (snap.data() || {}) : {};
+  return headless.formatHandle(
+    data.floqrHandle || data.username || data.minglHandle || data.displayName || data.publicName
+  );
 }
 
 async function startShoutOutCheckout(args, sessionRequest) {
@@ -263,12 +379,28 @@ async function startShoutOutCheckout(args, sessionRequest) {
   await featureGates.assertClubFeature(clubLocationId, "shoutOut");
   const snap = await db.collection("clubLocations").doc(clubLocationId).get();
   const venue = snap.exists ? {id: clubLocationId, ...(snap.data() || {})} : {id: clubLocationId};
+  const includeAttribution = args?.includeAttribution === true
+    || args?.includeAttribution === 1
+    || args?.includeAttribution === "1"
+    || existing?.includeAttribution === true;
+  const attribution = text(
+    args?.attribution || payload.attribution || existing?.attribution || parsed.attribution,
+    80
+  );
+  const mediaUrl = text(args?.mediaUrl || payload.mediaUrl || existing?.mediaUrl || parsed.mediaUrl, 500);
+  const mediaType = text(args?.mediaType || payload.mediaType || existing?.mediaType, 20);
   const composed = headless.composeShoutOutPayload({
     clubLocationId,
     venue,
     message,
     templateId,
-    screenFormatId
+    screenFormatId,
+    userPrompt,
+    includeAttribution,
+    attribution,
+    attributionChoice: text(args?.attributionChoice || existing?.attributionChoice, 40),
+    mediaUrl,
+    mediaType
   });
   if (!composed.ok) {
     return {
@@ -310,7 +442,8 @@ async function startShoutOutCheckout(args, sessionRequest) {
     clubLocationId,
     shoutout,
     venue,
-    auth: sessionRequest.auth
+    auth: sessionRequest.auth,
+    sessionRequest
   });
   return {
     ok: true,
@@ -322,16 +455,55 @@ async function startShoutOutCheckout(args, sessionRequest) {
   };
 }
 
+async function getVipAvailability(args, sessionRequest) {
+  await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
+  const clubLocationId = await requireClubLocationId(args?.clubLocationId || args?.locationName);
+  const headlessVip = require("./headless-vip-core");
+  const sectionQuery = String(args?.sectionQuery || args?.area || args?.sectionId || "").trim();
+  const listed = sectionQuery
+    ? headlessVip.resolveSectionQuery(clubLocationId, sectionQuery)
+    : {ok: false, matches: headlessVip.listSections(clubLocationId, ""), reason: "list"};
+  return {
+    ok: true,
+    tool: "getVipAvailability",
+    clubLocationId,
+    night: String(args?.night || headlessVip.tonightIso()),
+    sectionQuery,
+    matchReason: listed.reason || (listed.ok ? "exact" : "list"),
+    sections: listed.matches || [],
+    note: listed.ok
+      ? "Use this sectionId with createVipHold."
+      : (listed.matches && listed.matches.length
+        ? "Several tables match. Ask the patron to pick a label, then createVipHold with that sectionId."
+        : "No matching table. Ask for V1 / C10 / a printed label, not only the area name.")
+  };
+}
+
 async function createVipHold(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
   const clubLocationId = await requireClubLocationId(args?.clubLocationId || args?.locationName);
+  const headlessVip = require("./headless-vip-core");
+  const wanted = String(args?.sectionId || args?.sectionQuery || args?.area || "").trim();
+  const match = headlessVip.resolveSectionQuery(clubLocationId, wanted);
+  if (!match.ok) {
+    return {
+      ok: false,
+      tool: "createVipHold",
+      clubLocationId,
+      error: match.reason === "area" || match.reason === "ambiguous"
+        ? "That name is an area with several tables. Pick one sectionId from the list."
+        : "That table section was not found.",
+      sections: match.matches || [],
+      sectionQuery: wanted
+    };
+  }
   const result = await vip.runCreateVipHold(asRequest(sessionRequest, {
     clubLocationId,
-    night: args?.night,
-    sectionId: args?.sectionId,
-    partySize: args?.partySize
+    night: args?.night || headlessVip.tonightIso(),
+    sectionId: match.matches[0].id,
+    partySize: args?.partySize || headlessVip.DEFAULT_PARTY
   }));
-  return {ok: true, tool: "createVipHold", clubLocationId, ...result};
+  return {ok: true, tool: "createVipHold", clubLocationId, sectionId: match.matches[0].id, ...result};
 }
 
 async function recordVipConsent(args, sessionRequest) {
@@ -1070,6 +1242,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
 const TOOL_RUNNERS = {
   listShoutOutTemplates,
   startShoutOutCheckout,
+  getVipAvailability,
   createVipHold,
   recordVipConsent,
   createVipCheckout,
@@ -1093,6 +1266,7 @@ module.exports = {
   runProductTool,
   listShoutOutTemplates,
   startShoutOutCheckout,
+  getVipAvailability,
   createVipHold,
   recordVipConsent,
   createVipCheckout,
@@ -1121,6 +1295,8 @@ module.exports = {
   injectSelfProfile,
   resolveClubLocationId,
   requireClubLocationId,
+  loadPatronShoutOutAttribution,
+  notifyClubPendingHeadlessShoutOut,
   normalizeClubNeedle,
   CLUB_NAME_ALIASES
 };

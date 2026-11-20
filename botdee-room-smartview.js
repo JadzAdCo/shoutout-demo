@@ -1,13 +1,12 @@
 /* BOT DEE Room SMARTview v2 — deterministic intent routing.
-   Chat-embedded confirmation card only. Group rooms / invites / shared tab
-   are not live. Never create, invite, share, or charge from a classifier hit.
-   Request-scoped payload — no new Firestore docs. */
+   Confirm mints a join link (Functions-write live module). Shared tab / charge
+   stay off. Classifier never writes Firestore. */
 "use strict";
 
 const SCHEMA_VERSION = "floqr.botDeeRoomSmartView/1";
 const KIND = "botDeeRoom";
 const MEMBER_CAP = 8;
-const ROOMS_LIVE = false;
+const ROOMS_LIVE = true;
 
 const TYPOS = [
   [/\borders\b/g, "others"],
@@ -296,7 +295,7 @@ function shareableFactsFromUtterance(raw) {
   const original = text(raw, 200);
   const facts = [];
   const place = original.match(
-    /\b(mykonos|aurelia|decades|lima twist|paris|ibiza|miami|vegas|london)\b/i
+    /\b(mykonos|aurelia|decades|lima twist|paris|ibiza|miami|vegas|london|cancun|cancún)\b/i
   );
   if (place) {
     facts.push({
@@ -326,6 +325,12 @@ function shareableFactsFromUtterance(raw) {
 }
 
 function detectCommand(normalized, raw) {
+  if (
+    /^(?:confirm room(?: smartview)?)$/.test(normalized)
+    || /\bconfirm room smartview\b/.test(normalized)
+  ) {
+    return "confirm";
+  }
   if (
     /^(?:invite|add)\s+(?:two more|more)\s+(?:friends|people|guests)/.test(normalized)
     || /invite (?:two more|more) (?:friends|people)/.test(normalized)
@@ -411,6 +416,32 @@ function isSplitAsk(normalized) {
   );
 }
 
+function isNightlifeOnlyAsk(normalized) {
+  const nightlife = (
+    /\bvip\s+tables?\b/.test(normalized)
+    || /\btables?\s+tonight\b/.test(normalized)
+    || (/\btonight\b/.test(normalized) && /\b(?:vip|club|nightclub|booth)\b/.test(normalized))
+    || /\b(?:book|hold|reserve)\b.{0,32}\b(?:vip|table|booth)\b/.test(normalized)
+  );
+  const trip = /\b(?:trip|travel|vacation|itinerary|holiday)\b/.test(normalized);
+  return nightlife && !trip;
+}
+
+function isCancunTripAsk(normalized) {
+  if (!normalized || !/\bcancun\b/.test(normalized)) return false;
+  if (isNightlifeOnlyAsk(normalized)) return false;
+  return (
+    /\btrip\b/.test(normalized)
+    || /\btravel\b/.test(normalized)
+    || /\bvacation\b/.test(normalized)
+    || /\bitinerary\b/.test(normalized)
+    || /\bholiday\b/.test(normalized)
+  );
+}
+
+const CANCUN_TRIP_TITLE = "Cancun Trip";
+const CANCUN_TRIP_DESCRIPTION = "Let's plan our Cancun trip together with BOT-DEE.";
+
 function declineKey(classified) {
   const row = classified && typeof classified === "object" ? classified : {};
   return ["rs", row.level || "none", row.route || "none", row.command || "", row.share ? "share" : ""]
@@ -477,7 +508,7 @@ function classifyRoomIntent(raw, opts) {
     const row = {
       ...empty,
       level: "command",
-      route: "command",
+      route: command === "confirm" ? "confirm" : "command",
       command,
       handled: true,
       needsConfirmation: command === "kick" || command === "end",
@@ -505,6 +536,8 @@ function classifyRoomIntent(raw, opts) {
     || /\b(?:join us|join this chat|join this conversation)\b/.test(normalized)
   ) {
     level = "strong";
+  } else if (isCancunTripAsk(normalized)) {
+    level = "explicit";
   } else if (includesAny(normalized, CONTEXTUAL) || split || share) {
     level = "contextual";
   } else {
@@ -554,10 +587,16 @@ function replyFor(classified) {
       text: "I can’t use private BOT DEE history or host memory for that. Room SMARTview only uses what this group later confirms."
     };
   }
+  if (row.route === "confirm") {
+    return {
+      key: "botdee.room.confirmedLive",
+      text: "BOT DEE session is open. Invite Mingl friends from the card. Guests can invite too, up to host plus 7. Joining does not charge anyone."
+    };
+  }
   if (row.route === "setup") {
     return {
       key: "botdee.rs.setupIntro",
-      text: "Here’s Room SMARTview setup. Confirm to continue — nothing is created until you say so. Your private BOT DEE chat stays private."
+      text: "Here’s Room SMARTview setup. Confirm to open a BOT DEE session. Invite Mingl friends only — host plus 7 guests. Joining does not charge anyone. Your private BOT DEE chat stays private."
     };
   }
   if (row.route === "reopen") {
@@ -579,11 +618,11 @@ function replyFor(classified) {
     };
   }
   const commandCopy = {
-    invite: ["botdee.rs.commandInvite", "Invite more people from Room SMARTview. Group rooms are not live yet — no invite is sent until that ships."],
+    invite: ["botdee.room.commandInvite", "Invite Mingl friends into this BOT DEE session. Not a public link. Cap is host plus 7 guests."],
     members: ["botdee.rs.commandMembers", "There is no active Room SMARTview yet, so there is no member list to show."],
     summarize: ["botdee.rs.commandSummary", "There are no room-only decisions yet. Private BOT DEE history is not used as a room summary."],
-    who_pays: ["botdee.rs.commandWhoPays", "No one is charged from chat. A shared tab needs a later opt-in per person — it is not live."],
-    kick: ["botdee.rs.commandKick", "Only a verified host can remove someone, and only after confirm. There is no live room to change."],
+    who_pays: ["botdee.room.commandWhoPays", "No one is charged from chat. Opt in to the shared tab first. Split or one payer — only confirming uids are charged."],
+    kick: ["botdee.room.commandKick", "Only the host can remove a guest. Kicked friends cannot read further room messages."],
     leave: ["botdee.rs.commandLeave", "Leave applies only to a Room SMARTview you have joined. There is no active room."],
     end: ["botdee.rs.commandEnd", "Ending a room needs host confirmation and does not settle money. There is no live room to close."],
     make_private: ["botdee.rs.commandPrivate", "Do you want to leave Room SMARTview, or keep chatting privately here? Other people’s messages are not erased."]
@@ -595,6 +634,9 @@ function replyFor(classified) {
 function authorizedFromUtterance(raw, classified) {
   if (classified && classified.injection) {
     return {authorizedTitle: "", authorizedDescription: ""};
+  }
+  if (isCancunTripAsk(normalizeUtterance(raw))) {
+    return {authorizedTitle: CANCUN_TRIP_TITLE, authorizedDescription: CANCUN_TRIP_DESCRIPTION};
   }
   const cleaned = text(String(raw || "").replace(/https?:\/\/\S+/gi, " ").replace(/\s+/g, " "), 120);
   if (!cleaned) return {authorizedTitle: "", authorizedDescription: ""};
@@ -636,12 +678,14 @@ function buildRoomSmartView(opts) {
     },
     actions: {
       create: false,
-      invite: false,
-      kick: false,
-      end: false,
-      tabOptIn: false,
+      invite: classified.hasActiveRoom === true,
+      kick: classified.hasActiveRoom === true,
+      end: classified.hasActiveRoom === true,
+      tabOptIn: classified.hasActiveRoom === true,
       charge: false
     },
+    roomId: text(options.roomId, 80),
+    joinHref: text(options.joinHref, 240),
     replyKey: copy.key,
     declineKey: classified.declineKey || declineKey(classified)
   };
@@ -674,6 +718,8 @@ const api = {
   normalizeUtterance,
   classifyRoomIntent,
   isRoomSmartViewPrompt,
+  isCancunTripAsk,
+  isNightlifeOnlyAsk,
   buildRoomSmartView,
   buildRoomSession,
   declineKey,

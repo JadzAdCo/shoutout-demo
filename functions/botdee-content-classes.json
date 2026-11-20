@@ -57,6 +57,10 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-headless-vip": [
+      "masterAdmin",
+      "patron"
+    ],
     "help-botdee-knows-of-me": [
       "masterAdmin",
       "patron",
@@ -448,6 +452,10 @@
       "patron"
     ],
     "help-shoutout-choose-venue": [
+      "patron"
+    ],
+    "help-shoutout-headless-smartview": [
+      "masterAdmin",
       "patron"
     ],
     "help-shoutout-recommendations": [

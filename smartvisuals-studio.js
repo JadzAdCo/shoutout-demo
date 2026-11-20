@@ -18,6 +18,7 @@
   const EXAMPLES = [
     {id: "cancun", title: "Cancun Trip", description: "Let's plan our Cancun trip together with BOT-DEE."},
     {id: "paris-fw", title: "Paris Fashion Week", description: "Runway night in Paris."},
+    {id: "dining", title: "Dinner reservations", description: "Pick a restaurant for Saturday."},
     {id: "seattle-la", title: "Seattle LA", description: ""},
     {id: "san-dego", title: "San Dego weekend", description: ""},
     {id: "burningman", title: "Burningman", description: "Packing list only."},
@@ -54,6 +55,7 @@
     if (name === "tagging") renderTagging();
     if (name === "diagnostics") renderDiagnostics();
     if (name === "review") renderReview();
+    if (name === "ads") renderAds();
   }
 
   function renderLibrary() {
@@ -115,13 +117,38 @@
   function renderTagging() {
     const host = byId("svStudioExamples");
     if (!host || !root.FLOQRSmartVisualsResolver) return;
+    const policy = root.FLOQRSmartVisualsResolver.adPolicy();
     host.innerHTML = EXAMPLES.map(ex => {
       const out = root.FLOQRSmartVisualsResolver.resolve(ex, catalog);
+      const ad = root.FLOQRSmartVisualsResolver.selectAd(out, policy);
       return `<div class="sv-studio-example">
         <strong>${esc(ex.title)}</strong>
         <span>${esc(out.reasonCode)} · ${esc(out.backgroundId)} · ${esc(out.stencilId)} · ${esc(String(Math.round((out.confidence || 0) * 100)))}%</span>
+        <span>${esc(ad.fill ? ad.reasonCode : ad.reasonCode)} · ${esc(ad.headlineKey || "empty")}${ad.placeLabel ? " · " + esc(ad.placeLabel) : ""}</span>
       </div>`;
     }).join("");
+  }
+
+  function renderAds() {
+    const host = byId("svStudioAdsLive");
+    const policyHost = byId("svStudioAdsPolicy");
+    const policy = root.FLOQRSmartVisualsResolver?.adPolicy?.() || {};
+    if (policyHost) {
+      policyHost.innerHTML = `<ul class="sv-studio-dl">
+        <li>AdSense: ${esc(String(policy.adsenseApproved === true))} · adsEnabled: ${esc(String(policy.adsEnabled === true))}</li>
+        <li>mockFill: ${esc(String(policy.mockFill === true))} · ${esc(policy.mockFillKind || "")}</li>
+        <li>${esc(policy.note || "")}</li>
+      </ul>`;
+    }
+    if (!host || !root.FLOQRSmartVisuals) return;
+    host.innerHTML = "";
+    EXAMPLES.slice(0, 4).forEach(ex => {
+      const wrap = document.createElement("div");
+      wrap.className = "sv-studio-ad-example";
+      const visual = root.FLOQRSmartVisuals.resolveVisual(ex);
+      wrap.innerHTML = `<h4>${esc(ex.title)}</h4>${root.FLOQRSmartVisuals.renderAdSlot(ex, visual)}`;
+      host.appendChild(wrap);
+    });
   }
 
   function svgPreviewSrc(svgXml) {
@@ -165,7 +192,7 @@
     host.innerHTML = `<ul class="sv-studio-dl">
       <li>${esc(t("sv.diagRevision", "Registry revision"))}: ${esc(String(catalog?.revision || 1))}</li>
       <li>${esc(t("sv.diagGemini", "Gemini on view"))}: ${esc(String(root.FLOQRSmartVisualsResolver?.geminiAllowed?.() === true))}</li>
-      <li>${esc(t("sv.diagAds", "Ads enabled"))}: ${esc(String(root.FLOQRSmartVisuals?.ADS_ENABLED === true))}</li>
+      <li>${esc(t("sv.diagAds", "Ads enabled"))}: AdSense ${esc(String(root.FLOQRSmartVisuals?.ADS_ENABLED === true))} · mockFill ${esc(String(root.FLOQRSmartVisualsResolver?.adPolicy?.().mockFill === true))}</li>
       <li>${esc(t("sv.diagAssets", "Published assets"))}: ${esc(String(assets().length))}</li>
     </ul>
     <p class="sub small">${esc(t("sv.diagPii", "Diagnostics never include private BOT DEE history, member profiles, or SMARTsummary."))}</p>`;

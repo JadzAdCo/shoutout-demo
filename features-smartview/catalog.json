@@ -1,0 +1,92 @@
+{
+  "catalogVersion": 1,
+  "warning": "Verified from this repository's packaged catalog and routes. Live Firestore flags and patron-availability dates are not verified.",
+  "products": [
+    {
+      "id": "floqr",
+      "displayName": "FloqR",
+      "lifecycle": "unverified",
+      "statusVerified": false,
+      "mission": "Nightlife search, identity, and product shell shared by ShoutOut, BOT DEE, Mingl, VIP reserV, floqCast, and Si-nema.",
+      "parentProductId": null
+    },
+    {
+      "id": "bot-dee",
+      "displayName": "BOT DEE",
+      "lifecycle": "unverified",
+      "statusVerified": false,
+      "packaged": { "featureKey": "botDee", "IsFeatureEnabled": 1, "IsTestFeature": 1 },
+      "mission": "In-app concierge for search, help, and SMARTviews."
+    },
+    {
+      "id": "mingl",
+      "displayName": "Mingl",
+      "lifecycle": "unverified",
+      "statusVerified": false,
+      "packaged": { "featureKey": "mingl", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "mission": "Patron connections and chat after both people accept."
+    },
+    {
+      "id": "shoutout",
+      "displayName": "ShoutOut",
+      "lifecycle": "unverified",
+      "statusVerified": false,
+      "packaged": { "featureKey": "shoutOut", "IsFeatureEnabled": 1, "IsTestFeature": 0 },
+      "mission": "Paid LED messages at a venue."
+    },
+    {
+      "id": "vip-reserv",
+      "displayName": "VIP reserV",
+      "lifecycle": "unverified",
+      "statusVerified": false,
+      "packaged": { "featureKey": "vipReservations", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "mission": "Table holds and deposits where a club is subscribed."
+    },
+    {
+      "id": "floqcast",
+      "displayName": "floqCast",
+      "lifecycle": "unverified",
+      "statusVerified": false,
+      "packaged": { "featureKey": "floqCast", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "mission": "Phone camera to the venue Display 2 board after pay and club approve."
+    },
+    {
+      "id": "si-nema",
+      "displayName": "Si-nema",
+      "lifecycle": "unverified",
+      "statusVerified": false,
+      "packaged": { "featureKey": "sinema", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "mission": "Virtual sets from FloqMedia Spatial Studio grants."
+    },
+    {
+      "id": "si-tube",
+      "displayName": "Si-tube",
+      "lifecycle": "unverified",
+      "statusVerified": false,
+      "presentInRepo": false,
+      "mission": "Named in the Features SMARTview package only. No code in this repository."
+    }
+  ],
+  "features": [
+    {
+      "id": "mingl.beta-grant",
+      "productId": "mingl",
+      "title": "Mingl beta grant",
+      "category": "access",
+      "shortDescription": "Master Admin Features Mgmt can invite a patron and tick Mingl only after Mingl is Enabled and in Beta on Release Control.",
+      "accomplishment": "Stops Off features from being granted.",
+      "patronBenefit": "Mingl stays hidden until the club/platform actually opened it for testers.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Off features render disabled; invite drops Off keys.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "verificationNotes": "Packaged Mingl is Off. Live flags not read this run.",
+      "audienceRoles": ["masterAdmin", "betaTester"],
+      "availability": "unknown",
+      "releaseDateVerified": false,
+      "featureFlags": ["mingl"],
+      "publicCopyApproved": false,
+      "catalogVersion": 1
+    }
+  ]
+}

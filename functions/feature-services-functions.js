@@ -587,6 +587,60 @@ exports.revokeBetaInvite = onCall(CALL_OPTS, async request => {
   return {ok: true};
 });
 
+/** Master Admin Find patron: Auth email (case-insensitive) then users email / handle equality. Never scans 120 fat users docs. */
+/* s3.3.049 CI deploy marker — retrigger Features subset on main after the first tagged job was cancelled */
+exports.findBetaPatron = onCall(CALL_OPTS, async request => {
+  await assertAdmin(request, "beta.find");
+  const query = text(request.data?.query, 200);
+  if (query.length < 2) throw new HttpsError("invalid-argument", "Type at least 2 characters.");
+  const people = [];
+  const seen = new Set();
+  const push = (uid, data = {}, authEmail = "") => {
+    if (!uid || seen.has(uid)) return;
+    seen.add(uid);
+    people.push({
+      uid,
+      email: text(data.email || authEmail, 200),
+      displayName: text(data.displayName || data.fullName || "", 120),
+      floqrHandle: text(data.floqrHandle || "", 80)
+    });
+  };
+  if (query.includes("@")) {
+    const email = query.toLowerCase();
+    try {
+      const record = await admin.auth().getUserByEmail(email);
+      const snap = await db.collection("users").doc(record.uid).get();
+      push(record.uid, snap.exists ? snap.data() : {}, record.email || email);
+    } catch (error) {
+      if (error?.code !== "auth/user-not-found") {
+        console.error("findBetaPatron getUserByEmail failed", error?.message || error);
+      }
+    }
+    for (const candidate of [...new Set([query, email])]) {
+      const snap = await db.collection("users").where("email", "==", candidate).limit(5).get();
+      snap.docs.forEach(doc => push(doc.id, doc.data() || {}, candidate));
+    }
+  } else {
+    const handle = query.replace(/^@/, "");
+    if (handle) {
+      for (const candidate of [...new Set([handle, handle.toLowerCase()])]) {
+        const snap = await db.collection("users").where("floqrHandle", "==", candidate).limit(10).get();
+        snap.docs.forEach(doc => push(doc.id, doc.data() || {}));
+      }
+    }
+  }
+  const withBeta = await Promise.all(people.slice(0, 20).map(async person => {
+    const beta = await db.collection(C.betaTesters).doc(person.uid).get();
+    const row = beta.exists ? beta.data() : null;
+    return {
+      ...person,
+      isActiveBetaTester: core.isActiveBetaTester(row),
+      grantedFeatures: core.betaGrantsFrom(row)
+    };
+  }));
+  return {ok: true, people: withBeta};
+});
+
 exports.setBetaTesterFeatures = onCall(CALL_OPTS, async request => {
   const {email, sessionId} = await assertAdmin(request, "beta.features_change");
   const targetUid = text(request.data?.targetUid, 128);
@@ -600,27 +654,34 @@ exports.setBetaTesterFeatures = onCall(CALL_OPTS, async request => {
     throw asHttps(error);
   }
   const nowMs = Date.now();
+  const currentSnap = await db.collection(C.betaTesters).doc(targetUid).get();
+  const current = currentSnap.exists ? currentSnap.data() : null;
+  if (!core.isActiveBetaTester(current)) throw new HttpsError("failed-precondition", "This patron is not an active beta tester.");
+  const previous = core.validateBetaFeatures(current.features || {}, {requireOne: false});
+  if (core.canonicalJson(previous) === core.canonicalJson(features)) {
+    throw new HttpsError("failed-precondition", "Nothing changed — the tester already has that access.");
+  }
   const before = await db.runTransaction(async tx => {
     const ref = db.collection(C.betaTesters).doc(targetUid);
     const snap = await tx.get(ref);
     const head = await tx.get(headRef());
     const row = snap.exists ? snap.data() : null;
     if (!core.isActiveBetaTester(row)) throw new HttpsError("failed-precondition", "This patron is not an active beta tester.");
-    const previous = core.validateBetaFeatures(row.features || {}, {requireOne: false});
-    if (core.canonicalJson(previous) === core.canonicalJson(features)) {
+    const latest = core.validateBetaFeatures(row.features || {}, {requireOne: false});
+    if (core.canonicalJson(latest) === core.canonicalJson(features)) {
       throw new HttpsError("failed-precondition", "Nothing changed — the tester already has that access.");
     }
     tx.set(ref, {features, role: "betaTester", featuresUpdatedAtMs: nowMs, featuresUpdatedByEmail: email}, {merge: true});
     appendChainedAudit(tx, head, auditRecord(request, {
       eventType: "beta.features_changed",
       target: {type: "patron", id: targetUid},
-      before: {features: previous},
+      before: {features: latest},
       after: {features},
       reason,
       sessionId,
       nowMs
     }));
-    return previous;
+    return latest;
   });
   return {ok: true, before: grantedKeys(before), features: grantedKeys(features)};
 });
@@ -701,5 +762,6 @@ exports.verifyFeatureServiceAuditChain = onCall(CALL_OPTS, async request => {
 
 exports.__featureServiceHelpers = {
   assertFeatureAccess, viewerFor, loadFeature, UNAVAILABLE_MESSAGE,
-  assertAdmin, auditRecord, appendChainedAudit, writeChainedAudit, writeUnchainedAudit, headRef
+  assertAdmin, auditRecord, appendChainedAudit, writeChainedAudit, writeUnchainedAudit, headRef,
+  isAgentClient, auditActorFromRequest
 };

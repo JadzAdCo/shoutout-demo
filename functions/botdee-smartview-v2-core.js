@@ -811,7 +811,9 @@ function tagsFor(categories, primary, secondary) {
   const group = categories && categories[tabs.primary];
   if (!group || typeof group !== "object") return [];
   const rows = group[tabs.secondary];
-  return Array.isArray(rows) ? rows.slice() : [];
+  return Array.isArray(rows)
+    ? rows.map(tag => String(tag || "").trim()).filter(Boolean)
+    : [];
 }
 
 function noteFor({categories, primary, datingVisible}) {

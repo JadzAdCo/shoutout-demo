@@ -3146,6 +3146,12 @@
       brandName: item.brandName || loc.brandName,
       template: item.template || "neon",
       templateName: item.templateName || packaged.name || "",
+      templateClassName: packaged.className || item.templateClassName || "",
+      identityRail: item.identityRail !== false && packaged.identityRail !== false,
+      identityAnimation: item.identityAnimation || packaged.identityAnimation || "identity-loop",
+      identityAnimationSeconds: item.identityAnimationSeconds || packaged.identityAnimationSeconds || 6,
+      halloweenFinale: item.halloweenFinale === true || packaged.halloweenFinale === true,
+      allowEmoji: item.allowEmoji === true || packaged.allowEmoji === true,
       // s3.0.44: NFL dual mainText is the shoutout copy (up to 64 chars). Never re-truncate as jersey name.
       // Jersey kits: mainText mirrors the kit name; jerseyPatronName is the source of truth on the board.
       mainText: isNflDual

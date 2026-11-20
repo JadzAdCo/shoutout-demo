@@ -106,6 +106,12 @@
     if (/admin\.html/.test(href) && /tab=scheduling/.test(href)) return "Open Calendar & Scheduler";
     if (isScheduleInboxMessage(x)) return "Review & confirm shift";
     if (type === "betainvite" || /beta-invite\.html/.test(href)) return "Review beta invite";
+    if (type === "botdeeroominvite" || (/botdee\.html/.test(href) && /(?:[?&]t=|[?&]room=)/.test(href))) {
+      return "Review BOT DEE invite";
+    }
+    if (type === "pendingshoutout" || (/admin\.html/.test(href) && /(?:tab=queue|panel=panelQueue|panel=queue)\b/.test(href))) {
+      return "Open pending ShoutOuts";
+    }
     if (type === "templaterole" || /template-tags\.html/.test(href)) return "Open template tags";
     if (type === "paidvipreservreceipt" || /guest-list-reserv|vip-reservations|tab=vip/.test(href)) {
       return "Open Guest List & reserV";

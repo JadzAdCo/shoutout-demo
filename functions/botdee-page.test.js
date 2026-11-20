@@ -75,6 +75,9 @@ test("BOT DEE page is a guarded satellite with chat only (no Quick intent search
   assert.match(html, /data-floqr-chrome-icon="botDee"/);
   assert.match(html, /id="botDeeChatPage"/);
   assert.match(html, /id="botDeeTranscript"/);
+  assert.match(html, /id="botDeeShoutOutPreviewDock"/);
+  assert.ok(html.indexOf("botDeeShoutOutPreviewDock") > html.indexOf("botDeeTranscript"));
+  assert.ok(html.indexOf("botDeeChatForm") > html.indexOf("botDeeShoutOutPreviewDock"));
   assert.match(html, /id="botDeeChatForm"/);
   assert.doesNotMatch(html, /botDeeIntentFallback|Quick intent search|intentSearchPage|intentSearchInput/);
   assert.doesNotMatch(html, /intent-search\.js|botdee-search\.js/);

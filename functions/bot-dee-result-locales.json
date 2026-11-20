@@ -129,75 +129,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "Version-SMARTview-Reiter",
-          "blurb": "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet geprüfte FLOQR-Package-Hinweise aus der aktuellen README. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und "
+          "blurb": "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet nur geprüfte BOT-DEE- und Gemini-Änderungen — nicht Master Admin, Beta-Tester-Werkzeuge oder andere FLOQR-Produkthinweise. Hilfe wiederholt den Befehl Ver / Vers / Version. R"
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Version-SMARTview-Reiter",
-          "blurb": "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet geprüfte FLOQR-Package-Hinweise aus der aktuellen README. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und "
+          "blurb": "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet nur geprüfte BOT-DEE- und Gemini-Änderungen — nicht Master Admin, Beta-Tester-Werkzeuge oder andere FLOQR-Produkthinweise. Hilfe wiederholt den Befehl Ver / Vers / Version. R"
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Im BOT DEE-Chat sagen Sie Open Room SMARTview oder Start a group chat. Eine Room-SMARTview-Karte öffnet sich in derselben Blase. Bestätigen Sie, bevor etwas erstellt wird. Private BOT DEE-Nachrichten bleiben privat. Gruppen-Rooms, Einladungen und eine geteilte Rechnung sind noch "
+          "blurb": "Sage im BOT DEE-Chat Open Room SMARTview, Start a group chat oder plane eine Cancun-Reise in normalen Worten (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Das ist dieselbe Room SMARTview wie Open Room SMARTview Cancun Trip — Travel-Illustration und ein Muster-Ad Trav"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Im BOT DEE-Chat sagen Sie Open Room SMARTview oder Start a group chat. Eine Room-SMARTview-Karte öffnet sich in derselben Blase. Bestätigen Sie, bevor etwas erstellt wird. Private BOT DEE-Nachrichten bleiben privat. Gruppen-Rooms, Einladungen und eine geteilte Rechnung sind noch "
+          "blurb": "Sage im BOT DEE-Chat Open Room SMARTview, Start a group chat oder plane eine Cancun-Reise in normalen Worten (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Das ist dieselbe Room SMARTview wie Open Room SMARTview Cancun Trip — Travel-Illustration und ein Muster-Ad Trav"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "Room SMARTview-Einladung",
-          "blurb": "Laden Sie andere aus Room SMARTview ein, nachdem Sie bestätigt haben. Genannte Personen werden nicht allein durch den Namen nachgeschlagen — FLOQR sagt nicht, ob ein Konto existiert. Falsches Konto, Blockierte und Nicht-Freunde werden abgelehnt, wenn Gruppen-Rooms kommen. Heute w"
+          "label": "Mingl-Freunde einladen",
+          "blurb": "Nach Confirm zeigt Invite nur deine Mingl-Freunde. Jede Einladung ist an diesen Freund gebunden und landet in Inbox als Review BOT DEE invite. Kein öffentlicher Join-Link. Maximum Gastgeber plus 7. Gäste können weitere Mingl-Freunde einladen, bis der Gastgeber das abschaltet. Bei"
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "Room SMARTview-Einladung",
-          "blurb": "Laden Sie andere aus Room SMARTview ein, nachdem Sie bestätigt haben. Genannte Personen werden nicht allein durch den Namen nachgeschlagen — FLOQR sagt nicht, ob ein Konto existiert. Falsches Konto, Blockierte und Nicht-Freunde werden abgelehnt, wenn Gruppen-Rooms kommen. Heute w"
+          "label": "Mingl-Freunde einladen",
+          "blurb": "Nach Confirm zeigt Invite nur deine Mingl-Freunde. Jede Einladung ist an diesen Freund gebunden und landet in Inbox als Review BOT DEE invite. Kein öffentlicher Join-Link. Maximum Gastgeber plus 7. Gäste können weitere Mingl-Freunde einladen, bis der Gastgeber das abschaltet. Bei"
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "Einem Room SMARTview beitreten",
-          "blurb": "Einem Room SMARTview beizutreten ist nicht dasselbe wie einer geteilten Rechnung beizutreten oder eine Zahlung zu genehmigen. Wenn Rooms kommen, melden Sie sich an und nehmen eine gebundene Einladung an. Ein Link beitritt Sie nicht automatisch."
+          "label": "Einer BOT DEE-Sitzung beitreten",
+          "blurb": "Öffne die Inbox-Einladung, angemeldet als der Mingl-Freund, dem sie gilt. Falsches Konto, Ablauf oder Widerruf lehnt ab. Der Room ist nicht der Tab und genehmigt keine Zahlung. BOT DEE nimmt niemals Kartennummern."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "Einem Room SMARTview beitreten",
-          "blurb": "Einem Room SMARTview beizutreten ist nicht dasselbe wie einer geteilten Rechnung beizutreten oder eine Zahlung zu genehmigen. Wenn Rooms kommen, melden Sie sich an und nehmen eine gebundene Einladung an. Ein Link beitritt Sie nicht automatisch."
+          "label": "Einer BOT DEE-Sitzung beitreten",
+          "blurb": "Öffne die Inbox-Einladung, angemeldet als der Mingl-Freund, dem sie gilt. Falsches Konto, Ablauf oder Widerruf lehnt ab. Der Room ist nicht der Tab und genehmigt keine Zahlung. BOT DEE nimmt niemals Kartennummern."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beenden",
-          "blurb": "Nur der Host kann einen Room beenden, und nur nach Bestätigung. Beenden belastet niemanden und löscht keine privaten Chats anderer. Es gibt noch keinen Live-Room zum Schließen."
+          "blurb": "Nur der Gastgeber kann eine Room beenden. Beenden belastet niemanden und löscht fremde private Chats nicht. Ein unbezahlter Tab muss zuerst bezahlt oder storniert werden."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beenden",
-          "blurb": "Nur der Host kann einen Room beenden, und nur nach Bestätigung. Beenden belastet niemanden und löscht keine privaten Chats anderer. Es gibt noch keinen Live-Room zum Schließen."
+          "blurb": "Nur der Gastgeber kann eine Room beenden. Beenden belastet niemanden und löscht fremde private Chats nicht. Ein unbezahlter Tab muss zuerst bezahlt oder storniert werden."
         },
         "help:help-botdee-room-smartview-tab": {
-          "label": "Geteilte Rechnung in Room SMARTview",
-          "blurb": "Eine geteilte Rechnung ist späteres Opt-in. Dem Room beizutreten tritt keiner Rechnung bei. Einer Rechnung beizutreten genehmigt keine Zahlung. BOT DEE nimmt nie Kartennummern. Über die Rechnung teilen zu sprechen ist keine Belastung."
+          "label": "Gemeinsamer Tab Room SMARTview",
+          "blurb": "Zuerst zustimmen. Dann eine Zeile hinzufügen. Als ein Zahler oder geteilt schließen. Nur bestätigende uids werden über FloqR Stripe belastet. Dem Room beitreten heißt nicht dem Tab beitreten. BOT DEE nimmt niemals Kartennummern. Club POS kommt später."
         },
         "intent:help-botdee-room-smartview-tab": {
-          "label": "Geteilte Rechnung in Room SMARTview",
-          "blurb": "Eine geteilte Rechnung ist späteres Opt-in. Dem Room beizutreten tritt keiner Rechnung bei. Einer Rechnung beizutreten genehmigt keine Zahlung. BOT DEE nimmt nie Kartennummern. Über die Rechnung teilen zu sprechen ist keine Belastung."
+          "label": "Gemeinsamer Tab Room SMARTview",
+          "blurb": "Zuerst zustimmen. Dann eine Zeile hinzufügen. Als ein Zahler oder geteilt schließen. Nur bestätigende uids werden über FloqR Stripe belastet. Dem Room beitreten heißt nicht dem Tab beitreten. BOT DEE nimmt niemals Kartennummern. Club POS kommt später."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "Wer zahlt",
-          "blurb": "Fragen Sie Who’s paying in einem Room SMARTview, um später den gefilterten Opt-in-Status zu sehen. Niemand wird belastet, weil jemand „kaufen“ gesagt hat. Die letzten vier der Karte bleiben auf der eigenen Quittung des Zahlers."
+          "blurb": "Frage Who’s paying in Room SMARTview, um den Opt-in zu sehen. Niemand wird belastet, weil jemand buy gesagt hat. Die letzten vier der Karte bleiben auf dem Beleg des Zahlers."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "Wer zahlt",
-          "blurb": "Fragen Sie Who’s paying in einem Room SMARTview, um später den gefilterten Opt-in-Status zu sehen. Niemand wird belastet, weil jemand „kaufen“ gesagt hat. Die letzten vier der Karte bleiben auf der eigenen Quittung des Zahlers."
+          "blurb": "Frage Who’s paying in Room SMARTview, um den Opt-in zu sehen. Niemand wird belastet, weil jemand buy gesagt hat. Die letzten vier der Karte bleiben auf dem Beleg des Zahlers."
         },
         "help:help-botdee-room-smartview-kick": {
           "label": "Jemanden aus Room SMARTview entfernen",
-          "blurb": "Nur ein geprüfter Host kann ein Mitglied entfernen, und nur nach Bestätigung. Eine Modell-Antwort kann niemanden kicken. Es gibt noch keinen Live-Room zum Ändern."
+          "blurb": "Nur der Gastgeber kann einen Gast entfernen. Ein entfernter Freund liest keine weiteren Raumnachrichten. Eine Modellantwort kann niemanden kicken."
         },
         "intent:help-botdee-room-smartview-kick": {
           "label": "Jemanden aus Room SMARTview entfernen",
-          "blurb": "Nur ein geprüfter Host kann ein Mitglied entfernen, und nur nach Bestätigung. Eine Modell-Antwort kann niemanden kicken. Es gibt noch keinen Live-Room zum Ändern."
+          "blurb": "Nur der Gastgeber kann einen Gast entfernen. Ein entfernter Freund liest keine weiteren Raumnachrichten. Eine Modellantwort kann niemanden kicken."
         },
         "help:help-botdee-room-smartview-share": {
           "label": "In Room SMARTview teilen",
-          "blurb": "Share this conversation kopiert nie Ihren privaten BOT DEE-Thread. BOT DEE zeigt eine Vorschau ausgewählter teilbarer Fakten aus dieser Nachricht, als vorläufig markiert. Sie können Fakten bearbeiten oder streichen. Nichts wird veröffentlicht, bis Rooms live sind und Sie zustimme"
+          "blurb": "Share this conversation kopiert niemals deinen privaten BOT DEE-Thread. BOT DEE zeigt eine Vorschau ausgewählter teilbarer Fakten aus dieser Nachricht, als vorläufig markiert. Du kannst Fakten bearbeiten oder streichen. Profile und SMARTsummary bleiben draußen."
         },
         "intent:help-botdee-room-smartview-share": {
           "label": "In Room SMARTview teilen",
-          "blurb": "Share this conversation kopiert nie Ihren privaten BOT DEE-Thread. BOT DEE zeigt eine Vorschau ausgewählter teilbarer Fakten aus dieser Nachricht, als vorläufig markiert. Sie können Fakten bearbeiten oder streichen. Nichts wird veröffentlicht, bis Rooms live sind und Sie zustimme"
+          "blurb": "Share this conversation kopiert niemals deinen privaten BOT DEE-Thread. BOT DEE zeigt eine Vorschau ausgewählter teilbarer Fakten aus dieser Nachricht, als vorläufig markiert. Du kannst Fakten bearbeiten oder streichen. Profile und SMARTsummary bleiben draußen."
         },
         "help:help-botdee-smartview-review": {
           "label": "SMARTsummary prüfen und korrigieren",
@@ -478,6 +478,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Das Dock zeigt die echte LED-Vorlage (dieselbe Display-1-Composer-Vorschau) un"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Das Dock zeigt die echte LED-Vorlage (dieselbe Display-1-Composer-Vorschau) un"
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV aus dem BOT DEE-Chat",
+          "blurb": "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennu"
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV aus dem BOT DEE-Chat",
+          "blurb": "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennu"
         },
         "help:help-vip-book-table": {
           "label": "VIP-Tisch buchen (VIP reserV)",
@@ -1184,75 +1200,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "Onglets Version SMARTview",
-          "blurb": "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés liste les notes de package FLOQR vérifiées du README actuel. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte u"
+          "blurb": "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés n’affiche que les changements BOT DEE et Gemini vérifiés — pas Master Admin, les outils bêta-testeur, ni les autres notes produit FLOQR. Aide répète la commande Ver / Vers / Version. Changer d’"
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Onglets Version SMARTview",
-          "blurb": "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés liste les notes de package FLOQR vérifiées du README actuel. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte u"
+          "blurb": "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés n’affiche que les changements BOT DEE et Gemini vérifiés — pas Master Admin, les outils bêta-testeur, ni les autres notes produit FLOQR. Aide répète la commande Ver / Vers / Version. Changer d’"
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Dans le chat BOT DEE, dites Open Room SMARTview ou Start a group chat. Une carte Room SMARTview s’ouvre dans la même bulle. Confirmez avant toute création. Les messages BOT DEE privés restent privés. Les rooms de groupe, invitations et addition partagée ne sont pas encore en lign"
+          "blurb": "Dans le chat BOT DEE, dites Open Room SMARTview, Start a group chat, ou planifiez un voyage à Cancun en mots simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). C’est le même Room SMARTview que Open Room SMARTview Cancun Trip — illustration travel et un Ad échantil"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Dans le chat BOT DEE, dites Open Room SMARTview ou Start a group chat. Une carte Room SMARTview s’ouvre dans la même bulle. Confirmez avant toute création. Les messages BOT DEE privés restent privés. Les rooms de groupe, invitations et addition partagée ne sont pas encore en lign"
+          "blurb": "Dans le chat BOT DEE, dites Open Room SMARTview, Start a group chat, ou planifiez un voyage à Cancun en mots simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). C’est le même Room SMARTview que Open Room SMARTview Cancun Trip — illustration travel et un Ad échantil"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "Invitation Room SMARTview",
-          "blurb": "Invitez d’autres personnes depuis Room SMARTview après confirmation. Les personnes nommées ne sont pas recherchées juste parce que vous avez tapé un nom — FLOQR ne dira pas si un compte existe. Les invitations mauvais compte, bloquées et non-amis refuseront quand les rooms de gro"
+          "label": "Inviter des amis Mingl",
+          "blurb": "Après Confirm, Invite n’affiche que vos amis Mingl. Chaque invitation est liée à cet ami et arrive dans Inbox comme Review BOT DEE invite. Ce n’est pas un lien public. Capacité : hôte plus 7. Les invités peuvent inviter d’autres amis Mingl sauf si l’hôte désactive cela. Rejoindre"
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "Invitation Room SMARTview",
-          "blurb": "Invitez d’autres personnes depuis Room SMARTview après confirmation. Les personnes nommées ne sont pas recherchées juste parce que vous avez tapé un nom — FLOQR ne dira pas si un compte existe. Les invitations mauvais compte, bloquées et non-amis refuseront quand les rooms de gro"
+          "label": "Inviter des amis Mingl",
+          "blurb": "Après Confirm, Invite n’affiche que vos amis Mingl. Chaque invitation est liée à cet ami et arrive dans Inbox comme Review BOT DEE invite. Ce n’est pas un lien public. Capacité : hôte plus 7. Les invités peuvent inviter d’autres amis Mingl sauf si l’hôte désactive cela. Rejoindre"
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "Rejoindre un Room SMARTview",
-          "blurb": "Rejoindre un Room SMARTview n’est pas la même chose que rejoindre une addition partagée ou approuver un paiement. Quand les rooms arriveront, vous vous connecterez et acceptez une invitation liée. Ouvrir un lien ne vous fait pas rejoindre automatiquement."
+          "label": "Rejoindre une session BOT DEE",
+          "blurb": "Ouvrez l’invitation Inbox en étant connecté comme l’ami Mingl destinataire. Mauvais compte, expiration ou révocation refuse. Rejoindre la room n’est pas rejoindre une addition et n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "Rejoindre un Room SMARTview",
-          "blurb": "Rejoindre un Room SMARTview n’est pas la même chose que rejoindre une addition partagée ou approuver un paiement. Quand les rooms arriveront, vous vous connecterez et acceptez une invitation liée. Ouvrir un lien ne vous fait pas rejoindre automatiquement."
+          "label": "Rejoindre une session BOT DEE",
+          "blurb": "Ouvrez l’invitation Inbox en étant connecté comme l’ami Mingl destinataire. Mauvais compte, expiration ou révocation refuse. Rejoindre la room n’est pas rejoindre une addition et n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Terminer Room SMARTview",
-          "blurb": "Seul l’hôte peut terminer une room, et seulement après confirmation. Terminer ne facture personne et n’efface pas les chats privés des autres. Il n’y a pas encore de room en ligne à fermer."
+          "blurb": "Seul l’hôte peut terminer une room. Terminer ne débite personne et n’efface pas les chats privés des autres. Une addition impayée doit d’abord être payée ou annulée."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Terminer Room SMARTview",
-          "blurb": "Seul l’hôte peut terminer une room, et seulement après confirmation. Terminer ne facture personne et n’efface pas les chats privés des autres. Il n’y a pas encore de room en ligne à fermer."
+          "blurb": "Seul l’hôte peut terminer une room. Terminer ne débite personne et n’efface pas les chats privés des autres. Une addition impayée doit d’abord être payée ou annulée."
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Addition partagée Room SMARTview",
-          "blurb": "Une addition partagée est un opt-in plus tard. Rejoindre la room ne rejoint pas une addition. Rejoindre une addition n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte. Parler de partager l’addition n’est pas une facturation."
+          "blurb": "D’abord l’opt-in. Puis ajoutez une ligne. Fermez en un payeur ou en partage. Seuls les uid qui confirment sont débités via FloqR Stripe. Rejoindre la room n’est pas rejoindre l’addition. BOT DEE ne prend jamais de numéros de carte. Club POS plus tard."
         },
         "intent:help-botdee-room-smartview-tab": {
           "label": "Addition partagée Room SMARTview",
-          "blurb": "Une addition partagée est un opt-in plus tard. Rejoindre la room ne rejoint pas une addition. Rejoindre une addition n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte. Parler de partager l’addition n’est pas une facturation."
+          "blurb": "D’abord l’opt-in. Puis ajoutez une ligne. Fermez en un payeur ou en partage. Seuls les uid qui confirment sont débités via FloqR Stripe. Rejoindre la room n’est pas rejoindre l’addition. BOT DEE ne prend jamais de numéros de carte. Club POS plus tard."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "Qui paie",
-          "blurb": "Demandez Who’s paying dans un Room SMARTview pour voir plus tard le statut d’opt-in filtré. Personne n’est facturé parce que quelqu’un a dit acheter. Les quatre derniers de la carte restent sur le reçu du payeur."
+          "blurb": "Demandez Who’s paying dans Room SMARTview pour voir l’opt-in. Personne n’est débité parce que quelqu’un a dit buy. Les quatre derniers chiffres restent sur le reçu du payeur."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "Qui paie",
-          "blurb": "Demandez Who’s paying dans un Room SMARTview pour voir plus tard le statut d’opt-in filtré. Personne n’est facturé parce que quelqu’un a dit acheter. Les quatre derniers de la carte restent sur le reçu du payeur."
+          "blurb": "Demandez Who’s paying dans Room SMARTview pour voir l’opt-in. Personne n’est débité parce que quelqu’un a dit buy. Les quatre derniers chiffres restent sur le reçu du payeur."
         },
         "help:help-botdee-room-smartview-kick": {
           "label": "Retirer quelqu’un de Room SMARTview",
-          "blurb": "Seul un hôte vérifié peut retirer un membre, et seulement après confirmation. Une réponse du modèle ne peut expulser personne. Il n’y a pas encore de room en ligne à modifier."
+          "blurb": "Seul l’hôte peut retirer un invité. Un ami retiré ne lit plus les messages de la room. Une réponse du modèle ne peut exclure personne."
         },
         "intent:help-botdee-room-smartview-kick": {
           "label": "Retirer quelqu’un de Room SMARTview",
-          "blurb": "Seul un hôte vérifié peut retirer un membre, et seulement après confirmation. Une réponse du modèle ne peut expulser personne. Il n’y a pas encore de room en ligne à modifier."
+          "blurb": "Seul l’hôte peut retirer un invité. Un ami retiré ne lit plus les messages de la room. Une réponse du modèle ne peut exclure personne."
         },
         "help:help-botdee-room-smartview-share": {
           "label": "Partager dans Room SMARTview",
-          "blurb": "Share this conversation ne copie jamais votre fil BOT DEE privé. BOT DEE montre un aperçu de faits partageables sélectionnés de ce message, marqués provisoires. Vous pouvez modifier ou retirer des faits. Rien n’est publié tant que les rooms ne sont pas en ligne et que vous n’appr"
+          "blurb": "Share this conversation ne copie jamais votre fil BOT DEE privé. BOT DEE montre un aperçu de faits partageables de ce message, marqués provisoires. Vous pouvez modifier ou retirer des faits. Profils et SMARTsummary restent hors de la room."
         },
         "intent:help-botdee-room-smartview-share": {
           "label": "Partager dans Room SMARTview",
-          "blurb": "Share this conversation ne copie jamais votre fil BOT DEE privé. BOT DEE montre un aperçu de faits partageables sélectionnés de ce message, marqués provisoires. Vous pouvez modifier ou retirer des faits. Rien n’est publié tant que les rooms ne sont pas en ligne et que vous n’appr"
+          "blurb": "Share this conversation ne copie jamais votre fil BOT DEE privé. BOT DEE montre un aperçu de faits partageables de ce message, marqués provisoires. Vous pouvez modifier ou retirer des faits. Profils et SMARTsummary restent hors de la room."
         },
         "help:help-botdee-smartview-review": {
           "label": "Relire et corriger un SMARTsummary",
@@ -1533,6 +1549,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Le dock affiche le vr"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Le dock affiche le vr"
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV depuis le chat BOT DEE",
+          "blurb": "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de c"
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV depuis le chat BOT DEE",
+          "blurb": "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de c"
         },
         "help:help-vip-book-table": {
           "label": "Réserver une table VIP (VIP reserV)",
@@ -2143,11 +2175,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification de Mingl Room",
-          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Los anuncios, si se a"
+          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Un anuncio de muestra"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification de Mingl Room",
-          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Los anuncios, si se a"
+          "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Un anuncio de muestra"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview con SMARTvisuals",
@@ -2239,75 +2271,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "Pestañas de Version SMARTview",
-          "blurb": "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista notas de paquete FLOQR verificadas del README actual. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su S"
+          "blurb": "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista solo cambios verificados de BOT DEE y Gemini — no Master Admin, herramientas de beta testers ni otras notas de producto FLOQR. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o "
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Pestañas de Version SMARTview",
-          "blurb": "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista notas de paquete FLOQR verificadas del README actual. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su S"
+          "blurb": "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista solo cambios verificados de BOT DEE y Gemini — no Master Admin, herramientas de beta testers ni otras notas de producto FLOQR. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o "
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "En el chat de BOT DEE, diga Open Room SMARTview o Start a group chat. Se abre una tarjeta Room SMARTview en la misma burbuja. Confirme antes de crear nada. Los mensajes privados de BOT DEE siguen privados. Las rooms de grupo, invitaciones y cuenta compartida aún no están en vivo:"
+          "blurb": "En el chat BOT DEE di Open Room SMARTview, Start a group chat o planea un viaje a Cancun en palabras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Es el mismo Room SMARTview que Open Room SMARTview Cancun Trip — ilustración travel y un Ad de muestra Travel pa"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "En el chat de BOT DEE, diga Open Room SMARTview o Start a group chat. Se abre una tarjeta Room SMARTview en la misma burbuja. Confirme antes de crear nada. Los mensajes privados de BOT DEE siguen privados. Las rooms de grupo, invitaciones y cuenta compartida aún no están en vivo:"
+          "blurb": "En el chat BOT DEE di Open Room SMARTview, Start a group chat o planea un viaje a Cancun en palabras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Es el mismo Room SMARTview que Open Room SMARTview Cancun Trip — ilustración travel y un Ad de muestra Travel pa"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "Invitación Room SMARTview",
-          "blurb": "Invite a otros desde Room SMARTview después de confirmar. Las personas nombradas no se buscan solo por escribir un nombre: FLOQR no dirá si existe una cuenta. Invitaciones de cuenta incorrecta, bloqueadas y no amigas se rechazarán cuando lleguen las rooms de grupo. Hoy no se enví"
+          "label": "Invitar amigos Mingl",
+          "blurb": "Tras Confirm, Invite muestra solo tus amigos Mingl. Cada invitación está ligada a ese amigo y llega a Inbox como Review BOT DEE invite. No es un enlace público. Cupo: anfitrión más 7. Los invitados pueden invitar más amigos Mingl salvo que el anfitrión lo desactive. Unirse no es "
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "Invitación Room SMARTview",
-          "blurb": "Invite a otros desde Room SMARTview después de confirmar. Las personas nombradas no se buscan solo por escribir un nombre: FLOQR no dirá si existe una cuenta. Invitaciones de cuenta incorrecta, bloqueadas y no amigas se rechazarán cuando lleguen las rooms de grupo. Hoy no se enví"
+          "label": "Invitar amigos Mingl",
+          "blurb": "Tras Confirm, Invite muestra solo tus amigos Mingl. Cada invitación está ligada a ese amigo y llega a Inbox como Review BOT DEE invite. No es un enlace público. Cupo: anfitrión más 7. Los invitados pueden invitar más amigos Mingl salvo que el anfitrión lo desactive. Unirse no es "
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "Unirse a un Room SMARTview",
-          "blurb": "Unirse a un Room SMARTview no es lo mismo que unirse a una cuenta compartida o aprobar un pago. Cuando lleguen las rooms, iniciará sesión y aceptará una invitación vinculada. Abrir un enlace no le une automáticamente."
+          "label": "Unirse a una sesión BOT DEE",
+          "blurb": "Abre la invitación de Inbox iniciado sesión como el amigo Mingl destinatario. Cuenta incorrecta, caducada o revocada se niega. Unirse a la room no es unirse a una cuenta ni aprobar un pago. BOT DEE nunca toma números de tarjeta."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "Unirse a un Room SMARTview",
-          "blurb": "Unirse a un Room SMARTview no es lo mismo que unirse a una cuenta compartida o aprobar un pago. Cuando lleguen las rooms, iniciará sesión y aceptará una invitación vinculada. Abrir un enlace no le une automáticamente."
+          "label": "Unirse a una sesión BOT DEE",
+          "blurb": "Abre la invitación de Inbox iniciado sesión como el amigo Mingl destinatario. Cuenta incorrecta, caducada o revocada se niega. Unirse a la room no es unirse a una cuenta ni aprobar un pago. BOT DEE nunca toma números de tarjeta."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
-          "blurb": "Solo el anfitrión puede terminar una room, y solo tras confirmar. Terminar no cobra a nadie ni borra chats privados de otros. Aún no hay room en vivo que cerrar."
+          "blurb": "Solo el anfitrión puede terminar una room. Terminar no cobra a nadie ni borra chats privados de otros. Una cuenta impagada debe pagarse o anularse primero."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
-          "blurb": "Solo el anfitrión puede terminar una room, y solo tras confirmar. Terminar no cobra a nadie ni borra chats privados de otros. Aún no hay room en vivo que cerrar."
+          "blurb": "Solo el anfitrión puede terminar una room. Terminar no cobra a nadie ni borra chats privados de otros. Una cuenta impagada debe pagarse o anularse primero."
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Cuenta compartida Room SMARTview",
-          "blurb": "Una cuenta compartida es un opt-in posterior. Unirse a la room no une a una cuenta. Unirse a una cuenta no aprueba un pago. BOT DEE nunca toma números de tarjeta. Hablar de dividir la cuenta no es un cargo."
+          "blurb": "Primero el opt-in. Luego añade una línea. Cierra con un pagador o dividido. Solo se cobra a los uid que confirman, vía FloqR Stripe. Unirse a la room no es unirse a la cuenta. BOT DEE nunca toma números de tarjeta. Club POS más adelante."
         },
         "intent:help-botdee-room-smartview-tab": {
           "label": "Cuenta compartida Room SMARTview",
-          "blurb": "Una cuenta compartida es un opt-in posterior. Unirse a la room no une a una cuenta. Unirse a una cuenta no aprueba un pago. BOT DEE nunca toma números de tarjeta. Hablar de dividir la cuenta no es un cargo."
+          "blurb": "Primero el opt-in. Luego añade una línea. Cierra con un pagador o dividido. Solo se cobra a los uid que confirman, vía FloqR Stripe. Unirse a la room no es unirse a la cuenta. BOT DEE nunca toma números de tarjeta. Club POS más adelante."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "Quién paga",
-          "blurb": "Pregunte Who’s paying en un Room SMARTview para ver más adelante el estado de opt-in filtrado. Nadie se cobra porque alguien dijo comprar. Los cuatro últimos de la tarjeta quedan en el recibo del pagador."
+          "blurb": "Pregunta Who’s paying en Room SMARTview para ver el opt-in. Nadie se cobra porque alguien dijo buy. Los últimos cuatro de la tarjeta quedan en el recibo del pagador."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "Quién paga",
-          "blurb": "Pregunte Who’s paying en un Room SMARTview para ver más adelante el estado de opt-in filtrado. Nadie se cobra porque alguien dijo comprar. Los cuatro últimos de la tarjeta quedan en el recibo del pagador."
+          "blurb": "Pregunta Who’s paying en Room SMARTview para ver el opt-in. Nadie se cobra porque alguien dijo buy. Los últimos cuatro de la tarjeta quedan en el recibo del pagador."
         },
         "help:help-botdee-room-smartview-kick": {
           "label": "Quitar a alguien de Room SMARTview",
-          "blurb": "Solo un anfitrión verificado puede quitar a un miembro, y solo tras confirmar. Una respuesta del modelo no puede expulsar a nadie. Aún no hay room en vivo que cambiar."
+          "blurb": "Solo el anfitrión puede quitar a un invitado. Un amigo expulsado no lee más mensajes de la room. Una respuesta del modelo no puede expulsar a nadie."
         },
         "intent:help-botdee-room-smartview-kick": {
           "label": "Quitar a alguien de Room SMARTview",
-          "blurb": "Solo un anfitrión verificado puede quitar a un miembro, y solo tras confirmar. Una respuesta del modelo no puede expulsar a nadie. Aún no hay room en vivo que cambiar."
+          "blurb": "Solo el anfitrión puede quitar a un invitado. Un amigo expulsado no lee más mensajes de la room. Una respuesta del modelo no puede expulsar a nadie."
         },
         "help:help-botdee-room-smartview-share": {
           "label": "Compartir en Room SMARTview",
-          "blurb": "Share this conversation nunca copia su hilo privado de BOT DEE. BOT DEE muestra una vista previa de hechos compartibles de este mensaje, marcados como provisionales. Puede editar o quitar hechos. Nada se publica hasta que las rooms estén en vivo y usted apruebe."
+          "blurb": "Share this conversation nunca copia tu hilo privado de BOT DEE. BOT DEE muestra una vista previa de hechos compartibles de este mensaje, marcados como provisionales. Puedes editar o quitar hechos. Perfiles y SMARTsummary quedan fuera de la room."
         },
         "intent:help-botdee-room-smartview-share": {
           "label": "Compartir en Room SMARTview",
-          "blurb": "Share this conversation nunca copia su hilo privado de BOT DEE. BOT DEE muestra una vista previa de hechos compartibles de este mensaje, marcados como provisionales. Puede editar o quitar hechos. Nada se publica hasta que las rooms estén en vivo y usted apruebe."
+          "blurb": "Share this conversation nunca copia tu hilo privado de BOT DEE. BOT DEE muestra una vista previa de hechos compartibles de este mensaje, marcados como provisionales. Puedes editar o quitar hechos. Perfiles y SMARTsummary quedan fuera de la room."
         },
         "help:help-botdee-smartview-review": {
           "label": "Revisar y corregir un SMARTsummary",
@@ -2588,6 +2620,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. El dock muestra la plantilla LED real (la misma vista previa de"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. El dock muestra la plantilla LED real (la misma vista previa de"
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV desde el chat de BOT DEE",
+          "blurb": "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no"
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV desde el chat de BOT DEE",
+          "blurb": "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no"
         },
         "help:help-vip-book-table": {
           "label": "Reservar mesa VIP (VIP reserV)",
@@ -3198,11 +3246,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Gli ad"
+          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Un ese"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Gli ad"
+          "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Un ese"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview con SMARTvisuals",
@@ -3294,75 +3342,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "Schede Version SMARTview",
-          "blurb": "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca note di package FLOQR verificate dal README attuale. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il "
+          "blurb": "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca solo i cambiamenti verificati di BOT DEE e Gemini — non Master Admin, strumenti beta tester o altre note di prodotto FLOQR. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o e"
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Schede Version SMARTview",
-          "blurb": "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca note di package FLOQR verificate dal README attuale. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il "
+          "blurb": "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca solo i cambiamenti verificati di BOT DEE e Gemini — non Master Admin, strumenti beta tester o altre note di prodotto FLOQR. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o e"
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Nella chat BOT DEE, di’ Open Room SMARTview o Start a group chat. Si apre una scheda Room SMARTview nella stessa bolla. Conferma prima di creare qualcosa. I messaggi BOT DEE privati restano privati. Room di gruppo, inviti e conto condiviso non sono ancora live — Conferma non crea"
+          "blurb": "Nella chat BOT DEE di’ Open Room SMARTview, Start a group chat o pianifica un viaggio a Cancun in parole semplici (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). È lo stesso Room SMARTview di Open Room SMARTview Cancun Trip — illustrazione travel e un Ad campione Trave"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Nella chat BOT DEE, di’ Open Room SMARTview o Start a group chat. Si apre una scheda Room SMARTview nella stessa bolla. Conferma prima di creare qualcosa. I messaggi BOT DEE privati restano privati. Room di gruppo, inviti e conto condiviso non sono ancora live — Conferma non crea"
+          "blurb": "Nella chat BOT DEE di’ Open Room SMARTview, Start a group chat o pianifica un viaggio a Cancun in parole semplici (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). È lo stesso Room SMARTview di Open Room SMARTview Cancun Trip — illustrazione travel e un Ad campione Trave"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "Invito Room SMARTview",
-          "blurb": "Invita altri da Room SMARTview dopo la conferma. Le persone nominate non vengono cercate solo perché hai digitato un nome — FLOQR non dirà se un account esiste. Inviti account sbagliato, bloccati e non amici saranno rifiutati quando arriveranno le room di gruppo. Oggi non viene i"
+          "label": "Invita amici Mingl",
+          "blurb": "Dopo Confirm, Invite mostra solo i tuoi amici Mingl. Ogni invito è legato a quell’amico e arriva in Inbox come Review BOT DEE invite. Non è un link pubblico. Capienza: host più 7. Gli ospiti possono invitare altri amici Mingl finché l’host non lo disattiva. Entrare non è un pagam"
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "Invito Room SMARTview",
-          "blurb": "Invita altri da Room SMARTview dopo la conferma. Le persone nominate non vengono cercate solo perché hai digitato un nome — FLOQR non dirà se un account esiste. Inviti account sbagliato, bloccati e non amici saranno rifiutati quando arriveranno le room di gruppo. Oggi non viene i"
+          "label": "Invita amici Mingl",
+          "blurb": "Dopo Confirm, Invite mostra solo i tuoi amici Mingl. Ogni invito è legato a quell’amico e arriva in Inbox come Review BOT DEE invite. Non è un link pubblico. Capienza: host più 7. Gli ospiti possono invitare altri amici Mingl finché l’host non lo disattiva. Entrare non è un pagam"
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "Unirsi a un Room SMARTview",
-          "blurb": "Unirsi a un Room SMARTview non è come unirsi a un conto condiviso o approvare un pagamento. Quando arriveranno le room, accederai e accetterai un invito vincolato. Aprire un link non ti unisce automaticamente."
+          "label": "Unisciti a una sessione BOT DEE",
+          "blurb": "Apri l’invito Inbox autenticato come l’amico Mingl destinatario. Account sbagliato, scaduto o revocato rifiuta. Entrare nella room non è entrare in un conto e non approva un pagamento. BOT DEE non prende mai numeri di carta."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "Unirsi a un Room SMARTview",
-          "blurb": "Unirsi a un Room SMARTview non è come unirsi a un conto condiviso o approvare un pagamento. Quando arriveranno le room, accederai e accetterai un invito vincolato. Aprire un link non ti unisce automaticamente."
+          "label": "Unisciti a una sessione BOT DEE",
+          "blurb": "Apri l’invito Inbox autenticato come l’amico Mingl destinatario. Account sbagliato, scaduto o revocato rifiuta. Entrare nella room non è entrare in un conto e non approva un pagamento. BOT DEE non prende mai numeri di carta."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Termina Room SMARTview",
-          "blurb": "Solo l’host può terminare una room, e solo dopo conferma. Terminare non addebita nessuno e non cancella le chat private altrui. Non c’è ancora una room live da chiudere."
+          "blurb": "Solo l’host può terminare una room. Terminare non addebita nessuno e non cancella le chat private altrui. Un conto non pagato va prima pagato o annullato."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Termina Room SMARTview",
-          "blurb": "Solo l’host può terminare una room, e solo dopo conferma. Terminare non addebita nessuno e non cancella le chat private altrui. Non c’è ancora una room live da chiudere."
+          "blurb": "Solo l’host può terminare una room. Terminare non addebita nessuno e non cancella le chat private altrui. Un conto non pagato va prima pagato o annullato."
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Conto condiviso Room SMARTview",
-          "blurb": "Un conto condiviso è un opt-in successivo. Unirsi alla room non unisce a un conto. Unirsi a un conto non approva un pagamento. BOT DEE non prende mai numeri di carta. Parlare di dividere il conto non è un addebito."
+          "blurb": "Prima l’opt-in. Poi aggiungi una riga. Chiudi con un pagatore o diviso. Solo gli uid che confermano vengono addebitati via FloqR Stripe. Entrare nella room non è entrare nel conto. BOT DEE non prende mai numeri di carta. Club POS più avanti."
         },
         "intent:help-botdee-room-smartview-tab": {
           "label": "Conto condiviso Room SMARTview",
-          "blurb": "Un conto condiviso è un opt-in successivo. Unirsi alla room non unisce a un conto. Unirsi a un conto non approva un pagamento. BOT DEE non prende mai numeri di carta. Parlare di dividere il conto non è un addebito."
+          "blurb": "Prima l’opt-in. Poi aggiungi una riga. Chiudi con un pagatore o diviso. Solo gli uid che confermano vengono addebitati via FloqR Stripe. Entrare nella room non è entrare nel conto. BOT DEE non prende mai numeri di carta. Club POS più avanti."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "Chi paga",
-          "blurb": "Chiedi Who’s paying in un Room SMARTview per vedere in seguito lo stato opt-in filtrato. Nessuno viene addebitato perché qualcuno ha detto compra. Le ultime quattro della carta restano sulla ricevuta del pagatore."
+          "blurb": "Chiedi Who’s paying in Room SMARTview per vedere l’opt-in. Nessuno viene addebitato perché qualcuno ha detto buy. Le ultime quattro della carta restano sulla ricevuta del pagatore."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "Chi paga",
-          "blurb": "Chiedi Who’s paying in un Room SMARTview per vedere in seguito lo stato opt-in filtrato. Nessuno viene addebitato perché qualcuno ha detto compra. Le ultime quattro della carta restano sulla ricevuta del pagatore."
+          "blurb": "Chiedi Who’s paying in Room SMARTview per vedere l’opt-in. Nessuno viene addebitato perché qualcuno ha detto buy. Le ultime quattro della carta restano sulla ricevuta del pagatore."
         },
         "help:help-botdee-room-smartview-kick": {
-          "label": "Rimuovere qualcuno da Room SMARTview",
-          "blurb": "Solo un host verificato può rimuovere un membro, e solo dopo conferma. Una risposta del modello non può espellere nessuno. Non c’è ancora una room live da modificare."
+          "label": "Rimuovi qualcuno da Room SMARTview",
+          "blurb": "Solo l’host può rimuovere un ospite. Un amico rimosso non legge altri messaggi della room. Una risposta del modello non può espellere nessuno."
         },
         "intent:help-botdee-room-smartview-kick": {
-          "label": "Rimuovere qualcuno da Room SMARTview",
-          "blurb": "Solo un host verificato può rimuovere un membro, e solo dopo conferma. Una risposta del modello non può espellere nessuno. Non c’è ancora una room live da modificare."
+          "label": "Rimuovi qualcuno da Room SMARTview",
+          "blurb": "Solo l’host può rimuovere un ospite. Un amico rimosso non legge altri messaggi della room. Una risposta del modello non può espellere nessuno."
         },
         "help:help-botdee-room-smartview-share": {
           "label": "Condividi in Room SMARTview",
-          "blurb": "Share this conversation non copia mai il tuo thread BOT DEE privato. BOT DEE mostra un’anteprima di fatti condivisibili da questo messaggio, contrassegnati come provvisori. Puoi modificare o togliere fatti. Nulla viene pubblicato finché le room non sono live e tu approvi."
+          "blurb": "Share this conversation non copia mai il tuo thread BOT DEE privato. BOT DEE mostra un’anteprima di fatti condivisibili da questo messaggio, contrassegnati come provvisori. Puoi modificare o togliere fatti. Profili e SMARTsummary restano fuori dalla room."
         },
         "intent:help-botdee-room-smartview-share": {
           "label": "Condividi in Room SMARTview",
-          "blurb": "Share this conversation non copia mai il tuo thread BOT DEE privato. BOT DEE mostra un’anteprima di fatti condivisibili da questo messaggio, contrassegnati come provvisori. Puoi modificare o togliere fatti. Nulla viene pubblicato finché le room non sono live e tu approvi."
+          "blurb": "Share this conversation non copia mai il tuo thread BOT DEE privato. BOT DEE mostra un’anteprima di fatti condivisibili da questo messaggio, contrassegnati come provvisori. Puoi modificare o togliere fatti. Profili e SMARTsummary restano fuori dalla room."
         },
         "help:help-botdee-smartview-review": {
           "label": "Rivedi e correggi lo SMARTsummary",
@@ -3643,6 +3691,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Il dock mostra il vero template LED (la stessa anteprima composer di"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Il dock mostra il vero template LED (la stessa anteprima composer di"
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV dalla chat BOT DEE",
+          "blurb": "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview "
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV dalla chat BOT DEE",
+          "blurb": "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview "
         },
         "help:help-vip-book-table": {
           "label": "Prenota un tavolo VIP (VIP reserV)",
@@ -4253,11 +4317,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Anúncios, se aprovados, fic"
+          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Um anúncio de amostra rotul"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Anúncios, se aprovados, fic"
+          "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Um anúncio de amostra rotul"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview com SMARTvisuals",
@@ -4349,75 +4413,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "Abas do Version SMARTview",
-          "blurb": "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista notas de pacote FLOQR verificadas do README atual. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site C"
+          "blurb": "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista só mudanças verificadas de BOT DEE e Gemini — não Master Admin, ferramentas de beta tester nem outras notas de produto FLOQR. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou ex"
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Abas do Version SMARTview",
-          "blurb": "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista notas de pacote FLOQR verificadas do README atual. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site C"
+          "blurb": "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista só mudanças verificadas de BOT DEE e Gemini — não Master Admin, ferramentas de beta tester nem outras notas de produto FLOQR. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou ex"
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "No chat BOT DEE, diga Open Room SMARTview ou Start a group chat. Um cartão Room SMARTview abre no mesmo balão. Confirme antes de criar qualquer coisa. As mensagens privadas do BOT DEE ficam privadas. Rooms de grupo, convites e conta partilhada ainda não estão ativos — Confirmar n"
+          "blurb": "No chat BOT DEE diga Open Room SMARTview, Start a group chat ou planeie uma viagem a Cancun em palavras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). É o mesmo Room SMARTview que Open Room SMARTview Cancun Trip — ilustração travel e um Ad de amostra Travel pa"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "No chat BOT DEE, diga Open Room SMARTview ou Start a group chat. Um cartão Room SMARTview abre no mesmo balão. Confirme antes de criar qualquer coisa. As mensagens privadas do BOT DEE ficam privadas. Rooms de grupo, convites e conta partilhada ainda não estão ativos — Confirmar n"
+          "blurb": "No chat BOT DEE diga Open Room SMARTview, Start a group chat ou planeie uma viagem a Cancun em palavras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). É o mesmo Room SMARTview que Open Room SMARTview Cancun Trip — ilustração travel e um Ad de amostra Travel pa"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "Convite Room SMARTview",
-          "blurb": "Convide outros a partir do Room SMARTview depois de confirmar. Pessoas nomeadas não são procuradas só porque digitou um nome — a FLOQR não dirá se existe uma conta. Convites de conta errada, bloqueados e não amigos recusarão quando as rooms de grupo chegarem. Nada é enviado hoje;"
+          "label": "Convidar amigos Mingl",
+          "blurb": "Depois de Confirm, Invite mostra só os seus amigos Mingl. Cada convite fica ligado a esse amigo e chega ao Inbox como Review BOT DEE invite. Não é um link público. Limite: anfitrião mais 7. Convidados podem convidar mais amigos Mingl até o anfitrião desligar isso. Entrar não é pa"
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "Convite Room SMARTview",
-          "blurb": "Convide outros a partir do Room SMARTview depois de confirmar. Pessoas nomeadas não são procuradas só porque digitou um nome — a FLOQR não dirá se existe uma conta. Convites de conta errada, bloqueados e não amigos recusarão quando as rooms de grupo chegarem. Nada é enviado hoje;"
+          "label": "Convidar amigos Mingl",
+          "blurb": "Depois de Confirm, Invite mostra só os seus amigos Mingl. Cada convite fica ligado a esse amigo e chega ao Inbox como Review BOT DEE invite. Não é um link público. Limite: anfitrião mais 7. Convidados podem convidar mais amigos Mingl até o anfitrião desligar isso. Entrar não é pa"
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "Entrar num Room SMARTview",
-          "blurb": "Entrar num Room SMARTview não é o mesmo que entrar numa conta partilhada ou aprovar um pagamento. Quando as rooms chegarem, iniciará sessão e aceitará um convite vinculado. Abrir um link não o junta automaticamente."
+          "label": "Entrar numa sessão BOT DEE",
+          "blurb": "Abra o convite do Inbox autenticado como o amigo Mingl destinatário. Conta errada, expirado ou revogado recusa. Entrar na room não é entrar numa conta nem aprovar um pagamento. BOT DEE nunca pega números de cartão."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "Entrar num Room SMARTview",
-          "blurb": "Entrar num Room SMARTview não é o mesmo que entrar numa conta partilhada ou aprovar um pagamento. Quando as rooms chegarem, iniciará sessão e aceitará um convite vinculado. Abrir um link não o junta automaticamente."
+          "label": "Entrar numa sessão BOT DEE",
+          "blurb": "Abra o convite do Inbox autenticado como o amigo Mingl destinatário. Conta errada, expirado ou revogado recusa. Entrar na room não é entrar numa conta nem aprovar um pagamento. BOT DEE nunca pega números de cartão."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
-          "blurb": "Só o anfitrião pode terminar uma room, e só após confirmar. Terminar não cobra ninguém nem apaga chats privados de outros. Ainda não há room ativa para fechar."
+          "blurb": "Só o anfitrião pode terminar uma room. Terminar não cobra ninguém nem apaga chats privados de outros. Uma conta por pagar deve ser paga ou anulada primeiro."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
-          "blurb": "Só o anfitrião pode terminar uma room, e só após confirmar. Terminar não cobra ninguém nem apaga chats privados de outros. Ainda não há room ativa para fechar."
+          "blurb": "Só o anfitrião pode terminar uma room. Terminar não cobra ninguém nem apaga chats privados de outros. Uma conta por pagar deve ser paga ou anulada primeiro."
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Conta partilhada Room SMARTview",
-          "blurb": "Uma conta partilhada é um opt-in posterior. Entrar na room não entra numa conta. Entrar numa conta não aprova um pagamento. O BOT DEE nunca pede números de cartão. Falar em dividir a conta não é uma cobrança."
+          "blurb": "Primeiro o opt-in. Depois adicione uma linha. Feche com um pagador ou dividido. Só uid que confirmam são cobrados via FloqR Stripe. Entrar na room não é entrar na conta. BOT DEE nunca pega números de cartão. Club POS mais tarde."
         },
         "intent:help-botdee-room-smartview-tab": {
           "label": "Conta partilhada Room SMARTview",
-          "blurb": "Uma conta partilhada é um opt-in posterior. Entrar na room não entra numa conta. Entrar numa conta não aprova um pagamento. O BOT DEE nunca pede números de cartão. Falar em dividir a conta não é uma cobrança."
+          "blurb": "Primeiro o opt-in. Depois adicione uma linha. Feche com um pagador ou dividido. Só uid que confirmam são cobrados via FloqR Stripe. Entrar na room não é entrar na conta. BOT DEE nunca pega números de cartão. Club POS mais tarde."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "Quem paga",
-          "blurb": "Pergunte Who’s paying num Room SMARTview para ver mais tarde o estado de opt-in filtrado. Ninguém é cobrado porque alguém disse comprar. Os últimos quatro do cartão ficam no recibo do pagador."
+          "blurb": "Pergunte Who’s paying em Room SMARTview para ver o opt-in. Ninguém é cobrado porque alguém disse buy. Os últimos quatro do cartão ficam no recibo do pagador."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "Quem paga",
-          "blurb": "Pergunte Who’s paying num Room SMARTview para ver mais tarde o estado de opt-in filtrado. Ninguém é cobrado porque alguém disse comprar. Os últimos quatro do cartão ficam no recibo do pagador."
+          "blurb": "Pergunte Who’s paying em Room SMARTview para ver o opt-in. Ninguém é cobrado porque alguém disse buy. Os últimos quatro do cartão ficam no recibo do pagador."
         },
         "help:help-botdee-room-smartview-kick": {
-          "label": "Remover alguém do Room SMARTview",
-          "blurb": "Só um anfitrião verificado pode remover um membro, e só após confirmar. Uma resposta do modelo não pode expulsar ninguém. Ainda não há room ativa para alterar."
+          "label": "Remover alguém de Room SMARTview",
+          "blurb": "Só o anfitrião pode remover um convidado. Um amigo removido não lê mais mensagens da room. Uma resposta do modelo não pode expulsar ninguém."
         },
         "intent:help-botdee-room-smartview-kick": {
-          "label": "Remover alguém do Room SMARTview",
-          "blurb": "Só um anfitrião verificado pode remover um membro, e só após confirmar. Uma resposta do modelo não pode expulsar ninguém. Ainda não há room ativa para alterar."
+          "label": "Remover alguém de Room SMARTview",
+          "blurb": "Só o anfitrião pode remover um convidado. Um amigo removido não lê mais mensagens da room. Uma resposta do modelo não pode expulsar ninguém."
         },
         "help:help-botdee-room-smartview-share": {
-          "label": "Partilhar no Room SMARTview",
-          "blurb": "Share this conversation nunca copia o seu fio privado do BOT DEE. O BOT DEE mostra uma pré-visualização de factos partilháveis desta mensagem, marcados como provisórios. Pode editar ou retirar factos. Nada é publicado até as rooms estarem ativas e você aprovar."
+          "label": "Partilhar em Room SMARTview",
+          "blurb": "Share this conversation nunca copia o seu tópico privado BOT DEE. BOT DEE mostra uma pré-visualização de factos partilháveis desta mensagem, marcados como provisórios. Pode editar ou retirar factos. Perfis e SMARTsummary ficam fora da room."
         },
         "intent:help-botdee-room-smartview-share": {
-          "label": "Partilhar no Room SMARTview",
-          "blurb": "Share this conversation nunca copia o seu fio privado do BOT DEE. O BOT DEE mostra uma pré-visualização de factos partilháveis desta mensagem, marcados como provisórios. Pode editar ou retirar factos. Nada é publicado até as rooms estarem ativas e você aprovar."
+          "label": "Partilhar em Room SMARTview",
+          "blurb": "Share this conversation nunca copia o seu tópico privado BOT DEE. BOT DEE mostra uma pré-visualização de factos partilháveis desta mensagem, marcados como provisórios. Pode editar ou retirar factos. Perfis e SMARTsummary ficam fora da room."
         },
         "help:help-botdee-smartview-review": {
           "label": "Rever e corrigir o SMARTsummary",
@@ -4698,6 +4762,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. O dock mostra o modelo LED real (a mesma pré-visualização do compositor Display 1)"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. O dock mostra o modelo LED real (a mesma pré-visualização do compositor Display 1)"
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV a partir do chat BOT DEE",
+          "blurb": "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SM"
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV a partir do chat BOT DEE",
+          "blurb": "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SM"
         },
         "help:help-vip-book-table": {
           "label": "Reservar mesa VIP (VIP reserV)",
@@ -5308,11 +5388,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Реклама"
+          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Подписа"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Реклама"
+          "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Подписа"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview и SMARTvisuals",
@@ -5404,75 +5484,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "Вкладки Version SMARTview",
-          "blurb": "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового — проверенные заметки пакета FLOQR из текущего README. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ва"
+          "blurb": "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового показывает только проверенные изменения BOT DEE и Gemini — не Master Admin, не инструменты бета-тестеров и не другие заметки продуктов FLOQR. Справка повторяет команду Ver / Vers / Version. Смена"
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Вкладки Version SMARTview",
-          "blurb": "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового — проверенные заметки пакета FLOQR из текущего README. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ва"
+          "blurb": "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового показывает только проверенные изменения BOT DEE и Gemini — не Master Admin, не инструменты бета-тестеров и не другие заметки продуктов FLOQR. Справка повторяет команду Ver / Vers / Version. Смена"
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "В чате BOT DEE скажите Open Room SMARTview или Start a group chat. Карточка Room SMARTview откроется в том же пузыре. Подтвердите, прежде чем что-то создаётся. Личные сообщения BOT DEE остаются личными. Групповые room, приглашения и общий счёт ещё не в эфире — Подтвердить не созд"
+          "blurb": "В чате BOT DEE скажите Open Room SMARTview, Start a group chat или простыми словами запланируйте поездку в Cancun (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Это тот же Room SMARTview, что Open Room SMARTview Cancun Trip — travel-иллюстрация и образец Ad Travel par"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "В чате BOT DEE скажите Open Room SMARTview или Start a group chat. Карточка Room SMARTview откроется в том же пузыре. Подтвердите, прежде чем что-то создаётся. Личные сообщения BOT DEE остаются личными. Групповые room, приглашения и общий счёт ещё не в эфире — Подтвердить не созд"
+          "blurb": "В чате BOT DEE скажите Open Room SMARTview, Start a group chat или простыми словами запланируйте поездку в Cancun (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Это тот же Room SMARTview, что Open Room SMARTview Cancun Trip — travel-иллюстрация и образец Ad Travel par"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "Приглашение Room SMARTview",
-          "blurb": "Приглашайте других из Room SMARTview после подтверждения. Имена не ищутся только потому, что вы их набрали — FLOQR не скажет, существует ли аккаунт. Неверный аккаунт, блок и не-друзья будут отказны, когда появятся групповые room. Сегодня ничего не отправляется; групповые room не "
+          "label": "Пригласить друзей Mingl",
+          "blurb": "После Confirm кнопка Invite показывает только друзей Mingl. Каждое приглашение привязано к другу и приходит в Inbox как Review BOT DEE invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги."
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "Приглашение Room SMARTview",
-          "blurb": "Приглашайте других из Room SMARTview после подтверждения. Имена не ищутся только потому, что вы их набрали — FLOQR не скажет, существует ли аккаунт. Неверный аккаунт, блок и не-друзья будут отказны, когда появятся групповые room. Сегодня ничего не отправляется; групповые room не "
+          "label": "Пригласить друзей Mingl",
+          "blurb": "После Confirm кнопка Invite показывает только друзей Mingl. Каждое приглашение привязано к другу и приходит в Inbox как Review BOT DEE invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги."
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "Войти в Room SMARTview",
-          "blurb": "Вход в Room SMARTview — это не вход в общий счёт и не одобрение платежа. Когда появятся room, вы войдёте и примете привязанное приглашение. Открытие ссылки само по себе не присоединяет."
+          "label": "Войти в сессию BOT DEE",
+          "blurb": "Откройте приглашение Inbox, войдя как друг Mingl, которому оно отправлено. Чужой аккаунт, срок и отзыв отказывают. Вход в room — не вход в общий счёт и не согласие на оплату. BOT DEE никогда не берёт номера карт."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "Войти в Room SMARTview",
-          "blurb": "Вход в Room SMARTview — это не вход в общий счёт и не одобрение платежа. Когда появятся room, вы войдёте и примете привязанное приглашение. Открытие ссылки само по себе не присоединяет."
+          "label": "Войти в сессию BOT DEE",
+          "blurb": "Откройте приглашение Inbox, войдя как друг Mingl, которому оно отправлено. Чужой аккаунт, срок и отзыв отказывают. Вход в room — не вход в общий счёт и не согласие на оплату. BOT DEE никогда не берёт номера карт."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Завершить Room SMARTview",
-          "blurb": "Только хост может завершить room и только после подтверждения. Завершение никого не списывает и не стирает чужие личные чаты. Пока нет живой room для закрытия."
+          "blurb": "Только хост может завершить room. Завершение никого не списывает и не стирает чужие личные чаты. Неоплаченный общий счёт нужно оплатить или аннулировать сначала."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Завершить Room SMARTview",
-          "blurb": "Только хост может завершить room и только после подтверждения. Завершение никого не списывает и не стирает чужие личные чаты. Пока нет живой room для закрытия."
+          "blurb": "Только хост может завершить room. Завершение никого не списывает и не стирает чужие личные чаты. Неоплаченный общий счёт нужно оплатить или аннулировать сначала."
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Общий счёт Room SMARTview",
-          "blurb": "Общий счёт — это поздний opt-in. Вход в room не вход в счёт. Вход в счёт не одобряет платёж. BOT DEE никогда не берёт номера карт. Разговор о разделении счёта — не списание."
+          "blurb": "Сначала opt-in. Затем добавьте строку. Закройте одним плательщиком или раздельно. Списывают только подтвердившие uid через FloqR Stripe. Вход в room — не вход в счёт. BOT DEE никогда не берёт номера карт. Club POS позже."
         },
         "intent:help-botdee-room-smartview-tab": {
           "label": "Общий счёт Room SMARTview",
-          "blurb": "Общий счёт — это поздний opt-in. Вход в room не вход в счёт. Вход в счёт не одобряет платёж. BOT DEE никогда не берёт номера карт. Разговор о разделении счёта — не списание."
+          "blurb": "Сначала opt-in. Затем добавьте строку. Закройте одним плательщиком или раздельно. Списывают только подтвердившие uid через FloqR Stripe. Вход в room — не вход в счёт. BOT DEE никогда не берёт номера карт. Club POS позже."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "Кто платит",
-          "blurb": "Спросите Who’s paying в Room SMARTview, чтобы позже увидеть отфильтрованный opt-in. Никого не списывают потому, что кто-то сказал купить. Последние четыре карты остаются на квитанции плательщика."
+          "blurb": "Спросите Who’s paying в Room SMARTview, чтобы увидеть opt-in. Никого не списывают потому, что кто-то сказал купить. Последние четыре карты остаются на квитанции плательщика."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "Кто платит",
-          "blurb": "Спросите Who’s paying в Room SMARTview, чтобы позже увидеть отфильтрованный opt-in. Никого не списывают потому, что кто-то сказал купить. Последние четыре карты остаются на квитанции плательщика."
+          "blurb": "Спросите Who’s paying в Room SMARTview, чтобы увидеть opt-in. Никого не списывают потому, что кто-то сказал купить. Последние четыре карты остаются на квитанции плательщика."
         },
         "help:help-botdee-room-smartview-kick": {
           "label": "Удалить из Room SMARTview",
-          "blurb": "Только проверенный хост может удалить участника и только после подтверждения. Ответ модели никого не исключает. Пока нет живой room для изменения."
+          "blurb": "Только хост может удалить гостя. Удалённый друг не читает дальнейшие сообщения room. Ответ модели никого не исключает."
         },
         "intent:help-botdee-room-smartview-kick": {
           "label": "Удалить из Room SMARTview",
-          "blurb": "Только проверенный хост может удалить участника и только после подтверждения. Ответ модели никого не исключает. Пока нет живой room для изменения."
+          "blurb": "Только хост может удалить гостя. Удалённый друг не читает дальнейшие сообщения room. Ответ модели никого не исключает."
         },
         "help:help-botdee-room-smartview-share": {
           "label": "Поделиться в Room SMARTview",
-          "blurb": "Share this conversation никогда не копирует ваш личный тред BOT DEE. BOT DEE показывает предпросмотр выбранных фактов из этого сообщения, помеченных как предварительные. Можно править или убрать факты. Ничего не публикуется, пока room не в эфире и вы не одобрите."
+          "blurb": "Share this conversation никогда не копирует ваш личный тред BOT DEE. BOT DEE показывает предпросмотр выбранных фактов из этого сообщения, помеченных как предварительные. Можно править или убрать факты. Профили и SMARTsummary остаются вне room."
         },
         "intent:help-botdee-room-smartview-share": {
           "label": "Поделиться в Room SMARTview",
-          "blurb": "Share this conversation никогда не копирует ваш личный тред BOT DEE. BOT DEE показывает предпросмотр выбранных фактов из этого сообщения, помеченных как предварительные. Можно править или убрать факты. Ничего не публикуется, пока room не в эфире и вы не одобрите."
+          "blurb": "Share this conversation никогда не копирует ваш личный тред BOT DEE. BOT DEE показывает предпросмотр выбранных фактов из этого сообщения, помеченных как предварительные. Можно править или убрать факты. Профили и SMARTsummary остаются вне room."
         },
         "help:help-botdee-smartview-review": {
           "label": "Проверить и исправить SMARTsummary",
@@ -5753,6 +5833,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Док показывает живой LED-шаблон (тот же предпросмотр Display 1) и обновляется при выборе "
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Док показывает живой LED-шаблон (тот же предпросмотр Display 1) и обновляется при выборе "
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV из чата BOT DEE",
+          "blurb": "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview"
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV из чата BOT DEE",
+          "blurb": "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview"
         },
         "help:help-vip-book-table": {
           "label": "Забронировать VIP-стол (VIP reserV)",
@@ -6459,75 +6555,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "Καρτέλες Version SMARTview",
-          "blurb": "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει επαληθευμένες σημειώσεις πακέτου FLOQR από το τρέχον README. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο π"
+          "blurb": "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει μόνο επαληθευμένες αλλαγές BOT DEE και Gemini — όχι Master Admin, εργαλεία beta tester ή άλλες σημειώσεις προϊόντος FLOQR. Βοήθεια επαναλαμβάνει την εντολή Ver / Ver"
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Καρτέλες Version SMARTview",
-          "blurb": "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει επαληθευμένες σημειώσεις πακέτου FLOQR από το τρέχον README. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο π"
+          "blurb": "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει μόνο επαληθευμένες αλλαγές BOT DEE και Gemini — όχι Master Admin, εργαλεία beta tester ή άλλες σημειώσεις προϊόντος FLOQR. Βοήθεια επαναλαμβάνει την εντολή Ver / Ver"
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Στη συνομιλία BOT DEE πείτε Open Room SMARTview ή Start a group chat. Ανοίγει κάρτα Room SMARTview στην ίδια φυσαλίδα. Επιβεβαιώστε πριν δημιουργηθεί οτιδήποτε. Τα ιδιωτικά μηνύματα BOT DEE μένουν ιδιωτικά. Ομαδικές room, προσκλήσεις και κοινός λογαριασμός δεν είναι ακόμα live — "
+          "blurb": "Στη συνομιλία BOT DEE πείτε Open Room SMARTview, Start a group chat ή σχεδιάστε ένα ταξίδι Cancun με απλά λόγια (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Είναι το ίδιο Room SMARTview με Open Room SMARTview Cancun Trip — travel εικονογράφηση και δείγμα Ad Travel p"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Στη συνομιλία BOT DEE πείτε Open Room SMARTview ή Start a group chat. Ανοίγει κάρτα Room SMARTview στην ίδια φυσαλίδα. Επιβεβαιώστε πριν δημιουργηθεί οτιδήποτε. Τα ιδιωτικά μηνύματα BOT DEE μένουν ιδιωτικά. Ομαδικές room, προσκλήσεις και κοινός λογαριασμός δεν είναι ακόμα live — "
+          "blurb": "Στη συνομιλία BOT DEE πείτε Open Room SMARTview, Start a group chat ή σχεδιάστε ένα ταξίδι Cancun με απλά λόγια (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Είναι το ίδιο Room SMARTview με Open Room SMARTview Cancun Trip — travel εικονογράφηση και δείγμα Ad Travel p"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "Πρόσκληση Room SMARTview",
-          "blurb": "Προσκαλέστε άλλους από το Room SMARTview μετά την επιβεβαίωση. Τα ονόματα δεν αναζητούνται μόνο επειδή τα πληκτρολογήσατε — η FLOQR δεν θα πει αν υπάρχει λογαριασμός. Λάθος λογαριασμός, αποκλεισμένοι και μη φίλοι θα απορρίπτονται όταν έρθουν οι ομαδικές room. Σήμερα δεν στέλνεται"
+          "label": "Πρόσκληση φίλων Mingl",
+          "blurb": "Μετά το Confirm, το Invite δείχνει μόνο τους φίλους Mingl. Κάθε πρόσκληση δεσμεύεται σε αυτόν τον φίλο και φτάνει στο Inbox ως Review BOT DEE invite. Όχι δημόσιος σύνδεσμος. Όριο: οικοδεσπότης συν 7. Οι επισκέπτες μπορούν να προσκαλούν περισσότερους φίλους Mingl μέχρι ο οικοδεσπό"
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "Πρόσκληση Room SMARTview",
-          "blurb": "Προσκαλέστε άλλους από το Room SMARTview μετά την επιβεβαίωση. Τα ονόματα δεν αναζητούνται μόνο επειδή τα πληκτρολογήσατε — η FLOQR δεν θα πει αν υπάρχει λογαριασμός. Λάθος λογαριασμός, αποκλεισμένοι και μη φίλοι θα απορρίπτονται όταν έρθουν οι ομαδικές room. Σήμερα δεν στέλνεται"
+          "label": "Πρόσκληση φίλων Mingl",
+          "blurb": "Μετά το Confirm, το Invite δείχνει μόνο τους φίλους Mingl. Κάθε πρόσκληση δεσμεύεται σε αυτόν τον φίλο και φτάνει στο Inbox ως Review BOT DEE invite. Όχι δημόσιος σύνδεσμος. Όριο: οικοδεσπότης συν 7. Οι επισκέπτες μπορούν να προσκαλούν περισσότερους φίλους Mingl μέχρι ο οικοδεσπό"
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "Είσοδος σε Room SMARTview",
-          "blurb": "Η είσοδος σε Room SMARTview δεν είναι είσοδος σε κοινό λογαριασμό ούτε έγκριση πληρωμής. Όταν έρθουν οι room, θα συνδεθείτε και θα αποδεχτείτε δεσμευμένη πρόσκληση. Το άνοιγμα συνδέσμου δεν σας βάζει αυτόματα."
+          "label": "Συμμετοχή σε συνεδρία BOT DEE",
+          "blurb": "Ανοίξτε την πρόσκληση Inbox συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Λάθος λογαριασμός, λήξη ή ανάκληση αρνείται. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό ούτε έγκριση πληρωμής. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "Είσοδος σε Room SMARTview",
-          "blurb": "Η είσοδος σε Room SMARTview δεν είναι είσοδος σε κοινό λογαριασμό ούτε έγκριση πληρωμής. Όταν έρθουν οι room, θα συνδεθείτε και θα αποδεχτείτε δεσμευμένη πρόσκληση. Το άνοιγμα συνδέσμου δεν σας βάζει αυτόματα."
+          "label": "Συμμετοχή σε συνεδρία BOT DEE",
+          "blurb": "Ανοίξτε την πρόσκληση Inbox συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Λάθος λογαριασμός, λήξη ή ανάκληση αρνείται. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό ούτε έγκριση πληρωμής. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Τέλος Room SMARTview",
-          "blurb": "Μόνο ο host μπορεί να τελειώσει μια room, και μόνο μετά από επιβεβαίωση. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Δεν υπάρχει ακόμα live room για κλείσιμο."
+          "blurb": "Μόνο ο οικοδεσπότης μπορεί να τερματίσει μια room. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Ένας απλήρωτος κοινός λογαριασμός πρέπει πρώτα να πληρωθεί ή να ακυρωθεί."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Τέλος Room SMARTview",
-          "blurb": "Μόνο ο host μπορεί να τελειώσει μια room, και μόνο μετά από επιβεβαίωση. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Δεν υπάρχει ακόμα live room για κλείσιμο."
+          "blurb": "Μόνο ο οικοδεσπότης μπορεί να τερματίσει μια room. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Ένας απλήρωτος κοινός λογαριασμός πρέπει πρώτα να πληρωθεί ή να ακυρωθεί."
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Κοινός λογαριασμός Room SMARTview",
-          "blurb": "Ο κοινός λογαριασμός είναι μεταγενέστερο opt-in. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό. Η είσοδος σε λογαριασμό δεν εγκρίνει πληρωμή. Το BOT DEE δεν παίρνει ποτέ αριθμούς κάρτας. Η συζήτηση για μοίρασμα λογαριασμού δεν είναι χρέωση."
+          "blurb": "Πρώτα opt-in. Μετά προσθέστε γραμμή. Κλείστε με έναν πληρωτή ή μοιρασμένα. Χρεώνονται μόνο uid που επιβεβαιώνουν, μέσω FloqR Stripe. Η είσοδος στη room δεν είναι είσοδος στον λογαριασμό. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Club POS αργότερα."
         },
         "intent:help-botdee-room-smartview-tab": {
           "label": "Κοινός λογαριασμός Room SMARTview",
-          "blurb": "Ο κοινός λογαριασμός είναι μεταγενέστερο opt-in. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό. Η είσοδος σε λογαριασμό δεν εγκρίνει πληρωμή. Το BOT DEE δεν παίρνει ποτέ αριθμούς κάρτας. Η συζήτηση για μοίρασμα λογαριασμού δεν είναι χρέωση."
+          "blurb": "Πρώτα opt-in. Μετά προσθέστε γραμμή. Κλείστε με έναν πληρωτή ή μοιρασμένα. Χρεώνονται μόνο uid που επιβεβαιώνουν, μέσω FloqR Stripe. Η είσοδος στη room δεν είναι είσοδος στον λογαριασμό. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Club POS αργότερα."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "Ποιος πληρώνει",
-          "blurb": "Ρωτήστε Who’s paying σε Room SMARTview για να δείτε αργότερα φιλτραρισμένη κατάσταση opt-in. Κανείς δεν χρεώνεται επειδή κάποιος είπε αγόρασε. Τα τελευταία τέσσερα της κάρτας μένουν στην απόδειξη του πληρωτή."
+          "blurb": "Ρωτήστε Who’s paying σε Room SMARTview για να δείτε το opt-in. Κανείς δεν χρεώνεται επειδή κάποιος είπε buy. Τα τελευταία τέσσερα της κάρτας μένουν στην απόδειξη του πληρωτή."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "Ποιος πληρώνει",
-          "blurb": "Ρωτήστε Who’s paying σε Room SMARTview για να δείτε αργότερα φιλτραρισμένη κατάσταση opt-in. Κανείς δεν χρεώνεται επειδή κάποιος είπε αγόρασε. Τα τελευταία τέσσερα της κάρτας μένουν στην απόδειξη του πληρωτή."
+          "blurb": "Ρωτήστε Who’s paying σε Room SMARTview για να δείτε το opt-in. Κανείς δεν χρεώνεται επειδή κάποιος είπε buy. Τα τελευταία τέσσερα της κάρτας μένουν στην απόδειξη του πληρωτή."
         },
         "help:help-botdee-room-smartview-kick": {
           "label": "Αφαίρεση από Room SMARTview",
-          "blurb": "Μόνο επαληθευμένος host μπορεί να αφαιρέσει μέλος, και μόνο μετά από επιβεβαίωση. Απάντηση μοντέλου δεν μπορεί να διώξει κανέναν. Δεν υπάρχει ακόμα live room για αλλαγή."
+          "blurb": "Μόνο ο οικοδεσπότης αφαιρεί επισκέπτη. Ένας απομακρυσμένος φίλος δεν διαβάζει άλλα μηνύματα room. Απάντηση μοντέλου δεν αποκλείει κανέναν."
         },
         "intent:help-botdee-room-smartview-kick": {
           "label": "Αφαίρεση από Room SMARTview",
-          "blurb": "Μόνο επαληθευμένος host μπορεί να αφαιρέσει μέλος, και μόνο μετά από επιβεβαίωση. Απάντηση μοντέλου δεν μπορεί να διώξει κανέναν. Δεν υπάρχει ακόμα live room για αλλαγή."
+          "blurb": "Μόνο ο οικοδεσπότης αφαιρεί επισκέπτη. Ένας απομακρυσμένος φίλος δεν διαβάζει άλλα μηνύματα room. Απάντηση μοντέλου δεν αποκλείει κανέναν."
         },
         "help:help-botdee-room-smartview-share": {
-          "label": "Κοινοποίηση στο Room SMARTview",
-          "blurb": "Το Share this conversation δεν αντιγράφει ποτέ το ιδιωτικό νήμα BOT DEE. Το BOT DEE δείχνει προεπισκόπηση επιλεγμένων στοιχείων από αυτό το μήνυμα, ως προσωρινά. Μπορείτε να επεξεργαστείτε ή να αφαιρέσετε στοιχεία. Τίποτα δεν δημοσιεύεται μέχρι να είναι live οι room και να εγκρίν"
+          "label": "Κοινοποίηση σε Room SMARTview",
+          "blurb": "Το Share this conversation δεν αντιγράφει ποτέ το ιδιωτικό νήμα BOT DEE. Το BOT DEE δείχνει προεπισκόπηση επιλεγμένων κοινοποιήσιμων στοιχείων από αυτό το μήνυμα, ως προσωρινά. Μπορείτε να επεξεργαστείτε ή να αφαιρέσετε στοιχεία. Προφίλ και SMARTsummary μένουν έξω από τη room."
         },
         "intent:help-botdee-room-smartview-share": {
-          "label": "Κοινοποίηση στο Room SMARTview",
-          "blurb": "Το Share this conversation δεν αντιγράφει ποτέ το ιδιωτικό νήμα BOT DEE. Το BOT DEE δείχνει προεπισκόπηση επιλεγμένων στοιχείων από αυτό το μήνυμα, ως προσωρινά. Μπορείτε να επεξεργαστείτε ή να αφαιρέσετε στοιχεία. Τίποτα δεν δημοσιεύεται μέχρι να είναι live οι room και να εγκρίν"
+          "label": "Κοινοποίηση σε Room SMARTview",
+          "blurb": "Το Share this conversation δεν αντιγράφει ποτέ το ιδιωτικό νήμα BOT DEE. Το BOT DEE δείχνει προεπισκόπηση επιλεγμένων κοινοποιήσιμων στοιχείων από αυτό το μήνυμα, ως προσωρινά. Μπορείτε να επεξεργαστείτε ή να αφαιρέσετε στοιχεία. Προφίλ και SMARTsummary μένουν έξω από τη room."
         },
         "help:help-botdee-smartview-review": {
           "label": "Έλεγχος και διόρθωση SMARTsummary",
@@ -6808,6 +6904,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Το dock δείχνει το πραγματικό LED πρότυπο (την ίδια προεπισκόπηση Display 1"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Το dock δείχνει το πραγματικό LED πρότυπο (την ίδια προεπισκόπηση Display 1"
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV από τη συνομιλία BOT DEE",
+          "blurb": "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμού"
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV από τη συνομιλία BOT DEE",
+          "blurb": "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμού"
         },
         "help:help-vip-book-table": {
           "label": "Κράτηση VIP τραπεζιού (VIP reserV)",
@@ -7418,11 +7530,11 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Reklamy, jeśli kiedyś"
+          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Oznakowana próbka Ad "
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
-          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Reklamy, jeśli kiedyś"
+          "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Oznakowana próbka Ad "
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview ze SMARTvisuals",
@@ -7514,75 +7626,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "Karty Version SMARTview",
-          "blurb": "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje zweryfikowane notatki pakietu FLOQR z bieżącego README. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa"
+          "blurb": "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje tylko zweryfikowane zmiany BOT DEE i Gemini — nie Master Admin, narzędzia beta testerów ani inne notatki produktów FLOQR. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lu"
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Karty Version SMARTview",
-          "blurb": "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje zweryfikowane notatki pakietu FLOQR z bieżącego README. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa"
+          "blurb": "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje tylko zweryfikowane zmiany BOT DEE i Gemini — nie Master Admin, narzędzia beta testerów ani inne notatki produktów FLOQR. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lu"
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "W czacie BOT DEE powiedz Open Room SMARTview lub Start a group chat. Karta Room SMARTview otworzy się w tej samej dymku. Potwierdź, zanim cokolwiek powstanie. Prywatne wiadomości BOT DEE zostają prywatne. Roomy grupowe, zaproszenia i wspólny rachunek nie są jeszcze na żywo — Potw"
+          "blurb": "W czacie BOT DEE powiedz Open Room SMARTview, Start a group chat albo zaplanuj wyjazd do Cancun zwykłymi słowami (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). To ten sam Room SMARTview co Open Room SMARTview Cancun Trip — ilustracja travel i przykładowy Ad Travel par"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "W czacie BOT DEE powiedz Open Room SMARTview lub Start a group chat. Karta Room SMARTview otworzy się w tej samej dymku. Potwierdź, zanim cokolwiek powstanie. Prywatne wiadomości BOT DEE zostają prywatne. Roomy grupowe, zaproszenia i wspólny rachunek nie są jeszcze na żywo — Potw"
+          "blurb": "W czacie BOT DEE powiedz Open Room SMARTview, Start a group chat albo zaplanuj wyjazd do Cancun zwykłymi słowami (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). To ten sam Room SMARTview co Open Room SMARTview Cancun Trip — ilustracja travel i przykładowy Ad Travel par"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "Zaproszenie Room SMARTview",
-          "blurb": "Zaproś innych z Room SMARTview po potwierdzeniu. Osoby nazwane nie są wyszukiwane tylko dlatego, że wpisano imię — FLOQR nie powie, czy konto istnieje. Złe konto, blokada i nie-znajomi odmówią, gdy pojawią się roomy grupowe. Dziś nic nie jest wysyłane; roomy grupowe nie są na żyw"
+          "label": "Zaproś znajomych Mingl",
+          "blurb": "Po Confirm Invite pokazuje tylko Twoich znajomych Mingl. Każde zaproszenie jest powiązane z tym znajomym i trafia do Inbox jako Review BOT DEE invite. To nie jest publiczny link. Limit: gospodarz plus 7. Goście mogą zapraszać więcej znajomych Mingl, dopóki gospodarz tego nie wyłą"
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "Zaproszenie Room SMARTview",
-          "blurb": "Zaproś innych z Room SMARTview po potwierdzeniu. Osoby nazwane nie są wyszukiwane tylko dlatego, że wpisano imię — FLOQR nie powie, czy konto istnieje. Złe konto, blokada i nie-znajomi odmówią, gdy pojawią się roomy grupowe. Dziś nic nie jest wysyłane; roomy grupowe nie są na żyw"
+          "label": "Zaproś znajomych Mingl",
+          "blurb": "Po Confirm Invite pokazuje tylko Twoich znajomych Mingl. Każde zaproszenie jest powiązane z tym znajomym i trafia do Inbox jako Review BOT DEE invite. To nie jest publiczny link. Limit: gospodarz plus 7. Goście mogą zapraszać więcej znajomych Mingl, dopóki gospodarz tego nie wyłą"
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "Dołącz do Room SMARTview",
-          "blurb": "Dołączenie do Room SMARTview to nie to samo co dołączenie do wspólnego rachunku ani zgoda na płatność. Gdy pojawią się roomy, zalogujesz się i przyjmiesz powiązane zaproszenie. Otwarcie linku samo Cię nie dodaje."
+          "label": "Dołącz do sesji BOT DEE",
+          "blurb": "Otwórz zaproszenie Inbox zalogowany jako znajomy Mingl, do którego je wysłano. Złe konto, wygaśnięcie lub odwołanie odmawia. Dołączenie do room to nie dołączenie do rachunku ani zgoda na płatność. BOT DEE nigdy nie bierze numerów kart."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "Dołącz do Room SMARTview",
-          "blurb": "Dołączenie do Room SMARTview to nie to samo co dołączenie do wspólnego rachunku ani zgoda na płatność. Gdy pojawią się roomy, zalogujesz się i przyjmiesz powiązane zaproszenie. Otwarcie linku samo Cię nie dodaje."
+          "label": "Dołącz do sesji BOT DEE",
+          "blurb": "Otwórz zaproszenie Inbox zalogowany jako znajomy Mingl, do którego je wysłano. Złe konto, wygaśnięcie lub odwołanie odmawia. Dołączenie do room to nie dołączenie do rachunku ani zgoda na płatność. BOT DEE nigdy nie bierze numerów kart."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Zakończ Room SMARTview",
-          "blurb": "Tylko host może zakończyć room i tylko po potwierdzeniu. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nie ma jeszcze live room do zamknięcia."
+          "blurb": "Tylko gospodarz może zakończyć room. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nieopłacony wspólny rachunek trzeba najpierw zapłacić lub unieważnić."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Zakończ Room SMARTview",
-          "blurb": "Tylko host może zakończyć room i tylko po potwierdzeniu. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nie ma jeszcze live room do zamknięcia."
+          "blurb": "Tylko gospodarz może zakończyć room. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nieopłacony wspólny rachunek trzeba najpierw zapłacić lub unieważnić."
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Wspólny rachunek Room SMARTview",
-          "blurb": "Wspólny rachunek to późniejszy opt-in. Dołączenie do room to nie dołączenie do rachunku. Dołączenie do rachunku nie zatwierdza płatności. BOT DEE nigdy nie bierze numerów kart. Rozmowa o podziale rachunku to nie opłata."
+          "blurb": "Najpierw opt-in. Potem dodaj pozycję. Zamknij jednym płatnikiem lub podziel. Obciążani są tylko potwierdzający uid przez FloqR Stripe. Dołączenie do room to nie dołączenie do rachunku. BOT DEE nigdy nie bierze numerów kart. Club POS później."
         },
         "intent:help-botdee-room-smartview-tab": {
           "label": "Wspólny rachunek Room SMARTview",
-          "blurb": "Wspólny rachunek to późniejszy opt-in. Dołączenie do room to nie dołączenie do rachunku. Dołączenie do rachunku nie zatwierdza płatności. BOT DEE nigdy nie bierze numerów kart. Rozmowa o podziale rachunku to nie opłata."
+          "blurb": "Najpierw opt-in. Potem dodaj pozycję. Zamknij jednym płatnikiem lub podziel. Obciążani są tylko potwierdzający uid przez FloqR Stripe. Dołączenie do room to nie dołączenie do rachunku. BOT DEE nigdy nie bierze numerów kart. Club POS później."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "Kto płaci",
-          "blurb": "Zapytaj Who’s paying w Room SMARTview, by później zobaczyć odfiltrowany status opt-in. Nikt nie jest obciążany, bo ktoś powiedział kup. Ostatnie cztery karty zostają na paragonie płatnika."
+          "blurb": "Zapytaj Who’s paying w Room SMARTview, by zobaczyć opt-in. Nikt nie jest obciążany, bo ktoś powiedział buy. Ostatnie cztery karty zostają na paragonie płatnika."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "Kto płaci",
-          "blurb": "Zapytaj Who’s paying w Room SMARTview, by później zobaczyć odfiltrowany status opt-in. Nikt nie jest obciążany, bo ktoś powiedział kup. Ostatnie cztery karty zostają na paragonie płatnika."
+          "blurb": "Zapytaj Who’s paying w Room SMARTview, by zobaczyć opt-in. Nikt nie jest obciążany, bo ktoś powiedział buy. Ostatnie cztery karty zostają na paragonie płatnika."
         },
         "help:help-botdee-room-smartview-kick": {
           "label": "Usuń kogoś z Room SMARTview",
-          "blurb": "Tylko zweryfikowany host może usunąć członka i tylko po potwierdzeniu. Odpowiedź modelu nikogo nie wyrzuca. Nie ma jeszcze live room do zmiany."
+          "blurb": "Tylko gospodarz może usunąć gościa. Usunięty znajomy nie czyta dalszych wiadomości room. Odpowiedź modelu nikogo nie wyrzuca."
         },
         "intent:help-botdee-room-smartview-kick": {
           "label": "Usuń kogoś z Room SMARTview",
-          "blurb": "Tylko zweryfikowany host może usunąć członka i tylko po potwierdzeniu. Odpowiedź modelu nikogo nie wyrzuca. Nie ma jeszcze live room do zmiany."
+          "blurb": "Tylko gospodarz może usunąć gościa. Usunięty znajomy nie czyta dalszych wiadomości room. Odpowiedź modelu nikogo nie wyrzuca."
         },
         "help:help-botdee-room-smartview-share": {
           "label": "Udostępnij w Room SMARTview",
-          "blurb": "Share this conversation nigdy nie kopiuje Twojego prywatnego wątku BOT DEE. BOT DEE pokazuje podgląd wybranych faktów z tej wiadomości, oznaczonych jako wstępne. Możesz edytować lub odrzucić fakty. Nic nie jest publikowane, dopóki roomy nie będą na żywo i nie zatwierdzisz."
+          "blurb": "Share this conversation nigdy nie kopiuje Twojego prywatnego wątku BOT DEE. BOT DEE pokazuje podgląd wybranych faktów z tej wiadomości, oznaczonych jako wstępne. Możesz edytować lub odrzucić fakty. Profile i SMARTsummary zostają poza room."
         },
         "intent:help-botdee-room-smartview-share": {
           "label": "Udostępnij w Room SMARTview",
-          "blurb": "Share this conversation nigdy nie kopiuje Twojego prywatnego wątku BOT DEE. BOT DEE pokazuje podgląd wybranych faktów z tej wiadomości, oznaczonych jako wstępne. Możesz edytować lub odrzucić fakty. Nic nie jest publikowane, dopóki roomy nie będą na żywo i nie zatwierdzisz."
+          "blurb": "Share this conversation nigdy nie kopiuje Twojego prywatnego wątku BOT DEE. BOT DEE pokazuje podgląd wybranych faktów z tej wiadomości, oznaczonych jako wstępne. Możesz edytować lub odrzucić fakty. Profile i SMARTsummary zostają poza room."
         },
         "help:help-botdee-smartview-review": {
           "label": "Przejrzyj i popraw SMARTsummary",
@@ -7863,6 +7975,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Dock pokazuje żywy szablon LED (ten sam podgląd Display 1) i odświeża się"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Dock pokazuje żywy szablon LED (ten sam podgląd Display 1) i odświeża się"
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV z czatu BOT DEE",
+          "blurb": "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołąc"
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV z czatu BOT DEE",
+          "blurb": "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołąc"
         },
         "help:help-vip-book-table": {
           "label": "Zarezerwuj stolik VIP (VIP reserV)",
@@ -8569,75 +8697,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "Version SMARTview-tabbladen",
-          "blurb": "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont geverifieerde FLOQR-packagenotities uit de huidige README. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaa"
+          "blurb": "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont alleen geverifieerde BOT DEE- en Gemini-wijzigingen — geen Master Admin, bèta-testertools of andere FLOQR-productnotities. Help herhaalt het commando Ver / Vers / Version. Tab wissele"
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "Version SMARTview-tabbladen",
-          "blurb": "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont geverifieerde FLOQR-packagenotities uit de huidige README. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaa"
+          "blurb": "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont alleen geverifieerde BOT DEE- en Gemini-wijzigingen — geen Master Admin, bèta-testertools of andere FLOQR-productnotities. Help herhaalt het commando Ver / Vers / Version. Tab wissele"
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Zeg in de BOT DEE-chat Open Room SMARTview of Start a group chat. Er opent een Room SMARTview-kaart in dezelfde bubble. Bevestig voordat er iets wordt aangemaakt. Privé-BOT DEE-berichten blijven privé. Groepsrooms, uitnodigingen en een gedeelde rekening zijn nog niet live — Beves"
+          "blurb": "Zeg in BOT DEE-chat Open Room SMARTview, Start a group chat, of plan in gewone woorden een Cancun-trip (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Dat opent dezelfde Room SMARTview als Open Room SMARTview Cancun Trip — travel-illustratie en een sample Ad Travel par"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "Zeg in de BOT DEE-chat Open Room SMARTview of Start a group chat. Er opent een Room SMARTview-kaart in dezelfde bubble. Bevestig voordat er iets wordt aangemaakt. Privé-BOT DEE-berichten blijven privé. Groepsrooms, uitnodigingen en een gedeelde rekening zijn nog niet live — Beves"
+          "blurb": "Zeg in BOT DEE-chat Open Room SMARTview, Start a group chat, of plan in gewone woorden een Cancun-trip (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Dat opent dezelfde Room SMARTview als Open Room SMARTview Cancun Trip — travel-illustratie en een sample Ad Travel par"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "Room SMARTview-uitnodiging",
-          "blurb": "Nodig anderen uit via Room SMARTview na bevestiging. Genoemde personen worden niet opgezocht alleen omdat je een naam typte — FLOQR zegt niet of een account bestaat. Verkeerd account, geblokkeerd en niet-vrienden worden geweigerd wanneer groepsrooms komen. Vandaag wordt niets ver"
+          "label": "Mingl-vrienden uitnodigen",
+          "blurb": "Na Confirm toont Invite alleen je Mingl-vrienden. Elke uitnodiging is gebonden aan die vriend en landt in Inbox als Review BOT DEE invite. Geen openbare join-link. Cap is host plus 7. Gasten kunnen meer Mingl-vrienden uitnodigen tot de host dat uitzet. Deelnemen is geen betaling."
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "Room SMARTview-uitnodiging",
-          "blurb": "Nodig anderen uit via Room SMARTview na bevestiging. Genoemde personen worden niet opgezocht alleen omdat je een naam typte — FLOQR zegt niet of een account bestaat. Verkeerd account, geblokkeerd en niet-vrienden worden geweigerd wanneer groepsrooms komen. Vandaag wordt niets ver"
+          "label": "Mingl-vrienden uitnodigen",
+          "blurb": "Na Confirm toont Invite alleen je Mingl-vrienden. Elke uitnodiging is gebonden aan die vriend en landt in Inbox als Review BOT DEE invite. Geen openbare join-link. Cap is host plus 7. Gasten kunnen meer Mingl-vrienden uitnodigen tot de host dat uitzet. Deelnemen is geen betaling."
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "Deelnemen aan een Room SMARTview",
-          "blurb": "Deelnemen aan een Room SMARTview is niet hetzelfde als een gedeelde rekening joinen of een betaling goedkeuren. Wanneer rooms komen, log je in en accepteer je een gebonden uitnodiging. Een link openen laat je niet automatisch joinen."
+          "label": "Deelnemen aan een BOT DEE-sessie",
+          "blurb": "Open de Inbox-uitnodiging terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Verkeerd account, verlopen of ingetrokken weigert. Deelnemen aan de room is niet deelnemen aan een tab en keurt geen betaling goed. BOT DEE neemt nooit kaartnummers."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "Deelnemen aan een Room SMARTview",
-          "blurb": "Deelnemen aan een Room SMARTview is niet hetzelfde als een gedeelde rekening joinen of een betaling goedkeuren. Wanneer rooms komen, log je in en accepteer je een gebonden uitnodiging. Een link openen laat je niet automatisch joinen."
+          "label": "Deelnemen aan een BOT DEE-sessie",
+          "blurb": "Open de Inbox-uitnodiging terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Verkeerd account, verlopen of ingetrokken weigert. Deelnemen aan de room is niet deelnemen aan een tab en keurt geen betaling goed. BOT DEE neemt nooit kaartnummers."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beëindigen",
-          "blurb": "Alleen de host kan een room beëindigen, en alleen na bevestiging. Beëindigen belast niemand en wist geen privéchats van anderen. Er is nog geen live room om te sluiten."
+          "blurb": "Alleen de host kan een room beëindigen. Beëindigen belast niemand en wist andermans privéchats niet. Een onbetaalde gedeelde tab moet eerst betaald of geannuleerd."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beëindigen",
-          "blurb": "Alleen de host kan een room beëindigen, en alleen na bevestiging. Beëindigen belast niemand en wist geen privéchats van anderen. Er is nog geen live room om te sluiten."
+          "blurb": "Alleen de host kan een room beëindigen. Beëindigen belast niemand en wist andermans privéchats niet. Een onbetaalde gedeelde tab moet eerst betaald of geannuleerd."
         },
         "help:help-botdee-room-smartview-tab": {
-          "label": "Gedeelde rekening Room SMARTview",
-          "blurb": "Een gedeelde rekening is later opt-in. De room joinen is geen rekening joinen. Een rekening joinen keurt geen betaling goed. BOT DEE neemt nooit kaartnummers. Over de rekening splitsen praten is geen afschrijving."
+          "label": "Gedeelde tab Room SMARTview",
+          "blurb": "Eerst opt-in. Voeg dan een regel toe. Sluit als één betaler of splits. Alleen bevestigende uids worden belast via FloqR Stripe. Deelnemen aan de room is niet deelnemen aan een tab. BOT DEE neemt nooit kaartnummers. Club POS komt later."
         },
         "intent:help-botdee-room-smartview-tab": {
-          "label": "Gedeelde rekening Room SMARTview",
-          "blurb": "Een gedeelde rekening is later opt-in. De room joinen is geen rekening joinen. Een rekening joinen keurt geen betaling goed. BOT DEE neemt nooit kaartnummers. Over de rekening splitsen praten is geen afschrijving."
+          "label": "Gedeelde tab Room SMARTview",
+          "blurb": "Eerst opt-in. Voeg dan een regel toe. Sluit als één betaler of splits. Alleen bevestigende uids worden belast via FloqR Stripe. Deelnemen aan de room is niet deelnemen aan een tab. BOT DEE neemt nooit kaartnummers. Club POS komt later."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "Wie betaalt",
-          "blurb": "Vraag Who’s paying in een Room SMARTview om later de gefilterde opt-in-status te zien. Niemand wordt belast omdat iemand koop zei. De laatste vier van de kaart blijven op het eigen receipt van de betaler."
+          "blurb": "Vraag Who’s paying in een Room SMARTview om opt-in te zien. Niemand wordt belast omdat iemand buy zei. De laatste vier van de kaart blijven op het ontvangstbewijs van de betaler."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "Wie betaalt",
-          "blurb": "Vraag Who’s paying in een Room SMARTview om later de gefilterde opt-in-status te zien. Niemand wordt belast omdat iemand koop zei. De laatste vier van de kaart blijven op het eigen receipt van de betaler."
+          "blurb": "Vraag Who’s paying in een Room SMARTview om opt-in te zien. Niemand wordt belast omdat iemand buy zei. De laatste vier van de kaart blijven op het ontvangstbewijs van de betaler."
         },
         "help:help-botdee-room-smartview-kick": {
           "label": "Iemand uit Room SMARTview verwijderen",
-          "blurb": "Alleen een geverifieerde host kan een lid verwijderen, en alleen na bevestiging. Een modelantwoord kan niemand kicken. Er is nog geen live room om te wijzigen."
+          "blurb": "Alleen de host kan een gast verwijderen. Een verwijderde vriend leest geen verdere roomberichten. Een modelantwoord kan niemand kicken."
         },
         "intent:help-botdee-room-smartview-kick": {
           "label": "Iemand uit Room SMARTview verwijderen",
-          "blurb": "Alleen een geverifieerde host kan een lid verwijderen, en alleen na bevestiging. Een modelantwoord kan niemand kicken. Er is nog geen live room om te wijzigen."
+          "blurb": "Alleen de host kan een gast verwijderen. Een verwijderde vriend leest geen verdere roomberichten. Een modelantwoord kan niemand kicken."
         },
         "help:help-botdee-room-smartview-share": {
           "label": "Delen in Room SMARTview",
-          "blurb": "Share this conversation kopieert nooit je privé-BOT DEE-thread. BOT DEE toont een voorbeeld van geselecteerde deelbare feiten uit dit bericht, gemarkeerd als voorlopig. Je kunt feiten bewerken of weglaten. Niets wordt gepubliceerd tot rooms live zijn en jij goedkeurt."
+          "blurb": "Share this conversation kopieert nooit je privé BOT DEE-thread. BOT DEE toont een voorbeeld van geselecteerde deelbare feiten uit dit bericht, gemarkeerd als voorlopig. Je kunt feiten bewerken of weglaten. Profielen en SMARTsummary blijven buiten de room."
         },
         "intent:help-botdee-room-smartview-share": {
           "label": "Delen in Room SMARTview",
-          "blurb": "Share this conversation kopieert nooit je privé-BOT DEE-thread. BOT DEE toont een voorbeeld van geselecteerde deelbare feiten uit dit bericht, gemarkeerd als voorlopig. Je kunt feiten bewerken of weglaten. Niets wordt gepubliceerd tot rooms live zijn en jij goedkeurt."
+          "blurb": "Share this conversation kopieert nooit je privé BOT DEE-thread. BOT DEE toont een voorbeeld van geselecteerde deelbare feiten uit dit bericht, gemarkeerd als voorlopig. Je kunt feiten bewerken of weglaten. Profielen en SMARTsummary blijven buiten de room."
         },
         "help:help-botdee-smartview-review": {
           "label": "SMARTsummary controleren en corrigeren",
@@ -8918,6 +9046,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Het dock toont het echte LED-sjabloon (dezelfde Display 1-composervoorvertoning) en werkt"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Het dock toont het echte LED-sjabloon (dezelfde Display 1-composervoorvertoning) en werkt"
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV vanuit BOT DEE-chat",
+          "blurb": "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Ro"
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV vanuit BOT DEE-chat",
+          "blurb": "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Ro"
         },
         "help:help-vip-book-table": {
           "label": "VIP-tafel boeken (VIP reserV)",
@@ -9528,19 +9672,19 @@
       "results": {
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification لـ Mingl Room",
-          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. الإعلانات إن وُافق عليها تبقى أسفل البطاقة بوسم Ad."
+          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. عيّنة إعلان موسومة أسفل البطاقة تتبع الوسوم (شريك سفر / حلّق إلى Cancun لر"
         },
         "intent:help-smartvisuals-notification": {
           "label": "SMARTnotification لـ Mingl Room",
-          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. الإعلانات إن وُافق عليها تبقى أسفل البطاقة بوسم Ad."
+          "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. عيّنة إعلان موسومة أسفل البطاقة تتبع الوسوم (شريك سفر / حلّق إلى Cancun لر"
         },
         "help:help-smartvisuals-room": {
           "label": "Room SMARTview مع SMARTvisuals",
-          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. موضع Ad "
+          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. إعلان مو"
         },
         "intent:help-smartvisuals-room": {
           "label": "Room SMARTview مع SMARTvisuals",
-          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. موضع Ad "
+          "blurb": "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. إعلان مو"
         },
         "help:help-scheduling-schedule-for": {
           "label": "جداول الموظفين",
@@ -9624,75 +9768,75 @@
         },
         "help:help-botdee-version-smartview-tabs": {
           "label": "علامات Version SMARTview",
-          "blurb": "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض ملاحظات حزمة FLOQR الموثّقة من README الحالي. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظه"
+          "blurb": "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض تغييرات BOT DEE وGemini الموثّقة فقط — وليس Master Admin أو أدوات مختبري بيتا أو ملاحظات منتجات FLOQR الأخرى. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير "
         },
         "intent:help-botdee-version-smartview-tabs": {
           "label": "علامات Version SMARTview",
-          "blurb": "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض ملاحظات حزمة FLOQR الموثّقة من README الحالي. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظه"
+          "blurb": "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض تغييرات BOT DEE وGemini الموثّقة فقط — وليس Master Admin أو أدوات مختبري بيتا أو ملاحظات منتجات FLOQR الأخرى. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير "
         },
         "help:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "في دردشة BOT DEE قل Open Room SMARTview أو Start a group chat. تُفتح بطاقة Room SMARTview في نفس الفقاعة. أكّد قبل إنشاء أي شيء. رسائل BOT DEE الخاصة تبقى خاصة. غرف المجموعة والدعوات والفاتورة المشتركة ليست مباشرة بعد — التأكيد لا ينشئ room ولا يرسل دعوة ولا يحصّل أحداً. يتبع Sit"
+          "blurb": "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat أو خطّط رحلة Cancun بكلام عادي (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). هذه نفس Room SMARTview مثل Open Room SMARTview Cancun Trip — رسم travel وعينة Ad Travel partner / Fly to Cancun وليست حجز رحلات"
         },
         "intent:help-botdee-room-smartview": {
           "label": "Room SMARTview",
-          "blurb": "في دردشة BOT DEE قل Open Room SMARTview أو Start a group chat. تُفتح بطاقة Room SMARTview في نفس الفقاعة. أكّد قبل إنشاء أي شيء. رسائل BOT DEE الخاصة تبقى خاصة. غرف المجموعة والدعوات والفاتورة المشتركة ليست مباشرة بعد — التأكيد لا ينشئ room ولا يرسل دعوة ولا يحصّل أحداً. يتبع Sit"
+          "blurb": "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat أو خطّط رحلة Cancun بكلام عادي (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). هذه نفس Room SMARTview مثل Open Room SMARTview Cancun Trip — رسم travel وعينة Ad Travel partner / Fly to Cancun وليست حجز رحلات"
         },
         "help:help-botdee-room-smartview-invite": {
-          "label": "دعوة Room SMARTview",
-          "blurb": "ادعُ الآخرين من Room SMARTview بعد التأكيد. لا يُبحث عن الأسماء لمجرد كتابتها — لن تقول FLOQR إن كان الحساب موجوداً. دعوات الحساب الخطأ والمحظورين وغير الأصدقاء ستُرفض عندما تصل غرف المجموعة. لا يُرسل شيء اليوم؛ غرف المجموعة ليست مباشرة."
+          "label": "دعوة أصدقاء Mingl",
+          "blurb": "بعد Confirm يعرض Invite أصدقاء Mingl فقط. كل دعوة مربوطة بذلك الصديق وتصل Inbox كـ Review BOT DEE invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً."
         },
         "intent:help-botdee-room-smartview-invite": {
-          "label": "دعوة Room SMARTview",
-          "blurb": "ادعُ الآخرين من Room SMARTview بعد التأكيد. لا يُبحث عن الأسماء لمجرد كتابتها — لن تقول FLOQR إن كان الحساب موجوداً. دعوات الحساب الخطأ والمحظورين وغير الأصدقاء ستُرفض عندما تصل غرف المجموعة. لا يُرسل شيء اليوم؛ غرف المجموعة ليست مباشرة."
+          "label": "دعوة أصدقاء Mingl",
+          "blurb": "بعد Confirm يعرض Invite أصدقاء Mingl فقط. كل دعوة مربوطة بذلك الصديق وتصل Inbox كـ Review BOT DEE invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً."
         },
         "help:help-botdee-room-smartview-join": {
-          "label": "الانضمام إلى Room SMARTview",
-          "blurb": "الانضمام إلى Room SMARTview ليس الانضمام إلى فاتورة مشتركة ولا اعتماد دفعة. عندما تصل الغرف ستسجّل الدخول وتقبل دعوة مربوطة. فتح رابط لا يضمّك تلقائياً."
+          "label": "الانضمام إلى جلسة BOT DEE",
+          "blurb": "افتح دعوة Inbox وأنت مسجّل كصديق Mingl المُرسَل إليه. الحساب الخطأ أو المنتهية أو الملغاة تُرفض. الانضمام إلى room ليس انضماماً إلى حساب مشترك ولا موافقة على دفع. BOT DEE لا يأخذ أرقام البطاقات أبداً."
         },
         "intent:help-botdee-room-smartview-join": {
-          "label": "الانضمام إلى Room SMARTview",
-          "blurb": "الانضمام إلى Room SMARTview ليس الانضمام إلى فاتورة مشتركة ولا اعتماد دفعة. عندما تصل الغرف ستسجّل الدخول وتقبل دعوة مربوطة. فتح رابط لا يضمّك تلقائياً."
+          "label": "الانضمام إلى جلسة BOT DEE",
+          "blurb": "افتح دعوة Inbox وأنت مسجّل كصديق Mingl المُرسَل إليه. الحساب الخطأ أو المنتهية أو الملغاة تُرفض. الانضمام إلى room ليس انضماماً إلى حساب مشترك ولا موافقة على دفع. BOT DEE لا يأخذ أرقام البطاقات أبداً."
         },
         "help:help-botdee-room-smartview-end": {
           "label": "إنهاء Room SMARTview",
-          "blurb": "المضيف وحده يمكنه إنهاء room وبعد التأكيد فقط. الإنهاء لا يحصّل أحداً ولا يمسح دردشات الآخرين الخاصة. لا توجد room مباشرة للإغلاق بعد."
+          "blurb": "المضيف فقط يمكنه إنهاء room. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة. يجب دفع الحساب المشترك غير المدفوع أو إلغاؤه أولاً."
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "إنهاء Room SMARTview",
-          "blurb": "المضيف وحده يمكنه إنهاء room وبعد التأكيد فقط. الإنهاء لا يحصّل أحداً ولا يمسح دردشات الآخرين الخاصة. لا توجد room مباشرة للإغلاق بعد."
+          "blurb": "المضيف فقط يمكنه إنهاء room. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة. يجب دفع الحساب المشترك غير المدفوع أو إلغاؤه أولاً."
         },
         "help:help-botdee-room-smartview-tab": {
-          "label": "فاتورة Room SMARTview المشتركة",
-          "blurb": "الفاتورة المشتركة اشتراك لاحق. الانضمام إلى الـ room ليس انضماماً إلى فاتورة. الانضمام إلى فاتورة لا يعتمد دفعاً. BOT DEE لا يأخذ أرقام بطاقات أبداً. حديث تقسيم الفاتورة ليس تحصيلاً."
+          "label": "الحساب المشترك Room SMARTview",
+          "blurb": "أولاً الموافقة. ثم أضف بنداً. أغلق بدافع واحد أو مقسّم. يُخصم فقط من الحسابات المؤكِّدة عبر FloqR Stripe. الانضمام إلى room ليس انضماماً إلى الحساب. BOT DEE لا يأخذ أرقام البطاقات أبداً. Club POS لاحقاً."
         },
         "intent:help-botdee-room-smartview-tab": {
-          "label": "فاتورة Room SMARTview المشتركة",
-          "blurb": "الفاتورة المشتركة اشتراك لاحق. الانضمام إلى الـ room ليس انضماماً إلى فاتورة. الانضمام إلى فاتورة لا يعتمد دفعاً. BOT DEE لا يأخذ أرقام بطاقات أبداً. حديث تقسيم الفاتورة ليس تحصيلاً."
+          "label": "الحساب المشترك Room SMARTview",
+          "blurb": "أولاً الموافقة. ثم أضف بنداً. أغلق بدافع واحد أو مقسّم. يُخصم فقط من الحسابات المؤكِّدة عبر FloqR Stripe. الانضمام إلى room ليس انضماماً إلى الحساب. BOT DEE لا يأخذ أرقام البطاقات أبداً. Club POS لاحقاً."
         },
         "help:help-botdee-room-smartview-who-pays": {
           "label": "من يدفع",
-          "blurb": "اسأل Who’s paying في Room SMARTview لرؤية حالة الاشتراك المصفاة لاحقاً. لا يُحصَّل أحد لأن شخصاً قال اشترِ. آخر أربعة أرقام للبطاقة تبقى في إيصال الدافع فقط."
+          "blurb": "اسأل Who’s paying في Room SMARTview لرؤية حالة الموافقة. لا يُخصم أحد لأن شخصاً قال buy. آخر أربعة أرقام تبقى على إيصال الدافع."
         },
         "intent:help-botdee-room-smartview-who-pays": {
           "label": "من يدفع",
-          "blurb": "اسأل Who’s paying في Room SMARTview لرؤية حالة الاشتراك المصفاة لاحقاً. لا يُحصَّل أحد لأن شخصاً قال اشترِ. آخر أربعة أرقام للبطاقة تبقى في إيصال الدافع فقط."
+          "blurb": "اسأل Who’s paying في Room SMARTview لرؤية حالة الموافقة. لا يُخصم أحد لأن شخصاً قال buy. آخر أربعة أرقام تبقى على إيصال الدافع."
         },
         "help:help-botdee-room-smartview-kick": {
           "label": "إزالة شخص من Room SMARTview",
-          "blurb": "المضيف الموثّق وحده يمكنه إزالة عضو وبعد التأكيد فقط. رد النموذج لا يطرد أحداً. لا توجد room مباشرة للتغيير بعد."
+          "blurb": "المضيف فقط يخرج ضيفاً. الصديق المُزال لا يقرأ رسائل الـ room بعدها. رد النموذج لا يطرد أحداً."
         },
         "intent:help-botdee-room-smartview-kick": {
           "label": "إزالة شخص من Room SMARTview",
-          "blurb": "المضيف الموثّق وحده يمكنه إزالة عضو وبعد التأكيد فقط. رد النموذج لا يطرد أحداً. لا توجد room مباشرة للتغيير بعد."
+          "blurb": "المضيف فقط يخرج ضيفاً. الصديق المُزال لا يقرأ رسائل الـ room بعدها. رد النموذج لا يطرد أحداً."
         },
         "help:help-botdee-room-smartview-share": {
           "label": "المشاركة في Room SMARTview",
-          "blurb": "Share this conversation لا ينسخ أبداً خيط BOT DEE الخاص. يعرض BOT DEE معاينة لحقائق قابلة للمشاركة من هذه الرسالة، وسمها مؤقت. يمكنك تعديل الحقائق أو حذفها. لا يُنشر شيء حتى تصبح الغرف مباشرة وتوافق."
+          "blurb": "Share this conversation لا ينسخ محادثتك الخاصة في BOT DEE أبداً. يعرض BOT DEE معاينة حقائق قابلة للمشاركة من هذه الرسالة، معلَّمة مؤقتة. يمكنك تعديل الحقائق أو حذفها. الملفات الشخصية وSMARTsummary تبقى خارج الـ room."
         },
         "intent:help-botdee-room-smartview-share": {
           "label": "المشاركة في Room SMARTview",
-          "blurb": "Share this conversation لا ينسخ أبداً خيط BOT DEE الخاص. يعرض BOT DEE معاينة لحقائق قابلة للمشاركة من هذه الرسالة، وسمها مؤقت. يمكنك تعديل الحقائق أو حذفها. لا يُنشر شيء حتى تصبح الغرف مباشرة وتوافق."
+          "blurb": "Share this conversation لا ينسخ محادثتك الخاصة في BOT DEE أبداً. يعرض BOT DEE معاينة حقائق قابلة للمشاركة من هذه الرسالة، معلَّمة مؤقتة. يمكنك تعديل الحقائق أو حذفها. الملفات الشخصية وSMARTsummary تبقى خارج الـ room."
         },
         "help:help-botdee-smartview-review": {
           "label": "مراجعة وتصحيح SMARTsummary",
@@ -9973,6 +10117,22 @@
         "intent:help-shoutout-choose-venue": {
           "label": "Choose a ShoutOut venue",
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
+        },
+        "help:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. يعرض الإرساء قالب LED الحي (نفس معاينة Display 1) ويتحدّث عند اختيار القالب أو @handle أو نص مقابل صورة. أجب في"
+        },
+        "intent:help-shoutout-headless-smartview": {
+          "label": "ShoutOut SMARTpreview",
+          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. يعرض الإرساء قالب LED الحي (نفس معاينة Display 1) ويتحدّث عند اختيار القالب أو @handle أو نص مقابل صورة. أجب في"
+        },
+        "help:help-botdee-headless-vip": {
+          "label": "VIP reserV من محادثة BOT DEE",
+          "blurb": "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
+        },
+        "intent:help-botdee-headless-vip": {
+          "label": "VIP reserV من محادثة BOT DEE",
+          "blurb": "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
         },
         "help:help-vip-book-table": {
           "label": "حجز طاولة VIP (VIP reserV)",

@@ -21,8 +21,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.doesNotMatch(page, /search-chrome-toolbar/);
   assert.doesNotMatch(page, /data-floqr-chrome-btn=/);
   assert.match(page, /class="search-icon-row"/);
-  // Spot order: 1 ShoutOut · 2 BOT DEE · 3 VIP · 4 Settings · 5 floqCast · 6 Si-nema
-  assert.match(page, /id="shoutoutBtnCard"[\s\S]*?id="intentSearchBtnCard"[\s\S]*?id="vipReservBtnCard"[\s\S]*?id="settingsBtnCard"[\s\S]*?id="floqcastBtnCard"[\s\S]*?id="sinemaBtnCard"/);
+  // Spot order: 1 ShoutOut · 2 Mingl · 3 BOT DEE · 4 VIP · 5 Settings · 6 floqCast · 7 Si-nema
+  assert.match(page, /id="shoutoutBtnCard"[\s\S]*?id="minglBtnCard"[\s\S]*?id="intentSearchBtnCard"[\s\S]*?id="vipReservBtnCard"[\s\S]*?id="settingsBtnCard"[\s\S]*?id="floqcastBtnCard"[\s\S]*?id="sinemaBtnCard"/);
   assert.match(page, /id="shoutoutBtnCard"[^>]*>[\s\S]*data-floqr-chrome-icon="shoutOut"[\s\S]*shoutout-nightlife\.png/);
   assert.doesNotMatch(page, /id="shoutoutBtnCard"[\s\S]*shoutout-logo\.png/);
   assert.doesNotMatch(page, /shoutout-icon-title/);
