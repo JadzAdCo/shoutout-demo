@@ -653,12 +653,32 @@
     }
   }
 
+  async function loadFeaturesCatalog() {
+    if (global.__FLOQR_FEATURES_SMARTVIEW_CATALOG) return global.__FLOQR_FEATURES_SMARTVIEW_CATALOG;
+    try {
+      if (global.FLOQRFeaturesSmartView && typeof global.FLOQRFeaturesSmartView.loadCatalog === "function") {
+        const fromUi = await global.FLOQRFeaturesSmartView.loadCatalog();
+        if (fromUi) {
+          global.__FLOQR_FEATURES_SMARTVIEW_CATALOG = fromUi;
+          return fromUi;
+        }
+      }
+      const response = await fetch("./features-smartview/catalog.json", {cache: "no-store"});
+      if (!response.ok) return null;
+      const catalog = await response.json();
+      global.__FLOQR_FEATURES_SMARTVIEW_CATALOG = catalog;
+      return catalog;
+    } catch (_) {
+      return null;
+    }
+  }
+
   function ensureFeaturesSmartViews(text, views) {
     const list = Array.isArray(views) ? views.slice() : [];
     if (list.some(row => row && row.kind === "featuresSmartView")) return list;
     if (!isFeaturesSmartViewPrompt(text)) return list;
     const api = global.FLOQRFeaturesSmartViewCore;
-    const catalog = global.FLOQRFeaturesSmartView && global.__FLOQR_FEATURES_SMARTVIEW_CATALOG;
+    const catalog = global.__FLOQR_FEATURES_SMARTVIEW_CATALOG;
     if (api && catalog) {
       const pack = api.buildSmartView(catalog, text, {role: "patron"});
       if (pack && pack.smartViews && pack.smartViews[0]) list.push(pack.smartViews[0]);
@@ -1327,8 +1347,11 @@
       const roomSession = !isVersionPrompt(text) && !isFeaturesSmartViewPrompt(text) && !isHelpPrompt(text) && !isPrivacyPrompt(text)
         ? buildLocalRoomSession(text)
         : null;
-      const featurePack = isFeaturesSmartViewPrompt(text) && global.FLOQRFeaturesSmartViewCore
-        ? global.FLOQRFeaturesSmartViewCore.buildSmartView(global.__FLOQR_FEATURES_SMARTVIEW_CATALOG || {products: [], features: []}, text, {role: "patron"})
+      const featureCatalog = isFeaturesSmartViewPrompt(text)
+        ? (global.__FLOQR_FEATURES_SMARTVIEW_CATALOG || await loadFeaturesCatalog())
+        : null;
+      const featurePack = isFeaturesSmartViewPrompt(text) && global.FLOQRFeaturesSmartViewCore && featureCatalog
+        ? global.FLOQRFeaturesSmartViewCore.buildSmartView(featureCatalog, text, {role: "patron"})
         : null;
       const reply = roomSession
         ? roomReplyText(roomSession)
@@ -1390,6 +1413,9 @@
       const roomView = Array.isArray(data.smartViews)
         ? data.smartViews.find(row => row && row.kind === "botDeeRoom")
         : null;
+      if (isFeaturesSmartViewPrompt(text) && !global.__FLOQR_FEATURES_SMARTVIEW_CATALOG) {
+        await loadFeaturesCatalog();
+      }
       const views = ensureFeaturesSmartViews(text, ensureVersionSmartViews(text, ensureRoomSmartViews(text, data.smartViews)));
       const versionCardOnly = isVersionSmartViewAlias(text)
         && views.some(row => row && row.kind === "botDeeVersion");
@@ -2166,6 +2192,7 @@
       const input = byId("botDeeChatInput");
       if (input) input.value = String(q).slice(0, 200);
     }
+    loadFeaturesCatalog();
     restoreOrWelcome();
     if (pendingJoinToken) {
       setTimeout(async () => {

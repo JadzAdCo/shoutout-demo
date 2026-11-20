@@ -205,6 +205,8 @@ test("Version / package questions answer with FLOQR stamp", () => {
   assert.equal(bot.isVersionPrompt("What can Mingl do?"), false);
   assert.equal(bot.isFeaturesSmartViewPrompt("what changed in Mingl"), true);
   assert.equal(bot.isFeaturesSmartViewPrompt("What can Mingl do?"), true);
+  assert.equal(bot.isFeaturesSmartViewPrompt("What's new in Mingl"), true);
+  assert.equal(bot.isVersionPrompt("What's new in Mingl"), false);
   assert.equal(bot.isFeaturesSmartViewPrompt("Ver"), false);
   assert.equal(bot.isFeaturesSmartViewPrompt("Open Room SMARTview"), false);
 

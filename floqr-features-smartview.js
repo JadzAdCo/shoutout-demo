@@ -53,8 +53,16 @@
     return { role: isMasterAdmin ? "masterAdmin" : "patron", canAccessKeys, isMasterAdmin };
   }
 
-  function projection() {
-    return core().publicProjection(catalog, viewerAccess());
+  function catalogFor(host) {
+    if (catalog) return catalog;
+    if (host && host.__fsvSnapshot) return host.__fsvSnapshot;
+    return null;
+  }
+
+  function projection(host) {
+    const source = catalogFor(host);
+    if (!source) return {products: [], features: [], warning: ""};
+    return core().publicProjection(source, viewerAccess());
   }
 
   function stateFrom(host) {
@@ -107,13 +115,13 @@
     </article>`;
   }
 
-  function productHero(product, count) {
+  function productHero(product, count, warning) {
     return `<header class="floqr-fsv-hero">
       <h3 class="floqr-fsv-title">${esc(product ? product.displayName : t("fsv.title", "Features SMARTview"))}</h3>
       <p class="floqr-fsv-mission">${esc(product ? product.mission : t("fsv.subtitle", "Evidence-backed product features. Plans are not treated as shipped."))}</p>
       <p class="floqr-fsv-note">${esc(t("fsv.featureCount", "{n} catalog features", {n: count}))}
         · ${esc(t("fsv.latestRelease", "Latest verified release"))}: ${esc(product ? product.latestRelease : core().DATE_NOT_VERIFIED)}</p>
-      <p class="floqr-fsv-warning">${esc(catalog.warning || "")}</p>
+      <p class="floqr-fsv-warning">${esc(warning || "")}</p>
     </header>`;
   }
 
@@ -199,14 +207,15 @@
   }
 
   function render(host) {
-    if (!host || !catalog) return;
+    const source = catalogFor(host);
+    if (!host || !source) return;
     const api = core();
     if (!api) {
       host.textContent = "Features SMARTview core missing.";
       return;
     }
     const st = stateFrom(host);
-    const proj = projection();
+    const proj = projection(host);
     const product = proj.products.find(row => row.id === st.productId) || null;
     let rows = api.filterFeatures(proj.features, {
       view: st.view === "overview" ? "all" : st.view,
@@ -246,7 +255,7 @@
       </select>
     </form>` : "";
     host.innerHTML = `<div class="floqr-fsv-root" data-fsv-layout="${host.getAttribute("data-fsv-layout") || "page"}">
-      ${productHero(product, rows.length)}
+      ${productHero(product, rows.length, source.warning)}
       ${productSwitcher(proj, st.productId)}
       ${tabs(st.view)}
       ${search}
@@ -289,7 +298,7 @@
   }
 
   function askBotDee(featureId) {
-    const row = projection().features.find(item => item.id === featureId);
+    const row = projection(lastHost).features.find(item => item.id === featureId);
     const name = row ? row.productName : "";
     const href = navUrl("./botdee.html", {from: "features-smartview", q: name ? `What can ${name} do?` : "Features SMARTview"});
     if (root.location) root.location.href = href;
@@ -326,7 +335,8 @@
     host.querySelectorAll("[data-fsv-view-jump]").forEach(btn => {
       btn.addEventListener("click", event => {
         event.stopPropagation();
-        setState(host, {view: "journey"});
+        const view = btn.getAttribute("data-fsv-view-jump") || "overview";
+        setState(host, {view});
         render(host);
       });
     });
@@ -357,6 +367,7 @@
     const response = await fetch(CATALOG_URL, {cache: "no-store"});
     if (!response.ok) throw new Error("Could not load Features catalog.");
     catalog = await response.json();
+    root.__FLOQR_FEATURES_SMARTVIEW_CATALOG = catalog;
     return catalog;
   }
 
@@ -378,21 +389,23 @@
     }
   }
 
-  function mountPayload(host, payload) {
-    if (!host || !payload) return;
-    catalog = catalog || {
-      schemaVersion: payload.schemaVersion,
-      catalogVersion: 1,
+  function snapshotFromPayload(payload) {
+    return {
+      schemaVersion: payload.schemaVersion || "",
+      catalogVersion: payload.catalogVersion || 1,
       warning: payload.warning || "",
       products: payload.products || [],
-      features: (payload.features || []).map(row => ({
-        ...row,
-        statusVerified: row.statusVerified,
-        publicCopyApproved: row.publicCopyApproved,
-        releaseDateVerified: row.releaseDateVerified,
-        sourceEvidence: []
-      }))
+      features: payload.features || []
     };
+  }
+
+  function mountPayload(host, payload) {
+    if (!host || !payload) return;
+    lastHost = host;
+    host.classList.add("floqr-fsv-mount");
+    // Per-host snapshot only. A retrieve payload is product-filtered and capped at 12;
+    // never assign it to the module-wide catalog used by later cards in this session.
+    host.__fsvSnapshot = snapshotFromPayload(payload);
     if (payload.productId) host.setAttribute("data-fsv-product", payload.productId);
     if (payload.view) host.setAttribute("data-fsv-view", payload.view);
     render(host);

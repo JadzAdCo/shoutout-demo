@@ -102,7 +102,7 @@
   function normalizePrompt(raw) {
     return String(raw || "")
       .toLowerCase()
-      .replace(/[’']/g, "'")
+      .replace(/[\u2018\u2019\u201B\u02BC']/g, "")
       .replace(/[^a-z0-9+@.\s-]/g, " ")
       .replace(/\s+/g, " ")
       .trim();
@@ -134,7 +134,7 @@
     );
     if (!product) return false;
     if (/\bwhat can\b/.test(q)) return true;
-    if (/\bwhat(?:'s|s)?\s+(?:new|changed)\b/.test(q)) return true;
+    if (/\bwhats?\s+(?:new|changed)\b|\bwhat(?:'s|s| is)?\s+(?:new|changed)\b/.test(q)) return true;
     if (/\bwhen (?:was|is|did)\b.{0,40}\b(implement|release|available|ship)/.test(q)) return true;
     if (/\bwhat is coming\b|\bcoming soon\b|\bplanned for\b/.test(q)) return true;
     if (/\bfeature journey\b|\ball features\b|\bfeatures smartview\b/.test(q)) return true;
@@ -350,7 +350,7 @@
     const projection = publicProjection(catalog, access);
     let view = "overview";
     if (/\bcoming soon\b|\bwhat is coming\b|\bplanned\b/.test(q)) view = "comingSoon";
-    else if (/\bwhat(?:'s|s)?\s+new\b|\bwhat changed\b/.test(q)) view = "whatsNew";
+    else if (/\bwhats?\s+new\b|\bwhat(?:'s|s| is)?\s+new\b|\bwhat changed\b/.test(q)) view = "whatsNew";
     else if (/\bpast\b|\bretired\b|\bdeprecated\b/.test(q)) view = "past";
     else if (/\bjourney\b/.test(q)) view = "journey";
     else if (/\ball features\b/.test(q)) view = "all";

@@ -170,6 +170,7 @@ test("UI, BOT DEE, and Master Admin hosts are wired without hardcoded nav versio
   assert.match(read("master-feature-services.js"), /FLOQRFeaturesSmartView/);
   assert.match(read("botdee.html"), /features-smartview-core\.js/);
   assert.match(read("botdee.html"), /floqr-features-smartview\.js/);
+  assert.match(read("botdee.html"), /preload[^>]+features-smartview\/catalog\.json/);
   assert.match(read("features-smartview.html"), /FLOQRSessionShell\.bind/);
   assert.doesNotMatch(read("features-smartview.html"), /<a\b[^>]*href="[^"]*[?&]v=/);
   assert.match(read("functions/index.js"), /getFeaturesSmartViewCatalog/);
@@ -182,6 +183,116 @@ test("UI, BOT DEE, and Master Admin hosts are wired without hardcoded nav versio
   sandbox.globalThis = sandbox;
   vm.runInNewContext(read("floqr-features-smartview.js"), sandbox);
   assert.equal(typeof sandbox.FLOQRFeaturesSmartView.mount, "function");
+});
+
+function fakeHost() {
+  const host = {
+    attributes: Object.create(null),
+    innerHTML: "",
+    textContent: "",
+    classList: {add() {}},
+    __jumps: [],
+    getAttribute(name) {
+      return Object.prototype.hasOwnProperty.call(host.attributes, name) ? host.attributes[name] : "";
+    },
+    setAttribute(name, value) {
+      host.attributes[name] = String(value);
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll(sel) {
+      if (sel !== "[data-fsv-view-jump]") return [];
+      const buttons = [];
+      const re = /data-fsv-view-jump="([^"]+)"/g;
+      let match;
+      while ((match = re.exec(host.innerHTML))) {
+        const view = match[1];
+        buttons.push({
+          getAttribute(name) {
+            return name === "data-fsv-view-jump" ? view : null;
+          },
+          addEventListener(type, fn) {
+            if (type === "click") host.__jumps.push({view, fn});
+          }
+        });
+      }
+      return buttons;
+    }
+  };
+  return host;
+}
+
+function loadUiSandbox() {
+  const sandbox = {
+    URL,
+    URLSearchParams,
+    fetch: async () => ({ok: true, json: async () => catalog}),
+    location: {href: "https://jadzadco.github.io/shoutout-demo/botdee.html", search: ""}
+  };
+  sandbox.window = sandbox;
+  sandbox.globalThis = sandbox;
+  sandbox.self = sandbox;
+  vm.runInNewContext(read("features-smartview-core.js"), sandbox);
+  vm.runInNewContext(read("floqr-features-smartview.js"), sandbox);
+  return sandbox;
+}
+
+test("mountPayload keeps retrieve payloads per host and does not poison the module catalog", async () => {
+  const sandbox = loadUiSandbox();
+  const mingl = sandbox.FLOQRFeaturesSmartViewCore.retrieve(catalog, "What can Mingl do?", {role: "patron"});
+  const shout = sandbox.FLOQRFeaturesSmartViewCore.retrieve(catalog, "What can ShoutOut do?", {role: "patron"});
+  assert.ok(mingl.products.length <= 1);
+  assert.ok(mingl.features.length <= 12);
+  assert.ok(shout.products.length <= 1);
+  const host1 = fakeHost();
+  const host2 = fakeHost();
+  sandbox.FLOQRFeaturesSmartView.mountPayload(host1, mingl);
+  sandbox.FLOQRFeaturesSmartView.mountPayload(host2, shout);
+  assert.match(host1.innerHTML, /Mingl/);
+  assert.match(host2.innerHTML, /ShoutOut/);
+  assert.doesNotMatch(host2.innerHTML, />Mingl</);
+  const loaded = await sandbox.FLOQRFeaturesSmartView.loadCatalog();
+  assert.equal(loaded.products.length, 6);
+  assert.equal(sandbox.__FLOQR_FEATURES_SMARTVIEW_CATALOG.products.length, 6);
+});
+
+test("Read changes honors data-fsv-view-jump instead of always opening Feature Journey", () => {
+  const js = read("floqr-features-smartview.js");
+  assert.match(js, /data-fsv-view-jump="whatsNew"/);
+  assert.match(js, /btn\.getAttribute\("data-fsv-view-jump"\)/);
+  assert.doesNotMatch(js, /setState\(host, \{view: "journey"\}\)/);
+  const sandbox = loadUiSandbox();
+  const mingl = sandbox.FLOQRFeaturesSmartViewCore.retrieve(catalog, "What can Mingl do?", {role: "patron"});
+  const host = fakeHost();
+  sandbox.FLOQRFeaturesSmartView.mountPayload(host, mingl);
+  const readChanges = host.__jumps.find(row => row.view === "whatsNew");
+  assert.ok(readChanges, "Read changes jump is wired by bind()");
+  readChanges.fn({stopPropagation() {}});
+  assert.equal(host.getAttribute("data-fsv-view"), "whatsNew");
+  assert.match(host.innerHTML, /approved, verified releases/i);
+});
+
+test("BOT DEE local Features path loads catalog.json when durable threads are off", () => {
+  const chat = read("bot-dee-chat.js");
+  assert.match(chat, /async function loadFeaturesCatalog/);
+  assert.match(chat, /features-smartview\/catalog\.json/);
+  assert.match(chat, /await loadFeaturesCatalog\(\)/);
+  assert.match(chat, /global\.__FLOQR_FEATURES_SMARTVIEW_CATALOG = catalog/);
+  assert.match(chat, /const catalog = global\.__FLOQR_FEATURES_SMARTVIEW_CATALOG/);
+  assert.doesNotMatch(chat, /buildSmartView\([^)]*\{products:\s*\[\],\s*features:\s*\[\]\}/);
+  assert.doesNotMatch(chat, /FLOQRFeaturesSmartView && global\.__FLOQR_FEATURES_SMARTVIEW_CATALOG/);
+  assert.match(read("botdee.html"), /features-smartview\/catalog\.json/);
+});
+
+test("What's new in Mingl survives apostrophe stripping", () => {
+  ["What's new in Mingl", "What’s new in Mingl", "whats new in Mingl"].forEach(prompt => {
+    assert.equal(core.isFeaturesSmartViewPrompt(prompt), true, prompt);
+    const pack = core.retrieve(catalog, prompt, {role: "patron"});
+    assert.equal(pack.view, "whatsNew", prompt);
+    assert.equal(pack.productName, "Mingl", prompt);
+  });
+  assert.equal(core.isFeaturesSmartViewPrompt("What changed in ShoutOut?"), true);
 });
 
 test("deprecated and retired history is preserved in schema", () => {
