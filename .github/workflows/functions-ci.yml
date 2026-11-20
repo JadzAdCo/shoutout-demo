@@ -199,7 +199,7 @@ jobs:
           fi
           if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-features\]'; then
             SUBSET=1
-            add_fns setFeatureServiceFlags seedFeatureServices
+            add_fns setFeatureServiceFlags seedFeatureServices findBetaPatron setBetaTesterFeatures
             echo "Features & Services catalog deploy tagged"
           fi
           if echo "$COMMIT_MSG" | grep -q '\[firebase-deploy-crawl\]'; then
@@ -254,8 +254,26 @@ jobs:
               getBotDeeProviderSlots \
               listBotDeeProviderSlots \
               setBotDeeProviderSlot \
-              createHeadlessShoutOutCheckout
-            echo "BOT DEE hasUsedBotDee persist + six-phase + later-fill slot deploy tagged"
+              createHeadlessShoutOutCheckout \
+              createBotDeeRoom \
+              createBotDeeRoomInvite \
+              inviteBotDeeRoomGuest \
+              acceptBotDeeRoomInvite \
+              leaveBotDeeRoom \
+              kickBotDeeRoomMember \
+              endBotDeeRoom \
+              listBotDeeRoomFriends \
+              getBotDeeRoom \
+              setBotDeeRoomItinerary \
+              optInBotDeeRoomTab \
+              addBotDeeRoomTabLine \
+              acceptBotDeeRoomTabLine \
+              voidBotDeeRoomTabLine \
+              closeBotDeeRoomTab \
+              postBotDeeRoomTurn \
+              revokeBotDeeRoomInvite \
+              createFloqrCheckoutSession
+            echo "BOT DEE hasUsedBotDee persist + six-phase + later-fill slot + Mingl session invites deploy tagged"
           fi
           if [ "$SUBSET" = "0" ]; then
             mapfile -t FNS < <(
@@ -303,7 +321,25 @@ jobs:
               setBotDeeLegalGate \
               getBotDeeProviderSlots \
               listBotDeeProviderSlots \
-              setBotDeeProviderSlot
+              setBotDeeProviderSlot \
+              createBotDeeRoom \
+              createBotDeeRoomInvite \
+              inviteBotDeeRoomGuest \
+              acceptBotDeeRoomInvite \
+              leaveBotDeeRoom \
+              kickBotDeeRoomMember \
+              endBotDeeRoom \
+              listBotDeeRoomFriends \
+              getBotDeeRoom \
+              setBotDeeRoomItinerary \
+              optInBotDeeRoomTab \
+              addBotDeeRoomTabLine \
+              acceptBotDeeRoomTabLine \
+              voidBotDeeRoomTabLine \
+              closeBotDeeRoomTab \
+              postBotDeeRoomTurn \
+              revokeBotDeeRoomInvite \
+              createFloqrCheckoutSession
             do
               if ! printf '%s\n' "${FNS[@]}" | grep -qx "$f"; then
                 FNS+=("$f")

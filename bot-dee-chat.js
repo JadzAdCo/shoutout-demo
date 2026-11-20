@@ -31,6 +31,7 @@
   let visitLiveTurns = [];
   let chatsUiBound = false;
   let pendingJoinToken = "";
+  let pendingJoinRoomId = "";
   let chatTitles = {};
   let liveConversationId = "";
   let storedConversationId = "";
@@ -498,7 +499,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.046";
+    return "s3.3.050";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -1350,10 +1351,12 @@
         conversationId: liveConversationId || undefined,
         uiLanguage: currentUiLanguage(),
         roomSmartViewDeclined: loadRoomDeclined(),
-        joinToken: pendingJoinToken || undefined
+        joinToken: pendingJoinToken || undefined,
+        roomId: pendingJoinRoomId || undefined
       };
       const rawData = (await fn(payload))?.data || {};
       pendingJoinToken = "";
+      pendingJoinRoomId = "";
       applyHasUsed(rawData, 1);
       const data = await ensurePeopleSmartViews(text, rawData);
       const media = mergeMedia(data.media, harvestMediaFromText(data.reply));
@@ -2083,12 +2086,46 @@
   function captureJoinToken() {
     try {
       const url = new URL(location.href);
-      const token = String(url.searchParams.get("join") || "").trim();
+      const token = String(url.searchParams.get("t") || url.searchParams.get("join") || "").trim();
+      const roomId = String(url.searchParams.get("room") || "").trim();
       if (!token) return;
       pendingJoinToken = token;
+      if (roomId) pendingJoinRoomId = roomId;
       url.searchParams.delete("join");
+      url.searchParams.delete("t");
+      url.searchParams.delete("room");
       history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
     } catch (_) {}
+  }
+
+  async function acceptPendingInvite() {
+    if (!pendingJoinToken) return {ok: false, message: ""};
+    const fn = callable("acceptBotDeeRoomInvite");
+    if (!fn) {
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
+      return {ok: false, message: t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")};
+    }
+    try {
+      const data = (await fn({
+        token: pendingJoinToken,
+        roomId: pendingJoinRoomId || undefined
+      }))?.data || {};
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
+      if (data.ok) return {ok: true, message: ""};
+      return {
+        ok: false,
+        message: data.error || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")
+      };
+    } catch (error) {
+      pendingJoinToken = "";
+      pendingJoinRoomId = "";
+      return {
+        ok: false,
+        message: error?.message || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")
+      };
+    }
   }
 
   function bind(opts = {}) {
@@ -2104,8 +2141,13 @@
     }
     restoreOrWelcome();
     if (pendingJoinToken) {
-      setTimeout(() => {
-        sendMessage("I joined this Room SMARTview");
+      setTimeout(async () => {
+        const joined = await acceptPendingInvite();
+        if (joined && joined.ok) {
+          sendMessage("I joined this Room SMARTview");
+          return;
+        }
+        appendBubble("bot", (joined && joined.message) || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."));
       }, 400);
     }
     return {sendMessage, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};

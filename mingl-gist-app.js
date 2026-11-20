@@ -387,7 +387,26 @@
     }
   }
 
+  async function hydrateSiteChrome(user) {
+    const cs = window.FLOQRChromeScheme;
+    if (!cs) return;
+    try {
+      cs.syncAccessGate?.();
+      if (!user?.uid) {
+        cs.applyDocument?.(cs.effectiveChrome?.() || cs.getChrome?.());
+        return;
+      }
+      const snap = await db.collection("users").doc(user.uid).get();
+      cs.hydrateFromProfile?.(snap.exists ? snap.data() || {} : {});
+    } catch (_) {
+      try { cs.applyDocument?.(cs.effectiveChrome?.() || cs.getChrome?.()); } catch (__) { /* ignore */ }
+    }
+    window.FLOQRChromeAudit?.probePage?.({reason: "mingl-gist-hydrate"});
+  }
+
   function bindAuth() {
+    try { window.FLOQRChromeScheme?.syncAccessGate?.(); } catch (_) { /* ignore */ }
+    try { window.FLOQRChromeScheme?.applyDocument?.(); } catch (_) { /* ignore */ }
     window.FLOQRSessionShell?.bind?.({
       auth,
       chrome: "[data-floqr-auth-chrome]",
@@ -437,6 +456,7 @@
     bindViewer();
     auth.onAuthStateChanged(async (user) => {
       currentUser = user;
+      await hydrateSiteChrome(user);
       await refreshFeed();
     });
   }

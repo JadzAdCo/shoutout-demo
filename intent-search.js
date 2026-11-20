@@ -200,12 +200,13 @@
       id: "help-botdee-room-smartview",
       kind: "help",
       label: "Room SMARTview",
-      blurb: "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm mints a join link. Joining is not a payment and does not open a shared tab.",
+      blurb: "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
-        "invite others to this chat", "share this conversation", "join room smartview",
-        "joined bot dee session", "confirm room smartview"
+        "invite others to this chat", "invite mingl friends", "share this conversation",
+        "join room smartview", "joined bot dee session", "confirm room smartview",
+        "review bot dee invite"
       ],
       patterns: [
         /room\s*smart\s*view/,

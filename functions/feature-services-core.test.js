@@ -372,10 +372,24 @@ test("server enforces feature access on checkout and robotaxi", () => {
   assert.match(commerce, /assertFeatureAccess\(request\.auth, "rydr", request\)/);
   const index = read("functions/index.js");
   ["setFeatureServiceFlags", "seedFeatureServices", "createBetaInvite", "acceptBetaInvite", "declineBetaInvite",
-    "revokeBetaTester", "revokeBetaInvite", "setBetaTesterFeatures", "logFeatureAccessAttempt",
+    "revokeBetaTester", "revokeBetaInvite", "setBetaTesterFeatures", "findBetaPatron", "logFeatureAccessAttempt",
     "logFeatureCodePromotion", "verifyFeatureServiceAuditChain"].forEach(name => {
     assert.match(index, new RegExp(`\\b${name}: featureServiceFns\\.${name}\\b`), name);
   });
+});
+
+test("setBetaTesterFeatures rejects unchanged grants before the audit-head transaction", () => {
+  const fns = read("functions/feature-services-functions.js");
+  const start = fns.indexOf("exports.setBetaTesterFeatures");
+  const end = fns.indexOf("exports.logFeatureAccessAttempt");
+  assert.ok(start >= 0 && end > start);
+  const body = fns.slice(start, end);
+  const unchanged = body.indexOf("Nothing changed — the tester already has that access.");
+  const tx = body.indexOf("runTransaction");
+  assert.ok(unchanged >= 0 && tx > unchanged, "unchanged-grant check must run before runTransaction");
+  assert.match(fns, /exports\.findBetaPatron = onCall/);
+  assert.match(fns, /getUserByEmail/);
+  assert.match(read(".github/workflows/functions-ci.yml"), /add_fns setFeatureServiceFlags seedFeatureServices findBetaPatron setBetaTesterFeatures/);
 });
 
 test("Master Admins cannot become beta testers; feature grants and denials are logged", () => {
@@ -409,6 +423,13 @@ test("Master Admin Features Mgmt tab is SOS2FA gated with lazy sub-tabs", () => 
   assert.match(html, /class="beta-invite-actions"/);
   const app = read("master-feature-services.js");
   assert.match(app, /httpsCallable\("setBetaTesterFeatures"\)|call\("setBetaTesterFeatures"/);
+  assert.match(app, /call\("findBetaPatron"/);
+  assert.match(app, /searchPatronsByEmailFallback/);
+  assert.doesNotMatch(app, /USER_SCAN_LIMIT|collection\("users"\)\.limit\(/);
+  assert.match(app, /loadBeta\(\{keepVisible: true\}\)/);
+  const saveFn = app.slice(app.indexOf("async function saveTesterFeatures"), app.indexOf("async function revokeInvite"));
+  assert.doesNotMatch(saveFn, /loadAudit/);
+  assert.match(saveFn, /loadBeta\(\{keepVisible: true\}\)/);
   assert.match(app, /featureKeys/);
   assert.match(app, /syncInviteSubmitState|selectedInviteUid/);
   assert.match(app, /is-ready/);

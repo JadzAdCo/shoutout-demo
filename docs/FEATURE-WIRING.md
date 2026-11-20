@@ -827,21 +827,21 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
-## Room SMARTview intent routing (s3.3.033 / join live s3.3.046)
+## Room SMARTview + Mingl session invites (s3.3.033 / join s3.3.046 / Mingl invites s3.3.050)
 
-**Purpose:** BOT DEE recognizes Room SMARTview intents (explicit / strong invite / contextual collaborate / existing-room commands) and opens an inline **Room SMARTview** confirmation card. Official name is **Room SMARTview** (never “Mingl Room SmartView”). **s3.3.046:** Confirm sends `confirm room smartview` (bare `confirm` is VIP hold, not a new room). Join is **not** a payment and does **not** open a shared tab. A second Confirm rotates the host token on the **same** room. Leave / End / New chat clear `joinedRoomId`. Failed `?join=` replies instead of opening setup. Shared tab / charge stay off. Distinct from Version SMARTview and People SMARTview.
+**Purpose:** BOT DEE recognizes Room SMARTview intents and opens an inline **Room SMARTview** card. Official name is **Room SMARTview** (never “Mingl Room SmartView”). **s3.3.050:** Confirm creates a Mingl-friends-only session (host plus 7 guests). Guests can invite. Invite tokens are SHA-256 only, bound to `targetUid`, Inbox `type: botDeeRoomInvite` (**Review BOT DEE invite**, not a ShoutOut CTA). Join is **not** a payment. Shared tab is a later opt-in + FloqR Stripe (`orderType: botDeeRoomTab`). Beta gates: `botDee` on chat, `mingl` on invite/join/create/tab. Distinct from Version SMARTview and People SMARTview.
 
 | Layer | Wiring |
 |---|---|
-| UI | Card in the BOT DEE bubble (`bot-dee-chat.js` → `FLOQRBotDeeSmartView.mount`). Setup / offer / share-preview / command / deny. Participants 0/8, itinerary / tab / permissions rows, Confirm and Not now. Composer, draft, and scroll stay. Site Chrome tokens only. Confirm sends `confirm room smartview`. `?join=` is stripped after the client posts `joinToken`. |
-| Client | `botdee-room-smartview.js` (UMD, same file as Functions — classifier stays Firestore-free). `botdee-smartview.js` `renderRoomCard` / `bindRoomCard`. Chrome keys `botdee.rs.*` (`joinLink`, `confirmedLive`, `joined`). Decline keys in `sessionStorage floqr.roomSmartView.declined` and `executeBotSession.roomSmartViewDeclined`. Idle timer re-arms while `data-rs-active=1`. |
-| Backend | `functions/botdee-room-smartview.js` `classifyRoomIntent` / `buildRoomSession` (`ROOMS_LIVE=true`). Live writes in `functions/botdee-room-live.js` (`createRoom` / `joinRoom` / `rotateJoinToken` / `leaveRoom` / `endRoom` / `appendTurn`). `executeBotSession` runs join token → ShoutOut → VIP → room → people → Gemini. VIP/ShoutOut/people turns are **not** written to the room. Closed rooms refuse `appendTurn` / `loadTurns`. Host End/Leave clears `joinedRoomId` for **every** member; a non-host End does not unjoin them. Joined Gemini context uses **room turns only** (private thread is not copied). |
-| Data | `botDeeRooms/{roomId}` + `turns` (Functions-write; member-read; `joinTokenHash` SHA-256; `memberUids` cap 8; **no IP**; `charge` false). Thread pointer `botDeeThreads.joinedRoomId` + `joinedRoomConversationId` (cleared when the conversation changes). Classification rows in `data-classification-core.js`. |
-| URL / contract | `botdee.html?join=<token>` (no `?v=`). Display boards never get `?v=`. |
-| Security | Same `assertFeatureAccess(botDee)` as chat. Classifier cannot grant membership. Join hashes the token server-side. Shared tab / checkout never open from join. Prompt-injection asking for host memory is denied. |
-| Observability | Manual Feature Tests `s3-3-033-room-smartview-intent`, `s3-3-046-people-gaps-headless-vip-rooms`. |
-| Help | `help-botdee-room-smartview`, `-invite`, `-join`, `-end`, `-tab`, `-who-pays`, `-kick`, `-share`. BOT DEE intent `help-botdee-room-smartview`. |
-| Deploy | Pages + Functions (`executeBotSession`) + Firestore rules `s3.3.046-headless-vip-rooms`. `[firebase-deploy] [firebase-deploy-botdee]`. |
+| UI | Card in the BOT DEE bubble (`bot-dee-chat.js` → `FLOQRBotDeeSmartView.mount`). Invite picker is Mingl friends only. Participants cap 8, itinerary / tab / members (host **Remove**) / Invite / End. Confirm sends `confirm room smartview`. `?room=&t=` (legacy `?join=`) stripped after capture. Failed invite tokens do **not** post “I joined”. Satellite `FLOQRSessionShell` on `botdee.html`. |
+| Client | `botdee-room-smartview.js` (UMD, byte-identical to Functions). `botdee-smartview.js` `renderRoomCard` / `bindRoomCard` (`listBotDeeRoomFriends`, `createBotDeeRoomInvite`, `kickBotDeeRoomMember`, `optInBotDeeRoomTab`, `endBotDeeRoom`). `data-rs-room` is stamped from `stored.joinedRoomId` on later cards. Chrome `botdee.rs.*` + `botdee.room.*`. Inbox `inboxLinkLabel` → Review BOT DEE invite. |
+| Backend | Classifier `functions/botdee-room-smartview.js`. Live I/O `functions/botdee-session-store.js` + thin `botdee-room-live.js` (`joinRoom` = `acceptInvite`; `kickMember` / `resolveKickTarget`). `acceptInvite` reads room+invite **inside** the transaction (`admitMember`) so concurrent joins cannot overwrite `memberUids`. Host block is checked on guest invites. Callables in `functions/botdee-session-functions.js` (`createBotDeeRoomInvite` / `acceptBotDeeRoomInvite` / `inviteBotDeeRoomGuest` / kick / end / tab). Tab accept/void is assignee (or host void) only; accepting does not reopen a closing tab. `executeBotSession` join token or already-member `roomId` → persist `joinedRoomId`; kick utterance calls `kickMember`. Gemini context = **room events only** (private thread / memories not copied). Checkout `createFloqrCheckoutSession` `botDeeRoomTab` as paying uid; `last4` on payer receipt only. |
+| Data | `botDeeRooms` + `turns`/`events` (member-read). `botDeeRoomMembers`, `botDeeRoomInvites` (Functions-only, SHA-256), `botDeeRoomTabs` + `lines` (no card last4), `botDeeRoomAudit`, invite/turn throttles. **No IP.** Classification in `data-classification-core.js` job `botDeeSession`. |
+| URL / contract | `botdee.html?room=<id>&t=<token>` (no `?v=`). Display boards never get `?v=`. |
+| Security | `assertFeatureAccess(botDee)` + `mingl` on session callables and tab checkout. Token bound to `targetUid`; wrong account / expired / revoked / non-friend / **host block** / cap 8 refuse. Kicked uid removed from `memberUids` (cannot read events). Agent probes `actorRole: agent`. |
+| Observability | Manual Feature Tests `s3-3-050-botdee-mingl-session-invite`. |
+| Help | `help-botdee-room-smartview`, `-invite`, `-join`, `-end`, `-tab`, `-who-pays`, `-kick`, `-share` (11 langs). |
+| Deploy | Pages + Functions + Firestore rules `s3.3.047-botdee-mingl-session`. Merge to `origin/main` then `[firebase-deploy] [firebase-deploy-botdee]` from the origin/main archive. |
 
 ---
 
@@ -857,11 +857,11 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Client | `smartvisuals-resolver.js` (UMD, byte-identical to Functions) including `selectAd` / `adPolicy`. `smartvisuals-view.js` / `.css` — `ensureCatalog()` fetches `./smartvisuals/catalog.json` on every page that loads the module (Search and `botdee.html`), not only when `#smartvisualNotificationHost` exists. Search SMARTnotification compact Ad + Room SMARTview banner + BOT DEE `renderAdSlot`. `botdee.html` also preloads the catalog. `smartvisuals-studio.js` / `.css` Review reads `smartVisualDrafts.svgXml` via `<img src="data:image/svg+xml">`. Ads tab previews mock fill. Join Now → `FLOQRNav.pageUrl("./mingl-chat.html", {from:"smartvisual"})` (no `?v=`). |
 | Backend | `classifySmartVisual`, `publishSmartVisualDraft` (SOS2FA + `FLOQRReasonPrompt` ≥8 + SVG sanitizer; persists `svgXml` + `svgChecksumSha256` on the draft), `setSmartVisualOverride`, `getSmartVisualAdPolicy` (extends packaged `resolver.adPolicy()`: `adsEnabled: false`, `adsenseApproved: false`, `mockFill: true`, `emptyWhen` private-chat / prompt-injection). `functions/smartvisuals-svg-sanitize.js`. Gemini `geminiAllowed() === false`. |
 | Data | Published: `smartvisuals/{stencils,backgrounds}/*.svg`, `registry.json`, `catalog.json`. Firestore Functions-write: `smartVisualDrafts` (includes sanitized `svgXml` for Review), `smartVisualOverrides`, `smartVisualSelections` (hash → IDs), `smartVisualAdPolicy`, `smartVisualAuditLogs`. Classification rows in `data-classification-core.js`. No stored client IP. Private BOT DEE chat `sourceKind: private-chat` → `publicNotification: false`. |
-| URL / contract | Demo Search: `./?start=search&smartvisualInvite=cancun`. Display boards never get `?v=`. Package stamp `s3.3.046`. |
+| URL / contract | Demo Search: `./?start=search&smartvisualInvite=cancun`. Display boards never get `?v=`. Package stamp `s3.3.050`. |
 | Security | Default-deny unpublished assets. Prompt-injection / remote URLs in titles → `prompt-injection-ignored` + neutral art. Override of draft IDs rejected. Studio publish needs Master Admin SOS2FA. Rules: drafts/overrides/audit/adPolicy Master Admin read, write false; selections none. |
 | Observability | Manual Feature Tests `s3-3-038-smartvisuals-search-notification`, `s3-3-038-smartvisuals-studio`. Diagnostics package checks. |
 | Help | `help-smartvisuals-notification`, `help-smartvisuals-room` (patron, 11 langs), `help-smartvisuals-studio` (masterAdmin English). BOT DEE intents on the first two. |
-| Deploy | **PR only.** No Functions deploy, no Pages publish, no AdSense until Don asks. |
+| Deploy | Pages from `origin/main`. Functions `[firebase-deploy] [firebase-deploy-smartvisuals]` (`getSmartVisualAdPolicy` + Studio callables). No AdSense. |
 
 Resume: `@smartvisuals$` / `$smartvisuals$`. Rule: `.cursor/rules/design-notes-smartvisuals.mdc`. Architecture: `docs/FLOQR-TECHNICAL-BIBLE.md` §2.3.
 
@@ -938,7 +938,9 @@ When adding a section, use this skeleton:
 |---|---|
 | **NIC tab** | Parent **Features Mgmt** (`master.featuresServices`); sub-tabs: **Release Control** (`featuresReleaseControl`), **Beta & Testing** (`featuresBetaTesting`), **Audit Trail** (`featuresAuditTrail`) |
 | **Release Control** | Feature flag table + **Test → live** promotion; loads flags only |
-| **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists; loads beta data only (catalog flags if needed) |
+| **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists. Packaged Mingl default is Off; **live `featureServices/mingl` wins** (Master Admin using Mingl as beta means Enable Feature 1 + Enable Beta 1 — checkboxes are not disabled). **Find patron (s3.3.049):** `findBetaPatron` (SOS2FA Master Admin) uses Auth `getUserByEmail` then `users.email` / `floqrHandle` equality — no 120-doc scan. Returns uid/email/handle + active-tester flag; no IP stored; no new collection (`users` / `betaTesters` already classified). Client falls back to `users.where(email ==)` if the callable is not deployed yet. **Tester Save:** `setBetaTesterFeatures` rejects “Nothing changed” **before** the audit-head transaction; UI does not await Audit Trail after Save (that N+1 `users/{uid}` read was the “took forever” hang). |
+| **Save busy (s3.3.047)** | `floqr-save-busy.js` greys Save on click and sets **Command received…** when a callable/Firestore write starts. Loaded after `floqr-nav.js`. |
+| **Features SMARTview (s3.3.047)** | Catalog `features-smartview/catalog.json`; UI `floqr-features-smartview.js`. Master Admin → Features Mgmt → BOT DEE → SMARTviews → **Show Features SMARTview**. Product badges stay **Status not verified** until live flags + deploy evidence. Si-tube is not in this repo. |
 | **Audit Trail** | Hash-chained activity log + Verify integrity; loads audit only |
 | **Legacy deep link** | `#featuresServices` → `#featuresReleaseControl` |
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
@@ -1048,6 +1050,16 @@ When adding a section, use this skeleton:
 ## Search category icon row (spots)
 
 Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** · **6 Si-nema**. Hidden until Features & Services: **Mingl** (`#minglBtnCard` chrome photo tile, `data-floqr-chrome-icon="mingl"`), BartR, RydR. Mingl face: v3 clean vector `images/chrome/mingl-svg/logos/mingl-color-master.svg` → transparent PNGs + `mingl-*.jpg` chrome tiles (`scripts/build-mingl-v3-logo.py`). Colorless SVG kit remains in `images/chrome/mingl-svg/` for compact / FloqMedia lockups. Resume `@mingl-icon$`.
+
+## Mingl Chat / Gist Site chrome
+
+| Piece | Where |
+|---|---|
+| **Surfaces** | `mingl-chat.html` (standalone chats), `mingl-gist.html` (stories). Feature key `mingl`. Satellite shell (`FLOQRSessionShell`). |
+| **Chrome** | Same contract as BOT DEE / receipts: early-paint `html[data-floqr-chrome]` from `localStorage floqr.isSiteChrome`, then `floqr-chrome-scheme.js` + `floqr-chrome-audit.js`. Hero uses `data-floqr-chrome-icon="mingl"` + `floqr-page-title` (Appearance h2 size). Title **Mingl Chat** is a protected brand (never translated). |
+| **Client** | `mingl-chat-app.js` / `mingl-gist-app.js` `hydrateSiteChrome` → `hydrateFromProfile(users/{uid})` after sign-in; `applyDocument` when signed out. Compose / bubbles / menus use `--hot` `--accent` `--floqr-ink` `--line` (`styles.css` + overlay `mingl-chat-chrome.css`). Gist **story viewer** stays a dark overlay. |
+| **Data** | Reads existing `users.isSiteChrome` / `uiChrome` only. No new collection. No stored IP. |
+| **Diagnostics** | Manual Feature Test `s3-3-046-mingl-chat-site-chrome`. |
 
 ## Chrome icon drafts (nightlife / traditional review)
 

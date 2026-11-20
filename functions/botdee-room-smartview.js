@@ -561,14 +561,14 @@ function replyFor(classified) {
   }
   if (row.route === "confirm") {
     return {
-      key: "botdee.rs.confirmedLive",
-      text: "Room SMARTview is open. Share the join link so friends can talk with BOT DEE here. Joining is not a payment."
+      key: "botdee.room.confirmedLive",
+      text: "BOT DEE session is open. Invite Mingl friends from the card. Guests can invite too, up to host plus 7. Joining does not charge anyone."
     };
   }
   if (row.route === "setup") {
     return {
       key: "botdee.rs.setupIntro",
-      text: "Here’s Room SMARTview setup. Confirm to mint a join link — friends can talk with BOT DEE in this room. Joining is not a payment. Your private BOT DEE chat stays private."
+      text: "Here’s Room SMARTview setup. Confirm to open a BOT DEE session. Invite Mingl friends only — host plus 7 guests. Joining does not charge anyone. Your private BOT DEE chat stays private."
     };
   }
   if (row.route === "reopen") {
@@ -590,11 +590,11 @@ function replyFor(classified) {
     };
   }
   const commandCopy = {
-    invite: ["botdee.rs.commandInvite", "Share the Room SMARTview join link. Joining is not a payment and does not open a shared tab."],
+    invite: ["botdee.room.commandInvite", "Invite Mingl friends into this BOT DEE session. Not a public link. Cap is host plus 7 guests."],
     members: ["botdee.rs.commandMembers", "There is no active Room SMARTview yet, so there is no member list to show."],
     summarize: ["botdee.rs.commandSummary", "There are no room-only decisions yet. Private BOT DEE history is not used as a room summary."],
-    who_pays: ["botdee.rs.commandWhoPays", "No one is charged from chat. A shared tab needs a later opt-in per person — it is not live."],
-    kick: ["botdee.rs.commandKick", "Only a verified host can remove someone, and only after confirm. There is no live room to change."],
+    who_pays: ["botdee.room.commandWhoPays", "No one is charged from chat. Opt in to the shared tab first. Split or one payer — only confirming uids are charged."],
+    kick: ["botdee.room.commandKick", "Only the host can remove a guest. Kicked friends cannot read further room messages."],
     leave: ["botdee.rs.commandLeave", "Leave applies only to a Room SMARTview you have joined. There is no active room."],
     end: ["botdee.rs.commandEnd", "Ending a room needs host confirmation and does not settle money. There is no live room to close."],
     make_private: ["botdee.rs.commandPrivate", "Do you want to leave Room SMARTview, or keep chatting privately here? Other people’s messages are not erased."]
@@ -648,11 +648,12 @@ function buildRoomSmartView(opts) {
     actions: {
       create: false,
       invite: classified.hasActiveRoom === true,
-      kick: false,
+      kick: classified.hasActiveRoom === true,
       end: classified.hasActiveRoom === true,
-      tabOptIn: false,
+      tabOptIn: classified.hasActiveRoom === true,
       charge: false
     },
+    roomId: text(options.roomId, 80),
     joinHref: text(options.joinHref, 240),
     replyKey: copy.key,
     declineKey: classified.declineKey || declineKey(classified)
