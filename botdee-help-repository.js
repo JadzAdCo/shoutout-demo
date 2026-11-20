@@ -476,10 +476,11 @@
     {
       id: "help-smartvisuals-notification",
       title: "Mingl Room SMARTnotification",
-      body: "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come only from the room record. Ads, if ever approved, sit below the card and stay labeled Ad.",
+      body: "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come only from the room record. A labeled Ad sample under the card follows the room tags (Travel partner / Fly to Cancun for a Cancun Trip). It is not a live advertiser. Private chat and prompt injection keep the slot empty.",
       searchPhrases: [
         "smartnotification", "smart notification", "mingl room invitation", "view invitation",
-        "cancun trip", "smartvisuals", "smartstencils", "smartbackgrounds"
+        "cancun trip", "smartvisuals", "smartstencils", "smartbackgrounds",
+        "travel partner", "fly to cancun", "labeled ad"
       ],
       links: [{label: "Open Search", href: pageUrl("./", {start: "search"})}],
       audiences: ["patron", "serviceMember", "venueAdmin"],
@@ -489,10 +490,10 @@
     {
       id: "help-smartvisuals-room",
       title: "Room SMARTview with SMARTvisuals",
-      body: "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used to pick art. Group rooms are not live yet, so Join Now does not create a room or charge. A labeled Ad slot may sit below; it is empty until separately approved.",
+      body: "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used to pick art. Group rooms are not live yet, so Join Now does not create a room or charge. A labeled Ad below is a sample from those tags (Travel partner / Fly to Cancun). It stays empty for private chat or injection and is not a live advertiser.",
       searchPhrases: [
         "room smartview invitation", "join now mingl", "smartstencils", "smartbackgrounds",
-        "cancun trip room", "bot-dee itinerary"
+        "cancun trip room", "bot-dee itinerary", "travel partner", "exclusive mingl room deals"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin"],
@@ -502,7 +503,7 @@
     {
       id: "help-smartvisuals-studio",
       title: "SMARTvisual Studio",
-      body: "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads stay a separate labeled slot and are off.",
+      body: "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads are a separate labeled slot filled with a mock sample from authorized tags; AdSense stays off.",
       searchPhrases: ["smartvisual studio", "asset registry", "smartvisuals library", "publish stencil"],
       links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
       audiences: ["masterAdmin"],

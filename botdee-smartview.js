@@ -996,6 +996,13 @@
         <button type="button" class="botdee-sv-room-btn botdee-sv-room-main" data-rs-confirm>${esc(share ? t("botdee.rs.shareApprove", "Approve selected facts") : t("botdee.rs.confirm", "Confirm"))}</button>
         <button type="button" class="botdee-sv-room-btn" data-rs-decline>${esc(t("botdee.rs.notNow", "Not now"))}</button>
       </div>` : ""}
+      ${denied ? "" : (window.FLOQRSmartVisuals?.renderAdSlot
+        ? window.FLOQRSmartVisuals.renderAdSlot({
+          title: view.authorizedTitle,
+          description: view.authorizedDescription,
+          sourceKind: "authorized-room"
+        }, visual)
+        : "")}
       <p class="botdee-sv-room-toast" data-rs-toast hidden></p>
       <div class="botdee-sv-room-foot">
         <span>${esc(t("botdee.rs.foot", "BOT DEE · Room SMARTview"))}</span>

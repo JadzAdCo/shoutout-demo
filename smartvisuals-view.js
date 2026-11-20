@@ -1,16 +1,23 @@
 /* SMARTvisuals renderer — Search SMARTnotification + Room SMARTview.
    Scenic art via <img>. Stencils via <img> (currentColor not inherited on img — CSS filter).
-   Ads are a reserved labeled slot; AdSense is never loaded. */
+   Ads: labeled mock fill from authorized tags via getSmartVisualAdPolicy / resolver.selectAd.
+   AdSense is never loaded. */
 (function (root) {
   "use strict";
   if (root.FLOQRSmartVisuals) return;
 
-  const t = (key, fallback) => {
+  const t = (key, fallback, vars) => {
     try {
-      const out = root.FLOQRI18n?.t?.(key);
+      const out = root.FLOQRI18n?.t?.(key, vars);
       if (out && out !== key) return out;
     } catch (_) {}
-    return fallback;
+    let text = fallback;
+    if (vars && typeof vars === "object") {
+      Object.keys(vars).forEach(name => {
+        text = String(text).replace(new RegExp("\\{" + name + "\\}", "g"), String(vars[name]));
+      });
+    }
+    return text;
   };
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
@@ -148,18 +155,54 @@
       </button>`).join("")}</div>`;
   }
 
-  function adSlotHtml(payload) {
+  function packagedAdPolicy() {
+    return resolver()?.adPolicy?.() || {
+      adsEnabled: false,
+      adsenseApproved: false,
+      mockFill: true,
+      emptyWhen: ["private-source-denied", "prompt-injection-ignored", "private-chat", "privateChat"]
+    };
+  }
+
+  function selectAdFor(visual, payload) {
+    const r = resolver();
+    const policy = (payload && payload.adPolicy) || packagedAdPolicy();
+    if (!r || typeof r.selectAd !== "function") {
+      return {fill: false, reasonCode: "ad-resolver-missing", mock: true, liveInventory: false, advertiser: null};
+    }
+    return r.selectAd(visual || {}, policy);
+  }
+
+  function adSlotHtml(payload, visual, opts) {
     if (payload && payload.hideAd === true) return "";
-    if (!ADS_ENABLED) {
-      return `<aside class="sv-ad is-empty" data-sv-ad hidden>
+    const ad = selectAdFor(visual, payload);
+    const compact = opts && opts.compact === true;
+    if (!ad || ad.fill !== true) {
+      return `<aside class="sv-ad is-empty" data-sv-ad data-sv-ad-reason="${esc(ad && ad.reasonCode || "ad-policy-empty")}" hidden>
         <span class="sv-ad-label">${esc(t("sv.adLabel", "Ad"))}</span>
       </aside>`;
     }
-    return `<aside class="sv-ad" data-sv-ad aria-label="${esc(t("sv.adLabel", "Ad"))}">
+    const urls = resolver()?.urlsFor?.({
+      backgroundId: ad.backgroundId || (visual && visual.backgroundId),
+      stencilId: ad.stencilId || (visual && visual.stencilId)
+    }, catalog()) || {};
+    const kicker = t(ad.kickerKey, ad.category === "travel" ? t("sv.adTravelPartner", "Travel partner") : "Mingl Room");
+    const headline = t(ad.headlineKey, ad.placeLabel ? `Fly to ${ad.placeLabel}` : "Plan together", ad.headlineVars);
+    const sub = t(ad.subKey, "Exclusive Mingl Room Deals");
+    const disclaimer = t(ad.disclaimerKey, "Sample placement — not a live offer or booked inventory.");
+    const thumb = urls.backgroundUrl || (visual && visual.backgroundUrl) || "./smartvisuals/backgrounds/mingl-room.svg";
+    const stencil = urls.stencilUrl || "./smartvisuals/stencils/people.svg";
+    return `<aside class="sv-ad${compact ? " is-compact" : ""}" data-sv-ad data-sv-ad-reason="${esc(ad.reasonCode || "")}" data-sv-ad-cat="${esc(ad.category || "")}" aria-label="${esc(t("sv.adLabel", "Ad"))}">
       <span class="sv-ad-label">${esc(t("sv.adLabel", "Ad"))}</span>
+      <div class="sv-ad-art" aria-hidden="true">
+        <img class="sv-ad-bg" src="${esc(thumb)}" alt=""/>
+        <img class="sv-ad-stencil" src="${esc(stencil)}" alt=""/>
+      </div>
       <div class="sv-ad-body">
-        <strong>${esc(t("sv.adTravelPartner", "Travel partner"))}</strong>
-        <small>${esc(t("sv.adDisabled", "Sponsored placement is off until separately approved."))}</small>
+        <span class="sv-ad-kicker">${esc(kicker)}</span>
+        <strong class="sv-ad-headline">${esc(headline)}</strong>
+        <span class="sv-ad-sub">${esc(sub)}</span>
+        <small class="sv-ad-disclaimer">${esc(disclaimer)}</small>
       </div>
     </aside>`;
   }
@@ -197,6 +240,7 @@
         <button type="button" class="sv-btn sv-btn-primary" data-sv-view>${esc(t("sv.viewInvitation", "View Invitation"))} →</button>
         <button type="button" class="sv-btn sv-btn-ghost" data-sv-later>${esc(t("sv.notNow", "Not Now"))}</button>
       </div>
+      ${adSlotHtml(payload, visual, {compact: true})}
     </article>`;
   }
 
@@ -253,7 +297,7 @@
         <span class="sv-join-or">${esc(t("sv.or", "or"))}</span>
         <span class="sv-scheduled">📅 ${esc(t("sv.joinScheduled", "Join at Scheduled Time"))}<br>${esc(payload.scheduledLabel || "")}</span>
       </div>
-      ${adSlotHtml(payload)}
+      ${adSlotHtml(payload, visual)}
     </article>`;
   }
 
@@ -350,6 +394,10 @@
     ensureCatalog,
     syntheticCancun,
     resolveVisual,
+    selectAdFor,
+    packagedAdPolicy,
+    adSlotHtml,
+    renderAdSlot: adSlotHtml,
     renderNotification,
     renderRoom,
     mountNotification,
