@@ -451,9 +451,10 @@
     {
       id: "help-botdee-version-smartview-tabs",
       title: "Version SMARTview tabs",
-      body: "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified FLOQR package notes from the current README. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme.",
+      body: "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified BOT DEE and Gemini changes only — not Master Admin, beta tester tools, or other FLOQR product notes. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme.",
       searchPhrases: [
-        "version what's new", "version overview", "technical details bot dee", "version smartview tabs"
+        "version what's new", "version overview", "technical details bot dee", "version smartview tabs",
+        "bot dee what's new", "gemini what's new"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -463,10 +464,12 @@
     {
       id: "help-botdee-room-smartview",
       title: "Room SMARTview",
-      body: "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme.",
+      body: "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends). That opens the same Room SMARTview as Open Room SMARTview Cancun Trip — travel art and a sample Travel partner / Fly to Cancun Ad, not live flight or hotel booking. VIP tables tonight stay nightlife, not a trip card. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme.",
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
-        "group chat bot dee", "talk to bot dee together", "invite mingl friends"
+        "group chat bot dee", "talk to bot dee together", "invite mingl friends",
+        "let's plan our cancun trip", "let's plan a trip to cancun", "plan a cancun trip",
+        "cancun trip with friends"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -683,8 +686,8 @@
     {
       id: "help-botdee-smartcard-search",
       title: "Ask BOT DEE who someone is",
-      body: "Ask “Who am I?” to open your own SMARTview. Ask “Who is …”, “What do you know of …”, or “What about …” plus a first and last name, display name, or @handle. One match opens a People SMARTview card in the chat — not a markdown list or photo dump. Several matches show SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether that account exists.",
-      searchPhrases: ["who am i", "who is", "what do you know of", "what about", "tell me about", "display name", "find person on floqr", "do you know this person", "people search bot dee", "lookup public profile"],
+      body: "Ask “Who am I?” to open your own SMARTview. Ask “Who is …”, “What do you know of …”, or “What about …” plus a first name, last name, display name, Mingl or FloqR handle, or a social handle (Instagram, TikTok, X). Matches use those identity fields only — not bios, likes, drinks, or genres. One match opens a People SMARTview card in the chat — not a markdown list or photo dump. Several matches show compact SMARTcards to pick from. Private, blocked, or unpublished profiles are not listed — BOT DEE will not confirm whether that account exists.",
+      searchPhrases: ["who am i", "who is", "what do you know of", "what about", "tell me about", "display name", "find person on floqr", "do you know this person", "people search bot dee", "lookup public profile", "identity only", "not bio"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
@@ -2057,14 +2060,27 @@
     {
       id: "help-profile-mobile",
       title: "Mobile",
-      body: "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format so messages can reach you. Incomplete numbers cannot be saved.",
+      body: "Mobile is required. FLOQR uses this number to recognize you — one mobile means one FLOQR account. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format (E.164) so SMS and WhatsApp can reach you. If this number is already on another FLOQR sign-in, you will be asked to use that account instead of creating a second one.",
       searchPhrases: [
-        "mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code"
+        "mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code",
+        "required phone", "same phone", "duplicate account", "E.164"
       ],
       links: [{label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}],
       audiences: ["patron"],
       source: "help-repository-seed",
       page: "patron-portal.html"
+    },
+    {
+      id: "help-patron-account-merge",
+      title: "Patron account merge",
+      body: "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted until Don confirms. New sign-ups refuse a second account when the mobile is already claimed.",
+      searchPhrases: [
+        "merge accounts", "duplicate patron", "same phone", "MsLorna", "Lorna", "phone unifier"
+      ],
+      links: [{label: "Duplicate Records", href: pageUrl("./master-admin.html", {from: "botdee"})}],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html"
     },
     {
       id: "help-prior-travels",

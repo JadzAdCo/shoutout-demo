@@ -21,8 +21,8 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.doesNotMatch(page, /search-chrome-toolbar/);
   assert.doesNotMatch(page, /data-floqr-chrome-btn=/);
   assert.match(page, /class="search-icon-row"/);
-  // Spot order: 1 ShoutOut · 2 BOT DEE · 3 VIP · 4 Settings · 5 floqCast · 6 Si-nema
-  assert.match(page, /id="shoutoutBtnCard"[\s\S]*?id="intentSearchBtnCard"[\s\S]*?id="vipReservBtnCard"[\s\S]*?id="settingsBtnCard"[\s\S]*?id="floqcastBtnCard"[\s\S]*?id="sinemaBtnCard"/);
+  // Spot order: 1 ShoutOut · 2 Mingl · 3 BOT DEE · 4 VIP · 5 Settings · 6 floqCast · 7 Si-nema
+  assert.match(page, /id="shoutoutBtnCard"[\s\S]*?id="minglBtnCard"[\s\S]*?id="intentSearchBtnCard"[\s\S]*?id="vipReservBtnCard"[\s\S]*?id="settingsBtnCard"[\s\S]*?id="floqcastBtnCard"[\s\S]*?id="sinemaBtnCard"/);
   assert.match(page, /id="shoutoutBtnCard"[^>]*>[\s\S]*data-floqr-chrome-icon="shoutOut"[\s\S]*shoutout-nightlife\.png/);
   assert.doesNotMatch(page, /id="shoutoutBtnCard"[\s\S]*shoutout-logo\.png/);
   assert.doesNotMatch(page, /shoutout-icon-title/);
@@ -94,7 +94,15 @@ test("Search page shows the FLOQR logo and standardized ShoutOut / floqCast / VI
   assert.match(chrome, /shoutout-traditional-green\.png/);
   assert.match(chrome, /shoutout-nightlife\.png/);
   assert.match(chrome, /sinema-nightlife\.jpg/);
-  assert.match(chrome, /sinema-whiteblack\.jpg/);
+  assert.match(chrome, /sinema-whiteblack\.png/);
+  assert.ok(fs.existsSync(path.join(root, "scripts/build-sinema-chrome-icons.py")));
+  assert.ok(fs.existsSync(path.join(root, "images/chrome/sinema-svg/logos/sinema-color-master.svg")));
+  assert.ok(fs.existsSync(path.join(root, "images/chrome/sinema-whiteblack.png")));
+  const sinemaSvg = read("images/chrome/sinema-svg/logos/sinema-color-master.svg");
+  assert.match(sinemaSvg, /aria-label="Si-nema logo"/);
+  assert.doesNotMatch(sinemaSvg, /<image[\s>]/, "Si-nema master is real vector, not a PNG wrap");
+  assert.match(sinemaSvg, /Transparent canvas/);
+  assert.match(sinemaSvg, /no black fills/);
   assert.match(chrome, /mingl: "\.\/images\/chrome\/mingl-nightlife\.jpg/);
   assert.match(chrome, /mingl: "\.\/images\/chrome\/mingl-traditional\.jpg/);
   assert.match(chrome, /mingl: "\.\/images\/chrome\/mingl-whiteblack\.jpg/);

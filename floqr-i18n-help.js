@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.051";
+  const VERSION = "s3.3.055";
   const packs = {
     "ru": {
       "help-smartvisuals-notification": {
@@ -39,7 +39,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Спросить BOT DEE, кто это",
-        body: "«Who am I?» открывает ваш SMARTview. «Who is …», «What do you know of …» или «What about …» плюс имя и фамилия, display name или @хендл. Один результат — карточка People SMARTview в чате, не markdown и не сетка фото. Несколько — SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
+        body: "«Who am I?» открывает ваш SMARTview. «Who is …», «What do you know of …» или «What about …» плюс имя, фамилия, display name, хендл Mingl или FloqR либо соцсеть (Instagram, TikTok, X). Совпадение только по этим полям личности — не по био, лайкам, напиткам или жанрам. Один результат — карточка People SMARTview в чате, не markdown и не сетка фото. Несколько — компактные SMARTcard. Приватные, заблокированные и неопубликованные не показываются — BOT DEE не подтверждает, что аккаунт существует."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard людей",
@@ -55,11 +55,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Вкладки Version SMARTview",
-        body: "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового — проверенные заметки пакета FLOQR из текущего README. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ваш Site Chrome — второй темы нет."
+        body: "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового показывает только проверенные изменения BOT DEE и Gemini — не Master Admin, не инструменты бета-тестеров и не другие заметки продуктов FLOQR. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ваш Site Chrome — второй темы нет."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "В чате BOT DEE скажите Open Room SMARTview или Start a group chat. Confirm открывает сессию. Приглашайте только друзей Mingl — хост плюс 7 гостей. Гости тоже могут приглашать. Вход — не платёж и не общий счёт. BOT DEE никогда не берёт номера карт. Личные сообщения остаются личными. Site Chrome следует Appearance."
+        body: "В чате BOT DEE скажите Open Room SMARTview, Start a group chat или простыми словами запланируйте поездку в Cancun (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Это тот же Room SMARTview, что Open Room SMARTview Cancun Trip — travel-иллюстрация и образец Ad Travel partner / Fly to Cancun, не живое бронирование рейсов или отелей. VIP tables tonight остаются nightlife, не карточкой поездки. Confirm открывает сессию. Приглашайте только друзей Mingl — хост плюс 7 гостей. Гости тоже могут приглашать. Вход — не платёж и не общий счёт. BOT DEE никогда не берёт номера карт. Личные сообщения остаются личными. Site Chrome следует Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "Пригласить друзей Mingl",
@@ -235,7 +235,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV из чата BOT DEE",
-        body: "Скажите book a table at Aurelia, hold a table или I want a reservation в BOT DEE. Карточка VIP reserV показывает вечера, 2D-зоны зала (Mezzanine, West Booths, Dance Floor, Bar Lounge) и столы. Нажмите вечер, зону, стол (V1–V4 или AURELIA SUITE на mezzanine), затем Hold it, I agree к Terms и оплатите, если нужен депозит. Open VIP reserV map — полный план. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview — не платёж."
+        body: "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview — не платёж."
       },
       "help-vip-book-table": {
         title: "Забронировать VIP-стол (VIP reserV)",
@@ -375,7 +375,7 @@
       },
       "help-profile-mobile": {
         title: "Мобильный",
-        body: "FLOQR использует этот номер для SMS и WhatsApp. Страна подставляет код, например (+1) для США. Введите остальную часть мобильного номера. Мы сохраняем его в международном формате, чтобы сообщения доходили."
+        body: "Мобильный обязателен. FLOQR узнаёт вас по этому номеру — один мобильный означает один аккаунт. Страна подставляет код, например (+1) для США. Введите остальную часть номера. Мы сохраняем его в международном формате (E.164), чтобы доходили SMS и WhatsApp. Если номер уже на другом входе FLOQR, вас попросят использовать тот аккаунт, а не создавать второй."
       },
       "help-taxi-pickup-address": {
         title: "Адрес подачи такси",
@@ -541,7 +541,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "BOT DEE vragen wie iemand is",
-        body: "“Who am I?” opent uw SMARTview. “Who is …”, “What do you know of …” of “What about …” plus voor- en achternaam, weergavenaam of @handle. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst of fotogrid. Meer matches tonen SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
+        body: "“Who am I?” opent uw SMARTview. “Who is …”, “What do you know of …” of “What about …” plus voornaam, achternaam, weergavenaam, Mingl- of FloqR-handle, of een social handle (Instagram, TikTok, X). Alleen die identiteitsvelden tellen — geen bio’s, likes, drankjes of genres. Eén match opent een People SMARTview-kaart in de chat — geen markdownlijst of fotogrid. Meer matches tonen compacte SMARTcards. Privé, geblokkeerd of niet-gepubliceerd wordt niet getoond — BOT DEE bevestigt niet of dat account bestaat."
       },
       "help-botdee-smartcard": {
         title: "Mensen-SMARTcards",
@@ -557,11 +557,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Version SMARTview-tabbladen",
-        body: "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont geverifieerde FLOQR-packagenotities uit de huidige README. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaart gebruikt jouw Site Chrome — er is geen tweede thema."
+        body: "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont alleen geverifieerde BOT DEE- en Gemini-wijzigingen — geen Master Admin, bèta-testertools of andere FLOQR-productnotities. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaart gebruikt jouw Site Chrome — er is geen tweede thema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Zeg in BOT DEE-chat Open Room SMARTview of Start a group chat. Confirm opent een sessie. Nodig alleen Mingl-vrienden uit — host plus 7 gasten. Gasten mogen ook uitnodigen. Deelnemen is geen betaling en opent geen gedeelde tab. BOT DEE neemt nooit kaartnummers. Privéberichten blijven privé. Site Chrome volgt Appearance."
+        body: "Zeg in BOT DEE-chat Open Room SMARTview, Start a group chat, of plan in gewone woorden een Cancun-trip (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Dat opent dezelfde Room SMARTview als Open Room SMARTview Cancun Trip — travel-illustratie en een sample Ad Travel partner / Fly to Cancun, geen live vlucht- of hotelboeking. VIP tables tonight blijft nightlife, geen tripkaart. Confirm opent een sessie. Nodig alleen Mingl-vrienden uit — host plus 7 gasten. Gasten mogen ook uitnodigen. Deelnemen is geen betaling en opent geen gedeelde tab. BOT DEE neemt nooit kaartnummers. Privéberichten blijven privé. Site Chrome volgt Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "Mingl-vrienden uitnodigen",
@@ -737,7 +737,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV vanuit BOT DEE-chat",
-        body: "Zeg book a table at Aurelia, hold a table of I want a reservation in BOT DEE. De VIP reserV-kaart toont avonden, 2D-zones (Mezzanine, West Booths, Dance Floor, Bar Lounge) en tafels. Tik een avond, een zone, een tafel (V1–V4 of AURELIA SUITE op de mezzanine), daarna Hold it, I agree bij Terms, en betaal als er een deposit nodig is. Open VIP reserV map is het volledige plan. BOT DEE neemt nooit kaartnummers. Deelnemen aan Room SMARTview is geen betaling."
+        body: "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Room SMARTview is geen betaling."
       },
       "help-vip-book-table": {
         title: "VIP-tafel boeken (VIP reserV)",
@@ -877,7 +877,7 @@
       },
       "help-profile-mobile": {
         title: "Mobiel",
-        body: "FLOQR gebruikt dit nummer voor SMS en WhatsApp. Land vult de landcode, bijvoorbeeld (+1) voor de Verenigde Staten. Vul alleen de rest van je mobiele nummer in. We slaan het internationaal op zodat berichten aankomen."
+        body: "Mobiel is verplicht. FLOQR herkent je met dit nummer — één mobiel is één account. Land vult de landcode, bijvoorbeeld (+1) voor de Verenigde Staten. Vul alleen de rest van je nummer in. We slaan het internationaal op (E.164) zodat SMS en WhatsApp aankomen. Staat dit nummer al op een andere FLOQR-aanmelding, dan moet je dat account gebruiken in plaats van een tweede te maken."
       },
       "help-taxi-pickup-address": {
         title: "Taxi-ophaaladres",
@@ -1043,7 +1043,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Demander à BOT DEE qui est quelqu’un",
-        body: "« Who am I ? » ouvre votre SMARTview. « Who is … », « What do you know of … » ou « What about … » plus prénom et nom, nom d’affichage ou @identifiant. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown ni une grille de photos. Plusieurs résultats montrent des SMARTcards. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existence du compte."
+        body: "« Who am I ? » ouvre votre SMARTview. « Who is … », « What do you know of … » ou « What about … » plus prénom, nom, nom d’affichage, identifiant Mingl ou FloqR, ou un identifiant social (Instagram, TikTok, X). La recherche ne porte que sur ces champs d’identité — pas la bio, les likes, les boissons ni les genres. Un résultat ouvre une carte People SMARTview dans le chat — pas une liste markdown ni une grille de photos. Plusieurs résultats montrent des SMARTcards compactes. Les profils privés, bloqués ou non publiés n’apparaissent pas — BOT DEE ne confirme pas l’existence du compte."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards Personnes",
@@ -1059,11 +1059,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Onglets Version SMARTview",
-        body: "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés liste les notes de package FLOQR vérifiées du README actuel. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte utilise votre Site Chrome — pas de second thème."
+        body: "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés n’affiche que les changements BOT DEE et Gemini vérifiés — pas Master Admin, les outils bêta-testeur, ni les autres notes produit FLOQR. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte utilise votre Site Chrome — pas de second thème."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Dans le chat BOT DEE, dites Open Room SMARTview ou Start a group chat. Confirm ouvre une session. Invitez uniquement des amis Mingl — hôte plus 7 invités. Les invités peuvent aussi inviter. Rejoindre n’est pas un paiement et n’ouvre pas d’addition partagée. BOT DEE ne prend jamais de numéros de carte. Les messages privés restent privés. Site Chrome suit Appearance."
+        body: "Dans le chat BOT DEE, dites Open Room SMARTview, Start a group chat, ou planifiez un voyage à Cancun en mots simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). C’est le même Room SMARTview que Open Room SMARTview Cancun Trip — illustration travel et un Ad échantillon Travel partner / Fly to Cancun, pas de réservation live de vols ou d’hôtels. VIP tables tonight reste nightlife, pas une carte voyage. Confirm ouvre une session. Invitez uniquement des amis Mingl — hôte plus 7 invités. Les invités peuvent aussi inviter. Rejoindre n’est pas un paiement et n’ouvre pas d’addition partagée. BOT DEE ne prend jamais de numéros de carte. Les messages privés restent privés. Site Chrome suit Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "Inviter des amis Mingl",
@@ -1239,7 +1239,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV depuis le chat BOT DEE",
-        body: "Dites book a table at Aurelia, hold a table ou I want a reservation dans BOT DEE. La carte VIP reserV montre les soirs, les zones 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) et les tables. Touchez un soir, une zone, une table (V1–V4 ou AURELIA SUITE sur la mezzanine), puis Hold it, I agree aux Terms, et payez si un dépôt est requis. Open VIP reserV map est le plan complet. BOT DEE ne prend jamais de numéros de carte. Rejoindre un Room SMARTview n’est pas un paiement."
+        body: "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de carte. Rejoindre un Room SMARTview n’est pas un paiement."
       },
       "help-vip-book-table": {
         title: "Réserver une table VIP (VIP reserV)",
@@ -1379,7 +1379,7 @@
       },
       "help-profile-mobile": {
         title: "Mobile",
-        body: "FLOQR utilise ce numéro pour SMS et WhatsApp. Le pays remplit l’indicatif, par exemple (+1) pour les États-Unis. Saisissez seulement le reste du numéro mobile. Nous le stockons au format international pour que les messages arrivent."
+        body: "Le mobile est obligatoire. FLOQR vous reconnaît avec ce numéro — un mobile signifie un compte. Le pays remplit l’indicatif, par exemple (+1) pour les États-Unis. Saisissez seulement le reste du numéro. Nous le stockons au format international (E.164) pour SMS et WhatsApp. S’il est déjà sur une autre connexion FLOQR, vous devrez utiliser ce compte au lieu d’en créer un second."
       },
       "help-taxi-pickup-address": {
         title: "Adresse de prise en charge taxi",
@@ -1545,7 +1545,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "BOT DEE fragen, wer jemand ist",
-        body: "„Who am I?“ öffnet Ihre SMARTview. „Who is …“, „What do you know of …“ oder „What about …“ plus Vor- und Nachname, Anzeigename oder @Handle. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste und kein Fotogitter. Mehrere Treffer zeigen SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
+        body: "„Who am I?“ öffnet Ihre SMARTview. „Who is …“, „What do you know of …“ oder „What about …“ plus Vorname, Nachname, Anzeigename, Mingl- oder FloqR-Handle oder ein Social-Handle (Instagram, TikTok, X). Treffer nur über diese Identitätsfelder — nicht über Bio, Likes, Getränke oder Genres. Ein Treffer öffnet eine People-SMARTview-Karte im Chat — keine Markdown-Liste und kein Fotogitter. Mehrere Treffer zeigen kompakte SMARTcards. Private, blockierte oder unveröffentlichte Profile erscheinen nicht — BOT DEE bestätigt nicht, ob das Konto existiert."
       },
       "help-botdee-smartcard": {
         title: "Personen-SMARTcards",
@@ -1561,11 +1561,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Version-SMARTview-Reiter",
-        body: "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet geprüfte FLOQR-Package-Hinweise aus der aktuellen README. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und den Scroll. Die Karte nutzt Ihr Site Chrome — kein zweites Thema."
+        body: "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet nur geprüfte BOT-DEE- und Gemini-Änderungen — nicht Master Admin, Beta-Tester-Werkzeuge oder andere FLOQR-Produkthinweise. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und den Scroll. Die Karte nutzt Ihr Site Chrome — kein zweites Thema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Sage im BOT DEE-Chat Open Room SMARTview oder Start a group chat. Confirm öffnet eine Sitzung. Lade nur Mingl-Freunde ein — Gastgeber plus 7 Gäste. Gäste dürfen auch einladen. Beitreten ist keine Zahlung und öffnet keinen gemeinsamen Tab. BOT DEE nimmt niemals Kartennummern. Private Nachrichten bleiben privat. Site Chrome folgt Appearance."
+        body: "Sage im BOT DEE-Chat Open Room SMARTview, Start a group chat oder plane eine Cancun-Reise in normalen Worten (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Das ist dieselbe Room SMARTview wie Open Room SMARTview Cancun Trip — Travel-Illustration und ein Muster-Ad Travel partner / Fly to Cancun, keine Live-Flug- oder Hotelbuchung. VIP tables tonight bleibt Nightlife, keine Trip-Karte. Confirm öffnet eine Sitzung. Lade nur Mingl-Freunde ein — Gastgeber plus 7 Gäste. Gäste dürfen auch einladen. Beitreten ist keine Zahlung und öffnet keinen gemeinsamen Tab. BOT DEE nimmt niemals Kartennummern. Private Nachrichten bleiben privat. Site Chrome folgt Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "Mingl-Freunde einladen",
@@ -1741,7 +1741,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV aus dem BOT DEE-Chat",
-        body: "Sagen Sie book a table at Aurelia, hold a table oder I want a reservation in BOT DEE. Die VIP reserV-Karte zeigt Abende, 2D-Bereiche (Mezzanine, West Booths, Dance Floor, Bar Lounge) und Tische. Tippen Sie Abend, Bereich, Tisch (V1–V4 oder AURELIA SUITE auf der Mezzanine), dann Hold it, I agree zu Terms, und zahlen Sie, wenn eine Kaution nötig ist. Open VIP reserV map ist der volle Plan. BOT DEE nimmt nie Kartennummern. Room SMARTview beitreten ist keine Zahlung."
+        body: "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennummern. Room SMARTview beitreten ist keine Zahlung."
       },
       "help-vip-book-table": {
         title: "VIP-Tisch buchen (VIP reserV)",
@@ -1881,7 +1881,7 @@
       },
       "help-profile-mobile": {
         title: "Mobil",
-        body: "FLOQR nutzt diese Nummer für SMS und WhatsApp. Das Land füllt die Vorwahl, zum Beispiel (+1) für die Vereinigten Staaten. Geben Sie nur den Rest der Mobilnummer ein. Wir speichern sie im internationalen Format, damit Nachrichten ankommen."
+        body: "Mobilnummer ist Pflicht. FLOQR erkennt Sie an dieser Nummer — eine Mobilnummer bedeutet ein Konto. Das Land füllt die Vorwahl, zum Beispiel (+1) für die Vereinigten Staaten. Geben Sie nur den Rest der Nummer ein. Wir speichern sie international (E.164), damit SMS und WhatsApp ankommen. Ist die Nummer schon bei einer anderen FLOQR-Anmeldung, müssen Sie dieses Konto nutzen statt ein zweites anzulegen."
       },
       "help-taxi-pickup-address": {
         title: "Taxi-Abholadresse",
@@ -2047,7 +2047,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Preguntar a BOT DEE quién es alguien",
-        body: "«Who am I?» abre su SMARTview. «Who is …», «What do you know of …» o «What about …» más nombre y apellido, nombre para mostrar o @identificador. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown ni una cuadrícula de fotos. Varios muestran SMARTcards. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
+        body: "«Who am I?» abre su SMARTview. «Who is …», «What do you know of …» o «What about …» más nombre, apellido, nombre para mostrar, identificador Mingl o FloqR, o un identificador social (Instagram, TikTok, X). Solo coinciden esos campos de identidad — no la bio, los likes, las bebidas ni los géneros. Un resultado abre una tarjeta People SMARTview en el chat — no una lista markdown ni una cuadrícula de fotos. Varios muestran SMARTcards compactas. Perfiles privados, bloqueados o no publicados no aparecen — BOT DEE no confirma si esa cuenta existe."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards de personas",
@@ -2063,11 +2063,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Pestañas de Version SMARTview",
-        body: "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista notas de paquete FLOQR verificadas del README actual. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su Site Chrome — no hay un segundo tema."
+        body: "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista solo cambios verificados de BOT DEE y Gemini — no Master Admin, herramientas de beta testers ni otras notas de producto FLOQR. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su Site Chrome — no hay un segundo tema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "En el chat BOT DEE di Open Room SMARTview o Start a group chat. Confirm abre una sesión. Invita solo amigos Mingl — anfitrión más 7 invitados. Los invitados también pueden invitar. Unirse no es un pago y no abre una cuenta compartida. BOT DEE nunca toma números de tarjeta. Los mensajes privados siguen privados. Site Chrome sigue Appearance."
+        body: "En el chat BOT DEE di Open Room SMARTview, Start a group chat o planea un viaje a Cancun en palabras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Es el mismo Room SMARTview que Open Room SMARTview Cancun Trip — ilustración travel y un Ad de muestra Travel partner / Fly to Cancun, no reserva en vivo de vuelos u hoteles. VIP tables tonight sigue nightlife, no una tarjeta de viaje. Confirm abre una sesión. Invita solo amigos Mingl — anfitrión más 7 invitados. Los invitados también pueden invitar. Unirse no es un pago y no abre una cuenta compartida. BOT DEE nunca toma números de tarjeta. Los mensajes privados siguen privados. Site Chrome sigue Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "Invitar amigos Mingl",
@@ -2243,7 +2243,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV desde el chat de BOT DEE",
-        body: "Di book a table at Aurelia, hold a table o I want a reservation en BOT DEE. La tarjeta VIP reserV muestra noches, zonas 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) y mesas. Toca una noche, una zona, una mesa (V1–V4 o AURELIA SUITE en el mezzanine), luego Hold it, I agree a Terms, y paga si hay depósito. Open VIP reserV map es el plano completo. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no es un pago."
+        body: "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no es un pago."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -2383,7 +2383,7 @@
       },
       "help-profile-mobile": {
         title: "Móvil",
-        body: "FLOQR usa este número para SMS y WhatsApp. El país rellena el código, por ejemplo (+1) para Estados Unidos. Introduce solo el resto del número móvil. Lo guardamos en formato internacional para que lleguen los mensajes."
+        body: "El móvil es obligatorio. FLOQR te reconoce con este número: un móvil es una cuenta. El país rellena el código, por ejemplo (+1) para Estados Unidos. Introduce solo el resto del número. Lo guardamos en formato internacional (E.164) para SMS y WhatsApp. Si ya está en otro acceso FLOQR, deberás usar esa cuenta en lugar de crear una segunda."
       },
       "help-taxi-pickup-address": {
         title: "Dirección de recogida de taxi",
@@ -2549,7 +2549,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Chiedere a BOT DEE chi è qualcuno",
-        body: "“Who am I?” apre il tuo SMARTview. “Who is …”, “What do you know of …” o “What about …” più nome e cognome, nome visualizzato o @handle. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown né una griglia di foto. Più risultati mostrano SMARTcard. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
+        body: "“Who am I?” apre il tuo SMARTview. “Who is …”, “What do you know of …” o “What about …” più nome, cognome, nome visualizzato, handle Mingl o FloqR, o un handle social (Instagram, TikTok, X). Solo quei campi di identità — non bio, like, drink o generi. Un risultato apre una scheda People SMARTview in chat — non un elenco markdown né una griglia di foto. Più risultati mostrano SMARTcard compatte. Profili privati, bloccati o non pubblicati non compaiono — BOT DEE non conferma se l’account esiste."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard persone",
@@ -2565,11 +2565,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Schede Version SMARTview",
-        body: "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca note di package FLOQR verificate dal README attuale. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il tuo Site Chrome — non c’è un secondo tema."
+        body: "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca solo i cambiamenti verificati di BOT DEE e Gemini — non Master Admin, strumenti beta tester o altre note di prodotto FLOQR. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il tuo Site Chrome — non c’è un secondo tema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Nella chat BOT DEE di’ Open Room SMARTview o Start a group chat. Confirm apre una sessione. Invita solo amici Mingl — host più 7 ospiti. Anche gli ospiti possono invitare. Entrare non è un pagamento e non apre un conto condiviso. BOT DEE non prende mai numeri di carta. I messaggi privati restano privati. Site Chrome segue Appearance."
+        body: "Nella chat BOT DEE di’ Open Room SMARTview, Start a group chat o pianifica un viaggio a Cancun in parole semplici (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). È lo stesso Room SMARTview di Open Room SMARTview Cancun Trip — illustrazione travel e un Ad campione Travel partner / Fly to Cancun, non prenotazione live di voli o hotel. VIP tables tonight resta nightlife, non una scheda viaggio. Confirm apre una sessione. Invita solo amici Mingl — host più 7 ospiti. Anche gli ospiti possono invitare. Entrare non è un pagamento e non apre un conto condiviso. BOT DEE non prende mai numeri di carta. I messaggi privati restano privati. Site Chrome segue Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "Invita amici Mingl",
@@ -2745,7 +2745,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV dalla chat BOT DEE",
-        body: "Di’ book a table at Aurelia, hold a table o I want a reservation in BOT DEE. La scheda VIP reserV mostra serate, zone 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) e tavoli. Tocca una serata, una zona, un tavolo (V1–V4 o AURELIA SUITE sul mezzanine), poi Hold it, I agree ai Terms, e paga se serve un deposito. Open VIP reserV map è la mappa completa. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview non è un pagamento."
+        body: "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview non è un pagamento."
       },
       "help-vip-book-table": {
         title: "Prenota un tavolo VIP (VIP reserV)",
@@ -2885,7 +2885,7 @@
       },
       "help-profile-mobile": {
         title: "Cellulare",
-        body: "FLOQR usa questo numero per SMS e WhatsApp. Il paese inserisce il prefisso, ad esempio (+1) per gli Stati Uniti. Inserisci solo il resto del numero. Lo salviamo in formato internazionale così i messaggi arrivano."
+        body: "Il cellulare è obbligatorio. FLOQR ti riconosce con questo numero: un cellulare è un account. Il Paese riempie il prefisso, ad esempio (+1) per gli Stati Uniti. Inserisci solo il resto del numero. Lo salviamo in formato internazionale (E.164) per SMS e WhatsApp. Se è già su un altro accesso FLOQR, dovrai usare quell’account invece di crearne un secondo."
       },
       "help-taxi-pickup-address": {
         title: "Indirizzo di ritiro taxi",
@@ -3051,7 +3051,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Perguntar ao BOT DEE quem é alguém",
-        body: "“Who am I?” abre o seu SMARTview. “Who is …”, “What do you know of …” ou “What about …” mais nome e apelido, nome de exibição ou @handle. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown nem uma grelha de fotos. Vários mostram SMARTcards. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
+        body: "“Who am I?” abre o seu SMARTview. “Who is …”, “What do you know of …” ou “What about …” mais nome, apelido, nome de exibição, handle Mingl ou FloqR, ou um handle social (Instagram, TikTok, X). Só esses campos de identidade — não bios, likes, bebidas ou géneros. Um resultado abre um cartão People SMARTview no chat — não uma lista markdown nem uma grelha de fotos. Vários mostram SMARTcards compactos. Perfis privados, bloqueados ou não publicados não aparecem — o BOT DEE não confirma se essa conta existe."
       },
       "help-botdee-smartcard": {
         title: "SMARTcards de pessoas",
@@ -3067,11 +3067,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Abas do Version SMARTview",
-        body: "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista notas de pacote FLOQR verificadas do README atual. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site Chrome — não há um segundo tema."
+        body: "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista só mudanças verificadas de BOT DEE e Gemini — não Master Admin, ferramentas de beta tester nem outras notas de produto FLOQR. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site Chrome — não há um segundo tema."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "No chat BOT DEE diga Open Room SMARTview ou Start a group chat. Confirm abre uma sessão. Convide só amigos Mingl — anfitrião mais 7 convidados. Convidados também podem convidar. Entrar não é pagamento e não abre conta partilhada. BOT DEE nunca pega números de cartão. Mensagens privadas ficam privadas. Site Chrome segue Appearance."
+        body: "No chat BOT DEE diga Open Room SMARTview, Start a group chat ou planeie uma viagem a Cancun em palavras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). É o mesmo Room SMARTview que Open Room SMARTview Cancun Trip — ilustração travel e um Ad de amostra Travel partner / Fly to Cancun, sem reserva live de voos ou hotéis. VIP tables tonight continua nightlife, não um cartão de viagem. Confirm abre uma sessão. Convide só amigos Mingl — anfitrião mais 7 convidados. Convidados também podem convidar. Entrar não é pagamento e não abre conta partilhada. BOT DEE nunca pega números de cartão. Mensagens privadas ficam privadas. Site Chrome segue Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "Convidar amigos Mingl",
@@ -3247,7 +3247,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV a partir do chat BOT DEE",
-        body: "Diga book a table at Aurelia, hold a table ou I want a reservation no BOT DEE. O cartão VIP reserV mostra noites, zonas 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) e mesas. Toque numa noite, numa zona, numa mesa (V1–V4 ou AURELIA SUITE no mezzanine), depois Hold it, I agree aos Terms, e pague se houver depósito. Open VIP reserV map é o plano completo. BOT DEE nunca pede números de cartão. Entrar num Room SMARTview não é um pagamento."
+        body: "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SMARTview não é um pagamento."
       },
       "help-vip-book-table": {
         title: "Reservar mesa VIP (VIP reserV)",
@@ -3387,7 +3387,7 @@
       },
       "help-profile-mobile": {
         title: "Telemóvel",
-        body: "A FLOQR usa este número para SMS e WhatsApp. O país preenche o indicativo, por exemplo (+1) para os Estados Unidos. Introduza só o resto do número. Guardamo-lo em formato internacional para as mensagens chegarem."
+        body: "O telemóvel é obrigatório. A FLOQR reconhece-o com este número — um telemóvel é uma conta. O país preenche o indicativo, por exemplo (+1) para os Estados Unidos. Introduza só o resto do número. Guardamos no formato internacional (E.164) para SMS e WhatsApp. Se já estiver noutro acesso FLOQR, use essa conta em vez de criar uma segunda."
       },
       "help-taxi-pickup-address": {
         title: "Morada de recolha de táxi",
@@ -3553,7 +3553,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Ρωτήστε τον BOT DEE ποιος είναι κάποιος",
-        body: "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …», «What do you know of …» ή «What about …» με όνομα και επώνυμο, εμφανιζόμενο όνομα ή @handle. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown ούτε πλέγμα φωτογραφιών. Πολλά δείχνουν SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
+        body: "Το «Who am I?» ανοίγει το SMARTview σας. Το «Who is …», «What do you know of …» ή «What about …» με όνομα, επώνυμο, εμφανιζόμενο όνομα, handle Mingl ή FloqR, ή social handle (Instagram, TikTok, X). Μόνο αυτά τα πεδία ταυτότητας — όχι βιογραφικά, likes, ποτά ή είδη. Ένα αποτέλεσμα ανοίγει κάρτα People SMARTview στη συνομιλία — όχι λίστα markdown ούτε πλέγμα φωτογραφιών. Πολλά δείχνουν συμπαγείς SMARTcard. Ιδιωτικά, αποκλεισμένα ή μη δημοσιευμένα δεν εμφανίζονται — ο BOT DEE δεν επιβεβαιώνει αν υπάρχει λογαριασμός."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard ατόμων",
@@ -3569,11 +3569,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Καρτέλες Version SMARTview",
-        body: "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει επαληθευμένες σημειώσεις πακέτου FLOQR από το τρέχον README. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο πρόχειρο και την κύλιση. Η κάρτα χρησιμοποιεί το Site Chrome σας — δεν υπάρχει δεύτερο θέμα."
+        body: "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει μόνο επαληθευμένες αλλαγές BOT DEE και Gemini — όχι Master Admin, εργαλεία beta tester ή άλλες σημειώσεις προϊόντος FLOQR. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο πρόχειρο και την κύλιση. Η κάρτα χρησιμοποιεί το Site Chrome σας — δεν υπάρχει δεύτερο θέμα."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Στη συνομιλία BOT DEE πείτε Open Room SMARTview ή Start a group chat. Confirm ανοίγει συνεδρία. Προσκαλέστε μόνο φίλους Mingl — οικοδεσπότης συν 7 επισκέπτες. Οι επισκέπτες μπορούν επίσης να προσκαλούν. Η συμμετοχή δεν είναι πληρωμή και δεν ανοίγει κοινό λογαριασμό. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Τα ιδιωτικά μηνύματα μένουν ιδιωτικά. Το Site Chrome ακολουθεί Appearance."
+        body: "Στη συνομιλία BOT DEE πείτε Open Room SMARTview, Start a group chat ή σχεδιάστε ένα ταξίδι Cancun με απλά λόγια (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Είναι το ίδιο Room SMARTview με Open Room SMARTview Cancun Trip — travel εικονογράφηση και δείγμα Ad Travel partner / Fly to Cancun, όχι ζωντανή κράτηση πτήσεων ή ξενοδοχείων. VIP tables tonight μένει nightlife, όχι κάρτα ταξιδιού. Confirm ανοίγει συνεδρία. Προσκαλέστε μόνο φίλους Mingl — οικοδεσπότης συν 7 επισκέπτες. Οι επισκέπτες μπορούν επίσης να προσκαλούν. Η συμμετοχή δεν είναι πληρωμή και δεν ανοίγει κοινό λογαριασμό. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Τα ιδιωτικά μηνύματα μένουν ιδιωτικά. Το Site Chrome ακολουθεί Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "Πρόσκληση φίλων Mingl",
@@ -3749,7 +3749,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV από τη συνομιλία BOT DEE",
-        body: "Πείτε book a table at Aurelia, hold a table ή I want a reservation στο BOT DEE. Η κάρτα VIP reserV δείχνει βραδιές, ζώνες 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) και τραπέζια. Πατήστε βραδιά, ζώνη, τραπέζι (V1–V4 ή AURELIA SUITE στο mezzanine), μετά Hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Open VIP reserV map είναι το πλήρες σχέδιο. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Η είσοδος σε Room SMARTview δεν είναι πληρωμή."
+        body: "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Η είσοδος σε Room SMARTview δεν είναι πληρωμή."
       },
       "help-vip-book-table": {
         title: "Κράτηση VIP τραπεζιού (VIP reserV)",
@@ -3889,7 +3889,7 @@
       },
       "help-profile-mobile": {
         title: "Κινητό",
-        body: "Το FLOQR χρησιμοποιεί αυτόν τον αριθμό για SMS και WhatsApp. Η χώρα συμπληρώνει τον κωδικό, π.χ. (+1) για τις Ηνωμένες Πολιτείες. Εισαγάγετε μόνο το υπόλοιπο του κινητού. Το αποθηκεύουμε σε διεθνή μορφή ώστε να φτάνουν τα μηνύματα."
+        body: "Το κινητό είναι υποχρεωτικό. Το FLOQR σας αναγνωρίζει με αυτόν τον αριθμό — ένα κινητό είναι ένας λογαριασμός. Η χώρα συμπληρώνει τον κωδικό, π.χ. (+1) για τις ΗΠΑ. Εισαγάγετε μόνο το υπόλοιπο του αριθμού. Τον αποθηκεύουμε διεθνώς (E.164) για SMS και WhatsApp. Αν υπάρχει ήδη σε άλλη είσοδο FLOQR, θα χρησιμοποιήσετε εκείνον τον λογαριασμό αντί για δεύτερο."
       },
       "help-taxi-pickup-address": {
         title: "Διεύθυνση παραλαβής ταξί",
@@ -4055,7 +4055,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "Zapytaj BOT DEE, kim ktoś jest",
-        body: "„Who am I?” otwiera Twoje SMARTview. „Who is …”, „What do you know of …” lub „What about …” plus imię i nazwisko, nazwa wyświetlana lub @handle. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown ani siatkę zdjęć. Więcej wyników to SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
+        body: "„Who am I?” otwiera Twoje SMARTview. „Who is …”, „What do you know of …” lub „What about …” plus imię, nazwisko, nazwa wyświetlana, handle Mingl lub FloqR albo handle społecznościowy (Instagram, TikTok, X). Trafienia tylko po tych polach tożsamości — nie bio, polubienia, napoje ani gatunki. Jeden wynik otwiera kartę People SMARTview w czacie — nie listę markdown ani siatkę zdjęć. Więcej wyników to zwarte SMARTcard. Prywatne, zablokowane lub nieopublikowane nie są listowane — BOT DEE nie potwierdza, czy konto istnieje."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard osób",
@@ -4071,11 +4071,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "Karty Version SMARTview",
-        body: "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje zweryfikowane notatki pakietu FLOQR z bieżącego README. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa Twojego Site Chrome — nie ma drugiego motywu."
+        body: "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje tylko zweryfikowane zmiany BOT DEE i Gemini — nie Master Admin, narzędzia beta testerów ani inne notatki produktów FLOQR. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa Twojego Site Chrome — nie ma drugiego motywu."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "W czacie BOT DEE powiedz Open Room SMARTview lub Start a group chat. Confirm otwiera sesję. Zaproś tylko znajomych Mingl — gospodarz plus 7 gości. Goście też mogą zapraszać. Dołączenie nie jest płatnością i nie otwiera wspólnego rachunku. BOT DEE nigdy nie bierze numerów kart. Prywatne wiadomości zostają prywatne. Site Chrome idzie za Appearance."
+        body: "W czacie BOT DEE powiedz Open Room SMARTview, Start a group chat albo zaplanuj wyjazd do Cancun zwykłymi słowami (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). To ten sam Room SMARTview co Open Room SMARTview Cancun Trip — ilustracja travel i przykładowy Ad Travel partner / Fly to Cancun, bez żywego rezerwowania lotów ani hoteli. VIP tables tonight zostaje nightlife, nie kartą wyjazdu. Confirm otwiera sesję. Zaproś tylko znajomych Mingl — gospodarz plus 7 gości. Goście też mogą zapraszać. Dołączenie nie jest płatnością i nie otwiera wspólnego rachunku. BOT DEE nigdy nie bierze numerów kart. Prywatne wiadomości zostają prywatne. Site Chrome idzie za Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "Zaproś znajomych Mingl",
@@ -4251,7 +4251,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV z czatu BOT DEE",
-        body: "Powiedz book a table at Aurelia, hold a table albo I want a reservation w BOT DEE. Karta VIP reserV pokazuje wieczory, strefy 2D (Mezzanine, West Booths, Dance Floor, Bar Lounge) i stoliki. Dotknij wieczoru, strefy, stolika (V1–V4 lub AURELIA SUITE na mezzanine), potem Hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. Open VIP reserV map to pełny plan. BOT DEE nigdy nie bierze numerów kart. Dołączenie do Room SMARTview nie jest płatnością."
+        body: "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołączenie do Room SMARTview nie jest płatnością."
       },
       "help-vip-book-table": {
         title: "Zarezerwuj stolik VIP (VIP reserV)",
@@ -4391,7 +4391,7 @@
       },
       "help-profile-mobile": {
         title: "Telefon komórkowy",
-        body: "FLOQR używa tego numeru do SMS i WhatsApp. Kraj uzupełnia kierunkowy, np. (+1) dla Stanów Zjednoczonych. Wpisz tylko resztę numeru. Zapisujemy go w formacie międzynarodowym, żeby wiadomości dochodziły."
+        body: "Numer komórkowy jest wymagany. FLOQR rozpoznaje Cię po tym numerze — jeden numer to jedno konto. Kraj uzupełnia numer kierunkowy, np. (+1) dla USA. Wpisz tylko resztę numeru. Zapisujemy go w formacie międzynarodowym (E.164), aby działały SMS i WhatsApp. Jeśli numer jest już na innym logowaniu FLOQR, użyj tego konta zamiast zakładać drugie."
       },
       "help-taxi-pickup-address": {
         title: "Adres odbioru taksówki",
@@ -4557,7 +4557,7 @@
       },
       "help-botdee-smartcard-search": {
         title: "اسأل BOT DEE من هذا الشخص",
-        body: "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» أو «What about …» مع الاسم الأول والأخير أو الاسم المعروض أو @معرّف. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown أو شبكة صور. عدة نتائج تعرض SMARTcard. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
+        body: "«Who am I?» يفتح SMARTview الخاص بك. «Who is …» أو «What do you know of …» أو «What about …» مع الاسم الأول أو الأخير أو الاسم المعروض أو معرّف Mingl أو FloqR أو معرّف اجتماعي (Instagram أو TikTok أو X). المطابقة على حقول الهوية فقط — وليس السيرة أو الإعجابات أو المشروبات أو الأنواع. نتيجة واحدة تفتح بطاقة People SMARTview في الدردشة — وليس قائمة markdown أو شبكة صور. عدة نتائج تعرض SMARTcard مدمجة. الملفات الخاصة أو المحظورة أو غير المنشورة لا تُعرض — BOT DEE لا يؤكد وجود الحساب."
       },
       "help-botdee-smartcard": {
         title: "SMARTcard الأشخاص",
@@ -4573,11 +4573,11 @@
       },
       "help-botdee-version-smartview-tabs": {
         title: "علامات Version SMARTview",
-        body: "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض ملاحظات حزمة FLOQR الموثّقة من README الحالي. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظهر ثانٍ."
+        body: "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض تغييرات BOT DEE وGemini الموثّقة فقط — وليس Master Admin أو أدوات مختبري بيتا أو ملاحظات منتجات FLOQR الأخرى. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظهر ثانٍ."
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat. Confirm يفتح جلسة. ادعُ أصدقاء Mingl فقط — المضيف مع 7 ضيوف. يمكن للضيوف الدعوة أيضاً. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً. BOT DEE لا يأخذ أرقام البطاقات أبداً. الرسائل الخاصة تبقى خاصة. Site Chrome يتبع Appearance."
+        body: "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat أو خطّط رحلة Cancun بكلام عادي (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). هذه نفس Room SMARTview مثل Open Room SMARTview Cancun Trip — رسم travel وعينة Ad Travel partner / Fly to Cancun وليست حجز رحلات أو فنادق حيّاً. VIP tables tonight تبقى nightlife وليست بطاقة رحلة. Confirm يفتح جلسة. ادعُ أصدقاء Mingl فقط — المضيف مع 7 ضيوف. يمكن للضيوف الدعوة أيضاً. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً. BOT DEE لا يأخذ أرقام البطاقات أبداً. الرسائل الخاصة تبقى خاصة. Site Chrome يتبع Appearance."
       },
       "help-botdee-room-smartview-invite": {
         title: "دعوة أصدقاء Mingl",
@@ -4753,7 +4753,7 @@
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV من محادثة BOT DEE",
-        body: "قل book a table at Aurelia أو hold a table أو I want a reservation في BOT DEE. بطاقة VIP reserV تعرض الليالي ومناطق الخريطة ثنائية الأبعاد (Mezzanine وWest Booths وDance Floor وBar Lounge) والطاولات. اضغط الليلة ثم المنطقة ثم الطاولة (V1–V4 أو AURELIA SUITE في mezzanine) ثم Hold it وI agree لـ Terms وادفع إن لزم عربون. Open VIP reserV map هي الخطة الكاملة. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
+        body: "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
       },
       "help-vip-book-table": {
         title: "حجز طاولة VIP (VIP reserV)",
@@ -4893,7 +4893,7 @@
       },
       "help-profile-mobile": {
         title: "الجوّال",
-        body: "تستخدم FLOQR هذا الرقم لـ SMS و WhatsApp. البلد يملأ رمز الاتصال، مثل (+1) للولايات المتحدة. أدخل بقية رقم الجوّال فقط. نخزّنه بالصيغة الدولية حتى تصل الرسائل."
+        body: "الجوال مطلوب. يتعرّف FLOQR عليك بهذا الرقم — جوال واحد يعني حسابًا واحدًا. تملأ الدولة رمز الاتصال، مثل (+1) للولايات المتحدة. أدخل بقية الرقم فقط. نخزّنه بالصيغة الدولية (E.164) ليصلك SMS و WhatsApp. إذا كان الرقم على دخول FLOQR آخر فستُطلب منك استخدام ذلك الحساب بدل إنشاء حساب ثانٍ."
       },
       "help-taxi-pickup-address": {
         title: "عنوان التقاط سيارة الأجرة",

@@ -5,7 +5,7 @@ const path = require("path");
 const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
 const NEXT = "s3.3.051";
 const NEXT_NUM = "3.3.051";
-const NOTE = "Headless VIP reserV: intercept visit/I want a reservation, Aurelia copy, Hold it CTA, real hold errors";
+const NOTE = "BOT DEE natural Cancun trip talk opens Room SMARTview (same card as Open Room SMARTview Cancun Trip)";
 const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
 function transformHtml(src) {

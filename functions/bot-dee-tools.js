@@ -659,26 +659,69 @@ function squeezeNeedle(value) {
   return normalizeNeedle(value).replace(/\s+/g, "");
 }
 
-function identityAliases(data = {}) {
-  const handle = String(data.floqrHandle || data.username || data.minglHandle || "").replace(/^@+/, "").trim();
+/** People search identity keys only — never bio, likes, drinks, genres, or SMARTview tags. */
+const PEOPLE_IDENTITY_HANDLE_KEYS = Object.freeze([
+  "floqrHandle", "minglHandle", "username",
+  "instagram", "instagramHandle",
+  "tiktok", "tiktokHandle",
+  "xHandle", "twitter", "x",
+  "facebook", "facebookHandle"
+]);
+
+function identityNameValues(data = {}) {
   const first = String(data.firstName || "").trim();
   const last = String(data.lastName || "").trim();
-  const legal = [first, last].filter(Boolean).join(" ");
-  const names = [
-    data.displayName, data.publicName, data.fullName, legal, handle
+  return [
+    first,
+    last,
+    [first, last].filter(Boolean).join(" "),
+    data.displayName,
+    data.publicName,
+    data.fullName
   ].map(value => String(value || "").trim()).filter(Boolean);
+}
+
+function identityHandleValues(data = {}) {
+  return PEOPLE_IDENTITY_HANDLE_KEYS
+    .map(key => String(data[key] || "").replace(/^@+/, "").trim())
+    .filter(Boolean);
+}
+
+function pushIdentityAlias(out, seen, raw) {
+  const folded = normalizeNeedle(raw);
+  const squeezed = squeezeNeedle(raw);
+  [folded, squeezed].forEach(alias => {
+    if (!alias || seen.has(alias)) return;
+    seen.add(alias);
+    out.push(alias);
+  });
+}
+
+function identityAliases(data = {}) {
   const out = [];
   const seen = new Set();
-  names.forEach(raw => {
+  identityNameValues(data).forEach(raw => pushIdentityAlias(out, seen, raw));
+  identityHandleValues(data).forEach(raw => pushIdentityAlias(out, seen, raw));
+  return out;
+}
+
+function identityNameTokens(data = {}) {
+  const tokens = new Set();
+  identityNameValues(data).forEach(raw => {
+    normalizeNeedle(raw).split(/\s+/).filter(token => token.length > 1).forEach(token => tokens.add(token));
+  });
+  return tokens;
+}
+
+function identityHandleSet(data = {}) {
+  const set = new Set();
+  identityHandleValues(data).forEach(raw => {
     const folded = normalizeNeedle(raw);
     const squeezed = squeezeNeedle(raw);
-    [folded, squeezed].forEach(alias => {
-      if (!alias || seen.has(alias)) return;
-      seen.add(alias);
-      out.push(alias);
-    });
+    if (folded) set.add(folded);
+    if (squeezed) set.add(squeezed);
   });
-  return out;
+  return set;
 }
 
 function scoreIdentity(data, needle, tokens) {
@@ -689,22 +732,27 @@ function scoreIdentity(data, needle, tokens) {
   let points = 0;
   aliases.forEach(alias => {
     if (alias === n || (squeezed && alias === squeezed)) {
-      points = Math.max(points, alias.length >= 4 || alias.includes(" ") ? 50 : 6);
-    } else if (n.length >= 4 && alias.includes(n)) {
-      points = Math.max(points, 24);
+      points = Math.max(points, alias.length >= 4 || alias.includes(" ") ? 50 : 16);
     }
   });
-  const hay = aliases.join(" ");
-  const hits = (Array.isArray(tokens) ? tokens : []).filter(token => token.length > 1 && hay.includes(token));
-  if (hits.length && hits.length === tokens.length) {
-    if (tokens.length >= 2) points = Math.max(points, 40);
-    else if (tokens[0] && tokens[0].length >= 4) points = Math.max(points, 12);
+  const queryTokens = (Array.isArray(tokens) && tokens.length
+    ? tokens
+    : n.split(/\s+/)).map(token => normalizeNeedle(token).replace(/^@+/, "")).filter(token => token.length > 1);
+  if (!queryTokens.length) return points;
+  const nameTokens = identityNameTokens(data);
+  const handles = identityHandleSet(data);
+  if (queryTokens.every(token => nameTokens.has(token))) {
+    points = Math.max(points, queryTokens.length >= 2 ? 40 : 16);
+  }
+  if (queryTokens.length === 1 && (handles.has(queryTokens[0]) || handles.has(squeezed))) {
+    points = Math.max(points, queryTokens[0].length >= 4 || squeezed.length >= 4 ? 50 : 16);
   }
   return points;
 }
 
+/** People lookup: identity fields only. Bios / likes / drinks never score. */
 function scorePerson(data, needle, tokens) {
-  return Math.max(scoreIdentity(data, needle, tokens), scoreHay(userHaystack(data), needle, tokens));
+  return scoreIdentity(data, needle, tokens);
 }
 
 function scoreHay(hay, needle, tokens) {
@@ -955,14 +1003,9 @@ function isSelfProfileQuery(raw) {
   return false;
 }
 
-function hasPhrase(hay, phrase) {
-  const p = normalizeNeedle(phrase);
-  if (!p || p.length < 3) return false;
-  return ` ${hay} `.includes(` ${p} `);
-}
-
-function isSelfQuery(needle, viewerData = {}) {
-  const n = normalizeNeedle(needle);
+/** Exclusive self: me / who am I / my profile. Shared first/last names never skip the directory. */
+function isExclusiveSelfQuery(raw) {
+  const n = normalizeNeedle(raw);
   if (!n) return false;
   if (isSelfProfileQuery(n)) return true;
   if (/^(me|myself|mine)$/.test(n)) return true;
@@ -972,11 +1015,76 @@ function isSelfQuery(needle, viewerData = {}) {
   if (myAsk && /\b(food|music|travel|hobby|hobbies|eat|drink|beverage|handle|bio|photo)\b/.test(n)) {
     if (!/\b(at|for)\b/.test(n)) return true;
   }
+  return false;
+}
+
+function hasPhrase(hay, phrase) {
+  const p = normalizeNeedle(phrase);
+  if (!p || p.length < 3) return false;
+  return ` ${hay} `.includes(` ${p} `);
+}
+
+function isSelfQuery(needle, viewerData = {}) {
+  const n = normalizeNeedle(needle);
+  if (!n) return false;
+  if (isExclusiveSelfQuery(needle)) return true;
   const aliases = identityAliases(viewerData);
   const squeezed = squeezeNeedle(needle);
   if (aliases.some(alias => alias === n || (squeezed && alias === squeezed))) return true;
   if (aliases.some(alias => alias.length >= 4 && hasPhrase(n, alias))) return true;
   return false;
+}
+
+const PEOPLE_LOOKUP_STOPS = new Set([
+  "my", "friend", "buddy", "mate", "about", "know", "what", "who", "is", "are", "was", "were",
+  "this", "person", "you", "the", "do", "me", "named", "connection", "mingl"
+]);
+
+/**
+ * Identity-only people ranking without Firestore. Exclusive self (me / who am I)
+ * returns only the viewer. A shared first/last name still ranks other public hits.
+ */
+function rankPeopleIdentityHits({query, viewerUid, viewerData = {}, directory = []} = {}) {
+  const rawQuery = text(query, 160);
+  const exclusiveSelf = isExclusiveSelfQuery(rawQuery);
+  const friendContext = isFriendContextQuery(rawQuery);
+  const friendName = friendContext ? friendNameFromQuery(rawQuery) : "";
+  const needle = normalizeNeedle(rawQuery);
+  const matchNeedle = friendContext ? friendName : needle;
+  const tokens = String(matchNeedle || "")
+    .split(/\s+/)
+    .filter(t => t.length > 1 && !PEOPLE_LOOKUP_STOPS.has(t) && !FRIEND_NAME_STOPS.has(t));
+  const scored = [];
+  const seen = new Set();
+  const selfIdentityHit = !!(viewerUid && viewerData && !friendContext && matchNeedle
+    && scorePerson(viewerData, matchNeedle, tokens) >= 8);
+  // Exclusive self, or a shared name on a non-friend lookup. Friend asks stay on connections.
+  if (viewerUid && viewerData && (exclusiveSelf || selfIdentityHit)) {
+    scored.push(selfProfileCard(viewerUid, viewerData, 100, {relation: "self"}));
+    seen.add(viewerUid);
+  }
+  if (!exclusiveSelf && matchNeedle) {
+    directory.forEach(row => {
+      const id = String(row && row.id || "").trim();
+      const data = row && row.data || {};
+      if (!id || seen.has(id)) return;
+      if (!people.isPublic(data)) return;
+      const base = scorePerson(data, matchNeedle, tokens);
+      if (base < 8) return;
+      const relation = row.relation === "connection" ? "connection" : "public";
+      const bonus = relation === "connection" ? (friendContext ? 12 : 6) : 0;
+      scored.push(publicUserCard(id, data, base + bonus, {relation}));
+      seen.add(id);
+    });
+  }
+  scored.sort((a, b) => b.score - a.score || String(a.displayName).localeCompare(String(b.displayName)));
+  return {
+    exclusiveSelf,
+    selfQuery: exclusiveSelf,
+    friendContext,
+    ids: scored.map(row => row.id),
+    profiles: scored
+  };
 }
 
 function unpublishedSelfCard(uid, data = {}, score, extra = {}) {
@@ -1090,6 +1198,7 @@ function publicClubCard(id, data = {}, score) {
   };
 }
 
+/** Interest/bio blob for volunteered datapoints — NOT used to find people. */
 function userHaystack(data = {}) {
   const parts = [
     data.displayName, data.publicName, data.fullName, data.firstName, data.lastName,
@@ -1133,7 +1242,6 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   }
   const kind = String(args.kind || "any").trim().toLowerCase();
   const limit = Math.min(PUBLIC_PROFILE_MAX, Math.max(1, Number(args.limit) || 5));
-  const stop = new Set(["my", "friend", "buddy", "mate", "about", "know", "what", "you", "the", "do", "me", "named", "connection", "mingl"]);
   const viewerUid = sessionRequest.auth.uid;
   const scored = [];
   const seen = new Set();
@@ -1146,7 +1254,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   } catch (error) {
     console.warn("BOT DEE lookupPublicProfiles viewer failed", error?.message || error);
   }
-  const selfQuery = wantPeople && isSelfQuery(rawQuery, viewerData || {});
+  const exclusiveSelf = wantPeople && isExclusiveSelfQuery(rawQuery);
   const friendContext = wantPeople && isFriendContextQuery(rawQuery);
   const friendName = friendContext ? friendNameFromQuery(rawQuery) : "";
   // Friend prompts require a parseable person name — never fall back to leftover verbs
@@ -1154,19 +1262,22 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   const matchNeedle = friendContext ? friendName : needle;
   const tokens = String(matchNeedle || "")
     .split(/\s+/)
-    .filter(t => t.length > 1 && !stop.has(t) && !FRIEND_NAME_STOPS.has(t));
-
-  if (wantPeople && selfQuery && viewerData) {
+    .filter(t => t.length > 1 && !PEOPLE_LOOKUP_STOPS.has(t) && !FRIEND_NAME_STOPS.has(t));
+  const selfIdentityHit = wantPeople && viewerData && !friendContext && matchNeedle
+    && scorePerson(viewerData, matchNeedle, tokens) >= 8;
+  // Shared first/last names include the viewer AND the public directory.
+  // Friend asks stay on connections — never inject the signed-in namesake.
+  if (wantPeople && viewerData && (exclusiveSelf || selfIdentityHit)) {
     scored.push(selfProfileCard(viewerUid, viewerData, 100, {relation: "self"}));
     seen.add(viewerUid);
   }
 
   let connected = new Set();
-  if (wantPeople && (friendContext || !selfQuery)) {
+  if (wantPeople && (friendContext || !exclusiveSelf)) {
     connected = await loadConnectedUids(viewerUid);
   }
 
-  if (wantPeople && connected.size && !selfQuery && matchNeedle) {
+  if (wantPeople && connected.size && !exclusiveSelf && matchNeedle) {
     try {
       const ids = [...connected].slice(0, 100);
       const refs = ids.map(id => db.collection("users").doc(id));
@@ -1177,7 +1288,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         // Connections: public profiles only — never private fields.
         if (!people.isPublic(data)) return;
         const base = scorePerson(data, matchNeedle, tokens);
-        // Require a real name/handle match (threshold 8). No free pass for “friend” alone.
+        // Require a real name/handle match (threshold 8). Identity-only. No free pass for “friend” alone.
         if (base < 8) return;
         const points = base + (friendContext ? 12 : 6);
         scored.push(publicUserCard(doc.id, data, points, {relation: "connection"}));
@@ -1189,7 +1300,8 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   }
 
   // Public directory for non-friend queries only. Friend asks stay on connections + parsed name.
-  if (wantPeople && !selfQuery && !friendContext && matchNeedle) {
+  // Exclusive self (me / who am I) skips the directory; a shared first name does not.
+  if (wantPeople && !exclusiveSelf && !friendContext && matchNeedle) {
     try {
       const snap = await db.collection("users")
         .where("publicProfileVisibility", "==", "public")
@@ -1200,7 +1312,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
         const data = doc.data() || {};
         if (!people.isPublic(data)) return;
         const base = scorePerson(data, matchNeedle, tokens);
-        // Must match the query first — connection boost must not invent hits.
+        // Identity-only — bios / likes / drinks never invent hits.
         if (base < 8) return;
         const points = base + (connected.has(doc.id) ? 10 : 0);
         scored.push(publicUserCard(doc.id, data, points, {
@@ -1213,8 +1325,8 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
     }
   }
 
-  if (wantClubs && !selfQuery && !friendContext) {
-    const clubTokens = needle.split(/\s+/).filter(t => t.length > 1 && !stop.has(t));
+  if (wantClubs && !exclusiveSelf && !friendContext) {
+    const clubTokens = needle.split(/\s+/).filter(t => t.length > 1 && !PEOPLE_LOOKUP_STOPS.has(t));
     try {
       const snap = await db.collection("clubLocations").limit(PUBLIC_PROFILE_SCAN).get();
       snap.docs.forEach(doc => {
@@ -1243,7 +1355,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
   let note = "No public profiles matched. Ask the user to clarify the name or check spelling.";
   if (profiles.length) {
     note = "Viewer-context public volunteered datapoints (not PII/PCI — never email, phone, PAN, GPS). sharedDatapoints = keys this patron opted to publish. datapoints = every filled value for those keys — use ALL of them. A missing key is opted out or empty, not “FLOQR doesn’t track that.” photoCount photos are shown by the FLOQR app — never print URLs, tokens, or storage paths.";
-  } else if (selfQuery) {
+  } else if (exclusiveSelf) {
     note = "Could not load the viewer's profile yet. Ask them to open My Profile.";
   } else if (friendContext) {
     note = friendName
@@ -1255,7 +1367,7 @@ async function lookupPublicProfiles(args = {}, sessionRequest) {
     tool: "lookupPublicProfiles",
     query: rawQuery,
     kind: kind === "patron" || kind === "people" ? "user" : (kind === "venue" ? "club" : kind),
-    selfQuery: !!selfQuery,
+    selfQuery: !!exclusiveSelf,
     friendContext: !!friendContext,
     count: profiles.length,
     profiles,
@@ -1300,6 +1412,8 @@ module.exports = {
   lookupPublicProfiles,
   isClubPublic,
   isSelfProfileQuery,
+  isExclusiveSelfQuery,
+  rankPeopleIdentityHits,
   isFriendContextQuery,
   friendNameFromQuery,
   publicUserCard,
@@ -1309,7 +1423,10 @@ module.exports = {
   publicMinglKeys,
   datapointAllowed,
   userHaystack,
+  PEOPLE_IDENTITY_HANDLE_KEYS,
   identityAliases,
+  identityNameValues,
+  identityHandleValues,
   scoreIdentity,
   scorePerson,
   normalizeNeedle,

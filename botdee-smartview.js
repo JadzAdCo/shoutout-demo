@@ -330,11 +330,11 @@
         : `<span class="botdee-sc-thumb-empty" aria-hidden="true"></span>`);
     return `<article class="botdee-sv-people botdee-sc-card" data-kind="patron" data-presentation="peopleSmartCard" data-subject-uid="${esc(uid)}" role="button" tabindex="0" aria-label="${esc(t("botdee.sc.openSMARTview", "Open SMARTview"))}">
       <div class="botdee-sc-row">
-        <div class="botdee-sc-thumb botdee-sv-portrait" aria-hidden="${hasMedia ? "false" : "true"}">
+        <div class="botdee-sc-thumb" aria-hidden="${hasMedia ? "false" : "true"}">
           ${thumb}
         </div>
         <div class="botdee-sc-body">
-          <div class="botdee-sv-id">
+          <div class="botdee-sc-id botdee-sv-id">
             <div class="botdee-sc-name botdee-sv-name">${peopleNameHtml(people, payload)}</div>
             ${peopleHandleHtml(people)}
           </div>
@@ -536,7 +536,7 @@
         <h3>${esc(t("botdee.vs.whatsNewHeading", "What's New"))}</h3>
         ${changelog.length
           ? `<ul>${changelog.map(item => `<li>${esc(item.text || item.id || "")}</li>`).join("")}</ul>`
-          : `<p>${esc(t("botdee.vs.whatsNewEmpty", "No verified package notes are available for this build."))}</p>`}
+          : `<p>${esc(t("botdee.vs.whatsNewEmpty", "No BOT DEE or Gemini notes are listed for this build."))}</p>`}
       </div>
       <div class="botdee-sv-version-panel" data-vs-panel="help" role="tabpanel" hidden>
         <h3>${esc(t("botdee.vs.helpHeading", "Version command"))}</h3>

@@ -23,7 +23,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Build identifier",
     "botdee.vs.techCheck": "Last successful health check",
     "botdee.vs.whatsNewHeading": "What's New",
-    "botdee.vs.whatsNewEmpty": "No verified package notes are available for this build.",
+    "botdee.vs.whatsNewEmpty": "No BOT DEE or Gemini notes are listed for this build.",
     "botdee.vs.helpHeading": "Version command",
     "botdee.vs.helpBody": "Enter Ver, Vers, or Version to display this SMARTview. The command is case-insensitive. The card is the only answer — there is no six-phase chat dump. Longer questions like “what is your version?” still get a short text line plus this card.",
     "botdee.vs.footBrand": "FLOQR · System Information",
@@ -59,7 +59,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Identifiant de build",
     "botdee.vs.techCheck": "Dernière vérification de santé réussie",
     "botdee.vs.whatsNewHeading": "Nouveautés",
-    "botdee.vs.whatsNewEmpty": "Aucune note de package vérifiée n’est disponible pour cette version.",
+    "botdee.vs.whatsNewEmpty": "Aucune note BOT DEE ou Gemini n’est listée pour cette version.",
     "botdee.vs.helpHeading": "Commande Version",
     "botdee.vs.helpBody": "Saisissez Ver, Vers ou Version pour afficher ce SMARTview. La commande ignore la casse. La carte est la seule réponse — il n’y a pas de dump six-phase dans le chat. Les questions plus longues comme « what is your version? » reçoivent encore une courte ligne de texte plus cette carte.",
     "botdee.vs.footBrand": "FLOQR · Informations système",
@@ -95,7 +95,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Build-Kennung",
     "botdee.vs.techCheck": "Letzte erfolgreiche Gesundheitsprüfung",
     "botdee.vs.whatsNewHeading": "Neuigkeiten",
-    "botdee.vs.whatsNewEmpty": "Für diesen Build liegen keine geprüften Package-Hinweise vor.",
+    "botdee.vs.whatsNewEmpty": "Für diesen Build sind keine BOT-DEE- oder Gemini-Hinweise aufgeführt.",
     "botdee.vs.helpHeading": "Version-Befehl",
     "botdee.vs.helpBody": "Geben Sie Ver, Vers oder Version ein, um dieses SMARTview anzuzeigen. Der Befehl ignoriert Groß/Kleinschreibung. Die Karte ist die einzige Antwort — es gibt keinen Six-Phase-Chat-Dump. Längere Fragen wie „what is your version?“ erhalten weiter eine kurze Textzeile plus diese Karte.",
     "botdee.vs.footBrand": "FLOQR · Systeminformationen",
@@ -131,7 +131,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Identificador de build",
     "botdee.vs.techCheck": "Última comprobación de salud correcta",
     "botdee.vs.whatsNewHeading": "Novedades",
-    "botdee.vs.whatsNewEmpty": "No hay notas de paquete verificadas para esta versión.",
+    "botdee.vs.whatsNewEmpty": "No hay notas de BOT DEE o Gemini para esta versión.",
     "botdee.vs.helpHeading": "Comando Version",
     "botdee.vs.helpBody": "Escriba Ver, Vers o Version para mostrar este SMARTview. El comando no distingue mayúsculas. La tarjeta es la única respuesta — no hay un volcado six-phase en el chat. Preguntas más largas como “what is your version?” siguen recibiendo una línea corta más esta tarjeta.",
     "botdee.vs.footBrand": "FLOQR · Información del sistema",
@@ -167,7 +167,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Identificatore di build",
     "botdee.vs.techCheck": "Ultimo controllo di integrità riuscito",
     "botdee.vs.whatsNewHeading": "Novità",
-    "botdee.vs.whatsNewEmpty": "Nessuna nota di package verificata è disponibile per questa build.",
+    "botdee.vs.whatsNewEmpty": "Nessuna nota BOT DEE o Gemini è elencata per questa build.",
     "botdee.vs.helpHeading": "Comando Version",
     "botdee.vs.helpBody": "Inserisci Ver, Vers o Version per mostrare questo SMARTview. Il comando non distingue maiuscole. La scheda è l’unica risposta — non c’è un dump six-phase in chat. Domande più lunghe come “what is your version?” ricevono ancora una riga breve più questa scheda.",
     "botdee.vs.footBrand": "FLOQR · Informazioni di sistema",
@@ -203,7 +203,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Identificador de build",
     "botdee.vs.techCheck": "Última verificação de saúde bem-sucedida",
     "botdee.vs.whatsNewHeading": "Novidades",
-    "botdee.vs.whatsNewEmpty": "Não há notas de pacote verificadas para esta build.",
+    "botdee.vs.whatsNewEmpty": "Não há notas de BOT DEE ou Gemini listadas para esta build.",
     "botdee.vs.helpHeading": "Comando Version",
     "botdee.vs.helpBody": "Digite Ver, Vers ou Version para mostrar este SMARTview. O comando ignora maiúsculas. O cartão é a única resposta — não há dump six-phase no chat. Perguntas mais longas como “what is your version?” ainda recebem uma linha curta mais este cartão.",
     "botdee.vs.footBrand": "FLOQR · Informações do sistema",
@@ -239,7 +239,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Build-identificatie",
     "botdee.vs.techCheck": "Laatste geslaagde healthcheck",
     "botdee.vs.whatsNewHeading": "Nieuw",
-    "botdee.vs.whatsNewEmpty": "Er zijn geen geverifieerde packagenotities voor deze build.",
+    "botdee.vs.whatsNewEmpty": "Er staan geen BOT DEE- of Gemini-notities voor deze build.",
     "botdee.vs.helpHeading": "Version-opdracht",
     "botdee.vs.helpBody": "Typ Ver, Vers of Version om dit SMARTview te tonen. De opdracht negeert hoofdletters. De kaart is het enige antwoord — er is geen six-phase chatdump. Langere vragen zoals “what is your version?” krijgen nog een korte tekstregel plus deze kaart.",
     "botdee.vs.footBrand": "FLOQR · Systeeminformatie",
@@ -275,7 +275,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Идентификатор сборки",
     "botdee.vs.techCheck": "Последняя успешная проверка состояния",
     "botdee.vs.whatsNewHeading": "Что нового",
-    "botdee.vs.whatsNewEmpty": "Для этой сборки нет проверенных заметок пакета.",
+    "botdee.vs.whatsNewEmpty": "Для этой сборки нет заметок BOT DEE или Gemini.",
     "botdee.vs.helpHeading": "Команда Version",
     "botdee.vs.helpBody": "Введите Ver, Vers или Version, чтобы показать этот SMARTview. Регистр не важен. Карточка — единственный ответ: шестифазного дампа в чате нет. Более длинные вопросы вроде «what is your version?» по-прежнему получают короткую строку плюс эту карточку.",
     "botdee.vs.footBrand": "FLOQR · Системная информация",
@@ -311,7 +311,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Αναγνωριστικό build",
     "botdee.vs.techCheck": "Τελευταίος επιτυχής έλεγχος υγείας",
     "botdee.vs.whatsNewHeading": "Νέα",
-    "botdee.vs.whatsNewEmpty": "Δεν υπάρχουν επαληθευμένες σημειώσεις πακέτου για αυτό το build.",
+    "botdee.vs.whatsNewEmpty": "Δεν υπάρχουν σημειώσεις BOT DEE ή Gemini για αυτό το build.",
     "botdee.vs.helpHeading": "Εντολή Version",
     "botdee.vs.helpBody": "Πληκτρολογήστε Ver, Vers ή Version για αυτό το SMARTview. Η εντολή αγνοεί πεζά/κεφαλαία. Η κάρτα είναι η μόνη απάντηση — δεν υπάρχει six-phase dump στη συνομιλία. Μεγαλύτερες ερωτήσεις όπως «what is your version;» παίρνουν ακόμη μια σύντομη γραμμή συν αυτή την κάρτα.",
     "botdee.vs.footBrand": "FLOQR · Πληροφορίες συστήματος",
@@ -347,7 +347,7 @@ const CHROME = {
     "botdee.vs.techBuild": "Identyfikator buildu",
     "botdee.vs.techCheck": "Ostatnie udane sprawdzenie stanu",
     "botdee.vs.whatsNewHeading": "Nowości",
-    "botdee.vs.whatsNewEmpty": "Brak zweryfikowanych notatek pakietu dla tego buildu.",
+    "botdee.vs.whatsNewEmpty": "Brak notatek BOT DEE lub Gemini dla tego buildu.",
     "botdee.vs.helpHeading": "Polecenie Version",
     "botdee.vs.helpBody": "Wpisz Ver, Vers lub Version, aby pokazać ten SMARTview. Polecenie ignoruje wielkość liter. Karta jest jedyną odpowiedzią — nie ma zrzutu six-phase w czacie. Dłuższe pytania jak „what is your version?” nadal dostają krótką linię plus tę kartę.",
     "botdee.vs.footBrand": "FLOQR · Informacje systemowe",
@@ -383,7 +383,7 @@ const CHROME = {
     "botdee.vs.techBuild": "معرّف البناء",
     "botdee.vs.techCheck": "آخر فحص صحة ناجح",
     "botdee.vs.whatsNewHeading": "ما الجديد",
-    "botdee.vs.whatsNewEmpty": "لا توجد ملاحظات حزمة موثّقة لهذا البناء.",
+    "botdee.vs.whatsNewEmpty": "لا توجد ملاحظات BOT DEE أو Gemini لهذا البناء.",
     "botdee.vs.helpHeading": "أمر Version",
     "botdee.vs.helpBody": "أدخل Ver أو Vers أو Version لعرض SMARTview هذا. الأمر لا يراعي حالة الأحرف. البطاقة هي الإجابة الوحيدة — لا يوجد تفريغ six-phase في الدردشة. الأسئلة الأطول مثل “what is your version?” ما زالت تحصل على سطر نص قصير بالإضافة إلى هذه البطاقة.",
     "botdee.vs.footBrand": "FLOQR · معلومات النظام",
@@ -499,47 +499,47 @@ const HELP = {
   "help-botdee-version-smartview-tabs": {
     en: {
       title: "Version SMARTview tabs",
-      body: "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified FLOQR package notes from the current README. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme."
+      body: "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified BOT DEE and Gemini changes only — not Master Admin, beta tester tools, or other FLOQR product notes. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme."
     },
     de: {
       title: "Version-SMARTview-Reiter",
-      body: "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet geprüfte FLOQR-Package-Hinweise aus der aktuellen README. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und den Scroll. Die Karte nutzt Ihr Site Chrome — kein zweites Thema."
+      body: "Übersicht beschreibt BOT DEE und öffnet Technische Details ohne den Chat zu verlassen. Neuigkeiten listet nur geprüfte BOT-DEE- und Gemini-Änderungen — nicht Master Admin, Beta-Tester-Werkzeuge oder andere FLOQR-Produkthinweise. Hilfe wiederholt den Befehl Ver / Vers / Version. Reiterwechsel oder Aufklappen behält den ungesendeten Entwurf und den Scroll. Die Karte nutzt Ihr Site Chrome — kein zweites Thema."
     },
     fr: {
       title: "Onglets Version SMARTview",
-      body: "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés liste les notes de package FLOQR vérifiées du README actuel. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte utilise votre Site Chrome — pas de second thème."
+      body: "Aperçu décrit BOT DEE et ouvre les Détails techniques sans quitter le chat. Nouveautés n’affiche que les changements BOT DEE et Gemini vérifiés — pas Master Admin, les outils bêta-testeur, ni les autres notes produit FLOQR. Aide répète la commande Ver / Vers / Version. Changer d’onglet ou déplier garde le brouillon non envoyé et le défilement. La carte utilise votre Site Chrome — pas de second thème."
     },
     es: {
       title: "Pestañas de Version SMARTview",
-      body: "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista notas de paquete FLOQR verificadas del README actual. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su Site Chrome — no hay un segundo tema."
+      body: "Resumen describe BOT DEE y abre Detalles técnicos sin salir del chat. Novedades lista solo cambios verificados de BOT DEE y Gemini — no Master Admin, herramientas de beta testers ni otras notas de producto FLOQR. Ayuda repite el comando Ver / Vers / Version. Cambiar de pestaña o expandir conserva el borrador no enviado y el scroll. La tarjeta usa su Site Chrome — no hay un segundo tema."
     },
     it: {
       title: "Schede Version SMARTview",
-      body: "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca note di package FLOQR verificate dal README attuale. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il tuo Site Chrome — non c’è un secondo tema."
+      body: "Panoramica descrive BOT DEE e apre Dettagli tecnici senza uscire dalla chat. Novità elenca solo i cambiamenti verificati di BOT DEE e Gemini — non Master Admin, strumenti beta tester o altre note di prodotto FLOQR. Aiuto ripete il comando Ver / Vers / Version. Cambiare scheda o espandere tiene la bozza non inviata e lo scorrimento. La scheda usa il tuo Site Chrome — non c’è un secondo tema."
     },
     pt: {
       title: "Abas do Version SMARTview",
-      body: "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista notas de pacote FLOQR verificadas do README atual. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site Chrome — não há um segundo tema."
+      body: "Visão geral descreve o BOT DEE e abre Detalhes técnicos sem sair do chat. Novidades lista só mudanças verificadas de BOT DEE e Gemini — não Master Admin, ferramentas de beta tester nem outras notas de produto FLOQR. Ajuda repete o comando Ver / Vers / Version. Trocar de aba ou expandir mantém o rascunho não enviado e a rolagem. O cartão usa o seu Site Chrome — não há um segundo tema."
     },
     nl: {
       title: "Version SMARTview-tabbladen",
-      body: "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont geverifieerde FLOQR-packagenotities uit de huidige README. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaart gebruikt jouw Site Chrome — er is geen tweede thema."
+      body: "Overzicht beschrijft BOT DEE en opent Technische details zonder de chat te verlaten. Nieuw toont alleen geverifieerde BOT DEE- en Gemini-wijzigingen — geen Master Admin, bèta-testertools of andere FLOQR-productnotities. Help herhaalt het commando Ver / Vers / Version. Tab wisselen of uitklappen bewaart je onverzonden concept en scroll. De kaart gebruikt jouw Site Chrome — er is geen tweede thema."
     },
     ru: {
       title: "Вкладки Version SMARTview",
-      body: "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового — проверенные заметки пакета FLOQR из текущего README. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ваш Site Chrome — второй темы нет."
+      body: "Обзор описывает BOT DEE и открывает технические сведения, не покидая чат. Что нового показывает только проверенные изменения BOT DEE и Gemini — не Master Admin, не инструменты бета-тестеров и не другие заметки продуктов FLOQR. Справка повторяет команду Ver / Vers / Version. Смена вкладки или раскрытие сохраняет неотправленный черновик и прокрутку. Карточка берёт ваш Site Chrome — второй темы нет."
     },
     el: {
       title: "Καρτέλες Version SMARTview",
-      body: "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει επαληθευμένες σημειώσεις πακέτου FLOQR από το τρέχον README. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο πρόχειρο και την κύλιση. Η κάρτα χρησιμοποιεί το Site Chrome σας — δεν υπάρχει δεύτερο θέμα."
+      body: "Η Επισκόπηση περιγράφει το BOT DEE και ανοίγει Τεχνικές λεπτομέρειες χωρίς να φύγετε από τη συνομιλία. Νέα δείχνει μόνο επαληθευμένες αλλαγές BOT DEE και Gemini — όχι Master Admin, εργαλεία beta tester ή άλλες σημειώσεις προϊόντος FLOQR. Βοήθεια επαναλαμβάνει την εντολή Ver / Vers / Version. Αλλαγή καρτέλας ή ανάπτυξη κρατά το μη σταλμένο πρόχειρο και την κύλιση. Η κάρτα χρησιμοποιεί το Site Chrome σας — δεν υπάρχει δεύτερο θέμα."
     },
     pl: {
       title: "Karty Version SMARTview",
-      body: "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje zweryfikowane notatki pakietu FLOQR z bieżącego README. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa Twojego Site Chrome — nie ma drugiego motywu."
+      body: "Przegląd opisuje BOT DEE i otwiera Szczegóły techniczne bez opuszczania czatu. Nowości wypisuje tylko zweryfikowane zmiany BOT DEE i Gemini — nie Master Admin, narzędzia beta testerów ani inne notatki produktów FLOQR. Pomoc powtarza polecenie Ver / Vers / Version. Zmiana karty lub rozwinięcie zostawia niewysłany szkic i przewijanie. Karta używa Twojego Site Chrome — nie ma drugiego motywu."
     },
     ar: {
       title: "علامات Version SMARTview",
-      body: "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض ملاحظات حزمة FLOQR الموثّقة من README الحالي. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظهر ثانٍ."
+      body: "نظرة عامة تصف BOT DEE وتفتح التفاصيل التقنية دون مغادرة الدردشة. ما الجديد يعرض تغييرات BOT DEE وGemini الموثّقة فقط — وليس Master Admin أو أدوات مختبري بيتا أو ملاحظات منتجات FLOQR الأخرى. المساعدة تكرر أمر Ver / Vers / Version. تبديل العلامات أو توسيع التفاصيل يبقي المسودة غير المُرسلة والتمرير. البطاقة تستخدم Site Chrome لديك — لا يوجد مظهر ثانٍ."
     }
   }
 };

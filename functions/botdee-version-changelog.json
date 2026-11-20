@@ -1,110 +1,237 @@
 [
   {
+    "id": "s3.3.055",
+    "text": "s3.3.055: Headless VIP reserV: book/hold a table phrasing, night rail, 2D map, cancel unmounts dock",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.055: book a table / hold a table at Aurelia / do a reservation stay on VIP reserV with a 2D floor dock"
+  },
+  {
+    "id": "s3.3.054",
+    "text": "s3.3.054: BOT DEE people search is identity-only (not bios) and compact picker cards",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.054: People search matches names and handles only — not bios — and compact picker cards"
+  },
+  {
+    "id": "s3.3.053",
+    "text": "s3.3.053: Si-nema Search chrome is a vector mark with Site Chrome fills and transparent voids (White/Black PNG)"
+  },
+  {
+    "id": "s3.3.052",
+    "text": "s3.3.052: Required mobile is the FLOQR account unifier; Master Admin can merge duplicate patrons without deleting Auth. Mingl Search tile + profile avatar Mingl Chat follow Features & Services beta grant."
+  },
+  {
     "id": "s3.3.051",
-    "text": "s3.3.051: Headless VIP reserV: intercept visit/I want a reservation, Aurelia copy, Hold it CTA, real hold errors"
+    "text": "s3.3.051: BOT DEE natural Cancun trip talk opens Room SMARTview (same card as Open Room SMARTview Cancun Trip)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.051: BOT DEE natural Cancun trip talk opens Room SMARTview (same card as Open Room SMARTview Cancun Trip)"
   },
   {
     "id": "s3.3.050",
-    "text": "s3.3.050: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab"
+    "text": "s3.3.050: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.050: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab"
   },
   {
     "id": "s3.3.049",
-    "text": "s3.3.049: Beta Find patron by email; tester Save no longer waits on Audit Trail"
+    "text": "s3.3.049: Beta Find patron by email; tester Save no longer waits on Audit Trail",
+    "audiences": [
+      "masterAdmin"
+    ]
   },
   {
     "id": "s3.3.048",
-    "text": "s3.3.048: Save busy ignores unrelated writes and reason-prompt logs"
+    "text": "s3.3.048: Save busy ignores unrelated writes and reason-prompt logs",
+    "audiences": [
+      "masterAdmin"
+    ]
   },
   {
     "id": "s3.3.047",
-    "text": "s3.3.047: Gray Save after command received; Features SMARTview first slice on Master Admin BOT DEE SMARTviews"
+    "text": "s3.3.047: Gray Save after command received; Features SMARTview first slice on Master Admin BOT DEE SMARTviews",
+    "audiences": [
+      "masterAdmin"
+    ]
   },
   {
     "id": "s3.3.046",
-    "text": "s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join; App Check plan-trace logs to Master Admin (enforcement off)"
+    "text": "s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join; App Check plan-trace logs to Master Admin (enforcement off)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join"
   },
   {
     "id": "s3.3.045",
-    "text": "s3.3.045: ShoutOut SMARTpreview shows the live LED template and updates as you edit"
+    "text": "s3.3.045: ShoutOut SMARTpreview shows the live LED template and updates as you edit",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.045: ShoutOut SMARTpreview shows the live LED template and updates as you edit"
   },
   {
     "id": "s3.3.044",
-    "text": "s3.3.044: BOT DEE ShoutOut SMARTpreview collects template/@handle/media; core stays one-shot"
+    "text": "s3.3.044: BOT DEE ShoutOut SMARTpreview collects template/@handle/media; core stays one-shot",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.044: BOT DEE ShoutOut SMARTpreview collects template/@handle/media"
   },
   {
     "id": "s3.3.043",
-    "text": "s3.3.043: Headless ShoutOut composer parity (classic-bw + Club Admin inbox + LED)"
+    "text": "s3.3.043: Headless ShoutOut composer parity (classic-bw + Club Admin inbox + LED)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.043: Headless ShoutOut composer parity (classic-bw + Club Admin inbox + LED)"
   },
   {
     "id": "s3.3.042",
-    "text": "s3.3.042: Mingl Search chrome from v3 white/teal/purple vector"
+    "text": "s3.3.042: Mingl Search chrome from v3 white/teal/purple vector",
+    "audiences": [
+      "masterAdmin"
+    ]
   },
   {
     "id": "s3.3.041",
-    "text": "s3.3.041: BOT DEE + FloqR headless ShoutOut (club + message → Stripe or pending)"
+    "text": "s3.3.041: BOT DEE + FloqR headless ShoutOut (club + message → Stripe or pending)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.041: BOT DEE + FloqR headless ShoutOut (club + message → Stripe or pending)"
   },
   {
     "id": "s3.3.040",
-    "text": "s3.3.040: People lookup matches legal name, display name, handle, what-about"
+    "text": "s3.3.040: People lookup matches legal name, display name, handle, what-about",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.040: People lookup matches legal name, display name, handle, what-about"
   },
   {
     "id": "s3.3.039",
-    "text": "s3.3.039: People card stacked layout (photo, name+handle, compact SMARTsummary)"
+    "text": "s3.3.039: People card stacked layout (photo, name+handle, compact SMARTsummary)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.039: People card stacked layout (photo, name+handle, compact SMARTsummary)"
   },
   {
     "id": "s3.3.038",
-    "text": "s3.3.038: BOT DEE throw a ShoutOut from chat (no stacked help dump)"
+    "text": "s3.3.038: BOT DEE throw a ShoutOut from chat (no stacked help dump)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.038: BOT DEE throw a ShoutOut from chat (no stacked help dump)"
   },
   {
     "id": "s3.3.037",
-    "text": "s3.3.037: BOT DEE SMARTview transcript scroll + rename saved chats"
+    "text": "s3.3.037: BOT DEE SMARTview transcript scroll + rename saved chats",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.037: BOT DEE SMARTview transcript scroll + rename saved chats"
   },
   {
     "id": "s3.3.036",
-    "text": "s3.3.036: BOT DEE history collapse (+ / − Chats nest, Back to Search, recall kept)"
+    "text": "s3.3.036: BOT DEE history collapse (+ / − Chats nest, Back to Search, recall kept)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.036: BOT DEE history collapse (+ / − Chats nest, Back to Search, recall kept)"
   },
   {
     "id": "s3.3.035",
-    "text": "s3.3.035: Native select selected-value vertical centering (Appearance chrome + Master Admin BOT DEE Provider)"
+    "text": "s3.3.035: Native select selected-value vertical centering (Appearance chrome + Master Admin BOT DEE Provider)",
+    "audiences": [
+      "masterAdmin"
+    ]
   },
   {
     "id": "s3.3.034",
-    "text": "s3.3.034: Version SMARTview card only; live Operational/Degraded/Unavailable probe; real Gemini model id"
+    "text": "s3.3.034: Version SMARTview card only; live Operational/Degraded/Unavailable probe; real Gemini model id",
+    "audiences": [
+      "gemini"
+    ],
+    "whatsNewText": "s3.3.034: Version SMARTview card only; real Gemini model id"
   },
   {
     "id": "s3.3.033",
-    "text": "s3.3.033: BOT DEE Room SMARTview intent routing (confirmation card; group rooms not live)"
+    "text": "s3.3.033: BOT DEE Room SMARTview intent routing (confirmation card; group rooms not live)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.033: BOT DEE Room SMARTview intent routing (confirmation card; group rooms not live)"
   },
   {
     "id": "s3.3.032",
-    "text": "s3.3.032: BOT DEE Version SMARTview (Ver / Vers / Version aliases, honest stamps)"
+    "text": "s3.3.032: BOT DEE Version SMARTview (Ver / Vers / Version aliases, honest stamps)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.032: BOT DEE Version SMARTview (Ver / Vers / Version aliases, honest stamps)"
   },
   {
     "id": "s3.3.031",
-    "text": "s3.3.031: SMARTview spelling + public-page Profile Media on People cards"
+    "text": "s3.3.031: SMARTview spelling + public-page Profile Media on People cards",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.031: SMARTview spelling + public-page Profile Media on People cards"
   },
   {
     "id": "s3.3.030",
-    "text": "s3.3.030: Edit Profile iOS select text unclip + Account type help; My BOT DEE View my SMARTview (real patron card, mocks stay on Master Admin)"
+    "text": "s3.3.030: Edit Profile iOS select text unclip + Account type help; My BOT DEE View my SMARTview (real patron card, mocks stay on Master Admin)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.030: My BOT DEE View my SMARTview (real patron card, mocks stay on Master Admin)"
   },
   {
     "id": "s3.3.029",
-    "text": "s3.3.029: My BOT DEE iOS demeanor radios (custom 22px grid, cache-bust from s3.3.028)"
+    "text": "s3.3.029: My BOT DEE iOS demeanor radios (custom 22px grid, cache-bust from s3.3.028)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.029: My BOT DEE iOS demeanor radios (custom 22px grid, cache-bust from s3.3.028)"
   },
   {
     "id": "s3.3.028",
-    "text": "s3.3.028: People SMARTview v2 (inline patron card, owner edit, translation queue, Site Chrome)"
+    "text": "s3.3.028: People SMARTview v2 (inline patron card, owner edit, translation queue, Site Chrome)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.028: People SMARTview v2 (inline patron card, owner edit, translation queue, Site Chrome)"
   },
   {
     "id": "s3.3.027",
-    "text": "s3.3.027: BOT DEE recall after 300s pause — retrieve stored events, recap last two turns, discussed vs booked"
+    "text": "s3.3.027: BOT DEE recall after 300s pause — retrieve stored events, recap last two turns, discussed vs booked",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.027: BOT DEE recall after 300s pause — retrieve stored events, recap last two turns, discussed vs booked"
   },
   {
     "id": "s3.3.026",
-    "text": "s3.3.026: BOT DEE first-use overlay + My BOT DEE prefs; sessions reset as new users; no Settings bar"
+    "text": "s3.3.026: BOT DEE first-use overlay + My BOT DEE prefs; sessions reset as new users; no Settings bar",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.026: BOT DEE first-use overlay + My BOT DEE prefs"
   },
   {
     "id": "s3.3.025",
-    "text": "s3.3.025: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help"
+    "text": "s3.3.025: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.025: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help"
   }
 ]

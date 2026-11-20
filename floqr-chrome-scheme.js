@@ -46,7 +46,7 @@
   });
 
   /** Asset cache-bust for chrome icon / brand packs (not navigation). */
-  const ICON_V = "s3.3.051";  /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
+  const ICON_V = "s3.3.055";  /** Once Features & Services has answered, premium chrome may be demoted to Nightlife. */
   let featuresAccessResolved = false;
   /* s3.2.62 — rounded-square feature icons (Search tiles / product heroes). Settings stay circular. */
   const NIGHTLIFE_ICONS = {
@@ -113,7 +113,7 @@
     settings: "./images/chrome/settings-whiteblack.jpg?v=" + ICON_V,
     bartR: "./images/chrome/bartr-whiteblack.jpg?v=" + ICON_V,
     rydR: "./images/chrome/rydr-whiteblack.jpg?v=" + ICON_V,
-    sinema: "./images/chrome/sinema-whiteblack.jpg?v=" + ICON_V,
+    sinema: "./images/chrome/sinema-whiteblack.png?v=" + ICON_V,
     mingl: "./images/chrome/mingl-whiteblack.jpg?v=" + ICON_V
   };
   const ICON_PACK = {

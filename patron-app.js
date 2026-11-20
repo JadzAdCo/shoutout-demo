@@ -2175,14 +2175,14 @@
         status.textContent = pickupCheck.error;
         return;
       }
-      const phoneCheck = profileGeoCtl?.validateMobile?.({required: false})
+      const phoneCheck = profileGeoCtl?.validateMobile?.({required: true})
         || window.FLOQRGeoCatalog?.validateMobile?.(
           byId("profileCountry")?.value,
           byId("profilePhoneNational")?.value,
-          {required: false}
+          {required: true}
         );
       if (phoneCheck && !phoneCheck.ok) {
-        status.textContent = phoneCheck.error || "Enter a valid mobile number for SMS and WhatsApp.";
+        status.textContent = phoneCheck.error || window.FLOQRI18n?.t?.("profile.phone.required") || "Mobile is required. Enter your mobile number in international format.";
         return;
       }
       const pickupParts = pickupCheck?.ok && !pickupCheck.empty ? (pickupCheck.parts || {}) : {};
@@ -2248,6 +2248,14 @@
       const savePayload = existingSnap.exists
         ? preserveExistingProfileData(profile, existingProfile)
         : {...profile, createdAt: firebase.firestore.FieldValue.serverTimestamp()};
+
+      const claimed = await window.FLOQRAccountUnifier?.claimRequiredPhone?.(savePayload.phone, status);
+      if (!claimed?.ok) {
+        if (!window.FLOQRAccountUnifier) {
+          status.textContent = window.FLOQRI18n?.t?.("profile.phone.required") || "Mobile is required. Enter your mobile number in international format.";
+        }
+        return;
+      }
 
       await profileRef.set(savePayload, { merge: true });
 
@@ -2403,6 +2411,12 @@
       profile = await getUserProfile();
     } catch (readError) {
       setStatus(profileReadErrorMessage(readError));
+      showPage("landingPage");
+      return;
+    }
+    if (profile?.mergedInto || profile?.accountStatus === "merged") {
+      setStatus(tt("profile.phone.merged", null, "This sign-in was merged into another FLOQR account. Sign in with that account."));
+      try { await auth.signOut(); } catch (_) {}
       showPage("landingPage");
       return;
     }
@@ -3413,13 +3427,8 @@
       showPage("landingPage");
       return;
     }
-    const g = window.FLOQRFeatureGates;
-    if (g && !g.patronMayUse("mingl", currentUser, cachedUserProfile)) {
-      setStatus("Mingl is currently disabled for patrons.");
-      return;
-    }
     if (!featureServiceAllows("mingl")) {
-      setStatus(window.FLOQRFeatureServices.unavailableMessage());
+      setStatus(window.FLOQRFeatureServices?.unavailableMessage?.() || "This feature isn't available on your account yet.");
       showPage("categoryPage");
       return;
     }
@@ -6474,7 +6483,12 @@
         // Only soft-route to login after a real sign-out — not the initial null before session restore.
         if (wasSignedIn && !byId("landingPage")?.classList.contains("active")) showPage("landingPage");
         hadSignedInUser = false;
-        if (safeReturnTo(pendingReturnTo)) setStatus(tt("app.signInToContinue", null, "Sign in to continue to the page you opened."));
+        const gateParams = new URLSearchParams(window.location.search);
+        if (gateParams.get("phoneInUse") === "1") {
+          setStatus(tt("profile.phone.inUse", null, "This mobile is already on a FLOQR account. Sign in with that account. Same phone means the same person."));
+        } else if (gateParams.get("accountMerged") === "1") {
+          setStatus(tt("profile.phone.merged", null, "This sign-in was merged into another FLOQR account. Sign in with that account."));
+        } else if (safeReturnTo(pendingReturnTo)) setStatus(tt("app.signInToContinue", null, "Sign in to continue to the page you opened."));
         return;
       }
       hadSignedInUser = true;
@@ -6825,13 +6839,16 @@
       if(window.firebase && firebase.auth){
         clearInterval(waitAuth);
         firebase.auth().onAuthStateChanged(user => {
-          if(user) setTimeout(() => enhanceMenu(user), 350);
-    const fs = window.FLOQRFeatureServices;
-    if (fs?.ensureLoaded) {
-      fs.ensureLoaded({db: firebase.firestore(), user})
-        .then(() => fs.applyFeatureLinks(host))
-        .catch(error => console.warn("Profile menu feature links", error?.message || error));
-    }
+          if (!user) return;
+          setTimeout(async () => {
+            await enhanceMenu(user);
+            const menu = byId("userDropdown");
+            const fs = window.FLOQRFeatureServices;
+            if (!fs?.ensureLoaded || !menu) return;
+            fs.ensureLoaded({db: firebase.firestore(), user})
+              .then(() => fs.applyFeatureLinks(menu))
+              .catch(error => console.warn("Profile menu feature links", error?.message || error));
+          }, 350);
         });
       }
     }catch(e){}

@@ -145,7 +145,7 @@
   },
   "help-profile-mobile": {
     "title": "Mobile",
-    "body": "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format so messages can reach you. Incomplete numbers cannot be saved."
+    "body": "Mobile is required. FLOQR uses this number to recognize you — one mobile means one FLOQR account. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format (E.164) so SMS and WhatsApp can reach you. If this number is already on another FLOQR sign-in, you will be asked to use that account instead of creating a second one."
   },
   "help-prior-travels": {
     "title": "Prior Travels (City or Country)",
@@ -449,7 +449,7 @@
   },
   "help-botdee-version-smartview-tabs": {
     "title": "Version SMARTview tabs",
-    "body": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified FLOQR package notes from the current README. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme."
+    "body": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified BOT DEE and Gemini changes only — not Master Admin, beta tester tools, or other FLOQR product notes. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme."
   },
   "help-botdee-room-smartview": {
     "title": "Room SMARTview",

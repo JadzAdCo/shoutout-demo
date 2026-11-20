@@ -295,7 +295,7 @@ function shareableFactsFromUtterance(raw) {
   const original = text(raw, 200);
   const facts = [];
   const place = original.match(
-    /\b(mykonos|aurelia|decades|lima twist|paris|ibiza|miami|vegas|london)\b/i
+    /\b(mykonos|aurelia|decades|lima twist|paris|ibiza|miami|vegas|london|cancun|cancún)\b/i
   );
   if (place) {
     facts.push({
@@ -416,6 +416,32 @@ function isSplitAsk(normalized) {
   );
 }
 
+function isNightlifeOnlyAsk(normalized) {
+  const nightlife = (
+    /\bvip\s+tables?\b/.test(normalized)
+    || /\btables?\s+tonight\b/.test(normalized)
+    || (/\btonight\b/.test(normalized) && /\b(?:vip|club|nightclub|booth)\b/.test(normalized))
+    || /\b(?:book|hold|reserve)\b.{0,32}\b(?:vip|table|booth)\b/.test(normalized)
+  );
+  const trip = /\b(?:trip|travel|vacation|itinerary|holiday)\b/.test(normalized);
+  return nightlife && !trip;
+}
+
+function isCancunTripAsk(normalized) {
+  if (!normalized || !/\bcancun\b/.test(normalized)) return false;
+  if (isNightlifeOnlyAsk(normalized)) return false;
+  return (
+    /\btrip\b/.test(normalized)
+    || /\btravel\b/.test(normalized)
+    || /\bvacation\b/.test(normalized)
+    || /\bitinerary\b/.test(normalized)
+    || /\bholiday\b/.test(normalized)
+  );
+}
+
+const CANCUN_TRIP_TITLE = "Cancun Trip";
+const CANCUN_TRIP_DESCRIPTION = "Let's plan our Cancun trip together with BOT-DEE.";
+
 function declineKey(classified) {
   const row = classified && typeof classified === "object" ? classified : {};
   return ["rs", row.level || "none", row.route || "none", row.command || "", row.share ? "share" : ""]
@@ -510,6 +536,8 @@ function classifyRoomIntent(raw, opts) {
     || /\b(?:join us|join this chat|join this conversation)\b/.test(normalized)
   ) {
     level = "strong";
+  } else if (isCancunTripAsk(normalized)) {
+    level = "explicit";
   } else if (includesAny(normalized, CONTEXTUAL) || split || share) {
     level = "contextual";
   } else {
@@ -607,6 +635,9 @@ function authorizedFromUtterance(raw, classified) {
   if (classified && classified.injection) {
     return {authorizedTitle: "", authorizedDescription: ""};
   }
+  if (isCancunTripAsk(normalizeUtterance(raw))) {
+    return {authorizedTitle: CANCUN_TRIP_TITLE, authorizedDescription: CANCUN_TRIP_DESCRIPTION};
+  }
   const cleaned = text(String(raw || "").replace(/https?:\/\/\S+/gi, " ").replace(/\s+/g, " "), 120);
   if (!cleaned) return {authorizedTitle: "", authorizedDescription: ""};
   return {authorizedTitle: cleaned, authorizedDescription: cleaned};
@@ -687,6 +718,8 @@ const api = {
   normalizeUtterance,
   classifyRoomIntent,
   isRoomSmartViewPrompt,
+  isCancunTripAsk,
+  isNightlifeOnlyAsk,
   buildRoomSmartView,
   buildRoomSession,
   declineKey,

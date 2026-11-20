@@ -1,6 +1,11 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.051 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.055 (stable)
 
-- s3.3.051: Headless VIP reserV: intercept visit/I want a reservation, Aurelia copy, Hold it CTA, real hold errors
+- s3.3.055: Headless VIP reserV: book/hold a table phrasing, night rail, 2D map, cancel unmounts dock
+- s3.3.054: BOT DEE people search is identity-only (not bios) and compact picker cards
+- s3.3.053: Si-nema Search chrome is a vector mark with Site Chrome fills and transparent voids (White/Black PNG)
+- s3.3.052: Required mobile is the FLOQR account unifier; Master Admin can merge duplicate patrons without deleting Auth
+- s3.3.052: Mingl Search tile + profile avatar Mingl Chat follow Features & Services beta grant (legacy patron gate is live-only)
+- s3.3.051: BOT DEE natural Cancun trip talk opens Room SMARTview (same card as Open Room SMARTview Cancun Trip)
 - s3.3.050: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab
 - s3.3.049: Beta Find patron by email; tester Save no longer waits on Audit Trail
 - s3.3.048: Save busy ignores unrelated writes and reason-prompt logs

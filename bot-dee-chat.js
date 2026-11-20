@@ -397,6 +397,7 @@
   }
 
   async function ensurePeopleSmartViews(text, data) {
+    /* People matches come from searchPeopleSmartCards (identity fields only). Never haystack bios. */
     const classified = classifyPeopleSearchIntent(text);
     const session = data && typeof data === "object" ? data : {};
     if (classified.intent === "none") return session;
@@ -499,7 +500,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.051";
+    return "s3.3.055";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -1694,7 +1695,7 @@
           return;
         }
         const layout = Math.max(document.documentElement.clientHeight || 0, global.innerHeight || 0);
-        const occluded = Math.max(0, layout - (vv.height || layout) - (vv.offsetTop || 0));
+        const occluded = Math.max(0, layout - vv.height - (vv.offsetTop || 0));
         document.documentElement.style.setProperty("--botdee-kb", `${Math.round(occluded)}px`);
       } catch (_) {}
     };

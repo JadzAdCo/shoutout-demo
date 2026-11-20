@@ -202,19 +202,22 @@
       id: "help-botdee-room-smartview",
       kind: "help",
       label: "Room SMARTview",
-      blurb: "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
+      blurb: "Type Open Room SMARTview, Start a group chat, or plan a Cancun trip in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
         "invite others to this chat", "invite mingl friends", "share this conversation",
         "join room smartview", "joined bot dee session", "confirm room smartview",
-        "review bot dee invite"
+        "review bot dee invite", "let's plan our cancun trip", "let's plan a trip to cancun",
+        "plan a cancun trip", "cancun trip with friends"
       ],
       patterns: [
         /room\s*smart\s*view/,
         /start\s+a\s+group\s+chat/,
         /open\s+room\s+smartview/,
-        /share\s+this\s+conversation/
+        /share\s+this\s+conversation/,
+        /plan\s+(?:our\s+|a\s+)?(?:trip\s+to\s+)?cancun/,
+        /cancun\s+trip/
       ]
     },
     {
@@ -754,12 +757,12 @@
       id: "help-profile-mobile",
       kind: "help",
       label: "Mobile",
-      blurb: "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States.",
+      blurb: "Mobile is required. One mobile means one FLOQR account. Country fills the calling code, for example (+1) for the United States.",
       links: [
         {label: "Profile & Settings", href: pageUrl("./patron-portal.html", {from: "botdee", tab: "profile"})}
       ],
-      searchPhrases: ["mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code"],
-      patterns: [/\bmobile\b/, /\bphone\s+number\b/, /\bcountry\s+code\b/, /\(\+1\)/]
+      searchPhrases: ["mobile", "phone number", "sms", "whatsapp", "country code", "+1", "calling code", "required phone", "same phone", "duplicate account"],
+      patterns: [/\bmobile\b/, /\bphone\s+number\b/, /\bcountry\s+code\b/, /\(\+1\)/, /same\s+phone/, /duplicate\s+account/]
     },
     {
       id: "help-prior-travels",

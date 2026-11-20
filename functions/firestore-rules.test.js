@@ -66,6 +66,13 @@ test("identity and club updates preserve backend Stripe fields", () => {
   assert.match(blockFor("/clubLocations/{id}"), /preservesStripeBindingFields\(\)/);
   assert.match(rules, /clubAdminAssignments.*status == "active"/s);
   assert.match(rules, /FLOQR FIRESTORE RULES VERSION: v29\.09\.5-floqr-platform-payments/);
+  assert.match(rules, /"mergedInto"/);
+  assert.match(rules, /"phoneE164"/);
+});
+
+test("phoneIndex is Functions-write only", () => {
+  const block = blockFor("/phoneIndex/{phoneId}");
+  assert.match(block, /allow read, write: if false;/);
 });
 
 test("platformSettings feature gates are Master Admin write / public read", () => {

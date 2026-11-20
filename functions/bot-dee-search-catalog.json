@@ -573,17 +573,21 @@
       "id": "help-botdee-room-smartview",
       "kind": "help",
       "label": "Room SMARTview",
-      "blurb": "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay",
+      "blurb": "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends). That opens the same Room SMARTview as Open Room SMARTview Cancun Trip — trav",
       "href": "./botdee.html",
       "phrases": [
         "room smartview",
-        "in bot dee chat say open room smartview or start a group chat. confirm opens a session. invite mingl friends only host plus 7 guests. guests can invite too. joi",
+        "in bot dee chat say open room smartview start a group chat or plan a cancun trip in plain words let s plan our cancun trip let s plan a trip to cancun plan a ca",
         "start a group chat",
         "open room smartview",
         "create a room",
         "group chat bot dee",
         "talk to bot dee together",
         "invite mingl friends",
+        "let s plan our cancun trip",
+        "let s plan a trip to cancun",
+        "plan a cancun trip",
+        "cancun trip with friends",
         "open bot dee",
         "help-botdee-room-smartview"
       ]
@@ -735,11 +739,11 @@
       "id": "help-botdee-smartcard-search",
       "kind": "help",
       "label": "Ask BOT DEE who someone is",
-      "blurb": "Ask “Who am I?” to open your own SMARTview. Ask “Who is …”, “What do you know of …”, or “What about …” plus a first and last name, display name, or @handle. One match opens a People SMARTview card in the chat — not a markdown list or photo dump. Several matches show SMARTcards to",
+      "blurb": "Ask “Who am I?” to open your own SMARTview. Ask “Who is …”, “What do you know of …”, or “What about …” plus a first name, last name, display name, Mingl or FloqR handle, or a social handle (Instagram, TikTok, X). Matches use those identity fields only — not bios, likes, drinks, o",
       "href": "./botdee.html",
       "phrases": [
         "ask bot dee who someone is",
-        "ask who am i to open your own smartview. ask who is what do you know of or what about plus a first and last name display name or @handle. one match opens a peop",
+        "ask who am i to open your own smartview. ask who is what do you know of or what about plus a first name last name display name mingl or floqr handle or a social",
         "who am i",
         "who is",
         "what do you know of",
@@ -750,6 +754,8 @@
         "do you know this person",
         "people search bot dee",
         "lookup public profile",
+        "identity only",
+        "not bio",
         "open bot dee",
         "help-botdee-smartcard-search"
       ]
@@ -1014,14 +1020,16 @@
       "id": "help-botdee-version-smartview-tabs",
       "kind": "help",
       "label": "Version SMARTview tabs",
-      "blurb": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified FLOQR package notes from the current README. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses",
+      "blurb": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified BOT DEE and Gemini changes only — not Master Admin, beta tester tools, or other FLOQR product notes. Help repeats the Ver / Vers / Version command. Switching tabs or expanding d",
       "href": "./botdee.html",
       "phrases": [
         "version smartview tabs",
-        "overview describes bot dee and opens technical details without leaving chat. what s new lists verified floqr package notes from the current readme. help repeats",
+        "overview describes bot dee and opens technical details without leaving chat. what s new lists verified bot dee and gemini changes only not master admin beta tes",
         "version what s new",
         "version overview",
         "technical details bot dee",
+        "bot dee what s new",
+        "gemini what s new",
         "open bot dee",
         "help-botdee-version-smartview-tabs"
       ]
@@ -2314,6 +2322,26 @@
       ]
     },
     {
+      "sourceId": "help:help-patron-account-merge",
+      "id": "help-patron-account-merge",
+      "kind": "help",
+      "label": "Patron account merge",
+      "blurb": "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted unti",
+      "href": "./master-admin.html?from=botdee",
+      "phrases": [
+        "patron account merge",
+        "mslorna and another lorna gmail can be the same person with two auth uids. master admin looks up both accounts previews then merges firestore into one surviving",
+        "merge accounts",
+        "duplicate patron",
+        "same phone",
+        "mslorna",
+        "lorna",
+        "phone unifier",
+        "duplicate records",
+        "help-patron-account-merge"
+      ]
+    },
+    {
       "sourceId": "help:help-prior-travels",
       "id": "help-prior-travels",
       "kind": "help",
@@ -2399,17 +2427,21 @@
       "id": "help-profile-mobile",
       "kind": "help",
       "label": "Mobile",
-      "blurb": "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format so messages can reach you. Incomplete numbers cannot be saved.",
+      "blurb": "Mobile is required. FLOQR uses this number to recognize you — one mobile means one FLOQR account. Country fills the calling code, for example (+1) for the United States. Enter only the rest of your mobile number. We store it in international format (E.164) so SMS and WhatsApp can",
       "href": "./patron-portal.html?from=botdee&tab=profile",
       "phrases": [
         "mobile",
-        "floqr uses this number for sms and whatsapp. country fills the calling code for example 1 for the united states. enter only the rest of your mobile number. we s",
+        "mobile is required. floqr uses this number to recognize you one mobile means one floqr account. country fills the calling code for example 1 for the united stat",
         "phone number",
         "sms",
         "whatsapp",
         "country code",
         "1",
         "calling code",
+        "required phone",
+        "same phone",
+        "duplicate account",
+        "e.164",
         "profile settings",
         "help-profile-mobile"
       ]
@@ -3732,11 +3764,11 @@
       "id": "help-botdee-room-smartview",
       "kind": "help",
       "label": "Room SMARTview",
-      "blurb": "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
+      "blurb": "Type Open Room SMARTview, Start a group chat, or plan a Cancun trip in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
       "href": "./botdee.html",
       "phrases": [
         "room smartview",
-        "type open room smartview or start a group chat in bot dee. confirm then invite mingl friends. joining is not a payment and does not open a shared tab.",
+        "type open room smartview start a group chat or plan a cancun trip in bot dee. confirm then invite mingl friends. joining is not a payment and does not open a sh",
         "start a group chat",
         "open room smartview",
         "create a room",
@@ -3747,6 +3779,10 @@
         "joined bot dee session",
         "confirm room smartview",
         "review bot dee invite",
+        "let s plan our cancun trip",
+        "let s plan a trip to cancun",
+        "plan a cancun trip",
+        "cancun trip with friends",
         "help-botdee-room-smartview"
       ]
     },
@@ -4272,17 +4308,20 @@
       "id": "help-profile-mobile",
       "kind": "help",
       "label": "Mobile",
-      "blurb": "FLOQR uses this number for SMS and WhatsApp. Country fills the calling code, for example (+1) for the United States.",
+      "blurb": "Mobile is required. One mobile means one FLOQR account. Country fills the calling code, for example (+1) for the United States.",
       "href": "./botdee.html",
       "phrases": [
         "mobile",
-        "floqr uses this number for sms and whatsapp. country fills the calling code for example 1 for the united states.",
+        "mobile is required. one mobile means one floqr account. country fills the calling code for example 1 for the united states.",
         "phone number",
         "sms",
         "whatsapp",
         "country code",
         "1",
         "calling code",
+        "required phone",
+        "same phone",
+        "duplicate account",
         "help-profile-mobile"
       ]
     },
