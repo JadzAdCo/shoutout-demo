@@ -247,7 +247,7 @@ test("chat wires Room SMARTview join without charging", () => {
   assert.doesNotMatch(read("functions/botdee-room-smartview.js"), /createBotDeeRoom|botDeeRooms/);
   assert.match(read("functions/botdee-room-live.js"), /botDeeRooms/);
   assert.doesNotMatch(read("functions/botdee-room-live.js"), /charge:\s*true/);
-  assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom/);
+  assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom\b/);
   assert.match(read("botdee-smartview.js"), /confirm room smartview/);
   assert.match(read("botdee.html"), /botdee-room-smartview\.js/);
   assert.equal(room.classifyRoomIntent("confirm room smartview").route, "confirm");
@@ -261,8 +261,13 @@ test("chat wires Room SMARTview join without charging", () => {
   assert.match(session, /persistJoinedRoomId\(uid, null\)/);
   assert.match(read("functions/botdee-room-live.js"), /function leaveRoom/);
   assert.match(read("functions/botdee-room-live.js"), /function endRoom/);
+  assert.match(read("functions/botdee-room-live.js"), /function kickMember/);
   assert.match(session, /ended\.ok/);
   assert.match(session, /roomEndDenied/);
+  assert.match(session, /kickRoom && stored\.joinedRoomId/);
   assert.match(session, /memberUids/);
+  assert.match(session, /roomId: stored\.joinedRoomId/);
   assert.match(read("functions/botdee-room-live.js"), /!== "open"/);
+  const liveCard = room.buildRoomSession("Who is in this room?", {hasActiveRoom: true, roomId: "br_live"});
+  assert.equal(liveCard.smartViews[0].roomId, "br_live");
 });

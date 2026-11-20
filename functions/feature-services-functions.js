@@ -761,5 +761,6 @@ exports.verifyFeatureServiceAuditChain = onCall(CALL_OPTS, async request => {
 
 exports.__featureServiceHelpers = {
   assertFeatureAccess, viewerFor, loadFeature, UNAVAILABLE_MESSAGE,
-  assertAdmin, auditRecord, appendChainedAudit, writeChainedAudit, writeUnchainedAudit, headRef
+  assertAdmin, auditRecord, appendChainedAudit, writeChainedAudit, writeUnchainedAudit, headRef,
+  isAgentClient, auditActorFromRequest
 };

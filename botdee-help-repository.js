@@ -463,10 +463,10 @@
     {
       id: "help-botdee-room-smartview",
       title: "Room SMARTview",
-      body: "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm mints a join link friends can open while signed in. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme.",
+      body: "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme.",
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
-        "group chat bot dee", "talk to bot dee together"
+        "group chat bot dee", "talk to bot dee together", "invite mingl friends"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -511,9 +511,9 @@
     },
     {
       id: "help-botdee-room-smartview-invite",
-      title: "Room SMARTview invite",
-      body: "After you confirm Room SMARTview, share the join link. Named people are not looked up just because you typed a name — FLOQR will not say whether an account exists. Joining is not a payment and does not open a shared tab.",
-      searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation"],
+      title: "Invite Mingl friends",
+      body: "After you confirm Room SMARTview, Invite shows your Mingl friends only. Each invite is bound to that friend and lands in Inbox as Review BOT DEE invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
+      searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation", "invite mingl friends", "review bot dee invite"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
@@ -521,8 +521,8 @@
     },
     {
       id: "help-botdee-room-smartview-join",
-      title: "Join a Room SMARTview",
-      body: "Open a Room SMARTview join link while signed in, or paste it in BOT DEE. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
+      title: "Join a BOT DEE session",
+      body: "Open the Inbox invite while signed in as the Mingl friend it was sent to. Wrong account, expired, or revoked invites refuse. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
       searchPhrases: ["join room smartview", "join this bot dee chat", "can my friends join us"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -532,7 +532,7 @@
     {
       id: "help-botdee-room-smartview-end",
       title: "End Room SMARTview",
-      body: "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats.",
+      body: "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first.",
       searchPhrases: ["end this room", "close room smartview", "end group chat bot dee"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -542,7 +542,7 @@
     {
       id: "help-botdee-room-smartview-tab",
       title: "Room SMARTview shared tab",
-      body: "A shared tab is a later opt-in. Joining the room does not join a tab. Joining a tab does not approve a payment. BOT DEE never takes card numbers. Split-the-bill talk is not a charge.",
+      body: "Opt in first. Then add a line. Close as one payer or split. Only confirming uids are charged, via FloqR Stripe. Joining the room does not join a tab. BOT DEE never takes card numbers. Club POS is later.",
       searchPhrases: ["shared tab", "split the bill", "who is paying room", "pay together bot dee"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -552,7 +552,7 @@
     {
       id: "help-botdee-room-smartview-who-pays",
       title: "Who is paying",
-      body: "Ask Who’s paying in a Room SMARTview to see privacy-filtered opt-in status when tabs ship. Nobody is charged because someone said buy. Card last four stay on the payer’s own receipt.",
+      body: "Ask Who’s paying in a Room SMARTview to see opt-in status. Nobody is charged because someone said buy. Card last four stay on the payer’s own receipt.",
       searchPhrases: ["who's paying", "who is paying", "who pays in the room"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -562,7 +562,7 @@
     {
       id: "help-botdee-room-smartview-kick",
       title: "Remove someone from Room SMARTview",
-      body: "Only a verified host can remove a member, and only after confirm. A model reply cannot kick anyone. There is no live room to change yet.",
+      body: "Only the host can remove a guest. A kicked friend cannot read further room messages. A model reply cannot kick anyone.",
       searchPhrases: ["remove from room", "kick from room smartview", "remove jalen"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -572,7 +572,7 @@
     {
       id: "help-botdee-room-smartview-share",
       title: "Share into Room SMARTview",
-      body: "Share this conversation never copies your private BOT DEE thread. BOT DEE shows a preview of selected shareable facts from this message, marked tentative. You can edit or drop facts. Nothing is published until rooms are live and you approve.",
+      body: "Share this conversation never copies your private BOT DEE thread. BOT DEE shows a preview of selected shareable facts from this message, marked tentative. You can edit or drop facts. Private profiles and SMARTsummary stay out.",
       searchPhrases: ["share this conversation", "share our plans", "share with my friends bot dee"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],

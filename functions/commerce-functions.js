@@ -1188,6 +1188,33 @@ exports.createFloqrConnectOnboardingLink = onCall({
       sectionLabel: label
     };
   }
+  if (type === "botDeeRoomTab") {
+    const roomId = text(payload.roomId, 80);
+    const closeId = text(payload.closeId, 80);
+    if (!roomId || !closeId) throw new HttpsError("invalid-argument", "BOT DEE tab checkout needs roomId and closeId.");
+    const tabSnap = await db.collection("botDeeRoomTabs").doc(roomId).get();
+    if (!tabSnap.exists) throw new HttpsError("not-found", "Shared tab not found.");
+    const tab = tabSnap.data() || {};
+    if (text(tab.closeId, 80) !== closeId) throw new HttpsError("failed-precondition", "This tab checkout expired. Close the tab again.");
+    const amount = Math.max(50, Math.round(Number(tab.closeAmountCents || payload.amountCents || 0)));
+    const venue = text(tab.venueName || payload.venueName || "FLOQR", 80);
+    return {
+      amountCents: amount,
+      unitAmountCents: amount,
+      currency: "usd",
+      quantity: 1,
+      itemName: `BOT DEE shared tab — ${venue}`,
+      description: "FloqR Stripe shared tab for a BOT DEE Mingl session. Receipt stays on the paying account.",
+      floqrShareCents: amount,
+      venueShareCents: 0,
+      paymentModel: "floqr-platform",
+      product: "botDeeRoomTab",
+      roomId,
+      closeId,
+      clubLocationId: text(tab.venueId || payload.venueId, 80),
+      venueName: venue
+    };
+  }
   throw new HttpsError("invalid-argument", "Unsupported FLOQR checkout type.");
 }
 
@@ -1271,7 +1298,8 @@ const CHECKOUT_FEATURE_KEYS = Object.freeze({
   robotaxi: "rydr",
   suprstarRequest: "floqCast",
   suprstrSlot: "floqCast",
-  vipReservation: "vipReservations"
+  vipReservation: "vipReservations",
+  botDeeRoomTab: "botDee"
 });
 
 async function runCreateFloqrCheckoutSession(request) {
@@ -1327,6 +1355,19 @@ async function runCreateFloqrCheckoutSession(request) {
         status:"awaiting_payment",
         updatedAt:admin.firestore.FieldValue.serverTimestamp()
       }, {merge:true});
+    }
+    if (type === "botDeeRoomTab") {
+      await require("./feature-services-functions").__featureServiceHelpers.assertFeatureAccess(request.auth, "mingl", request);
+      const roomId = text(payload.roomId, 80);
+      const closeId = text(payload.closeId, 80);
+      if (!roomId || !closeId) throw new HttpsError("invalid-argument", "BOT DEE tab checkout needs roomId and closeId.");
+      const tabSnap = await db.collection("botDeeRoomTabs").doc(roomId).get();
+      if (!tabSnap.exists) throw new HttpsError("not-found", "Shared tab not found.");
+      const tab = tabSnap.data() || {};
+      if (text(tab.closeId, 80) !== closeId) throw new HttpsError("failed-precondition", "This tab checkout expired. Close the tab again.");
+      if (text(tab.closeUid, 80) !== request.auth.uid) throw new HttpsError("permission-denied", "Only the paying uid can check out this tab.");
+      const opted = Array.isArray(tab.optedInUids) && tab.optedInUids.includes(request.auth.uid);
+      if (!opted) throw new HttpsError("failed-precondition", "Opt in to the shared tab before paying. Nobody is charged without that OK.");
     }
     if (type === "vipReservation") {
       const holdId = text(payload.holdId, 120);
@@ -2628,6 +2669,56 @@ async function finalizePaidOrder(orderId, session) {
       });
     } catch (vipReceiptErr) {
       console.warn("VIP reserV receipt delivery failed", vipReceiptErr?.message || vipReceiptErr);
+    }
+  }
+
+  if (order.orderType === "botDeeRoomTab") {
+    const paidAtIso = formatPaidAt(new Date());
+    const sessionStore = require("./botdee-session-store");
+    await sessionStore.fulfillTabPayment({
+      order: {...order, id: orderId},
+      cardLast4: text(cardFields.cardLast4, 4)
+    });
+    const venue = text(order.venueName || order.itemName, 80);
+    const receipt = {
+      invoiceNumber: text(order.invoiceNumber, 80),
+      orderId,
+      orderType: "botDeeRoomTab",
+      title: text(order.itemName, 160) || `BOT DEE shared tab — ${venue}`,
+      venueName: venue,
+      clubLocationId: text(order.clubLocationId, 80),
+      amountCents: Number(order.amountCents || 0),
+      currency: text(order.currency, 8) || "usd",
+      paymentStatus: "paid",
+      fulfillmentStatus: "botdee-tab-paid",
+      paidAtIso,
+      cardBrand: text(cardFields.cardBrand, 20),
+      cardLast4: text(cardFields.cardLast4, 4),
+      itemName: text(order.itemName, 160)
+    };
+    await ref.set({
+      fulfillmentStatus: "botdee-tab-paid",
+      receipt,
+      receiptStatus: "final",
+      paidAtIso,
+      itemName: receipt.itemName
+    }, {merge: true});
+    try {
+      await deliverServiceReceipt({
+        order: {
+          ...order,
+          customerEmail: session?.customer_details?.email || order.customerEmail || order.ownerEmail || "",
+          ...cardFields
+        },
+        receipt,
+        sendgridApiKey: secretValueSafe(SENDGRID_API_KEY, "SENDGRID_API_KEY"),
+        fromEmail: RECEIPT_FROM_EMAIL,
+        routeToInbox: true,
+        sendEmail: true,
+        portalLink: "./patron-portal.html?tab=feature-orders"
+      });
+    } catch (tabReceiptErr) {
+      console.warn("BOT DEE tab receipt delivery failed", tabReceiptErr?.message || tabReceiptErr);
     }
   }
   await ref.set({stripeFulfillmentComplete:true, fulfilledAt:paidAt, updatedAt:paidAt}, {merge:true});

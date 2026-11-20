@@ -963,7 +963,7 @@
     const visualHero = visual ? `<div class="sv-hero botdee-sv-visual" data-sv-reason="${esc(visual.reasonCode || "neutral-fallback")}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}">
         <img class="sv-bg" src="${esc(visual.backgroundUrl)}" alt="${esc(t("sv.scenicAlt", "Scenic illustration for this room. Not a photograph."))}"/>
       </div>` : "";
-    return `<article class="botdee-sv-room" data-kind="botDeeRoom" data-rs-mode="${esc(view.mode || "")}" data-rs-decline="${esc(view.declineKey || "")}" data-rs-active="${activeRoom ? "1" : "0"}">
+    return `<article class="botdee-sv-room" data-kind="botDeeRoom" data-rs-mode="${esc(view.mode || "")}" data-rs-decline="${esc(view.declineKey || "")}" data-rs-active="${activeRoom ? "1" : "0"}" data-rs-room="${esc(view.roomId || "")}">
       <h2 class="botdee-sv-room-title">${esc(t("botdee.rs.title", "Room SMARTview"))}</h2>
       ${visualHero}
       <div class="botdee-sv-room-head">
@@ -975,7 +975,7 @@
       </div>
       <div class="botdee-sv-room-stats">
         <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.participants", "Participants"))}</span><b>${esc(String(count))} / ${esc(String(cap))}</b><small>${esc(t("botdee.rs.includingHost", "including host"))}</small></div>
-        <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.roomStatus", "Room status"))}</span><b data-rs-status-b>${esc(status)}</b><small>${esc(t("botdee.rs.notLiveNote", "Group rooms are not live yet"))}</small></div>
+        <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.roomStatus", "Room status"))}</span><b data-rs-status-b>${esc(status)}</b><small>${esc(activeRoom ? t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests") : t("botdee.rs.notLiveNote", "Group rooms are not live yet"))}</small></div>
       </div>
       ${denied ? `<p class="botdee-sv-room-note">${esc(t("botdee.rs.injectionDenied", "I can’t use private BOT DEE history or host memory for that. Room SMARTview only uses what this group later confirms."))}</p>` : ""}
       ${renderRoomNeedles(view)}
@@ -987,9 +987,9 @@
       </div>
       <div class="botdee-sv-room-panel" data-rs-panel-body hidden></div>
       <div class="botdee-sv-room-controls">
-        <button type="button" class="botdee-sv-room-btn" data-rs-panel="invite" disabled>${esc(t("botdee.rs.invite", "Invite"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-panel="invite"${activeRoom ? "" : " disabled"}>${esc(t("botdee.rs.invite", "Invite"))}</button>
         <button type="button" class="botdee-sv-room-btn" data-rs-panel="members">${esc(t("botdee.rs.members", "Members"))}</button>
-        <button type="button" class="botdee-sv-room-btn botdee-sv-room-danger" data-rs-end disabled>${esc(t("botdee.rs.endRoom", "End Room"))}</button>
+        <button type="button" class="botdee-sv-room-btn botdee-sv-room-danger" data-rs-end${activeRoom ? "" : " disabled"}>${esc(t("botdee.rs.endRoom", "End Room"))}</button>
       </div>
       ${joinHref ? `<p class="botdee-sv-room-note"><a class="botdee-sv-action" href="${esc(joinHref)}">${esc(t("botdee.rs.joinLink", "Join this Room SMARTview"))}</a></p>` : ""}
       ${confirmable ? `<div class="botdee-sv-room-confirm" data-rs-confirm-row>
@@ -1009,16 +1009,23 @@
       return `<p>${esc(t("botdee.rs.itineraryEmpty", "No shared plans yet"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.privacyNote", "Private BOT DEE messages, other members’ profiles, and SMARTsummary are not included."))}</p>`;
     }
     if (name === "tab") {
-      return `<p>${esc(t("botdee.rs.tabConsent", "Consent required before any charge"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.neverCharge", "No charge without a later personal OK"))}</p>`;
+      return `<p>${esc(t("botdee.rs.tabConsent", "Consent required before any charge"))}</p>
+        <p class="botdee-sv-room-note">${esc(t("botdee.room.tabHelp", "Opt in first. Add a line. Close as one payer or split. Receipts stay on the paying uid. Club POS is later."))}</p>
+        <button type="button" class="botdee-sv-room-btn botdee-sv-room-main" data-rs-tab-optin>${esc(t("botdee.room.optInTab", "Opt in to shared tab"))}</button>
+        <label class="botdee-sv-room-note">${esc(t("botdee.room.lineItem", "Item"))}<input data-rs-tab-item maxlength="80" /></label>
+        <label class="botdee-sv-room-note">${esc(t("botdee.room.lineAmount", "Amount (USD)"))}<input data-rs-tab-amount inputmode="decimal" /></label>
+        <button type="button" class="botdee-sv-room-btn" data-rs-tab-add>${esc(t("botdee.room.addLine", "Add line"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-tab-close-one>${esc(t("botdee.room.payWholeTab", "I'll pay the tab"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-tab-close-split>${esc(t("botdee.room.payMyLines", "Pay my lines"))}</button>`;
     }
     if (name === "permissions") {
-      return `<p>${esc(t("botdee.rs.hostManaged", "Host managed"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.notLiveNote", "Group rooms are not live yet"))}</p>`;
+      return `<p>${esc(t("botdee.rs.hostManaged", "Host managed"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests"))}</p>`;
     }
     if (name === "members") {
-      return `<p>${esc(t("botdee.rs.commandMembers", "There is no active Room SMARTview yet, so there is no member list to show."))}</p>`;
+      return `<p>${esc(t("botdee.room.membersLive", "Members of this BOT DEE session. Display names only — no emails."))}</p><div data-rs-members-list></div>`;
     }
     if (name === "invite") {
-      return `<p>${esc(t("botdee.rs.commandInvite", "Invite more people from Room SMARTview. Group rooms are not live yet — no invite is sent until that ships."))}</p>`;
+      return `<p>${esc(t("botdee.room.commandInvite", "Invite Mingl friends into this BOT DEE session. Not a public link. Cap is host plus 7 guests."))}</p><div data-rs-friend-list>${esc(t("botdee.room.loadingFriends", "Loading Mingl friends…"))}</div>`;
     }
     return "";
   }
@@ -1032,7 +1039,122 @@
       toast.hidden = false;
       toast.textContent = message;
     };
+    const roomIdOf = () => card.getAttribute("data-rs-room") || "";
+    const call = async (name, payload) => {
+      const fn = functionsCallable(name);
+      if (!fn) throw new Error("offline");
+      return (await fn(payload))?.data || {};
+    };
     const panel = card.querySelector("[data-rs-panel-body]");
+    const fillFriends = async () => {
+      const host = panel?.querySelector("[data-rs-friend-list]");
+      if (!host) return;
+      try {
+        const data = await call("listBotDeeRoomFriends", {});
+        const friends = Array.isArray(data.friends) ? data.friends : [];
+        if (!friends.length) {
+          host.textContent = t("botdee.room.noFriends", "No Mingl friends to invite yet.");
+          return;
+        }
+        host.innerHTML = friends.map(row => `<button type="button" class="botdee-sv-room-btn" data-rs-invite-uid="${esc(row.uid)}">${esc(row.displayName || row.handle || t("botdee.room.friend", "Mingl friend"))}</button>`).join("");
+        host.querySelectorAll("[data-rs-invite-uid]").forEach(btn => {
+          btn.addEventListener("click", async event => {
+            event.preventDefault();
+            const roomId = roomIdOf();
+            if (!roomId) {
+              showToast(t("botdee.room.confirmFirst", "Confirm the session first, then invite Mingl friends."));
+              return;
+            }
+            try {
+              await call("createBotDeeRoomInvite", {roomId, targetUid: btn.getAttribute("data-rs-invite-uid")});
+              showToast(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
+            } catch (error) {
+              showToast(error?.message || t("botdee.room.inviteFailed", "Could not send that invite."));
+            }
+          });
+        });
+      } catch (error) {
+        host.textContent = error?.message || t("botdee.room.inviteFailed", "Could not send that invite.");
+      }
+    };
+    const fillMembers = async () => {
+      const host = panel?.querySelector("[data-rs-members-list]");
+      const roomId = roomIdOf();
+      if (!host || !roomId) return;
+      try {
+        const data = await call("getBotDeeRoom", {roomId});
+        const members = Array.isArray(data.members) ? data.members : [];
+        const hostUid = data.room?.hostUid || "";
+        const viewerIsHost = data.viewerIsHost === true;
+        host.innerHTML = members.map(row => {
+          const role = row.uid === hostUid ? t("botdee.room.host", "host") : t("botdee.room.guest", "guest");
+          const kick = viewerIsHost && row.uid && row.uid !== hostUid
+            ? ` <button type="button" class="botdee-sv-room-btn botdee-sv-room-danger" data-rs-kick-uid="${esc(row.uid)}">${esc(t("botdee.room.removeGuest", "Remove"))}</button>`
+            : "";
+          return `<div>${esc(row.displayName || row.handle || row.uid)} · ${esc(role)}${kick}</div>`;
+        }).join("");
+        host.querySelectorAll("[data-rs-kick-uid]").forEach(btn => {
+          btn.addEventListener("click", async event => {
+            event.preventDefault();
+            try {
+              await call("kickBotDeeRoomMember", {roomId, targetUid: btn.getAttribute("data-rs-kick-uid")});
+              showToast(t("botdee.room.kicked", "Guest removed from this session."));
+              fillMembers();
+            } catch (error) {
+              showToast(error?.message || t("botdee.room.kickFailed", "Could not remove that guest."));
+            }
+          });
+        });
+      } catch (_) {
+        host.textContent = t("botdee.room.membersLive", "Members of this BOT DEE session. Display names only — no emails.");
+      }
+    };
+    const bindTabActions = () => {
+      panel?.querySelector("[data-rs-tab-optin]")?.addEventListener("click", async event => {
+        event.preventDefault();
+        try {
+          await call("optInBotDeeRoomTab", {roomId: roomIdOf()});
+          showToast(t("botdee.room.tabOptedIn", "You opted in. Lines can attach to you now. Still no charge until you pay."));
+        } catch (error) {
+          showToast(error?.message || t("botdee.room.tabFailed", "Could not update the shared tab."));
+        }
+      });
+      panel?.querySelector("[data-rs-tab-add]")?.addEventListener("click", async event => {
+        event.preventDefault();
+        const item = panel.querySelector("[data-rs-tab-item]")?.value || "Tab item";
+        const dollars = Number(panel.querySelector("[data-rs-tab-amount]")?.value || 0);
+        try {
+          await call("addBotDeeRoomTabLine", {roomId: roomIdOf(), item, amountCents: Math.round(dollars * 100)});
+          showToast(t("botdee.room.lineAdded", "Line added as proposed. Accept it before checkout."));
+        } catch (error) {
+          showToast(error?.message || t("botdee.room.tabFailed", "Could not update the shared tab."));
+        }
+      });
+      const closeTab = async mode => {
+        try {
+          const plan = await call("closeBotDeeRoomTab", {roomId: roomIdOf(), mode});
+          const checkout = functionsCallable("createFloqrCheckoutSession");
+          if (!checkout) throw new Error("offline");
+          const paid = await checkout({
+            orderType: "botDeeRoomTab",
+            payload: plan.payload || plan
+          });
+          const url = paid?.data?.url || paid?.data?.checkoutUrl;
+          if (url) location.href = url;
+          else showToast(t("botdee.room.checkoutReady", "Checkout is ready on your account only."));
+        } catch (error) {
+          showToast(error?.message || t("botdee.room.tabFailed", "Could not update the shared tab."));
+        }
+      };
+      panel?.querySelector("[data-rs-tab-close-one]")?.addEventListener("click", event => {
+        event.preventDefault();
+        closeTab("one_payer");
+      });
+      panel?.querySelector("[data-rs-tab-close-split]")?.addEventListener("click", event => {
+        event.preventDefault();
+        closeTab("split");
+      });
+    };
     card.querySelectorAll("[data-rs-panel]").forEach(btn => {
       btn.addEventListener("click", event => {
         event.preventDefault();
@@ -1043,6 +1165,9 @@
         panel.hidden = open;
         panel.setAttribute("data-open", open ? "" : name);
         panel.innerHTML = open ? "" : html;
+        if (!open && name === "invite") fillFriends();
+        if (!open && name === "members") fillMembers();
+        if (!open && name === "tab") bindTabActions();
       });
     });
     card.querySelector("[data-rs-confirm]")?.addEventListener("click", event => {
@@ -1058,13 +1183,25 @@
         global.FLOQRBotDeeChat.sendMessage("confirm room smartview");
         return;
       }
-      showToast(t("botdee.rs.confirmedLive", "Room SMARTview is open. Share the join link so friends can talk with BOT DEE here. Joining is not a payment."));
+      showToast(t("botdee.room.confirmedLive", "BOT DEE session is open. Invite Mingl friends from the card. Joining does not charge anyone."));
     });
     card.querySelector("[data-rs-decline]")?.addEventListener("click", event => {
       event.preventDefault();
       rememberRoomDecline(card.getAttribute("data-rs-decline"));
       showToast(t("botdee.rs.declined", "OK — I won’t keep offering Room SMARTview for this."));
       card.querySelector("[data-rs-confirm-row]")?.setAttribute("hidden", "");
+    });
+    card.querySelector("[data-rs-end]")?.addEventListener("click", async event => {
+      event.preventDefault();
+      const roomId = roomIdOf();
+      if (!roomId) return;
+      try {
+        await call("endBotDeeRoom", {roomId});
+        showToast(t("botdee.rs.endedLive", "This Room SMARTview is closed. Private BOT DEE chat continues here."));
+        if (global.FLOQRBotDeeChat?.sendMessage) global.FLOQRBotDeeChat.sendMessage("leave the room");
+      } catch (error) {
+        showToast(error?.message || t("botdee.rs.endNeedsHost", "Only the host can end this Room SMARTview. Say leave the room to leave without closing it."));
+      }
     });
   }
 

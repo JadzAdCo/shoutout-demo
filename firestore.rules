@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// FLOQR FIRESTORE RULES VERSION: s3.3.046-headless-vip-rooms
+// FLOQR FIRESTORE RULES VERSION: s3.3.047-botdee-mingl-session
+// PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.3.046-headless-vip-rooms
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.3.040-smartvisuals
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.2.40-floqr-admin-and-club-owned-tags
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: s3.2.28-club-owned-template-tags
@@ -25,6 +26,7 @@ rules_version = '2';
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.59-diagnostic-cleanup-rules
 // PREVIOUS PACKAGE MARKER RETAINED FOR DIAGNOSTICS: FLOQR FIRESTORE RULES VERSION: v28.57-mingl-diagnostic-rules
 // Last required Firestore rules update added/confirmed:
+// - s3.3.047: BOT DEE Mingl session invites (botDeeRoomMembers/Invites/Tabs/Audit); member-read; invites Functions-only; no IP
 // - s3.3.046: botDeeRooms member-read, Functions-write (Room SMARTview join; no IP; shared tab/charge off)
 // - s3.3.032: usercharacter_analysis signed-in read when publicWithinFloqr==1 and the pair is not blocked (People SMARTcard live listen)
 // - s3.3.021: botDeeThreads.hasUsedBotDee 0|1 is Functions-write (owner read on the thread doc; clients cannot set it)
@@ -837,6 +839,58 @@ service cloud.firestore {
  );
  allow write: if false;
  }
+ match /events/{eventId} {
+ allow read: if signedIn()
+ && exists(/databases/$(database)/documents/botDeeRooms/$(roomId))
+ && (
+ request.auth.uid == get(/databases/$(database)/documents/botDeeRooms/$(roomId)).data.hostUid
+ || request.auth.uid in get(/databases/$(database)/documents/botDeeRooms/$(roomId)).data.memberUids
+ );
+ allow write: if false;
+ }
+ }
+
+ match /botDeeRoomMembers/{memberId} {
+ allow read: if signedIn()
+ && resource.data.uid == request.auth.uid
+ && resource.data.leftAtMs == null;
+ allow write: if false;
+ }
+
+ match /botDeeRoomInvites/{inviteId} {
+ allow read, write: if false;
+ }
+
+ match /botDeeRoomTabs/{roomId} {
+ allow read: if signedIn()
+ && exists(/databases/$(database)/documents/botDeeRooms/$(roomId))
+ && (
+ request.auth.uid == get(/databases/$(database)/documents/botDeeRooms/$(roomId)).data.hostUid
+ || request.auth.uid in get(/databases/$(database)/documents/botDeeRooms/$(roomId)).data.memberUids
+ );
+ allow write: if false;
+ match /lines/{lineId} {
+ allow read: if signedIn()
+ && exists(/databases/$(database)/documents/botDeeRooms/$(roomId))
+ && (
+ request.auth.uid == get(/databases/$(database)/documents/botDeeRooms/$(roomId)).data.hostUid
+ || request.auth.uid in get(/databases/$(database)/documents/botDeeRooms/$(roomId)).data.memberUids
+ );
+ allow write: if false;
+ }
+ }
+
+ match /botDeeRoomAudit/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
+ match /botDeeRoomInviteThrottle/{uid} {
+ allow read, write: if false;
+ }
+
+ match /botDeeRoomTurnThrottle/{roomId} {
+ allow read, write: if false;
  }
 
  match /botDeeExecutions/{executionId} {

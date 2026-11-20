@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.049";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.049";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.050";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.050";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,20 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.050",
+      title: "s3.3.050 — BOT DEE Mingl session invites + shared tab",
+      checks: [
+        {label:"Mingl invite core", file:"functions/botdee-session-core.js", includes:["evaluateInvite", "inviteHref", "minglFriendsOnly", "host plus 7"]},
+        {label:"Session callables", file:"functions/botdee-session-functions.js", includes:["createBotDeeRoomInvite", "acceptBotDeeRoomInvite", "assertFeatureAccess(request.auth, \"mingl\""]},
+        {label:"Join captures room and t", file:"bot-dee-chat.js", includes:["acceptBotDeeRoomInvite", "searchParams.get(\"t\")", "searchParams.get(\"room\")"]},
+        {label:"Inbox Review BOT DEE invite", file:"patron-portal-app.js", includes:["botdeeroominvite", "Review BOT DEE invite"]},
+        {label:"Tab checkout mingl gate", file:"functions/commerce-functions.js", includes:["botDeeRoomTab", "assertFeatureAccess(request.auth, \"mingl\""]},
+        {label:"Invites Functions-only", file:"firestore.rules", includes:["match /botDeeRoomInvites/{inviteId}", "allow read, write: if false;"]},
+        {label:"BOT DEE subset deploys session callables", file:".github/workflows/functions-ci.yml", includes:["createBotDeeRoomInvite", "acceptBotDeeRoomInvite", "createFloqrCheckoutSession"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-050-botdee-mingl-session-invite"]}
+      ]
+    },
     {
       version: "s3.3.049",
       title: "s3.3.049 — Beta Find patron email lookup + Save without Audit hang",
@@ -3520,6 +3534,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-050-botdee-mingl-session-invite",
+      area:"BOT DEE",
+      feature:"Mingl friends invite into a BOT DEE session + shared tab",
+      changed:"s3.3.050 — Confirm Room SMARTview opens a Mingl-friends-only session (host plus 7 guests). Invite picker is Mingl connections, not a public join link. Inbox type botDeeRoomInvite → Review BOT DEE invite. Guests can invite. Shared tab is opt-in then FloqR Stripe split/one payer. Beta Mingl + BOT DEE gates.",
+      howToTest:"1) After Pages + Functions + rules deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js ?v=s3.3.050. Sign in with BOT DEE + Mingl (beta if test). 2) Say Open Room SMARTview → Confirm. Invite is enabled; no public join URL. 3) Invite a Mingl friend — they get Inbox Review BOT DEE invite. Wrong account opening botdee.html?room=&t= refuses. 4) Friend joins while signed in as that account — they see the shared card; private BOT DEE history is not copied. 5) Guest can Invite another Mingl friend until 8 people. Host End closes the room. 6) Shared tab: Opt in → add a line → I'll pay the tab opens Stripe on that uid only. Other members do not see card last4. 7) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Mingl-only invites, cap 8, guests can invite, join is not a payment, tab opt-in required, receipts on payer only. Beta gates hide the path when Mingl/BOT DEE is off.",
+      troubleshoot:"Invite still a public ?join= link → cached botdee-smartview.js / Functions not this SHA (acceptInvite). Inbox says Open Related ShoutOut → cached patron-portal-app.js inboxLinkLabel. Wrong account joins → token not bound to targetUid. Tab charges without opt-in → stop; canAttachLine must refuse. last4 on another member → publicTabLine leak. Functions deny mingl → Features & Services Mingl still test/off for that account. 404 on createBotDeeRoomInvite → BOT DEE subset list missing session names; redeploy from origin/main with [firebase-deploy-botdee]."
+    },
     {
       id:"s3-3-049-lorna-mingl-beta-save",
       area:"Master Admin",

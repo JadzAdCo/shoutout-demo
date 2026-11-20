@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.049 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.050 (stable)
 
+- s3.3.050: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab
 - s3.3.049: Beta Find patron by email; tester Save no longer waits on Audit Trail
 - s3.3.048: Save busy ignores unrelated writes and reason-prompt logs
 - s3.3.047: Gray Save after command received; Features SMARTview first slice on Master Admin BOT DEE SMARTviews

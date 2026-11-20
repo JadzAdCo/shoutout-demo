@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.049";
+  const VERSION = "s3.3.050";
   const packs = {
     "ru": {
       "help-smartvisuals-notification": {
@@ -59,35 +59,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat. Confirm ينشئ رابط انضمام للأصدقاء المسجّلين. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً. BOT DEE لا يأخذ أرقام البطاقات أبداً. الرسائل الخاصة تبقى خاصة. Site Chrome يتبع Appearance."
+        body: "В чате BOT DEE скажите Open Room SMARTview или Start a group chat. Confirm открывает сессию. Приглашайте только друзей Mingl — хост плюс 7 гостей. Гости тоже могут приглашать. Вход — не платёж и не общий счёт. BOT DEE никогда не берёт номера карт. Личные сообщения остаются личными. Site Chrome следует Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "دعوة Room SMARTview",
-        body: "بعد Confirm شارك رابط Room SMARTview. الأسماء لا تُبحث فقط لأنك كتبتها — FLOQR لن يقول إن كان الحساب موجوداً. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً."
+        title: "Пригласить друзей Mingl",
+        body: "После Confirm кнопка Invite показывает только друзей Mingl. Каждое приглашение привязано к другу и приходит в Inbox как Review BOT DEE invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги."
       },
       "help-botdee-room-smartview-join": {
-        title: "الانضمام إلى Room SMARTview",
-        body: "افتح رابط Room SMARTview وأنت مسجّل الدخول، أو الصقه في BOT DEE. الانضمام إلى room ليس انضماماً إلى حساب مشترك ولا يوافق على دفع. BOT DEE لا يأخذ أرقام البطاقات أبداً."
+        title: "Войти в сессию BOT DEE",
+        body: "Откройте приглашение Inbox, войдя как друг Mingl, которому оно отправлено. Чужой аккаунт, срок и отзыв отказывают. Вход в room — не вход в общий счёт и не согласие на оплату. BOT DEE никогда не берёт номера карт."
       },
       "help-botdee-room-smartview-end": {
-        title: "إنهاء Room SMARTview",
-        body: "المضيف فقط يمكنه إنهاء room وبعد التأكيد فقط. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة."
+        title: "Завершить Room SMARTview",
+        body: "Только хост может завершить room. Завершение никого не списывает и не стирает чужие личные чаты. Неоплаченный общий счёт нужно оплатить или аннулировать сначала."
       },
       "help-botdee-room-smartview-tab": {
         title: "Общий счёт Room SMARTview",
-        body: "Общий счёт — это поздний opt-in. Вход в room не вход в счёт. Вход в счёт не одобряет платёж. BOT DEE никогда не берёт номера карт. Разговор о разделении счёта — не списание."
+        body: "Сначала opt-in. Затем добавьте строку. Закройте одним плательщиком или раздельно. Списывают только подтвердившие uid через FloqR Stripe. Вход в room — не вход в счёт. BOT DEE никогда не берёт номера карт. Club POS позже."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "Кто платит",
-        body: "Спросите Who’s paying в Room SMARTview, чтобы позже увидеть отфильтрованный opt-in. Никого не списывают потому, что кто-то сказал купить. Последние четыре карты остаются на квитанции плательщика."
+        body: "Спросите Who’s paying в Room SMARTview, чтобы увидеть opt-in. Никого не списывают потому, что кто-то сказал купить. Последние четыре карты остаются на квитанции плательщика."
       },
       "help-botdee-room-smartview-kick": {
         title: "Удалить из Room SMARTview",
-        body: "Только проверенный хост может удалить участника и только после подтверждения. Ответ модели никого не исключает. Пока нет живой room для изменения."
+        body: "Только хост может удалить гостя. Удалённый друг не читает дальнейшие сообщения room. Ответ модели никого не исключает."
       },
       "help-botdee-room-smartview-share": {
         title: "Поделиться в Room SMARTview",
-        body: "Share this conversation никогда не копирует ваш личный тред BOT DEE. BOT DEE показывает предпросмотр выбранных фактов из этого сообщения, помеченных как предварительные. Можно править или убрать факты. Ничего не публикуется, пока room не в эфире и вы не одобрите."
+        body: "Share this conversation никогда не копирует ваш личный тред BOT DEE. BOT DEE показывает предпросмотр выбранных фактов из этого сообщения, помеченных как предварительные. Можно править или убрать факты. Профили и SMARTsummary остаются вне room."
       },
       "help-botdee-smartview-review": {
         title: "Проверить и исправить SMARTsummary",
@@ -561,35 +561,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Zeg in de BOT DEE-chat Open Room SMARTview of Start a group chat. Er opent een Room SMARTview-kaart in dezelfde bubble. Bevestig voordat er iets wordt aangemaakt. Privé-BOT DEE-berichten blijven privé. Groepsrooms, uitnodigingen en een gedeelde rekening zijn nog niet live — Bevestigen maakt geen room, stuurt geen uitnodiging en belast niemand. Site Chrome volgt je Appearance-thema."
+        body: "Zeg in BOT DEE-chat Open Room SMARTview of Start a group chat. Confirm opent een sessie. Nodig alleen Mingl-vrienden uit — host plus 7 gasten. Gasten mogen ook uitnodigen. Deelnemen is geen betaling en opent geen gedeelde tab. BOT DEE neemt nooit kaartnummers. Privéberichten blijven privé. Site Chrome volgt Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "Room SMARTview-uitnodiging",
-        body: "Nodig anderen uit via Room SMARTview na bevestiging. Genoemde personen worden niet opgezocht alleen omdat je een naam typte — FLOQR zegt niet of een account bestaat. Verkeerd account, geblokkeerd en niet-vrienden worden geweigerd wanneer groepsrooms komen. Vandaag wordt niets verstuurd; groepsrooms zijn niet live."
+        title: "Mingl-vrienden uitnodigen",
+        body: "Na Confirm toont Invite alleen je Mingl-vrienden. Elke uitnodiging is gebonden aan die vriend en landt in Inbox als Review BOT DEE invite. Geen openbare join-link. Cap is host plus 7. Gasten kunnen meer Mingl-vrienden uitnodigen tot de host dat uitzet. Deelnemen is geen betaling."
       },
       "help-botdee-room-smartview-join": {
-        title: "Deelnemen aan een Room SMARTview",
-        body: "Deelnemen aan een Room SMARTview is niet hetzelfde als een gedeelde rekening joinen of een betaling goedkeuren. Wanneer rooms komen, log je in en accepteer je een gebonden uitnodiging. Een link openen laat je niet automatisch joinen."
+        title: "Deelnemen aan een BOT DEE-sessie",
+        body: "Open de Inbox-uitnodiging terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Verkeerd account, verlopen of ingetrokken weigert. Deelnemen aan de room is niet deelnemen aan een tab en keurt geen betaling goed. BOT DEE neemt nooit kaartnummers."
       },
       "help-botdee-room-smartview-end": {
         title: "Room SMARTview beëindigen",
-        body: "Alleen de host kan een room beëindigen, en alleen na bevestiging. Beëindigen belast niemand en wist geen privéchats van anderen. Er is nog geen live room om te sluiten."
+        body: "Alleen de host kan een room beëindigen. Beëindigen belast niemand en wist andermans privéchats niet. Een onbetaalde gedeelde tab moet eerst betaald of geannuleerd."
       },
       "help-botdee-room-smartview-tab": {
-        title: "Gedeelde rekening Room SMARTview",
-        body: "Een gedeelde rekening is later opt-in. De room joinen is geen rekening joinen. Een rekening joinen keurt geen betaling goed. BOT DEE neemt nooit kaartnummers. Over de rekening splitsen praten is geen afschrijving."
+        title: "Gedeelde tab Room SMARTview",
+        body: "Eerst opt-in. Voeg dan een regel toe. Sluit als één betaler of splits. Alleen bevestigende uids worden belast via FloqR Stripe. Deelnemen aan de room is niet deelnemen aan een tab. BOT DEE neemt nooit kaartnummers. Club POS komt later."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "Wie betaalt",
-        body: "Vraag Who’s paying in een Room SMARTview om later de gefilterde opt-in-status te zien. Niemand wordt belast omdat iemand koop zei. De laatste vier van de kaart blijven op het eigen receipt van de betaler."
+        body: "Vraag Who’s paying in een Room SMARTview om opt-in te zien. Niemand wordt belast omdat iemand buy zei. De laatste vier van de kaart blijven op het ontvangstbewijs van de betaler."
       },
       "help-botdee-room-smartview-kick": {
         title: "Iemand uit Room SMARTview verwijderen",
-        body: "Alleen een geverifieerde host kan een lid verwijderen, en alleen na bevestiging. Een modelantwoord kan niemand kicken. Er is nog geen live room om te wijzigen."
+        body: "Alleen de host kan een gast verwijderen. Een verwijderde vriend leest geen verdere roomberichten. Een modelantwoord kan niemand kicken."
       },
       "help-botdee-room-smartview-share": {
         title: "Delen in Room SMARTview",
-        body: "Share this conversation kopieert nooit je privé-BOT DEE-thread. BOT DEE toont een voorbeeld van geselecteerde deelbare feiten uit dit bericht, gemarkeerd als voorlopig. Je kunt feiten bewerken of weglaten. Niets wordt gepubliceerd tot rooms live zijn en jij goedkeurt."
+        body: "Share this conversation kopieert nooit je privé BOT DEE-thread. BOT DEE toont een voorbeeld van geselecteerde deelbare feiten uit dit bericht, gemarkeerd als voorlopig. Je kunt feiten bewerken of weglaten. Profielen en SMARTsummary blijven buiten de room."
       },
       "help-botdee-smartview-review": {
         title: "SMARTsummary controleren en corrigeren",
@@ -1063,35 +1063,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Dans le chat BOT DEE, dites Open Room SMARTview ou Start a group chat. Une carte Room SMARTview s’ouvre dans la même bulle. Confirmez avant toute création. Les messages BOT DEE privés restent privés. Les rooms de groupe, invitations et addition partagée ne sont pas encore en ligne — Confirmer ne crée pas de room, n’envoie pas d’invitation et ne facture personne. Site Chrome suit votre thème Appearance."
+        body: "Dans le chat BOT DEE, dites Open Room SMARTview ou Start a group chat. Confirm ouvre une session. Invitez uniquement des amis Mingl — hôte plus 7 invités. Les invités peuvent aussi inviter. Rejoindre n’est pas un paiement et n’ouvre pas d’addition partagée. BOT DEE ne prend jamais de numéros de carte. Les messages privés restent privés. Site Chrome suit Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "Invitation Room SMARTview",
-        body: "Invitez d’autres personnes depuis Room SMARTview après confirmation. Les personnes nommées ne sont pas recherchées juste parce que vous avez tapé un nom — FLOQR ne dira pas si un compte existe. Les invitations mauvais compte, bloquées et non-amis refuseront quand les rooms de groupe arriveront. Rien n’est envoyé aujourd’hui ; les rooms de groupe ne sont pas en ligne."
+        title: "Inviter des amis Mingl",
+        body: "Après Confirm, Invite n’affiche que vos amis Mingl. Chaque invitation est liée à cet ami et arrive dans Inbox comme Review BOT DEE invite. Ce n’est pas un lien public. Capacité : hôte plus 7. Les invités peuvent inviter d’autres amis Mingl sauf si l’hôte désactive cela. Rejoindre n’est pas un paiement."
       },
       "help-botdee-room-smartview-join": {
-        title: "Rejoindre un Room SMARTview",
-        body: "Rejoindre un Room SMARTview n’est pas la même chose que rejoindre une addition partagée ou approuver un paiement. Quand les rooms arriveront, vous vous connecterez et acceptez une invitation liée. Ouvrir un lien ne vous fait pas rejoindre automatiquement."
+        title: "Rejoindre une session BOT DEE",
+        body: "Ouvrez l’invitation Inbox en étant connecté comme l’ami Mingl destinataire. Mauvais compte, expiration ou révocation refuse. Rejoindre la room n’est pas rejoindre une addition et n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte."
       },
       "help-botdee-room-smartview-end": {
         title: "Terminer Room SMARTview",
-        body: "Seul l’hôte peut terminer une room, et seulement après confirmation. Terminer ne facture personne et n’efface pas les chats privés des autres. Il n’y a pas encore de room en ligne à fermer."
+        body: "Seul l’hôte peut terminer une room. Terminer ne débite personne et n’efface pas les chats privés des autres. Une addition impayée doit d’abord être payée ou annulée."
       },
       "help-botdee-room-smartview-tab": {
         title: "Addition partagée Room SMARTview",
-        body: "Une addition partagée est un opt-in plus tard. Rejoindre la room ne rejoint pas une addition. Rejoindre une addition n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte. Parler de partager l’addition n’est pas une facturation."
+        body: "D’abord l’opt-in. Puis ajoutez une ligne. Fermez en un payeur ou en partage. Seuls les uid qui confirment sont débités via FloqR Stripe. Rejoindre la room n’est pas rejoindre l’addition. BOT DEE ne prend jamais de numéros de carte. Club POS plus tard."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "Qui paie",
-        body: "Demandez Who’s paying dans un Room SMARTview pour voir plus tard le statut d’opt-in filtré. Personne n’est facturé parce que quelqu’un a dit acheter. Les quatre derniers de la carte restent sur le reçu du payeur."
+        body: "Demandez Who’s paying dans Room SMARTview pour voir l’opt-in. Personne n’est débité parce que quelqu’un a dit buy. Les quatre derniers chiffres restent sur le reçu du payeur."
       },
       "help-botdee-room-smartview-kick": {
         title: "Retirer quelqu’un de Room SMARTview",
-        body: "Seul un hôte vérifié peut retirer un membre, et seulement après confirmation. Une réponse du modèle ne peut expulser personne. Il n’y a pas encore de room en ligne à modifier."
+        body: "Seul l’hôte peut retirer un invité. Un ami retiré ne lit plus les messages de la room. Une réponse du modèle ne peut exclure personne."
       },
       "help-botdee-room-smartview-share": {
         title: "Partager dans Room SMARTview",
-        body: "Share this conversation ne copie jamais votre fil BOT DEE privé. BOT DEE montre un aperçu de faits partageables sélectionnés de ce message, marqués provisoires. Vous pouvez modifier ou retirer des faits. Rien n’est publié tant que les rooms ne sont pas en ligne et que vous n’approuvez pas."
+        body: "Share this conversation ne copie jamais votre fil BOT DEE privé. BOT DEE montre un aperçu de faits partageables de ce message, marqués provisoires. Vous pouvez modifier ou retirer des faits. Profils et SMARTsummary restent hors de la room."
       },
       "help-botdee-smartview-review": {
         title: "Relire et corriger un SMARTsummary",
@@ -1565,35 +1565,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Im BOT DEE-Chat sagen Sie Open Room SMARTview oder Start a group chat. Eine Room-SMARTview-Karte öffnet sich in derselben Blase. Bestätigen Sie, bevor etwas erstellt wird. Private BOT DEE-Nachrichten bleiben privat. Gruppen-Rooms, Einladungen und eine geteilte Rechnung sind noch nicht live — Bestätigen erstellt keinen Room, sendet keine Einladung und belastet niemanden. Site Chrome folgt Ihrem Appearance-Thema."
+        body: "Sage im BOT DEE-Chat Open Room SMARTview oder Start a group chat. Confirm öffnet eine Sitzung. Lade nur Mingl-Freunde ein — Gastgeber plus 7 Gäste. Gäste dürfen auch einladen. Beitreten ist keine Zahlung und öffnet keinen gemeinsamen Tab. BOT DEE nimmt niemals Kartennummern. Private Nachrichten bleiben privat. Site Chrome folgt Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "Room SMARTview-Einladung",
-        body: "Laden Sie andere aus Room SMARTview ein, nachdem Sie bestätigt haben. Genannte Personen werden nicht allein durch den Namen nachgeschlagen — FLOQR sagt nicht, ob ein Konto existiert. Falsches Konto, Blockierte und Nicht-Freunde werden abgelehnt, wenn Gruppen-Rooms kommen. Heute wird nichts gesendet; Gruppen-Rooms sind nicht live."
+        title: "Mingl-Freunde einladen",
+        body: "Nach Confirm zeigt Invite nur deine Mingl-Freunde. Jede Einladung ist an diesen Freund gebunden und landet in Inbox als Review BOT DEE invite. Kein öffentlicher Join-Link. Maximum Gastgeber plus 7. Gäste können weitere Mingl-Freunde einladen, bis der Gastgeber das abschaltet. Beitreten ist keine Zahlung."
       },
       "help-botdee-room-smartview-join": {
-        title: "Einem Room SMARTview beitreten",
-        body: "Einem Room SMARTview beizutreten ist nicht dasselbe wie einer geteilten Rechnung beizutreten oder eine Zahlung zu genehmigen. Wenn Rooms kommen, melden Sie sich an und nehmen eine gebundene Einladung an. Ein Link beitritt Sie nicht automatisch."
+        title: "Einer BOT DEE-Sitzung beitreten",
+        body: "Öffne die Inbox-Einladung, angemeldet als der Mingl-Freund, dem sie gilt. Falsches Konto, Ablauf oder Widerruf lehnt ab. Der Room ist nicht der Tab und genehmigt keine Zahlung. BOT DEE nimmt niemals Kartennummern."
       },
       "help-botdee-room-smartview-end": {
         title: "Room SMARTview beenden",
-        body: "Nur der Host kann einen Room beenden, und nur nach Bestätigung. Beenden belastet niemanden und löscht keine privaten Chats anderer. Es gibt noch keinen Live-Room zum Schließen."
+        body: "Nur der Gastgeber kann eine Room beenden. Beenden belastet niemanden und löscht fremde private Chats nicht. Ein unbezahlter Tab muss zuerst bezahlt oder storniert werden."
       },
       "help-botdee-room-smartview-tab": {
-        title: "Geteilte Rechnung in Room SMARTview",
-        body: "Eine geteilte Rechnung ist späteres Opt-in. Dem Room beizutreten tritt keiner Rechnung bei. Einer Rechnung beizutreten genehmigt keine Zahlung. BOT DEE nimmt nie Kartennummern. Über die Rechnung teilen zu sprechen ist keine Belastung."
+        title: "Gemeinsamer Tab Room SMARTview",
+        body: "Zuerst zustimmen. Dann eine Zeile hinzufügen. Als ein Zahler oder geteilt schließen. Nur bestätigende uids werden über FloqR Stripe belastet. Dem Room beitreten heißt nicht dem Tab beitreten. BOT DEE nimmt niemals Kartennummern. Club POS kommt später."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "Wer zahlt",
-        body: "Fragen Sie Who’s paying in einem Room SMARTview, um später den gefilterten Opt-in-Status zu sehen. Niemand wird belastet, weil jemand „kaufen“ gesagt hat. Die letzten vier der Karte bleiben auf der eigenen Quittung des Zahlers."
+        body: "Frage Who’s paying in Room SMARTview, um den Opt-in zu sehen. Niemand wird belastet, weil jemand buy gesagt hat. Die letzten vier der Karte bleiben auf dem Beleg des Zahlers."
       },
       "help-botdee-room-smartview-kick": {
         title: "Jemanden aus Room SMARTview entfernen",
-        body: "Nur ein geprüfter Host kann ein Mitglied entfernen, und nur nach Bestätigung. Eine Modell-Antwort kann niemanden kicken. Es gibt noch keinen Live-Room zum Ändern."
+        body: "Nur der Gastgeber kann einen Gast entfernen. Ein entfernter Freund liest keine weiteren Raumnachrichten. Eine Modellantwort kann niemanden kicken."
       },
       "help-botdee-room-smartview-share": {
         title: "In Room SMARTview teilen",
-        body: "Share this conversation kopiert nie Ihren privaten BOT DEE-Thread. BOT DEE zeigt eine Vorschau ausgewählter teilbarer Fakten aus dieser Nachricht, als vorläufig markiert. Sie können Fakten bearbeiten oder streichen. Nichts wird veröffentlicht, bis Rooms live sind und Sie zustimmen."
+        body: "Share this conversation kopiert niemals deinen privaten BOT DEE-Thread. BOT DEE zeigt eine Vorschau ausgewählter teilbarer Fakten aus dieser Nachricht, als vorläufig markiert. Du kannst Fakten bearbeiten oder streichen. Profile und SMARTsummary bleiben draußen."
       },
       "help-botdee-smartview-review": {
         title: "SMARTsummary prüfen und korrigieren",
@@ -2067,35 +2067,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "En el chat de BOT DEE, diga Open Room SMARTview o Start a group chat. Se abre una tarjeta Room SMARTview en la misma burbuja. Confirme antes de crear nada. Los mensajes privados de BOT DEE siguen privados. Las rooms de grupo, invitaciones y cuenta compartida aún no están en vivo: Confirmar no crea una room, no envía invitación ni cobra. Site Chrome sigue su tema de Appearance."
+        body: "En el chat BOT DEE di Open Room SMARTview o Start a group chat. Confirm abre una sesión. Invita solo amigos Mingl — anfitrión más 7 invitados. Los invitados también pueden invitar. Unirse no es un pago y no abre una cuenta compartida. BOT DEE nunca toma números de tarjeta. Los mensajes privados siguen privados. Site Chrome sigue Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "Invitación Room SMARTview",
-        body: "Invite a otros desde Room SMARTview después de confirmar. Las personas nombradas no se buscan solo por escribir un nombre: FLOQR no dirá si existe una cuenta. Invitaciones de cuenta incorrecta, bloqueadas y no amigas se rechazarán cuando lleguen las rooms de grupo. Hoy no se envía nada; las rooms de grupo no están en vivo."
+        title: "Invitar amigos Mingl",
+        body: "Tras Confirm, Invite muestra solo tus amigos Mingl. Cada invitación está ligada a ese amigo y llega a Inbox como Review BOT DEE invite. No es un enlace público. Cupo: anfitrión más 7. Los invitados pueden invitar más amigos Mingl salvo que el anfitrión lo desactive. Unirse no es un pago."
       },
       "help-botdee-room-smartview-join": {
-        title: "Unirse a un Room SMARTview",
-        body: "Unirse a un Room SMARTview no es lo mismo que unirse a una cuenta compartida o aprobar un pago. Cuando lleguen las rooms, iniciará sesión y aceptará una invitación vinculada. Abrir un enlace no le une automáticamente."
+        title: "Unirse a una sesión BOT DEE",
+        body: "Abre la invitación de Inbox iniciado sesión como el amigo Mingl destinatario. Cuenta incorrecta, caducada o revocada se niega. Unirse a la room no es unirse a una cuenta ni aprobar un pago. BOT DEE nunca toma números de tarjeta."
       },
       "help-botdee-room-smartview-end": {
         title: "Terminar Room SMARTview",
-        body: "Solo el anfitrión puede terminar una room, y solo tras confirmar. Terminar no cobra a nadie ni borra chats privados de otros. Aún no hay room en vivo que cerrar."
+        body: "Solo el anfitrión puede terminar una room. Terminar no cobra a nadie ni borra chats privados de otros. Una cuenta impagada debe pagarse o anularse primero."
       },
       "help-botdee-room-smartview-tab": {
         title: "Cuenta compartida Room SMARTview",
-        body: "Una cuenta compartida es un opt-in posterior. Unirse a la room no une a una cuenta. Unirse a una cuenta no aprueba un pago. BOT DEE nunca toma números de tarjeta. Hablar de dividir la cuenta no es un cargo."
+        body: "Primero el opt-in. Luego añade una línea. Cierra con un pagador o dividido. Solo se cobra a los uid que confirman, vía FloqR Stripe. Unirse a la room no es unirse a la cuenta. BOT DEE nunca toma números de tarjeta. Club POS más adelante."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "Quién paga",
-        body: "Pregunte Who’s paying en un Room SMARTview para ver más adelante el estado de opt-in filtrado. Nadie se cobra porque alguien dijo comprar. Los cuatro últimos de la tarjeta quedan en el recibo del pagador."
+        body: "Pregunta Who’s paying en Room SMARTview para ver el opt-in. Nadie se cobra porque alguien dijo buy. Los últimos cuatro de la tarjeta quedan en el recibo del pagador."
       },
       "help-botdee-room-smartview-kick": {
         title: "Quitar a alguien de Room SMARTview",
-        body: "Solo un anfitrión verificado puede quitar a un miembro, y solo tras confirmar. Una respuesta del modelo no puede expulsar a nadie. Aún no hay room en vivo que cambiar."
+        body: "Solo el anfitrión puede quitar a un invitado. Un amigo expulsado no lee más mensajes de la room. Una respuesta del modelo no puede expulsar a nadie."
       },
       "help-botdee-room-smartview-share": {
         title: "Compartir en Room SMARTview",
-        body: "Share this conversation nunca copia su hilo privado de BOT DEE. BOT DEE muestra una vista previa de hechos compartibles de este mensaje, marcados como provisionales. Puede editar o quitar hechos. Nada se publica hasta que las rooms estén en vivo y usted apruebe."
+        body: "Share this conversation nunca copia tu hilo privado de BOT DEE. BOT DEE muestra una vista previa de hechos compartibles de este mensaje, marcados como provisionales. Puedes editar o quitar hechos. Perfiles y SMARTsummary quedan fuera de la room."
       },
       "help-botdee-smartview-review": {
         title: "Revisar y corregir un SMARTsummary",
@@ -2569,35 +2569,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Nella chat BOT DEE, di’ Open Room SMARTview o Start a group chat. Si apre una scheda Room SMARTview nella stessa bolla. Conferma prima di creare qualcosa. I messaggi BOT DEE privati restano privati. Room di gruppo, inviti e conto condiviso non sono ancora live — Conferma non crea una room, non invia un invito e non addebita nessuno. Site Chrome segue il tema Appearance."
+        body: "Nella chat BOT DEE di’ Open Room SMARTview o Start a group chat. Confirm apre una sessione. Invita solo amici Mingl — host più 7 ospiti. Anche gli ospiti possono invitare. Entrare non è un pagamento e non apre un conto condiviso. BOT DEE non prende mai numeri di carta. I messaggi privati restano privati. Site Chrome segue Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "Invito Room SMARTview",
-        body: "Invita altri da Room SMARTview dopo la conferma. Le persone nominate non vengono cercate solo perché hai digitato un nome — FLOQR non dirà se un account esiste. Inviti account sbagliato, bloccati e non amici saranno rifiutati quando arriveranno le room di gruppo. Oggi non viene inviato nulla; le room di gruppo non sono live."
+        title: "Invita amici Mingl",
+        body: "Dopo Confirm, Invite mostra solo i tuoi amici Mingl. Ogni invito è legato a quell’amico e arriva in Inbox come Review BOT DEE invite. Non è un link pubblico. Capienza: host più 7. Gli ospiti possono invitare altri amici Mingl finché l’host non lo disattiva. Entrare non è un pagamento."
       },
       "help-botdee-room-smartview-join": {
-        title: "Unirsi a un Room SMARTview",
-        body: "Unirsi a un Room SMARTview non è come unirsi a un conto condiviso o approvare un pagamento. Quando arriveranno le room, accederai e accetterai un invito vincolato. Aprire un link non ti unisce automaticamente."
+        title: "Unisciti a una sessione BOT DEE",
+        body: "Apri l’invito Inbox autenticato come l’amico Mingl destinatario. Account sbagliato, scaduto o revocato rifiuta. Entrare nella room non è entrare in un conto e non approva un pagamento. BOT DEE non prende mai numeri di carta."
       },
       "help-botdee-room-smartview-end": {
         title: "Termina Room SMARTview",
-        body: "Solo l’host può terminare una room, e solo dopo conferma. Terminare non addebita nessuno e non cancella le chat private altrui. Non c’è ancora una room live da chiudere."
+        body: "Solo l’host può terminare una room. Terminare non addebita nessuno e non cancella le chat private altrui. Un conto non pagato va prima pagato o annullato."
       },
       "help-botdee-room-smartview-tab": {
         title: "Conto condiviso Room SMARTview",
-        body: "Un conto condiviso è un opt-in successivo. Unirsi alla room non unisce a un conto. Unirsi a un conto non approva un pagamento. BOT DEE non prende mai numeri di carta. Parlare di dividere il conto non è un addebito."
+        body: "Prima l’opt-in. Poi aggiungi una riga. Chiudi con un pagatore o diviso. Solo gli uid che confermano vengono addebitati via FloqR Stripe. Entrare nella room non è entrare nel conto. BOT DEE non prende mai numeri di carta. Club POS più avanti."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "Chi paga",
-        body: "Chiedi Who’s paying in un Room SMARTview per vedere in seguito lo stato opt-in filtrato. Nessuno viene addebitato perché qualcuno ha detto compra. Le ultime quattro della carta restano sulla ricevuta del pagatore."
+        body: "Chiedi Who’s paying in Room SMARTview per vedere l’opt-in. Nessuno viene addebitato perché qualcuno ha detto buy. Le ultime quattro della carta restano sulla ricevuta del pagatore."
       },
       "help-botdee-room-smartview-kick": {
-        title: "Rimuovere qualcuno da Room SMARTview",
-        body: "Solo un host verificato può rimuovere un membro, e solo dopo conferma. Una risposta del modello non può espellere nessuno. Non c’è ancora una room live da modificare."
+        title: "Rimuovi qualcuno da Room SMARTview",
+        body: "Solo l’host può rimuovere un ospite. Un amico rimosso non legge altri messaggi della room. Una risposta del modello non può espellere nessuno."
       },
       "help-botdee-room-smartview-share": {
         title: "Condividi in Room SMARTview",
-        body: "Share this conversation non copia mai il tuo thread BOT DEE privato. BOT DEE mostra un’anteprima di fatti condivisibili da questo messaggio, contrassegnati come provvisori. Puoi modificare o togliere fatti. Nulla viene pubblicato finché le room non sono live e tu approvi."
+        body: "Share this conversation non copia mai il tuo thread BOT DEE privato. BOT DEE mostra un’anteprima di fatti condivisibili da questo messaggio, contrassegnati come provvisori. Puoi modificare o togliere fatti. Profili e SMARTsummary restano fuori dalla room."
       },
       "help-botdee-smartview-review": {
         title: "Rivedi e correggi lo SMARTsummary",
@@ -3071,35 +3071,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "No chat BOT DEE, diga Open Room SMARTview ou Start a group chat. Um cartão Room SMARTview abre no mesmo balão. Confirme antes de criar qualquer coisa. As mensagens privadas do BOT DEE ficam privadas. Rooms de grupo, convites e conta partilhada ainda não estão ativos — Confirmar não cria room, não envia convite nem cobra. Site Chrome segue o tema Appearance."
+        body: "No chat BOT DEE diga Open Room SMARTview ou Start a group chat. Confirm abre uma sessão. Convide só amigos Mingl — anfitrião mais 7 convidados. Convidados também podem convidar. Entrar não é pagamento e não abre conta partilhada. BOT DEE nunca pega números de cartão. Mensagens privadas ficam privadas. Site Chrome segue Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "Convite Room SMARTview",
-        body: "Convide outros a partir do Room SMARTview depois de confirmar. Pessoas nomeadas não são procuradas só porque digitou um nome — a FLOQR não dirá se existe uma conta. Convites de conta errada, bloqueados e não amigos recusarão quando as rooms de grupo chegarem. Nada é enviado hoje; as rooms de grupo não estão ativas."
+        title: "Convidar amigos Mingl",
+        body: "Depois de Confirm, Invite mostra só os seus amigos Mingl. Cada convite fica ligado a esse amigo e chega ao Inbox como Review BOT DEE invite. Não é um link público. Limite: anfitrião mais 7. Convidados podem convidar mais amigos Mingl até o anfitrião desligar isso. Entrar não é pagamento."
       },
       "help-botdee-room-smartview-join": {
-        title: "Entrar num Room SMARTview",
-        body: "Entrar num Room SMARTview não é o mesmo que entrar numa conta partilhada ou aprovar um pagamento. Quando as rooms chegarem, iniciará sessão e aceitará um convite vinculado. Abrir um link não o junta automaticamente."
+        title: "Entrar numa sessão BOT DEE",
+        body: "Abra o convite do Inbox autenticado como o amigo Mingl destinatário. Conta errada, expirado ou revogado recusa. Entrar na room não é entrar numa conta nem aprovar um pagamento. BOT DEE nunca pega números de cartão."
       },
       "help-botdee-room-smartview-end": {
         title: "Terminar Room SMARTview",
-        body: "Só o anfitrião pode terminar uma room, e só após confirmar. Terminar não cobra ninguém nem apaga chats privados de outros. Ainda não há room ativa para fechar."
+        body: "Só o anfitrião pode terminar uma room. Terminar não cobra ninguém nem apaga chats privados de outros. Uma conta por pagar deve ser paga ou anulada primeiro."
       },
       "help-botdee-room-smartview-tab": {
         title: "Conta partilhada Room SMARTview",
-        body: "Uma conta partilhada é um opt-in posterior. Entrar na room não entra numa conta. Entrar numa conta não aprova um pagamento. O BOT DEE nunca pede números de cartão. Falar em dividir a conta não é uma cobrança."
+        body: "Primeiro o opt-in. Depois adicione uma linha. Feche com um pagador ou dividido. Só uid que confirmam são cobrados via FloqR Stripe. Entrar na room não é entrar na conta. BOT DEE nunca pega números de cartão. Club POS mais tarde."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "Quem paga",
-        body: "Pergunte Who’s paying num Room SMARTview para ver mais tarde o estado de opt-in filtrado. Ninguém é cobrado porque alguém disse comprar. Os últimos quatro do cartão ficam no recibo do pagador."
+        body: "Pergunte Who’s paying em Room SMARTview para ver o opt-in. Ninguém é cobrado porque alguém disse buy. Os últimos quatro do cartão ficam no recibo do pagador."
       },
       "help-botdee-room-smartview-kick": {
-        title: "Remover alguém do Room SMARTview",
-        body: "Só um anfitrião verificado pode remover um membro, e só após confirmar. Uma resposta do modelo não pode expulsar ninguém. Ainda não há room ativa para alterar."
+        title: "Remover alguém de Room SMARTview",
+        body: "Só o anfitrião pode remover um convidado. Um amigo removido não lê mais mensagens da room. Uma resposta do modelo não pode expulsar ninguém."
       },
       "help-botdee-room-smartview-share": {
-        title: "Partilhar no Room SMARTview",
-        body: "Share this conversation nunca copia o seu fio privado do BOT DEE. O BOT DEE mostra uma pré-visualização de factos partilháveis desta mensagem, marcados como provisórios. Pode editar ou retirar factos. Nada é publicado até as rooms estarem ativas e você aprovar."
+        title: "Partilhar em Room SMARTview",
+        body: "Share this conversation nunca copia o seu tópico privado BOT DEE. BOT DEE mostra uma pré-visualização de factos partilháveis desta mensagem, marcados como provisórios. Pode editar ou retirar factos. Perfis e SMARTsummary ficam fora da room."
       },
       "help-botdee-smartview-review": {
         title: "Rever e corrigir o SMARTsummary",
@@ -3573,35 +3573,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Στη συνομιλία BOT DEE πείτε Open Room SMARTview ή Start a group chat. Ανοίγει κάρτα Room SMARTview στην ίδια φυσαλίδα. Επιβεβαιώστε πριν δημιουργηθεί οτιδήποτε. Τα ιδιωτικά μηνύματα BOT DEE μένουν ιδιωτικά. Ομαδικές room, προσκλήσεις και κοινός λογαριασμός δεν είναι ακόμα live — η Επιβεβαίωση δεν δημιουργεί room, δεν στέλνει πρόσκληση και δεν χρεώνει κανέναν. Το Site Chrome ακολουθεί το θέμα Appearance."
+        body: "Στη συνομιλία BOT DEE πείτε Open Room SMARTview ή Start a group chat. Confirm ανοίγει συνεδρία. Προσκαλέστε μόνο φίλους Mingl — οικοδεσπότης συν 7 επισκέπτες. Οι επισκέπτες μπορούν επίσης να προσκαλούν. Η συμμετοχή δεν είναι πληρωμή και δεν ανοίγει κοινό λογαριασμό. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Τα ιδιωτικά μηνύματα μένουν ιδιωτικά. Το Site Chrome ακολουθεί Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "Πρόσκληση Room SMARTview",
-        body: "Προσκαλέστε άλλους από το Room SMARTview μετά την επιβεβαίωση. Τα ονόματα δεν αναζητούνται μόνο επειδή τα πληκτρολογήσατε — η FLOQR δεν θα πει αν υπάρχει λογαριασμός. Λάθος λογαριασμός, αποκλεισμένοι και μη φίλοι θα απορρίπτονται όταν έρθουν οι ομαδικές room. Σήμερα δεν στέλνεται τίποτα· οι ομαδικές room δεν είναι live."
+        title: "Πρόσκληση φίλων Mingl",
+        body: "Μετά το Confirm, το Invite δείχνει μόνο τους φίλους Mingl. Κάθε πρόσκληση δεσμεύεται σε αυτόν τον φίλο και φτάνει στο Inbox ως Review BOT DEE invite. Όχι δημόσιος σύνδεσμος. Όριο: οικοδεσπότης συν 7. Οι επισκέπτες μπορούν να προσκαλούν περισσότερους φίλους Mingl μέχρι ο οικοδεσπότης να το κλείσει. Η συμμετοχή δεν είναι πληρωμή."
       },
       "help-botdee-room-smartview-join": {
-        title: "Είσοδος σε Room SMARTview",
-        body: "Η είσοδος σε Room SMARTview δεν είναι είσοδος σε κοινό λογαριασμό ούτε έγκριση πληρωμής. Όταν έρθουν οι room, θα συνδεθείτε και θα αποδεχτείτε δεσμευμένη πρόσκληση. Το άνοιγμα συνδέσμου δεν σας βάζει αυτόματα."
+        title: "Συμμετοχή σε συνεδρία BOT DEE",
+        body: "Ανοίξτε την πρόσκληση Inbox συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Λάθος λογαριασμός, λήξη ή ανάκληση αρνείται. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό ούτε έγκριση πληρωμής. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών."
       },
       "help-botdee-room-smartview-end": {
         title: "Τέλος Room SMARTview",
-        body: "Μόνο ο host μπορεί να τελειώσει μια room, και μόνο μετά από επιβεβαίωση. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Δεν υπάρχει ακόμα live room για κλείσιμο."
+        body: "Μόνο ο οικοδεσπότης μπορεί να τερματίσει μια room. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Ένας απλήρωτος κοινός λογαριασμός πρέπει πρώτα να πληρωθεί ή να ακυρωθεί."
       },
       "help-botdee-room-smartview-tab": {
         title: "Κοινός λογαριασμός Room SMARTview",
-        body: "Ο κοινός λογαριασμός είναι μεταγενέστερο opt-in. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό. Η είσοδος σε λογαριασμό δεν εγκρίνει πληρωμή. Το BOT DEE δεν παίρνει ποτέ αριθμούς κάρτας. Η συζήτηση για μοίρασμα λογαριασμού δεν είναι χρέωση."
+        body: "Πρώτα opt-in. Μετά προσθέστε γραμμή. Κλείστε με έναν πληρωτή ή μοιρασμένα. Χρεώνονται μόνο uid που επιβεβαιώνουν, μέσω FloqR Stripe. Η είσοδος στη room δεν είναι είσοδος στον λογαριασμό. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Club POS αργότερα."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "Ποιος πληρώνει",
-        body: "Ρωτήστε Who’s paying σε Room SMARTview για να δείτε αργότερα φιλτραρισμένη κατάσταση opt-in. Κανείς δεν χρεώνεται επειδή κάποιος είπε αγόρασε. Τα τελευταία τέσσερα της κάρτας μένουν στην απόδειξη του πληρωτή."
+        body: "Ρωτήστε Who’s paying σε Room SMARTview για να δείτε το opt-in. Κανείς δεν χρεώνεται επειδή κάποιος είπε buy. Τα τελευταία τέσσερα της κάρτας μένουν στην απόδειξη του πληρωτή."
       },
       "help-botdee-room-smartview-kick": {
         title: "Αφαίρεση από Room SMARTview",
-        body: "Μόνο επαληθευμένος host μπορεί να αφαιρέσει μέλος, και μόνο μετά από επιβεβαίωση. Απάντηση μοντέλου δεν μπορεί να διώξει κανέναν. Δεν υπάρχει ακόμα live room για αλλαγή."
+        body: "Μόνο ο οικοδεσπότης αφαιρεί επισκέπτη. Ένας απομακρυσμένος φίλος δεν διαβάζει άλλα μηνύματα room. Απάντηση μοντέλου δεν αποκλείει κανέναν."
       },
       "help-botdee-room-smartview-share": {
-        title: "Κοινοποίηση στο Room SMARTview",
-        body: "Το Share this conversation δεν αντιγράφει ποτέ το ιδιωτικό νήμα BOT DEE. Το BOT DEE δείχνει προεπισκόπηση επιλεγμένων στοιχείων από αυτό το μήνυμα, ως προσωρινά. Μπορείτε να επεξεργαστείτε ή να αφαιρέσετε στοιχεία. Τίποτα δεν δημοσιεύεται μέχρι να είναι live οι room και να εγκρίνετε."
+        title: "Κοινοποίηση σε Room SMARTview",
+        body: "Το Share this conversation δεν αντιγράφει ποτέ το ιδιωτικό νήμα BOT DEE. Το BOT DEE δείχνει προεπισκόπηση επιλεγμένων κοινοποιήσιμων στοιχείων από αυτό το μήνυμα, ως προσωρινά. Μπορείτε να επεξεργαστείτε ή να αφαιρέσετε στοιχεία. Προφίλ και SMARTsummary μένουν έξω από τη room."
       },
       "help-botdee-smartview-review": {
         title: "Έλεγχος και διόρθωση SMARTsummary",
@@ -4075,35 +4075,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "W czacie BOT DEE powiedz Open Room SMARTview lub Start a group chat. Karta Room SMARTview otworzy się w tej samej dymku. Potwierdź, zanim cokolwiek powstanie. Prywatne wiadomości BOT DEE zostają prywatne. Roomy grupowe, zaproszenia i wspólny rachunek nie są jeszcze na żywo — Potwierdź nie tworzy room, nie wysyła zaproszenia i nikogo nie obciąża. Site Chrome idzie za motywem Appearance."
+        body: "W czacie BOT DEE powiedz Open Room SMARTview lub Start a group chat. Confirm otwiera sesję. Zaproś tylko znajomych Mingl — gospodarz plus 7 gości. Goście też mogą zapraszać. Dołączenie nie jest płatnością i nie otwiera wspólnego rachunku. BOT DEE nigdy nie bierze numerów kart. Prywatne wiadomości zostają prywatne. Site Chrome idzie za Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "Zaproszenie Room SMARTview",
-        body: "Zaproś innych z Room SMARTview po potwierdzeniu. Osoby nazwane nie są wyszukiwane tylko dlatego, że wpisano imię — FLOQR nie powie, czy konto istnieje. Złe konto, blokada i nie-znajomi odmówią, gdy pojawią się roomy grupowe. Dziś nic nie jest wysyłane; roomy grupowe nie są na żywo."
+        title: "Zaproś znajomych Mingl",
+        body: "Po Confirm Invite pokazuje tylko Twoich znajomych Mingl. Każde zaproszenie jest powiązane z tym znajomym i trafia do Inbox jako Review BOT DEE invite. To nie jest publiczny link. Limit: gospodarz plus 7. Goście mogą zapraszać więcej znajomych Mingl, dopóki gospodarz tego nie wyłączy. Dołączenie nie jest płatnością."
       },
       "help-botdee-room-smartview-join": {
-        title: "Dołącz do Room SMARTview",
-        body: "Dołączenie do Room SMARTview to nie to samo co dołączenie do wspólnego rachunku ani zgoda na płatność. Gdy pojawią się roomy, zalogujesz się i przyjmiesz powiązane zaproszenie. Otwarcie linku samo Cię nie dodaje."
+        title: "Dołącz do sesji BOT DEE",
+        body: "Otwórz zaproszenie Inbox zalogowany jako znajomy Mingl, do którego je wysłano. Złe konto, wygaśnięcie lub odwołanie odmawia. Dołączenie do room to nie dołączenie do rachunku ani zgoda na płatność. BOT DEE nigdy nie bierze numerów kart."
       },
       "help-botdee-room-smartview-end": {
         title: "Zakończ Room SMARTview",
-        body: "Tylko host może zakończyć room i tylko po potwierdzeniu. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nie ma jeszcze live room do zamknięcia."
+        body: "Tylko gospodarz może zakończyć room. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nieopłacony wspólny rachunek trzeba najpierw zapłacić lub unieważnić."
       },
       "help-botdee-room-smartview-tab": {
         title: "Wspólny rachunek Room SMARTview",
-        body: "Wspólny rachunek to późniejszy opt-in. Dołączenie do room to nie dołączenie do rachunku. Dołączenie do rachunku nie zatwierdza płatności. BOT DEE nigdy nie bierze numerów kart. Rozmowa o podziale rachunku to nie opłata."
+        body: "Najpierw opt-in. Potem dodaj pozycję. Zamknij jednym płatnikiem lub podziel. Obciążani są tylko potwierdzający uid przez FloqR Stripe. Dołączenie do room to nie dołączenie do rachunku. BOT DEE nigdy nie bierze numerów kart. Club POS później."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "Kto płaci",
-        body: "Zapytaj Who’s paying w Room SMARTview, by później zobaczyć odfiltrowany status opt-in. Nikt nie jest obciążany, bo ktoś powiedział kup. Ostatnie cztery karty zostają na paragonie płatnika."
+        body: "Zapytaj Who’s paying w Room SMARTview, by zobaczyć opt-in. Nikt nie jest obciążany, bo ktoś powiedział buy. Ostatnie cztery karty zostają na paragonie płatnika."
       },
       "help-botdee-room-smartview-kick": {
         title: "Usuń kogoś z Room SMARTview",
-        body: "Tylko zweryfikowany host może usunąć członka i tylko po potwierdzeniu. Odpowiedź modelu nikogo nie wyrzuca. Nie ma jeszcze live room do zmiany."
+        body: "Tylko gospodarz może usunąć gościa. Usunięty znajomy nie czyta dalszych wiadomości room. Odpowiedź modelu nikogo nie wyrzuca."
       },
       "help-botdee-room-smartview-share": {
         title: "Udostępnij w Room SMARTview",
-        body: "Share this conversation nigdy nie kopiuje Twojego prywatnego wątku BOT DEE. BOT DEE pokazuje podgląd wybranych faktów z tej wiadomości, oznaczonych jako wstępne. Możesz edytować lub odrzucić fakty. Nic nie jest publikowane, dopóki roomy nie będą na żywo i nie zatwierdzisz."
+        body: "Share this conversation nigdy nie kopiuje Twojego prywatnego wątku BOT DEE. BOT DEE pokazuje podgląd wybranych faktów z tej wiadomości, oznaczonych jako wstępne. Możesz edytować lub odrzucić fakty. Profile i SMARTsummary zostają poza room."
       },
       "help-botdee-smartview-review": {
         title: "Przejrzyj i popraw SMARTsummary",
@@ -4577,35 +4577,35 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "في دردشة BOT DEE قل Open Room SMARTview أو Start a group chat. تُفتح بطاقة Room SMARTview في نفس الفقاعة. أكّد قبل إنشاء أي شيء. رسائل BOT DEE الخاصة تبقى خاصة. غرف المجموعة والدعوات والفاتورة المشتركة ليست مباشرة بعد — التأكيد لا ينشئ room ولا يرسل دعوة ولا يحصّل أحداً. يتبع Site Chrome مظهر Appearance."
+        body: "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat. Confirm يفتح جلسة. ادعُ أصدقاء Mingl فقط — المضيف مع 7 ضيوف. يمكن للضيوف الدعوة أيضاً. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً. BOT DEE لا يأخذ أرقام البطاقات أبداً. الرسائل الخاصة تبقى خاصة. Site Chrome يتبع Appearance."
       },
       "help-botdee-room-smartview-invite": {
-        title: "دعوة Room SMARTview",
-        body: "ادعُ الآخرين من Room SMARTview بعد التأكيد. لا يُبحث عن الأسماء لمجرد كتابتها — لن تقول FLOQR إن كان الحساب موجوداً. دعوات الحساب الخطأ والمحظورين وغير الأصدقاء ستُرفض عندما تصل غرف المجموعة. لا يُرسل شيء اليوم؛ غرف المجموعة ليست مباشرة."
+        title: "دعوة أصدقاء Mingl",
+        body: "بعد Confirm يعرض Invite أصدقاء Mingl فقط. كل دعوة مربوطة بذلك الصديق وتصل Inbox كـ Review BOT DEE invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً."
       },
       "help-botdee-room-smartview-join": {
-        title: "الانضمام إلى Room SMARTview",
-        body: "الانضمام إلى Room SMARTview ليس الانضمام إلى فاتورة مشتركة ولا اعتماد دفعة. عندما تصل الغرف ستسجّل الدخول وتقبل دعوة مربوطة. فتح رابط لا يضمّك تلقائياً."
+        title: "الانضمام إلى جلسة BOT DEE",
+        body: "افتح دعوة Inbox وأنت مسجّل كصديق Mingl المُرسَل إليه. الحساب الخطأ أو المنتهية أو الملغاة تُرفض. الانضمام إلى room ليس انضماماً إلى حساب مشترك ولا موافقة على دفع. BOT DEE لا يأخذ أرقام البطاقات أبداً."
       },
       "help-botdee-room-smartview-end": {
         title: "إنهاء Room SMARTview",
-        body: "المضيف وحده يمكنه إنهاء room وبعد التأكيد فقط. الإنهاء لا يحصّل أحداً ولا يمسح دردشات الآخرين الخاصة. لا توجد room مباشرة للإغلاق بعد."
+        body: "المضيف فقط يمكنه إنهاء room. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة. يجب دفع الحساب المشترك غير المدفوع أو إلغاؤه أولاً."
       },
       "help-botdee-room-smartview-tab": {
-        title: "فاتورة Room SMARTview المشتركة",
-        body: "الفاتورة المشتركة اشتراك لاحق. الانضمام إلى الـ room ليس انضماماً إلى فاتورة. الانضمام إلى فاتورة لا يعتمد دفعاً. BOT DEE لا يأخذ أرقام بطاقات أبداً. حديث تقسيم الفاتورة ليس تحصيلاً."
+        title: "الحساب المشترك Room SMARTview",
+        body: "أولاً الموافقة. ثم أضف بنداً. أغلق بدافع واحد أو مقسّم. يُخصم فقط من الحسابات المؤكِّدة عبر FloqR Stripe. الانضمام إلى room ليس انضماماً إلى الحساب. BOT DEE لا يأخذ أرقام البطاقات أبداً. Club POS لاحقاً."
       },
       "help-botdee-room-smartview-who-pays": {
         title: "من يدفع",
-        body: "اسأل Who’s paying في Room SMARTview لرؤية حالة الاشتراك المصفاة لاحقاً. لا يُحصَّل أحد لأن شخصاً قال اشترِ. آخر أربعة أرقام للبطاقة تبقى في إيصال الدافع فقط."
+        body: "اسأل Who’s paying في Room SMARTview لرؤية حالة الموافقة. لا يُخصم أحد لأن شخصاً قال buy. آخر أربعة أرقام تبقى على إيصال الدافع."
       },
       "help-botdee-room-smartview-kick": {
         title: "إزالة شخص من Room SMARTview",
-        body: "المضيف الموثّق وحده يمكنه إزالة عضو وبعد التأكيد فقط. رد النموذج لا يطرد أحداً. لا توجد room مباشرة للتغيير بعد."
+        body: "المضيف فقط يخرج ضيفاً. الصديق المُزال لا يقرأ رسائل الـ room بعدها. رد النموذج لا يطرد أحداً."
       },
       "help-botdee-room-smartview-share": {
         title: "المشاركة في Room SMARTview",
-        body: "Share this conversation لا ينسخ أبداً خيط BOT DEE الخاص. يعرض BOT DEE معاينة لحقائق قابلة للمشاركة من هذه الرسالة، وسمها مؤقت. يمكنك تعديل الحقائق أو حذفها. لا يُنشر شيء حتى تصبح الغرف مباشرة وتوافق."
+        body: "Share this conversation لا ينسخ محادثتك الخاصة في BOT DEE أبداً. يعرض BOT DEE معاينة حقائق قابلة للمشاركة من هذه الرسالة، معلَّمة مؤقتة. يمكنك تعديل الحقائق أو حذفها. الملفات الشخصية وSMARTsummary تبقى خارج الـ room."
       },
       "help-botdee-smartview-review": {
         title: "مراجعة وتصحيح SMARTsummary",
