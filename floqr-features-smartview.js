@@ -226,13 +226,13 @@
   }
 
   function journeyHtml(rows) {
-    const order = ["concept", "planned", "in_development", "beta", "released", "deprecated", "retired"];
+    const api = core();
+    const order = api.STATUS_STEPS || [api.STATUS_TESTING, api.STATUS_BETA, api.STATUS_IN_DEVELOPMENT];
     return `<ol class="floqr-fsv-journey floqr-fsv-journey-wide">
       ${order.map(step => {
-        const hits = rows.filter(row => row.lifecycle === step);
-        const label = t("fsv.lifecycle." + step, core().LIFECYCLE_LABELS[step]);
+        const hits = rows.filter(row => row.lifecycleLabel === step);
         return `<li>
-          <strong>${esc(label)}</strong>
+          <strong>${esc(badgeText(step))}</strong>
           ${hits.length ? hits.map(row => `<span class="floqr-fsv-badge ${badgeClass(row.lifecycleLabel)}">${esc(row.title)} · ${esc(badgeText(row.lifecycleLabel))}</span>`).join(" ") : `<span class="floqr-fsv-note">${esc(t("fsv.dateNotVerified", "Not verified"))}</span>`}
         </li>`;
       }).join("")}
@@ -260,9 +260,9 @@
     let rows = api.filterFeatures(proj.features, {
       view: st.view === "overview" ? "all" : st.view,
       productId: st.productId,
-      q: st.q
+      q: st.q,
+      lifecycle: st.lifecycle
     });
-    if (st.lifecycle) rows = rows.filter(row => row.lifecycle === st.lifecycle);
     const open = rows.find(row => row.id === st.featureId) || proj.features.find(row => row.id === st.featureId);
     const overviewCards = st.view === "overview"
       ? (product ? rows.slice(0, 6) : proj.products.map(prod => {
@@ -289,8 +289,8 @@
       <label class="visually-hidden" for="fsvLifecycle">${esc(t("fsv.filterLifecycle", "Lifecycle"))}</label>
       <select id="fsvLifecycle">
         <option value="">${esc(t("fsv.filterAll", "All statuses"))}</option>
-        ${["concept","planned","in_development","beta","released","deprecated","retired"].map(step =>
-          `<option value="${step}"${st.lifecycle === step ? " selected" : ""}>${esc(t("fsv.lifecycle." + step, api.LIFECYCLE_LABELS[step]))}</option>`
+        ${(api.STATUS_STEPS || [api.STATUS_TESTING, api.STATUS_BETA, api.STATUS_IN_DEVELOPMENT]).map(step =>
+          `<option value="${step}"${st.lifecycle === step ? " selected" : ""}>${esc(badgeText(step))}</option>`
         ).join("")}
       </select>
     </form>` : "";

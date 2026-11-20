@@ -173,10 +173,11 @@ test("BOT DEE retrieval cites catalog records and admits uncertainty", () => {
   assert.equal(vip.admitUncertainty, true);
   const cinema = core.retrieve(catalog, "What is coming to Si-nema?", {});
   assert.equal(cinema.view, "comingSoon");
-  assert.ok(cinema.features.some(row => row.id === "si-nema.ai-movie"));
+  assert.equal(cinema.productName, "Si-nema");
   cinema.features.forEach(row => {
-    assert.notEqual(row.lifecycle, "released");
+    assert.equal(row.lifecycleLabel, "In development");
   });
+  assert.ok(!cinema.features.some(row => row.id === "si-nema.ai-movie"));
   const rydr = core.buildSmartView(catalog, "What can RydR do?", {role: "patron"});
   assert.equal(rydr.handled, true);
   assert.equal(rydr.smartViews[0].productName, "RydR");
@@ -190,6 +191,44 @@ test("BOT DEE retrieval cites catalog records and admits uncertainty", () => {
   assert.equal(core.isFeaturesSmartViewPrompt("Ver"), false);
   assert.equal(core.isFeaturesSmartViewPrompt("Open Room SMARTview"), false);
   assert.equal(core.isFeaturesSmartViewPrompt("plan a Cancun trip"), false);
+});
+
+test("catalog-wide Features replies do not invent a FLOQR platform status", () => {
+  ["Features SMARTview", "What's new", "all features", "feature journey"].forEach(prompt => {
+    const pack = core.buildSmartView(catalog, prompt, {role: "patron"});
+    assert.equal(pack.handled, true, prompt);
+    assert.equal(pack.smartViews[0].productId, "", prompt);
+    assert.doesNotMatch(pack.reply, /FLOQR is /);
+    assert.doesNotMatch(pack.reply, /\b\w+ is (Testing|Beta|In development)\./);
+  });
+  const mingl = core.buildSmartView(catalog, "What can Mingl do?", {role: "patron"});
+  assert.match(mingl.reply, /Mingl is Beta/);
+});
+
+test("Coming Soon, Beta filter, and journey columns follow flag badges", () => {
+  const pub = core.publicProjection(catalog, {role: "patron"});
+  const soon = core.filterFeatures(pub.features, {view: "comingSoon"});
+  assert.ok(soon.length > 0);
+  soon.forEach(row => {
+    assert.equal(row.lifecycleLabel, "In development", row.id);
+  });
+  assert.ok(soon.some(row => row.productId === "shoutout"));
+  assert.ok(soon.some(row => row.productId === "si-tube"));
+  assert.ok(!soon.some(row => row.productId === "mingl"));
+  assert.ok(!soon.some(row => row.productId === "rydr"));
+  assert.ok(!soon.some(row => row.productId === "floqcast"));
+  assert.ok(!soon.some(row => row.productId === "vip-reserv"));
+  assert.ok(!soon.some(row => row.productId === "si-nema"));
+  const beta = core.filterFeatures(pub.features, {view: "all", lifecycle: "Beta"});
+  assert.ok(beta.length > 0);
+  beta.forEach(row => assert.equal(row.lifecycleLabel, "Beta", row.id));
+  assert.ok(beta.some(row => row.productId === "mingl"));
+  assert.ok(beta.some(row => row.productId === "rydr"));
+  assert.ok(beta.some(row => row.productId === "floqcast"));
+  assert.ok(!beta.some(row => row.productId === "shoutout"));
+  const testing = core.filterFeatures(pub.features, {view: "all", lifecycle: "Testing"});
+  testing.forEach(row => assert.equal(row.lifecycleLabel, "Testing", row.id));
+  assert.ok(testing.some(row => row.productId === "bot-dee"));
 });
 
 test("Try feature stays off without authorization and availability", () => {
@@ -354,6 +393,45 @@ test("Mingl What's New card stays product-scoped and All Features lists Mingl ro
   assert.match(host.innerHTML, /Room SMARTview collaboration/);
   assert.doesNotMatch(host.innerHTML, /No catalog features match/);
   assert.doesNotMatch(host.innerHTML, /ShoutOut/);
+});
+
+test("All Features dropdown and Feature Journey use Testing, Beta, In development", async () => {
+  const sandbox = loadUiSandbox();
+  const host = fakeHost();
+  await sandbox.FLOQRFeaturesSmartView.mount(host, {view: "all"});
+  assert.match(host.innerHTML, /option value="Testing"/);
+  assert.match(host.innerHTML, /option value="Beta"/);
+  assert.match(host.innerHTML, /option value="In development"/);
+  assert.doesNotMatch(host.innerHTML, /option value="in_development"/);
+  assert.doesNotMatch(host.innerHTML, /option value="concept"/);
+  host.setAttribute("data-fsv-lifecycle", "Beta");
+  sandbox.FLOQRFeaturesSmartView.mountPayload(host, {
+    schemaVersion: catalog.schemaVersion,
+    warning: catalog.warning,
+    products: catalog.products,
+    features: catalog.features,
+    view: "all",
+    productId: ""
+  });
+  assert.match(host.innerHTML, /Mutual connections and chat/);
+  assert.match(host.innerHTML, /Venue pickup request/);
+  assert.match(host.innerHTML, /Live phone to display2/);
+  assert.doesNotMatch(host.innerHTML, /Venue ShoutOut display/);
+  host.setAttribute("data-fsv-lifecycle", "");
+  host.setAttribute("data-fsv-view", "journey");
+  sandbox.FLOQRFeaturesSmartView.mountPayload(host, {
+    schemaVersion: catalog.schemaVersion,
+    warning: catalog.warning,
+    products: catalog.products,
+    features: catalog.features,
+    view: "journey",
+    productId: ""
+  });
+  assert.match(host.innerHTML, /<strong>Testing<\/strong>/);
+  assert.match(host.innerHTML, /<strong>Beta<\/strong>/);
+  assert.match(host.innerHTML, /<strong>In development<\/strong>/);
+  assert.doesNotMatch(host.innerHTML, /<strong>Concept<\/strong>/);
+  assert.doesNotMatch(host.innerHTML, /<strong>Planned<\/strong>/);
 });
 
 test("scoped catalog rows are projected once so verified release fields survive", async () => {

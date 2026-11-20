@@ -37,6 +37,7 @@
   const STATUS_TESTING = "Testing";
   const STATUS_BETA = "Beta";
   const STATUS_IN_DEVELOPMENT = "In development";
+  const STATUS_STEPS = Object.freeze([STATUS_TESTING, STATUS_BETA, STATUS_IN_DEVELOPMENT]);
   const DATE_NOT_VERIFIED = "Not verified";
   const PACKAGED_FEATURE_FLAGS = Object.freeze({
     botDee: Object.freeze({IsFeatureEnabled: 1, IsTestFeature: 1}),
@@ -387,14 +388,18 @@
     const needle = normalizePrompt(query.q || "");
     return (features || []).filter(row => {
       if (productId && row.productId !== productId) return false;
+      if (query.lifecycle && row.lifecycleLabel !== query.lifecycle) return false;
       if (view === "whatsNew") {
         return row.publicCopyApproved && row.lifecycle === "released" && row.releaseDateVerified;
       }
       if (view === "comingSoon") {
-        return row.lifecycle === "concept" || row.lifecycle === "planned" || row.lifecycle === "in_development";
+        return row.lifecycleLabel === STATUS_IN_DEVELOPMENT;
       }
       if (view === "past") {
-        return row.lifecycle === "deprecated" || row.lifecycle === "retired";
+        return row.lifecycleLabel === LIFECYCLE_LABELS.deprecated
+          || row.lifecycleLabel === LIFECYCLE_LABELS.retired
+          || row.lifecycle === "deprecated"
+          || row.lifecycle === "retired";
       }
       if (needle) {
         const hay = normalizePrompt([
@@ -436,14 +441,25 @@
 
   function buildSmartView(catalog, prompt, accessRaw) {
     const payload = retrieve(catalog, prompt, accessRaw);
-    const productName = payload.productName || "FLOQR";
-    const flags = flagsForProductId(payload.productId, accessRaw);
-    const status = flagStatusLabel(flags.IsFeatureEnabled, flags.IsTestFeature);
-    let reply = payload.admitUncertainty
-      ? productName + " is " + status + ". Dates are not verified. I will not treat a plan as shipped."
-      : "Here is the published Features SMARTview for " + productName + ".";
+    const productName = payload.productId ? (payload.productName || productDisplayName(payload.productId)) : "";
+    const named = !!productName;
+    let reply;
     if (!payload.features.length && payload.view === "whatsNew") {
-      reply = "What's New lists only approved, verified releases. None are published for " + (productName || "this product") + " yet.";
+      reply = named
+        ? "What's New lists only approved, verified releases. None are published for " + productName + " yet."
+        : "What's New lists only approved, verified releases. None are published yet.";
+    } else if (payload.admitUncertainty) {
+      if (named) {
+        const flags = flagsForProductId(payload.productId, accessRaw);
+        const status = flagStatusLabel(flags.IsFeatureEnabled, flags.IsTestFeature);
+        reply = productName + " is " + status + ". Dates are not verified. I will not treat a plan as shipped.";
+      } else {
+        reply = "Dates are not verified. Status is Testing, Beta, or In development from Features & Services flags. I will not treat a plan as shipped.";
+      }
+    } else {
+      reply = named
+        ? "Here is the published Features SMARTview for " + productName + "."
+        : "Here is the published Features SMARTview.";
     }
     return {
       handled: true,
@@ -522,6 +538,7 @@
     STATUS_TESTING,
     STATUS_BETA,
     STATUS_IN_DEVELOPMENT,
+    STATUS_STEPS,
     DATE_NOT_VERIFIED,
     PACKAGED_FEATURE_FLAGS,
     VIEWS,
