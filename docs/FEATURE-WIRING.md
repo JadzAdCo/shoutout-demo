@@ -1049,6 +1049,16 @@ When adding a section, use this skeleton:
 
 Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** · **6 Si-nema**. Hidden until Features & Services: **Mingl** (`#minglBtnCard` chrome photo tile, `data-floqr-chrome-icon="mingl"`), BartR, RydR. Mingl face: v3 clean vector `images/chrome/mingl-svg/logos/mingl-color-master.svg` → transparent PNGs + `mingl-*.jpg` chrome tiles (`scripts/build-mingl-v3-logo.py`). Colorless SVG kit remains in `images/chrome/mingl-svg/` for compact / FloqMedia lockups. Resume `@mingl-icon$`.
 
+## Mingl Chat / Gist Site chrome
+
+| Piece | Where |
+|---|---|
+| **Surfaces** | `mingl-chat.html` (standalone chats), `mingl-gist.html` (stories). Feature key `mingl`. Satellite shell (`FLOQRSessionShell`). |
+| **Chrome** | Same contract as BOT DEE / receipts: early-paint `html[data-floqr-chrome]` from `localStorage floqr.isSiteChrome`, then `floqr-chrome-scheme.js` + `floqr-chrome-audit.js`. Hero uses `data-floqr-chrome-icon="mingl"` + `floqr-page-title` (Appearance h2 size). Title **Mingl Chat** is a protected brand (never translated). |
+| **Client** | `mingl-chat-app.js` / `mingl-gist-app.js` `hydrateSiteChrome` → `hydrateFromProfile(users/{uid})` after sign-in; `applyDocument` when signed out. Compose / bubbles / menus use `--hot` `--accent` `--floqr-ink` `--line` (`styles.css` + overlay `mingl-chat-chrome.css`). Gist **story viewer** stays a dark overlay. |
+| **Data** | Reads existing `users.isSiteChrome` / `uiChrome` only. No new collection. No stored IP. |
+| **Diagnostics** | Manual Feature Test `s3-3-046-mingl-chat-site-chrome`. |
+
 ## Chrome icon drafts (nightlife / traditional review)
 
 | Piece | Where |

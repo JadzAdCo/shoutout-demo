@@ -9,16 +9,14 @@
 
 .mingl-gist-topbar {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: flex-start;
   gap: 12px;
   margin-bottom: 14px;
 }
 
 .mingl-gist-topbar h1 {
-  margin: 4px 0 0;
-  font-size: clamp(28px, 7vw, 40px);
-  letter-spacing: -0.02em;
+  margin: 0;
 }
 
 .mingl-gist-status {
@@ -60,7 +58,7 @@
   height: 68px;
   border-radius: 999px;
   padding: 3px;
-  background: linear-gradient(135deg, #f43abf, #26d8ff 55%, #d7ff3f);
+  background: linear-gradient(135deg, var(--hot), var(--accent) 55%, var(--lime));
   display: grid;
   place-items: center;
 }
@@ -70,7 +68,7 @@
 }
 
 .mingl-gist-ring-avatar.sponsored {
-  background: linear-gradient(135deg, #ffd45a, #f43abf);
+  background: linear-gradient(135deg, var(--lime), var(--hot));
 }
 
 .mingl-gist-ring-avatar > span,
@@ -78,9 +76,9 @@
   width: 100%;
   height: 100%;
   border-radius: 999px;
-  border: 2px solid #070a18;
+  border: 2px solid var(--floqr-ink);
   object-fit: cover;
-  background: #12162c;
+  background: color-mix(in srgb, var(--floqr-ink) 88%, var(--text));
   display: grid;
   place-items: center;
   font-weight: 900;
@@ -98,7 +96,7 @@
 }
 
 .mingl-gist-empty {
-  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border: 1px dashed var(--line);
   border-radius: 18px;
   padding: 22px 16px;
   text-align: center;
@@ -170,7 +168,7 @@
   height: 36px;
   border-radius: 999px;
   overflow: hidden;
-  background: linear-gradient(135deg, #f43abf, #26d8ff);
+  background: linear-gradient(135deg, var(--hot), var(--accent));
   display: grid;
   place-items: center;
   font-weight: 900;
@@ -303,8 +301,8 @@
   padding: 0 16px;
   border-radius: 999px;
   border: 0;
-  background: linear-gradient(90deg, #f43abf, #26d8ff);
-  color: #06101c;
+  background: linear-gradient(90deg, var(--hot), var(--accent));
+  color: var(--floqr-ink);
   font-weight: 1000;
   text-decoration: none;
   width: fit-content;

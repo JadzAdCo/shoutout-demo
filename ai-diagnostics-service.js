@@ -231,7 +231,11 @@
         {label:"Session intercepts VIP", file:"functions/bot-dee-functions.js", includes:["tryHeadlessVip", "headlessVipDraft", "botdee-room-live"]},
         {label:"Room join live", file:"functions/botdee-room-live.js", includes:["botDeeRooms", "joinTokenHash", "charge: false"]},
         {label:"Idle skip while docks/room open", file:"bot-dee-chat.js", includes:["hasOpenWorkflow", "botDeeVipPreviewDock", "data-rs-active"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-046-people-gaps-headless-vip-rooms"]}
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-046-people-gaps-headless-vip-rooms"]},
+        {label:"Mingl Chat Site chrome", file:"mingl-chat.html", includes:["floqr.isSiteChrome", "floqr-chrome-scheme.js", "data-floqr-chrome-icon=\"mingl\"", "mingl-chat-chrome.css"]},
+        {label:"Mingl Chat hydrates chrome", file:"mingl-chat-app.js", includes:["hydrateSiteChrome", "hydrateFromProfile"]},
+        {label:"Mingl Gist Site chrome", file:"mingl-gist.html", includes:["floqr.isSiteChrome", "floqr-chrome-scheme.js", "data-floqr-chrome-icon=\"mingl\""]},
+        {label:"Mingl chrome overlay tokens", file:"mingl-chat-chrome.css", includes:["var(--floqr-ink)", "whiteBlack"]}
       ]
     },
     {
@@ -3537,8 +3541,17 @@
       expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
       troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
     },
-    {
-      id:"s3-3-046-people-gaps-headless-vip-rooms",
+      {
+        id:"s3-3-046-mingl-chat-site-chrome",
+        area:"Mingl / Site chrome",
+        feature:"Mingl Chat follows Appearance Site chrome",
+        changed:"mingl-chat.html (and Mingl Gist) early-paints data-floqr-chrome, loads floqr-chrome-scheme.js + floqr-chrome-audit.js, hydrates users.isSiteChrome, and swaps the Mingl chrome icon. Compose/bubbles use chrome tokens instead of Nightlife navy. Package s3.3.046.",
+        howToTest:"1) Sign in, open My Profile → Appearance, pick White / Black (or Traditional). 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/mingl-chat.html until mingl-chat.html / styles.css / mingl-chat-app.js match this SHA. 3) Body, cards, title, Mingl icon, compose bar, and bubbles must match that chrome — not Nightlife pink/cyan navy. 4) Switch Nightlife and reload — Mingl Chat returns to neon navy. 5) Repeat Mingl Gist (mingl-gist.html) for the page chrome (story viewer stays dark). 6) Mark Succeed/Failed.",
+        expected:"Mingl Chat paints the active Site chrome on first load and after sign-in hydrate. Icon and compose follow the scheme. Display URLs stay without ?v=.",
+        troubleshoot:"Still Nightlife → cached mingl-chat.html missing floqr.isSiteChrome early-paint or floqr-chrome-scheme.js. Icon stuck on nightlife.jpg → data-floqr-chrome-icon=mingl + applyDocument. Compose still navy on White/Black → cached styles.css before --floqr-ink compose. Signed-in wrong chrome → hydrateSiteChrome / users.isSiteChrome."
+      },
+      {
+        id:"s3-3-046-people-gaps-headless-vip-rooms",
       area:"BOT DEE",
       feature:"People SMARTview spacing + headless VIP reserV + joined Room SMARTview",
       changed:"s3.3.046 — People SMARTview details box no longer reserves empty bands around Music/Nightlife chips and genre tags. Headless VIP reserV from chat: Mezzanine at Aurelia lists V1–V4 + AURELIA SUITE instead of “section wasn’t found.” Confirm Room SMARTview mints a join link; joining is not a payment. Idle pause does not fire while a ShoutOut/VIP dock or active room is open.",

@@ -1,0 +1,52 @@
+/* Mingl Chat / Gist — Site chrome follow-through (loaded after styles.css).
+   New file so cached styles.css?v=s3.3.046 still loses to these rules. */
+
+.mingl-chat-hero{margin-bottom:8px}
+.mingl-chat-hero-main{display:flex;align-items:center;gap:12px}
+.mingl-chat-hero-main h1{margin:0}
+.mingl-chat-icon{width:56px;height:56px;object-fit:cover;border-radius:14px;flex:0 0 auto;box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 40%,transparent)}
+
+.mingl-compose,
+.mingl-compose-clean{
+  border-color:var(--line);
+  background:color-mix(in srgb,var(--floqr-ink) 94%,transparent);
+}
+.mingl-compose-menu-panel,
+.mingl-message-action-menu,
+.mingl-inline-edit-card,
+.mingl-forward-card{
+  border-color:var(--line);
+  background:color-mix(in srgb,var(--floqr-ink) 96%,transparent);
+}
+.mingl-messages{
+  background:color-mix(in srgb,var(--text) 10%,transparent);
+}
+.mingl-message{
+  background:color-mix(in srgb,var(--text) 8%,transparent);
+}
+.mingl-message.mine{
+  background:linear-gradient(90deg,color-mix(in srgb,var(--hot) 40%,transparent),color-mix(in srgb,var(--accent) 32%,transparent));
+}
+.mingl-request-copy span{color:var(--text)}
+.mingl-compose-menu summary{color:var(--floqr-ink)}
+.chat-plus-button{color:var(--text);background:color-mix(in srgb,var(--text) 10%,transparent)}
+
+html[data-floqr-chrome="whiteBlack"] .mingl-chat-icon{
+  box-shadow:0 0 0 1px rgba(10,10,10,.35);
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-compose,
+html[data-floqr-chrome="whiteBlack"] .mingl-compose-clean,
+html[data-floqr-chrome="whiteBlack"] .mingl-compose-menu-panel,
+html[data-floqr-chrome="whiteBlack"] .mingl-message-action-menu,
+html[data-floqr-chrome="whiteBlack"] .mingl-inline-edit-card,
+html[data-floqr-chrome="whiteBlack"] .mingl-forward-card{
+  background:#fff;
+  border-color:rgba(40,40,40,.42);
+  color:#0a0a0a;
+  box-shadow:0 10px 28px rgba(0,0,0,.08);
+}
+html[data-floqr-chrome="whiteBlack"] .mingl-messages{background:#f4f4f4}
+html[data-floqr-chrome="whiteBlack"] .mingl-message{background:#fff;color:#0a0a0a}
+html[data-floqr-chrome="whiteBlack"] .mingl-message.mine{background:#f2f2f2}
+html[data-floqr-chrome="whiteBlack"] .mingl-compose-menu summary{color:#fff}
+html[data-floqr-chrome="whiteBlack"] .mingl-chat-avatar{color:#fff}
