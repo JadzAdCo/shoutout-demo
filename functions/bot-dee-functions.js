@@ -424,12 +424,39 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
   const uid = session?.userId || session?.request?.auth?.uid || "";
   const parsed = headless.parseVipExecute(userPrompt);
   if (parsed.cancel && previousDraft) {
+    const cancelHoldId = String(previousDraft.holdId || "").trim();
+    if (cancelHoldId) {
+      const released = await tools.releaseVipHold({holdId: cancelHoldId}, session.request);
+      const holdGone = !!(released?.ok || released?.code === "not-found");
+      if (!holdGone) {
+        const kept = headless.clipInteractiveDraft({...previousDraft, holdId: cancelHoldId});
+        const stillVenue = headless.clubDisplayName(kept.clubQuery) || kept.clubQuery;
+        try { await threadsMod.persistHeadlessVipDraft(uid, kept); } catch (_) {}
+        const view = vipView.buildVipSmartView({
+          draft: kept,
+          needs: [],
+          venueName: stillVenue,
+          mode: "hold"
+        });
+        const table = kept.sectionLabel || kept.sectionId || "that table";
+        return vipSmartOutcome(
+          released?.error
+            ? `VIP reserV is still holding ${table}. ${released.error} Finish I agree, or try cancel again.`
+            : `VIP reserV is still holding ${table}. Finish I agree, or try cancel again.`,
+          lang,
+          {model: "headless-draft", toolRounds: 1, smartViews: [view]}
+        );
+      }
+    }
     try { await threadsMod.persistHeadlessVipDraft(uid, null); } catch (_) {}
-    return vipSmartOutcome("Cancelled — that VIP reserV hold was not created.", lang, {
-      model: "headless-draft",
-      toolRounds: 0,
-      smartViews: []
-    });
+    const cancelledTable = previousDraft.sectionLabel || previousDraft.sectionId || "";
+    return vipSmartOutcome(
+      cancelHoldId
+        ? `Cancelled — the VIP reserV hold${cancelledTable ? ` on ${cancelledTable}` : ""} was released.`
+        : "Cancelled — that VIP reserV hold was not created.",
+      lang,
+      {model: "headless-draft", toolRounds: cancelHoldId ? 1 : 0, smartViews: []}
+    );
   }
   let merged = headless.mergeInteractiveDraft(previousDraft, parsed);
   if (headless.isOverviewPrompt(userPrompt)) {

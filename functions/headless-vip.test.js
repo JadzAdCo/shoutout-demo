@@ -123,6 +123,7 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   assert.match(session, /detachStaleHold/);
   assert.match(session, /releaseVipHold/);
   assert.match(session, /holdGone/);
+  assert.match(session, /the VIP reserV hold/);
   assert.match(session, /wantsTerms/);
   assert.match(session, /isRepeatSelectedSection/);
   assert.match(session, /clubDisplayName/);
