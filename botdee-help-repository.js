@@ -463,10 +463,12 @@
     {
       id: "help-botdee-room-smartview",
       title: "Room SMARTview",
-      body: "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme.",
+      body: "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends). That opens the same Room SMARTview as Open Room SMARTview Cancun Trip — travel art and a sample Travel partner / Fly to Cancun Ad, not live flight or hotel booking. VIP tables tonight stay nightlife, not a trip card. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme.",
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
-        "group chat bot dee", "talk to bot dee together", "invite mingl friends"
+        "group chat bot dee", "talk to bot dee together", "invite mingl friends",
+        "let's plan our cancun trip", "let's plan a trip to cancun", "plan a cancun trip",
+        "cancun trip with friends"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],

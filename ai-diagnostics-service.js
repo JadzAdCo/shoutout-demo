@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.050";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.050";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.051";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.051";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.051",
+      title: "s3.3.051 — Natural Cancun trip talk opens Room SMARTview",
+      checks: [
+        {label:"Cancun trip classifier", file:"functions/botdee-room-smartview.js", includes:["function isCancunTripAsk(", "function isNightlifeOnlyAsk(", "CANCUN_TRIP_TITLE"]},
+        {label:"Root classifier matches Functions", file:"botdee-room-smartview.js", includes:["function isCancunTripAsk("]},
+        {label:"Intent tests", file:"functions/botdee-room-smartview.test.js", includes:["natural Cancun trip phrases mount the same Room SMARTview", "nightlife-only VIP tonight does not open"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-051-botdee-cancun-trip-natural"]}
+      ]
+    },
     {
       version: "s3.3.050",
       title: "s3.3.050 — BOT DEE Mingl session invites + shared tab",
@@ -3534,6 +3544,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-051-botdee-cancun-trip-natural",
+      area:"BOT DEE",
+      feature:"Natural Cancun trip talk opens Room SMARTview",
+      changed:"s3.3.051 — Let’s plan our Cancun trip / Let’s plan a trip to Cancun / plan a Cancun trip / Cancun trip with friends mount the same Room SMARTview as Open Room SMARTview Cancun Trip: Cancun Trip title, travel kit art, labeled mock Ad Travel partner / Fly to Cancun. BOT DEE does not book live flights or hotels. VIP tables tonight stays nightlife, not a trip card.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-room-smartview.js ?v=s3.3.051. Sign in with BOT DEE. 2) Say Let’s plan our Cancun trip — Room SMARTview card with travel illustration (bali + flight stencil) and Travel partner / Fly to Cancun Ad. Not a VIP/ShoutOut/floqCast pitch and not a live booking claim. 3) New turn: Let’s plan a trip to Cancun — same card. 4) Also try plan a Cancun trip and Cancun trip with friends. 5) Say VIP tables tonight — must NOT open the Cancun trip Room SMARTview. 6) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Cancun trip phrasing opens Room SMARTview with Cancun Trip art + mock travel Ad. Nightlife-only VIP tonight does not. No live flight booking claim. Brands untranslated.",
+      troubleshoot:"Still ‘cannot book flights’ + VIP tiles → Functions executeBotSession not this SHA (isCancunTripAsk missing) or cached botdee-room-smartview.js. Empty Ad → selectAd/mockFill. VIP tonight opened a trip card → nightlife veto failed. Wrong art → authorizedTitle must canonicalize to Cancun Trip (bg-bali + st-flight)."
+    },
     {
       id:"s3-3-050-botdee-mingl-session-invite",
       area:"BOT DEE",

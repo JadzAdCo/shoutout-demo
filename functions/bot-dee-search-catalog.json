@@ -570,17 +570,21 @@
       "id": "help-botdee-room-smartview",
       "kind": "help",
       "label": "Room SMARTview",
-      "blurb": "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay",
+      "blurb": "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends). That opens the same Room SMARTview as Open Room SMARTview Cancun Trip — trav",
       "href": "./botdee.html",
       "phrases": [
         "room smartview",
-        "in bot dee chat say open room smartview or start a group chat. confirm opens a session. invite mingl friends only host plus 7 guests. guests can invite too. joi",
+        "in bot dee chat say open room smartview start a group chat or plan a cancun trip in plain words let s plan our cancun trip let s plan a trip to cancun plan a ca",
         "start a group chat",
         "open room smartview",
         "create a room",
         "group chat bot dee",
         "talk to bot dee together",
         "invite mingl friends",
+        "let s plan our cancun trip",
+        "let s plan a trip to cancun",
+        "plan a cancun trip",
+        "cancun trip with friends",
         "open bot dee",
         "help-botdee-room-smartview"
       ]
@@ -3729,11 +3733,11 @@
       "id": "help-botdee-room-smartview",
       "kind": "help",
       "label": "Room SMARTview",
-      "blurb": "Type Open Room SMARTview or Start a group chat in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
+      "blurb": "Type Open Room SMARTview, Start a group chat, or plan a Cancun trip in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
       "href": "./botdee.html",
       "phrases": [
         "room smartview",
-        "type open room smartview or start a group chat in bot dee. confirm then invite mingl friends. joining is not a payment and does not open a shared tab.",
+        "type open room smartview start a group chat or plan a cancun trip in bot dee. confirm then invite mingl friends. joining is not a payment and does not open a sh",
         "start a group chat",
         "open room smartview",
         "create a room",
@@ -3744,6 +3748,10 @@
         "joined bot dee session",
         "confirm room smartview",
         "review bot dee invite",
+        "let s plan our cancun trip",
+        "let s plan a trip to cancun",
+        "plan a cancun trip",
+        "cancun trip with friends",
         "help-botdee-room-smartview"
       ]
     },
