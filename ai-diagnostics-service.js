@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.049";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.049";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.050";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.050";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,8 +223,8 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.3.049",
-      title: "s3.3.049 — BOT DEE Mingl session invites + shared tab",
+      version: "s3.3.050",
+      title: "s3.3.050 — BOT DEE Mingl session invites + shared tab",
       checks: [
         {label:"Mingl invite core", file:"functions/botdee-session-core.js", includes:["evaluateInvite", "inviteHref", "minglFriendsOnly", "host plus 7"]},
         {label:"Session callables", file:"functions/botdee-session-functions.js", includes:["createBotDeeRoomInvite", "acceptBotDeeRoomInvite", "assertFeatureAccess(request.auth, \"mingl\""]},
@@ -233,7 +233,17 @@
         {label:"Tab checkout mingl gate", file:"functions/commerce-functions.js", includes:["botDeeRoomTab", "assertFeatureAccess(request.auth, \"mingl\""]},
         {label:"Invites Functions-only", file:"firestore.rules", includes:["match /botDeeRoomInvites/{inviteId}", "allow read, write: if false;"]},
         {label:"BOT DEE subset deploys session callables", file:".github/workflows/functions-ci.yml", includes:["createBotDeeRoomInvite", "acceptBotDeeRoomInvite", "createFloqrCheckoutSession"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-049-botdee-mingl-session-invite"]}
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-050-botdee-mingl-session-invite"]}
+      ]
+    },
+    {
+      version: "s3.3.049",
+      title: "s3.3.049 — Beta Find patron email lookup + Save without Audit hang",
+      checks: [
+        {label:"Find patron callable", file:"functions/feature-services-functions.js", includes:["exports.findBetaPatron", "getUserByEmail"]},
+        {label:"Nothing-changed before audit lock", file:"functions/feature-services-functions.js", includes:["Nothing changed — the tester already has that access."]},
+        {label:"Beta Save does not await audit", file:"master-feature-services.js", includes:["call(\"findBetaPatron\"", "loadBeta({keepVisible: true})"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-049-lorna-mingl-beta-save"]}
       ]
     },
     {
@@ -3223,7 +3233,7 @@
       checks: [
         {label:"Access matrix", file:"floqr-feature-services.js", includes:["function stateOf(", "function searchVisible(", "function hasBetaGrant(", "logFeatureAccessAttempt"]},
         {label:"Server access matrix", file:"functions/feature-services-core.js", includes:["function featureState(", "function searchTileVisible(", "function validateBetaFeatures("]},
-        {label:"Beta feature callables", file:"functions/feature-services-functions.js", includes:["exports.setBetaTesterFeatures", "exports.logFeatureAccessAttempt", "beta.invite_denied"]},
+        {label:"Beta feature callables", file:"functions/feature-services-functions.js", includes:["exports.setBetaTesterFeatures", "exports.findBetaPatron", "exports.logFeatureAccessAttempt", "beta.invite_denied"]},
         {label:"Sign-in redirect", file:"floqr-session-shell.js", includes:["function redirectToLogin(", "profileRequired=sign-in", "function requireSignIn("]},
         {label:"Welcome buttons", file:"index.html", includes:["Continue with SMS OTP (US &amp; Canada Only)", "mail-icon", "sms-icon"]},
         {label:"Unified button gradient", file:"styles.css", includes:["#loginActions .signin{background:linear-gradient(90deg,#1f8fff"]},
@@ -3525,13 +3535,22 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
-      id:"s3-3-049-botdee-mingl-session-invite",
+      id:"s3-3-050-botdee-mingl-session-invite",
       area:"BOT DEE",
       feature:"Mingl friends invite into a BOT DEE session + shared tab",
-      changed:"s3.3.049 — Confirm Room SMARTview opens a Mingl-friends-only session (host plus 7 guests). Invite picker is Mingl connections, not a public join link. Inbox type botDeeRoomInvite → Review BOT DEE invite. Guests can invite. Shared tab is opt-in then FloqR Stripe split/one payer. Beta Mingl + BOT DEE gates.",
-      howToTest:"1) After Pages + Functions + rules deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js ?v=s3.3.049. Sign in with BOT DEE + Mingl (beta if test). 2) Say Open Room SMARTview → Confirm. Invite is enabled; no public join URL. 3) Invite a Mingl friend — they get Inbox Review BOT DEE invite. Wrong account opening botdee.html?room=&t= refuses. 4) Friend joins while signed in as that account — they see the shared card; private BOT DEE history is not copied. 5) Guest can Invite another Mingl friend until 8 people. Host End closes the room. 6) Shared tab: Opt in → add a line → I'll pay the tab opens Stripe on that uid only. Other members do not see card last4. 7) Mark Succeed/Failed. Display URLs have no ?v=.",
+      changed:"s3.3.050 — Confirm Room SMARTview opens a Mingl-friends-only session (host plus 7 guests). Invite picker is Mingl connections, not a public join link. Inbox type botDeeRoomInvite → Review BOT DEE invite. Guests can invite. Shared tab is opt-in then FloqR Stripe split/one payer. Beta Mingl + BOT DEE gates.",
+      howToTest:"1) After Pages + Functions + rules deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js ?v=s3.3.050. Sign in with BOT DEE + Mingl (beta if test). 2) Say Open Room SMARTview → Confirm. Invite is enabled; no public join URL. 3) Invite a Mingl friend — they get Inbox Review BOT DEE invite. Wrong account opening botdee.html?room=&t= refuses. 4) Friend joins while signed in as that account — they see the shared card; private BOT DEE history is not copied. 5) Guest can Invite another Mingl friend until 8 people. Host End closes the room. 6) Shared tab: Opt in → add a line → I'll pay the tab opens Stripe on that uid only. Other members do not see card last4. 7) Mark Succeed/Failed. Display URLs have no ?v=.",
       expected:"Mingl-only invites, cap 8, guests can invite, join is not a payment, tab opt-in required, receipts on payer only. Beta gates hide the path when Mingl/BOT DEE is off.",
       troubleshoot:"Invite still a public ?join= link → cached botdee-smartview.js / Functions not this SHA (acceptInvite). Inbox says Open Related ShoutOut → cached patron-portal-app.js inboxLinkLabel. Wrong account joins → token not bound to targetUid. Tab charges without opt-in → stop; canAttachLine must refuse. last4 on another member → publicTabLine leak. Functions deny mingl → Features & Services Mingl still test/off for that account. 404 on createBotDeeRoomInvite → BOT DEE subset list missing session names; redeploy from origin/main with [firebase-deploy-botdee]."
+    },
+    {
+      id:"s3-3-049-lorna-mingl-beta-save",
+      area:"Master Admin",
+      feature:"Beta tester Save (Mingl) does not hang on Audit Trail",
+      changed:"Master Admin using Mingl as a beta feature means live featureServices/mingl is Enabled+Test — the checkbox is not Off. Find patron looks up the sign-in email (findBetaPatron / email equality). Tester-table Save returns immediately after setBetaTesterFeatures; the tester list stays visible while it refreshes. Unchanged grants fail before the audit-head lock. Audit Trail is not loaded from the Beta tab Save.",
+      howToTest:"1) Hard-refresh Master Admin → Features Mgmt → SOS2FA → Beta & Testing. 2) Confirm Mingl is ticked/enabled on Release Control (Enable Feature 1 + Enable Beta 1). 3) In the active testers table, tick Mingl for Lorna and Save with a reason. Status should read Beta feature access saved without replacing the table with Loading for tens of seconds. 4) If grants already match, the error is immediate (Nothing changed) — not a hang. 5) Find patron with her full Gmail; she appears without scanning the first 120 users.",
+      expected:"Mingl checkbox is usable. Save either writes mingl:1 or says Nothing changed quickly. The tester table does not sit on Loading beta testers while Audit Trail resolves patron labels.",
+      troubleshoot:"Mingl still disabled → Reload Release Control so live featureServices/mingl loads (packaged default is Off). Save hangs after Command received… → Functions still on the old setBetaTesterFeatures that takes the audit-head lock for unchanged grants; wait for [firebase-deploy-features]. Find misses her email → paste the exact Auth sign-in email; callable must be deployed. She is not an active tester → Invite first, she must accept beta-invite.html."
     },
     {
       id:"s3-3-047-features-smartview-master",

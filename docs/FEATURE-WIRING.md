@@ -827,9 +827,9 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
-## Room SMARTview + Mingl session invites (s3.3.033 / join s3.3.046 / Mingl invites s3.3.049)
+## Room SMARTview + Mingl session invites (s3.3.033 / join s3.3.046 / Mingl invites s3.3.050)
 
-**Purpose:** BOT DEE recognizes Room SMARTview intents and opens an inline **Room SMARTview** card. Official name is **Room SMARTview** (never “Mingl Room SmartView”). **s3.3.049:** Confirm creates a Mingl-friends-only session (host plus 7 guests). Guests can invite. Invite tokens are SHA-256 only, bound to `targetUid`, Inbox `type: botDeeRoomInvite` (**Review BOT DEE invite**, not a ShoutOut CTA). Join is **not** a payment. Shared tab is a later opt-in + FloqR Stripe (`orderType: botDeeRoomTab`). Beta gates: `botDee` on chat, `mingl` on invite/join/create/tab. Distinct from Version SMARTview and People SMARTview.
+**Purpose:** BOT DEE recognizes Room SMARTview intents and opens an inline **Room SMARTview** card. Official name is **Room SMARTview** (never “Mingl Room SmartView”). **s3.3.050:** Confirm creates a Mingl-friends-only session (host plus 7 guests). Guests can invite. Invite tokens are SHA-256 only, bound to `targetUid`, Inbox `type: botDeeRoomInvite` (**Review BOT DEE invite**, not a ShoutOut CTA). Join is **not** a payment. Shared tab is a later opt-in + FloqR Stripe (`orderType: botDeeRoomTab`). Beta gates: `botDee` on chat, `mingl` on invite/join/create/tab. Distinct from Version SMARTview and People SMARTview.
 
 | Layer | Wiring |
 |---|---|
@@ -839,7 +839,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Data | `botDeeRooms` + `turns`/`events` (member-read). `botDeeRoomMembers`, `botDeeRoomInvites` (Functions-only, SHA-256), `botDeeRoomTabs` + `lines` (no card last4), `botDeeRoomAudit`, invite/turn throttles. **No IP.** Classification in `data-classification-core.js` job `botDeeSession`. |
 | URL / contract | `botdee.html?room=<id>&t=<token>` (no `?v=`). Display boards never get `?v=`. |
 | Security | `assertFeatureAccess(botDee)` + `mingl` on session callables and tab checkout. Token bound to `targetUid`; wrong account / expired / revoked / non-friend / **host block** / cap 8 refuse. Kicked uid removed from `memberUids` (cannot read events). Agent probes `actorRole: agent`. |
-| Observability | Manual Feature Tests `s3-3-049-botdee-mingl-session-invite`. |
+| Observability | Manual Feature Tests `s3-3-050-botdee-mingl-session-invite`. |
 | Help | `help-botdee-room-smartview`, `-invite`, `-join`, `-end`, `-tab`, `-who-pays`, `-kick`, `-share` (11 langs). |
 | Deploy | Pages + Functions + Firestore rules `s3.3.047-botdee-mingl-session`. Merge to `origin/main` then `[firebase-deploy] [firebase-deploy-botdee]` from the origin/main archive. |
 
@@ -938,7 +938,7 @@ When adding a section, use this skeleton:
 |---|---|
 | **NIC tab** | Parent **Features Mgmt** (`master.featuresServices`); sub-tabs: **Release Control** (`featuresReleaseControl`), **Beta & Testing** (`featuresBetaTesting`), **Audit Trail** (`featuresAuditTrail`) |
 | **Release Control** | Feature flag table + **Test → live** promotion; loads flags only |
-| **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists; loads beta data only (catalog flags if needed). **Mingl grant:** packaged Mingl is Off (`IsFeatureEnabled=0`); Off checkboxes are disabled and Invite drops Off keys — enable Mingl on Release Control (Enable Feature 1 + Enable Beta 1) before ticking Mingl for a tester (e.g. Lorna). Find patron scans 120 `users` docs (or Network Dashboard’s 200) unless email equality is added. |
+| **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists. Packaged Mingl default is Off; **live `featureServices/mingl` wins** (Master Admin using Mingl as beta means Enable Feature 1 + Enable Beta 1 — checkboxes are not disabled). **Find patron (s3.3.049):** `findBetaPatron` (SOS2FA Master Admin) uses Auth `getUserByEmail` then `users.email` / `floqrHandle` equality — no 120-doc scan. Returns uid/email/handle + active-tester flag; no IP stored; no new collection (`users` / `betaTesters` already classified). Client falls back to `users.where(email ==)` if the callable is not deployed yet. **Tester Save:** `setBetaTesterFeatures` rejects “Nothing changed” **before** the audit-head transaction; UI does not await Audit Trail after Save (that N+1 `users/{uid}` read was the “took forever” hang). |
 | **Save busy (s3.3.047)** | `floqr-save-busy.js` greys Save on click and sets **Command received…** when a callable/Firestore write starts. Loaded after `floqr-nav.js`. |
 | **Features SMARTview (s3.3.047)** | Catalog `features-smartview/catalog.json`; UI `floqr-features-smartview.js`. Master Admin → Features Mgmt → BOT DEE → SMARTviews → **Show Features SMARTview**. Product badges stay **Status not verified** until live flags + deploy evidence. Si-tube is not in this repo. |
 | **Audit Trail** | Hash-chained activity log + Verify integrity; loads audit only |
