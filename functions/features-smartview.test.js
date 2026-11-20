@@ -257,6 +257,24 @@ test("mountPayload keeps retrieve payloads per host and does not poison the modu
   assert.equal(sandbox.__FLOQR_FEATURES_SMARTVIEW_CATALOG.products.length, 6);
 });
 
+test("host snapshot wins after loadCatalog so a Mingl card does not show other product chips", async () => {
+  const sandbox = loadUiSandbox();
+  const loaded = await sandbox.FLOQRFeaturesSmartView.loadCatalog();
+  assert.equal(loaded.products.length, 6);
+  const mingl = sandbox.FLOQRFeaturesSmartViewCore.retrieve(catalog, "What can Mingl do?", {role: "patron"});
+  assert.equal(mingl.productName, "Mingl");
+  const host = fakeHost();
+  sandbox.FLOQRFeaturesSmartView.mountPayload(host, mingl);
+  assert.match(host.innerHTML, /data-fsv-product="mingl"/);
+  assert.match(host.innerHTML, /Mingl/);
+  assert.doesNotMatch(host.innerHTML, /data-fsv-product="shoutout"/);
+  assert.doesNotMatch(host.innerHTML, /data-fsv-product="vip-reserv"/);
+  assert.doesNotMatch(host.innerHTML, /data-fsv-product="si-nema"/);
+  assert.doesNotMatch(host.innerHTML, /data-fsv-product="bot-dee"/);
+  assert.doesNotMatch(host.innerHTML, /ShoutOut/);
+  assert.doesNotMatch(host.innerHTML, /VIP reserV/);
+});
+
 test("Read changes honors data-fsv-view-jump instead of always opening Feature Journey", () => {
   const js = read("floqr-features-smartview.js");
   assert.match(js, /data-fsv-view-jump="whatsNew"/);

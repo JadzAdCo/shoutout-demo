@@ -54,8 +54,8 @@
   }
 
   function catalogFor(host) {
-    if (catalog) return catalog;
     if (host && host.__fsvSnapshot) return host.__fsvSnapshot;
+    if (catalog) return catalog;
     return null;
   }
 
