@@ -13,10 +13,11 @@ const core = require("./feature-services-core");
 const ROOT = path.join(__dirname, "..");
 const read = file => fs.readFileSync(path.join(ROOT, file), "utf8");
 
-function loadClientModule() {
+function loadClientModule(extraWindow = {}) {
   const doc = {readyState: "complete", body: {dataset: {}}, addEventListener() {}};
-  const sandbox = {window: {}, document: doc, console, setTimeout, clearTimeout};
+  const sandbox = {window: {...extraWindow}, document: doc, console, setTimeout, clearTimeout};
   sandbox.window.document = doc;
+  sandbox.window.FLOQRFeatureGates = extraWindow.FLOQRFeatureGates || sandbox.window.FLOQRFeatureGates;
   vm.runInNewContext(read("floqr-feature-services.js"), sandbox);
   return sandbox.window.FLOQRFeatureServices;
 }
@@ -100,12 +101,196 @@ test("linkState matrix: off / test granted / test non-tester / test master / liv
   assert.equal(client.linkState("mingl", {who: who.granted, rows: stale}).show, false, "a stale link field never opens an off feature");
   const legacy = {mingl: {key: "mingl", IsFeatureEnabled: 1, IsTestFeature: 1}};
   assert.equal(client.linkState("mingl", {who: who.granted, rows: legacy}).beta, true, "missing fields derive from the flags");
+  const driftedStoredOff = client.normalize("mingl", {IsFeatureEnabled: 1, IsTestFeature: 1, enableFeatureLink: 0, enableBetaFeatureLink: 0});
+  assert.equal(driftedStoredOff.enableFeatureLink, 1, "client re-derives link fields like the server");
+  assert.equal(client.linkState("mingl", {surface: "search", who: who.granted, rows: {mingl: driftedStoredOff}}).show, true, "stored enableFeatureLink=0 must not hide an enabled test tile");
   assert.equal(client.linkState("nope", {who: who.master, rows: {}}).show, false);
+});
+
+test("Search applySearchUi unhides Mingl for a granted tester even when the legacy patron gate is off", async () => {
+  const classList = (initial = ["hidden"]) => {
+    const set = new Set(initial);
+    return {
+      toggle(name, on) { if (on) set.add(name); else set.delete(name); },
+      contains(name) { return set.has(name); }
+    };
+  };
+  const minglEl = {id: "minglBtnCard", tagName: "BUTTON", classList: classList(), dataset: {}, setAttribute() {}, disabled: true};
+  const vipEl = {id: "vipReservBtnCard", tagName: "A", classList: classList(), dataset: {}, setAttribute() {}, disabled: false};
+  const doc = {
+    getElementById(id) {
+      if (id === "minglBtnCard") return minglEl;
+      if (id === "vipReservBtnCard") return vipEl;
+      return null;
+    }
+  };
+  const extra = {
+    FLOQRFeatureGates: {
+      patronMayUse: () => false,
+      isMasterAdminEmail: () => false,
+      isSuperAdmin: () => false
+    }
+  };
+  const client = loadClientModule(extra);
+  const featureDocs = {
+    mingl: {IsFeatureEnabled: 1, IsTestFeature: 1, enableFeatureLink: 0, enableBetaFeatureLink: 0},
+    vipReservations: {IsFeatureEnabled: 1, IsTestFeature: 1, enableFeatureLink: 1, enableBetaFeatureLink: 1},
+    botDee: {IsFeatureEnabled: 1, IsTestFeature: 1, enableFeatureLink: 1, enableBetaFeatureLink: 1},
+    sinema: {IsFeatureEnabled: 1, IsTestFeature: 1, enableFeatureLink: 1, enableBetaFeatureLink: 1}
+  };
+  const db = {
+    collection(name) {
+      if (name === "featureServices") {
+        return {
+          get: async () => ({
+            forEach(fn) {
+              Object.entries(featureDocs).forEach(([id, data]) => fn({id, data: () => data}));
+            }
+          })
+        };
+      }
+      if (name === "betaTesters") {
+        return {
+          doc: () => ({
+            get: async () => ({
+              exists: true,
+              data: () => ({IsBetaTester: 1, status: "active", features: {mingl: 1, vipReservations: 1, botDee: 1, sinema: 1}})
+            })
+          })
+        };
+      }
+      const missing = {exists: false, data() { return {}; }};
+      return {get: async () => ({forEach() {}}), doc: () => ({get: async () => missing})};
+    }
+  };
+  await client.load({db, user: {uid: "lorna-signed-in", email: "lorna@gmail.com"}, profile: {}});
+  client.applySearchUi(doc);
+  assert.equal(minglEl.classList.contains("hidden"), false, "Mingl tile unhides for the signed-in uid grant");
+  assert.equal(minglEl.disabled, false);
+  assert.equal(vipEl.classList.contains("hidden"), false, "VIP still shows (empty patronGate)");
+});
+
+test("applyFeatureLinks unhides data-floqr-feature-link=mingl on the profile menu when the legacy patron gate is off", async () => {
+  const classList = (initial = ["hidden"]) => {
+    const set = new Set(initial);
+    return {
+      toggle(name, on) { if (on) set.add(name); else set.delete(name); },
+      contains(name) { return set.has(name); },
+      add(name) { set.add(name); },
+      remove(name) { set.delete(name); }
+    };
+  };
+  const minglLink = {
+    dataset: {floqrFeatureLink: "mingl"},
+    classList: classList(),
+    hidden: true,
+    querySelector() { return null; },
+    appendChild() {},
+    setAttribute() {}
+  };
+  const styleEl = {id: "floqrFeatureLinkStyles", textContent: ""};
+  const doc = {
+    getElementById(id) { return id === "floqrFeatureLinkStyles" ? styleEl : null; },
+    createElement() { return {id: "", textContent: "", className: ""}; },
+    head: {appendChild() {}}
+  };
+  const scope = {
+    ownerDocument: doc,
+    querySelectorAll(sel) {
+      return String(sel).includes("data-floqr-feature-link") ? [minglLink] : [];
+    }
+  };
+  const client = loadClientModule({
+    FLOQRFeatureGates: {
+      patronMayUse: () => false,
+      isMasterAdminEmail: () => false,
+      isSuperAdmin: () => false
+    }
+  });
+  const db = {
+    collection(name) {
+      if (name === "featureServices") {
+        return {
+          get: async () => ({
+            forEach(fn) {
+              fn({id: "mingl", data: () => ({IsFeatureEnabled: 1, IsTestFeature: 1, enableFeatureLink: 0})});
+            }
+          })
+        };
+      }
+      if (name === "betaTesters") {
+        return {
+          doc: () => ({
+            get: async () => ({
+              exists: true,
+              data: () => ({IsBetaTester: 1, status: "active", features: {mingl: 1}})
+            })
+          })
+        };
+      }
+      return {get: async () => ({forEach() {}}), doc: () => ({get: async () => ({exists: false, data() { return {}; }})})};
+    }
+  };
+  await client.load({db, user: {uid: "lorna-signed-in", email: "lorna@gmail.com"}, profile: {}});
+  const out = client.applyFeatureLinks(scope);
+  assert.equal(minglLink.classList.contains("hidden"), false, "avatar menu Mingl link unhides for the signed-in uid grant");
+  assert.equal(minglLink.hidden, false);
+  assert.equal(out[0]?.visible, true);
+});
+
+test("Search tile visibility is per signed-in betaTesters uid, not another Lorna account", async () => {
+  const classList = (initial = ["hidden"]) => {
+    const set = new Set(initial);
+    return {
+      toggle(name, on) { if (on) set.add(name); else set.delete(name); },
+      contains(name) { return set.has(name); }
+    };
+  };
+  const minglEl = {id: "minglBtnCard", tagName: "BUTTON", classList: classList(), dataset: {}, setAttribute() {}, disabled: true};
+  const doc = {getElementById(id) { return id === "minglBtnCard" ? minglEl : null; }};
+  const client = loadClientModule({
+    FLOQRFeatureGates: {
+      patronMayUse: () => true,
+      isMasterAdminEmail: () => false,
+      isSuperAdmin: () => false
+    }
+  });
+  const db = {
+    collection(name) {
+      if (name === "featureServices") {
+        return {
+          get: async () => ({
+            forEach(fn) {
+              fn({id: "mingl", data: () => ({IsFeatureEnabled: 1, IsTestFeature: 1})});
+            }
+          })
+        };
+      }
+      if (name === "betaTesters") {
+        return {
+          doc: uid => ({
+            get: async () => uid === "lorna-ms"
+              ? {exists: true, data: () => ({IsBetaTester: 1, status: "active", features: {botDee: 1, vipReservations: 1, sinema: 1}})}
+              : {exists: true, data: () => ({IsBetaTester: 1, status: "active", features: {mingl: 1}})}
+          })
+        };
+      }
+      return {get: async () => ({forEach() {}}), doc: () => ({get: async () => ({exists: false})})};
+    }
+  };
+  await client.load({db, user: {uid: "lorna-ms", email: "mslorna@gmail.com"}, profile: {}});
+  client.applySearchUi(doc);
+  assert.equal(minglEl.classList.contains("hidden"), true, "Mingl stays hidden when the signed-in uid has no mingl grant");
+  await client.load({db, user: {uid: "lorna-gmail", email: "lorna@gmail.com"}, profile: {}});
+  client.applySearchUi(doc);
+  assert.equal(minglEl.classList.contains("hidden"), false, "the other Lorna uid with mingl:1 does see the tile");
 });
 
 test("every feature link surface goes through linkState", () => {
   const guard = read("floqr-feature-services.js");
   assert.match(guard, /linkState\(base\.key, \{surface: "search"\}\)/, "Search tiles use linkState with search semantics");
+  assert.match(guard, /stateOf\(features\[canonicalizeFeatureKey\(base\.key\)\]\) === "test"\) return true/, "test tiles skip the legacy patronFeatureGates AND");
+  assert.match(guard, /function featureLinkAllowed\(/, "Search tiles and profile links share one F&S helper");
   assert.match(guard, /function applyFeatureLinks\(/);
   assert.match(guard, /root\.FLOQRTabGates|gates\.apply\(/, "hidden via FLOQRTabGates");
   assert.match(guard, /cat\.betaPill/);

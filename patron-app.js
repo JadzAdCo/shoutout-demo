@@ -3427,13 +3427,8 @@
       showPage("landingPage");
       return;
     }
-    const g = window.FLOQRFeatureGates;
-    if (g && !g.patronMayUse("mingl", currentUser, cachedUserProfile)) {
-      setStatus("Mingl is currently disabled for patrons.");
-      return;
-    }
     if (!featureServiceAllows("mingl")) {
-      setStatus(window.FLOQRFeatureServices.unavailableMessage());
+      setStatus(window.FLOQRFeatureServices?.unavailableMessage?.() || "This feature isn't available on your account yet.");
       showPage("categoryPage");
       return;
     }
@@ -6844,13 +6839,16 @@
       if(window.firebase && firebase.auth){
         clearInterval(waitAuth);
         firebase.auth().onAuthStateChanged(user => {
-          if(user) setTimeout(() => enhanceMenu(user), 350);
-    const fs = window.FLOQRFeatureServices;
-    if (fs?.ensureLoaded) {
-      fs.ensureLoaded({db: firebase.firestore(), user})
-        .then(() => fs.applyFeatureLinks(host))
-        .catch(error => console.warn("Profile menu feature links", error?.message || error));
-    }
+          if (!user) return;
+          setTimeout(async () => {
+            await enhanceMenu(user);
+            const menu = byId("userDropdown");
+            const fs = window.FLOQRFeatureServices;
+            if (!fs?.ensureLoaded || !menu) return;
+            fs.ensureLoaded({db: firebase.firestore(), user})
+              .then(() => fs.applyFeatureLinks(menu))
+              .catch(error => console.warn("Profile menu feature links", error?.message || error));
+          }, 350);
         });
       }
     }catch(e){}

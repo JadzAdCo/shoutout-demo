@@ -68,8 +68,10 @@
     return {
       ...base,
       ...flags,
-      enableFeatureLink: has("enableFeatureLink") ? flag(data.enableFeatureLink) : derived.enableFeatureLink,
-      enableBetaFeatureLink: has("enableBetaFeatureLink") ? flag(data.enableBetaFeatureLink) : derived.enableBetaFeatureLink,
+      // Same as server normalizeFeature: flags are source of truth. A stored
+      // enableFeatureLink=0 on an enabled test doc must not hide the Search tile.
+      enableFeatureLink: derived.enableFeatureLink,
+      enableBetaFeatureLink: derived.enableBetaFeatureLink,
       linkFieldsStored: stored,
       linkFieldsDrifted: !!raw && (!stored || flag(data.enableFeatureLink) !== derived.enableFeatureLink || flag(data.enableBetaFeatureLink) !== derived.enableBetaFeatureLink),
       revision: Number(data.revision || 0),
@@ -145,10 +147,7 @@
     const canon = canonicalizeFeatureKey(key);
     const row = rows[canon];
     if (!row) return {key: canon, show: false, beta: false, state: "off", enableFeatureLink: 0, enableBetaFeatureLink: 0};
-    const fields = {
-      enableFeatureLink: flag(row.enableFeatureLink ?? deriveLinkFields(row).enableFeatureLink),
-      enableBetaFeatureLink: flag(row.enableBetaFeatureLink ?? deriveLinkFields(row).enableBetaFeatureLink)
-    };
+    const fields = deriveLinkFields(row);
     const allowed = surface === "search" ? searchVisible(canon, who, rows) : canAccess(canon, who, rows);
     const show = fields.enableFeatureLink === 1 && allowed;
     return {key: canon, show, beta: show && fields.enableBetaFeatureLink === 1, state: stateOf(row), ...fields};
@@ -244,14 +243,24 @@
   function patronGateAllows(base) {
     const gates = root.FLOQRFeatureGates;
     if (!base.patronGate || !gates?.patronMayUse) return true;
+    // Test (beta) tiles and profile links follow Features & Services: searchVisible / beta grant.
+    // VIP and Si-nema already skip this because patronGate is empty. Mingl must
+    // not stay hidden on Search or the avatar menu when a tester is granted mingl
+    // but the legacy platformSettings/patronFeatureGates.mingl kill switch is off.
+    if (stateOf(features[canonicalizeFeatureKey(base.key)]) === "test") return true;
     return gates.patronMayUse(base.patronGate, viewerUser, viewerProfile);
+  }
+
+  /** Search tiles, profile avatar menus, and My Profile tabs share this F&S gate. */
+  function featureLinkAllowed(base, link) {
+    return !!(base && link && link.show && patronGateAllows(base));
   }
 
   function applySearchUi(doc = document) {
     const betaLabel = t("cat.betaPill", "Beta");
     CATALOG.forEach(base => {
       const link = linkState(base.key, {surface: "search"});
-      const allowed = link.show && patronGateAllows(base);
+      const allowed = featureLinkAllowed(base, link);
       const beta = allowed && link.beta;
       base.buttonIds.forEach(id => {
         const el = doc.getElementById(id);
@@ -339,7 +348,7 @@
       const key = el.dataset.floqrFeatureLink;
       const base = CATALOG.find(row => row.key === key);
       const link = linkState(key, {surface: el.dataset.floqrFeatureSurface || "link"});
-      const visible = !!base && link.show && patronGateAllows(base);
+      const visible = featureLinkAllowed(base, link);
       setLinkVisible(el, visible, el.dataset.floqrFeaturePanel || "", key);
       setBetaPill(el, visible && link.beta, doc);
       return {key, visible, beta: visible && link.beta};

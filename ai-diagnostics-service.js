@@ -224,7 +224,7 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.052",
-      title: "s3.3.052 — Required mobile unifier + Master Admin patron merge",
+      title: "s3.3.052 — Required mobile unifier + Mingl Search tile for granted testers",
       checks: [
         {label:"Phone index Functions-only", file:"firestore.rules", includes:["match /phoneIndex/{phoneId}", "allow read, write: if false;"]},
         {label:"Merge callables", file:"functions/account-unifier-functions.js", includes:["exports.claimPatronPhone", "exports.mergePatronAccounts", "authDeleted: false"]},
@@ -232,7 +232,13 @@
         {label:"Required phone on create", file:"patron-app.js", includes:["required: true", "claimRequiredPhone"]},
         {label:"Required phone on My Profile", file:"patron-portal-app.js", includes:["required: true", "claimRequiredPhone"]},
         {label:"Master Admin merge card", file:"master-admin.html", includes:["id=\"patronAccountMerge\"", "patron-account-merge.js"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-052-patron-phone-unifier"]}
+        {label:"Manual test phone unifier", file:"ai-diagnostics-service.js", includes:["s3-3-052-patron-phone-unifier"]},
+        {label:"Test tiles skip legacy patron gate", file:"floqr-feature-services.js", includes:["stateOf(features[canonicalizeFeatureKey(base.key)]) === \"test\") return true"]},
+        {label:"Link fields re-derived from flags", file:"floqr-feature-services.js", includes:["enableFeatureLink: derived.enableFeatureLink"]},
+        {label:"Mingl tile after ShoutOut", file:"index.html", includes:["id=\"minglBtnCard\"", "data-feature-key=\"mingl\"", "id=\"intentSearchBtnCard\""]},
+        {label:"Profile and Search share F&S helper", file:"floqr-feature-services.js", includes:["function featureLinkAllowed(", "function applyFeatureLinks("]},
+        {label:"Search avatar Mingl link", file:"patron-app.js", includes:["data-floqr-feature-link=\"mingl\"", "fs.applyFeatureLinks(menu)"]},
+        {label:"Manual test Mingl tile", file:"ai-diagnostics-service.js", includes:["s3-3-052-mingl-search-tile"]}
       ]
     },
     {
@@ -3563,10 +3569,19 @@
       id:"s3-3-052-patron-phone-unifier",
       area:"Accounts",
       feature:"Required mobile unifies patrons; Master Admin merge does not delete Auth",
-      changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Do not run the live Lorna merge until Don asks.",
-      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.052. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until Don asks. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
+      changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Live Lorna merge waits for a separate Don confirmation after deploy.",
+      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.052. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until Don separately confirms after deploy. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
       expected:"Mobile required. Duplicate phone cannot create a second live profile. Preview shows both uids and does not delete Auth. Merge is Master Admin + SOS2FA + reason only.",
       troubleshoot:"Save still optional phone → cached patron-app.js / patron-portal-app.js. Second account created → Functions claimPatronPhone / phoneIndex rules not this SHA. Merge button works without SOS2FA → stop; lookupPatronAccounts must assertSos2faSession. Auth user vanished → mergePatronAccounts must not call deleteUser; revert and wait for Don."
+    },
+    {
+      id:"s3-3-052-mingl-search-tile",
+      area:"Search",
+      feature:"Mingl Search tile for granted beta testers",
+      changed:"s3.3.052 — Search shows Mingl like BOT DEE/VIP when featureServices/mingl is Enabled+Test and betaTesters/{signed-in uid}.features.mingl==1. Test tiles no longer AND platformSettings/patronFeatureGates.mingl. Tile sits next to ShoutOut (not after Cinema). Duplicate Lorna Auth accounts: tick Mingl + Save feature access on both uids until merge.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ until floqr-feature-services.js?v=s3.3.052. 2) Sign in as the same Auth user Master Admin ticked (check the email on the tester row — MsLorna and the other Lorna @gmail.com are different uids until merged). 3) Search should show Mingl with a Beta pill beside ShoutOut / BOT DEE / VIP. 4) Open the avatar / profile card — Mingl Chat must appear (data-floqr-feature-link=mingl via applyFeatureLinks). 5) Master Admin → Features Mgmt: Mingl Enable Feature 1 + Enable Beta 1. For each Lorna uid, Mingl checked → Save feature access. 6) Mark Succeed/Failed.",
+      expected:"Granted tester sees Mingl on Search and on the profile avatar menu. Cinema (Si-nema) is a different tile. Signing in as the other Lorna uid without mingl:1 still hides Mingl on both surfaces.",
+      troubleshoot:"No Mingl on Search or the profile card → confirm the signed-in email matches the tester row, then tick Mingl on THAT uid and Save. Tile still missing after grant → cached index.html / floqr-feature-services.js / patron-app.js before s3.3.052. Cinema showing instead → that is sinemaBtnCard, not a Mingl mixup. Enable Feature still 0 → packaged default is Off; Save Mingl on Release Control first."
     },
     {
       id:"botdee-whats-new-catalog",
