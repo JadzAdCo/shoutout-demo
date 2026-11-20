@@ -85,7 +85,8 @@ test("What's New ships inside Functions (no repo-root README required)", () => {
     rootDir: path.join(__dirname, "no-such-readme-dir")
   });
   assert.ok(missingRoot.changelog.length >= 1);
-  assert.equal(missingRoot.changelog[0].id, bundled[0].id);
+  // What's New is BOT DEE/Gemini only — latest package bullet may be Search/chrome.
+  assert.equal(missingRoot.changelog[0].id, vs.changelogItems()[0].id);
   const fromReadme = vs.changelogFromReadme(root);
   assert.equal(bundled[0].id, fromReadme[0].id);
   assert.doesNotMatch(read("functions/botdee-version-smartview.js"), /changelogFromReadme\(options\.rootDir\)/);
