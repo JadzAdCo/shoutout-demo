@@ -1,5 +1,13 @@
 [
   {
+    "id": "s3.3.054",
+    "text": "s3.3.054: BOT DEE people search is identity-only (not bios) and compact picker cards",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.054: People search matches names and handles only — not bios — and compact picker cards"
+  },
+  {
     "id": "s3.3.053",
     "text": "s3.3.053: Si-nema Search chrome is a vector mark with Site Chrome fills and transparent voids (White/Black PNG)"
   },
