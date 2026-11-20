@@ -1,0 +1,463 @@
+{
+  "schemaVersion": "floqr.featuresSmartView/1",
+  "catalogVersion": 2,
+  "warning": "Packaged catalog only. Live flags and availability dates are not verified. Plans are not treated as shipped.",
+  "auditedAt": "2026-11-20",
+  "defaultBranchSha": "868bec33e874e57ab33b73f6127641df67edec66",
+  "products": [
+    {
+      "id": "bot-dee",
+      "displayName": "BOT-DEE",
+      "lifecycle": "beta",
+      "statusVerified": false,
+      "mission": "In-app concierge for search, help, and SMARTviews.",
+      "packaged": { "featureKey": "botDee", "IsFeatureEnabled": 1, "IsTestFeature": 1 },
+      "presentInRepo": true
+    },
+    {
+      "id": "mingl",
+      "displayName": "Mingl",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "mission": "Patron connections and chat after both people accept.",
+      "packaged": { "featureKey": "mingl", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "presentInRepo": true
+    },
+    {
+      "id": "shoutout",
+      "displayName": "ShoutOut",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "mission": "Paid LED messages at a venue.",
+      "packaged": { "featureKey": "shoutOut", "IsFeatureEnabled": 1, "IsTestFeature": 0 },
+      "presentInRepo": true
+    },
+    {
+      "id": "vip-reserv",
+      "displayName": "VIP reserV",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "mission": "Table holds and deposits where a club is subscribed.",
+      "packaged": { "featureKey": "vipReservations", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "presentInRepo": true
+    },
+    {
+      "id": "si-nema",
+      "displayName": "Si-nema",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "mission": "Virtual sets from FloqMedia Spatial Studio grants.",
+      "packaged": { "featureKey": "sinema", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "presentInRepo": true
+    },
+    {
+      "id": "si-tube",
+      "displayName": "Si-tube",
+      "lifecycle": "concept",
+      "statusVerified": false,
+      "mission": "Named in the Features SMARTview kit. No product page or feature key in this repository.",
+      "presentInRepo": false
+    }
+  ],
+  "features": [
+    {
+      "id": "bot-dee.chat",
+      "productId": "bot-dee",
+      "title": "Conversational concierge",
+      "category": "assistant",
+      "shortDescription": "Signed-in patrons can chat with BOT DEE on botdee.html for help, search, and SMARTviews.",
+      "accomplishment": "Gives a single in-app place to ask how FLOQR products work.",
+      "patronBenefit": "You do not have to hunt through admin docs for basic how-tos.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Satellite chat reuses the Search session. Feature key botDee is packaged Enabled + Test.",
+      "lifecycle": "beta",
+      "statusVerified": false,
+      "verificationNotes": "Packaged featureServices/botDee {1,1}. Live Firestore flags were not read this run. Pages hosts botdee.html on main.",
+      "audienceRoles": ["patron", "betaTester", "masterAdmin"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "mergedAt": "",
+      "releasedAt": "",
+      "releaseDateVerified": false,
+      "featureFlags": ["botDee"],
+      "sourceEvidence": [
+        {
+          "kind": "doc",
+          "url": "https://github.com/JadzAdCo/shoutout-demo/blob/868bec33e874e57ab33b73f6127641df67edec66/functions/feature-services-core.js",
+          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
+          "observedAt": "2026-11-20",
+          "note": "Packaged catalog row botDee IsFeatureEnabled 1 IsTestFeature 1",
+          "visibility": "public"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2,
+      "history": [
+        { "type": "in_development", "at": "", "note": "Code on main; live audience not verified", "public": true }
+      ]
+    },
+    {
+      "id": "bot-dee.version-smartview",
+      "productId": "bot-dee",
+      "title": "Version SMARTview",
+      "category": "smartview",
+      "shortDescription": "Ver / Vers / Version opens a Version SMARTview card with live package stamps — not Features SMARTview.",
+      "accomplishment": "Shows honest service status for BOT DEE and Gemini on this request.",
+      "patronBenefit": "You can check which package this chat is on without a six-phase dump.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Alias replies are card-only. What's New on that card is BOT DEE/Gemini notes only.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "verificationNotes": "Distinct from Features SMARTview. Do not list Master Admin tools on Version What's New.",
+      "audienceRoles": ["patron"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "releaseDateVerified": false,
+      "featureFlags": ["botDee"],
+      "sourceEvidence": [
+        {
+          "kind": "doc",
+          "note": "functions/botdee-version-smartview.js on inspected SHA",
+          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
+          "observedAt": "2026-11-20",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "bot-dee.people-smartview",
+      "productId": "bot-dee",
+      "title": "People SMARTview",
+      "category": "people",
+      "shortDescription": "Who is / What do you know of questions mount public-within-FLOQR People cards.",
+      "accomplishment": "Looks up people by identity fields only (name, handle), not bios.",
+      "patronBenefit": "You see the same public profile media as the public page, not a second profile.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "PR #141 merged identity-only scoring. Merged date is not a patron-availability date.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "verificationNotes": "Merged PR is not proof Functions were deployed from that SHA.",
+      "audienceRoles": ["patron"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "mergedAt": "2026-11-20T15:42:09Z",
+      "releasedAt": "",
+      "releaseDateVerified": false,
+      "featureFlags": ["botDee"],
+      "sourceEvidence": [
+        {
+          "kind": "pr",
+          "prNumber": 141,
+          "url": "https://github.com/JadzAdCo/shoutout-demo/pull/141",
+          "sha": "a9978516210d91bf6e2b07d3c30644d0ed0baef5",
+          "observedAt": "2026-11-20T15:42:09Z",
+          "note": "Merged. Deploy evidence not attached.",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "bot-dee.room-smartview",
+      "productId": "bot-dee",
+      "title": "Room SMARTview",
+      "category": "rooms",
+      "shortDescription": "Open Room SMARTview or plan a Cancun trip mounts a group session card. This is not Features SMARTview.",
+      "accomplishment": "Invited Mingl friends can join a BOT DEE session. Join is not a payment.",
+      "patronBenefit": "Friends can plan in one BOT DEE card instead of scattered chats — when the session path is available to you.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Confirm + invite path exists in code. Live audience follows botDee + mingl gates.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "audienceRoles": ["patron", "betaTester"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "mergedAt": "2026-11-19T21:23:03Z",
+      "releasedAt": "",
+      "releaseDateVerified": false,
+      "featureFlags": ["botDee", "mingl"],
+      "sourceEvidence": [
+        {
+          "kind": "pr",
+          "prNumber": 128,
+          "url": "https://github.com/JadzAdCo/shoutout-demo/pull/128",
+          "sha": "dc24880cf8ebb02062136794e0827435f7a36dcd",
+          "observedAt": "2026-11-19T21:23:03Z",
+          "note": "Merged with Room join + headless VIP. Not a Features SMARTview release.",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "mingl.connections",
+      "productId": "mingl",
+      "title": "Mutual connections and chat",
+      "category": "social",
+      "shortDescription": "Mingl chat opens after both people accept. Packaged Mingl default is Off + Test.",
+      "accomplishment": "Keeps chat behind a two-way accept and a Features & Services gate.",
+      "patronBenefit": "Mingl stays hidden until the platform actually opened it for your account.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Packaged featureServices/mingl {0,1}. Live flags may differ and were not read this run.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "verificationNotes": "Do not treat Search tile presence for Master Admin QA as a public release.",
+      "audienceRoles": ["betaTester", "masterAdmin"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "releaseDateVerified": false,
+      "featureFlags": ["mingl"],
+      "sourceEvidence": [
+        {
+          "kind": "feature_flag",
+          "note": "Packaged default Off. Live featureServices/mingl not read.",
+          "observedAt": "2026-11-20",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "mingl.room-smartview-collab",
+      "productId": "mingl",
+      "title": "Room SMARTview collaboration",
+      "category": "rooms",
+      "shortDescription": "Helps invited patrons plan in a shared BOT DEE workspace. Kit sample card — status not verified.",
+      "accomplishment": "Shared decisions in Room SMARTview, not a second Mingl product.",
+      "patronBenefit": "Reduces planning friction for groups when the session is available.",
+      "previousBehavior": "Hypothesis: planning spread across individual chats — not verified.",
+      "proposedBehavior": "Shared itinerary and optional later tab. Do not imply shipped GroupPay or 16-person calls.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "audienceRoles": ["betaTester"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "releaseDateVerified": false,
+      "featureFlags": ["mingl", "botDee"],
+      "sourceEvidence": [
+        {
+          "kind": "doc",
+          "note": "Kit compact-card example explicitly unverified",
+          "observedAt": "2026-11-20",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "shoutout.venue-led",
+      "productId": "shoutout",
+      "title": "Venue ShoutOut display",
+      "category": "display",
+      "shortDescription": "Paid LED messages play on venue Display 1. Packaged ShoutOut is Enabled and not a test feature.",
+      "accomplishment": "Patrons can compose a ShoutOut for a club LED when the venue is enabled.",
+      "patronBenefit": "Your message can appear on the club board after pay and club approve.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Packaged shoutOut {1,0}. Live Firestore flags and first patron-available date are not verified.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "verificationNotes": "Design notes say only ShoutOut is live by default. That is packaged intent, not a dated deployment attestation. Lifecycle is not Released until availability evidence is attached.",
+      "audienceRoles": ["patron"],
+      "supportedPlatforms": ["web", "led"],
+      "availability": "unknown",
+      "releaseDateVerified": false,
+      "featureFlags": ["shoutOut"],
+      "sourceEvidence": [
+        {
+          "kind": "feature_flag",
+          "note": "Packaged default live. Firestore live doc not read. Pages hosts composer.",
+          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
+          "observedAt": "2026-11-20",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "shoutout.headless-chat",
+      "productId": "shoutout",
+      "title": "ShoutOut from BOT DEE chat",
+      "category": "headless",
+      "shortDescription": "Throw a ShoutOut in BOT DEE with SMARTpreview. LED still waits on Club Admin Approve.",
+      "accomplishment": "Collects venue, template, handle, and board type in chat.",
+      "patronBenefit": "You can start a ShoutOut without leaving BOT DEE — when that path is available.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "audienceRoles": ["patron"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "releaseDateVerified": false,
+      "featureFlags": ["shoutOut", "botDee"],
+      "sourceEvidence": [
+        {
+          "kind": "doc",
+          "note": "Headless ShoutOut SMARTpreview on main; not a dated public release",
+          "observedAt": "2026-11-20",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "vip-reserv.holds",
+      "productId": "vip-reserv",
+      "title": "VIP table holds and deposits",
+      "category": "reservations",
+      "shortDescription": "Hold a table, accept Terms, pay a deposit when the club requires it. Phase 2 code is on main.",
+      "accomplishment": "Keeps inventory on a timed hold before checkout.",
+      "patronBenefit": "You can reserve a published table when VIP reserV is enabled for that club and your account.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Packaged vipReservations {0,1}. Club must also enable VIP. Live flags not read.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "verificationNotes": "Do not mark Released from conversation. GroupPay is not this feature.",
+      "audienceRoles": ["betaTester", "masterAdmin"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "mergedAt": "2026-10-17T15:01:34Z",
+      "releasedAt": "",
+      "releaseDateVerified": false,
+      "featureFlags": ["vipReservations"],
+      "sourceEvidence": [
+        {
+          "kind": "pr",
+          "prNumber": 2,
+          "url": "https://github.com/JadzAdCo/shoutout-demo/pull/2",
+          "sha": "3ee9f31cede069f6ca6a9440505fb71022124ace",
+          "observedAt": "2026-10-17T15:01:34Z",
+          "note": "Terms/flow merged. Not proof of patron availability.",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "vip-reserv.headless",
+      "productId": "vip-reserv",
+      "title": "VIP reserV from BOT DEE chat",
+      "category": "headless",
+      "shortDescription": "Ask BOT DEE to hold a VIP table. BOT DEE never takes card numbers.",
+      "accomplishment": "Names club, night, and table or area, then hold → Terms → pay if required.",
+      "patronBenefit": "You can start a hold in chat when VIP reserV is available to you.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "audienceRoles": ["betaTester"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "mergedAt": "2026-11-20T15:51:37Z",
+      "releasedAt": "",
+      "releaseDateVerified": false,
+      "featureFlags": ["vipReservations", "botDee"],
+      "sourceEvidence": [
+        {
+          "kind": "pr",
+          "prNumber": 134,
+          "url": "https://github.com/JadzAdCo/shoutout-demo/pull/134",
+          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
+          "observedAt": "2026-11-20T15:51:37Z",
+          "note": "Merged to main. Functions deploy from this SHA not independently attested this run.",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "si-nema.virtual-set",
+      "productId": "si-nema",
+      "title": "Si-nema virtual set",
+      "category": "studio",
+      "shortDescription": "Load a granted FloqMedia Spatial Studio project as a virtual set. Geometry stays on FloqMedia.",
+      "accomplishment": "FloqR stores a pin (projectId + revision), not a copy of photos or meshes.",
+      "patronBenefit": "You can open a granted set in Si-nema when the feature is enabled for you.",
+      "previousBehavior": "Not verified",
+      "currentBehavior": "Satellite sinema.html exists. Packaged sinema {0,1}. Search tile stays hidden until flags allow.",
+      "proposedBehavior": "AI movie workflows from the kit sample are not shipped.",
+      "lifecycle": "in_development",
+      "statusVerified": false,
+      "verificationNotes": "Si-nema product page is not Features SMARTview. Do not mark AI movie creation Released.",
+      "audienceRoles": ["betaTester", "masterAdmin"],
+      "supportedPlatforms": ["web"],
+      "availability": "unknown",
+      "mergedAt": "2026-11-15T08:01:44Z",
+      "releasedAt": "",
+      "releaseDateVerified": false,
+      "featureFlags": ["sinema"],
+      "sourceEvidence": [
+        {
+          "kind": "pr",
+          "prNumber": 84,
+          "url": "https://github.com/JadzAdCo/shoutout-demo/pull/84",
+          "sha": "628c32fd3d78deeb1a5e784b5d42e250d5768bd2",
+          "observedAt": "2026-11-15T08:01:44Z",
+          "note": "OIDC + pins merged. Production firestore.rules for Spatial still draft per FEATURE-WIRING.",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "si-nema.ai-movie",
+      "productId": "si-nema",
+      "title": "AI movie creation",
+      "category": "concept",
+      "shortDescription": "Kit sample concept only. Not verified in this repository as a patron feature.",
+      "accomplishment": "None verified.",
+      "patronBenefit": "Not available.",
+      "proposedBehavior": "Story-bible movies are a documentation standard (Aurelia scene), not a shipped Si-nema workflow.",
+      "lifecycle": "concept",
+      "statusVerified": false,
+      "audienceRoles": [],
+      "supportedPlatforms": [],
+      "availability": "unknown",
+      "releaseDateVerified": false,
+      "sourceEvidence": [
+        {
+          "kind": "doc",
+          "note": "SAMPLE_CATALOG.json exampleFeature; unverified",
+          "observedAt": "2026-11-20",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    },
+    {
+      "id": "si-tube.viewing",
+      "productId": "si-tube",
+      "title": "AI movie viewing and distribution",
+      "category": "concept",
+      "shortDescription": "Named in the Features SMARTview kit. No Si-tube page, feature key, or callables in this repo.",
+      "accomplishment": "None in this repository.",
+      "patronBenefit": "Not available.",
+      "lifecycle": "concept",
+      "statusVerified": false,
+      "audienceRoles": [],
+      "supportedPlatforms": [],
+      "availability": "unknown",
+      "releaseDateVerified": false,
+      "presentInRepo": false,
+      "sourceEvidence": [
+        {
+          "kind": "doc",
+          "note": "Repo grep found no sitube product implementation on inspected SHA",
+          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
+          "observedAt": "2026-11-20",
+          "visibility": "internal"
+        }
+      ],
+      "publicCopyApproved": false,
+      "catalogVersion": 2
+    }
+  ]
+}

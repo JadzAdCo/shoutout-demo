@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.055";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.055";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.056";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.056";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,6 +223,17 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.056",
+      title: "s3.3.056 — Features SMARTview six-product catalog + BOT DEE retrieval",
+      checks: [
+        {label:"Six product display names", file:"features-smartview/catalog.json", includes:["BOT-DEE", "Mingl", "ShoutOut", "VIP reserV", "Si-nema", "Si-tube"], notIncludes:["floqCast"]},
+        {label:"Core byte-identical", file:"features-smartview-core.js", includes:["STATUS_NOT_VERIFIED", "isFeaturesSmartViewPrompt", "publicProjection"]},
+        {label:"Satellite session shell", file:"features-smartview.html", includes:["FLOQRSessionShell.bind", "features-smartview-core.js"]},
+        {label:"Editorial callables", file:"functions/features-smartview-functions.js", includes:["approveFeaturesSmartViewCopy", "rollbackFeaturesSmartViewCopy"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-056-features-smartview"]}
+      ]
+    },
+    {
       version: "s3.3.055",
       title: "s3.3.055 — Headless VIP reserV intercept, Hold it CTA, Aurelia copy",
       checks: [
@@ -318,7 +329,7 @@
       checks: [
         {label:"Save busy module", file:"floqr-save-busy.js", includes:["FLOQRSaveBusy", "Command received", "app.saveReceived"]},
         {label:"Save busy on Master Admin", file:"master-admin.html", includes:["floqr-save-busy.js"]},
-        {label:"Features SMARTview catalog", file:"features-smartview/catalog.json", includes:["Si-tube", "BOT DEE", "floqCast", "statusVerified"]},
+        {label:"Features SMARTview catalog", file:"features-smartview/catalog.json", includes:["Si-tube", "statusVerified"]},
         {label:"Features SMARTview host", file:"master-admin.html", includes:["botDeeMasterLoadFeaturesSmartView", "botDeeMasterFeaturesSmartView"]},
         {label:"Manual tests", file:"ai-diagnostics-service.js", includes:["s3-3-047-save-busy-command-received", "s3-3-047-features-smartview-master"]}
       ]
@@ -3682,12 +3693,21 @@
       troubleshoot:"Mingl still disabled → Reload Release Control so live featureServices/mingl loads (packaged default is Off). Save hangs after Command received… → Functions still on the old setBetaTesterFeatures that takes the audit-head lock for unchanged grants; wait for [firebase-deploy-features]. Find misses her email → paste the exact Auth sign-in email; callable must be deployed. She is not an active tester → Invite first, she must accept beta-invite.html."
     },
     {
+      id:"s3-3-056-features-smartview",
+      area:"BOT DEE / Features SMARTview",
+      feature:"Features SMARTview six-product catalog (Status not verified)",
+      changed:"s3.3.056 replaces the eight-badge stub with six kit products (BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, Si-tube), six views, compact+detail cards, BOT DEE retrieval with citations, and editorial approve/rollback callables. No feature is Released. What's New is empty. Do not merge/deploy without Don's approval.",
+      howToTest:"1) After Pages publish (not this PR unless Don approves): hard-refresh features-smartview.html until features-smartview-core.js?v=s3.3.056. 2) Sign in on Search first. 3) Confirm six product chips and Status not verified on every card. 4) What's New empty. 5) Si-tube has no Try. 6) In BOT DEE say What can Mingl do — Features card, not Version, not Room. 7) Master Admin → Features Mgmt → BOT DEE → Show Features SMARTview. 8) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Six names exact. No floqCast / FloqR product cards. No Try. BOT DEE admits not verified and will not treat a plan as shipped.",
+      troubleshoot:"Eight old badges → cached s3.3.047 catalog. Version card instead of Features → prompt was Ver, not a product question. Room card → Open Room SMARTview / Cancun trip. Functions 404 on approve → this PR is Pages+code only until Don deploys."
+    },
+    {
       id:"s3-3-047-features-smartview-master",
       area:"Master Admin",
-      feature:"Features SMARTview (eight products, Status not verified)",
-      changed:"Master Admin → Features Mgmt → BOT DEE → SMARTviews → Show Features SMARTview. Catalog is evidence-backed: packaged flags only, Si-tube marked not in repo, no invented Beta-since dates. Live Firestore flags not verified this run.",
-      howToTest:"1) Hard-refresh Master Admin. 2) Features Mgmt → BOT DEE (`#featuresBotDee`) → SMARTviews. 3) Click Show Features SMARTview. 4) Confirm eight cards: FloqR, BOT DEE, Mingl, ShoutOut, VIP reserV, floqCast, Si-nema, Si-tube. 5) Every badge says Status not verified. Si-tube says Not in this repository.",
-      expected:"No BOT-DEE / FloqCAST misspellings. No Try action on Si-tube. No fabricated release dates.",
+      feature:"Features SMARTview (six products as of s3.3.056, Status not verified)",
+      changed:"Master Admin → Features Mgmt → BOT DEE → SMARTviews → Show Features SMARTview. Catalog is evidence-backed: packaged flags only, Si-tube marked not in repo, no invented Beta-since dates. Live Firestore flags not verified this run. s3.3.056 dropped FloqR and floqCast from this catalog.",
+      howToTest:"1) Hard-refresh Master Admin. 2) Features Mgmt → BOT DEE (`#featuresBotDee`) → SMARTviews. 3) Click Show Features SMARTview. 4) Confirm six cards: BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, Si-tube. 5) Every badge says Status not verified. Si-tube says Not in this repository.",
+      expected:"Exact kit display names. No Try action on Si-tube. No fabricated release dates. FloqR and floqCast are not Features SMARTview products.",
       troubleshoot:"Button missing → master-admin.html host + floqr-features-smartview.js. Catalog 404 → features-smartview/catalog.json not on Pages. Live availability still unknown until Firebase flags are read."
     },
     {

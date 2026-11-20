@@ -201,6 +201,12 @@ test("Version / package questions answer with FLOQR stamp", () => {
   assert.equal(bot.isVersionPrompt("what is the VIP package"), false);
   assert.equal(bot.isVersionPrompt("tell me about the ShoutOut package"), false);
   assert.equal(bot.isVersionPrompt("what package for baller alert"), false);
+  assert.equal(bot.isVersionPrompt("what changed in Mingl"), false);
+  assert.equal(bot.isVersionPrompt("What can Mingl do?"), false);
+  assert.equal(bot.isFeaturesSmartViewPrompt("what changed in Mingl"), true);
+  assert.equal(bot.isFeaturesSmartViewPrompt("What can Mingl do?"), true);
+  assert.equal(bot.isFeaturesSmartViewPrompt("Ver"), false);
+  assert.equal(bot.isFeaturesSmartViewPrompt("Open Room SMARTview"), false);
 
   const reply = bot.versionReply("patron", "what is your version?");
   assert.match(reply, /BOT DEE/i);

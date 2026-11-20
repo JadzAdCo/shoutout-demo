@@ -962,7 +962,7 @@ When adding a section, use this skeleton:
 | **Release Control** | Feature flag table + **Test → live** promotion; loads flags only |
 | **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists. Packaged Mingl default is Off; **live `featureServices/mingl` wins** (Master Admin using Mingl as beta means Enable Feature 1 + Enable Beta 1 — checkboxes are not disabled). **Find patron (s3.3.049):** `findBetaPatron` (SOS2FA Master Admin) uses Auth `getUserByEmail` then `users.email` / `floqrHandle` equality — no 120-doc scan. Returns uid/email/handle + active-tester flag; no IP stored; no new collection (`users` / `betaTesters` already classified). Client falls back to `users.where(email ==)` if the callable is not deployed yet. **Tester Save:** `setBetaTesterFeatures` rejects “Nothing changed” **before** the audit-head transaction; UI does not await Audit Trail after Save (that N+1 `users/{uid}` read was the “took forever” hang). |
 | **Save busy (s3.3.047)** | `floqr-save-busy.js` greys Save on click and sets **Command received…** when a callable/Firestore write starts. Loaded after `floqr-nav.js`. |
-| **Features SMARTview (s3.3.047)** | Catalog `features-smartview/catalog.json`; UI `floqr-features-smartview.js`. Master Admin → Features Mgmt → BOT DEE → SMARTviews → **Show Features SMARTview**. Product badges stay **Status not verified** until live flags + deploy evidence. Si-tube is not in this repo. |
+| **Features SMARTview (s3.3.056)** | Six products only: **BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, Si-tube** (kit names; not Room SMARTview, not Version SMARTview, not floqCast/FloqR cards). Git catalog `features-smartview/catalog.json` (+ Functions copy) is Pages truth. Core `features-smartview-core.js` is byte-identical with `functions/features-smartview-core.js`. Satellite `features-smartview.html` (`FLOQRSessionShell`). BOT DEE retrieval via `isFeaturesSmartViewPrompt` + `buildSmartView` (citations to `features-smartview.html?feature=`; never treats a plan as shipped). Editorial SOS2FA callables `getFeaturesSmartViewCatalog` / `approveFeaturesSmartViewCopy` / `rollbackFeaturesSmartViewCopy`. Firestore `featuresSmartviewApprovals` / `Drafts` / `AuditLogs` Functions-write. Ingest `scripts/ingest-features-smartview.js` (local `gh`; cache gitignored). **No merge/deploy until Don approves.** Every feature `statusVerified: false`; What's New empty; Si-tube `presentInRepo: false`. Help `help-features-smartview` / `-status` / `-botdee`. |
 | **Audit Trail** | Hash-chained activity log + Verify integrity; loads audit only |
 | **Legacy deep link** | `#featuresServices` → `#featuresReleaseControl` |
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
@@ -1133,3 +1133,19 @@ Live package **s3.2.71**. Resume `@halloween$`.
 | **Help** | `help-classic-halloween` (patron) in `botdee-help-repository.js`, `scripts/_help-en.json`, `floqr-i18n-help.js` (10 langs); BOT DEE intent `classic-halloween` in `intent-search.js`; regenerated `functions/botdee-content-classes.json` + `functions/bot-dee-search-catalog.json` |
 | **Diagnostics** | Manual Feature Test `s3-2-71-classic-halloween`; package install checks `s3.2.71` |
 | **Tests / QA** | `functions/classic-halloween-template.test.js`; visual QA `node reports/classic-halloween/halloween-qa.mjs` → `reports/classic-halloween/*.png` + `qa-results.json` |
+
+## Features SMARTview (s3.3.056)
+
+Product-discovery catalog. **Not** Room SMARTview / SMARTvisuals and **not** BOT DEE Version SMARTview. Resume from kit `internal/FLOQR_Features_SMARTview_Cursor_Package/`. **Do not merge or deploy until Don approves.**
+
+| Layer | Wiring |
+|---|---|
+| Surfaces | Satellite `features-smartview.html` (session shell, no `data-floqr-feature` gate). Master Admin → Features Mgmt → BOT DEE → SMARTviews → Show Features SMARTview. BOT DEE chat card via `botdee-smartview.js` `mountPayload`. |
+| Products | Exact display names: BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, Si-tube. Views: Overview, What's New, Feature Journey, All Features, Coming Soon, Past/Retired. Compact card + detail sheet. Try only when `statusVerified` + released/beta + availability + `canAccess`. |
+| Client | `features-smartview-core.js`, `floqr-features-smartview.js` / `.css`, catalog `features-smartview/catalog.json`. Cache-bust `?v=s3.3.056` on those scripts only. Nav links have no hardcoded `?v=`. |
+| Backend | `functions/features-smartview-functions.js` (`getFeaturesSmartViewCatalog`, `approveFeaturesSmartViewCopy`, `rollbackFeaturesSmartViewCopy`). SOS2FA via `assertAdmin`. Catalog copy `functions/features-smartview/catalog.json` must stay byte-identical. |
+| Data | Git catalog is public Pages truth. Firestore `featuresSmartviewApprovals` / `featuresSmartviewDrafts` / `featuresSmartviewAuditLogs` — Master Admin read, Functions write. Classification in `data-classification-core.js`. Ingest cache gitignored. |
+| BOT DEE | `isFeaturesSmartViewPrompt` wins over Version for product-scoped “what changed in Mingl”. Bare `Ver` stays Version. Room / Cancun / throw ShoutOut / hold VIP stay other cards. Citations are catalog pages, never private PR URLs. |
+| Help | `help-features-smartview`, `help-features-smartview-status`, `help-features-smartview-botdee` |
+| Tests | `functions/features-smartview.test.js`, i18n coverage, Manual Feature Test `s3-3-056-features-smartview` |
+| Status this PR | Every record `statusVerified: false`, `releaseDateVerified: false`, `publicCopyApproved: false`. What's New empty. Si-tube not in repo. SAMPLE_CATALOG.json unverified. |

@@ -875,6 +875,50 @@
       audiences: ["patron", "masterAdmin"]
     },
     {
+      id: "help-features-smartview",
+      title: "Features SMARTview",
+      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status stays Status not verified until availability is evidenced. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview and not Version SMARTview. Plans are never treated as shipped.",
+      searchPhrases: [
+        "features smartview", "feature catalog", "what can mingl do", "product features",
+        "coming soon si-nema", "si-tube", "bot-dee features", "feature journey"
+      ],
+      links: [
+        {label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})},
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "masterAdmin"]
+    },
+    {
+      id: "help-features-smartview-status",
+      title: "Status not verified",
+      body: "Features SMARTview shows Status not verified when live flags, Pages rollout, or patron availability dates were not checked. Merged on is a pull-request merge time, not Available since. Released is only shown with deployment or availability evidence. SAMPLE catalog rows and conversation claims are not proof of a live release.",
+      searchPhrases: [
+        "status not verified", "date implemented", "merged on", "available since",
+        "not verified feature", "released evidence"
+      ],
+      links: [
+        {label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "masterAdmin"]
+    },
+    {
+      id: "help-features-smartview-botdee",
+      title: "Ask BOT DEE about a product",
+      body: "In BOT DEE say What can Mingl do, What changed in ShoutOut, What is coming to Si-nema, or When was VIP reserV implemented. BOT DEE answers from the Features catalog with citations. It admits Status not verified and will not treat a plan as shipped. Type Ver for Version SMARTview. Type Open Room SMARTview for a shared room. Those are different cards.",
+      searchPhrases: [
+        "what can mingl do", "what changed in shoutout", "what is coming to si-nema",
+        "when was vip reserv implemented", "ask bot dee features", "features catalog citation"
+      ],
+      links: [
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},
+        {label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "masterAdmin"]
+    },
+    {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
       body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit when the club requires one. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe (or confirm without checkout if the venue does not require a deposit). A table only shows booked/unavailable (isReserved=1) after that payment or no-deposit confirm — a hold alone stays amber. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",

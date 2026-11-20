@@ -172,6 +172,9 @@
     ["smartVisualAdPolicy", "master", 0, "SMARTvisuals labeled-ad slot policy (AdSense off; mock fill from authorized tags)"],
     ["smartVisualAuditLogs", "master", 1, "SMARTvisual Studio publish/override/sanitizer denials (actor email; Functions-write)"],
     ["smartVisualDrafts", "master", 1, "Unpublished SMARTstencil/SMARTbackground drafts; patrons never read"],
+    ["featuresSmartviewApprovals", "master", 0, "Editorial approval stamps for Features SMARTview public copy; Functions-write; no IP"],
+    ["featuresSmartviewDrafts", "master", 0, "Unpublished Features SMARTview ingest drafts; patrons never read; Functions-write"],
+    ["featuresSmartviewAuditLogs", "master", 1, "Features SMARTview approve/rollback audit (actor email; Functions-write; no IP)"],
     ["smartVisualOverrides", "master", 0, "Authorized host/admin SMARTvisual asset overrides (Functions-write)"],
     ["smartVisualSelections", "secret", 0, "Cached classification hash → approved asset IDs (Functions-write; no titles stored)"],
     ["sos2faChallenges", "secret", 1, "SOS2FA sign-in challenges"],
@@ -294,7 +297,9 @@
     ["clubEmployeeDesignations", "workerEmail", "ownClubAdmin", 1, "Staff member email"],
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"],
     ["smartVisualDrafts", "svgXml", "master", 0, "Sanitized unpublished SVG markup for Studio Review; patrons never read"],
-    ["smartVisualDrafts", "svgChecksumSha256", "master", 0, "SHA-256 of the sanitized draft SVG"]
+    ["smartVisualDrafts", "svgChecksumSha256", "master", 0, "SHA-256 of the sanitized draft SVG"],
+    ["featuresSmartviewApprovals", "publicCopy", "master", 0, "Reviewer-approved patron-facing feature copy; no PR bodies or secrets"],
+    ["featuresSmartviewApprovals", "publicCopyReviewer", "master", 1, "Master Admin email that approved Features SMARTview copy"]
   ];
 
   const CATALOG = ROWS.map(presetRow);
@@ -639,7 +644,8 @@
     peopleDirectory: {purpose: "Show other members' profiles without private fields; club contacts only to that club's admins", collections: ["users", "clubLocations", "clubAdminAssignments", "clubEmployeeDesignations", "workerAssociationRequests", "minglConnections", "chatRooms"]},
     botDeeSession: {purpose: "Mingl-friends BOT DEE rooms, invites, shared thread, itinerary, and FloqR Stripe tab", collections: ["botDeeRooms", "botDeeRoomMembers", "botDeeRoomInvites", "botDeeRoomTabs", "botDeeRoomAudit", "botDeeRoomInviteThrottle", "botDeeRoomTurnThrottle", "minglConnections", "userBlocks", "users", "inboxNotifications"]},
     shoutoutStories: {purpose: "Show approved ShoutOuts as Mingl Gist stories without the submitter's contact details", collections: ["shoutouts"]},
-    patronAccountUnifier: {purpose: "Claim a required mobile as the patron record unifier and merge duplicate Auth accounts without deleting Auth or storing client IP", collections: ["users", "phoneIndex", "betaTesters", "minglConnections", "inboxNotifications", "botDeeThreads", "botDeeRooms", "botDeeRoomMembers", "botDeeRoomInvites", "userBlocks", "usercharacter_analysis", "featureServiceAuditLogs", "featureServiceAuditHead"]}
+    patronAccountUnifier: {purpose: "Claim a required mobile as the patron record unifier and merge duplicate Auth accounts without deleting Auth or storing client IP", collections: ["users", "phoneIndex", "betaTesters", "minglConnections", "inboxNotifications", "botDeeThreads", "botDeeRooms", "botDeeRoomMembers", "botDeeRoomInvites", "userBlocks", "usercharacter_analysis", "featureServiceAuditLogs", "featureServiceAuditHead"]},
+    featuresSmartViewIngest: {purpose: "Stamp editorial approval or rollback for Features SMARTview public copy without publishing git catalog automatically", collections: ["featuresSmartviewApprovals", "featuresSmartviewDrafts", "featuresSmartviewAuditLogs"]}
   };
 
   function systemJob(job, collection) {

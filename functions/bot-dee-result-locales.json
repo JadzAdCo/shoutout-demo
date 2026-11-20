@@ -495,6 +495,30 @@
           "label": "VIP reserV aus dem BOT DEE-Chat",
           "blurb": "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennu"
         },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview ist der Produktkatalog für BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema und Si-tube. Öffne Überblick, Neuigkeiten, Feature-Reise, Alle Features, Demnächst oder Vergangen/Retired. Der Status bleibt Status not verified, bis Verfügbarkeit belegt ist. Neuigkeiten "
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview ist der Produktkatalog für BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema und Si-tube. Öffne Überblick, Neuigkeiten, Feature-Reise, Alle Features, Demnächst oder Vergangen/Retired. Der Status bleibt Status not verified, bis Verfügbarkeit belegt ist. Neuigkeiten "
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview zeigt Status not verified, wenn Live-Flags, Pages-Rollout oder Patron-Verfügbarkeitsdaten nicht geprüft wurden. Merged on ist eine Pull-Request-Merge-Zeit, nicht Available since. Released erscheint nur mit Deploy- oder Verfügbarkeitsbeleg. SAMPLE-Zeilen und Ges"
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview zeigt Status not verified, wenn Live-Flags, Pages-Rollout oder Patron-Verfügbarkeitsdaten nicht geprüft wurden. Merged on ist eine Pull-Request-Merge-Zeit, nicht Available since. Released erscheint nur mit Deploy- oder Verfügbarkeitsbeleg. SAMPLE-Zeilen und Ges"
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "BOT DEE zu einem Produkt fragen",
+          "blurb": "Sage in BOT DEE What can Mingl do, What changed in ShoutOut, What is coming to Si-nema oder When was VIP reserV implemented. BOT DEE antwortet aus dem Features-Katalog mit Zitaten. Es gibt Status not verified zu und behandelt einen Plan nicht als ausgeliefert. Tippe Ver für Versi"
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "BOT DEE zu einem Produkt fragen",
+          "blurb": "Sage in BOT DEE What can Mingl do, What changed in ShoutOut, What is coming to Si-nema oder When was VIP reserV implemented. BOT DEE antwortet aus dem Features-Katalog mit Zitaten. Es gibt Status not verified zu und behandelt einen Plan nicht als ausgeliefert. Tippe Ver für Versi"
+        },
         "help:help-vip-book-table": {
           "label": "VIP-Tisch buchen (VIP reserV)",
           "blurb": "VIP reserV zeigt den Saalplan und bucht Tische. Öffne VIP reserV aus der Suche, wähle Decades oder Lima Twist Club und einen Abend, tippe einen grünen Tisch, halte 30 Minuten, akzeptiere die AGB und zahle die Anzahlung mit FloqR Stripe. Bars und DJ nie buchbar. Marke VIP reserV w"
@@ -1565,6 +1589,30 @@
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV depuis le chat BOT DEE",
           "blurb": "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de c"
+        },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview est le catalogue produits de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema et Si-tube. Ouvrez Aperçu, Nouveautés, Parcours, Toutes les fonctions, Bientôt ou Passé/retiré. Le statut reste Status not verified tant que la disponibilité n’est pas prouvée. Nouveauté"
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview est le catalogue produits de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema et Si-tube. Ouvrez Aperçu, Nouveautés, Parcours, Toutes les fonctions, Bientôt ou Passé/retiré. Le statut reste Status not verified tant que la disponibilité n’est pas prouvée. Nouveauté"
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview affiche Status not verified lorsque les flags live, le déploiement Pages ou les dates de disponibilité patrons n’ont pas été vérifiés. Merged on est une heure de fusion de pull request, pas Available since. Released n’apparaît qu’avec une preuve de déploiement "
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview affiche Status not verified lorsque les flags live, le déploiement Pages ou les dates de disponibilité patrons n’ont pas été vérifiés. Merged on est une heure de fusion de pull request, pas Available since. Released n’apparaît qu’avec une preuve de déploiement "
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "Demander à BOT DEE un produit",
+          "blurb": "Dans BOT DEE dites What can Mingl do, What changed in ShoutOut, What is coming to Si-nema ou When was VIP reserV implemented. BOT DEE répond depuis le catalogue Features avec des citations. Il admet Status not verified et ne traitera pas un plan comme livré. Tapez Ver pour Versio"
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "Demander à BOT DEE un produit",
+          "blurb": "Dans BOT DEE dites What can Mingl do, What changed in ShoutOut, What is coming to Si-nema ou When was VIP reserV implemented. BOT DEE répond depuis le catalogue Features avec des citations. Il admet Status not verified et ne traitera pas un plan comme livré. Tapez Ver pour Versio"
         },
         "help:help-vip-book-table": {
           "label": "Réserver une table VIP (VIP reserV)",
@@ -2637,6 +2685,30 @@
           "label": "VIP reserV desde el chat de BOT DEE",
           "blurb": "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no"
         },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview es el catálogo de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema y Si-tube. Abre Resumen, Novedades, Recorrido, Todas las funciones, Próximamente o Pasado/Retired. El estado permanece Status not verified hasta que haya evidencia de disponibilidad. Novedades qued"
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview es el catálogo de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema y Si-tube. Abre Resumen, Novedades, Recorrido, Todas las funciones, Próximamente o Pasado/Retired. El estado permanece Status not verified hasta que haya evidencia de disponibilidad. Novedades qued"
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview muestra Status not verified cuando no se comprobaron flags en vivo, el despliegue de Pages o las fechas de disponibilidad para patrons. Merged on es la hora de fusión de un pull request, no Available since. Released solo aparece con evidencia de despliegue o di"
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview muestra Status not verified cuando no se comprobaron flags en vivo, el despliegue de Pages o las fechas de disponibilidad para patrons. Merged on es la hora de fusión de un pull request, no Available since. Released solo aparece con evidencia de despliegue o di"
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "Preguntar a BOT DEE por un producto",
+          "blurb": "En BOT DEE di What can Mingl do, What changed in ShoutOut, What is coming to Si-nema o When was VIP reserV implemented. BOT DEE responde desde el catálogo Features con citas. Admite Status not verified y no trata un plan como entregado. Escribe Ver para Version SMARTview. Escribe"
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "Preguntar a BOT DEE por un producto",
+          "blurb": "En BOT DEE di What can Mingl do, What changed in ShoutOut, What is coming to Si-nema o When was VIP reserV implemented. BOT DEE responde desde el catálogo Features con citas. Admite Status not verified y no trata un plan como entregado. Escribe Ver para Version SMARTview. Escribe"
+        },
         "help:help-vip-book-table": {
           "label": "Reservar mesa VIP (VIP reserV)",
           "blurb": "VIP reserV muestra el mapa y reserva mesas. Abre VIP reserV desde Buscar, elige Decades o Lima Twist Club y una noche, toca una mesa verde, reserva 30 minutos, acepta Términos y paga el depósito con FloqR Stripe. Barras y DJ no reservables. En Aurelia, use Explore 3D walk-through"
@@ -3707,6 +3779,30 @@
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV dalla chat BOT DEE",
           "blurb": "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview "
+        },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview è il catalogo prodotti di BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema e Si-tube. Apri Panoramica, Novità, Percorso, Tutte le funzioni, Prossimamente o Passato/Retired. Lo stato resta Status not verified finché la disponibilità non è evidenziata. Novità resta "
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview è il catalogo prodotti di BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema e Si-tube. Apri Panoramica, Novità, Percorso, Tutte le funzioni, Prossimamente o Passato/Retired. Lo stato resta Status not verified finché la disponibilità non è evidenziata. Novità resta "
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview mostra Status not verified quando flag live, rollout Pages o date di disponibilità patron non sono stati controllati. Merged on è l’ora di merge di una pull request, non Available since. Released compare solo con evidenza di deploy o disponibilità. Righe SAMPLE"
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview mostra Status not verified quando flag live, rollout Pages o date di disponibilità patron non sono stati controllati. Merged on è l’ora di merge di una pull request, non Available since. Released compare solo con evidenza di deploy o disponibilità. Righe SAMPLE"
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "Chiedere a BOT DEE un prodotto",
+          "blurb": "In BOT DEE di’ What can Mingl do, What changed in ShoutOut, What is coming to Si-nema o When was VIP reserV implemented. BOT DEE risponde dal catalogo Features con citazioni. Ammette Status not verified e non tratta un piano come rilasciato. Digita Ver per Version SMARTview. Digi"
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "Chiedere a BOT DEE un prodotto",
+          "blurb": "In BOT DEE di’ What can Mingl do, What changed in ShoutOut, What is coming to Si-nema o When was VIP reserV implemented. BOT DEE risponde dal catalogo Features con citazioni. Ammette Status not verified e non tratta un piano come rilasciato. Digita Ver per Version SMARTview. Digi"
         },
         "help:help-vip-book-table": {
           "label": "Prenota un tavolo VIP (VIP reserV)",
@@ -4779,6 +4875,30 @@
           "label": "VIP reserV a partir do chat BOT DEE",
           "blurb": "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SM"
         },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview é o catálogo de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema e Si-tube. Abra Visão geral, Novidades, Jornada, Todas as funções, Em breve ou Passado/Retired. O estado permanece Status not verified até haver evidência de disponibilidade. Novidades fica vazio até"
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview é o catálogo de BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema e Si-tube. Abra Visão geral, Novidades, Jornada, Todas as funções, Em breve ou Passado/Retired. O estado permanece Status not verified até haver evidência de disponibilidade. Novidades fica vazio até"
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview mostra Status not verified quando flags ao vivo, o rollout Pages ou datas de disponibilidade para patrons não foram checados. Merged on é o horário de merge de um pull request, não Available since. Released só aparece com evidência de deploy ou disponibilidade."
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview mostra Status not verified quando flags ao vivo, o rollout Pages ou datas de disponibilidade para patrons não foram checados. Merged on é o horário de merge de um pull request, não Available since. Released só aparece com evidência de deploy ou disponibilidade."
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "Perguntar ao BOT DEE sobre um produto",
+          "blurb": "No BOT DEE diga What can Mingl do, What changed in ShoutOut, What is coming to Si-nema ou When was VIP reserV implemented. BOT DEE responde pelo catálogo Features com citações. Admite Status not verified e não trata um plano como entregue. Digite Ver para Version SMARTview. Digit"
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "Perguntar ao BOT DEE sobre um produto",
+          "blurb": "No BOT DEE diga What can Mingl do, What changed in ShoutOut, What is coming to Si-nema ou When was VIP reserV implemented. BOT DEE responde pelo catálogo Features com citações. Admite Status not verified e não trata um plano como entregue. Digite Ver para Version SMARTview. Digit"
+        },
         "help:help-vip-book-table": {
           "label": "Reservar mesa VIP (VIP reserV)",
           "blurb": "VIP reserV mostra o mapa e reserva mesas. Abra VIP reserV na Busca, escolha Decades ou Lima Twist Club e uma noite, toque numa mesa verde, segure 30 minutos, aceite os Termos e pague o depósito com FloqR Stripe. Barras e DJ não reserváveis. Em Aurelia, use Explore 3D walk-through"
@@ -5849,6 +5969,30 @@
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV из чата BOT DEE",
           "blurb": "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview"
+        },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview — каталог продуктов BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema и Si-tube. Откройте Обзор, Что нового, Путь функции, Все функции, Скоро или Прошлое/Retired. Статус остаётся Status not verified, пока нет доказательств доступности. «Что нового» пусто, пока реце"
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview — каталог продуктов BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema и Si-tube. Откройте Обзор, Что нового, Путь функции, Все функции, Скоро или Прошлое/Retired. Статус остаётся Status not verified, пока нет доказательств доступности. «Что нового» пусто, пока реце"
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview показывает Status not verified, если живые флаги, выкладка Pages или даты доступности для patron не проверялись. Merged on — время слияния pull request, не Available since. Released только при доказательстве деплоя или доступности. Строки SAMPLE и слова из разг"
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview показывает Status not verified, если живые флаги, выкладка Pages или даты доступности для patron не проверялись. Merged on — время слияния pull request, не Available since. Released только при доказательстве деплоя или доступности. Строки SAMPLE и слова из разг"
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "Спросить BOT DEE о продукте",
+          "blurb": "В BOT DEE скажите What can Mingl do, What changed in ShoutOut, What is coming to Si-nema или When was VIP reserV implemented. BOT DEE отвечает из каталога Features со ссылками. Он признаёт Status not verified и не считает план выпущенным. Введите Ver для Version SMARTview. Введит"
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "Спросить BOT DEE о продукте",
+          "blurb": "В BOT DEE скажите What can Mingl do, What changed in ShoutOut, What is coming to Si-nema или When was VIP reserV implemented. BOT DEE отвечает из каталога Features со ссылками. Он признаёт Status not verified и не считает план выпущенным. Введите Ver для Version SMARTview. Введит"
         },
         "help:help-vip-book-table": {
           "label": "Забронировать VIP-стол (VIP reserV)",
@@ -6921,6 +7065,30 @@
           "label": "VIP reserV από τη συνομιλία BOT DEE",
           "blurb": "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμού"
         },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Το Features SMARTview είναι ο κατάλογος προϊόντων για BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema και Si-tube. Ανοίξτε Επισκόπηση, Νέα, Διαδρομή, Όλες τις λειτουργίες, Σύντομα ή Παρελθόν/Retired. Η κατάσταση μένει Status not verified μέχρι να τεκμηριωθεί η διαθεσιμότητα. Τα Νέα"
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Το Features SMARTview είναι ο κατάλογος προϊόντων για BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema και Si-tube. Ανοίξτε Επισκόπηση, Νέα, Διαδρομή, Όλες τις λειτουργίες, Σύντομα ή Παρελθόν/Retired. Η κατάσταση μένει Status not verified μέχρι να τεκμηριωθεί η διαθεσιμότητα. Τα Νέα"
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Το Features SMARTview δείχνει Status not verified όταν δεν ελέγχθηκαν ζωντανά flags, το rollout Pages ή ημερομηνίες διαθεσιμότητας για patrons. Το Merged on είναι ώρα συγχώνευσης pull request, όχι Available since. Το Released εμφανίζεται μόνο με τεκμήριο deploy ή διαθεσιμότητας. "
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Το Features SMARTview δείχνει Status not verified όταν δεν ελέγχθηκαν ζωντανά flags, το rollout Pages ή ημερομηνίες διαθεσιμότητας για patrons. Το Merged on είναι ώρα συγχώνευσης pull request, όχι Available since. Το Released εμφανίζεται μόνο με τεκμήριο deploy ή διαθεσιμότητας. "
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "Ρώτα τον BOT DEE για ένα προϊόν",
+          "blurb": "Στο BOT DEE πες What can Mingl do, What changed in ShoutOut, What is coming to Si-nema ή When was VIP reserV implemented. Ο BOT DEE απαντά από τον κατάλογο Features με παραπομπές. Παραδέχεται Status not verified και δεν θεωρεί σχέδιο παραδομένο. Πληκτρολόγησε Ver για Version SMAR"
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "Ρώτα τον BOT DEE για ένα προϊόν",
+          "blurb": "Στο BOT DEE πες What can Mingl do, What changed in ShoutOut, What is coming to Si-nema ή When was VIP reserV implemented. Ο BOT DEE απαντά από τον κατάλογο Features με παραπομπές. Παραδέχεται Status not verified και δεν θεωρεί σχέδιο παραδομένο. Πληκτρολόγησε Ver για Version SMAR"
+        },
         "help:help-vip-book-table": {
           "label": "Κράτηση VIP τραπεζιού (VIP reserV)",
           "blurb": "Το VIP reserV δείχνει τον χάρτη και κλείνει τραπέζια. Ανοίξτε VIP reserV από Αναζήτηση, επιλέξτε Decades ή Lima Twist Club και βράδυ, πατήστε πράσινο τραπέζι, κρατήστε 30 λεπτά, αποδεχτείτε Όρους και πληρώστε με FloqR Stripe. Μπαρ και DJ μη κρατήσιμα. Στην Aurelia χρησιμοποιήστε "
@@ -7991,6 +8159,30 @@
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV z czatu BOT DEE",
           "blurb": "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołąc"
+        },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview to katalog produktów BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema i Si-tube. Otwórz Przegląd, Nowości, Ścieżkę, Wszystkie funkcje, Wkrótce lub Przeszłość/Retired. Status zostaje Status not verified, dopóki dostępność nie ma dowodu. Nowości zostają puste, aż re"
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview to katalog produktów BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema i Si-tube. Otwórz Przegląd, Nowości, Ścieżkę, Wszystkie funkcje, Wkrótce lub Przeszłość/Retired. Status zostaje Status not verified, dopóki dostępność nie ma dowodu. Nowości zostają puste, aż re"
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview pokazuje Status not verified, gdy nie sprawdzono flag na żywo, wdrożenia Pages ani dat dostępności dla patronów. Merged on to czas scalenia pull request, nie Available since. Released pojawia się tylko z dowodem wdrożenia lub dostępności. Wiersze SAMPLE i twier"
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview pokazuje Status not verified, gdy nie sprawdzono flag na żywo, wdrożenia Pages ani dat dostępności dla patronów. Merged on to czas scalenia pull request, nie Available since. Released pojawia się tylko z dowodem wdrożenia lub dostępności. Wiersze SAMPLE i twier"
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "Zapytaj BOT DEE o produkt",
+          "blurb": "W BOT DEE powiedz What can Mingl do, What changed in ShoutOut, What is coming to Si-nema albo When was VIP reserV implemented. BOT DEE odpowiada z katalogu Features z cytatami. Przyznaje Status not verified i nie traktuje planu jako dostarczonego. Wpisz Ver dla Version SMARTview."
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "Zapytaj BOT DEE o produkt",
+          "blurb": "W BOT DEE powiedz What can Mingl do, What changed in ShoutOut, What is coming to Si-nema albo When was VIP reserV implemented. BOT DEE odpowiada z katalogu Features z cytatami. Przyznaje Status not verified i nie traktuje planu jako dostarczonego. Wpisz Ver dla Version SMARTview."
         },
         "help:help-vip-book-table": {
           "label": "Zarezerwuj stolik VIP (VIP reserV)",
@@ -9063,6 +9255,30 @@
           "label": "VIP reserV vanuit BOT DEE-chat",
           "blurb": "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Ro"
         },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview is de productcatalogus voor BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema en Si-tube. Open Overzicht, Nieuw, Feature-reis, Alle features, Binnenkort of Verleden/Retired. Status blijft Status not verified tot beschikbaarheid is bewezen. Nieuw blijft leeg tot een"
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview is de productcatalogus voor BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema en Si-tube. Open Overzicht, Nieuw, Feature-reis, Alle features, Binnenkort of Verleden/Retired. Status blijft Status not verified tot beschikbaarheid is bewezen. Nieuw blijft leeg tot een"
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview toont Status not verified wanneer live flags, Pages-uitrol of patron-beschikbaarheidsdata niet zijn gecontroleerd. Merged on is een pull-request-mergetijd, niet Available since. Released verschijnt alleen met deploy- of beschikbaarheidsbewijs. SAMPLE-rijen en g"
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "Features SMARTview toont Status not verified wanneer live flags, Pages-uitrol of patron-beschikbaarheidsdata niet zijn gecontroleerd. Merged on is een pull-request-mergetijd, niet Available since. Released verschijnt alleen met deploy- of beschikbaarheidsbewijs. SAMPLE-rijen en g"
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "BOT DEE over een product vragen",
+          "blurb": "Zeg in BOT DEE What can Mingl do, What changed in ShoutOut, What is coming to Si-nema of When was VIP reserV implemented. BOT DEE antwoordt uit de Features-catalogus met citaten. Het geeft Status not verified toe en behandelt een plan niet als geleverd. Typ Ver voor Version SMART"
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "BOT DEE over een product vragen",
+          "blurb": "Zeg in BOT DEE What can Mingl do, What changed in ShoutOut, What is coming to Si-nema of When was VIP reserV implemented. BOT DEE antwoordt uit de Features-catalogus met citaten. Het geeft Status not verified toe en behandelt een plan niet als geleverd. Typ Ver voor Version SMART"
+        },
         "help:help-vip-book-table": {
           "label": "VIP-tafel boeken (VIP reserV)",
           "blurb": "VIP reserV toont de plattegrond en boekt tafels. Open VIP reserV via Zoeken, kies Decades of Lima Twist Club en een avond, tik een groene tafel, houd 30 minuten, accepteer voorwaarden en betaal de borg met FloqR Stripe. Bars en DJ niet boekbaar. Bij Aurelia gebruikt u Explore 3D "
@@ -10133,6 +10349,30 @@
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV من محادثة BOT DEE",
           "blurb": "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
+        },
+        "help:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview هو كتالوج منتجات BOT-DEE وMingl وShoutOut وVIP reserV وSi-nema وSi-tube. افتح نظرة عامة أو ما الجديد أو رحلة الميزة أو كل الميزات أو قريبًا أو السابق/Retired. تبقى الحالة Status not verified حتى يثبت التوفر. ما الجديد يبقى فارغًا حتى يوافق مراجع على إصدار موثّق"
+        },
+        "intent:help-features-smartview": {
+          "label": "Features SMARTview",
+          "blurb": "Features SMARTview هو كتالوج منتجات BOT-DEE وMingl وShoutOut وVIP reserV وSi-nema وSi-tube. افتح نظرة عامة أو ما الجديد أو رحلة الميزة أو كل الميزات أو قريبًا أو السابق/Retired. تبقى الحالة Status not verified حتى يثبت التوفر. ما الجديد يبقى فارغًا حتى يوافق مراجع على إصدار موثّق"
+        },
+        "help:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "يعرض Features SMARTview الحالة Status not verified عندما لم تُفحص الأعلام الحية أو طرح Pages أو تواريخ توفر الـ patron. Merged on وقت دمج طلب سحب، وليس Available since. Released يظهر فقط مع دليل نشر أو توفر. صفوف SAMPLE وادّعاءات المحادثة ليست إثباتًا لإصدار حي."
+        },
+        "intent:help-features-smartview-status": {
+          "label": "Status not verified",
+          "blurb": "يعرض Features SMARTview الحالة Status not verified عندما لم تُفحص الأعلام الحية أو طرح Pages أو تواريخ توفر الـ patron. Merged on وقت دمج طلب سحب، وليس Available since. Released يظهر فقط مع دليل نشر أو توفر. صفوف SAMPLE وادّعاءات المحادثة ليست إثباتًا لإصدار حي."
+        },
+        "help:help-features-smartview-botdee": {
+          "label": "اسأل BOT DEE عن منتج",
+          "blurb": "في BOT DEE قل What can Mingl do أو What changed in ShoutOut أو What is coming to Si-nema أو When was VIP reserV implemented. يجيب BOT DEE من كتالوج Features مع استشهادات. يعترف بـ Status not verified ولن يعامل خطة كأنها أُطلقت. اكتب Ver لـ Version SMARTview. اكتب Open Room SMARTv"
+        },
+        "intent:help-features-smartview-botdee": {
+          "label": "اسأل BOT DEE عن منتج",
+          "blurb": "في BOT DEE قل What can Mingl do أو What changed in ShoutOut أو What is coming to Si-nema أو When was VIP reserV implemented. يجيب BOT DEE من كتالوج Features مع استشهادات. يعترف بـ Status not verified ولن يعامل خطة كأنها أُطلقت. اكتب Ver لـ Version SMARTview. اكتب Open Room SMARTv"
         },
         "help:help-vip-book-table": {
           "label": "حجز طاولة VIP (VIP reserV)",

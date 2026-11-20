@@ -199,6 +199,41 @@
       ]
     },
     {
+      id: "help-features-smartview",
+      kind: "help",
+      label: "Features SMARTview",
+      blurb: "Product catalog for BOT-DEE, Mingl, ShoutOut, VIP reserV, Si-nema, and Si-tube. Status stays Status not verified until availability is evidenced. Not Room SMARTview and not Version SMARTview.",
+      links: [{label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}],
+      searchPhrases: [
+        "features smartview", "feature catalog", "what can mingl do", "coming soon si-nema",
+        "si-tube", "feature journey", "bot-dee features"
+      ],
+      patterns: [
+        /features?\s*smart\s*view/,
+        /feature\s+catalog/,
+        /what\s+can\s+mingl\s+do/,
+        /coming\s+soon\s+si-?nema/
+      ]
+    },
+    {
+      id: "help-features-smartview-status",
+      kind: "help",
+      label: "Status not verified",
+      blurb: "Merged on is not Available since. Released needs deployment evidence. Sample catalog rows are not a live release.",
+      links: [{label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}],
+      searchPhrases: ["status not verified", "date implemented", "merged on", "available since"],
+      patterns: [/status\s+not\s+verified/, /date\s+implemented/, /merged\s+on/]
+    },
+    {
+      id: "help-features-smartview-botdee",
+      kind: "help",
+      label: "Ask BOT DEE about a product",
+      blurb: "Ask What can Mingl do or What changed in ShoutOut. BOT DEE cites the Features catalog and will not treat a plan as shipped.",
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
+      searchPhrases: ["what changed in shoutout", "what is coming to si-nema", "ask bot dee features"],
+      patterns: [/what\s+changed\s+in\s+shout/, /what\s+is\s+coming\s+to\s+si-?nema/]
+    },
+    {
       id: "help-botdee-room-smartview",
       kind: "help",
       label: "Room SMARTview",
@@ -1109,6 +1144,7 @@
     "help-botdee-room-smartview-end": ["patron"], "help-botdee-room-smartview-tab": ["patron"], "help-botdee-room-smartview-who-pays": ["patron"],
     "help-botdee-room-smartview-kick": ["patron"], "help-botdee-room-smartview-share": ["patron"],
     "help-botdee-headless-vip": ["patron"],
+    "help-features-smartview": ["patron"], "help-features-smartview-status": ["patron"], "help-features-smartview-botdee": ["patron"],
     "help-smartvisuals-notification": ["patron"], "help-smartvisuals-room": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-profile-account-type": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],

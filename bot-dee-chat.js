@@ -500,7 +500,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.055";
+    return "s3.3.056";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -642,6 +642,27 @@
     if (hasVersion) return list;
     const local = global.FLOQRBotDeeSmartView?.localVersionPayload?.();
     if (local) list.push(local);
+    return list;
+  }
+
+  function isFeaturesSmartViewPrompt(raw) {
+    try {
+      return !!(global.FLOQRFeaturesSmartViewCore && global.FLOQRFeaturesSmartViewCore.isFeaturesSmartViewPrompt(raw));
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function ensureFeaturesSmartViews(text, views) {
+    const list = Array.isArray(views) ? views.slice() : [];
+    if (list.some(row => row && row.kind === "featuresSmartView")) return list;
+    if (!isFeaturesSmartViewPrompt(text)) return list;
+    const api = global.FLOQRFeaturesSmartViewCore;
+    const catalog = global.FLOQRFeaturesSmartView && global.__FLOQR_FEATURES_SMARTVIEW_CATALOG;
+    if (api && catalog) {
+      const pack = api.buildSmartView(catalog, text, {role: "patron"});
+      if (pack && pack.smartViews && pack.smartViews[0]) list.push(pack.smartViews[0]);
+    }
     return list;
   }
 
@@ -1302,16 +1323,20 @@
 
     // Local chatbot first only when durable threads are off (old Functions / flag 0).
     // Durable path always hits executeBotSession so refresh / another phone can resume.
-    if (!durableEnabled && classifyPeopleSearchIntent(text).intent === "none" && (isPrivilegeAskPrompt(text) || isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text) || isRoomSmartViewPrompt(text))) {
-      const roomSession = !isVersionPrompt(text) && !isHelpPrompt(text) && !isPrivacyPrompt(text)
+    if (!durableEnabled && classifyPeopleSearchIntent(text).intent === "none" && (isPrivilegeAskPrompt(text) || isAckPrompt(text) || isChitchatPrompt(text) || isIdentityPrompt(text) || isVersionPrompt(text) || isFeaturesSmartViewPrompt(text) || isHelpPrompt(text) || isPrivacyPrompt(text) || isRoomSmartViewPrompt(text))) {
+      const roomSession = !isVersionPrompt(text) && !isFeaturesSmartViewPrompt(text) && !isHelpPrompt(text) && !isPrivacyPrompt(text)
         ? buildLocalRoomSession(text)
+        : null;
+      const featurePack = isFeaturesSmartViewPrompt(text) && global.FLOQRFeaturesSmartViewCore
+        ? global.FLOQRFeaturesSmartViewCore.buildSmartView(global.__FLOQR_FEATURES_SMARTVIEW_CATALOG || {products: [], features: []}, text, {role: "patron"})
         : null;
       const reply = roomSession
         ? roomReplyText(roomSession)
-        : localBotReply(text, {resuming});
+        : (featurePack ? featurePack.reply : localBotReply(text, {resuming}));
       const versionViews = isVersionPrompt(text) ? ensureVersionSmartViews(text, []) : [];
+      const featureViews = featurePack && featurePack.smartViews ? featurePack.smartViews : [];
       const roomViews = roomSession ? ensureRoomSmartViews(text, roomSession.smartViews || []) : [];
-      appendBubble("bot", reply, [], [], versionViews.concat(roomViews));
+      appendBubble("bot", reply, [], [], versionViews.concat(featureViews, roomViews));
       pushHistory("model", reply);
       visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
       setStatus("");
@@ -1365,7 +1390,7 @@
       const roomView = Array.isArray(data.smartViews)
         ? data.smartViews.find(row => row && row.kind === "botDeeRoom")
         : null;
-      const views = ensureVersionSmartViews(text, ensureRoomSmartViews(text, data.smartViews));
+      const views = ensureFeaturesSmartViews(text, ensureVersionSmartViews(text, ensureRoomSmartViews(text, data.smartViews)));
       const versionCardOnly = isVersionSmartViewAlias(text)
         && views.some(row => row && row.kind === "botDeeVersion");
       const peopleCard = hasPeopleSmartView(views);
