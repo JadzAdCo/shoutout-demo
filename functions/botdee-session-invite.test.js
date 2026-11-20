@@ -171,6 +171,14 @@ test("Firestore: invites Functions-only; events member-read; no IP", () => {
   assert.doesNotMatch(read("functions/botdee-session-core.js"), /last4OnOther|cardLast4: text/);
 });
 
+test("BOT DEE subset deploy lists first-time session callables and tab checkout", () => {
+  const workflow = read(".github/workflows/functions-ci.yml");
+  assert.match(workflow, /createBotDeeRoomInvite/);
+  assert.match(workflow, /acceptBotDeeRoomInvite/);
+  assert.match(workflow, /kickBotDeeRoomMember/);
+  assert.match(workflow, /createFloqrCheckoutSession/);
+});
+
 test("client join captures room=&t= and Inbox is not a ShoutOut CTA", () => {
   const chat = read("bot-dee-chat.js");
   assert.match(chat, /acceptBotDeeRoomInvite/);

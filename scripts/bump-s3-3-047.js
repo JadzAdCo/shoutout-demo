@@ -5,7 +5,7 @@ const path = require("path");
 const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
 const NEXT = "s3.3.047";
 const NEXT_NUM = "3.3.047";
-const NOTE = "BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab";
+const NOTE = "Gray Save after command received; Features SMARTview first slice on Master Admin BOT DEE SMARTviews";
 const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
 function transformHtml(src) {

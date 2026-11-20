@@ -742,6 +742,10 @@ html.floqr-desktop-browser a.admin-tab-link.buttonlike{
 .ai-crawl-primary-actions .primary{
   min-height:44px;
 }
+button.is-busy,
+button[aria-busy="true"],
+input.is-busy,
+input[aria-busy="true"],
 #aiCrawling button.is-busy,
 #aiCrawling button[aria-busy="true"],
 body.oidc-page #oidcContinueBtn.is-busy,
@@ -749,7 +753,6 @@ body.oidc-page #oidcContinueBtn[aria-busy="true"]{
   opacity:.45;
   filter:grayscale(1);
   cursor:progress;
-  pointer-events:none;
   background:#6b7280!important;
   color:#e5e7eb!important;
   box-shadow:none!important;

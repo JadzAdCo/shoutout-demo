@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.047";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.047";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.049";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.049";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,8 +223,8 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.3.047",
-      title: "s3.3.047 — BOT DEE Mingl session invites + shared tab",
+      version: "s3.3.049",
+      title: "s3.3.049 — BOT DEE Mingl session invites + shared tab",
       checks: [
         {label:"Mingl invite core", file:"functions/botdee-session-core.js", includes:["evaluateInvite", "inviteHref", "minglFriendsOnly", "host plus 7"]},
         {label:"Session callables", file:"functions/botdee-session-functions.js", includes:["createBotDeeRoomInvite", "acceptBotDeeRoomInvite", "assertFeatureAccess(request.auth, \"mingl\""]},
@@ -232,7 +232,19 @@
         {label:"Inbox Review BOT DEE invite", file:"patron-portal-app.js", includes:["botdeeroominvite", "Review BOT DEE invite"]},
         {label:"Tab checkout mingl gate", file:"functions/commerce-functions.js", includes:["botDeeRoomTab", "assertFeatureAccess(request.auth, \"mingl\""]},
         {label:"Invites Functions-only", file:"firestore.rules", includes:["match /botDeeRoomInvites/{inviteId}", "allow read, write: if false;"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-047-botdee-mingl-session-invite"]}
+        {label:"BOT DEE subset deploys session callables", file:".github/workflows/functions-ci.yml", includes:["createBotDeeRoomInvite", "acceptBotDeeRoomInvite", "createFloqrCheckoutSession"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-049-botdee-mingl-session-invite"]}
+      ]
+    },
+    {
+      version: "s3.3.047",
+      title: "s3.3.047 — Save busy + Features SMARTview",
+      checks: [
+        {label:"Save busy module", file:"floqr-save-busy.js", includes:["FLOQRSaveBusy", "Command received", "app.saveReceived"]},
+        {label:"Save busy on Master Admin", file:"master-admin.html", includes:["floqr-save-busy.js"]},
+        {label:"Features SMARTview catalog", file:"features-smartview/catalog.json", includes:["Si-tube", "BOT DEE", "floqCast", "statusVerified"]},
+        {label:"Features SMARTview host", file:"master-admin.html", includes:["botDeeMasterLoadFeaturesSmartView", "botDeeMasterFeaturesSmartView"]},
+        {label:"Manual tests", file:"ai-diagnostics-service.js", includes:["s3-3-047-save-busy-command-received", "s3-3-047-features-smartview-master"]}
       ]
     },
     {
@@ -247,7 +259,11 @@
         {label:"Session intercepts VIP", file:"functions/bot-dee-functions.js", includes:["tryHeadlessVip", "headlessVipDraft", "botdee-room-live"]},
         {label:"Room join live", file:"functions/botdee-room-live.js", includes:["botDeeRooms", "joinTokenHash", "charge: false"]},
         {label:"Idle skip while docks/room open", file:"bot-dee-chat.js", includes:["hasOpenWorkflow", "botDeeVipPreviewDock", "data-rs-active"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-046-people-gaps-headless-vip-rooms"]}
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-046-people-gaps-headless-vip-rooms"]},
+        {label:"Mingl Chat Site chrome", file:"mingl-chat.html", includes:["floqr.isSiteChrome", "floqr-chrome-scheme.js", "data-floqr-chrome-icon=\"mingl\"", "mingl-chat-chrome.css"]},
+        {label:"Mingl Chat hydrates chrome", file:"mingl-chat-app.js", includes:["hydrateSiteChrome", "hydrateFromProfile"]},
+        {label:"Mingl Gist Site chrome", file:"mingl-gist.html", includes:["floqr.isSiteChrome", "floqr-chrome-scheme.js", "data-floqr-chrome-icon=\"mingl\""]},
+        {label:"Mingl chrome overlay tokens", file:"mingl-chat-chrome.css", includes:["var(--floqr-ink)", "whiteBlack"]}
       ]
     },
     {
@@ -3509,13 +3525,31 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
-      id:"s3-3-047-botdee-mingl-session-invite",
+      id:"s3-3-049-botdee-mingl-session-invite",
       area:"BOT DEE",
       feature:"Mingl friends invite into a BOT DEE session + shared tab",
-      changed:"s3.3.047 — Confirm Room SMARTview opens a Mingl-friends-only session (host plus 7 guests). Invite picker is Mingl connections, not a public join link. Inbox type botDeeRoomInvite → Review BOT DEE invite. Guests can invite. Shared tab is opt-in then FloqR Stripe split/one payer. Beta Mingl + BOT DEE gates. No production deploy until Don.",
-      howToTest:"1) After Pages + Functions + rules deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js ?v=s3.3.047. Sign in with BOT DEE + Mingl (beta if test). 2) Say Open Room SMARTview → Confirm. Invite is enabled; no public join URL. 3) Invite a Mingl friend — they get Inbox Review BOT DEE invite. Wrong account opening botdee.html?room=&t= refuses. 4) Friend joins while signed in as that account — they see the shared card; private BOT DEE history is not copied. 5) Guest can Invite another Mingl friend until 8 people. Host End closes the room. 6) Shared tab: Opt in → add a line → I'll pay the tab opens Stripe on that uid only. Other members do not see card last4. 7) Mark Succeed/Failed. Display URLs have no ?v=.",
+      changed:"s3.3.049 — Confirm Room SMARTview opens a Mingl-friends-only session (host plus 7 guests). Invite picker is Mingl connections, not a public join link. Inbox type botDeeRoomInvite → Review BOT DEE invite. Guests can invite. Shared tab is opt-in then FloqR Stripe split/one payer. Beta Mingl + BOT DEE gates.",
+      howToTest:"1) After Pages + Functions + rules deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js ?v=s3.3.049. Sign in with BOT DEE + Mingl (beta if test). 2) Say Open Room SMARTview → Confirm. Invite is enabled; no public join URL. 3) Invite a Mingl friend — they get Inbox Review BOT DEE invite. Wrong account opening botdee.html?room=&t= refuses. 4) Friend joins while signed in as that account — they see the shared card; private BOT DEE history is not copied. 5) Guest can Invite another Mingl friend until 8 people. Host End closes the room. 6) Shared tab: Opt in → add a line → I'll pay the tab opens Stripe on that uid only. Other members do not see card last4. 7) Mark Succeed/Failed. Display URLs have no ?v=.",
       expected:"Mingl-only invites, cap 8, guests can invite, join is not a payment, tab opt-in required, receipts on payer only. Beta gates hide the path when Mingl/BOT DEE is off.",
-      troubleshoot:"Invite still a public ?join= link → cached botdee-smartview.js / Functions not this SHA (acceptInvite). Inbox says Open Related ShoutOut → cached patron-portal-app.js inboxLinkLabel. Wrong account joins → token not bound to targetUid. Tab charges without opt-in → stop; canAttachLine must refuse. last4 on another member → publicTabLine leak. Functions deny mingl → Features & Services Mingl still test/off for that account."
+      troubleshoot:"Invite still a public ?join= link → cached botdee-smartview.js / Functions not this SHA (acceptInvite). Inbox says Open Related ShoutOut → cached patron-portal-app.js inboxLinkLabel. Wrong account joins → token not bound to targetUid. Tab charges without opt-in → stop; canAttachLine must refuse. last4 on another member → publicTabLine leak. Functions deny mingl → Features & Services Mingl still test/off for that account. 404 on createBotDeeRoomInvite → BOT DEE subset list missing session names; redeploy from origin/main with [firebase-deploy-botdee]."
+    },
+    {
+      id:"s3-3-047-features-smartview-master",
+      area:"Master Admin",
+      feature:"Features SMARTview (eight products, Status not verified)",
+      changed:"Master Admin → Features Mgmt → BOT DEE → SMARTviews → Show Features SMARTview. Catalog is evidence-backed: packaged flags only, Si-tube marked not in repo, no invented Beta-since dates. Live Firestore flags not verified this run.",
+      howToTest:"1) Hard-refresh Master Admin. 2) Features Mgmt → BOT DEE (`#featuresBotDee`) → SMARTviews. 3) Click Show Features SMARTview. 4) Confirm eight cards: FloqR, BOT DEE, Mingl, ShoutOut, VIP reserV, floqCast, Si-nema, Si-tube. 5) Every badge says Status not verified. Si-tube says Not in this repository.",
+      expected:"No BOT-DEE / FloqCAST misspellings. No Try action on Si-tube. No fabricated release dates.",
+      troubleshoot:"Button missing → master-admin.html host + floqr-features-smartview.js. Catalog 404 → features-smartview/catalog.json not on Pages. Live availability still unknown until Firebase flags are read."
+    },
+    {
+      id:"s3-3-047-save-busy-command-received",
+      area:"Master Admin / Club Admin / My Profile",
+      feature:"Save buttons gray out once the save command is received",
+      changed:"Shared floqr-save-busy.js. Clicking Save greys the button (Saving…). When the callable or Firestore write starts, label becomes Command received…. Cancelled reason prompt or failed/finished save restores the button. Blocks double-clicks on Features Mgmt Mingl beta Save.",
+      howToTest:"1) Master Admin → Features Mgmt → SOS2FA. 2) On a feature row or an active beta tester, press Save. Button greys immediately. 3) After the reason window Save, label reads Command received… until the callable returns. 4) Cancel the reason window — original Save restores. 5) Repeat on My Profile language Save if signed in.",
+      expected:"No second Save click while busy. Gray + Command received… after the server command is sent. Restores after success or error.",
+      troubleshoot:"Still clickable twice → hard-refresh so floqr-save-busy.js loads after floqr-nav.js. Reason cancel leaves it gray → idle restore is 1.6s if no callable; wait or reload. Invite as beta tester is not a Save button by design."
     },
     {
       id:"s3-3-046-app-check-master-logs",
@@ -3562,8 +3596,17 @@
       expected:"Photo first, then name+handle, then a tight SMARTsummary. Lower facts compacted. Chat card and SMARTview match. No leftover side-column portrait.",
       troubleshoot:"Still side-by-side photo → cached botdee-smartview.css before stacked .botdee-sv-identity column. Tall empty summary box → cached CSS still has padded .botdee-sv-summary-btn. Missing Bio/Looking to meet on live card → Functions getPeopleSmartView not this SHA (client still paints city/socials from existing fields)."
     },
-    {
-      id:"s3-3-046-people-gaps-headless-vip-rooms",
+      {
+        id:"s3-3-046-mingl-chat-site-chrome",
+        area:"Mingl / Site chrome",
+        feature:"Mingl Chat follows Appearance Site chrome",
+        changed:"mingl-chat.html (and Mingl Gist) early-paints data-floqr-chrome, loads floqr-chrome-scheme.js + floqr-chrome-audit.js, hydrates users.isSiteChrome, and swaps the Mingl chrome icon. Compose/bubbles use chrome tokens instead of Nightlife navy. Cache-bust s3.3.048.",
+        howToTest:"1) Sign in, open My Profile → Appearance, pick White / Black (or Traditional). 2) Hard-refresh https://jadzadco.github.io/shoutout-demo/mingl-chat.html until mingl-chat.html / styles.css / mingl-chat-app.js / mingl-chat-chrome.css ?v=s3.3.048. 3) Body, cards, title, Mingl icon, compose bar, and bubbles must match that chrome — not Nightlife pink/cyan navy. 4) Switch Nightlife and reload — Mingl Chat returns to neon navy. 5) Repeat Mingl Gist (mingl-gist.html) for the page chrome (story viewer stays dark). 6) Mark Succeed/Failed.",
+        expected:"Mingl Chat paints the active Site chrome on first load and after sign-in hydrate. Icon and compose follow the scheme. Display URLs stay without ?v=.",
+        troubleshoot:"Still Nightlife → cached mingl-chat.html missing floqr.isSiteChrome early-paint or floqr-chrome-scheme.js. Icon stuck on nightlife.jpg → data-floqr-chrome-icon=mingl + applyDocument. Compose still navy on White/Black → cached styles.css before --floqr-ink compose. Signed-in wrong chrome → hydrateSiteChrome / users.isSiteChrome."
+      },
+      {
+        id:"s3-3-046-people-gaps-headless-vip-rooms",
       area:"BOT DEE",
       feature:"People SMARTview spacing + headless VIP reserV + joined Room SMARTview",
       changed:"s3.3.046 — People SMARTview details box no longer reserves empty bands around Music/Nightlife chips and genre tags. Headless VIP reserV from chat: Mezzanine at Aurelia lists V1–V4 + AURELIA SUITE instead of “section wasn’t found.” Confirm Room SMARTview mints a join link; joining is not a payment. Idle pause does not fire while a ShoutOut/VIP dock or active room is open.",

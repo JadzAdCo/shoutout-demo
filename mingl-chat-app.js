@@ -963,6 +963,30 @@
     }
   }
 
+  async function hydrateSiteChrome(user) {
+    const cs = window.FLOQRChromeScheme;
+    if (!cs) return;
+    try {
+      cs.syncAccessGate?.();
+      if (!user?.uid) {
+        cs.applyDocument?.(cs.effectiveChrome?.() || cs.getChrome?.());
+        return;
+      }
+      const profile = currentProfile && Object.keys(currentProfile).length
+        ? currentProfile
+        : null;
+      if (profile) {
+        cs.hydrateFromProfile?.(profile);
+      } else {
+        const snap = await db.collection("users").doc(user.uid).get();
+        cs.hydrateFromProfile?.(snap.exists ? snap.data() || {} : {});
+      }
+    } catch (_) {
+      try { cs.applyDocument?.(cs.effectiveChrome?.() || cs.getChrome?.()); } catch (__) { /* ignore */ }
+    }
+    window.FLOQRChromeAudit?.probePage?.({reason: "mingl-chat-hydrate"});
+  }
+
   function loginGoogle() {
     if (window.FLOQRSessionShell?.popupBlocked?.("#minglChatStatus")) return;
     auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(error => setText("minglChatStatus", error.message));
@@ -975,6 +999,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    try { window.FLOQRChromeScheme?.syncAccessGate?.(); } catch (_) { /* ignore */ }
+    try { window.FLOQRChromeScheme?.applyDocument?.(); } catch (_) { /* ignore */ }
     window.FLOQRSessionShell?.bind?.({
       auth,
       chrome: "[data-floqr-auth-chrome]",
@@ -1008,9 +1034,14 @@
     currentUser = user;
     byId("minglChatLogin")?.classList.toggle("hidden", !!user);
     byId("minglChatShell")?.classList.toggle("hidden", !user);
-    if (!user) return;
+    if (!user) {
+      currentProfile = {};
+      await hydrateSiteChrome(null);
+      return;
+    }
     const profileSnap = await db.collection("users").doc(user.uid).get().catch(() => null);
     currentProfile = profileSnap?.exists ? profileSnap.data() : {};
+    await hydrateSiteChrome(user);
     await loadRooms();
   });
 })();

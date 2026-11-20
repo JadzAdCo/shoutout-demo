@@ -1,7 +1,15 @@
 [
   {
+    "id": "s3.3.049",
+    "text": "s3.3.049: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab"
+  },
+  {
+    "id": "s3.3.048",
+    "text": "s3.3.048: Save busy ignores unrelated writes and reason-prompt logs"
+  },
+  {
     "id": "s3.3.047",
-    "text": "s3.3.047: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab"
+    "text": "s3.3.047: Gray Save after command received; Features SMARTview first slice on Master Admin BOT DEE SMARTviews"
   },
   {
     "id": "s3.3.046",

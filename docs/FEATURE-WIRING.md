@@ -827,9 +827,9 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
-## Room SMARTview + Mingl session invites (s3.3.033 / join s3.3.046 / Mingl invites s3.3.047)
+## Room SMARTview + Mingl session invites (s3.3.033 / join s3.3.046 / Mingl invites s3.3.049)
 
-**Purpose:** BOT DEE recognizes Room SMARTview intents and opens an inline **Room SMARTview** card. Official name is **Room SMARTview** (never “Mingl Room SmartView”). **s3.3.047:** Confirm creates a Mingl-friends-only session (host plus 7 guests). Guests can invite. Invite tokens are SHA-256 only, bound to `targetUid`, Inbox `type: botDeeRoomInvite` (**Review BOT DEE invite**, not a ShoutOut CTA). Join is **not** a payment. Shared tab is a later opt-in + FloqR Stripe (`orderType: botDeeRoomTab`). Beta gates: `botDee` on chat, `mingl` on invite/join/create/tab. Distinct from Version SMARTview and People SMARTview.
+**Purpose:** BOT DEE recognizes Room SMARTview intents and opens an inline **Room SMARTview** card. Official name is **Room SMARTview** (never “Mingl Room SmartView”). **s3.3.049:** Confirm creates a Mingl-friends-only session (host plus 7 guests). Guests can invite. Invite tokens are SHA-256 only, bound to `targetUid`, Inbox `type: botDeeRoomInvite` (**Review BOT DEE invite**, not a ShoutOut CTA). Join is **not** a payment. Shared tab is a later opt-in + FloqR Stripe (`orderType: botDeeRoomTab`). Beta gates: `botDee` on chat, `mingl` on invite/join/create/tab. Distinct from Version SMARTview and People SMARTview.
 
 | Layer | Wiring |
 |---|---|
@@ -839,9 +839,9 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Data | `botDeeRooms` + `turns`/`events` (member-read). `botDeeRoomMembers`, `botDeeRoomInvites` (Functions-only, SHA-256), `botDeeRoomTabs` + `lines` (no card last4), `botDeeRoomAudit`, invite/turn throttles. **No IP.** Classification in `data-classification-core.js` job `botDeeSession`. |
 | URL / contract | `botdee.html?room=<id>&t=<token>` (no `?v=`). Display boards never get `?v=`. |
 | Security | `assertFeatureAccess(botDee)` + `mingl` on session callables and tab checkout. Token bound to `targetUid`; wrong account / expired / revoked / non-friend / **host block** / cap 8 refuse. Kicked uid removed from `memberUids` (cannot read events). Agent probes `actorRole: agent`. |
-| Observability | Manual Feature Tests `s3-3-047-botdee-mingl-session-invite`. |
+| Observability | Manual Feature Tests `s3-3-049-botdee-mingl-session-invite`. |
 | Help | `help-botdee-room-smartview`, `-invite`, `-join`, `-end`, `-tab`, `-who-pays`, `-kick`, `-share` (11 langs). |
-| Deploy | **PR only until Don asks.** Pages + Functions + Firestore rules `s3.3.047-botdee-mingl-session`. `[firebase-deploy] [firebase-deploy-botdee]` when Don deploys. |
+| Deploy | Pages + Functions + Firestore rules `s3.3.047-botdee-mingl-session`. Merge to `origin/main` then `[firebase-deploy] [firebase-deploy-botdee]` from the origin/main archive. |
 
 ---
 
@@ -938,7 +938,9 @@ When adding a section, use this skeleton:
 |---|---|
 | **NIC tab** | Parent **Features Mgmt** (`master.featuresServices`); sub-tabs: **Release Control** (`featuresReleaseControl`), **Beta & Testing** (`featuresBetaTesting`), **Audit Trail** (`featuresAuditTrail`) |
 | **Release Control** | Feature flag table + **Test → live** promotion; loads flags only |
-| **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists; loads beta data only (catalog flags if needed) |
+| **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists; loads beta data only (catalog flags if needed). **Mingl grant:** packaged Mingl is Off (`IsFeatureEnabled=0`); Off checkboxes are disabled and Invite drops Off keys — enable Mingl on Release Control (Enable Feature 1 + Enable Beta 1) before ticking Mingl for a tester (e.g. Lorna). Find patron scans 120 `users` docs (or Network Dashboard’s 200) unless email equality is added. |
+| **Save busy (s3.3.047)** | `floqr-save-busy.js` greys Save on click and sets **Command received…** when a callable/Firestore write starts. Loaded after `floqr-nav.js`. |
+| **Features SMARTview (s3.3.047)** | Catalog `features-smartview/catalog.json`; UI `floqr-features-smartview.js`. Master Admin → Features Mgmt → BOT DEE → SMARTviews → **Show Features SMARTview**. Product badges stay **Status not verified** until live flags + deploy evidence. Si-tube is not in this repo. |
 | **Audit Trail** | Hash-chained activity log + Verify integrity; loads audit only |
 | **Legacy deep link** | `#featuresServices` → `#featuresReleaseControl` |
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
@@ -1048,6 +1050,16 @@ When adding a section, use this skeleton:
 ## Search category icon row (spots)
 
 Visible order on Search (`index.html` `.search-icon-row`): **1 ShoutOut** · **2 BOT DEE** · **3 VIP reserV** · **4 Settings** · **5 floqCast** · **6 Si-nema**. Hidden until Features & Services: **Mingl** (`#minglBtnCard` chrome photo tile, `data-floqr-chrome-icon="mingl"`), BartR, RydR. Mingl face: v3 clean vector `images/chrome/mingl-svg/logos/mingl-color-master.svg` → transparent PNGs + `mingl-*.jpg` chrome tiles (`scripts/build-mingl-v3-logo.py`). Colorless SVG kit remains in `images/chrome/mingl-svg/` for compact / FloqMedia lockups. Resume `@mingl-icon$`.
+
+## Mingl Chat / Gist Site chrome
+
+| Piece | Where |
+|---|---|
+| **Surfaces** | `mingl-chat.html` (standalone chats), `mingl-gist.html` (stories). Feature key `mingl`. Satellite shell (`FLOQRSessionShell`). |
+| **Chrome** | Same contract as BOT DEE / receipts: early-paint `html[data-floqr-chrome]` from `localStorage floqr.isSiteChrome`, then `floqr-chrome-scheme.js` + `floqr-chrome-audit.js`. Hero uses `data-floqr-chrome-icon="mingl"` + `floqr-page-title` (Appearance h2 size). Title **Mingl Chat** is a protected brand (never translated). |
+| **Client** | `mingl-chat-app.js` / `mingl-gist-app.js` `hydrateSiteChrome` → `hydrateFromProfile(users/{uid})` after sign-in; `applyDocument` when signed out. Compose / bubbles / menus use `--hot` `--accent` `--floqr-ink` `--line` (`styles.css` + overlay `mingl-chat-chrome.css`). Gist **story viewer** stays a dark overlay. |
+| **Data** | Reads existing `users.isSiteChrome` / `uiChrome` only. No new collection. No stored IP. |
+| **Diagnostics** | Manual Feature Test `s3-3-046-mingl-chat-site-chrome`. |
 
 ## Chrome icon drafts (nightlife / traditional review)
 
