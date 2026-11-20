@@ -13,7 +13,9 @@
   const patched = { callable: false, firestore: false, reason: false };
   let active = [];
   let pendingCommands = 0;
+  let waitingReason = false;
   let idleTimer = 0;
+  const SKIP_WRITE_PATH = /(?:^|\/)(appLogs|mailLogs|displayAccessLogs|featureServiceAuditLogs|featureServiceAccessThrottle)(?:\/|$)/;
 
   function t(key, fallback) {
     try {
@@ -91,6 +93,7 @@
   function end() {
     clearIdle();
     pendingCommands = 0;
+    waitingReason = false;
     active.forEach(restoreOne);
     active = [];
   }
@@ -119,8 +122,9 @@
   }
 
   function noteCommand() {
-    if (!active.length) return false;
-    pendingCommands += 1;
+    if (!active.length || waitingReason) return false;
+    if (pendingCommands) return false;
+    pendingCommands = 1;
     markReceived();
     return true;
   }
@@ -166,6 +170,8 @@
     if (!proto || typeof proto[method] !== "function" || proto[method].__floqrSaveBusy) return;
     const original = proto[method];
     function busyWrite(...args) {
+      const path = String(this?.path || "");
+      if (SKIP_WRITE_PATH.test(path)) return original.apply(this, args);
       const counted = noteCommand();
       try {
         return wrapThen(original.apply(this, args), counted);
@@ -186,7 +192,6 @@
     wrapWrite(fs.DocumentReference?.prototype, "set");
     wrapWrite(fs.DocumentReference?.prototype, "update");
     wrapWrite(fs.DocumentReference?.prototype, "delete");
-    wrapWrite(fs.CollectionReference?.prototype, "add");
   }
 
   function patchReasonPrompt() {
@@ -196,8 +201,12 @@
     patched.reason = true;
     const original = api.ask.bind(api);
     api.ask = function askBusy(options) {
-      if (active.length) scheduleIdle(PROMPT_IDLE_MS);
+      if (active.length) {
+        waitingReason = true;
+        scheduleIdle(PROMPT_IDLE_MS);
+      }
       return original(options).then(reason => {
+        waitingReason = false;
         if (reason == null) end();
         else scheduleIdle(IDLE_MS);
         return reason;
@@ -243,6 +252,8 @@
     begin,
     end,
     markReceived,
+    noteCommand,
+    settleCommand,
     isSaveButton,
     install
   };

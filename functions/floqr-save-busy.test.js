@@ -9,8 +9,9 @@ const vm = require("vm");
 const rootDir = path.resolve(__dirname, "..");
 const read = relativePath => fs.readFileSync(path.join(rootDir, relativePath), "utf8");
 
-function loadBusy() {
+function loadBusy(opts = {}) {
   const timers = [];
+  let resolveAsk;
   const win = {
     document: {
       documentElement: { dataset: {} },
@@ -24,10 +25,15 @@ function loadBusy() {
     clearInterval() {},
     FLOQRI18n: { t(key) { return { "app.saveBusy": "Saving…", "app.saveReceived": "Command received…" }[key] || key; } }
   };
+  if (opts.withReason) {
+    win.FLOQRReasonPrompt = {
+      ask() { return new Promise(resolve => { resolveAsk = resolve; }); }
+    };
+  }
   win.window = win;
   win.globalThis = win;
   vm.runInNewContext(read("floqr-save-busy.js"), win);
-  return { win, timers };
+  return { win, timers, resolveAsk: value => resolveAsk && resolveAsk(value) };
 }
 
 function button(overrides = {}) {
@@ -90,6 +96,37 @@ test("Master Admin feature Save and beta tester Save are save buttons", () => {
   });
   assert.equal(win.FLOQRSaveBusy.isSaveButton(feature), true);
   assert.equal(win.FLOQRSaveBusy.isSaveButton(beta), true);
+});
+
+test("only the first save command is counted; later writes do not release busy early", () => {
+  const { win } = loadBusy();
+  const api = win.FLOQRSaveBusy;
+  const btn = button();
+  api.begin(btn);
+  assert.equal(api.noteCommand(), true);
+  assert.equal(btn.textContent, "Command received…");
+  assert.equal(api.noteCommand(), false);
+  assert.equal(btn.classList.contains("is-busy"), true);
+  api.settleCommand();
+  assert.equal(btn.classList.contains("is-busy"), false);
+});
+
+test("unrelated writes during a reason prompt do not release Save", async () => {
+  const { win, resolveAsk } = loadBusy({ withReason: true });
+  const api = win.FLOQRSaveBusy;
+  const btn = button();
+  api.begin(btn);
+  const prompt = win.FLOQRReasonPrompt.ask({ summary: "Mingl flags", minLength: 8 });
+  assert.equal(api.noteCommand(), false);
+  assert.equal(btn.textContent, "Saving…");
+  api.settleCommand();
+  assert.equal(btn.classList.contains("is-busy"), true);
+  resolveAsk("enabled mingl for lorna testers");
+  assert.equal(await prompt, "enabled mingl for lorna testers");
+  assert.equal(api.noteCommand(), true);
+  assert.equal(btn.textContent, "Command received…");
+  api.settleCommand();
+  assert.equal(btn.classList.contains("is-busy"), false);
 });
 
 test("pages that load floqr-nav also load floqr-save-busy", () => {
