@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.048";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.048";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.049";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.049";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.049",
+      title: "s3.3.049 — Beta Find patron email lookup + Save without Audit hang",
+      checks: [
+        {label:"Find patron callable", file:"functions/feature-services-functions.js", includes:["exports.findBetaPatron", "getUserByEmail"]},
+        {label:"Nothing-changed before audit lock", file:"functions/feature-services-functions.js", includes:["Nothing changed — the tester already has that access."]},
+        {label:"Beta Save does not await audit", file:"master-feature-services.js", includes:["call(\"findBetaPatron\"", "loadBeta({keepVisible: true})"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-049-lorna-mingl-beta-save"]}
+      ]
+    },
     {
       version: "s3.3.047",
       title: "s3.3.047 — Save busy + Features SMARTview",
@@ -3209,7 +3219,7 @@
       checks: [
         {label:"Access matrix", file:"floqr-feature-services.js", includes:["function stateOf(", "function searchVisible(", "function hasBetaGrant(", "logFeatureAccessAttempt"]},
         {label:"Server access matrix", file:"functions/feature-services-core.js", includes:["function featureState(", "function searchTileVisible(", "function validateBetaFeatures("]},
-        {label:"Beta feature callables", file:"functions/feature-services-functions.js", includes:["exports.setBetaTesterFeatures", "exports.logFeatureAccessAttempt", "beta.invite_denied"]},
+        {label:"Beta feature callables", file:"functions/feature-services-functions.js", includes:["exports.setBetaTesterFeatures", "exports.findBetaPatron", "exports.logFeatureAccessAttempt", "beta.invite_denied"]},
         {label:"Sign-in redirect", file:"floqr-session-shell.js", includes:["function redirectToLogin(", "profileRequired=sign-in", "function requireSignIn("]},
         {label:"Welcome buttons", file:"index.html", includes:["Continue with SMS OTP (US &amp; Canada Only)", "mail-icon", "sms-icon"]},
         {label:"Unified button gradient", file:"styles.css", includes:["#loginActions .signin{background:linear-gradient(90deg,#1f8fff"]},
@@ -3510,6 +3520,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-049-lorna-mingl-beta-save",
+      area:"Master Admin",
+      feature:"Beta tester Save (Mingl) does not hang on Audit Trail",
+      changed:"Master Admin using Mingl as a beta feature means live featureServices/mingl is Enabled+Test — the checkbox is not Off. Find patron looks up the sign-in email (findBetaPatron / email equality). Tester-table Save returns immediately after setBetaTesterFeatures; the tester list stays visible while it refreshes. Unchanged grants fail before the audit-head lock. Audit Trail is not loaded from the Beta tab Save.",
+      howToTest:"1) Hard-refresh Master Admin → Features Mgmt → SOS2FA → Beta & Testing. 2) Confirm Mingl is ticked/enabled on Release Control (Enable Feature 1 + Enable Beta 1). 3) In the active testers table, tick Mingl for Lorna and Save with a reason. Status should read Beta feature access saved without replacing the table with Loading for tens of seconds. 4) If grants already match, the error is immediate (Nothing changed) — not a hang. 5) Find patron with her full Gmail; she appears without scanning the first 120 users.",
+      expected:"Mingl checkbox is usable. Save either writes mingl:1 or says Nothing changed quickly. The tester table does not sit on Loading beta testers while Audit Trail resolves patron labels.",
+      troubleshoot:"Mingl still disabled → Reload Release Control so live featureServices/mingl loads (packaged default is Off). Save hangs after Command received… → Functions still on the old setBetaTesterFeatures that takes the audit-head lock for unchanged grants; wait for [firebase-deploy-features]. Find misses her email → paste the exact Auth sign-in email; callable must be deployed. She is not an active tester → Invite first, she must accept beta-invite.html."
+    },
     {
       id:"s3-3-047-features-smartview-master",
       area:"Master Admin",

@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.048 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.049 (stable)
 
+- s3.3.049: Beta Find patron by email; tester Save no longer waits on Audit Trail
 - s3.3.048: Save busy ignores unrelated writes and reason-prompt logs
 - s3.3.047: Gray Save after command received; Features SMARTview first slice on Master Admin BOT DEE SMARTviews
 - s3.3.046: People SMARTview chip gaps + headless VIP reserV + Room SMARTview join; App Check plan-trace logs to Master Admin (enforcement off)

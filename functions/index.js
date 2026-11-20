@@ -83,6 +83,7 @@ module.exports = {
   revokeBetaTester: featureServiceFns.revokeBetaTester,
   revokeBetaInvite: featureServiceFns.revokeBetaInvite,
   setBetaTesterFeatures: featureServiceFns.setBetaTesterFeatures,
+  findBetaPatron: featureServiceFns.findBetaPatron,
   logFeatureAccessAttempt: featureServiceFns.logFeatureAccessAttempt,
   logFeatureCodePromotion: featureServiceFns.logFeatureCodePromotion,
   verifyFeatureServiceAuditChain: featureServiceFns.verifyFeatureServiceAuditChain,

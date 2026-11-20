@@ -1,5 +1,9 @@
 [
   {
+    "id": "s3.3.049",
+    "text": "s3.3.049: Beta Find patron by email; tester Save no longer waits on Audit Trail"
+  },
+  {
     "id": "s3.3.048",
     "text": "s3.3.048: Save busy ignores unrelated writes and reason-prompt logs"
   },
