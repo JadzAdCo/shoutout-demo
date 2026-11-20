@@ -1,0 +1,34 @@
+.floqr-fsv-root{color:var(--text,#e5e7eb)}
+.floqr-fsv-hero{margin:0 0 12px}
+.floqr-fsv-hero h3{margin:0 0 4px}
+.floqr-fsv-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.floqr-fsv-tabs button[aria-selected="true"]{outline:2px solid var(--accent,#00d4fe)}
+.floqr-fsv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.floqr-fsv-card{
+  margin:0;
+  padding:12px;
+  border:1px solid color-mix(in srgb, var(--accent,#00d4fe) 35%, transparent);
+  border-radius:14px;
+  background:color-mix(in srgb,#111 70%, transparent);
+  text-align:left;
+}
+.floqr-fsv-name{margin:0;font-size:1.05rem}
+.floqr-fsv-badge{
+  display:inline-block;
+  margin:6px 0;
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:.72rem;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  background:#374151;
+  color:#e5e7eb;
+}
+.floqr-fsv-mission,.floqr-fsv-note{margin:0;font-size:.88rem;color:var(--muted,#c4c4c4)}
+.floqr-fsv-empty{margin:0;color:var(--muted,#c4c4c4)}
+@media (max-width:1024px){
+  .floqr-fsv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  .floqr-fsv-grid{grid-template-columns:1fr}
+}

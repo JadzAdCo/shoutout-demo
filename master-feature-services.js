@@ -717,6 +717,9 @@
     byId("botDeeManifestReload")?.addEventListener("click", () => loadBotDeeManifest());
     byId("botDeeLegalSave")?.addEventListener("click", () => saveBotDeeLegalGate());
     byId("botDeeSlotSave")?.addEventListener("click", () => saveBotDeeProviderSlot());
+    byId("botDeeMasterLoadFeaturesSmartView")?.addEventListener("click", () => {
+      root.FLOQRFeaturesSmartView?.mount?.("botDeeMasterFeaturesSmartView");
+    });
     if (typeof window.matchMedia === "function") {
       const mq = window.matchMedia("(max-width: 1024px)");
       const onMq = () => syncInviteFeaturesVisibility();

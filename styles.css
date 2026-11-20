@@ -723,6 +723,16 @@ html.floqr-desktop-browser #categoryPage.page.active .search-icon-row{
 .employee-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
 .employee-row p{margin:5px 0;color:var(--muted)}
 button:disabled,input:disabled{opacity:.55;cursor:not-allowed}
+button.is-busy,input.is-busy,button[aria-busy="true"],input[aria-busy="true"]{
+  opacity:.45;
+  filter:grayscale(1);
+  cursor:progress;
+  background:#6b7280;
+  color:#e5e7eb;
+  border-color:#6b7280;
+  box-shadow:none
+}
+button.is-busy.is-save-received,input.is-busy.is-save-received{opacity:.4}
 button.is-critical-busy,button.primary.is-critical-busy{opacity:.42;filter:grayscale(1);cursor:wait;pointer-events:none;background:#6b7280;color:#e5e7eb;border-color:#6b7280}
 @media(max-width:760px){.public-profile-card{grid-template-columns:1fr}.public-profile-hero{min-height:260px}.profile-media-grid,.role-template-grid{grid-template-columns:1fr}}
 

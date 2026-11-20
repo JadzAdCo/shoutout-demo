@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.046";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.046";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.047";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.047";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.047",
+      title: "s3.3.047 — Save busy + Features SMARTview (workspace, unpublished)",
+      checks: [
+        {label:"Save busy module", file:"floqr-save-busy.js", includes:["FLOQRSaveBusy", "Command received", "app.saveReceived"]},
+        {label:"Save busy on Master Admin", file:"master-admin.html", includes:["floqr-save-busy.js"]},
+        {label:"Features SMARTview catalog", file:"features-smartview/catalog.json", includes:["Si-tube", "BOT DEE", "floqCast", "statusVerified"]},
+        {label:"Features SMARTview host", file:"master-admin.html", includes:["botDeeMasterLoadFeaturesSmartView", "botDeeMasterFeaturesSmartView"]},
+        {label:"Manual tests", file:"ai-diagnostics-service.js", includes:["s3-3-047-save-busy-command-received", "s3-3-047-features-smartview-master"]}
+      ]
+    },
     {
       version: "s3.3.046",
       title: "s3.3.046 — People SMARTview chip gaps + headless VIP reserV + Room join",
@@ -3492,6 +3503,24 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-047-features-smartview-master",
+      area:"Master Admin",
+      feature:"Features SMARTview (eight products, Status not verified)",
+      changed:"Master Admin → Features Mgmt → BOT DEE → SMARTviews → Show Features SMARTview. Catalog is evidence-backed: packaged flags only, Si-tube marked not in repo, no invented Beta-since dates. Live Firestore flags not verified this run.",
+      howToTest:"1) Hard-refresh Master Admin (`master-admin.html?v=s3.3.047`). 2) Features Mgmt → BOT DEE → SMARTviews. 3) Click Show Features SMARTview. 4) Confirm eight cards: FloqR, BOT DEE, Mingl, ShoutOut, VIP reserV, floqCast, Si-nema, Si-tube. 5) Every badge says Status not verified. Si-tube says Not in this repository.",
+      expected:"No BOT-DEE / FloqCAST misspellings. No Try action on Si-tube. No fabricated release dates.",
+      troubleshoot:"Button missing → master-admin.html host + floqr-features-smartview.js. Catalog 404 → features-smartview/catalog.json not on Pages. Live availability still unknown until Firebase flags are read."
+    },
+    {
+      id:"s3-3-047-save-busy-command-received",
+      area:"Master Admin / Club Admin / My Profile",
+      feature:"Save buttons gray out once the save command is received",
+      changed:"Shared floqr-save-busy.js. Clicking Save greys the button (Saving…). When the callable or Firestore write starts, label becomes Command received…. Cancelled reason prompt or failed/finished save restores the button. Blocks double-clicks on Features Mgmt Mingl beta Save.",
+      howToTest:"1) Master Admin → Features Mgmt → SOS2FA. 2) On a feature row or an active beta tester, press Save. Button greys immediately. 3) After the reason window Save, label reads Command received… until the callable returns. 4) Cancel the reason window — original Save restores. 5) Repeat on My Profile language Save if signed in.",
+      expected:"No second Save click while busy. Gray + Command received… after the server command is sent. Restores after success or error.",
+      troubleshoot:"Still clickable twice → hard-refresh so floqr-save-busy.js loads after floqr-nav.js. Reason cancel leaves it gray → idle restore is 1.6s if no callable; wait or reload. Invite as beta tester is not a Save button by design."
+    },
     {
       id:"s3-3-046-app-check-master-logs",
       area:"Master Admin",

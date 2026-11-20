@@ -938,7 +938,9 @@ When adding a section, use this skeleton:
 |---|---|
 | **NIC tab** | Parent **Features Mgmt** (`master.featuresServices`); sub-tabs: **Release Control** (`featuresReleaseControl`), **Beta & Testing** (`featuresBetaTesting`), **Audit Trail** (`featuresAuditTrail`) |
 | **Release Control** | Feature flag table + **Test → live** promotion; loads flags only |
-| **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists; loads beta data only (catalog flags if needed) |
+| **Beta & Testing** | Search beside Find patron; select radio; Note + Invite; active/pending lists; loads beta data only (catalog flags if needed). **Mingl grant:** packaged Mingl is Off (`IsFeatureEnabled=0`); Off checkboxes are disabled and Invite drops Off keys — enable Mingl on Release Control (Enable Feature 1 + Enable Beta 1) before ticking Mingl for a tester (e.g. Lorna). Find patron scans 120 `users` docs (or Network Dashboard’s 200) unless email equality is added. |
+| **Save busy (s3.3.047)** | `floqr-save-busy.js` greys Save on click and sets **Command received…** when a callable/Firestore write starts. Loaded after `floqr-nav.js`. |
+| **Features SMARTview (s3.3.047)** | Catalog `features-smartview/catalog.json`; UI `floqr-features-smartview.js`. Master Admin → Features Mgmt → BOT DEE → SMARTviews → **Show Features SMARTview**. Product badges stay **Status not verified** until live flags + deploy evidence. Si-tube is not in this repo. |
 | **Audit Trail** | Hash-chained activity log + Verify integrity; loads audit only |
 | **Legacy deep link** | `#featuresServices` → `#featuresReleaseControl` |
 | **Agent audit** | Scripted/agent denials log `actorEmail`/`actorRole` = `agent` (`isAgentClient`) |
