@@ -124,6 +124,7 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   assert.match(session, /releaseVipHold/);
   assert.match(session, /holdGone/);
   assert.match(session, /the VIP reserV hold/);
+  assert.match(session, /mode: "cancelled"/);
   assert.match(session, /wantsTerms/);
   assert.match(session, /isRepeatSelectedSection/);
   assert.match(session, /clubDisplayName/);
@@ -165,6 +166,7 @@ test("VIP dock has a Hold it CTA and strips the demo slug", () => {
   assert.match(smart, /botdee-vip-map/);
   assert.match(smart, /botdee-vip-map-stage/);
   assert.doesNotMatch(smart, /background-position:\$\{posX\}/);
+  assert.match(smart, /mode === "cancelled"/);
   assert.match(smart, /botdee-vip-rail/);
   assert.match(smart, /data-vip-prompt="hold it"/);
   assert.match(smart, /data-vip-prompt="I agree"/);

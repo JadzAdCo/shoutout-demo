@@ -1339,8 +1339,15 @@
       dockVipPreview(live);
       return {docked: true, inline: list.filter(row => !isVipPayload(row))};
     }
-    if (vips.length) clearVipPreviewDock();
-    return {docked: false, inline: list};
+    const closed = vips.some(row => {
+      const mode = String(row.mode || "");
+      return mode === "cancelled" || mode === "checkout";
+    });
+    if (closed || vips.length) clearVipPreviewDock();
+    return {
+      docked: false,
+      inline: list.filter(row => !isVipPayload(row) || String(row.mode || "") === "checkout")
+    };
   }
 
   function renderCard(payload) {

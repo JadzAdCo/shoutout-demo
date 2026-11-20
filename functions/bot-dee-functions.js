@@ -450,12 +450,19 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
     }
     try { await threadsMod.persistHeadlessVipDraft(uid, null); } catch (_) {}
     const cancelledTable = previousDraft.sectionLabel || previousDraft.sectionId || "";
+    const cancelledVenue = headless.clubDisplayName(previousDraft.clubQuery) || previousDraft.clubQuery || "";
+    const cancelledView = vipView.buildVipSmartView({
+      draft: {clubQuery: previousDraft.clubQuery || ""},
+      needs: [],
+      venueName: cancelledVenue,
+      mode: "cancelled"
+    });
     return vipSmartOutcome(
       cancelHoldId
         ? `Cancelled — the VIP reserV hold${cancelledTable ? ` on ${cancelledTable}` : ""} was released.`
         : "Cancelled — that VIP reserV hold was not created.",
       lang,
-      {model: "headless-draft", toolRounds: cancelHoldId ? 1 : 0, smartViews: []}
+      {model: "headless-draft", toolRounds: cancelHoldId ? 1 : 0, smartViews: [cancelledView]}
     );
   }
   let merged = headless.mergeInteractiveDraft(previousDraft, parsed);
