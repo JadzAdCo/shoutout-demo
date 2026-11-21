@@ -264,6 +264,7 @@ test("UI, BOT DEE, and Master Admin hosts are wired without hardcoded nav versio
   assert.match(read("botdee.html"), /features-smartview-core\.js/);
   assert.match(read("botdee.html"), /floqr-features-smartview\.js/);
   assert.match(read("botdee.html"), /preload[^>]+features-smartview\/catalog\.json/);
+  assert.match(read("features-smartview.html"), /if \(!firebase\.apps\.length\) firebase\.initializeApp\(firebaseConfig\);/);
   assert.match(read("features-smartview.html"), /FLOQRSessionShell\.bind/);
   assert.doesNotMatch(read("features-smartview.html"), /<a\b[^>]*href="[^"]*[?&]v=/);
   assert.match(read("functions/index.js"), /getFeaturesSmartViewCatalog/);

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.057";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.057";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.058";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.058";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,12 +223,21 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.058",
+      title: "s3.3.058 — Features SMARTview satellite initializeApp before bind",
+      checks: [
+        {label:"Satellite initializeApp", file:"features-smartview.html", includes:["if (!firebase.apps.length) firebase.initializeApp(firebaseConfig)", "FLOQRSessionShell.bind"]},
+        {label:"Eight product display names", file:"features-smartview/catalog.json", includes:["RydR", "floqCast"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-056-features-smartview", "s3.3.058"]}
+      ]
+    },
+    {
       version: "s3.3.056",
       title: "s3.3.056 — Features SMARTview eight-product catalog + BOT DEE retrieval",
       checks: [
         {label:"Eight product display names", file:"features-smartview/catalog.json", includes:["BOT-DEE", "Mingl", "ShoutOut", "RydR", "floqCast", "VIP reserV", "Si-nema", "Si-tube"]},
         {label:"Core byte-identical", file:"features-smartview-core.js", includes:["STATUS_TESTING", "flagStatusLabel", "isFeaturesSmartViewPrompt", "publicProjection"]},
-        {label:"Satellite session shell", file:"features-smartview.html", includes:["FLOQRSessionShell.bind", "features-smartview-core.js"]},
+        {label:"Satellite session shell", file:"features-smartview.html", includes:["FLOQRSessionShell.bind", "features-smartview-core.js", "firebase.initializeApp(firebaseConfig)"]},
         {label:"Editorial callables", file:"functions/features-smartview-functions.js", includes:["approveFeaturesSmartViewCopy", "rollbackFeaturesSmartViewCopy"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-056-features-smartview"]}
       ]
@@ -3697,9 +3706,9 @@
       area:"BOT DEE / Features SMARTview",
       feature:"Features SMARTview eight-product catalog (Testing / Beta / In development)",
       changed:"s3.3.056 catalog products: BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, Si-tube. Exact display names RydR and floqCast. Six views, compact+detail cards, BOT DEE retrieval with citations, editorial approve/rollback callables. Patron badges are Testing (Enable Feature + Enable Beta Feature), Beta (Enable Beta Feature only), or In development (neither). Dates stay Not verified. What's New is empty. Do not merge/deploy without Don's approval.",
-      howToTest:"1) After Pages publish (not this PR unless Don approves): hard-refresh features-smartview.html until features-smartview-core.js?v=s3.3.057. 2) Sign in on Search first. 3) Confirm eight product chips. Packaged badges: BOT-DEE Testing, Mingl/RydR/floqCast/VIP/Si-nema Beta, ShoutOut and Si-tube In development. 4) What's New empty. Dates Not verified. 5) Si-tube has no Try. 6) In BOT DEE say What can Mingl do and What can floqCast do — Features cards, not Version, not Room. 7) Master Admin → Features Mgmt → BOT DEE → Show Features SMARTview. 8) Mark Succeed/Failed. Display URLs have no ?v=.",
-      expected:"Eight names exact (RydR, floqCast spelling). No FloqR product card. No invented release dates. BOT DEE names Testing/Beta/In development and will not treat a plan as shipped.",
-      troubleshoot:"Eight old badges → cached s3.3.047 catalog. Version card instead of Features → prompt was Ver, not a product question. Room card → Open Room SMARTview / Cancun trip. Functions 404 on approve → this PR is Pages+code only until Don deploys."
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/features-smartview.html?v=s3.3.058 until features-smartview-core.js?v=s3.3.058. 2) Sign in on Search first, then return. 3) Confirm eight product chips. Packaged badges: BOT-DEE Testing, Mingl/RydR/floqCast/VIP/Si-nema Beta, ShoutOut and Si-tube In development. 4) What's New empty. Dates Not verified. 5) Si-tube has no Try. 6) In BOT DEE say What can Mingl do and What can floqCast do — Features cards, not Version, not Room. 7) Master Admin → Features Mgmt → BOT DEE → Show Features SMARTview. 8) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Eight names exact (RydR, floqCast spelling). Host mounts chips (not an empty card). No FloqR product card. No invented release dates. BOT DEE names Testing/Beta/In development and will not treat a plan as shipped.",
+      troubleshoot:"Empty host / console Firebase: No Firebase App → cached HTML still calls firebase.auth() before initializeApp; hard-refresh ?v=s3.3.058. Eight old badges → cached s3.3.047 catalog. Version card instead of Features → prompt was Ver, not a product question. Room card → Open Room SMARTview / Cancun trip. Functions 404 on approve → getFeaturesSmartViewCatalog not on this SHA."
     },
     {
       id:"s3-3-047-features-smartview-master",
