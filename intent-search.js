@@ -199,6 +199,41 @@
       ]
     },
     {
+      id: "help-features-smartview",
+      kind: "help",
+      label: "Features SMARTview",
+      blurb: "Product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Status is Testing, Beta, or In development from Features & Services flags. Dates stay Not verified. Not Room SMARTview and not Version SMARTview.",
+      links: [{label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}],
+      searchPhrases: [
+        "features smartview", "feature catalog", "what can mingl do", "coming soon si-nema",
+        "si-tube", "feature journey", "bot-dee features", "what can rydr do", "what can floqcast do"
+      ],
+      patterns: [
+        /features?\s*smart\s*view/,
+        /feature\s+catalog/,
+        /what\s+can\s+mingl\s+do/,
+        /coming\s+soon\s+si-?nema/
+      ]
+    },
+    {
+      id: "help-features-smartview-status",
+      kind: "help",
+      label: "Testing, Beta, In development",
+      blurb: "Testing = Enable Feature and Enable Beta Feature. Beta = Enable Beta Feature only. In development = neither. Dates stay Not verified.",
+      links: [{label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}],
+      searchPhrases: ["testing beta in development", "date implemented", "merged on", "available since"],
+      patterns: [/status\s+not\s+verified/, /in\s+development/, /date\s+implemented/, /merged\s+on/, /enable\s+beta\s+feature/]
+    },
+    {
+      id: "help-features-smartview-botdee",
+      kind: "help",
+      label: "Ask BOT DEE about a product",
+      blurb: "Ask What can Mingl do or What changed in ShoutOut. BOT DEE cites the Features catalog and will not treat a plan as shipped.",
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
+      searchPhrases: ["what changed in shoutout", "what is coming to si-nema", "ask bot dee features"],
+      patterns: [/what\s+changed\s+in\s+shout/, /what\s+is\s+coming\s+to\s+si-?nema/]
+    },
+    {
       id: "help-botdee-room-smartview",
       kind: "help",
       label: "Room SMARTview",
@@ -1109,6 +1144,7 @@
     "help-botdee-room-smartview-end": ["patron"], "help-botdee-room-smartview-tab": ["patron"], "help-botdee-room-smartview-who-pays": ["patron"],
     "help-botdee-room-smartview-kick": ["patron"], "help-botdee-room-smartview-share": ["patron"],
     "help-botdee-headless-vip": ["patron"],
+    "help-features-smartview": ["patron"], "help-features-smartview-status": ["patron"], "help-features-smartview-botdee": ["patron"],
     "help-smartvisuals-notification": ["patron"], "help-smartvisuals-room": ["patron"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-profile-account-type": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],

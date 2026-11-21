@@ -1625,6 +1625,73 @@
       ]
     },
     {
+      "sourceId": "help:help-features-smartview",
+      "id": "help-features-smartview",
+      "kind": "help",
+      "label": "Features SMARTview",
+      "blurb": "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status is Testing when Enable Feature and Enable Beta Feature are both",
+      "href": "./features-smartview.html?from=botdee",
+      "phrases": [
+        "features smartview",
+        "features smartview is the product catalog for bot-dee mingl shoutout rydr floqcast vip reserv si-nema and si-tube. open overview what s new feature journey all ",
+        "feature catalog",
+        "what can mingl do",
+        "product features",
+        "coming soon si-nema",
+        "si-tube",
+        "bot-dee features",
+        "feature journey",
+        "what can rydr do",
+        "what can floqcast do",
+        "rydr",
+        "floqcast",
+        "open features smartview",
+        "open bot dee",
+        "help-features-smartview"
+      ]
+    },
+    {
+      "sourceId": "help:help-features-smartview-botdee",
+      "id": "help-features-smartview-botdee",
+      "kind": "help",
+      "label": "Ask BOT DEE about a product",
+      "blurb": "In BOT DEE say What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema, or When was VIP reserV implemented. BOT DEE answers from the Features catalog with citations. It reports Testing, Beta, or In development and will not tr",
+      "href": "./botdee.html?from=botdee",
+      "phrases": [
+        "ask bot dee about a product",
+        "in bot dee say what can mingl do what can rydr do what can floqcast do what changed in shoutout what is coming to si-nema or when was vip reserv implemented. bo",
+        "what can mingl do",
+        "what changed in shoutout",
+        "what is coming to si-nema",
+        "when was vip reserv implemented",
+        "ask bot dee features",
+        "features catalog citation",
+        "open bot dee",
+        "open features smartview",
+        "help-features-smartview-botdee"
+      ]
+    },
+    {
+      "sourceId": "help:help-features-smartview-status",
+      "id": "help-features-smartview-status",
+      "kind": "help",
+      "label": "Testing, Beta, In development",
+      "blurb": "Features SMARTview shows Testing when Enable Feature and Enable Beta Feature are both on, Beta when only Enable Beta Feature (IsTestFeature) is on, and In development when neither applies. Dates stay Not verified — do not invent a release date. Merged on is a pull-request merge t",
+      "href": "./features-smartview.html?from=botdee",
+      "phrases": [
+        "testing beta in development",
+        "features smartview shows testing when enable feature and enable beta feature are both on beta when only enable beta feature istestfeature is on and in developme",
+        "date implemented",
+        "merged on",
+        "available since",
+        "not verified feature",
+        "released evidence",
+        "status testing",
+        "open features smartview",
+        "help-features-smartview-status"
+      ]
+    },
+    {
       "sourceId": "help:help-floqcast",
       "id": "help-floqcast",
       "kind": "help",
@@ -3942,6 +4009,59 @@
         "bus boys carry",
         "shoutout led",
         "help-donpapi-led-wall"
+      ]
+    },
+    {
+      "sourceId": "intent:help-features-smartview",
+      "id": "help-features-smartview",
+      "kind": "help",
+      "label": "Features SMARTview",
+      "blurb": "Product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Status is Testing, Beta, or In development from Features & Services flags. Dates stay Not verified. Not Room SMARTview and not Version SMARTview.",
+      "href": "./botdee.html",
+      "phrases": [
+        "features smartview",
+        "product catalog for bot-dee mingl shoutout rydr floqcast vip reserv si-nema and si-tube. status is testing beta or in development from features services flags. ",
+        "feature catalog",
+        "what can mingl do",
+        "coming soon si-nema",
+        "si-tube",
+        "feature journey",
+        "bot-dee features",
+        "what can rydr do",
+        "what can floqcast do",
+        "help-features-smartview"
+      ]
+    },
+    {
+      "sourceId": "intent:help-features-smartview-botdee",
+      "id": "help-features-smartview-botdee",
+      "kind": "help",
+      "label": "Ask BOT DEE about a product",
+      "blurb": "Ask What can Mingl do or What changed in ShoutOut. BOT DEE cites the Features catalog and will not treat a plan as shipped.",
+      "href": "./botdee.html",
+      "phrases": [
+        "ask bot dee about a product",
+        "ask what can mingl do or what changed in shoutout. bot dee cites the features catalog and will not treat a plan as shipped.",
+        "what changed in shoutout",
+        "what is coming to si-nema",
+        "ask bot dee features",
+        "help-features-smartview-botdee"
+      ]
+    },
+    {
+      "sourceId": "intent:help-features-smartview-status",
+      "id": "help-features-smartview-status",
+      "kind": "help",
+      "label": "Testing, Beta, In development",
+      "blurb": "Testing = Enable Feature and Enable Beta Feature. Beta = Enable Beta Feature only. In development = neither. Dates stay Not verified.",
+      "href": "./botdee.html",
+      "phrases": [
+        "testing beta in development",
+        "testing enable feature and enable beta feature. beta enable beta feature only. in development neither. dates stay not verified.",
+        "date implemented",
+        "merged on",
+        "available since",
+        "help-features-smartview-status"
       ]
     },
     {

@@ -875,6 +875,51 @@
       audiences: ["patron", "masterAdmin"]
     },
     {
+      id: "help-features-smartview",
+      title: "Features SMARTview",
+      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status is Testing when Enable Feature and Enable Beta Feature are both on, Beta when only Enable Beta Feature is on, and In development otherwise. Dates stay Not verified — do not invent a release date. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview, not Version SMARTview. Plans are never treated as shipped.",
+      searchPhrases: [
+        "features smartview", "feature catalog", "what can mingl do", "product features",
+        "coming soon si-nema", "si-tube", "bot-dee features", "feature journey",
+        "what can rydr do", "what can floqcast do", "rydr", "floqcast"
+      ],
+      links: [
+        {label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})},
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "masterAdmin"]
+    },
+    {
+      id: "help-features-smartview-status",
+      title: "Testing, Beta, In development",
+      body: "Features SMARTview shows Testing when Enable Feature and Enable Beta Feature are both on, Beta when only Enable Beta Feature (IsTestFeature) is on, and In development when neither applies. Dates stay Not verified — do not invent a release date. Merged on is a pull-request merge time, not Available since. Released still needs deployment or availability evidence. SAMPLE catalog rows and conversation claims are not proof of a live release. Catalog products include RydR and floqCast (brand spelling floqCast).",
+      searchPhrases: [
+        "testing beta in development", "date implemented", "merged on", "available since",
+        "not verified feature", "released evidence", "status testing"
+      ],
+      links: [
+        {label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "masterAdmin"]
+    },
+    {
+      id: "help-features-smartview-botdee",
+      title: "Ask BOT DEE about a product",
+      body: "In BOT DEE say What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema, or When was VIP reserV implemented. BOT DEE answers from the Features catalog with citations. It reports Testing, Beta, or In development and will not treat a plan as shipped. Dates are not verified. Type Ver for Version SMARTview. Type Open Room SMARTview for a shared room. Those are different cards.",
+      searchPhrases: [
+        "what can mingl do", "what changed in shoutout", "what is coming to si-nema",
+        "when was vip reserv implemented", "ask bot dee features", "features catalog citation"
+      ],
+      links: [
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},
+        {label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}
+      ],
+      source: "help-repository-seed",
+      audiences: ["patron", "masterAdmin"]
+    },
+    {
       id: "help-vip-book-table",
       title: "Book a VIP table (VIP reserV)",
       body: "Search a VIP reserV club, pick a night on the floor map, hold a table, accept Terms, and pay the deposit when the club requires one. Open VIP reserV from Search (when granted) or the profile menu. Choose a venue first, then the floor map and night, tap a green table (details open in a pop-out), hold it for 30 minutes, continue to the Terms page, and pay the deposit with FloqR Stripe (or confirm without checkout if the venue does not require a deposit). A table only shows booked/unavailable (isReserved=1) after that payment or no-deposit confirm — a hold alone stays amber. Bars and the DJ booth are never bookable. At Aurelia, use Explore 3D walk-through for the interactive room (2D map stays the booking UI). Brand name VIP reserV is never translated.",

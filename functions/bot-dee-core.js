@@ -409,6 +409,9 @@ function isVersionPrompt(raw) {
   try {
     if (require("./botdee-version-smartview").isVersionSmartViewAlias(raw)) return true;
   } catch (_) {}
+  try {
+    if (require("./features-smartview-core").isFeaturesSmartViewPrompt(raw)) return false;
+  } catch (_) {}
   const q = normalize(raw);
   if (!q || q.length > 140) return false;
   // Product commerce / feature wording — never hijack as FLOQR stamp.
@@ -1251,6 +1254,13 @@ module.exports = {
   isMoodPrompt,
   isIdentityPrompt,
   isVersionPrompt,
+  isFeaturesSmartViewPrompt: raw => {
+    try {
+      return require("./features-smartview-core").isFeaturesSmartViewPrompt(raw);
+    } catch (_) {
+      return false;
+    }
+  },
   isVersionSmartViewAlias: raw => {
     try {
       return require("./botdee-version-smartview").isVersionSmartViewAlias(raw);

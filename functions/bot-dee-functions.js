@@ -682,6 +682,23 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
       smartViews: [versionView]
     };
   }
+  if (bot.isFeaturesSmartViewPrompt(userPrompt)) {
+    const features = require("./features-smartview-core");
+    const catalog = require("./features-smartview/catalog.json");
+    const canAccessKeys = {};
+    (Array.isArray(allowed) ? allowed : []).forEach(key => { canAccessKeys[key] = true; });
+    const pack = features.buildSmartView(catalog, userPrompt, {role, canAccessKeys});
+    return {
+      reply: pack.reply,
+      results: [],
+      provider: pack.provider,
+      model: pack.model,
+      toolRounds: 0,
+      uiLanguage: lang,
+      smartViews: pack.smartViews,
+      replyKey: pack.replyKey
+    };
+  }
   if (bot.isPrivacyPrompt(userPrompt)) {
     return {
       reply: bot.privacyReply(),
@@ -1319,6 +1336,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       || bot.isChitchatPrompt(userPrompt)
       || bot.isIdentityPrompt(userPrompt)
       || bot.isVersionPrompt(userPrompt)
+      || bot.isFeaturesSmartViewPrompt(userPrompt)
       || bot.isHelpPrompt(userPrompt)
       || bot.isPrivacyPrompt(userPrompt)
     ) {

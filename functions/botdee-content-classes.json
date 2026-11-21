@@ -313,6 +313,18 @@
     "help-features-services": [
       "masterAdmin"
     ],
+    "help-features-smartview": [
+      "masterAdmin",
+      "patron"
+    ],
+    "help-features-smartview-botdee": [
+      "masterAdmin",
+      "patron"
+    ],
+    "help-features-smartview-status": [
+      "masterAdmin",
+      "patron"
+    ],
     "help-floqcast": [
       "patron"
     ],
@@ -659,6 +671,15 @@
       "patron"
     ],
     "help-donpapi-led-wall": [
+      "patron"
+    ],
+    "help-features-smartview": [
+      "patron"
+    ],
+    "help-features-smartview-botdee": [
+      "patron"
+    ],
+    "help-features-smartview-status": [
       "patron"
     ],
     "help-floqcast": [
