@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.056";
+  const VERSION = "s3.3.057";
   const packs = {
     "ru": {
       "help-smartvisuals-notification": {
@@ -47,7 +47,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "В чате BOT DEE введите Ver, Vers или Version (регистр не важен, ? по желанию). Карточка Version SMARTview — единственный ответ: BOT DEE не сбрасывает в чат пакет, модель, six-phase или список mock-интеграций. На ней реальный штамп пакета FLOQR, id модели Gemini этого развёртывания (та же, что вызвал бы executeBotSession, даже если этот ход не генерировал) и живой статус службы по проверке этого запроса. Цифры на дизайн-макетах — примеры; живые значения берутся из приложения. Site Chrome следует теме Appearance."
+        body: "Введите Ver, Vers или Version — регистр не важен. BOT DEE показывает карточку версии. Более длинный вопрос вроде «какая у тебя версия?» тоже показывает эту карточку."
       },
       "help-botdee-version-smartview-status": {
         title: "Статус Version SMARTview — живая проверка",
@@ -561,7 +561,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Typ in de BOT DEE-chat Ver, Vers of Version (hoofdletters maken niet uit, ? optioneel). De Version SMARTview-kaart is het enige antwoord — BOT DEE dumpt geen package, model, six-phase of mock-integratietekst in de chatbubble. Die toont de echte FLOQR-packagestempel, het Gemini-model-id van deze deployment (hetzelfde model dat executeBotSession zou aanroepen, ook als deze beurt niet genereerde) en een live servicestatus van een peiling van dit verzoek. Cijfers op ontwerpbeelden zijn voorbeelden — live waarden komen uit de app. Site Chrome volgt je Appearance-thema."
+        body: "Typ Ver, Vers of Version — hoofdletters maken niet uit. BOT DEE toont de versiekaart. Een langere vraag zoals “wat is je versie?” toont ook die kaart."
       },
       "help-botdee-version-smartview-status": {
         title: "Version SMARTview-status is een live peiling",
@@ -1075,7 +1075,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Dans le chat BOT DEE, saisissez Ver, Vers ou Version (casse indifférente, ? optionnel). La carte Version SMARTview est la seule réponse — BOT DEE ne déverse pas le package, le modèle, le six-phase ni les intégrations mock dans la bulle. Elle affiche le vrai tampon de package FLOQR, l’identifiant du modèle Gemini de ce déploiement (le même que executeBotSession, même si ce tour n’a pas généré), et un état de service issu d’une sonde de cette requête. Les chiffres des visuels de design sont des exemples — les valeurs live viennent de l’app. Site Chrome suit votre thème Appearance."
+        body: "Saisissez Ver, Vers ou Version — les majuscules ne comptent pas. BOT DEE affiche la carte de version. Une question plus longue comme « quelle est votre version ? » affiche aussi cette carte."
       },
       "help-botdee-version-smartview-status": {
         title: "L’état Version SMARTview est une sonde live",
@@ -1589,7 +1589,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Im BOT DEE-Chat tippen Sie Ver, Vers oder Version (Groß/Klein egal, optional ?). Die Version-SMARTview-Karte ist die einzige Antwort — BOT DEE dumppt kein Package, Modell, Six-Phase oder Mock-Integrationen in die Chatblase. Sie zeigt den echten FLOQR-Package-Stempel, die Gemini-Modell-ID dieses Deployments (dasselbe Modell, das executeBotSession nutzen würde, auch wenn dieser Zug nicht generiert), und einen Live-Dienststatus aus einer Prüfung dieser Anfrage. Zahlen in Designbildern sind Beispiele — Live-Werte kommen aus der App. Site Chrome folgt Ihrem Appearance-Thema."
+        body: "Geben Sie Ver, Vers oder Version ein — Groß- und Kleinschreibung spielt keine Rolle. BOT DEE zeigt die Versionskarte. Eine längere Frage wie „Was ist deine Version?“ zeigt ebenfalls diese Karte."
       },
       "help-botdee-version-smartview-status": {
         title: "Version-SMARTview-Status ist eine Live-Prüfung",
@@ -2103,7 +2103,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "En el chat de BOT DEE, escriba Ver, Vers o Version (mayúsculas da igual, ? opcional). La tarjeta Version SMARTview es la única respuesta — BOT DEE no vuelca paquete, modelo, six-phase ni integraciones mock en la burbuja. Muestra el sello real del paquete FLOQR, el id del modelo Gemini de este despliegue (el mismo que usaría executeBotSession, aunque este turno no generara) y un estado de servicio de una sonda de esta petición. Los números de las imágenes de diseño son ejemplos — los valores en vivo salen de la app. Site Chrome sigue su tema de Appearance."
+        body: "Escriba Ver, Vers o Version — las mayúsculas no importan. BOT DEE muestra la tarjeta de versión. Una pregunta más larga como “¿cuál es tu versión?” también muestra esa tarjeta."
       },
       "help-botdee-version-smartview-status": {
         title: "El estado de Version SMARTview es una sonda en vivo",
@@ -2617,7 +2617,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Nella chat BOT DEE, digita Ver, Vers o Version (maiuscole indifferenti, ? opzionale). La scheda Version SMARTview è l’unica risposta — BOT DEE non scarica package, modello, six-phase o integrazioni mock nella bolla. Mostra il vero timbro del package FLOQR, l’id del modello Gemini di questo deployment (lo stesso che userebbe executeBotSession, anche se questo turno non ha generato) e uno stato del servizio da una sonda di questa richiesta. I numeri nelle immagini di design sono esempi — i valori live arrivano dall’app. Site Chrome segue il tema Appearance."
+        body: "Digita Ver, Vers o Version — le maiuscole non contano. BOT DEE mostra la scheda della versione. Una domanda più lunga come “qual è la tua versione?” mostra comunque quella scheda."
       },
       "help-botdee-version-smartview-status": {
         title: "Lo stato Version SMARTview è una sonda live",
@@ -3131,7 +3131,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "No chat BOT DEE, digite Ver, Vers ou Version (maiúsculas não importam, ? opcional). O cartão Version SMARTview é a única resposta — BOT DEE não despeja package, modelo, six-phase nem integrações mock no balão. Mostra o carimbo real do pacote FLOQR, o id do modelo Gemini deste deployment (o mesmo que executeBotSession usaria, mesmo quando esta vez não gerou) e um estado de serviço de uma sonda deste pedido. Números nas imagens de design são exemplos — os valores ao vivo vêm do app. Site Chrome segue o tema Appearance."
+        body: "Digite Ver, Vers ou Version — maiúsculas não importam. BOT DEE mostra o cartão de versão. Uma pergunta mais longa como “qual é a sua versão?” também mostra esse cartão."
       },
       "help-botdee-version-smartview-status": {
         title: "O estado do Version SMARTview é uma sonda ao vivo",
@@ -3645,7 +3645,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "Στη συνομιλία BOT DEE πληκτρολογήστε Ver, Vers ή Version (κεφαλαία αδιάφορα, προαιρετικό ;). Η κάρτα Version SMARTview είναι η μόνη απάντηση — η BOT DEE δεν ρίχνει package, μοντέλο, six-phase ή mock integrations στη φυσαλίδα. Δείχνει την πραγματική σφραγίδα πακέτου FLOQR, το id μοντέλου Gemini αυτού του deployment (το ίδιο που θα καλούσε το executeBotSession, ακόμα κι αν αυτός ο γύρος δεν παρήγαγε) και ζωντανή κατάσταση υπηρεσίας από έλεγχο αυτού του αιτήματος. Οι αριθμοί στις εικόνες σχεδίασης είναι παραδείγματα — οι ζωντανές τιμές έρχονται από την εφαρμογή. Το Site Chrome ακολουθεί το θέμα Appearance."
+        body: "Πληκτρολογήστε Ver, Vers ή Version — τα κεφαλαία δεν μετράνε. Η BOT DEE δείχνει την κάρτα έκδοσης. Μια μεγαλύτερη ερώτηση όπως «ποια είναι η έκδοσή σου;» δείχνει επίσης αυτή την κάρτα."
       },
       "help-botdee-version-smartview-status": {
         title: "Η κατάσταση Version SMARTview είναι ζωντανός έλεγχος",
@@ -4159,7 +4159,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "W czacie BOT DEE wpisz Ver, Vers lub Version (wielkość liter nieważna, opcjonalny ?). Karta Version SMARTview jest jedyną odpowiedzią — BOT DEE nie zrzuca pakietu, modelu, six-phase ani mock-integracji do dymka. Pokazuje prawdziwy stempel pakietu FLOQR, id modelu Gemini tego wdrożenia (ten sam, którego użyłby executeBotSession, nawet gdy ta tura nie generowała) oraz żywy status usługi z sondy tego żądania. Liczby na obrazach projektu to przykłady — żywe wartości pochodzą z aplikacji. Site Chrome idzie za motywem Appearance."
+        body: "Wpisz Ver, Vers lub Version — wielkość liter nie ma znaczenia. BOT DEE pokazuje kartę wersji. Dłuższe pytanie, na przykład „jaka jest twoja wersja?”, też pokazuje tę kartę."
       },
       "help-botdee-version-smartview-status": {
         title: "Status Version SMARTview to żywa sonda",
@@ -4673,7 +4673,7 @@
       },
       "help-botdee-version-smartview": {
         title: "Version SMARTview",
-        body: "في دردشة BOT DEE اكتب Ver أو Vers أو Version (حجم الأحرف لا يهم، ? اختياري). بطاقة Version SMARTview هي الإجابة الوحيدة — لا تُفرّغ BOT DEE نص الحزمة أو النموذج أو six-phase أو التكاملات الوهمية في فقاعة الدردشة. تعرض ختم حزمة FLOQR الحقيقي، ومعرّف نموذج Gemini لهذا النشر (نفس النموذج الذي يستدعيه executeBotSession حتى إن تخطّى هذا الدور التوليد)، وحالة خدمة حيّة من فحص هذا الطلب. الأرقام في صور التصميم أمثلة — القيم الحية تأتي من التطبيق. يتبع Site Chrome مظهر Appearance."
+        body: "اكتب Ver أو Vers أو Version — لا يهم حجم الأحرف. تعرض BOT DEE بطاقة الإصدار. سؤال أطول مثل «ما إصدارك؟» يعرض هذه البطاقة أيضًا."
       },
       "help-botdee-version-smartview-status": {
         title: "حالة Version SMARTview فحص حي",

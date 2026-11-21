@@ -49,12 +49,13 @@ test("screenshot mixed bullets: BOT DEE/Gemini stay, Master Admin / Save / Featu
   assert.doesNotMatch(blob, /App Check/i);
 });
 
-test("mixed s3.3.046 keeps People/Room/headless VIP and drops App Check", () => {
+test("mixed s3.3.046 keeps People/Room VIP and drops App Check", () => {
   const row = catalog.classifyItem(byId("s3.3.046"));
   assert.equal(row.keep, true);
-  assert.match(row.text, /People SMARTview chip gaps/i);
-  assert.match(row.text, /Room SMARTview join/i);
+  assert.match(row.text, /People SMARTview/i);
+  assert.match(row.text, /Room SMARTview/i);
   assert.doesNotMatch(row.text, /App Check/i);
+  assert.doesNotMatch(row.text, /headless/i);
 });
 
 test("semicolons inside parentheses do not split Room SMARTview notes", () => {

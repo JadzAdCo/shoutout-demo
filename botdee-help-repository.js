@@ -426,7 +426,7 @@
     {
       id: "help-botdee-version-smartview",
       title: "Version SMARTview",
-      body: "In BOT DEE chat, type Ver, Vers, or Version (any capitalization, optional ?). The Version SMARTview card is the only answer — BOT DEE does not dump package, model, six-phase, or mock-integration text in the chat bubble. It shows the real FLOQR package stamp, the Gemini model id this deployment uses (the same model executeBotSession would call, even when this turn skipped generation), and a live service status from a probe of this request. Numbers in design pictures are examples — live values come from the app. Site Chrome follows your Appearance theme.",
+      body: "Type Ver, Vers, or Version — capitals do not matter. BOT DEE shows the version card. A longer question like “what is your version?” still shows that card.",
       searchPhrases: [
         "version smartview", "ver command", "vers command", "version command",
         "bot dee version", "floqr version", "what version is bot dee"
