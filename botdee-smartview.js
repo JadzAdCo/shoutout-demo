@@ -405,6 +405,14 @@
     return !!(payload && typeof payload === "object" && payload.kind === "botDeeVersion");
   }
 
+  function isFeaturesPayload(payload) {
+    return !!(payload && typeof payload === "object" && payload.kind === "featuresSmartView");
+  }
+
+  function renderFeaturesCard(payload) {
+    return `<div class="floqr-fsv-inline-host" data-kind="featuresSmartView" data-fsv-product="${esc(payload.productId || "")}"></div>`;
+  }
+
   function overlayFrontendPackage(payload) {
     const next = payload && typeof payload === "object" ? payload : {};
     const navV = global.FLOQRNav?.appVersion ? String(global.FLOQRNav.appVersion) : "";
@@ -1360,6 +1368,7 @@
   function renderCard(payload) {
     if (!payload || typeof payload !== "object") return "";
     if (isVersionPayload(payload)) return renderVersionCard(payload);
+    if (isFeaturesPayload(payload)) return renderFeaturesCard(payload);
     if (isRoomPayload(payload)) return renderRoomCard(payload);
     if (isShoutOutPayload(payload)) return renderShoutOutCard(payload);
     if (isVipPayload(payload)) return renderVipCard(payload);
@@ -1991,6 +2000,17 @@
     el.innerHTML = list.map(renderCard).join("") + more || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SMARTviews yet."))}</p>`;
     wireActionLinks(el);
     el.querySelectorAll(".botdee-sv-version").forEach(card => bindVersionCard(card));
+    const featureHosts = el.querySelectorAll(".floqr-fsv-inline-host");
+    let featureIndex = 0;
+    list.forEach(payload => {
+      if (!isFeaturesPayload(payload)) return;
+      const host = featureHosts[featureIndex];
+      featureIndex += 1;
+      if (host && global.FLOQRFeaturesSmartView?.mountPayload) {
+        host.setAttribute("data-fsv-layout", "inline");
+        global.FLOQRFeaturesSmartView.mountPayload(host, payload);
+      }
+    });
     el.querySelectorAll(".botdee-sv-room").forEach(card => bindRoomCard(card));
     el.querySelectorAll(".botdee-sv-shoutout").forEach(card => bindShoutOutCard(card));
     el.querySelectorAll(".botdee-sv-vip").forEach(card => bindVipCard(card));
@@ -2026,6 +2046,8 @@
     renderPeopleCard,
     renderCompactPeopleCard,
     renderVersionCard,
+    isFeaturesPayload,
+    renderFeaturesCard,
     renderRoomCard,
     isVersionPayload,
     isRoomPayload,

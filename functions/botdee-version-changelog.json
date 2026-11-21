@@ -1,10 +1,18 @@
 [
   {
-    "id": "s3.3.056",
-    "text": "s3.3.056: Plain language on the BOT DEE version card",
+    "id": "s3.3.057",
+    "text": "s3.3.057: Plain language on the BOT DEE version card",
     "audiences": [
       "other"
     ]
+  },
+  {
+    "id": "s3.3.056",
+    "text": "s3.3.056: Features SMARTview six-product catalog, BOT DEE retrieval, editorial approve (not published until Don approves)",
+    "audiences": [
+      "botDee"
+    ],
+    "whatsNewText": "s3.3.056: Features SMARTview catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, Si-tube. Status stays not verified until availability evidence. Not Room SMARTview and not Version SMARTview."
   },
   {
     "id": "s3.3.055",

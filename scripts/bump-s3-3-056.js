@@ -5,7 +5,7 @@ const path = require("path");
 const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
 const NEXT = "s3.3.056";
 const NEXT_NUM = "3.3.056";
-const NOTE = "Plain language on the BOT DEE version card";
+const NOTE = "Features SMARTview six-product catalog, BOT DEE retrieval, editorial approve (not published until Don approves)";
 const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
 function transformHtml(src) {
@@ -36,7 +36,13 @@ function run(root) {
   edit("ai-diagnostics-service.js", src => src
     .replace(/PREVIEW_LINKS_PACKAGE = "s3\.\d+\.\d+"/, `PREVIEW_LINKS_PACKAGE = "${NEXT}"`)
     .replace(/CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3\.\d+\.\d+"/, `CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "${NEXT}"`));
-  edit("functions/package.json", src => src.replace(/"version": "[^"]+"/, `"version": "${NEXT_NUM}"`));
+  edit("functions/package.json", src => {
+    src = src.replace(/"version": "[^"]+"/, `"version": "${NEXT_NUM}"`);
+    if (!src.includes("features-smartview.test.js")) {
+      src = src.replace("i18n-coverage.test.js", "features-smartview.test.js i18n-coverage.test.js");
+    }
+    return src;
+  });
   edit("README.md", src => src
     .replace(/^# CURRENT PACKAGE: FLOQR ShoutOut s3\.\d+\.\d+[^\n]*/m, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)
     .replace(/^(- s3\.\d+\.\d+:)/m, `- ${NEXT}: ${NOTE}\n$1`));
@@ -51,7 +57,8 @@ function run(root) {
     rows.unshift({
       id: NEXT,
       text: `${NEXT}: ${NOTE}`,
-      audiences: ["other"]
+      audiences: ["botDee"],
+      whatsNewText: `${NEXT}: Features SMARTview catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, Si-tube. Status stays not verified until availability evidence. Not Room SMARTview and not Version SMARTview.`
     });
     return `${JSON.stringify(rows, null, 2)}\n`;
   });
