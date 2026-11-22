@@ -877,7 +877,7 @@
     {
       id: "help-features-smartview",
       title: "Features SMARTview",
-      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status is Testing when Enable Feature and Enable Beta Feature are both on, Beta when only Enable Beta Feature is on, and In development otherwise. Dates stay Not verified — do not invent a release date. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview, not Version SMARTview. Plans are never treated as shipped.",
+      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status is Production when Enable Feature is on and Enable Beta Feature is off, Testing when both are on, Beta when only Enable Beta Feature is on, and In development when Enable Feature is off. Coming Soon lists In development only. Dates stay Not verified — do not invent a release date. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview, not Version SMARTview. Plans are never treated as shipped.",
       searchPhrases: [
         "features smartview", "feature catalog", "what can mingl do", "product features",
         "coming soon si-nema", "si-tube", "bot-dee features", "feature journey",
@@ -892,11 +892,11 @@
     },
     {
       id: "help-features-smartview-status",
-      title: "Testing, Beta, In development",
-      body: "Features SMARTview shows Testing when Enable Feature and Enable Beta Feature are both on, Beta when only Enable Beta Feature (IsTestFeature) is on, and In development when neither applies. Dates stay Not verified — do not invent a release date. Merged on is a pull-request merge time, not Available since. Released still needs deployment or availability evidence. SAMPLE catalog rows and conversation claims are not proof of a live release. Catalog products include RydR and floqCast (brand spelling floqCast).",
+      title: "Production, Testing, Beta, In development",
+      body: "Features SMARTview shows Production (Prod) when Enable Feature is on and Enable Beta Feature is off — live for everyone, including ShoutOut's packaged default. Testing is both flags on. Beta is Enable Beta Feature only. In development is Enable Feature off. Coming Soon is In development only. Dates stay Not verified — do not invent a release date. Merged on is a pull-request merge time, not Available since. Released still needs deployment or availability evidence. SAMPLE catalog rows and conversation claims are not proof of a live release. Catalog products include RydR and floqCast (brand spelling floqCast).",
       searchPhrases: [
-        "testing beta in development", "date implemented", "merged on", "available since",
-        "not verified feature", "released evidence", "status testing"
+        "testing beta in development", "production prod", "date implemented", "merged on", "available since",
+        "not verified feature", "released evidence", "status testing", "status production"
       ],
       links: [
         {label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}
@@ -907,7 +907,7 @@
     {
       id: "help-features-smartview-botdee",
       title: "Ask BOT DEE about a product",
-      body: "In BOT DEE say What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema, or When was VIP reserV implemented. BOT DEE answers from the Features catalog with citations. It reports Testing, Beta, or In development and will not treat a plan as shipped. Dates are not verified. Type Ver for Version SMARTview. Type Open Room SMARTview for a shared room. Those are different cards.",
+      body: "In BOT DEE say What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema, or When was VIP reserV implemented. BOT DEE answers from the Features catalog with citations. It reports Production, Testing, Beta, or In development and will not treat a plan as shipped. Dates are not verified. Type Ver for Version SMARTview. Type Open Room SMARTview for a shared room. Those are different cards.",
       searchPhrases: [
         "what can mingl do", "what changed in shoutout", "what is coming to si-nema",
         "when was vip reserv implemented", "ask bot dee features", "features catalog citation"

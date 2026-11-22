@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.058";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.058";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.059";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.059";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.059",
+      title: "s3.3.059 — Features SMARTview Production (Prod) status",
+      checks: [
+        {label:"Production flag map", file:"features-smartview-core.js", includes:["STATUS_PRODUCTION", "flagStatusLabel"]},
+        {label:"ShoutOut packaged live", file:"features-smartview/catalog.json", includes:["shoutOut", "IsFeatureEnabled"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-059-features-smartview-production", "s3.3.059"]}
+      ]
+    },
     {
       version: "s3.3.058",
       title: "s3.3.058 — Features SMARTview satellite initializeApp before bind",
@@ -3702,13 +3711,22 @@
       troubleshoot:"Mingl still disabled → Reload Release Control so live featureServices/mingl loads (packaged default is Off). Save hangs after Command received… → Functions still on the old setBetaTesterFeatures that takes the audit-head lock for unchanged grants; wait for [firebase-deploy-features]. Find misses her email → paste the exact Auth sign-in email; callable must be deployed. She is not an active tester → Invite first, she must accept beta-invite.html."
     },
     {
+      id:"s3-3-059-features-smartview-production",
+      area:"BOT DEE / Features SMARTview",
+      feature:"ShoutOut Production (Prod) badge",
+      changed:"Fourth public status Production maps from IsFeatureEnabled=1 and IsTestFeature=0. ShoutOut packaged default {1,0} shows Production, not In development. Testing remains enabled+test, Beta remains test-only, In development remains Enable Feature off. Coming Soon stays In development only. Date implemented stays Not verified. Live featureServices flags win when loaded.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/features-smartview.html until features-smartview-core.js?v=s3.3.059. 2) Sign in on Search first, then return. 3) ShoutOut chip badge is Production (CSS shows PRODUCTION). Mingl, RydR, and floqCast stay Beta. BOT-DEE stays Testing. Si-tube stays In development. 4) Coming Soon does not list ShoutOut. 5) Date implemented is Not verified. 6) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"ShoutOut badge text is Production (uppercase PRODUCTION on the chip). Other products are not marked Production unless live flags are enabled and not test. No invented release date.",
+      troubleshoot:"Still IN DEVELOPMENT → cached core before s3.3.059; hard-refresh ?v=s3.3.059. Mingl/RydR/floqCast showing Production → live featureServices flags were flipped live; packaged defaults are Beta. Empty chips → initializeApp missing, see s3.3.058."
+    },
+    {
       id:"s3-3-056-features-smartview",
       area:"BOT DEE / Features SMARTview",
       feature:"Features SMARTview eight-product catalog (Testing / Beta / In development)",
       changed:"s3.3.056 catalog products: BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, Si-tube. Exact display names RydR and floqCast. Six views, compact+detail cards, BOT DEE retrieval with citations, editorial approve/rollback callables. Patron badges are Testing (Enable Feature + Enable Beta Feature), Beta (Enable Beta Feature only), or In development (neither). Dates stay Not verified. What's New is empty. Do not merge/deploy without Don's approval.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/features-smartview.html?v=s3.3.058 until features-smartview-core.js?v=s3.3.058. 2) Sign in on Search first, then return. 3) Confirm eight product chips. Packaged badges: BOT-DEE Testing, Mingl/RydR/floqCast/VIP/Si-nema Beta, ShoutOut and Si-tube In development. 4) What's New empty. Dates Not verified. 5) Si-tube has no Try. 6) In BOT DEE say What can Mingl do and What can floqCast do — Features cards, not Version, not Room. 7) Master Admin → Features Mgmt → BOT DEE → Show Features SMARTview. 8) Mark Succeed/Failed. Display URLs have no ?v=.",
-      expected:"Eight names exact (RydR, floqCast spelling). Host mounts chips (not an empty card). No FloqR product card. No invented release dates. BOT DEE names Testing/Beta/In development and will not treat a plan as shipped.",
-      troubleshoot:"Empty host / console Firebase: No Firebase App → cached HTML still calls firebase.auth() before initializeApp; hard-refresh ?v=s3.3.058. Eight old badges → cached s3.3.047 catalog. Version card instead of Features → prompt was Ver, not a product question. Room card → Open Room SMARTview / Cancun trip. Functions 404 on approve → getFeaturesSmartViewCatalog not on this SHA."
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/features-smartview.html until features-smartview-core.js?v=s3.3.059. 2) Sign in on Search first, then return. 3) Confirm eight product chips. Packaged badges: BOT-DEE Testing, Mingl/RydR/floqCast/VIP/Si-nema Beta, ShoutOut Production, Si-tube In development. 4) What's New empty. Dates Not verified. 5) Si-tube has no Try. 6) In BOT DEE say What can Mingl do and What can floqCast do — Features cards, not Version, not Room. 7) Master Admin → Features Mgmt → BOT DEE → Show Features SMARTview. 8) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Eight names exact (RydR, floqCast spelling). Host mounts chips (not an empty card). ShoutOut is Production. No FloqR product card. No invented release dates. BOT DEE names Production/Testing/Beta/In development and will not treat a plan as shipped.",
+      troubleshoot:"Empty host / console Firebase: No Firebase App → cached HTML still calls firebase.auth() before initializeApp; hard-refresh ?v=s3.3.059. ShoutOut IN DEVELOPMENT → cached mapping before Production status. Version card instead of Features → prompt was Ver, not a product question. Room card → Open Room SMARTview / Cancun trip. Functions 404 on approve → getFeaturesSmartViewCatalog not on this SHA."
     },
     {
       id:"s3-3-047-features-smartview-master",

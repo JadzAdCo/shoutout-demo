@@ -33,6 +33,17 @@
     return url.pathname.split("/").pop() + url.search + url.hash;
   }
 
+  async function ensureLiveFeatureFlags() {
+    const services = root.FLOQRFeatureServices;
+    if (!services || typeof services.ensureLoaded !== "function") return;
+    try {
+      const auth = root.firebase && root.firebase.auth && root.firebase.auth();
+      const user = auth && auth.currentUser;
+      const db = root.firebase && root.firebase.firestore && root.firebase.firestore();
+      await services.ensureLoaded({db, user});
+    } catch (_) {}
+  }
+
   function viewerAccess() {
     const services = root.FLOQRFeatureServices;
     const keys = core().FEATURE_KEYS;
@@ -118,6 +129,7 @@
   }
 
   function badgeClass(label) {
+    if (label === "Production") return "is-production";
     if (label === "Testing") return "is-testing";
     if (label === "Released") return "is-released";
     if (label === "Beta") return "is-beta";
@@ -128,6 +140,7 @@
   }
 
   function badgeText(label) {
+    if (label === "Production") return t("fsv.statusProduction", "Production");
     if (label === "Testing") return t("fsv.statusTesting", "Testing");
     if (label === "Beta") return t("fsv.lifecycle.beta", "Beta");
     if (label === "In development") return t("fsv.lifecycle.in_development", "In development");
@@ -227,7 +240,7 @@
 
   function journeyHtml(rows) {
     const api = core();
-    const order = api.STATUS_STEPS || [api.STATUS_TESTING, api.STATUS_BETA, api.STATUS_IN_DEVELOPMENT];
+    const order = api.STATUS_STEPS || [api.STATUS_PRODUCTION, api.STATUS_TESTING, api.STATUS_BETA, api.STATUS_IN_DEVELOPMENT];
     return `<ol class="floqr-fsv-journey floqr-fsv-journey-wide">
       ${order.map(step => {
         const hits = rows.filter(row => row.lifecycleLabel === step);
@@ -289,7 +302,7 @@
       <label class="visually-hidden" for="fsvLifecycle">${esc(t("fsv.filterLifecycle", "Lifecycle"))}</label>
       <select id="fsvLifecycle">
         <option value="">${esc(t("fsv.filterAll", "All statuses"))}</option>
-        ${(api.STATUS_STEPS || [api.STATUS_TESTING, api.STATUS_BETA, api.STATUS_IN_DEVELOPMENT]).map(step =>
+        ${(api.STATUS_STEPS || [api.STATUS_PRODUCTION, api.STATUS_TESTING, api.STATUS_BETA, api.STATUS_IN_DEVELOPMENT]).map(step =>
           `<option value="${step}"${st.lifecycle === step ? " selected" : ""}>${esc(badgeText(step))}</option>`
         ).join("")}
       </select>
@@ -419,6 +432,7 @@
     host.textContent = "Loading Features catalog…";
     try {
       await loadCatalog();
+      await ensureLiveFeatureFlags();
       if (opts && opts.productId) host.setAttribute("data-fsv-product", opts.productId);
       if (opts && opts.view) host.setAttribute("data-fsv-view", opts.view);
       if (opts && opts.featureId) host.setAttribute("data-fsv-feature", opts.featureId);

@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.057 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.059 (stable)
 
+- s3.3.059: Features SMARTview Production (Prod) status
 - s3.3.057: Plain language on the BOT DEE version card
 - s3.3.056: Features SMARTview eight-product catalog (BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, Si-tube), BOT DEE retrieval, editorial approve (not published until Don approves)
 - s3.3.055: Headless VIP reserV: book/hold a table phrasing, night rail, 2D map, cancel unmounts dock

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "floqr.featuresSmartView/1",
   "catalogVersion": 2,
-  "warning": "Status is Testing, Beta, or In development from Features & Services flags. Dates are not verified. Plans are not treated as shipped.",
+  "warning": "Status is Production, Testing, Beta, or In development from Features & Services flags. Dates are not verified. Plans are not treated as shipped.",
   "auditedAt": "2026-11-20",
   "defaultBranchSha": "868bec33e874e57ab33b73f6127641df67edec66",
   "products": [
