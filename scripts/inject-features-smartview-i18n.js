@@ -48,14 +48,16 @@ const CHROME = {
     "fsv.replyOk": "Here is the published Features SMARTview.",
     "fsv.showMaster": "Show Features SMARTview",
     "fsv.editorialHint": "Patron What's New stays empty until a Master Admin approves verified release copy. Do not merge this as a live announcement.",
-    "fsv.warning": "Packaged catalog only. Live flags and availability dates are not verified.",
+    "fsv.warning": "Status is Production, Testing, Beta, or In development from Features & Services flags. Dates are not verified.",
     "fsv.lifecycle.concept": "Concept",
     "fsv.lifecycle.planned": "Planned",
     "fsv.lifecycle.in_development": "In development",
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   fr: {
     "fsv.title": "Features SMARTview",
@@ -107,7 +109,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   de: {
     "fsv.title": "Features SMARTview",
@@ -159,7 +163,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   es: {
     "fsv.title": "Features SMARTview",
@@ -211,7 +217,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   nl: {
     "fsv.title": "Features SMARTview",
@@ -263,7 +271,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   ru: {
     "fsv.title": "Features SMARTview",
@@ -315,7 +325,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   it: {
     "fsv.title": "Features SMARTview",
@@ -367,7 +379,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   pt: {
     "fsv.title": "Features SMARTview",
@@ -419,7 +433,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   el: {
     "fsv.title": "Features SMARTview",
@@ -471,7 +487,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   pl: {
     "fsv.title": "Features SMARTview",
@@ -523,7 +541,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   },
   ar: {
     "fsv.title": "Features SMARTview",
@@ -575,7 +595,9 @@ const CHROME = {
     "fsv.lifecycle.beta": "Beta",
     "fsv.lifecycle.released": "Released",
     "fsv.lifecycle.deprecated": "Deprecated",
-    "fsv.lifecycle.retired": "Retired"
+    "fsv.lifecycle.retired": "Retired",
+    "fsv.statusTesting": "Testing",
+    "fsv.statusProduction": "Production"
   }
 };
 

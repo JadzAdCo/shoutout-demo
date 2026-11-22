@@ -32,12 +32,33 @@ function publicCatalog(access) {
   return core.publicProjection(catalog, access || {role: "patron", canAccessKeys: {}});
 }
 
+async function liveFeatureFlags() {
+  const fsCore = require("./feature-services-core");
+  const featureFlags = {};
+  const snaps = await Promise.all(fsCore.FEATURE_KEYS.map(key => audit.loadFeature(key)));
+  snaps.forEach(feature => {
+    if (!feature || !feature.key) return;
+    featureFlags[feature.key] = {
+      IsFeatureEnabled: feature.IsFeatureEnabled,
+      IsTestFeature: feature.IsTestFeature
+    };
+  });
+  return featureFlags;
+}
+
 exports.getFeaturesSmartViewCatalog = onCall(CALL_OPTS, async request => {
   if (!request.auth) deny("unauthenticated", "Sign in to read Features SMARTview.");
+  let featureFlags = {};
+  try {
+    featureFlags = await liveFeatureFlags();
+  } catch (error) {
+    console.warn("Features SMARTview live flags unavailable; packaged defaults", error?.message || error);
+  }
   const access = {
     role: "patron",
     canAccessKeys: {},
-    isMasterAdmin: false
+    isMasterAdmin: false,
+    featureFlags
   };
   const projection = publicCatalog(access);
   const leaked = JSON.stringify(projection);

@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.059",
+    "text": "s3.3.059: Features SMARTview Production (Prod) status",
+    "audiences": [
+      "other"
+    ]
+  },
+  {
     "id": "s3.3.057",
     "text": "s3.3.057: Plain language on the BOT DEE version card",
     "audiences": [

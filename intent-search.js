@@ -202,7 +202,7 @@
       id: "help-features-smartview",
       kind: "help",
       label: "Features SMARTview",
-      blurb: "Product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Status is Testing, Beta, or In development from Features & Services flags. Dates stay Not verified. Not Room SMARTview and not Version SMARTview.",
+      blurb: "Product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Status is Production, Testing, Beta, or In development from Features & Services flags. Dates stay Not verified. Not Room SMARTview and not Version SMARTview.",
       links: [{label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}],
       searchPhrases: [
         "features smartview", "feature catalog", "what can mingl do", "coming soon si-nema",
@@ -218,11 +218,11 @@
     {
       id: "help-features-smartview-status",
       kind: "help",
-      label: "Testing, Beta, In development",
-      blurb: "Testing = Enable Feature and Enable Beta Feature. Beta = Enable Beta Feature only. In development = neither. Dates stay Not verified.",
+      label: "Production, Testing, Beta, In development",
+      blurb: "Production = Enable Feature on, Enable Beta Feature off. Testing = both on. Beta = Enable Beta Feature only. In development = Enable Feature off. Dates stay Not verified.",
       links: [{label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})}],
-      searchPhrases: ["testing beta in development", "date implemented", "merged on", "available since"],
-      patterns: [/status\s+not\s+verified/, /in\s+development/, /date\s+implemented/, /merged\s+on/, /enable\s+beta\s+feature/]
+      searchPhrases: ["testing beta in development", "production prod", "date implemented", "merged on", "available since"],
+      patterns: [/status\s+not\s+verified/, /in\s+development/, /date\s+implemented/, /merged\s+on/, /enable\s+beta\s+feature/, /production\s+\(prod\)/]
     },
     {
       id: "help-features-smartview-botdee",

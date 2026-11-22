@@ -76,14 +76,19 @@ async function loadAllowedFeatures(auth) {
   const snaps = await Promise.all(fsCore.FEATURE_KEYS.map(key => audit.loadFeature(key)));
   const keys = [];
   const labels = [];
+  const featureFlags = {};
   snaps.forEach(feature => {
     if (!feature?.key) return;
+    featureFlags[feature.key] = {
+      IsFeatureEnabled: feature.IsFeatureEnabled,
+      IsTestFeature: feature.IsTestFeature
+    };
     if (fsCore.canAccessFeature(feature, viewer)) {
       keys.push(feature.key);
       labels.push(feature.label || feature.key);
     }
   });
-  return {keys, labels, viewer};
+  return {keys, labels, viewer, featureFlags};
 }
 
 async function runGeminiSession({apiKey, role, history, userPrompt, session, uiLanguage, allowedFeatures, personalization, modelContext}) {
@@ -611,7 +616,7 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
   );
 }
 
-function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined, functionsReachable, geminiConfigured} = {}) {
+function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined, functionsReachable, geminiConfigured} = {}) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const isActive = !!active;
@@ -687,7 +692,7 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, pe
     const catalog = require("./features-smartview/catalog.json");
     const canAccessKeys = {};
     (Array.isArray(allowed) ? allowed : []).forEach(key => { canAccessKeys[key] = true; });
-    const pack = features.buildSmartView(catalog, userPrompt, {role, canAccessKeys});
+    const pack = features.buildSmartView(catalog, userPrompt, {role, canAccessKeys, featureFlags: featureFlags || {}});
     return {
       reply: pack.reply,
       results: [],
@@ -870,9 +875,11 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       receivedAtMs
     );
     let allowedFeatures = null;
+    let featureFlags = {};
     try {
       const access = await loadAllowedFeatures(request.auth);
       allowedFeatures = access.keys;
+      featureFlags = access.featureFlags || {};
     } catch (error) {
       console.warn("BOT DEE feature access load failed; fail closed to live defaults", error?.message || error);
       allowedFeatures = ["shoutOut", "botDee", "passes"];
@@ -1060,7 +1067,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       }
       if (!outcome) {
         outcome = localSession(role, userPrompt, {
-          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+          active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined: roomDeclined,
           functionsReachable: true,
           geminiConfigured: !!apiKey
         });
@@ -1341,7 +1348,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       || bot.isPrivacyPrompt(userPrompt)
     ) {
       outcome = localSession(role, userPrompt, {
-        active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+        active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined: roomDeclined,
         functionsReachable: true,
         geminiConfigured: !!apiKey
       });
@@ -1369,7 +1376,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       } catch (error) {
         console.warn("BOT DEE Gemini failed; using contextualSearch fallback", error?.message || error);
         outcome = localSession(role, userPrompt, {
-          active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+          active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined: roomDeclined,
           functionsReachable: true,
           geminiConfigured: !!apiKey
         });
@@ -1377,7 +1384,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       }
     } else {
       outcome = localSession(role, userPrompt, {
-        active, uiLanguage, allowedFeatures, personalization, roomSmartViewDeclined: roomDeclined,
+        active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined: roomDeclined,
         functionsReachable: true,
         geminiConfigured: false
       });

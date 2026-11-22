@@ -34,10 +34,13 @@
     deprecated: "Deprecated",
     retired: "Retired"
   });
+  const STATUS_PRODUCTION = "Production";
   const STATUS_TESTING = "Testing";
   const STATUS_BETA = "Beta";
   const STATUS_IN_DEVELOPMENT = "In development";
-  const STATUS_STEPS = Object.freeze([STATUS_TESTING, STATUS_BETA, STATUS_IN_DEVELOPMENT]);
+  const STATUS_STEPS = Object.freeze([
+    STATUS_PRODUCTION, STATUS_TESTING, STATUS_BETA, STATUS_IN_DEVELOPMENT
+  ]);
   const DATE_NOT_VERIFIED = "Not verified";
   const PACKAGED_FEATURE_FLAGS = Object.freeze({
     botDee: Object.freeze({IsFeatureEnabled: 1, IsTestFeature: 1}),
@@ -97,6 +100,7 @@
 
   /** Patron badge from Features & Services flags. Never invents a release date. */
   function flagStatusLabel(enabled, test) {
+    if (flag01(enabled) === 1 && flag01(test) === 0) return STATUS_PRODUCTION;
     if (flag01(enabled) === 1 && flag01(test) === 1) return STATUS_TESTING;
     if (flag01(test) === 1) return STATUS_BETA;
     return STATUS_IN_DEVELOPMENT;
@@ -454,7 +458,7 @@
         const status = flagStatusLabel(flags.IsFeatureEnabled, flags.IsTestFeature);
         reply = productName + " is " + status + ". Dates are not verified. I will not treat a plan as shipped.";
       } else {
-        reply = "Dates are not verified. Status is Testing, Beta, or In development from Features & Services flags. I will not treat a plan as shipped.";
+        reply = "Dates are not verified. Status is Production, Testing, Beta, or In development from Features & Services flags. I will not treat a plan as shipped.";
       }
     } else {
       reply = named
@@ -535,6 +539,7 @@
     DISPLAY_NAMES,
     LIFECYCLES,
     LIFECYCLE_LABELS,
+    STATUS_PRODUCTION,
     STATUS_TESTING,
     STATUS_BETA,
     STATUS_IN_DEVELOPMENT,
