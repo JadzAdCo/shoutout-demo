@@ -31,6 +31,14 @@
   "byLang": {
     "de": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "SMARTvisuals erstellen / bearbeiten",
+          "blurb": "Erstellen oder bearbeiten Sie einen SMARTstencil- oder SMARTbackground-Entwurf. Name ist Pflicht. SMARTstencils müssen SVG sein. SMARTbackgrounds akzeptieren SVG, JPEG, PNG oder WebP. Dateien werden serverseitig geprüft. Entwürfe erreichen Gäste erst nach geprüfter Veröffentlichu"
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "SMARTvisuals erstellen / bearbeiten",
+          "blurb": "Erstellen oder bearbeiten Sie einen SMARTstencil- oder SMARTbackground-Entwurf. Name ist Pflicht. SMARTstencils müssen SVG sein. SMARTbackgrounds akzeptieren SVG, JPEG, PNG oder WebP. Dateien werden serverseitig geprüft. Entwürfe erreichen Gäste erst nach geprüfter Veröffentlichu"
+        },
         "help:help-smartvisuals-notification": {
           "label": "Mingl Room SMARTnotification",
           "blurb": "Auf der Suche kann eine kompakte Mingl-Room-Einladung erscheinen. Einladung ansehen öffnet Room SMARTview. Nicht jetzt blendet sie für diese Sitzung aus. Die Grafik ist SMARTbackground-Illustration mit SMARTstencils — kein Foto, kein offizielles Zeichen. Namen und RSVP kommen nur"
@@ -1142,6 +1150,14 @@
     },
     "fr": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "Créer / modifier SMARTvisuals",
+          "blurb": "Créez ou modifiez un brouillon SMARTstencil ou SMARTbackground. Le nom est requis. Les SMARTstencils doivent être en SVG. Les SMARTbackgrounds acceptent SVG, JPEG, PNG ou WebP. Les fichiers sont nettoyés côté serveur. Les brouillons n’atteignent pas les patrons avant une publicat"
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "Créer / modifier SMARTvisuals",
+          "blurb": "Créez ou modifiez un brouillon SMARTstencil ou SMARTbackground. Le nom est requis. Les SMARTstencils doivent être en SVG. Les SMARTbackgrounds acceptent SVG, JPEG, PNG ou WebP. Les fichiers sont nettoyés côté serveur. Les brouillons n’atteignent pas les patrons avant une publicat"
+        },
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
           "blurb": "Une invitation Mingl Room compacte peut s’afficher dans la Recherche. Voir l’invitation ouvre Room SMARTview. Pas maintenant la masque pour cette session. L’art est une illustration SMARTbackground avec SMARTstencils — pas une photo ni une marque officielle. Les noms et RSVP vien"
@@ -2253,6 +2269,14 @@
     },
     "es": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "Crear / editar SMARTvisuals",
+          "blurb": "Cree o edite un borrador de SMARTstencil o SMARTbackground. El nombre es obligatorio. Los SMARTstencils deben ser SVG. Los SMARTbackgrounds aceptan SVG, JPEG, PNG o WebP. Los archivos se sanitizan en el servidor. Los borradores no llegan a patrons hasta una publicación auditada. "
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "Crear / editar SMARTvisuals",
+          "blurb": "Cree o edite un borrador de SMARTstencil o SMARTbackground. El nombre es obligatorio. Los SMARTstencils deben ser SVG. Los SMARTbackgrounds aceptan SVG, JPEG, PNG o WebP. Los archivos se sanitizan en el servidor. Los borradores no llegan a patrons hasta una publicación auditada. "
+        },
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification de Mingl Room",
           "blurb": "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Un anuncio de muestra"
@@ -3364,6 +3388,14 @@
     },
     "it": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "Crea / modifica SMARTvisuals",
+          "blurb": "Crea o modifica una bozza SMARTstencil o SMARTbackground. Il nome è obbligatorio. Gli SMARTstencils devono essere SVG. Gli SMARTbackgrounds accettano SVG, JPEG, PNG o WebP. I file sono sanificati sul server. Le bozze non arrivano ai patron prima di una pubblicazione con audit. L’"
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "Crea / modifica SMARTvisuals",
+          "blurb": "Crea o modifica una bozza SMARTstencil o SMARTbackground. Il nome è obbligatorio. Gli SMARTstencils devono essere SVG. Gli SMARTbackgrounds accettano SVG, JPEG, PNG o WebP. I file sono sanificati sul server. Le bozze non arrivano ai patron prima di una pubblicazione con audit. L’"
+        },
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
           "blurb": "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Un ese"
@@ -4475,6 +4507,14 @@
     },
     "pt": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "Criar / editar SMARTvisuals",
+          "blurb": "Crie ou edite um rascunho SMARTstencil ou SMARTbackground. O nome é obrigatório. SMARTstencils têm de ser SVG. SMARTbackgrounds aceitam SVG, JPEG, PNG ou WebP. Os ficheiros são limpos no servidor. Rascunhos não chegam a patrons até uma publicação auditada. A arte é ilustração FLO"
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "Criar / editar SMARTvisuals",
+          "blurb": "Crie ou edite um rascunho SMARTstencil ou SMARTbackground. O nome é obrigatório. SMARTstencils têm de ser SVG. SMARTbackgrounds aceitam SVG, JPEG, PNG ou WebP. Os ficheiros são limpos no servidor. Rascunhos não chegam a patrons até uma publicação auditada. A arte é ilustração FLO"
+        },
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
           "blurb": "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Um anúncio de amostra rotul"
@@ -5586,6 +5626,14 @@
     },
     "ru": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "Создать / изменить SMARTvisuals",
+          "blurb": "Создайте или измените черновик SMARTstencil или SMARTbackground. Название обязательно. SMARTstencils только SVG. SMARTbackgrounds: SVG, JPEG, PNG или WebP. Файлы очищаются на сервере. Черновики не видны гостям до проверенной публикации. Это иллюстрация FLOQR, не фото и не официал"
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "Создать / изменить SMARTvisuals",
+          "blurb": "Создайте или измените черновик SMARTstencil или SMARTbackground. Название обязательно. SMARTstencils только SVG. SMARTbackgrounds: SVG, JPEG, PNG или WebP. Файлы очищаются на сервере. Черновики не видны гостям до проверенной публикации. Это иллюстрация FLOQR, не фото и не официал"
+        },
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
           "blurb": "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Подписа"
@@ -6697,6 +6745,14 @@
     },
     "el": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "Δημιουργία / επεξεργασία SMARTvisuals",
+          "blurb": "Δημιουργήστε ή επεξεργαστείτε προσχέδιο SMARTstencil ή SMARTbackground. Το όνομα είναι υποχρεωτικό. Τα SMARTstencils πρέπει να είναι SVG. Τα SMARTbackgrounds δέχονται SVG, JPEG, PNG ή WebP. Τα αρχεία καθαρίζονται στον διακομιστή. Τα προσχέδια δεν φτάνουν στους patrons πριν από ελ"
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "Δημιουργία / επεξεργασία SMARTvisuals",
+          "blurb": "Δημιουργήστε ή επεξεργαστείτε προσχέδιο SMARTstencil ή SMARTbackground. Το όνομα είναι υποχρεωτικό. Τα SMARTstencils πρέπει να είναι SVG. Τα SMARTbackgrounds δέχονται SVG, JPEG, PNG ή WebP. Τα αρχεία καθαρίζονται στον διακομιστή. Τα προσχέδια δεν φτάνουν στους patrons πριν από ελ"
+        },
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
           "blurb": "Στην Αναζήτηση μπορεί να εμφανιστεί συμπαγής πρόσκληση Mingl Room. Η προβολή ανοίγει το Room SMARTview. Όχι τώρα την κρύβει σε αυτή τη συνεδρία. Η εικόνα είναι εικονογράφηση SMARTbackground με SMARTstencils — όχι φωτογραφία ούτε επίσημο σήμα. Ονόματα και RSVP μόνο από την εγγραφή"
@@ -7808,6 +7864,14 @@
     },
     "pl": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "Utwórz / edytuj SMARTvisuals",
+          "blurb": "Utwórz lub edytuj szkic SMARTstencil albo SMARTbackground. Nazwa jest wymagana. SMARTstencils muszą być SVG. SMARTbackgrounds przyjmują SVG, JPEG, PNG lub WebP. Pliki są czyszczone na serwerze. Szkice nie trafiają do gości przed audytowaną publikacją. To ilustracja FLOQR, nie zdj"
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "Utwórz / edytuj SMARTvisuals",
+          "blurb": "Utwórz lub edytuj szkic SMARTstencil albo SMARTbackground. Nazwa jest wymagana. SMARTstencils muszą być SVG. SMARTbackgrounds przyjmują SVG, JPEG, PNG lub WebP. Pliki są czyszczone na serwerze. Szkice nie trafiają do gości przed audytowaną publikacją. To ilustracja FLOQR, nie zdj"
+        },
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification Mingl Room",
           "blurb": "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Oznakowana próbka Ad "
@@ -8919,6 +8983,14 @@
     },
     "nl": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "SMARTvisuals maken / bewerken",
+          "blurb": "Maak of bewerk een SMARTstencil- of SMARTbackground-concept. Naam is verplicht. SMARTstencils moeten SVG zijn. SMARTbackgrounds accepteren SVG, JPEG, PNG of WebP. Bestanden worden op de server schoongemaakt. Concepten bereiken gasten pas na een gecontroleerde publicatie. De scene"
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "SMARTvisuals maken / bewerken",
+          "blurb": "Maak of bewerk een SMARTstencil- of SMARTbackground-concept. Naam is verplicht. SMARTstencils moeten SVG zijn. SMARTbackgrounds accepteren SVG, JPEG, PNG of WebP. Bestanden worden op de server schoongemaakt. Concepten bereiken gasten pas na een gecontroleerde publicatie. De scene"
+        },
         "help:help-smartvisuals-notification": {
           "label": "Mingl Room SMARTnotification",
           "blurb": "Op Zoeken kan een compacte Mingl Room-uitnodiging verschijnen. Uitnodiging bekijken opent Room SMARTview. Niet nu verbergt hem deze sessie. De art is SMARTbackground-illustratie met SMARTstencils — geen foto en geen officieel merkteken. Namen en RSVP komen alleen uit het room-rec"
@@ -10030,6 +10102,14 @@
     },
     "ar": {
       "results": {
+        "help:help-smartvisuals-create": {
+          "label": "إنشاء / تعديل SMARTvisuals",
+          "blurb": "أنشئ أو عدّل مسودة SMARTstencil أو SMARTbackground. الاسم مطلوب. يجب أن تكون SMARTstencils بصيغة SVG. تقبل SMARTbackgrounds SVG أو JPEG أو PNG أو WebP. تُنظَّف الملفات على الخادم. لا تصل المسودات إلى الرواد قبل نشر مُدقَّق. الفن رسم FLOQR وليس صورة ولا علامة رسمية لوجهة أو لأسبوع"
+        },
+        "intent:help-smartvisuals-create": {
+          "label": "إنشاء / تعديل SMARTvisuals",
+          "blurb": "أنشئ أو عدّل مسودة SMARTstencil أو SMARTbackground. الاسم مطلوب. يجب أن تكون SMARTstencils بصيغة SVG. تقبل SMARTbackgrounds SVG أو JPEG أو PNG أو WebP. تُنظَّف الملفات على الخادم. لا تصل المسودات إلى الرواد قبل نشر مُدقَّق. الفن رسم FLOQR وليس صورة ولا علامة رسمية لوجهة أو لأسبوع"
+        },
         "help:help-smartvisuals-notification": {
           "label": "SMARTnotification لـ Mingl Room",
           "blurb": "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. عيّنة إعلان موسومة أسفل البطاقة تتبع الوسوم (شريك سفر / حلّق إلى Cancun لر"

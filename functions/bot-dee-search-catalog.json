@@ -2813,6 +2813,27 @@
       ]
     },
     {
+      "sourceId": "help:help-smartvisuals-create",
+      "id": "help-smartvisuals-create",
+      "kind": "help",
+      "label": "Create / Edit SMARTvisuals",
+      "blurb": "Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photogr",
+      "href": "./master-admin.html",
+      "phrases": [
+        "create / edit smartvisuals",
+        "create or edit a smartstencil or smartbackground draft. name is required. smartstencils must be svg. smartbackgrounds accept svg jpeg png or webp. files are san",
+        "create smartbackground",
+        "edit smartvisual",
+        "svg jpeg png webp",
+        "milan background",
+        "submit for review",
+        "art upload",
+        "create / edit",
+        "smartvisual studio",
+        "help-smartvisuals-create"
+      ]
+    },
+    {
       "sourceId": "help:help-smartvisuals-notification",
       "id": "help-smartvisuals-notification",
       "kind": "help",
@@ -2874,6 +2895,7 @@
         "publish stencil",
         "place smartview background",
         "venue card background",
+        "jpeg png webp",
         "help-smartvisuals-studio"
       ]
     },
@@ -4634,6 +4656,23 @@
         "how to throw a shoutout",
         "pick a club choose a template free black white classic or bot dee for paid themes pay if needed and send to the live display.",
         "help-shoutout"
+      ]
+    },
+    {
+      "sourceId": "intent:help-smartvisuals-create",
+      "id": "help-smartvisuals-create",
+      "kind": "help",
+      "label": "Create / Edit SMARTvisuals",
+      "blurb": "Master Admin Create / Edit drafts. Name is required. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP.",
+      "href": "./botdee.html",
+      "phrases": [
+        "create / edit smartvisuals",
+        "master admin create / edit drafts. name is required. smartbackgrounds accept svg jpeg png or webp.",
+        "create smartbackground",
+        "edit smartvisual",
+        "art upload",
+        "svg jpeg png webp",
+        "help-smartvisuals-create"
       ]
     },
     {
