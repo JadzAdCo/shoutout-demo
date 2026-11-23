@@ -81,6 +81,21 @@ test("patron My BOT DEE shows real SMARTview; mocks stay on Master Admin", () =>
   assert.match(upgrade, /loadSmartPreviewDemos/);
 });
 
+test("place cards are compact templates without chrome photo wells", () => {
+  const catalog = smart.mockCatalog();
+  const venue = catalog.find(row => row.kind === "venue");
+  assert.equal((venue.images || []).length, 0);
+  assert.equal(venue.floqrPublicData.smartBackgroundId, "bg-washington-dc");
+  const restaurant = catalog.find(row => row.kind === "restaurant");
+  assert.equal((restaurant.images || []).length, 0);
+  assert.equal(restaurant.floqrPublicData.smartBackgroundId, "bg-dining");
+  const js = read("botdee-smartview.js");
+  assert.match(js, /function renderPlaceCard\(/);
+  assert.match(js, /botdee-sv-place-chrome/);
+  assert.doesNotMatch(js, /class="botdee-sv-images"/);
+  assert.match(read("botdee-smartview.css"), /\.botdee-sv-place/);
+});
+
 test("smartViewLoadCopy uses sign-in copy only for unauthenticated", () => {
   const {createContext, runInContext} = require("vm");
   const src = read("botdee-upgrade-ui.js");

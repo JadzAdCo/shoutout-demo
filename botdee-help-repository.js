@@ -506,8 +506,8 @@
     {
       id: "help-smartvisuals-studio",
       title: "SMARTvisual Studio",
-      body: "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads are a separate labeled slot filled with a mock sample from authorized tags; AdSense stays off.",
-      searchPhrases: ["smartvisual studio", "asset registry", "smartvisuals library", "publish stencil"],
+      body: "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Preview in Place SMARTview shows the compact club/place card. Use as Place SMARTview background writes a published SMARTbackground (SOS2FA + reason) so venue cards are not an empty black well. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads are a separate labeled slot filled with a mock sample from authorized tags; AdSense stays off.",
+      searchPhrases: ["smartvisual studio", "asset registry", "smartvisuals library", "publish stencil", "place smartview background", "venue card background"],
       links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
@@ -752,7 +752,7 @@
     {
       id: "help-botdee-place-search",
       title: "Ask BOT DEE for FLOQR venues",
-      body: "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open their FLOQR public page. Patron photos and ShoutOut / VIP pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so.",
+      body: "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a photo well. Patron photos and ShoutOut / VIP pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so.",
       searchPhrases: [
         "sushi restaurants", "sushi in washington dc", "restaurants in dc",
         "clubs in washington dc", "dining search", "find a club", "japanese restaurant",

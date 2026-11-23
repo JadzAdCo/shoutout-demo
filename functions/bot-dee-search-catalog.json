@@ -508,7 +508,7 @@
       "id": "help-botdee-place-search",
       "kind": "help",
       "label": "Ask BOT DEE for FLOQR venues",
-      "blurb": "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open their FLOQR public page. Patron photos and ShoutOut / VIP pitches stay off unless you asked for those. If n",
+      "blurb": "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a pho",
       "href": "./botdee.html",
       "phrases": [
         "ask bot dee for floqr venues",
@@ -2864,14 +2864,16 @@
       "id": "help-smartvisuals-studio",
       "kind": "help",
       "label": "SMARTvisual Studio",
-      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads are a separate labeled slot filled",
+      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Preview in Place SMARTview shows the compact club/place card. Use as Place SMARTview background writes a published SMARTbackground (SOS2FA + reason) s",
       "href": "./master-admin.html",
       "phrases": [
         "smartvisual studio",
-        "smartvisual studio is the master admin library for smartstencils and smartbackgrounds. search and preview packaged art as images. drafts need license sanitizer ",
+        "smartvisual studio is the master admin library for smartstencils and smartbackgrounds. search and preview packaged art as images. preview in place smartview sho",
         "asset registry",
         "smartvisuals library",
         "publish stencil",
+        "place smartview background",
+        "venue card background",
         "help-smartvisuals-studio"
       ]
     },

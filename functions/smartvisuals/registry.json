@@ -98,7 +98,52 @@
       "backgroundId": "bg-mingl-room",
       "stencilId": "st-people",
       "reasonCode": "neutral-fallback"
-    }
+    },
+    "placeCardDefaults": {
+      "venue": {
+        "backgroundId": "bg-vip-nightlife",
+        "stencilId": "st-nightclub"
+      },
+      "restaurant": {
+        "backgroundId": "bg-dining",
+        "stencilId": "st-restaurant"
+      },
+      "hotel": {
+        "backgroundId": "bg-hotel-stay",
+        "stencilId": "st-hotel"
+      },
+      "short_term_rental": {
+        "backgroundId": "bg-hotel-stay",
+        "stencilId": "st-hotel"
+      },
+      "event": {
+        "backgroundId": "bg-concert",
+        "stencilId": "st-music"
+      },
+      "travel": {
+        "backgroundId": "bg-bali",
+        "stencilId": "st-flight"
+      },
+      "vehicle": {
+        "backgroundId": "bg-road-trip",
+        "stencilId": "st-car"
+      },
+      "product": {
+        "backgroundId": "bg-shoutout",
+        "stencilId": "st-shopping"
+      },
+      "real_estate": {
+        "backgroundId": "bg-washington-dc",
+        "stencilId": "st-location"
+      }
+    },
+    "surfaces": [
+      "smartNotification",
+      "roomSmartView",
+      "peopleSmartView",
+      "placeSmartView",
+      "studioPreview"
+    ]
   },
   "assets": [
     {

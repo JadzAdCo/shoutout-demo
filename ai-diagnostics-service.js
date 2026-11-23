@@ -223,6 +223,16 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.063",
+      title: "s3.3.063 — Compact Place SMARTview + Studio SMARTbackground",
+      checks: [
+        {label:"Place card renderer", file:"botdee-smartview.js", includes:["function renderPlaceCard(", "botdee-sv-place", "resolvePlaceCard"]},
+        {label:"Place card CSS", file:"botdee-smartview.css", includes:["--sv-place-bg", ".botdee-sv-place-chrome"]},
+        {label:"Studio Place preview/assign", file:"smartvisuals-studio.js", includes:["previewPlaceCard", "placeSmartView:", "setSmartVisualOverride"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-063-place-smartview-compact"]}
+      ]
+    },
+    {
       version: "s3.3.060",
       title: "s3.3.060 — Features SMARTview Close + public catalog (no Search wall)",
       checks: [
@@ -3818,6 +3828,15 @@
       howToTest:"1) Sign in as Master Admin. Open https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio. 2) Library shows published kit art as images. Search/filter works. 3) Tagging & Resolver: Cancun Trip → travel/flight + Fly to Cancun ad; Paris Fashion Week → fashion; Dinner reservations → dining; Seattle LA → collision/neutral generic ad; San Dego → San Diego; Burningman → burning-man without official affiliation. 4) Create: upload an SVG with <script> — rejected. Valid SVG + name + license → reason prompt; without SOS2FA, Functions deny and the git registry is unchanged. 5) Ads tab shows mockFill true, AdSense off, and sample banners. 6) Preview in Search SMARTnotification opens ?smartvisualInvite=cancun. 7) Mark Succeed/Failed. Studio draft persist needs Functions deploy.",
       expected:"Studio is Master Admin only. Patrons only see published registry assets. Malicious SVG never publishes. Ads are labeled mock samples, not AdSense.",
       troubleshoot:"Empty library → smartvisuals/catalog.json missing on the served origin. Submit succeeded without SOS2FA → stop; publishSmartVisualDraft must assertAdmin. Script SVG accepted → sanitizer not wired. Search overlay missing after Preview → index.html host or smartvisuals-view.js cache. Blank Ad chrome → selectAd not wired."
+    },
+    {
+      id:"s3-3-063-place-smartview-compact",
+      area:"BOT DEE",
+      feature:"Compact Place SMARTview (venue / club cards)",
+      changed:"Place SMARTview is a fixed compact template: venue name, short blurb, ratings, Open FLOQR Public Page, 28px BOT DEE chrome. No empty VENUE band, no giant photo well around the chrome icon. Background is a published SMARTbackground (city/kind default, or Master Admin Studio assign). Not Features SMARTview.",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.063. Sign in with BOT DEE access. 2) Ask for Aurelia (FLOQR demo club) or clubs in Washington DC. Expect a tight card: kind + Aurelia, two-line blurb, FLOQR 4.8, Open FLOQR Public Page. Chrome icon is 28px, not a full-width empty well. Scenic art is illustration behind the copy, not black empty. 3) Master Admin → SMARTvisual Studio → pick a published SMARTbackground → Preview in Place SMARTview. Optionally Use as Place SMARTview background (SOS2FA + reason). 4) Phone ~390 and desktop ~1280. Display URLs have no ?v=. 5) Mark Succeed/Failed. Live override stamp needs Functions deploy of executeBotSession / attachVenueSearch.",
+      expected:"Compact Place card with SMARTbackground. No giant empty media well. Studio can preview and assign the background. Features SMARTview catalog page is unchanged.",
+      troubleshoot:"Still a tall empty well → cached botdee-smartview.css / .js before renderPlaceCard, or Master Admin mock catalog still serving chrome JPG images (needs this SHA). Black with no illustration → catalog.json not loaded (ensureCatalog) or Functions not stamping smartBackgroundId and city classify missed. Studio assign saved but chat unchanged → Functions deploy pending; packaged city/kind defaults still apply on Pages. Assigned Features SMARTview by mistake → wrong surface (features-smartview.html)."
     },
     {
       id:"s3-3-040-people-alias-match",

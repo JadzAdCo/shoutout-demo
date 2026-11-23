@@ -9,13 +9,7 @@
       "visibility": "public",
       "canonicalFloqrPageId": "temp-democlub-1",
       "summary": "FLOQR demo club. SmartView is a compact wrapper — the club public page is canonical.",
-      "images": [
-        {
-          "url": "./images/chrome/botdee-nightlife.jpg",
-          "licenseStatus": "approved",
-          "attribution": "FLOQR chrome pack"
-        }
-      ],
+      "images": [],
       "ratings": [
         {
           "provider": "FLOQR",
@@ -41,7 +35,8 @@
         "genres": [
           "House",
           "Afrobeats"
-        ]
+        ],
+        "smartBackgroundId": "bg-washington-dc"
       },
       "recommendationExplanation": {},
       "actions": [
@@ -59,13 +54,7 @@
       "visibility": "public",
       "canonicalFloqrPageId": null,
       "summary": "Mock restaurant card. Google/Yelp values are placeholders and not live API data.",
-      "images": [
-        {
-          "url": "./images/chrome/botdee-nightlife.jpg",
-          "licenseStatus": "unknown",
-          "attribution": "Mock placeholder — not a Google Places photo"
-        }
-      ],
+      "images": [],
       "ratings": [
         {
           "provider": "Google",
@@ -102,7 +91,8 @@
         "cuisine": [
           "American",
           "Caribbean"
-        ]
+        ],
+        "smartBackgroundId": "bg-dining"
       },
       "recommendationExplanation": {},
       "actions": [
