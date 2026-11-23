@@ -1652,7 +1652,7 @@
       "id": "help-features-smartview",
       "kind": "help",
       "label": "Features SMARTview",
-      "blurb": "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status is Production when Enable Feature is on and Enable Beta Feature",
+      "blurb": "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. The catalog page opens without Search sign-in. Close dismisses the pro",
       "href": "./features-smartview.html?from=botdee",
       "phrases": [
         "features smartview",
@@ -1668,6 +1668,8 @@
         "what can floqcast do",
         "rydr",
         "floqcast",
+        "close product detail",
+        "catalog without search sign-in",
         "open features smartview",
         "open bot dee",
         "help-features-smartview"

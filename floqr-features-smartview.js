@@ -109,12 +109,20 @@
     };
   }
 
+  function hasHostAttr(host, name) {
+    if (host && typeof host.hasAttribute === "function") return !!host.hasAttribute(name);
+    if (!host || typeof host.getAttribute !== "function") return false;
+    return host.getAttribute(name) != null;
+  }
+
   function stateFrom(host) {
     const params = new URLSearchParams(root.location ? root.location.search : "");
+    const productSet = hasHostAttr(host, "data-fsv-product");
+    const featureSet = hasHostAttr(host, "data-fsv-feature");
     return {
-      productId: host.getAttribute("data-fsv-product") || params.get("product") || "",
+      productId: productSet ? (host.getAttribute("data-fsv-product") || "") : (params.get("product") || ""),
       view: host.getAttribute("data-fsv-view") || params.get("view") || "overview",
-      featureId: host.getAttribute("data-fsv-feature") || params.get("feature") || "",
+      featureId: featureSet ? (host.getAttribute("data-fsv-feature") || "") : (params.get("feature") || ""),
       q: host.getAttribute("data-fsv-q") || "",
       lifecycle: host.getAttribute("data-fsv-lifecycle") || ""
     };
@@ -214,11 +222,15 @@
     const tryBtn = row.tryAllowed && row.tryRoute
       ? `<a class="floqr-fsv-try" href="${esc(navUrl(row.tryRoute, row.productId === "shoutout" ? {start: "shoutout"} : {from: "features-smartview"}))}">${esc(t("fsv.tryFeature", "Try feature"))}</a>`
       : "";
+    const copyNote = row.publicCopyApproved
+      ? ""
+      : `<p class="floqr-fsv-note">${esc(t("fsv.copyNotApproved", "Catalog copy is evidence-backed and is not approved public marketing."))}</p>`;
     return `<div class="floqr-fsv-detail" role="dialog" aria-modal="true" aria-labelledby="fsvDetailTitle">
-      <button type="button" class="floqr-fsv-close" data-fsv-close>${esc(t("fsv.close", "Close"))}</button>
+      <button type="button" class="floqr-fsv-close" data-fsv-close="1" aria-label="${esc(t("fsv.close", "Close"))}">${esc(t("fsv.close", "Close"))}</button>
       <p class="floqr-fsv-kicker">${esc(row.productName)}</p>
       <h4 id="fsvDetailTitle" class="floqr-fsv-name">${esc(row.title)}</h4>
       <span class="floqr-fsv-badge ${badgeClass(row.lifecycleLabel)}">${esc(badgeText(row.lifecycleLabel))}</span>
+      ${copyNote}
       <dl class="floqr-fsv-dl">
         <dt>${esc(t("fsv.accomplishment", "What it accomplishes"))}</dt><dd>${esc(row.accomplishment)}</dd>
         <dt>${esc(t("fsv.before", "Before"))}</dt><dd>${esc(row.previousBehavior || t("fsv.dateNotVerified", "Not verified"))}</dd>
@@ -313,28 +325,46 @@
       ${tabs(st.view)}
       ${search}
       ${grid}
-      <div class="floqr-fsv-sheet" data-fsv-sheet ${open ? "" : "hidden"}>${open ? detailHtml(open) : ""}</div>
+      <div class="floqr-fsv-sheet${open ? " is-open" : ""}" data-fsv-sheet ${open ? "" : "hidden"}>${open ? detailHtml(open) : ""}</div>
     </div>`;
     bind(host);
     if (open) {
       const sheet = host.querySelector("[data-fsv-sheet]");
       const close = host.querySelector("[data-fsv-close]");
       close && close.focus();
-      trapFocus(sheet);
+      trapFocus(sheet, host);
     }
   }
 
-  function trapFocus(sheet) {
+  let ignoreOpenUntil = 0;
+
+  function swallowCloseEvent(event) {
+    if (!event) return;
+    if (typeof event.preventDefault === "function") event.preventDefault();
+    if (typeof event.stopPropagation === "function") event.stopPropagation();
+    if (typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
+  }
+
+  function ignoreGhostClick() {
+    return Date.now() < ignoreOpenUntil;
+  }
+
+  function closeSheet(host, event) {
+    swallowCloseEvent(event);
+    ignoreOpenUntil = Date.now() + 500;
+    if (!host) host = lastHost;
+    if (!host) return;
+    setState(host, {featureId: ""});
+    render(host);
+  }
+
+  function trapFocus(sheet, host) {
     if (!sheet || sheet.hidden) return;
     const nodes = [...sheet.querySelectorAll("button, a, input, select, textarea, [tabindex]:not([tabindex='-1'])")];
     if (!nodes.length) return;
     sheet.addEventListener("keydown", event => {
       if (event.key === "Escape") {
-        const host = sheet.closest("[id], .botdee-sv-host, .floqr-fsv-mount") || lastHost;
-        if (host) {
-          setState(host, {featureId: ""});
-          render(host);
-        }
+        closeSheet(host || lastHost, event);
         return;
       }
       if (event.key !== "Tab") return;
@@ -359,28 +389,43 @@
 
   function bind(host) {
     host.querySelectorAll("[data-fsv-view]").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", event => {
+        if (ignoreGhostClick()) {
+          swallowCloseEvent(event);
+          return;
+        }
         setState(host, {view: btn.getAttribute("data-fsv-view"), featureId: ""});
         render(host);
       });
     });
     host.querySelectorAll("[data-fsv-product]").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", event => {
+        if (ignoreGhostClick()) {
+          swallowCloseEvent(event);
+          return;
+        }
         setState(host, {productId: btn.getAttribute("data-fsv-product") || "", featureId: ""});
         render(host);
       });
     });
     host.querySelectorAll("[data-fsv-open]").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", event => {
+        if (ignoreGhostClick()) {
+          swallowCloseEvent(event);
+          return;
+        }
         setState(host, {featureId: btn.getAttribute("data-fsv-open")});
         render(host);
       });
     });
-    host.querySelectorAll("[data-fsv-close]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        setState(host, {featureId: ""});
-        render(host);
+    const sheet = host.querySelector("[data-fsv-sheet]");
+    if (sheet && typeof sheet.addEventListener === "function") {
+      sheet.addEventListener("click", event => {
+        if (event.target === sheet) closeSheet(host, event);
       });
+    }
+    host.querySelectorAll("[data-fsv-close]").forEach(btn => {
+      btn.addEventListener("click", event => closeSheet(host, event));
     });
     host.querySelectorAll("[data-fsv-ask]").forEach(btn => {
       btn.addEventListener("click", () => askBotDee(btn.getAttribute("data-fsv-ask")));
@@ -433,9 +478,11 @@
     try {
       await loadCatalog();
       await ensureLiveFeatureFlags();
-      if (opts && opts.productId) host.setAttribute("data-fsv-product", opts.productId);
+      if (opts && opts.productId != null) host.setAttribute("data-fsv-product", opts.productId);
       if (opts && opts.view) host.setAttribute("data-fsv-view", opts.view);
-      if (opts && opts.featureId) host.setAttribute("data-fsv-feature", opts.featureId);
+      if (opts && Object.prototype.hasOwnProperty.call(opts, "featureId")) {
+        host.setAttribute("data-fsv-feature", opts.featureId || "");
+      }
       if (!host.getAttribute("data-fsv-view")) host.setAttribute("data-fsv-view", "overview");
       render(host);
     } catch (error) {

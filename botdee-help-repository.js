@@ -891,11 +891,12 @@
     {
       id: "help-features-smartview",
       title: "Features SMARTview",
-      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status is Production when Enable Feature is on and Enable Beta Feature is off, Testing when both are on, Beta when only Enable Beta Feature is on, and In development when Enable Feature is off. Coming Soon lists In development only. Dates stay Not verified — do not invent a release date. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview, not Version SMARTview. Plans are never treated as shipped.",
+      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. The catalog page opens without Search sign-in. Close dismisses the product detail sheet. Status is Production when Enable Feature is on and Enable Beta Feature is off, Testing when both are on, Beta when only Enable Beta Feature is on, and In development when Enable Feature is off. Coming Soon lists In development only. Dates stay Not verified — do not invent a release date. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview, not Version SMARTview. Plans are never treated as shipped.",
       searchPhrases: [
         "features smartview", "feature catalog", "what can mingl do", "product features",
         "coming soon si-nema", "si-tube", "bot-dee features", "feature journey",
-        "what can rydr do", "what can floqcast do", "rydr", "floqcast"
+        "what can rydr do", "what can floqcast do", "rydr", "floqcast",
+        "close product detail", "catalog without search sign-in"
       ],
       links: [
         {label: "Open Features SMARTview", href: pageUrl("./features-smartview.html", {from: "botdee"})},
