@@ -186,6 +186,10 @@ const CLUB_NAME_ALIASES = Object.freeze({
   "lima twist club": "lima-twist-washington-dc",
   "lima twist washington": "lima-twist-washington-dc",
   "lima twist washington dc": "lima-twist-washington-dc",
+  heist: "heist-washington-dc",
+  "heist dc": "heist-washington-dc",
+  "heist washington": "heist-washington-dc",
+  "heist washington dc": "heist-washington-dc",
   shoko: "shoko-barcelona-spain",
   "shoko barcelona": "shoko-barcelona-spain",
   "shoko barcelona spain": "shoko-barcelona-spain"
@@ -641,11 +645,11 @@ function isBareTemplateSwitch(raw, draft) {
 function applyBareInteractiveReply(draft, parsed, raw, templateRow) {
   const next = parsed && typeof parsed === "object" ? parsed : {};
   if (!draft) return next;
-  if (isBareTemplateSwitch(raw, draft)) return next;
   const overlay = templateRow && typeof templateRow === "object"
     ? templateRow
     : catalogShapeFor(draftTemplateId(draft));
   const step = interactiveNeeds(draft, overlay)[0] || "";
+  if (!step && isBareTemplateSwitch(raw, draft)) return next;
   if (isBareAffirmative(raw)) {
     if (step === "handle") next.handleDecision = next.handleDecision || "include";
     else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
@@ -664,9 +668,14 @@ function applyBareInteractiveReply(draft, parsed, raw, templateRow) {
   if (!step || isControlReply(raw)) return next;
   const text = String(raw || "").trim();
   if (!text) return next;
-  if (step === "club" && !next.clubQuery) {
-    next.clubQuery = extractAliasClub(text) || extractAtClub(text)
-      || (!extractCelebrationMessage(text) && text.length <= 80 ? text : "");
+  if (step === "club") {
+    if (!next.clubQuery) {
+      next.clubQuery = extractAliasClub(text) || extractAtClub(text)
+        || (!extractCelebrationMessage(text) && text.length <= 80 ? text : "");
+    }
+    if (next.clubQuery && extractStandaloneTemplate(text) && !extractTemplateHint(text)) {
+      next.templateId = "";
+    }
   } else if (step === "message" && !next.message) {
     next.message = extractCelebrationMessage(text) || extractQuotedMessage(text) || bareSlotText(text, 400);
   } else if (step === "jerseyTeamId" && !next.jerseyTeamId) {

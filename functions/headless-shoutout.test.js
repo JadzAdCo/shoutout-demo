@@ -223,6 +223,21 @@ test("follow-up fills the asked collectableInput slot", () => {
   assert.equal(kit.jerseyTeamId, "soccerMorocco");
 });
 
+test("venue prompt Heist fills the club, not Locked Up", () => {
+  const draft = headless.mergeInteractiveDraft({}, {
+    message: "Happy birthday Maya"
+  });
+  assert.deepEqual(headless.interactiveNeeds(draft), ["club"]);
+  const parsed = headless.parseShoutOutExecute("Heist");
+  headless.applyBareInteractiveReply(draft, parsed, "Heist");
+  assert.equal(parsed.clubQuery, "heist-washington-dc");
+  assert.equal(parsed.templateId || "", "");
+  const next = headless.mergeInteractiveDraft(draft, parsed, {freshThrow: false});
+  assert.equal(next.clubQuery, "heist-washington-dc");
+  assert.notEqual(next.templateId, "heistVaultNight");
+  assert.deepEqual(headless.interactiveNeeds(next), []);
+});
+
 test("template switch does not fill the new overlay's first slot", () => {
   const draft = headless.mergeInteractiveDraft({}, headless.parseShoutOutExecute(
     "throw a shoutout at Decades that says Happy birthday Maya"
