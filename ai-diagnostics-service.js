@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.060";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.060";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.062";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.062";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -3639,6 +3639,33 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-035-botdee-place-search",
+      area:"BOT DEE",
+      feature:"Contextual FLOQR venue search (dining / clubs in a city)",
+      changed:"Sushi restaurants in Washington DC searches onboarded clubs (KATA) instead of patron photos + a VIP/ShoutOut dump. No Google/Yelp. Venue cards open club-profile.html?location= without ?v=.",
+      howToTest:"1) Hard-refresh botdee.html. Sign in with botDee. 2) Ask: Sushi restaurants in Washington DC. 3) Confirm venue card(s) for onboarded sushi (KATA DC) and a FLOQR Public Page link — not patron Profile Media tiles, not a ShoutOut/VIP pitch, not a duplicate link list under the card. 4) Ask Who is Lorna — people SMARTcard still works. 5) Ask clubs in Washington DC — nightlife venues, not a restaurant-guide refusal. 6) Ask Sushi restaurants in Miami and Ethiopian restaurants in DC — empty-catalog reply, not KATA. 7) Mark Succeed/Failed.",
+      expected:"Dining/place asks return onboarded FLOQR venues. Unknown city/cuisine says the catalog has no listing yet. People search still answers Who is. No product dump on sushi. Functions executeBotSession deployed with this SHA.",
+      troubleshoot:"Still a product dump + people photos → executeBotSession not on this SHA (need a BOT DEE Functions deploy from origin/main). Cached chat JS → hard-refresh. Empty sushi result → kata-washington-dc missing cuisine in clubLocations. Miami/Ethiopian returning KATA → leftoverTokens not deployed. Who is broken → people attach still after venue; dining classifier should return none for Who is. Duplicate club links under the card → results[] must stay empty so only SMARTviews render."
+    },
+    {
+      id:"s3-2-42-venue-command-help-chrome",
+      area:"Club Admin",
+      feature:"Venue Command Center ? help; remove privilege banners",
+      changed:"Removed FLOQR Club Admin eyebrow, Location View label, and idle Master Admin verified status. Moved former subtitle into h1 ? help (help-venue-command-center) with venueAdmin+masterAdmin audiences and full locale packs. Access still hasClubAdminAccess; privilege tier not shown after gate.",
+      howToTest:"1) Hard-refresh admin.html?location=temp-democlub-1 (admin-app.js ?v=s3.3.061) as Club Admin or Master Admin. 2) Header shows Venue Command Center + ? only — no FLOQR Club Admin, no Location View, no Master Admin verified line, no grey subtitle paragraph. 3) Tap ? — body equals former Approve ShoutOuts… blurb (localized). 4) Unaffiliated account still hits venue gate; assigned admin still opens panel.",
+      expected:"Clean header; help ? has subtitle copy; access gate unchanged; no privilege disclosure string.",
+      troubleshoot:"Still see verified line → admin-app.js must setText(adminStatus,\"\") after gate. Missing ? → help-attach.js + help-venue-command-center in botdee-help-repository + floqr-i18n-help. Wrong language → run i18n-coverage-report.js."
+    },
+    {
+      id:"s3-2-41-traditional-search-output-chrome",
+      area:"Site chrome / Search",
+      feature:"Traditional search-output pills + VIP/FloqCast venue cards match View Club",
+      changed:"Search-output .badge-row / .tag-row pills use View Club cyan ink + charcoal fill with !important (ShoutOut club cards, VIP venue cards, FloqCast, services). VIP full-card venue buttons keep white copy + cyan active border. FloqCast Select venue CTAs match.",
+      howToTest:"1) Site chrome Traditional; hard-refresh Search + vip.html + floqcast-search.html (styles.css / vip.css / floqcast-search.css ?v=s3.3.060). 2) ShoutOut location card: night pills (Thursday/Friday/Saturday) = cyan text on charcoal (same as View Club ink); View Club unchanged. 3) VIP reserV venue cards: Bookable/genre pills cyan; Select venue primary gradient; hover card gets thin cyan border. 4) FloqCast: Select venue = charcoal + cyan; selected card cyan ring; Go live stays primary gradient.",
+      expected:"All dynamic search-output secondary pills/CTAs match View Club Traditional chrome; primaries stay brand gradient.",
+      troubleshoot:"Still white pill text → hard refresh styles.css + vip.css + floqcast-search.css s3.3.060 (feature CSS loads after styles). Confirm html[data-floqr-chrome=traditional]."
+    },
     {
       id:"s3-3-055-headless-vip-ux",
       area:"BOT DEE",

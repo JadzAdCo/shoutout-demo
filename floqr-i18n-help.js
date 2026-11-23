@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.060";
+  const VERSION = "s3.3.062";
   const packs = {
     "ru": {
       "help-smartvisuals-notification": {
@@ -25,7 +25,11 @@
         title: "Конфиденциальность и сессия BOT DEE",
         body: "Пауза в пять минут завершает живую сессию BOT DEE. Она не удаляет этот чат для вошедшего пользователя, воспоминания или рабочие процессы. Копии в «Мой профиль» → «Функции и заказы» → My BOT DEE тоже остаются. Гости остаются эфемерными. Чаты Mingl сюда не копируются. Enter отправляет сообщение; Shift+Enter начинает новую строку. Имя и тон задаются в «Мой профиль» → My BOT DEE, не кнопкой в чате."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "Спросить BOT DEE про площадки FLOQR",
+        body: "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают публичную страницу клуба. Фото посетителей и питчи ShoutOut / VIP не показываются, если вы об этом не просили. Если площадки ещё нет — BOT DEE так и скажет."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, FloqCAST, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, а после паузы может продолжить сохранённую историю. Пауза не удаляет чат. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите «Настройки» под полем чата для сохранённых чатов и воспоминаний. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат. Знак + справа вверху открывает сохранённые чаты и не удаляет их."
       },
@@ -349,6 +353,10 @@
         title: "Назначение Club Admin на площадку",
         body: "Club Admins открывают Venue Command Center только для назначенного клуба. Открытие admin.html без площадки больше не ведёт по умолчанию на Zebbies. Демо-аккаунты temp_clubadmin_N@floqr-demo.com соответствуют temp-democlub-N. Неназначенные админы запрашивают назначение у Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Центр управления площадкой",
+        body: "Одобряйте ShoutOuts, смотрите показатели площадки и сверяйте активность аккаунта для этой локации."
+      },
       "help-general-notifications": {
         title: "Общие уведомления",
         body: "SOS2FA и другие системные сообщения FloqR следуют этим флагам в записи пользователя патрона. Площадкам или независимым service members нужна подписка на платные SMS/WhatsApp сервисы Twilio."
@@ -539,7 +547,11 @@
         title: "BOT DEE privacy en sessie",
         body: "De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Ze verwijdert deze ingelogde chat, herinneringen of workflows niet. Optionele kopieën in Mijn profiel → Functies en bestellingen → My BOT DEE blijven ook. Gasten blijven tijdelijk. Mingl-chats worden hier nooit gekopieerd. Enter verstuurt; Shift+Enter begint een nieuwe regel. Naam en toon staan in Mijn profiel → My BOT DEE, niet als knop in de chat."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "Vraag BOT DEE naar FLOQR-venues",
+        body: "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen de FLOQR-publiekspagina. Patronfoto’s en ShoutOut- / VIP-pitches blijven weg tenzij u daarnaar vroeg. Als er nog niets onboarded is, zegt BOT DEE dat."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How are you?) en zoekt alleen als je vraagt hoe je iets in FLOQR doet. Als je bent ingelogd, bewaart BOT DEE deze chat als je vernieuwt of een andere telefoon opent, en na de pauze verdergaan met de opgeslagen geschiedenis. De pauze verwijdert de chat niet. Antwoorden gebruiken de classificatie van jouw account. Ingelogd ziet BOT DEE dezelfde openbaar gedeelde profieldatapoints als jij (muziek, eten, reizen, hobby’s en de rest van Privacy datapoint sharing) — nooit e-mail, telefoon, kaartgegevens of GPS. Tik op Instellingen onder het chatvak voor opgeslagen chats en herinneringen. Tik in de chat op een foto om die in een apart venster te openen. Sluit met X of Sluiten om de chat weer te zien. De + rechtsboven opent opgeslagen chats en verwijdert ze niet."
       },
@@ -863,6 +875,10 @@
         title: "Club Admin-venue toewijzing",
         body: "Club Admins openen het Venue Command Center alleen voor een club waaraan ze zijn toegewezen. admin.html zonder venue opent niet langer standaard Zebbies. Demo-accounts temp_clubadmin_N@floqr-demo.com horen bij temp-democlub-N. Niet-toegewezen admins vragen toewijzing aan bij Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Venue Command Center",
+        body: "Keur ShoutOuts goed, bekijk venue-prestaties en stem accountactiviteit af voor deze locatie."
+      },
       "help-general-notifications": {
         title: "Algemene meldingen",
         body: "SOS2FA en andere FloqR-systeemberichten volgen deze vlaggen in het gebruikersrecord van een patron. Venues of onafhankelijke service members moeten zich abonneren op betaalde SMS/WhatsApp Twilio-diensten."
@@ -1053,7 +1069,11 @@
         title: "Confidentialité et session BOT DEE",
         body: "La pause de cinq minutes termine la session BOT DEE en direct. Elle ne supprime pas ce chat connecté, les souvenirs ni les workflows. Les copies dans Mon profil → Fonctions et commandes → My BOT DEE restent aussi. Les invités restent éphémères. Les discussions Mingl ne sont jamais copiées ici. Entrée envoie ; Maj+Entrée commence une nouvelle ligne. Le nom et le ton se règlent dans Mon profil → My BOT DEE, pas par un bouton dans le chat."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "Demander à BOT DEE des lieux FLOQR",
+        body: "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent la page publique FLOQR. Photos de patrons et pitches ShoutOut / VIP restent hors sujet sauf si vous les avez demandés. S’il n’y a encore rien, BOT DEE le dit."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, et après la pause il peut reprendre l’historique enregistré. La pause ne supprime pas le chat. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez Réglages sous la zone de chat pour les discussions et souvenirs enregistrés. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat. Le + en haut à droite ouvre les chats enregistrés sans les supprimer."
       },
@@ -1377,6 +1397,10 @@
         title: "Club Admin affectation du lieu",
         body: "Les 3 joueurs n'ouvrent le Venue Command Center que pour le club auquel ils sont affectés. L'ouverture de admin.html sans lieu n'est plus par défaut Zebbies. Les comptes de démonstration temp_clubadmin_N@floqr-demo.com correspondent à temp-democlub-N. Les administrateurs non attribués demandent une affectation à Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Centre de commande du lieu",
+        body: "Approuvez les ShoutOuts, suivez les performances du lieu et rapprochez l'activité de ce club."
+      },
       "help-general-notifications": {
         title: "Notifications générales",
         body: "SOS2FA et d'autres messages du système FloqR suivent ces indicateurs tels que définis dans l'enregistrement de votre utilisateur. Les sites ou les membres de services indépendants spécifiques doivent s'abonner aux services Twilio payants SMS/WhatsApp"
@@ -1567,7 +1591,11 @@
         title: "BOT DEE Datenschutz und Sitzung",
         body: "Die fünfminütige Pause beendet die Live-Sitzung. Sie löscht nicht diesen angemeldeten Chat, Erinnerungen oder Workflows. Optionale Kopien unter Mein Profil → Funktionen & Bestellungen → My BOT DEE bleiben. Gäste bleiben flüchtig. Mingl-Chats werden hier nie kopiert. Enter sendet; Umschalt+Enter beginnt eine neue Zeile. Name und Ton stellst du unter Mein Profil → My BOT DEE ein, nicht per Schaltfläche im Chat."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "BOT DEE nach FLOQR-Locations fragen",
+        body: "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen die FLOQR-Public-Page. Patron-Fotos und ShoutOut-/VIP-Pitches bleiben weg, außer Sie haben danach gefragt. Ist noch nichts onboardet, sagt BOT DEE das."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (versuch How are you?) und sucht nur, wenn du fragst, wie man etwas in FLOQR macht. Wenn du angemeldet bist, behält BOT DEE diesen Chat beim Aktualisieren oder auf einem zweiten Handy, und nach der Pause den gespeicherten Verlauf fortsetzen. Die Pause löscht den Chat nicht. Antworten nutzen die Klassifizierung deines Kontos. Angemeldet sieht BOT DEE dieselben freiwillig öffentlichen Profildatenpunkte wie du (Musik, Essen, Reisen, Hobbys und der Rest von Privacy datapoint sharing) — niemals E-Mail, Telefon, Kartendaten oder GPS. Tippe unter dem Chatfeld auf Einstellungen für gespeicherte Chats und Erinnerungen. Tippe im Chat auf ein Foto, um es in einem eigenen Fenster zu öffnen. Schließen mit X oder Schließen, um den Chat wieder zu sehen. Das + oben rechts öffnet gespeicherte Chats und löscht sie nicht."
       },
@@ -1891,6 +1919,10 @@
         title: "Club Admin Veranstaltungsortzuweisung",
         body: "Club Admins öffnen das Venue Command Center nur für einen Club, dem sie zugewiesen sind. Beim Öffnen von admin.html ohne Veranstaltungsort wird nicht mehr standardmäßig Zebbies verwendet. Demokonten temp_clubadmin_N@floqr-demo.com sind temp-democlub-N zugeordnet. Nicht zugewiesene Administratoren beantragen eine Zuweisung ab Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Venue Command Center",
+        body: "ShoutOuts freigeben, Venue-Leistung prüfen und Kontoaktivität für diesen Standort abstimmen."
+      },
       "help-general-notifications": {
         title: "Allgemeine Benachrichtigungen",
         body: "SOS2FA und andere FloqR-Systemmeldungen folgen diesen Flags, die in einem Benutzerdatensatz Ihres Benutzers festgelegt sind. Veranstaltungsorte oder bestimmte unabhängige Servicemitglieder müssen kostenpflichtige Twilio-Dienste für SMS/WhatsApp abonnieren"
@@ -2081,7 +2113,11 @@
         title: "Privacidad y sesión de BOT DEE",
         body: "La pausa de cinco minutos termina la sesión en vivo. No borra este chat con sesión iniciada, los recuerdos ni los flujos. Las copias en Mi perfil → Funciones y pedidos → My BOT DEE también se quedan. Los invitados siguen siendo efímeros. Los chats de Mingl nunca se copian aquí. Intro envía; Mayús+Intro empieza una línea nueva. Nombre y tono se eligen en Mi perfil → My BOT DEE, no con un botón en el chat."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "Preguntar a BOT DEE por locales FLOQR",
+        body: "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren la página pública FLOQR. Las fotos de patrons y los pitches de ShoutOut / VIP no aparecen salvo que los pida. Si aún no hay nada, BOT DEE lo dice."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, y después de la pausa puede continuar el historial guardado. La pausa no borra el chat. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca Ajustes bajo el cuadro de chat para chats y recuerdos guardados. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat. El + de arriba a la derecha abre chats guardados y no los borra."
       },
@@ -2405,6 +2441,10 @@
         title: "Club Admin asignación de lugar",
         body: "Los 3 solo abren el Centro de comando del lugar para un club al que están asignados. Abrir admin.html sin un lugar ya no es el predeterminado Zebbies. Las cuentas de demostración temp_clubadmin_N@floqr-demo.com se asignan a temp-democlub-N. Los administradores no asignados solicitan la asignación desde Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Venue Command Center",
+        body: "Aprueba ShoutOuts, revisa el rendimiento del local y concilia la actividad de la cuenta de esta ubicación."
+      },
       "help-general-notifications": {
         title: "Notificaciones generales",
         body: "SOS2FA y otros mensajes del sistema FloqR siguen estas banderas según lo establecido en su registro de usuario. Los lugares o miembros del servicio independientes específicos deben suscribirse a servicios pagos de SMS/WhatsApp Twilio."
@@ -2595,7 +2635,11 @@
         title: "Privacy e sessione BOT DEE",
         body: "La pausa di cinque minuti termina la sessione dal vivo. Non cancella questa chat da connesso, i ricordi o i flussi. Restano anche le copie in Il mio profilo → Funzioni e ordini → My BOT DEE. Gli ospiti restano effimeri. Le chat Mingl non vengono mai copiate qui. Invio invia; Maiusc+Invio inizia una nuova riga. Nome e tono sono in Il mio profilo → My BOT DEE, non un pulsante in chat."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "Chiedere a BOT DEE i locali FLOQR",
+        body: "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono la pagina pubblica FLOQR. Foto dei patron e pitch ShoutOut / VIP restano fuori se non li hai chiesti. Se non c’è ancora nulla, BOT DEE lo dice."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, FloqCAST, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una persona (prova How are you?) e cerca solo quando chiedi come fare qualcosa in FLOQR. Se hai effettuato l’accesso, BOT DEE conserva questa chat se aggiorni o apri un altro telefono, e dopo la pausa può riprendere la cronologia salvata. La pausa non cancella la chat. Le risposte usano la classificazione del tuo account. Se hai effettuato l’accesso, BOT DEE vede gli stessi datapoint pubblici volontari che vedi tu (musica, cibo, viaggi, hobby e il resto di Privacy datapoint sharing) — mai email, telefono, dati della carta o GPS. Tocca Impostazioni sotto la casella di chat per chat e memorie salvate. Tocca una foto in chat per aprirla in una finestra. Chiudi con X o Chiudi per tornare alla chat. Il + in alto a destra apre le chat salvate e non le elimina."
       },
@@ -2919,6 +2963,10 @@
         title: "Club Admin assegnazione della sede",
         body: "I 3 aprono il Venue Command Center solo per il club a cui sono assegnati. L'apertura di admin.html senza una sede non viene più impostata su Zebbies. I conti demo temp_clubadmin_N@floqr-demo.com sono mappati su temp-democlub-N. Gli amministratori non assegnati richiedono l'assegnazione da Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Venue Command Center",
+        body: "Approva ShoutOuts, esamina il rendimento della sede e riconcilia l'attività dell'account per questa sede."
+      },
       "help-general-notifications": {
         title: "Notifiche generali",
         body: "SOS2FA e altri messaggi di sistema FloqR seguono questi flag come impostati nel record utente di un utente. Le sedi o i membri specifici del servizio indipendente devono abbonarsi ai servizi Twilio a pagamento SMS/WhatsApp"
@@ -3109,7 +3157,11 @@
         title: "Privacidade e sessão BOT DEE",
         body: "A pausa de cinco minutos termina a sessão ao vivo. Não apaga este chat com sessão iniciada, memórias ou fluxos. As cópias em O meu perfil → Funções e encomendas → My BOT DEE também ficam. Os convidados continuam efémeros. Os chats Mingl nunca são copiados para aqui. Enter envia; Shift+Enter começa uma nova linha. Nome e tom estão em O meu perfil → My BOT DEE, não num botão no chat."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "Perguntar ao BOT DEE por locais FLOQR",
+        body: "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem a página pública FLOQR. Fotos de patrons e pitches de ShoutOut / VIP ficam de fora salvo se pedir. Se ainda não houver listing, o BOT DEE diz."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, e depois da pausa pode continuar o histórico guardado. A pausa não apaga o chat. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque em Definições abaixo da caixa de chat para chats e memórias guardados. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat. O + no canto superior direito abre chats guardados e não os apaga."
       },
@@ -3433,6 +3485,10 @@
         title: "Club Admin atribuição de local",
         body: "Club Adminsó abrem o Venue Command Center para um clube ao qual estão atribuídos. Abrir admin.html sem um local não é mais o padrão Zebbies. As contas de demonstração temp_clubadmin_N@floqr-demo.com são mapeadas para temp-democlub-N. Administradores não atribuídos solicitam atribuição de Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Centro de Comando do Local",
+        body: "Aprovar ShoutOuts, avaliar o desempenho do local e reconciliar a atividade da conta para este local."
+      },
       "help-general-notifications": {
         title: "Notificações Gerais",
         body: "O SOS2FA e outras mensagens do sistema FloqR seguem essas sinalizações conforme definido no registro do usuário do usuário. Locais ou membros de serviços independentes específicos precisam assinar serviços pagos SMS/WhatsApp da Twilio"
@@ -3623,7 +3679,11 @@
         title: "Απόρρητο και συνεδρία BOT DEE",
         body: "Η παύση των πέντε λεπτών τελειώνει τη ζωντανή συνεδρία. Δεν διαγράφει αυτή τη συνομιλία για συνδεδεμένους, τις μνήμες ή τις ροές. Οι προαιρετικές αντιγραφές στο Προφίλ μου → Λειτουργίες και παραγγελίες → My BOT DEE μένουν κι αυτές. Οι επισκέπτες μένουν προσωρινοί. Οι συνομιλίες Mingl δεν αντιγράφονται εδώ. Enter στέλνει· Shift+Enter ξεκινά νέα γραμμή. Όνομα και ύφος είναι στο Προφίλ μου → My BOT DEE, όχι κουμπί στη συνομιλία."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "Ρωτήστε τον BOT DEE για χώρους FLOQR",
+        body: "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν τη δημόσια σελίδα FLOQR. Φωτογραφίες patrons και pitches ShoutOut / VIP μένουν εκτός εκτός αν τα ζητήσατε. Αν δεν υπάρχει ακόμα, ο BOT DEE το λέει."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκιμάστε How are you?) και αναζητά μόνο όταν ρωτάτε πώς να κάνετε κάτι στο FLOQR. Αν έχετε συνδεθεί, ο BOT DEE κρατά αυτή τη συνομιλία αν ανανεώσετε ή ανοίξετε άλλο τηλέφωνο, και μετά την παύση μπορεί να συνεχίσει το αποθηκευμένο ιστορικό. Η παύση δεν διαγράφει τη συνομιλία. Οι απαντήσεις χρησιμοποιούν την ταξινόμηση του λογαριασμού σας. Αν έχετε συνδεθεί, ο BOT DEE βλέπει τα ίδια δημόσια εθελοντικά datapoints προφίλ με εσάς (μουσική, φαγητό, ταξίδια, χόμπι και τα υπόλοιπα του Privacy datapoint sharing) — ποτέ email, τηλέφωνο, στοιχεία κάρτας ή GPS. Πατήστε Ρυθμίσεις κάτω από το πλαίσιο συνομιλίας για αποθηκευμένες συνομιλίες και μνήμες. Πατήστε μια φωτογραφία στη συνομιλία για να ανοίξει σε παράθυρο. Κλείστε με X ή Κλείσιμο για να δείτε πάλι τη συνομιλία. Το + πάνω δεξιά ανοίγει αποθηκευμένες συνομιλίες και δεν τις διαγράφει."
       },
@@ -3947,6 +4007,10 @@
         title: "Club Admin ανάθεση χώρου",
         body: "Club Admin ανοίγει μόνο το Κέντρο Διοίκησης του Χώρου για μια λέσχη στην οποία έχουν ανατεθεί. Το άνοιγμα του admin.html χωρίς χώρο δεν είναι πλέον ως προεπιλογή Zebbies. Οι δοκιμαστικοί λογαριασμοί temp_clubadmin_N@floqr-demo.com αντιστοιχίζονται στο temp-democlub-N. Οι μη εκχωρημένοι διαχειριστές ζητούν εκχώρηση από το Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Κέντρο εντολών του χώρου διεξαγωγής",
+        body: "Έγκριση ShoutOuts, έλεγχος απόδοσης χώρου και αντιστοίχιση δραστηριότητας λογαριασμού για αυτήν την τοποθεσία."
+      },
       "help-general-notifications": {
         title: "Γενικές Ειδοποιήσεις",
         body: "Το SOS2FA και άλλα μηνύματα συστήματος FloqR ακολουθούν αυτές τις σημαίες, όπως έχουν οριστεί στο αρχείο χρηστών σας. Χώροι εκδηλώσεων ή συγκεκριμένα ανεξάρτητα μέλη υπηρεσίας πρέπει να εγγραφούν στις επί πληρωμή υπηρεσίες SMS/WhatsApp Twilio"
@@ -4137,7 +4201,11 @@
         title: "Prywatność i sesja BOT DEE",
         body: "Pięciominutowa pauza kończy sesję na żywo. Nie usuwa tego czatu dla zalogowanych, wspomnień ani przepływów. Zostają też kopie w Mój profil → Funkcje i zamówienia → My BOT DEE. Goście pozostają tymczasowi. Czaty Mingl nigdy nie są tu kopiowane. Enter wysyła; Shift+Enter zaczyna nową linię. Imię i ton ustawisz w Mój profil → My BOT DEE, nie przyciskiem na czacie."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "Zapytaj BOT DEE o lokale FLOQR",
+        body: "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają publiczną stronę FLOQR. Zdjęcia patronów i pitch ShoutOut / VIP zostają pominięte, chyba że o nie poprosisz. Jeśli nic jeszcze nie jest onboardowane, BOT DEE to powie."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, FloqCAST, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, a po pauzie może wrócić do zapisanej historii. Pauza nie usuwa czatu. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij Ustawienia pod polem czatu, aby otworzyć zapisane czaty i wspomnienia. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu. Znak + w prawym górnym rogu otwiera zapisane czaty i ich nie usuwa."
       },
@@ -4461,6 +4529,10 @@
         title: "Club Admin przypisanie lokalu",
         body: "Club Adminotwierza tylko Centrum Dowodzenia Miejsca dla klubu, do którego są przypisani. Otwarcie admin.html bez miejsca nie domyślnie ustawia już Zebbies. Konta demonstracyjne temp_clubadmin_N@floqr-demo.com mapują na temp-democlub-N. Nieprzypisani administratorzy proszą o przypisanie od Master Admin."
       },
+      "help-venue-command-center": {
+        title: "Centrum dowodzenia obiektem",
+        body: "Zatwierdź ShoutOuts, sprawdź wydajność atrakcji i uzgodnij aktywność na koncie dla tej lokalizacji."
+      },
       "help-general-notifications": {
         title: "Powiadomienia ogólne",
         body: "SOS2FA i inne systemowe wiadomości FloqR podążają za tymi flagami ustawionymi w rekordzie użytkownika patrona. Miejsca lub konkretnych niezależnych członków usługowych muszą subskrybować płatne usługi Twilio SMS/WhatsApp"
@@ -4651,7 +4723,11 @@
         title: "خصوصية وجلسة BOT DEE",
         body: "توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. لا يحذف هذه المحادثة للمستخدم المسجّل أو الذكريات أو مسارات العمل. تبقى النسخ الاختيارية في ملفي → الميزات والطلبات → My BOT DEE أيضًا. يبقى الضيوف مؤقتين. لا تُنسخ محادثات Mingl إلى هنا. Enter يرسل؛ Shift+Enter يبدأ سطرًا جديدًا. الاسم والأسلوب من ملفي → My BOT DEE، وليس زرًا في المحادثة."
       },
-"help-botdee-page": {
+    "help-botdee-place-search": {
+        title: "اسأل BOT DEE عن أماكن FLOQR",
+        body: "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح الصفحة العامة لـ FLOQR. صور الرواد وعروض ShoutOut / VIP لا تظهر إلا إذا طلبتها. إذا لم يُدرج المكان بعد، يقول BOT DEE ذلك."
+      },
+      "help-botdee-page": {
         title: "BOT DEE",
         body: "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وFloqCAST وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في FLOQR. إذا سجّلت الدخول، يحتفظ BOT DEE بهذه المحادثة عند التحديث أو على هاتف آخر وبعد التوقف يمكنه متابعة السجل المحفوظ. التوقف لا يحذف المحادثة. تستخدم الإجابات تصنيف حسابك. بعد تسجيل الدخول يرى BOT DEE نفس نقاط البيانات العامة المتطوع بها التي تراها (الموسيقى والطعام والسفر والهوايات وبقية Privacy datapoint sharing) — لا بريد إلكتروني ولا هاتف ولا بيانات بطاقة ولا GPS. اضغط الإعدادات تحت صندوق الدردشة للمحادثات والذكريات المحفوظة. اضغط على صورة في المحادثة لفتحها في نافذة. أغلق بـ X أو إغلاق للعودة إلى المحادثة. علامة + أعلى اليمين تفتح المحادثات المحفوظة ولا تحذفها."
       },
@@ -4974,6 +5050,10 @@
       "help-club-admin-affiliation": {
         title: "Club Admin تعيين المكان",
         body: "Club Admin يفتح فقط مركز قيادة المكان للنادي الذي يتم تعيينه له. فتح admin.html بدون مكان لم يعد يحدد Zebbies افتراضياً. حسابات العرض temp_clubadmin_N@floqr-demo.com تتطابق مع temp-democlub-N. المطالبين الذين لم يتم تعيينهم يطلبون التعيين من Master Admin."
+      },
+      "help-venue-command-center": {
+        title: "مركز قيادة المنشأة",
+        body: "الموافقة على ShoutOuts، ومراجعة أداء المكان، وتسوية نشاط الحساب لهذا الموقع."
       },
       "help-general-notifications": {
         title: "الإشعارات العامة",

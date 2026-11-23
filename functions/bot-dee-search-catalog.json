@@ -504,6 +504,29 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-place-search",
+      "id": "help-botdee-place-search",
+      "kind": "help",
+      "label": "Ask BOT DEE for FLOQR venues",
+      "blurb": "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open their FLOQR public page. Patron photos and ShoutOut / VIP pitches stay off unless you asked for those. If n",
+      "href": "./botdee.html",
+      "phrases": [
+        "ask bot dee for floqr venues",
+        "ask in plain words sushi restaurants in washington dc clubs in dc or a named club. bot dee searches onboarded floqr venues only not google or yelp. matching clu",
+        "sushi restaurants",
+        "sushi in washington dc",
+        "restaurants in dc",
+        "clubs in washington dc",
+        "dining search",
+        "find a club",
+        "japanese restaurant",
+        "bot dee venues",
+        "bot dee restaurants",
+        "open bot dee",
+        "help-botdee-place-search"
+      ]
+    },
+    {
       "sourceId": "help:help-botdee-privacy-assistant",
       "id": "help-botdee-privacy-assistant",
       "kind": "help",
@@ -3252,6 +3275,25 @@
       ]
     },
     {
+      "sourceId": "help:help-venue-command-center",
+      "id": "help-venue-command-center",
+      "kind": "help",
+      "label": "Venue Command Center",
+      "blurb": "Approve ShoutOuts, review venue performance, and reconcile account activity for this location.",
+      "href": "./admin.html?from=botdee",
+      "phrases": [
+        "venue command center",
+        "approve shoutouts review venue performance and reconcile account activity for this location.",
+        "club admin",
+        "approve shoutouts",
+        "venue performance",
+        "account activity",
+        "reconcile account",
+        "floqr club admin",
+        "help-venue-command-center"
+      ]
+    },
+    {
       "sourceId": "help:help-venue-crawl-datapoints",
       "id": "help-venue-crawl-datapoints",
       "kind": "help",
@@ -3829,6 +3871,26 @@
         "ip language",
         "country language",
         "help-app-language"
+      ]
+    },
+    {
+      "sourceId": "intent:help-botdee-place-search",
+      "id": "help-botdee-place-search",
+      "kind": "help",
+      "label": "Ask BOT DEE for FLOQR venues",
+      "blurb": "Ask sushi restaurants in Washington DC or clubs in DC. BOT DEE searches onboarded FLOQR venues only — not Google or Yelp — and opens the club public page.",
+      "href": "./botdee.html",
+      "phrases": [
+        "ask bot dee for floqr venues",
+        "ask sushi restaurants in washington dc or clubs in dc. bot dee searches onboarded floqr venues only not google or yelp and opens the club public page.",
+        "sushi restaurants",
+        "sushi in washington dc",
+        "restaurants in dc",
+        "clubs in washington dc",
+        "japanese restaurant",
+        "dining search",
+        "find a club",
+        "help-botdee-place-search"
       ]
     },
     {

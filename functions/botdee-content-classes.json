@@ -79,6 +79,12 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-place-search": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-privacy-assistant": [
       "masterAdmin",
       "patron",
@@ -248,7 +254,8 @@
       "patron"
     ],
     "help-club-admin-affiliation": [
-      "masterAdmin"
+      "masterAdmin",
+      "venueAdmin"
     ],
     "help-club-display-screens": [
       "venueAdmin"
@@ -546,6 +553,10 @@
     "help-twilio-logging": [
       "masterAdmin"
     ],
+    "help-venue-command-center": [
+      "masterAdmin",
+      "venueAdmin"
+    ],
     "help-venue-crawl-datapoints": [
       "masterAdmin"
     ],
@@ -644,6 +655,9 @@
       "patron"
     ],
     "help-app-language": [
+      "patron"
+    ],
+    "help-botdee-place-search": [
       "patron"
     ],
     "help-botdee-room-smartview": [
