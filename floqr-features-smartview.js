@@ -336,11 +336,22 @@
     }
   }
 
+  let ignoreOpenUntil = 0;
+
+  function swallowCloseEvent(event) {
+    if (!event) return;
+    if (typeof event.preventDefault === "function") event.preventDefault();
+    if (typeof event.stopPropagation === "function") event.stopPropagation();
+    if (typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
+  }
+
+  function ignoreGhostClick() {
+    return Date.now() < ignoreOpenUntil;
+  }
+
   function closeSheet(host, event) {
-    if (event) {
-      if (typeof event.preventDefault === "function") event.preventDefault();
-      if (typeof event.stopPropagation === "function") event.stopPropagation();
-    }
+    swallowCloseEvent(event);
+    ignoreOpenUntil = Date.now() + 500;
     if (!host) host = lastHost;
     if (!host) return;
     setState(host, {featureId: ""});
@@ -378,19 +389,31 @@
 
   function bind(host) {
     host.querySelectorAll("[data-fsv-view]").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", event => {
+        if (ignoreGhostClick()) {
+          swallowCloseEvent(event);
+          return;
+        }
         setState(host, {view: btn.getAttribute("data-fsv-view"), featureId: ""});
         render(host);
       });
     });
     host.querySelectorAll("[data-fsv-product]").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", event => {
+        if (ignoreGhostClick()) {
+          swallowCloseEvent(event);
+          return;
+        }
         setState(host, {productId: btn.getAttribute("data-fsv-product") || "", featureId: ""});
         render(host);
       });
     });
     host.querySelectorAll("[data-fsv-open]").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", event => {
+        if (ignoreGhostClick()) {
+          swallowCloseEvent(event);
+          return;
+        }
         setState(host, {featureId: btn.getAttribute("data-fsv-open")});
         render(host);
       });
@@ -402,9 +425,7 @@
       });
     }
     host.querySelectorAll("[data-fsv-close]").forEach(btn => {
-      const dismiss = event => closeSheet(host, event);
-      btn.addEventListener("pointerdown", dismiss);
-      btn.addEventListener("click", dismiss);
+      btn.addEventListener("click", event => closeSheet(host, event));
     });
     host.querySelectorAll("[data-fsv-ask]").forEach(btn => {
       btn.addEventListener("click", () => askBotDee(btn.getAttribute("data-fsv-ask")));

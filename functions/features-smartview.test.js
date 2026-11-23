@@ -285,8 +285,11 @@ test("UI, BOT DEE, and Master Admin hosts are wired without hardcoded nav versio
   assert.match(read("features-smartview.html"), /data-floqr-public/);
   assert.match(read("features-smartview.html"), /autoRedirect:\s*false/);
   assert.match(read("features-smartview.html"), /mountCatalog\(\);/);
+  assert.match(read("features-smartview.html"), /function hostAttr\(host, name, fallback\)/);
   assert.match(read("floqr-features-smartview.js"), /function closeSheet/);
   assert.match(read("floqr-features-smartview.js"), /hasHostAttr/);
+  assert.match(read("floqr-features-smartview.js"), /ignoreGhostClick/);
+  assert.doesNotMatch(read("floqr-features-smartview.js"), /pointerdown/);
   assert.match(read("floqr-features-smartview.css"), /backdrop-filter:\s*none/);
   assert.doesNotMatch(read("features-smartview.html"), /<a\b[^>]*href="[^"]*[?&]v=/);
   assert.match(read("functions/index.js"), /getFeaturesSmartViewCatalog/);
@@ -310,6 +313,7 @@ function fakeHost() {
     __jumps: [],
     __tabs: [],
     __closes: [],
+    __opens: [],
     hasAttribute(name) {
       return Object.prototype.hasOwnProperty.call(host.attributes, name);
     },
@@ -334,6 +338,9 @@ function fakeHost() {
       } else if (sel === "[data-fsv-close]") {
         attr = "data-fsv-close";
         bucket = "__closes";
+      } else if (sel === "[data-fsv-open]") {
+        attr = "data-fsv-open";
+        bucket = "__opens";
       } else {
         return [];
       }
@@ -571,6 +578,11 @@ test("Close dismisses the detail sheet even when the URL has ?feature=", async (
   assert.equal(host.getAttribute("data-fsv-feature"), "");
   assert.doesNotMatch(host.innerHTML, /floqr-fsv-sheet is-open/);
   assert.match(host.innerHTML, /data-fsv-sheet hidden/);
+  const reopen = host.__opens[0];
+  assert.ok(reopen, "card open is wired after Close");
+  reopen.fn({preventDefault() {}, stopPropagation() {}, stopImmediatePropagation() {}});
+  assert.equal(host.getAttribute("data-fsv-feature"), "");
+  assert.doesNotMatch(host.innerHTML, /floqr-fsv-sheet is-open/);
 });
 
 test("deprecated and retired history is preserved in schema", () => {
