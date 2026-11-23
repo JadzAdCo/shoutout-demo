@@ -15,4 +15,8 @@
 .sv-studio-ad-example h4{margin:0 0 8px;font-size:13px}
 .sv-studio-dl{margin:0;padding-left:18px}
 .sv-studio-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:16px}
+.sv-studio-place-kind{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.sv-studio-place-kind select{min-height:40px}
+.sv-studio-place-preview{max-width:420px}
+.sv-studio-place-preview .botdee-sv-place{margin:0}
 @media (max-width:800px){.sv-studio-layout{grid-template-columns:1fr}}

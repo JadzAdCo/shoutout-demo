@@ -250,14 +250,14 @@ function mockCatalog() {
       visibility: "public",
       canonicalFloqrPageId: venueId,
       summary: "FLOQR demo club. SmartView is a compact wrapper — the club public page is canonical.",
-      images: [{
-        url: "./images/chrome/botdee-nightlife.jpg",
-        licenseStatus: "approved",
-        attribution: "FLOQR chrome pack"
-      }],
       ratings: [{provider: "FLOQR", value: 4.8, retrievedAt: when}],
       sources: [{provider: "FLOQR", url: venueHref, retrievedAt: when, reuseRights: "approved"}],
-      floqrPublicData: {locationId: venueId, city: "Washington, DC", genres: ["House", "Afrobeats"]},
+      floqrPublicData: {
+        locationId: venueId,
+        city: "Washington, DC",
+        genres: ["House", "Afrobeats"],
+        smartBackgroundId: "bg-washington-dc"
+      },
       actions: [{id: "open-public-page", label: "Open FLOQR Public Page", href: venueHref}]
     }),
     basePayload({
@@ -265,11 +265,6 @@ function mockCatalog() {
       title: "Mock · District Kitchen",
       visibility: "public",
       summary: "Mock restaurant card. Google/Yelp values are placeholders and not live API data.",
-      images: [{
-        url: "./images/chrome/botdee-nightlife.jpg",
-        licenseStatus: "unknown",
-        attribution: "Mock placeholder — not a Google Places photo"
-      }],
       ratings: [
         {provider: "Google", value: 4.4, retrievedAt: when},
         {provider: "Yelp", value: 4.0, retrievedAt: when},
@@ -285,7 +280,8 @@ function mockCatalog() {
         address: "Mock address — not copied from Google Places",
         menuIframeAllowed: false,
         menuHref: "https://www.floqr.app/",
-        cuisine: ["American", "Caribbean"]
+        cuisine: ["American", "Caribbean"],
+        smartBackgroundId: "bg-dining"
       },
       actions: [{id: "menu-external", label: "Menu (external)", href: "https://www.floqr.app/", iframe: false}]
     }),

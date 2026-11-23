@@ -94,24 +94,112 @@
       <img src="./${esc(asset.path)}" alt="${esc(asset.name)}" class="sv-studio-preview"/>
       <p>${esc((asset.tags || []).join(", "))}</p>
       <p class="sub small">${esc(t("sv.licenseNote", "Original FLOQR illustration. Not a photograph or official mark."))}</p>
+      <p class="sub small">${esc(t("sv.studioPlaceHint", "Place SMARTview cards use a published SMARTbackground, not an empty photo well. SOS2FA and a reason are required to save."))}</p>
+      <p class="button-row sv-studio-place-row">
+        <label class="sv-studio-place-kind">${esc(t("sv.placeBgKind", "Place card type"))}
+          <select id="svStudioPlaceKind">
+            <option value="venue">${esc(t("botdee.sv.kindVenue", "Venue"))}</option>
+            <option value="restaurant">${esc(t("botdee.sv.kindRestaurant", "Restaurant"))}</option>
+            <option value="hotel">${esc(t("botdee.sv.kindHotel", "Hotel"))}</option>
+            <option value="event">${esc(t("botdee.sv.kindEvent", "Event"))}</option>
+            <option value="travel">${esc(t("botdee.sv.kindTravel", "Travel"))}</option>
+          </select>
+        </label>
+      </p>
       <p class="button-row">
         <button type="button" class="buttonlike" data-sv-preview="notify">${esc(t("sv.previewNotify", "Preview in Search SMARTnotification"))}</button>
         <button type="button" class="buttonlike" data-sv-preview="room">${esc(t("sv.previewRoom", "Preview in Room SMARTview"))}</button>
-      </p>`;
+        <button type="button" class="buttonlike" data-sv-preview="place">${esc(t("sv.previewPlace", "Preview in Place SMARTview"))}</button>
+        ${asset.type === "background" ? `<button type="button" class="buttonlike primary" data-sv-assign-place="1">${esc(t("sv.assignPlaceBg", "Use as Place SMARTview background"))}</button>` : ""}
+      </p>
+      <p id="svStudioPlaceStatus" class="status" aria-live="polite"></p>`;
     box.querySelectorAll("[data-sv-preview]").forEach(btn => {
       btn.addEventListener("click", () => previewSurface(btn.getAttribute("data-sv-preview"), asset));
     });
+    box.querySelector("[data-sv-assign-place]")?.addEventListener("click", () => assignPlaceBackground(asset));
   }
 
   function previewSurface(kind, asset) {
+    const host = byId("svStudioLivePreview");
+    if (!host) return;
+    host.hidden = false;
+    if (kind === "place") {
+      previewPlaceCard(asset, host);
+      return;
+    }
     const payload = Object.assign(root.FLOQRSmartVisuals?.syntheticCancun?.() || {title: "Cancun Trip", demo: true}, {
       override: {backgroundId: asset.type === "background" ? asset.id : "bg-bali", stencilId: asset.type === "stencil" ? asset.id : "st-flight", authorized: true}
     });
-    const host = byId("svStudioLivePreview");
-    if (!host || !root.FLOQRSmartVisuals) return;
-    host.hidden = false;
+    if (!root.FLOQRSmartVisuals) return;
     if (kind === "notify") root.FLOQRSmartVisuals.mountNotification(host, payload, {onView() { root.FLOQRSmartVisuals.mountRoom(host, payload, {}); }});
     else root.FLOQRSmartVisuals.mountRoom(host, payload, {});
+  }
+
+  function previewPlaceCard(asset, host) {
+    const api = root.FLOQRBotDeeSmartView;
+    if (!api?.renderCard) {
+      host.innerHTML = `<p class="status">${esc(t("sv.previewPlaceNeedRenderer", "Place SMARTview renderer is missing."))}</p>`;
+      return;
+    }
+    if (catalog) root.FLOQRSmartVisualsCatalog = catalog;
+    const kind = byId("svStudioPlaceKind")?.value || "venue";
+    const backgroundId = asset.type === "background" ? asset.id : "";
+    const html = api.renderCard({
+      kind,
+      title: kind === "venue" ? "Aurelia" : t("sv.untitled", "Mingl Room"),
+      summary: kind === "venue"
+        ? "FLOQR demo club. SmartView is a compact wrapper — the club public page is canonical."
+        : "",
+      ratings: [{provider: "FLOQR", value: 4.8}],
+      actions: [{id: "open-public-page", href: "./club-profile.html?location=temp-democlub-1", label: "Open FLOQR Public Page"}],
+      sources: [{provider: "FLOQR", reuseRights: "approved"}],
+      canonicalFloqrPageId: "temp-democlub-1",
+      floqrPublicData: {city: "Washington, DC", smartBackgroundId: backgroundId}
+    });
+    host.innerHTML = `<div class="sv-studio-place-preview">${html}</div>`;
+    try { root.FLOQRChromeScheme?.applyDocument?.(); } catch (_) { /* ignore */ }
+  }
+
+  async function assignPlaceBackground(asset) {
+    const status = byId("svStudioPlaceStatus");
+    if (!asset || asset.type !== "background") {
+      if (status) status.textContent = t("sv.studioNeedMeta", "Name and license are required.");
+      return;
+    }
+    const reasonPrompt = root.FLOQRReasonPrompt;
+    if (!reasonPrompt?.ask) {
+      if (status) status.textContent = t("sv.studioNeedReason", "Reason prompt module missing — nothing was saved.");
+      return;
+    }
+    const kind = byId("svStudioPlaceKind")?.value || "venue";
+    const reason = await reasonPrompt.ask({
+      summary: t("sv.studioPlaceSummary", "SMARTvisuals: set Place SMARTview background"),
+      minLength: 8
+    });
+    if (reason == null) {
+      if (status) status.textContent = t("sv.cancelled", "Cancelled — nothing was saved.");
+      return;
+    }
+    try {
+      const callable = firebase.app().functions("us-central1").httpsCallable("setSmartVisualOverride");
+      const sos = root.FLOQRSOS2FA?.sessionId?.();
+      const stencilId = asset.pairedStencilId
+        ? (String(asset.pairedStencilId).startsWith("st-") ? asset.pairedStencilId : `st-${asset.pairedStencilId}`)
+        : "st-location";
+      const result = await callable({
+        roomKey: `placeSmartView:${kind}`,
+        backgroundId: asset.id,
+        stencilId,
+        reason,
+        sos2faSessionId: sos,
+        clientKind: "agent"
+      });
+      if (status) status.textContent = t("sv.placeBgSaved", "Place SMARTview background saved.")
+        + ` (${result.data?.backgroundId || asset.id})`;
+      previewPlaceCard(asset, byId("svStudioLivePreview") || document.createElement("div"));
+    } catch (err) {
+      if (status) status.textContent = err?.message || t("sv.studioDenied", "Publish denied.");
+    }
   }
 
   function renderTagging() {

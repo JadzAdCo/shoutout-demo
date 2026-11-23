@@ -1,41 +1,134 @@
 .botdee-sv-card {
-  margin: 0.75rem 0;
-  padding: 0.85rem 1rem;
+  margin: 0.4rem 0 0;
+  padding: 0.45rem 0.55rem 0.5rem;
   border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 35%, transparent);
   border-radius: 14px;
-  background: color-mix(in srgb, #111 70%, transparent);
+  background: color-mix(in srgb, var(--floqr-ink, #05080a) 78%, transparent);
 }
 .botdee-sv-kind {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.8;
+  line-height: 1.2;
 }
 .botdee-sv-head h3 {
-  margin: 0.15rem 0 0.35rem;
+  margin: 0.05rem 0 0;
   font-size: 1.05rem;
+  line-height: 1.15;
 }
 .botdee-sv-mock,
 .botdee-sv-research,
 .botdee-sv-missing {
-  margin: 0 0 0.4rem;
-  font-size: 0.82rem;
+  margin: 0;
+  font-size: 0.68rem;
   color: #fbbf24;
+  line-height: 1.2;
 }
-.botdee-sv-summary { margin: 0 0 0.5rem; font-size: 0.92rem; }
-.botdee-sv-images { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.botdee-sv-images img {
-  width: 160px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 8px;
-  background: #000;
+.botdee-sv-summary {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.28;
+  color: var(--muted, #d8e8e8);
 }
-.botdee-sv-images figcaption { font-size: 0.72rem; opacity: 0.75; }
-.botdee-sv-ratings ul { margin: 0.25rem 0 0; padding-left: 1.1rem; }
+.botdee-sv-images { display: none; }
+.botdee-sv-ratings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem 0.45rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.74rem;
+  line-height: 1.2;
+}
+.botdee-sv-ratings p { display: none; }
+.botdee-sv-ratings ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 .botdee-sv-provider { font-weight: 700; }
-.botdee-sv-actions { list-style: none; margin: 0.6rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.botdee-sv-actions {
+  list-style: none;
+  margin: 0.12rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.botdee-sv-actions .buttonlike {
+  min-height: 36px;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.78rem;
+}
+.botdee-sv-canonical { display: none; }
+
+/* Place / venue SMARTview — fixed compact template. SMARTbackground, not a photo well. */
+.botdee-sv-place {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  min-height: 0;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--floqr-ink, #05080a) 58%, transparent),
+      color-mix(in srgb, var(--floqr-ink, #05080a) 82%, transparent)),
+    var(--sv-place-bg, none) center / cover no-repeat,
+    color-mix(in srgb, var(--floqr-ink, #05080a) 88%, transparent);
+}
+.botdee-sv-place > * { position: relative; z-index: 1; flex: 0 0 auto; min-height: 0; }
+.botdee-sv-place-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 0;
+}
+.botdee-sv-place-chrome {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 45%, transparent);
+}
+.botdee-sv-place-copy { flex: 1 1 auto; min-width: 0; }
+.botdee-sv-place-copy h3 {
+  margin: 0;
+  font-size: clamp(0.98rem, 4vw, 1.12rem);
+  line-height: 1.15;
+}
+.botdee-sv-place .botdee-sv-mock {
+  flex: 0 0 auto;
+  max-width: 9.5rem;
+  text-align: right;
+}
+.botdee-sv-place .botdee-sv-summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.botdee-sv-place .botdee-sv-cuisine {
+  margin: 0;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  color: var(--muted, #d8e8e8);
+}
+.botdee-sv-place .botdee-sv-missing { margin: 0; }
+.botdee-sv-place .botdee-sv-actions .botdee-sv-action-main {
+  background: linear-gradient(110deg, var(--accent, #00d4fe), var(--hot, var(--accent, #00d4fe)));
+  color: var(--floqr-ink, #001819);
+  border: 0;
+  font-weight: 800;
+}
 .botdee-upgrade-panel {
   margin: 1rem 0 0;
   padding: 0.9rem 1rem;
@@ -47,7 +140,8 @@
 .botdee-upgrade-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
 .botdee-explain { font-size: 0.88rem; }
 @media (max-width: 600px) {
-  .botdee-sv-images img { width: 100%; height: auto; max-height: 140px; }
+  .botdee-sv-place { padding: 0.4rem 0.45rem 0.45rem; }
+  .botdee-sv-place .botdee-sv-mock { max-width: 7.5rem; }
 }
 
 /* People SmartView v2 — inherits viewer Site Chrome tokens; never hardcode a theme. */
@@ -57,6 +151,8 @@
    inside the bubble — View Full Profile + Mingl must stay reachable. */
 .botdee-transcript .botdee-sv-host,
 .botdee-transcript .botdee-sv-people,
+.botdee-transcript .botdee-sv-card,
+.botdee-transcript .botdee-sv-place,
 .botdee-transcript .botdee-sv-version,
 .botdee-transcript .botdee-sv-room,
 .botdee-transcript .botdee-sv-shoutout,

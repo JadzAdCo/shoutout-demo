@@ -103,6 +103,54 @@
     });
   }
 
+  const PLACE_KINDS = new Set([
+    "venue", "restaurant", "hotel", "short_term_rental", "event",
+    "real_estate", "product", "travel", "vehicle"
+  ]);
+
+  const KIND_LABELS = {
+    venue: {key: "botdee.sv.kindVenue", label: "Venue"},
+    restaurant: {key: "botdee.sv.kindRestaurant", label: "Restaurant"},
+    hotel: {key: "botdee.sv.kindHotel", label: "Hotel"},
+    short_term_rental: {key: "botdee.sv.kindRental", label: "Short-term rental"},
+    event: {key: "botdee.sv.kindEvent", label: "Event"},
+    travel: {key: "botdee.sv.kindTravel", label: "Travel"},
+    vehicle: {key: "botdee.sv.kindVehicle", label: "Vehicle"},
+    product: {key: "botdee.sv.kindProduct", label: "Product"},
+    real_estate: {key: "botdee.sv.kindEstate", label: "Real estate"}
+  };
+
+  function isPlacePayload(payload) {
+    return !!(payload && PLACE_KINDS.has(payload.kind));
+  }
+
+  function kindLabel(kind) {
+    const row = KIND_LABELS[kind];
+    return row ? t(row.key, row.label) : String(kind || "");
+  }
+
+  function placeVisual(payload) {
+    const resolver = global.FLOQRSmartVisualsResolver;
+    if (!resolver?.resolvePlaceCard) {
+      return {backgroundUrl: "", backgroundId: "", stencilUrl: ""};
+    }
+    const catalog = global.FLOQRSmartVisualsCatalog;
+    const selection = resolver.resolvePlaceCard(payload, catalog);
+    const urls = resolver.urlsFor ? resolver.urlsFor(selection, catalog) : {};
+    return {
+      backgroundId: selection.backgroundId || "",
+      backgroundUrl: urls.backgroundUrl || "",
+      stencilUrl: urls.stencilUrl || ""
+    };
+  }
+
+  function chromeIconSrc() {
+    const scheme = global.FLOQRChromeScheme;
+    const url = scheme?.iconUrl?.("botDee");
+    if (url) return url;
+    return "./images/chrome/botdee-nightlife.jpg";
+  }
+
   function ratingRow(row) {
     if (!row || !row.provider) return "";
     const value = Number.isFinite(Number(row.value)) ? Number(row.value).toFixed(1) : "—";
@@ -1365,6 +1413,49 @@
     };
   }
 
+  function renderPlaceCard(payload) {
+    const mock = payload.sources && payload.sources.some(s => s.provider === "mock" || s.reuseRights === "unknown");
+    const iframeOk = payload.floqrPublicData && payload.floqrPublicData.menuIframeAllowed === true;
+    const ratings = Array.isArray(payload.ratings) ? payload.ratings.filter(row => row && row.provider) : [];
+    const actions = Array.isArray(payload.actions) ? payload.actions : [];
+    const cuisine = payload.floqrPublicData && Array.isArray(payload.floqrPublicData.cuisines)
+      ? payload.floqrPublicData.cuisines
+      : (payload.floqrPublicData && payload.floqrPublicData.cuisine) || [];
+    const nhtsa = payload.kind === "vehicle" ? payload.floqrPublicData && payload.floqrPublicData.nhtsa : null;
+    const visual = placeVisual(payload);
+    const bgStyle = visual.backgroundUrl
+      ? ` style="--sv-place-bg:url('${esc(visual.backgroundUrl)}')"`
+      : "";
+    const actionHtml = actions.map(action => {
+      const href = String(action.href || "").trim();
+      if (!href || /javascript:/i.test(href)) return "";
+      const label = action.id === "open-public-page"
+        ? t("botdee.smartviewVenueOpen", "Open FLOQR Public Page")
+        : (action.id === "menu-external" && !iframeOk
+          ? t("botdee.smartviewMenuExternal", "Menu (opens outside FLOQR)")
+          : esc(action.label || "Open"));
+      const fixed = resolveSameOriginHref(href);
+      if (!fixed) return "";
+      const main = action.id === "open-public-page" ? " botdee-sv-action-main" : "";
+      return `<li><a class="buttonlike${main}" href="${esc(fixed)}">${label}</a></li>`;
+    }).join("");
+    return `<article class="botdee-sv-card botdee-sv-place" data-kind="${esc(payload.kind)}" data-sv-bg="${esc(visual.backgroundId || "")}"${bgStyle}>
+      <header class="botdee-sv-place-head">
+        <img class="botdee-sv-place-chrome" data-floqr-chrome-icon="botDee" src="${esc(chromeIconSrc())}" alt="${esc(t("botdee.sv.chromeAlt", "BOT DEE"))}" width="28" height="28"/>
+        <div class="botdee-sv-place-copy">
+          <p class="botdee-sv-kind">${esc(kindLabel(payload.kind))}</p>
+          <h3>${esc(payload.title)}</h3>
+        </div>
+        ${mock ? `<p class="botdee-sv-mock">${esc(t("botdee.smartviewMockBadge", "Mock / not live licensed data"))}</p>` : ""}
+      </header>
+      ${payload.summary ? `<p class="botdee-sv-summary">${esc(payload.summary)}</p>` : ""}
+      ${ratings.length ? `<ul class="botdee-sv-ratings">${ratings.map(ratingRow).join("")}</ul>` : ""}
+      ${cuisine.length ? `<p class="botdee-sv-cuisine">${esc(Array.isArray(cuisine) ? cuisine.join(" · ") : cuisine)}</p>` : ""}
+      ${nhtsa && nhtsa.status === "missing" ? `<p class="botdee-sv-missing">${esc(nhtsa.note || "Safety rating unavailable for this year/trim.")}</p>` : ""}
+      ${actionHtml ? `<ul class="botdee-sv-actions">${actionHtml}</ul>` : ""}
+    </article>`;
+  }
+
   function renderCard(payload) {
     if (!payload || typeof payload !== "object") return "";
     if (isVersionPayload(payload)) return renderVersionCard(payload);
@@ -1374,47 +1465,7 @@
     if (isVipPayload(payload)) return renderVipCard(payload);
     if (isCompactCard(payload)) return renderCompactPeopleCard(payload);
     if (peopleOf(payload)) return renderPeopleCard(payload);
-    const mock = payload.sources && payload.sources.some(s => s.provider === "mock" || s.reuseRights === "unknown");
-    const researchOff = payload.publicWebResearch && payload.publicWebResearch.enabled === false;
-    const iframeOk = payload.floqrPublicData && payload.floqrPublicData.menuIframeAllowed === true;
-    const images = Array.isArray(payload.images) ? payload.images.slice(0, 2) : [];
-    const ratings = Array.isArray(payload.ratings) ? payload.ratings : [];
-    const actions = Array.isArray(payload.actions) ? payload.actions : [];
-    const cuisine = payload.floqrPublicData && Array.isArray(payload.floqrPublicData.cuisines)
-      ? payload.floqrPublicData.cuisines
-      : (payload.floqrPublicData && payload.floqrPublicData.cuisine) || [];
-    const nhtsa = payload.kind === "vehicle" ? payload.floqrPublicData && payload.floqrPublicData.nhtsa : null;
-    return `<article class="botdee-sv-card" data-kind="${esc(payload.kind)}">
-      <header class="botdee-sv-head">
-        <p class="botdee-sv-kind">${esc(payload.kind)}</p>
-        <h3>${esc(payload.title)}</h3>
-        ${mock ? `<p class="botdee-sv-mock">${esc(t("botdee.smartviewMockBadge", "Mock / not live licensed data"))}</p>` : ""}
-      </header>
-      ${payload.summary ? `<p class="botdee-sv-summary">${esc(payload.summary)}</p>` : ""}
-      ${images.length ? `<div class="botdee-sv-images">${images.map(img => (
-        img.licenseStatus === "blocked"
-          ? `<p class="sub small">${esc(img.attribution || "Image blocked")}</p>`
-          : `<figure><img src="${esc(resolveImageSrc(img.url))}" alt="" width="160" height="90"/>
-              <figcaption>${esc(img.attribution || "")}</figcaption></figure>`
-      )).join("")}</div>` : ""}
-      ${ratings.length ? `<div class="botdee-sv-ratings"><p>${esc(t("botdee.smartviewRatingsNote", "Ratings are shown separately by source."))}</p><ul>${ratings.map(ratingRow).join("")}</ul></div>` : ""}
-      ${cuisine.length ? `<p class="botdee-sv-cuisine">${esc(cuisine.join(" · "))}</p>` : ""}
-      ${nhtsa && nhtsa.status === "missing" ? `<p class="botdee-sv-missing">${esc(nhtsa.note || "Safety rating unavailable for this year/trim.")}</p>` : ""}
-      ${payload.kind === "patron" && researchOff ? `<p class="botdee-sv-research">${esc(t("botdee.smartviewResearchDisabled", "Public Web Research is off until legal and identity review."))}</p>` : ""}
-      ${payload.kind === "venue" && payload.canonicalFloqrPageId ? `<p class="botdee-sv-canonical">FLOQR Public Page</p>` : ""}
-      <ul class="botdee-sv-actions">${actions.map(action => {
-        const href = String(action.href || "").trim();
-        if (!href || /javascript:/i.test(href)) return "";
-        const label = action.id === "open-public-page"
-          ? t("botdee.smartviewVenueOpen", "Open FLOQR Public Page")
-          : (action.id === "menu-external" && !iframeOk
-            ? t("botdee.smartviewMenuExternal", "Menu (opens outside FLOQR)")
-            : esc(action.label || "Open"));
-        const fixed = resolveSameOriginHref(href);
-        if (!fixed) return "";
-        return `<li><a class="buttonlike" href="${esc(fixed)}">${label}</a></li>`;
-      }).join("")}</ul>
-    </article>`;
+    return renderPlaceCard(payload);
   }
 
   function paintPeopleTabs(card, people, primary, secondary) {
@@ -1929,9 +1980,11 @@
     const list = Array.isArray(views) ? views : [];
     const paint = (resync) => {
       paintHost(el, list, peopleSearch);
+      try { global.FLOQRChromeScheme?.applyDocument?.(); } catch (_) { /* ignore */ }
       if (resync) scrollTranscriptAfterPaint(el);
     };
-    const needsCatalog = list.some(isRoomPayload) && window.FLOQRSmartVisuals?.ensureCatalog;
+    const needsCatalog = list.some(row => isRoomPayload(row) || isPlacePayload(row))
+      && window.FLOQRSmartVisuals?.ensureCatalog;
     if (needsCatalog && !catalogReady()) {
       window.FLOQRSmartVisuals.ensureCatalog().then(() => paint(true), () => paint(true));
       return;
@@ -2043,6 +2096,8 @@
 
   global.FLOQRBotDeeSmartView = {
     renderCard,
+    renderPlaceCard,
+    isPlacePayload,
     renderPeopleCard,
     renderCompactPeopleCard,
     renderVersionCard,

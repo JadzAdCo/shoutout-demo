@@ -5,7 +5,7 @@ const path = require("path");
 const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
 const NEXT = "s3.3.063";
 const NEXT_NUM = "3.3.063";
-const NOTE = "Features SMARTview Close + evidence catalog";
+const NOTE = "Features SMARTview Close + evidence catalog; compact Place SMARTview cards with admin-editable SMARTbackgrounds";
 const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
 function transformHtml(src) {

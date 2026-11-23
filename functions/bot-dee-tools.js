@@ -1008,15 +1008,11 @@ function clubToResult(card) {
 
 function clubSmartView(card) {
   const cuisine = listish(card.cuisines && card.cuisines.length ? card.cuisines : card.cuisine).slice(0, 6);
-  return {
+  const payload = {
     kind: "venue",
     title: card.displayName,
     summary: card.bio || [card.city, card.brandName].filter(Boolean).join(" · "),
-    images: (card.imageUrls || []).slice(0, 2).map(url => ({
-      url,
-      attribution: "FLOQR public page",
-      licenseStatus: "ok"
-    })),
+    images: [],
     floqrPublicData: {
       cuisine,
       cuisines: cuisine,
@@ -1031,6 +1027,31 @@ function clubSmartView(card) {
     }],
     sources: [{provider: "floqr", reuseRights: "club"}]
   };
+  try {
+    const visual = require("./smartvisuals-resolver").resolvePlaceCard(payload);
+    if (visual && visual.backgroundId) payload.floqrPublicData.smartBackgroundId = visual.backgroundId;
+  } catch (_) { /* catalog optional on this path */ }
+  return payload;
+}
+
+async function loadPlaceBackgroundOverride(kind) {
+  try {
+    for (const key of [`placeSmartView:${kind}`, "placeSmartView"]) {
+      const snap = await db.collection("smartVisualOverrides").doc(key).get();
+      if (!snap.exists) continue;
+      const id = String(snap.data()?.backgroundId || "").trim();
+      if (id) return id;
+    }
+  } catch (_) { /* overrides optional until Functions deploy */ }
+  return "";
+}
+
+function applyPlaceBackgroundOverride(payload, backgroundId) {
+  if (!payload || !backgroundId) return payload;
+  payload.floqrPublicData = Object.assign({}, payload.floqrPublicData || {}, {
+    smartBackgroundId: backgroundId
+  });
+  return payload;
 }
 
 async function searchPublicClubs(classified, limit = 5) {
@@ -1055,20 +1076,18 @@ async function attachVenueSearch({query} = {}) {
   const reply = found
     ? (names.length ? `Here are FLOQR venues that match: ${names.join(", ")}.` : "Here are FLOQR venues that match.")
     : "FLOQR doesn't list that kind of spot there yet. I only search onboarded venues — not a general restaurant guide.";
-  const media = cards.flatMap(card => (
-    (card.imageUrls || []).slice(0, 1).map((url, index) => ({
-      url,
-      alt: `${card.displayName} photo ${index + 1}`,
-      kind: "photo"
-    }))
-  )).slice(0, 8);
+  const media = [];
+  let overrideBg = "";
+  try {
+    overrideBg = await loadPlaceBackgroundOverride("venue");
+  } catch (_) { /* packaged resolver still stamps a SMARTbackground */ }
   return {
     handled: true,
     classified,
     reply,
     replyKey: found ? "botdee.place.found" : "botdee.place.none",
     results: [],
-    smartViews: cards.map(clubSmartView),
+    smartViews: cards.map(card => applyPlaceBackgroundOverride(clubSmartView(card), overrideBg)),
     media,
     venueSearch: {
       intent: classified.intent,
@@ -1741,6 +1760,8 @@ module.exports = {
   attachVenueSearch,
   publicClubCard,
   clubSmartView,
+  applyPlaceBackgroundOverride,
+  loadPlaceBackgroundOverride,
   clubToResult,
   isClubPublic,
   isSelfProfileQuery,

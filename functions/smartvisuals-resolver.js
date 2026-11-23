@@ -440,6 +440,106 @@
     return false;
   }
 
+  const PLACE_CARD_DEFAULTS = {
+    venue: {backgroundId: "bg-vip-nightlife", stencilId: "st-nightclub"},
+    restaurant: {backgroundId: "bg-dining", stencilId: "st-restaurant"},
+    hotel: {backgroundId: "bg-hotel-stay", stencilId: "st-hotel"},
+    short_term_rental: {backgroundId: "bg-hotel-stay", stencilId: "st-hotel"},
+    event: {backgroundId: "bg-concert", stencilId: "st-music"},
+    travel: {backgroundId: "bg-bali", stencilId: "st-flight"},
+    vehicle: {backgroundId: "bg-road-trip", stencilId: "st-car"},
+    product: {backgroundId: "bg-shoutout", stencilId: "st-shopping"},
+    real_estate: {backgroundId: "bg-washington-dc", stencilId: "st-location"}
+  };
+
+  function publishedBackground(catalog, id) {
+    const bg = byId(catalog, id);
+    return bg && bg.type === "background" && bg.approvalStatus === "published" ? bg : null;
+  }
+
+  function placeKindDefault(kind, catalog) {
+    const tax = (catalog && catalog.taxonomy && catalog.taxonomy.placeCardDefaults) || {};
+    const packed = tax[kind] || PLACE_CARD_DEFAULTS[kind] || PLACE_CARD_DEFAULTS.venue;
+    return {
+      backgroundId: backgroundIdOf(packed.backgroundId),
+      stencilId: stencilIdOf(packed.stencilId)
+    };
+  }
+
+  function explicitPlaceBackgroundId(payload) {
+    if (!payload || typeof payload !== "object") return "";
+    const publicData = payload.floqrPublicData && typeof payload.floqrPublicData === "object"
+      ? payload.floqrPublicData
+      : {};
+    return text(
+      payload.backgroundId
+        || payload.smartBackgroundId
+        || publicData.smartBackgroundId
+        || publicData.backgroundId,
+      80
+    );
+  }
+
+  function classifyUsefulForPlace(classified) {
+    if (!classified || classified.ok === false) return false;
+    const reason = String(classified.reasonCode || "");
+    if (classified.injectionIgnored === true) return false;
+    if (reason === "neutral-fallback" || reason === "no-signal" || reason === "empty-title"
+      || reason === "below-threshold" || reason === "collision" || reason === "prompt-injection-ignored"
+      || reason === "private-source-denied") return false;
+    return classified.backgroundId && classified.backgroundId !== "bg-mingl-room";
+  }
+
+  /** Place / venue SMARTview art. Gemini off. Explicit published id wins, then city/title, then kind default. */
+  function resolvePlaceCard(input, catalogOpt) {
+    const catalog = loadCatalog(catalogOpt);
+    const payload = input && typeof input === "object" ? input : {};
+    const kind = String(payload.kind || "venue");
+    const def = placeKindDefault(kind, catalog);
+    const explicit = explicitPlaceBackgroundId(payload);
+    if (explicit) {
+      const bg = publishedBackground(catalog, explicit);
+      if (bg) {
+        return {
+          ok: true,
+          kind,
+          backgroundId: bg.id,
+          stencilId: def.stencilId,
+          reasonCode: "place-card-explicit",
+          geminiUsed: false,
+          modelCalls: 0
+        };
+      }
+    }
+    const city = payload.floqrPublicData && payload.floqrPublicData.city;
+    const classified = resolve({
+      title: text(payload.title, 160),
+      description: text([payload.summary, city, kind].filter(Boolean).join(" "), 400),
+      sourceKind: "place-smartview"
+    }, catalog);
+    if (classifyUsefulForPlace(classified) && publishedBackground(catalog, classified.backgroundId)) {
+      return {
+        ok: true,
+        kind,
+        backgroundId: classified.backgroundId,
+        stencilId: classified.stencilId || def.stencilId,
+        reasonCode: "place-card-classified",
+        geminiUsed: false,
+        modelCalls: 0
+      };
+    }
+    const fallback = publishedBackground(catalog, def.backgroundId);
+    return {
+      ok: true,
+      kind,
+      backgroundId: (fallback && fallback.id) || "bg-vip-nightlife",
+      stencilId: def.stencilId,
+      reasonCode: "place-card-kind-default",
+      geminiUsed: false,
+      modelCalls: 0
+    };
+  }
+
   const EMPTY_WHEN = ["private-source-denied", "prompt-injection-ignored", "private-chat", "privateChat"];
   const THEMATIC = ["travel", "fashion", "dining", "nightclub", "event", "sports", "hotel"];
   const PLACE_LABELS = {
@@ -682,9 +782,11 @@
     CONFIDENCE_THRESHOLD,
     TYPO_THRESHOLD,
     DEFAULT_AD_POLICY,
+    PLACE_CARD_DEFAULTS,
     loadCatalog,
     classify,
     resolve,
+    resolvePlaceCard,
     urlsFor,
     contentHash,
     geminiAllowed,

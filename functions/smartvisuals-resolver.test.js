@@ -316,3 +316,41 @@ test("renderer wires Search notification and Room SMARTview through selectAd", (
   assert.match(read("botdee-smartview.js"), /renderAdSlot/);
   assert.match(read("smartvisuals-preview.html"), /Paris Fashion Week/);
 });
+
+test("Place SMARTview uses published SMARTbackground, not a photo well", () => {
+  const aurelia = resolver.resolvePlaceCard({
+    kind: "venue",
+    title: "Aurelia",
+    summary: "FLOQR demo club",
+    floqrPublicData: {city: "Washington, DC"}
+  }, catalog);
+  assert.equal(aurelia.ok, true);
+  assert.equal(aurelia.geminiUsed, false);
+  assert.equal(aurelia.backgroundId, "bg-washington-dc");
+  assert.equal(aurelia.reasonCode, "place-card-classified");
+
+  const stamped = resolver.resolvePlaceCard({
+    kind: "venue",
+    title: "Aurelia",
+    floqrPublicData: {city: "Washington, DC", smartBackgroundId: "bg-vip-nightlife"}
+  }, catalog);
+  assert.equal(stamped.backgroundId, "bg-vip-nightlife");
+  assert.equal(stamped.reasonCode, "place-card-explicit");
+
+  const dining = resolver.resolvePlaceCard({kind: "restaurant", title: "District Kitchen"}, catalog);
+  assert.equal(dining.backgroundId, "bg-dining");
+  assert.ok(dining.reasonCode === "place-card-kind-default" || dining.reasonCode === "place-card-classified");
+
+  const product = resolver.resolvePlaceCard({kind: "product", title: "Mock Tee"}, catalog);
+  assert.equal(product.backgroundId, "bg-shoutout");
+  assert.equal(product.reasonCode, "place-card-kind-default");
+
+  const js = read("botdee-smartview.js");
+  assert.match(js, /function renderPlaceCard/);
+  assert.match(js, /botdee-sv-place/);
+  assert.doesNotMatch(js, /botdee-sv-images/);
+  assert.match(read("botdee-smartview.css"), /--sv-place-bg/);
+  assert.match(read("smartvisuals-studio.js"), /Preview in Place SMARTview/);
+  assert.match(read("smartvisuals-studio.js"), /placeSmartView:/);
+  assert.ok(catalog.taxonomy.placeCardDefaults.venue.backgroundId);
+});
