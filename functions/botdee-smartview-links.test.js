@@ -81,6 +81,14 @@ test("patron My BOT DEE shows real SMARTview; mocks stay on Master Admin", () =>
   assert.match(upgrade, /loadSmartPreviewDemos/);
 });
 
+test("headless SMARTview host is public and mounts compact cards", () => {
+  const html = read("botdee-smartview-headless.html");
+  assert.match(html, /data-floqr-public/);
+  assert.match(html, /botdee-smartview-headless\.js\?v=/);
+  assert.match(html, /FLOQRBotDeeSmartView\.mount/);
+  assert.doesNotMatch(html, /data-floqr-feature=/);
+});
+
 test("place cards are compact templates without chrome photo wells", () => {
   const catalog = smart.mockCatalog();
   const venue = catalog.find(row => row.kind === "venue");
