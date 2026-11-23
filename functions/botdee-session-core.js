@@ -828,6 +828,18 @@ function denialMessage(reason) {
   return map[reason] || map.not_found;
 }
 
+
+function holdGateMessage(reason) {
+  const code = text(reason, 40);
+  if (code === "not_found" || code === "closed") {
+    return "This Room SMARTview is not open for that hold. Vote with the group, or leave the room first.";
+  }
+  if (code === "not_host" || code === "not_member" || code === "no_choice" || code === "stale_choice" || code === "choice_not_ready") {
+    return denialMessage(code);
+  }
+  return "Could not confirm the room vote. Hold it stays with the host after 60% yes. Try again.";
+}
+
 module.exports = {
   MEMBER_CAP,
   HOST_ELECTION_RATIO,
@@ -902,5 +914,6 @@ module.exports = {
   closeTabPlan,
   unpaidTabBlocksDelete,
   rateLimitOk,
-  denialMessage
+  denialMessage,
+  holdGateMessage
 };

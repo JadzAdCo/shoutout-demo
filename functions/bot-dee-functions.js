@@ -798,8 +798,7 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
           try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
           const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
           return vipSmartOutcome(
-            sessionCore.denialMessage(written?.error || written?.reason) ||
-              "Could not confirm the room vote. Hold it stays with the host after 60% yes. Try again.",
+            sessionCore.holdGateMessage(written?.error || written?.reason),
             lang,
             {model: "headless-draft", toolRounds: 0, smartViews: [view]}
           );
@@ -821,7 +820,7 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
           return vipSmartOutcome(
             gate.reason === "choice_not_ready"
               ? `Need ${gate.tally.needed} yes from ${gate.tally.memberCount} joined members before Hold it (${gate.tally.yes} so far).`
-              : sessionCore.denialMessage(gate.reason),
+              : sessionCore.holdGateMessage(gate.reason),
             lang,
             {model: "headless-draft", toolRounds: 0, smartViews: [view]}
           );

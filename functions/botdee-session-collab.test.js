@@ -140,6 +140,23 @@ test("callables and client expose collab without vip.html", () => {
   assert.match(read("functions/data-classification-core.js"), /hostBallot/);
 });
 
+test("hold gate copy is room-vote, not invite", () => {
+  assert.equal(
+    core.holdGateMessage("failed"),
+    "Could not confirm the room vote. Hold it stays with the host after 60% yes. Try again."
+  );
+  assert.equal(
+    core.holdGateMessage("not_found"),
+    "This Room SMARTview is not open for that hold. Vote with the group, or leave the room first."
+  );
+  assert.match(core.holdGateMessage("not_host"), /host/i);
+  assert.doesNotMatch(core.holdGateMessage("failed"), /invite/i);
+  assert.doesNotMatch(core.holdGateMessage(""), /invite/i);
+  const session = read("functions/bot-dee-functions.js");
+  assert.match(session, /holdGateMessage\(written\?\.error \|\| written\?\.reason\)/);
+  assert.doesNotMatch(session, /denialMessage\(written\?\.error/);
+});
+
 test("collab votes persist in a room transaction; hold gate fails closed", () => {
   const store = read("functions/botdee-session-store.js");
   assert.match(store, /async function mutateRoom/);
