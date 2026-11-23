@@ -228,11 +228,20 @@ test("venue prompt Heist fills the club, not Locked Up", () => {
     message: "Happy birthday Maya"
   });
   assert.deepEqual(headless.interactiveNeeds(draft), ["club"]);
-  const parsed = headless.parseShoutOutExecute("Heist");
-  headless.applyBareInteractiveReply(draft, parsed, "Heist");
+  const prompt = "Heist";
+  const parsed = headless.parseShoutOutExecute(prompt);
+  const fromThread = headless.fillFromConversation([], prompt);
+  headless.applyBareInteractiveReply(draft, parsed, prompt);
   assert.equal(parsed.clubQuery, "heist-washington-dc");
   assert.equal(parsed.templateId || "", "");
-  const next = headless.mergeInteractiveDraft(draft, parsed, {freshThrow: false});
+  assert.equal(parsed.dropStandaloneTemplate, true);
+  assert.notEqual(fromThread.templateId, "heistVaultNight");
+  const filled = headless.combineHeadlessFill(parsed, {
+    ...fromThread,
+    templateId: "heistVaultNight"
+  });
+  assert.equal(filled.templateId || "", "");
+  const next = headless.mergeInteractiveDraft(draft, filled, {freshThrow: false});
   assert.equal(next.clubQuery, "heist-washington-dc");
   assert.notEqual(next.templateId, "heistVaultNight");
   assert.deepEqual(headless.interactiveNeeds(next), []);
@@ -459,6 +468,7 @@ test("startShoutOutCheckout and FloqR callable accept flat club + message", () =
   assert.match(session, /tryHeadlessShoutOut/);
   assert.match(session, /isShoutOutExecutePrompt\(userPrompt\)/);
   assert.match(session, /fillFromConversation/);
+  assert.match(session, /combineHeadlessFill\(parsed, fromThread\)/);
   assert.match(session, /applyBareInteractiveReply\(previousDraft, parsed, userPrompt, askedRow\)/);
   assert.match(session, /isInteractiveFollowUp\(userPrompt, previousShoutDraft, previousShoutRow\)/);
   assert.match(session, /loadTemplateCollectableRow\(previousShoutDraft\.templateId\)/);

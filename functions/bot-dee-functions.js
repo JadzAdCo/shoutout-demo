@@ -255,17 +255,7 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
       shoutOutPreview: "closed"
     });
   }
-  const filled = {
-    ...fromThread,
-    ...parsed,
-    clubQuery: parsed.clubQuery || fromThread.clubQuery,
-    message: parsed.message || fromThread.message,
-    templateId: parsed.templateId || fromThread.templateId,
-    jerseyTeamId: parsed.jerseyTeamId || fromThread.jerseyTeamId,
-    jerseyName: parsed.jerseyName || fromThread.jerseyName,
-    jerseyNumber: parsed.jerseyNumber || fromThread.jerseyNumber,
-    playerName: parsed.playerName || fromThread.playerName
-  };
+  const filled = headless.combineHeadlessFill(parsed, fromThread);
   const merged = headless.mergeInteractiveDraft(previousDraft, filled, {
     freshThrow: !!(parsed.clubQuery && parsed.message)
   });

@@ -641,6 +641,13 @@ function isBareTemplateSwitch(raw, draft) {
   return switched !== draftTemplateId(draft);
 }
 
+function isClubTemplateCollision(raw) {
+  const text = String(raw || "").trim();
+  if (!text || extractTemplateHint(text)) return false;
+  if (!extractStandaloneTemplate(text)) return false;
+  return !!(extractAliasClub(text) || extractAtClub(text));
+}
+
 /** Map a follow-up (yes/no or the asked collectableInput) onto the current step. Never mint on “yes”. */
 function applyBareInteractiveReply(draft, parsed, raw, templateRow) {
   const next = parsed && typeof parsed === "object" ? parsed : {};
@@ -675,6 +682,7 @@ function applyBareInteractiveReply(draft, parsed, raw, templateRow) {
     }
     if (next.clubQuery && extractStandaloneTemplate(text) && !extractTemplateHint(text)) {
       next.templateId = "";
+      next.dropStandaloneTemplate = true;
     }
   } else if (step === "message" && !next.message) {
     next.message = extractCelebrationMessage(text) || extractQuotedMessage(text) || bareSlotText(text, 400);
@@ -798,7 +806,7 @@ function fillFromConversation(turns, currentPrompt) {
     }
     if (parsed.message) filled.message = parsed.message;
     else if (extractCelebrationMessage(text)) filled.message = extractCelebrationMessage(text);
-    if (parsed.templateId) filled.templateId = parsed.templateId;
+    if (parsed.templateId && !isClubTemplateCollision(text)) filled.templateId = parsed.templateId;
     if (parsed.screenFormatId) filled.screenFormatId = parsed.screenFormatId;
     if (parsed.handleDecision) filled.handleDecision = parsed.handleDecision;
     if (parsed.attribution) filled.attribution = parsed.attribution;
@@ -820,9 +828,25 @@ function fillFromConversation(turns, currentPrompt) {
     filled.cancel = latest.cancel === true;
     if (latest.handleDecision) filled.handleDecision = latest.handleDecision;
     if (latest.mediaDecision) filled.mediaDecision = latest.mediaDecision;
-    if (latest.templateId) filled.templateId = latest.templateId;
+    if (latest.templateId && !isClubTemplateCollision(current)) filled.templateId = latest.templateId;
   }
   return filled;
+}
+
+function combineHeadlessFill(parsed = {}, fromThread = {}) {
+  const row = parsed && typeof parsed === "object" ? parsed : {};
+  const thread = fromThread && typeof fromThread === "object" ? fromThread : {};
+  return {
+    ...thread,
+    ...row,
+    clubQuery: row.clubQuery || thread.clubQuery,
+    message: row.message || thread.message,
+    templateId: row.dropStandaloneTemplate ? (row.templateId || "") : (row.templateId || thread.templateId),
+    jerseyTeamId: row.jerseyTeamId || thread.jerseyTeamId,
+    jerseyName: row.jerseyName || thread.jerseyName,
+    jerseyNumber: row.jerseyNumber || thread.jerseyNumber,
+    playerName: row.playerName || thread.playerName
+  };
 }
 
 function emptyInteractiveDraft() {
@@ -1238,6 +1262,7 @@ module.exports = {
   interactiveNeeds,
   inputsForDraft,
   fillFromConversation,
+  combineHeadlessFill,
   extractCelebrationMessage,
   extractJerseyTeam,
   listHeadlessTemplates,
