@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.059 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.062 (stable)
 
+- s3.3.062: Cache-bust stamps match the shipped search, Venue Command Center, and BOT DEE venue pages
 - s3.3.059: Features SMARTview Production (Prod) status
 - s3.3.057: Plain language on the BOT DEE version card
 - s3.3.056: Features SMARTview eight-product catalog (BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, Si-tube), BOT DEE retrieval, editorial approve (not published until Don approves)
