@@ -530,6 +530,10 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
     merged.sectionId = merged.matches[0].id;
     merged.sectionLabel = merged.matches[0].label;
   }
+  if (merged.sectionId && !merged.maxCapacity) {
+    merged.maxCapacity = headless.sectionCapacity(merged.clubQuery, merged.sectionId);
+  }
+  merged.partySize = headless.clampPartySize(merged.partySize || headless.DEFAULT_PARTY, merged.maxCapacity);
   const priorHoldId = String(previousDraft?.holdId || "").trim();
   merged = headless.detachStaleHold(previousDraft, merged);
   if (priorHoldId && priorHoldId !== merged.holdId) {
@@ -567,7 +571,18 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
   }
   const needs = headless.interactiveNeeds(merged);
   const venueName = headless.clubDisplayName(merged.clubQuery) || merged.clubQuery;
-  const viewBase = {draft: merged, needs, venueName};
+  let floor = null;
+  if (merged.clubQuery && merged.night) {
+    try {
+      floor = await tools.getVipFloorStatus({
+        clubLocationId: merged.clubQuery,
+        night: merged.night
+      }, session.request);
+    } catch (_) {
+      floor = null;
+    }
+  }
+  const viewBase = {draft: merged, needs, venueName, floor};
   if (needs.length) {
     try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
     const view = vipView.buildVipSmartView({...viewBase, mode: "draft"});
@@ -577,10 +592,7 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
       smartViews: [view]
     });
   }
-  const repeatingTable = !!(previousDraft && previousDraft.sectionId
-    && previousDraft.sectionId === merged.sectionId
-    && headless.isRepeatSelectedSection(userPrompt, merged));
-  const wantsHold = parsed.confirmHold || headless.isBareAffirmative(userPrompt) || repeatingTable;
+  const wantsHold = parsed.confirmHold;
   const wantsTerms = parsed.acceptTerms || headless.isAcceptTermsPrompt(userPrompt);
   if (!merged.holdId && !wantsHold && !wantsTerms) {
     try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
@@ -591,7 +603,6 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
       {model: "headless-draft", toolRounds: 0, smartViews: [view]}
     );
   }
-  let holdLinks = [];
   if (!merged.holdId) {
     const hold = await tools.createVipHold({
       clubLocationId: merged.clubQuery,
@@ -613,7 +624,7 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
       });
     }
     merged.holdId = hold.holdId || hold.hold?.holdId || "";
-    holdLinks = bot.linksFromToolResult(hold, lang);
+    merged.holdExpiresAtMs = Math.max(0, Math.floor(Number(hold.expiresAtMs || hold.hold?.expiresAtMs) || 0));
   }
   if (merged.holdId && wantsTerms) {
     try {
@@ -625,20 +636,20 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
           consentId: merged.consentId,
           returnBase: session?.request?.data?.returnBase
         }, session.request);
-        const links = bot.linksFromToolResult(checkout, lang);
         try { await threadsMod.persistHeadlessVipDraft(uid, null); } catch (_) {}
         const view = vipView.buildVipSmartView({
           ...viewBase,
-          mode: "checkout",
+          mode: checkout.checkoutUrl ? "checkout" : "pass",
           checkoutUrl: checkout.checkoutUrl || "",
-          passHref: checkout.passHref || ""
+          reservationId: checkout.reservationId || "",
+          holdExpiresAtMs: merged.holdExpiresAtMs
         });
         return vipSmartOutcome(
           checkout.checkoutUrl
-            ? "VIP reserV is ready to pay. Open the secure link — I never take card numbers."
-            : (checkout.message || "VIP reserV hold is confirmed. Check your pass in My Profile."),
+            ? "VIP reserV is ready to pay. Stripe opens in a pop-out — this chat stays here. I never take card numbers."
+            : (checkout.message || `VIP reserV pass for ${merged.sectionLabel || merged.sectionId} at ${venueName}. Show this at the door.`),
           lang,
-          {results: links, smartViews: [view]}
+          {smartViews: [view]}
         );
       }
     } catch (error) {
@@ -646,11 +657,11 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
     }
   }
   try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
-  const view = vipView.buildVipSmartView({...viewBase, mode: "hold", draft: merged});
+  const view = vipView.buildVipSmartView({...viewBase, mode: "hold", draft: merged, holdExpiresAtMs: merged.holdExpiresAtMs});
   return vipSmartOutcome(
     `Held ${merged.sectionLabel || merged.sectionId} at ${venueName} for 30 minutes. Tap I agree to accept VIP Terms, then pay if a deposit is required.`,
     lang,
-    {results: holdLinks, smartViews: [view]}
+    {smartViews: [view]}
   );
 }
 

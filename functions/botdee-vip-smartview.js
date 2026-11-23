@@ -38,6 +38,33 @@ function buildVipSmartView(opts = {}) {
   const draft = vip.clipInteractiveDraft(options.draft);
   const needs = Array.isArray(options.needs) ? options.needs : vip.interactiveNeeds(draft);
   const mode = text(options.mode, 24) || (draft.holdId ? "hold" : (needs.length ? "draft" : "ready"));
+  const floor = options.floor && typeof options.floor === "object" ? options.floor : null;
+  const nightMeta = Array.isArray(floor?.bookableNights)
+    ? floor.bookableNights.map(row => ({
+      night: row.night,
+      iso: row.night,
+      open: true,
+      hours: row.label || ""
+    }))
+    : [];
+  if (floor && floor.nightOpen === false) {
+    nightMeta.push({night: draft.night, iso: draft.night, open: false, closed: true});
+  }
+  const nights = vip.nightOptions(draft.night, 7, nightMeta);
+  if (Array.isArray(floor?.bookableNights) && floor.bookableNights.length) {
+    const open = new Set(floor.bookableNights.map(row => String(row.night || "")));
+    nights.forEach(row => {
+      if (!open.has(row.iso)) row.closed = true;
+    });
+  }
+  let map = vip.mapLiteForClub(draft.clubQuery, draft);
+  if (map && Array.isArray(floor?.sections)) map = vip.applyFloorStatus(map, floor.sections);
+  const mapFull = vip.mapLiteForClub(draft.clubQuery, draft, {full: true});
+  const fullMap = mapFull && Array.isArray(floor?.sections)
+    ? vip.applyFloorStatus(mapFull, floor.sections)
+    : mapFull;
+  const venues = vip.listBookableVenues();
+  const maxCapacity = Math.max(0, Math.floor(Number(draft.maxCapacity || options.maxCapacity) || 0));
   return {
     schemaVersion: SCHEMA_VERSION,
     kind: KIND,
@@ -46,21 +73,27 @@ function buildVipSmartView(opts = {}) {
     venueName: text(options.venueName || vip.clubDisplayName(draft.clubQuery) || draft.clubQuery, 80),
     clubLocationId: text(draft.clubQuery, 120),
     night: text(draft.night, 12),
+    nightOpen: floor && typeof floor.nightOpen === "boolean" ? floor.nightOpen : true,
     sectionId: text(draft.sectionId, 80),
     sectionLabel: text(draft.sectionLabel || draft.sectionQuery, 80),
     partySize: draft.partySize || 0,
+    maxCapacity,
     holdId: text(draft.holdId, 80),
     consentId: text(draft.consentId, 80),
+    holdExpiresAtMs: Math.max(0, Math.floor(Number(options.holdExpiresAtMs || draft.holdExpiresAtMs) || 0)),
     checkoutUrl: text(options.checkoutUrl, 500),
     passHref: text(options.passHref, 200),
+    reservationId: text(options.reservationId, 80),
     needs,
     matches: draft.matches || [],
-    nights: vip.nightOptions(draft.night),
-    map: vip.mapLiteForClub(draft.clubQuery, draft),
+    venues,
+    nights,
+    map,
+    mapFull: fullMap,
+    collapsed: mode === "ready" || mode === "hold" ? !!draft.sectionId : false,
+    termsTitle: "VIP reserV Terms of use (beta)",
+    termsSummary: "I agree records VIP Terms consent and opens Stripe in a pop-out. BOT DEE never takes card numbers. This chat stays here.",
     suggestions: suggestionPrompts(draft),
-    vipHref: draft.clubQuery
-      ? `./vip.html?from=botdee&location=${encodeURIComponent(draft.clubQuery)}`
-      : "./vip.html?from=botdee",
     surface: text(options.surface, 24) || "bubble"
   };
 }

@@ -224,7 +224,7 @@ exports.getVipBetaVenues = onCall(CALL_OPTS, async request => {
 });
 
 /** Sections + inventory status for a night. */
-exports.getVipAvailability = onCall(CALL_OPTS, async request => {
+async function runGetVipAvailability(request) {
   await assertFeatureAccess(request.auth, "vipReservations", request);
   const clubLocationId = text(request.data?.clubLocationId, 120);
   const night = validateNight(request.data?.night);
@@ -324,7 +324,9 @@ exports.getVipAvailability = onCall(CALL_OPTS, async request => {
     sections,
     tables: tableRows
   };
-});
+}
+
+exports.getVipAvailability = onCall(CALL_OPTS, runGetVipAvailability);
 
 /** Transactional inventory hold (30 min). */
 async function runCreateVipHold(request) {
@@ -1365,6 +1367,7 @@ exports.expireVipHolds = onSchedule({
 });
 
 exports.__vipHelpers = {
+  runGetVipAvailability,
   runCreateVipHold,
   runReleaseVipHold,
   runRecordVipConsent,

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="referrer" content="no-referrer"/>
+  <title>VIP reserV</title>
+  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.060"/>
+  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.060"/>
+</head>
+<body class="botdee-vip-popout-page" data-floqr-public>
+<main class="botdee-vip-popout">
+  <div class="botdee-photo-popout-bar">
+    <button type="button" id="botDeeVipX" class="botdee-photo-popout-x" aria-label="Close">×</button>
+    <button type="button" id="botDeeVipClose" class="botdee-photo-popout-close">Close</button>
+  </div>
+  <div id="botDeeVipBody" class="botdee-vip-popout-body"></div>
+  <p id="botDeeVipStatus" class="botdee-photo-popout-status" role="status"></p>
+</main>
+<script>
+(function () {
+  "use strict";
+
+  function params() {
+    try { return new URLSearchParams(location.search); } catch (_) { return new URLSearchParams(); }
+  }
+
+  function readPayload() {
+    try {
+      if (window.opener && window.opener.__floqrBotDeeVipPopout) return window.opener.__floqrBotDeeVipPopout;
+    } catch (_) {}
+    try { return JSON.parse(sessionStorage.getItem("floqr.botdeeVipPopout") || "null"); } catch (_) {}
+    return null;
+  }
+
+  function post(kind, extra) {
+    var message = Object.assign({source: "floqr-botdee-vip", kind: kind}, extra || {});
+    try {
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, location.origin);
+    } catch (_) {}
+  }
+
+  function closePopout() {
+    try { window.close(); } catch (_) {}
+    statusEl.textContent = "You can close this window to return to BOT DEE.";
+  }
+
+  function esc(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function seatClass(table) {
+    var status = String(table && table.status || "available");
+    if (table && table.selected) return " is-on";
+    if (status === "booked") return " is-booked";
+    if (status === "held") return " is-held";
+    if (status === "closed") return " is-closed";
+    return "";
+  }
+
+  function mapHtml(map) {
+    if (!map || !map.imageUrl) return "<p>Open VIP reserV from BOT DEE chat to see the floor.</p>";
+    var vb = map.viewBox && typeof map.viewBox === "object" ? map.viewBox : {x: 0, y: 0, w: 1, h: 1};
+    var vw = Math.max(0.08, Number(vb.w) || 1);
+    var vh = Math.max(0.08, Number(vb.h) || 1);
+    var tables = (Array.isArray(map.tables) ? map.tables : []).map(function (table) {
+      var r = table.rect || {};
+      var status = String(table.status || "available");
+      var locked = status === "booked" || status === "closed";
+      var prompt = locked ? "" : ' data-vip-prompt="' + esc(table.prompt || table.label) + '"';
+      var disabled = locked ? " disabled" : "";
+      return '<button type="button" class="botdee-vip-seat' + seatClass(table) + '" style="left:' +
+        ((Number(r.x) || 0) * 100) + "%;top:" + ((Number(r.y) || 0) * 100) + "%;width:" +
+        ((Number(r.w) || 0) * 100) + "%;height:" + ((Number(r.h) || 0) * 100) + '%"' +
+        prompt + disabled + ">" + esc(table.label) + "</button>";
+    }).join("");
+    return '<div class="botdee-vip-map"><div class="botdee-vip-map-stage" style="width:' +
+      ((1 / vw) * 100) + "%;height:" + ((1 / vh) * 100) + "%;left:" +
+      (-(Number(vb.x) || 0) / vw * 100) + "%;top:" + (-(Number(vb.y) || 0) / vh * 100) +
+      "%;background-image:url('" + esc(map.imageUrl) + "')\">" + tables + "</div></div>";
+  }
+
+  var q = params();
+  var kind = String(q.get("kind") || "").trim();
+  var payload = readPayload() || {};
+  var view = payload.view && typeof payload.view === "object" ? payload.view : {};
+  var labels = payload.labels && typeof payload.labels === "object" ? payload.labels : {};
+  if (!kind) kind = String(payload.kind || "map");
+  var body = document.getElementById("botDeeVipBody");
+  var statusEl = document.getElementById("botDeeVipStatus");
+  var closeBtn = document.getElementById("botDeeVipClose");
+  var xBtn = document.getElementById("botDeeVipX");
+  closeBtn.textContent = labels.close || "Close";
+  closeBtn.setAttribute("aria-label", labels.close || "Close");
+  xBtn.setAttribute("aria-label", labels.close || "Close");
+  closeBtn.addEventListener("click", closePopout);
+  xBtn.addEventListener("click", closePopout);
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") { event.preventDefault(); closePopout(); }
+  });
+
+  if (kind === "paid") {
+    document.title = labels.pass || "Your VIP reserV pass";
+    var table = view.sectionLabel || view.sectionId || "";
+    var venue = view.venueName || "";
+    body.innerHTML = '<h1>' + esc(labels.pass || "Your VIP reserV pass") + '</h1>' +
+      '<p class="botdee-vip-popout-pass">' + esc((table ? table + " · " : "") + venue) + '</p>' +
+      '<p>Show this at the door. This window is still part of your BOT DEE session.</p>';
+    statusEl.textContent = q.get("order") ? ("Order " + q.get("order")) : "";
+    post("paid", {orderId: q.get("order") || "", reservationId: q.get("reservationId") || view.reservationId || ""});
+    return;
+  }
+
+  if (kind === "payCancel") {
+    document.title = labels.pay || "VIP reserV";
+    body.innerHTML = "<h1>Payment cancelled</h1><p>Return to BOT DEE to keep the hold or tap Cancel hold.</p>";
+    post("payCancel", {orderId: q.get("order") || ""});
+    return;
+  }
+
+  if (kind === "terms") {
+    document.title = labels.terms || view.termsTitle || "VIP reserV Terms";
+    body.innerHTML = "<h1>" + esc(view.termsTitle || labels.terms || "VIP reserV Terms") + "</h1>" +
+      '<p class="botdee-vip-popout-terms">' + esc(view.termsSummary || "I agree records VIP Terms consent and opens Stripe in a pop-out. BOT DEE never takes card numbers. Legal Terms stay in English until counsel approves other languages.") + "</p>" +
+      '<p>Legal Terms of use stay in English. Chrome on the dock is translated.</p>' +
+      '<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-prompt="I agree">' +
+      esc(labels.pay ? "I agree" : "I agree") + "</button>";
+  } else {
+    document.title = labels.map || "VIP reserV map";
+    body.innerHTML = "<h1>" + esc(labels.map || "VIP reserV map") + "</h1>" + mapHtml(view.mapFull || view.map);
+  }
+
+  body.querySelectorAll("[data-vip-prompt]").forEach(function (btn) {
+    btn.addEventListener("click", function (event) {
+      event.preventDefault();
+      if (btn.disabled) return;
+      post("prompt", {prompt: btn.getAttribute("data-vip-prompt") || ""});
+      closePopout();
+    });
+  });
+})();
+</script>
+</body>
+</html>

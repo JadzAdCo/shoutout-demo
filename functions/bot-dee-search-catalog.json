@@ -260,11 +260,11 @@
       "id": "help-botdee-headless-vip",
       "kind": "help",
       "label": "VIP reserV from BOT DEE chat",
-      "blurb": "Say book a table at Aurelia, hold a table, or I want a reservation in BOT DEE. The VIP reserV card shows nights, the 2D floor areas (Mezzanine, West Booths, Dance Floor, Bar Lounge), and tables. Tap a night, tap an area, tap a table (V1–V4 or AURELIA SUITE on the mezzanine), then",
+      "blurb": "Say book a table at Aurelia in BOT DEE and stay in this chat. The VIP reserV dock shows nights (closed nights stay listed), live table colors (green available, amber held, red booked), and party size clamped to that table. Tap a table to select it — only Hold it starts a 30-minut",
       "href": "./botdee.html?from=botdee",
       "phrases": [
         "vip reserv from bot dee chat",
-        "say book a table at aurelia hold a table or i want a reservation in bot dee. the vip reserv card shows nights the 2d floor areas mezzanine west booths dance flo",
+        "say book a table at aurelia in bot dee and stay in this chat. the vip reserv dock shows nights closed nights stay listed live table colors green available amber",
         "headless vip",
         "vip from chat",
         "hold a table at aurelia",
@@ -276,8 +276,9 @@
         "v1 aurelia",
         "hold it vip",
         "floor plan bot dee",
+        "vip popout",
+        "cancel hold",
         "open bot dee",
-        "open vip reserv",
         "help-botdee-headless-vip"
       ]
     },
@@ -4204,7 +4205,7 @@
       "kind": "product",
       "label": "VIP reserV — book a VIP table",
       "blurb": "Explore a club floor map and reserve a VIP table. Beta: Decades, Lima Twist Club, Aurelia.",
-      "href": "./vip.html?from=botdee",
+      "href": "./botdee.html?from=botdee",
       "phrases": [
         "vip reserv book a vip table",
         "explore a club floor map and reserve a vip table. beta decades lima twist club aurelia.",

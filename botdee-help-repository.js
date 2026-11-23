@@ -1253,15 +1253,14 @@
     {
       id: "help-botdee-headless-vip",
       title: "VIP reserV from BOT DEE chat",
-      body: "Say book a table at Aurelia, hold a table, or I want a reservation in BOT DEE. The VIP reserV card shows nights, the 2D floor areas (Mezzanine, West Booths, Dance Floor, Bar Lounge), and tables. Tap a night, tap an area, tap a table (V1–V4 or AURELIA SUITE on the mezzanine), then Hold it, I agree to Terms, and pay if a deposit is required. Open VIP reserV map is the full pinch-zoom plan. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment.",
+      body: "Say book a table at Aurelia in BOT DEE and stay in this chat. The VIP reserV dock shows nights (closed nights stay listed), live table colors (green available, amber held, red booked), and party size clamped to that table. Tap a table to select it — only Hold it starts a 30-minute hold. I agree records Terms (legal text stays English) and Stripe opens in a pop-out; this chat stays. After pay, the pass returns to this chat. Map, Terms, pay, and pass are pop-outs, not vip.html. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment.",
       searchPhrases: [
         "headless vip", "vip from chat", "hold a table at aurelia", "book a table",
         "do a reservation", "mezzanine", "vip reserv bot dee", "book vip in bot dee",
-        "v1 aurelia", "hold it vip", "floor plan bot dee"
+        "v1 aurelia", "hold it vip", "floor plan bot dee", "vip popout", "cancel hold"
       ],
       links: [
-        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},
-        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "botdee"})}
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "masterAdmin"]

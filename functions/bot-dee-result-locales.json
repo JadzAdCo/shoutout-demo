@@ -513,11 +513,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV aus dem BOT DEE-Chat",
-          "blurb": "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennu"
+          "blurb": "Sagen Sie book a table at Aurelia in BOT DEE und bleiben Sie in diesem Chat. Das VIP reserV-Dock zeigt Abende (geschlossene bleiben gelistet), Tischfarben (grün frei, amber Hold, rot gebucht) und die Gruppengröße bis zur Tischkapazität. Tisch antippen wählt — nur Hold it startet "
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV aus dem BOT DEE-Chat",
-          "blurb": "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennu"
+          "blurb": "Sagen Sie book a table at Aurelia in BOT DEE und bleiben Sie in diesem Chat. Das VIP reserV-Dock zeigt Abende (geschlossene bleiben gelistet), Tischfarben (grün frei, amber Hold, rot gebucht) und die Gruppengröße bis zur Tischkapazität. Tisch antippen wählt — nur Hold it startet "
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -1640,11 +1640,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV depuis le chat BOT DEE",
-          "blurb": "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de c"
+          "blurb": "Dites book a table at Aurelia dans BOT DEE et restez dans ce chat. Le dock VIP reserV montre les soirées (les fermées restent listées), les couleurs de tables (vert libre, ambre hold, rouge réservé) et la taille du groupe limitée à la table. Touchez une table pour la choisir — se"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV depuis le chat BOT DEE",
-          "blurb": "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de c"
+          "blurb": "Dites book a table at Aurelia dans BOT DEE et restez dans ce chat. Le dock VIP reserV montre les soirées (les fermées restent listées), les couleurs de tables (vert libre, ambre hold, rouge réservé) et la taille du groupe limitée à la table. Touchez une table pour la choisir — se"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -2767,11 +2767,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV desde el chat de BOT DEE",
-          "blurb": "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no"
+          "blurb": "Di book a table at Aurelia en BOT DEE y quédate en este chat. El dock de VIP reserV muestra noches (las cerradas siguen listadas), colores de mesa (verde libre, ámbar hold, rojo reservado) y el grupo limitado a la mesa. Toca una mesa para elegirla: solo Hold it inicia 30 minutos."
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV desde el chat de BOT DEE",
-          "blurb": "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no"
+          "blurb": "Di book a table at Aurelia en BOT DEE y quédate en este chat. El dock de VIP reserV muestra noches (las cerradas siguen listadas), colores de mesa (verde libre, ámbar hold, rojo reservado) y el grupo limitado a la mesa. Toca una mesa para elegirla: solo Hold it inicia 30 minutos."
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -3894,11 +3894,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV dalla chat BOT DEE",
-          "blurb": "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview "
+          "blurb": "Di’ book a table at Aurelia in BOT DEE e resta in questa chat. Il dock VIP reserV mostra le serate (quelle chiuse restano in elenco), i colori dei tavoli (verde libero, ambra hold, rosso prenotato) e il gruppo limitato al tavolo. Tocca un tavolo per sceglierlo: solo Hold it avvia"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV dalla chat BOT DEE",
-          "blurb": "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview "
+          "blurb": "Di’ book a table at Aurelia in BOT DEE e resta in questa chat. Il dock VIP reserV mostra le serate (quelle chiuse restano in elenco), i colori dei tavoli (verde libero, ambra hold, rosso prenotato) e il gruppo limitato al tavolo. Tocca un tavolo per sceglierlo: solo Hold it avvia"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -5021,11 +5021,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV a partir do chat BOT DEE",
-          "blurb": "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SM"
+          "blurb": "Diga book a table at Aurelia no BOT DEE e fique neste chat. O dock VIP reserV mostra noites (fechadas continuam listadas), cores das mesas (verde livre, âmbar hold, vermelho reservado) e o grupo limitado à mesa. Toque numa mesa para a escolher — só Hold it inicia 30 minutos. I ag"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV a partir do chat BOT DEE",
-          "blurb": "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SM"
+          "blurb": "Diga book a table at Aurelia no BOT DEE e fique neste chat. O dock VIP reserV mostra noites (fechadas continuam listadas), cores das mesas (verde livre, âmbar hold, vermelho reservado) e o grupo limitado à mesa. Toque numa mesa para a escolher — só Hold it inicia 30 minutos. I ag"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -6148,11 +6148,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV из чата BOT DEE",
-          "blurb": "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview"
+          "blurb": "Скажите book a table at Aurelia в BOT DEE и оставайтесь в этом чате. Док VIP reserV показывает вечера (закрытые тоже), цвета столов (зелёный свободно, янтарный hold, красный booked) и размер группы по вместимости. Нажмите стол, чтобы выбрать — только Hold it начинает 30-минутный "
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV из чата BOT DEE",
-          "blurb": "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview"
+          "blurb": "Скажите book a table at Aurelia в BOT DEE и оставайтесь в этом чате. Док VIP reserV показывает вечера (закрытые тоже), цвета столов (зелёный свободно, янтарный hold, красный booked) и размер группы по вместимости. Нажмите стол, чтобы выбрать — только Hold it начинает 30-минутный "
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -7275,11 +7275,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV από τη συνομιλία BOT DEE",
-          "blurb": "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμού"
+          "blurb": "Πείτε book a table at Aurelia στο BOT DEE και μείνετε σε αυτή τη συνομιλία. Το dock VIP reserV δείχνει βραδιές (οι κλειστές μένουν στη λίστα), χρώματα τραπεζιών (πράσινο διαθέσιμο, κεχριμπάρι hold, κόκκινο booked) και μέγεθος παρέας μέχρι τη χωρητικότητα. Πατήστε τραπέζι για επιλ"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV από τη συνομιλία BOT DEE",
-          "blurb": "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμού"
+          "blurb": "Πείτε book a table at Aurelia στο BOT DEE και μείνετε σε αυτή τη συνομιλία. Το dock VIP reserV δείχνει βραδιές (οι κλειστές μένουν στη λίστα), χρώματα τραπεζιών (πράσινο διαθέσιμο, κεχριμπάρι hold, κόκκινο booked) και μέγεθος παρέας μέχρι τη χωρητικότητα. Πατήστε τραπέζι για επιλ"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -8402,11 +8402,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV z czatu BOT DEE",
-          "blurb": "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołąc"
+          "blurb": "Powiedz book a table at Aurelia w BOT DEE i zostań na tym czacie. Dock VIP reserV pokazuje wieczory (zamknięte zostają na liście), kolory stolików (zielony wolny, bursztyn hold, czerwony booked) i wielkość grupy do pojemności stolika. Dotknij stolika, aby wybrać — tylko Hold it z"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV z czatu BOT DEE",
-          "blurb": "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołąc"
+          "blurb": "Powiedz book a table at Aurelia w BOT DEE i zostań na tym czacie. Dock VIP reserV pokazuje wieczory (zamknięte zostają na liście), kolory stolików (zielony wolny, bursztyn hold, czerwony booked) i wielkość grupy do pojemności stolika. Dotknij stolika, aby wybrać — tylko Hold it z"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -9529,11 +9529,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV vanuit BOT DEE-chat",
-          "blurb": "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Ro"
+          "blurb": "Zeg book a table at Aurelia in BOT DEE en blijf in deze chat. Het VIP reserV-dock toont avonden (gesloten avonden blijven staan), live tafelkleuren (groen vrij, amber hold, rood geboekt) en groepsgrootte tot de tafelcapaciteit. Tik een tafel om te kiezen — alleen Hold it start ee"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV vanuit BOT DEE-chat",
-          "blurb": "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Ro"
+          "blurb": "Zeg book a table at Aurelia in BOT DEE en blijf in deze chat. Het VIP reserV-dock toont avonden (gesloten avonden blijven staan), live tafelkleuren (groen vrij, amber hold, rood geboekt) en groepsgrootte tot de tafelcapaciteit. Tik een tafel om te kiezen — alleen Hold it start ee"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -10656,11 +10656,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV من محادثة BOT DEE",
-          "blurb": "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
+          "blurb": "قل book a table at Aurelia في BOT DEE وابقَ في هذه المحادثة. رصيف VIP reserV يعرض الليالي (المغلقة تبقى مدرجة) وألوان الطاولات (أخضر متاح، عنبري hold، أحمر محجوز) وحجم المجموعة حتى سعة الطاولة. اضغط طاولة للاختيار — Hold it فقط يبدأ حجزاً لـ 30 دقيقة. I agree يسجّل Terms (النص ال"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV من محادثة BOT DEE",
-          "blurb": "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
+          "blurb": "قل book a table at Aurelia في BOT DEE وابقَ في هذه المحادثة. رصيف VIP reserV يعرض الليالي (المغلقة تبقى مدرجة) وألوان الطاولات (أخضر متاح، عنبري hold، أحمر محجوز) وحجم المجموعة حتى سعة الطاولة. اضغط طاولة للاختيار — Hold it فقط يبدأ حجزاً لـ 30 دقيقة. I agree يسجّل Terms (النص ال"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",

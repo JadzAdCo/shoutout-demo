@@ -1456,14 +1456,14 @@ async function runCreateFloqrCheckoutSession(request) {
         : type === "suprstarRequest"
           ? `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}&popup=1`
           : type === "vipReservation"
-            ? `${returnBase}vip.html?vipPaid=1&order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`
+            ? `${returnBase}${payload && payload.botDeePopout ? "botdee-vip-popout.html" : "vip.html"}?${payload && payload.botDeePopout ? "kind=paid&" : "vipPaid=1&"}order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`
             : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:type === "rydrFare"
         ? `${returnBase}pickup.html?rydrCancelled=1&order=${encodeURIComponent(orderRef.id)}${rydrLocQuery}`
         : type === "suprstarRequest"
           ? `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1&popup=1`
           : type === "vipReservation"
-            ? `${returnBase}vip.html?vipCancelled=1&order=${encodeURIComponent(orderRef.id)}`
+            ? `${returnBase}${payload && payload.botDeePopout ? "botdee-vip-popout.html?kind=payCancel" : "vip.html?vipCancelled=1"}&order=${encodeURIComponent(orderRef.id)}`
             : `${returnBase}payment-return.html?order=${encodeURIComponent(orderRef.id)}&cancelled=1`,
       client_reference_id:orderRef.id,
       metadata:{orderId:orderRef.id, orderType:type, ownerUid:request.auth.uid, correlationId, ownerKey:text(summary.ownerKey, 220)},

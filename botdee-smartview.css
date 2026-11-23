@@ -1514,6 +1514,35 @@ body.botdee-sv-overlay-open { overflow: hidden; }
   background: #fde047;
   box-shadow: 0 0 0 2px #fff;
 }
+.botdee-vip-seat.is-held {
+  background: color-mix(in srgb, #f59e0b 82%, transparent);
+  color: #1a0d00;
+}
+.botdee-vip-seat.is-booked {
+  background: color-mix(in srgb, #ef4444 82%, transparent);
+  color: #fff;
+  cursor: not-allowed;
+}
+.botdee-vip-seat.is-closed,
+.botdee-vip-chip.is-closed {
+  background: color-mix(in srgb, #9ca3af 55%, transparent);
+  color: #111827;
+  cursor: default;
+}
+.botdee-sv-vip.is-collapsed .botdee-vip-expand {
+  display: none;
+}
+.botdee-vip-clock,
+.botdee-vip-terms,
+.botdee-vip-pass {
+  margin: 0;
+  font-size: 0.78rem;
+}
+.botdee-vip-cap {
+  font-weight: 600;
+  opacity: 0.8;
+  font-size: 0.72rem;
+}
 .botdee-vip-party {
   display: flex;
   align-items: center;
