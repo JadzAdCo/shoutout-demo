@@ -223,6 +223,16 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.069",
+      title: "s3.3.069 — Demo Worker Mgmt; Find demo worker + Generate code",
+      checks: [
+        {label:"Demo Worker Mgmt nav + h1", file:"master-admin.html", includes:["Demo Worker Mgmt", "master.demoEmployees.find", "demoEmpSearch", "demoEmpGenerateSelectedBtn"]},
+        {label:"Hash alias demoWorkerMgmt", file:"master-admin-app.js", includes:["demoWorkerMgmt", "demoEmployees"]},
+        {label:"Chrome packs", file:"floqr-i18n.js", includes:["Demo Worker Mgmt", "master.demoEmployees.find"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-065-demo-worker-mgmt"]}
+      ]
+    },
+    {
       version: "s3.3.068",
       title: "s3.3.068 — Patron merge card on Duplicate Records only; one Find patron per column",
       checks: [
@@ -3704,6 +3714,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-065-demo-worker-mgmt",
+      area:"Master Admin",
+      feature:"Demo Worker Mgmt tab; same-mobile Search only on Patron accounts",
+      changed:"s3.3.065 — Entity Management tab is Demo Worker Mgmt (hash still #demoEmployees; #demoWorkerMgmt aliases). Find demo worker + Generate code stay on that tab. Same-mobile patron Search / Find patron is only on Reports → Duplicate Records → Patron accounts (same mobile). Chrome does not name an operator.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / floqr-i18n.js / master-demo-employees.js ?v=s3.3.065. Unlock SOS2FA. 2) Entity Management → Demo Worker Mgmt (#demoEmployees). Nav pill and heading say Demo Worker Mgmt. Filter is Find demo worker + Generate code — not Find patron, not Patron accounts (same mobile). 3) Open #demoWorkerMgmt — same panel. 4) Reports → Duplicate Records: Patron accounts (same mobile) has the only same-mobile Find patron (one per column). 5) BOT DEE help Demo Worker Mgmt still hashes #demoEmployees. Display URLs have no ?v=.",
+      expected:"Tab renamed in chrome. Demo worker code lookup stays distinct. Same-mobile Search is only on the merge card. Hash #demoEmployees still works.",
+      troubleshoot:"Old Demo Svc / Emp Mgmt label → cached master-admin.html / floqr-i18n.js before s3.3.065. Merge card on the worker tab → #patronAccountMerge leaked outside #duplicateRecords (needs s3.3.064 placement). Find patron on Demo Worker Mgmt → that search belongs on Duplicate Records. #demoWorkerMgmt blanks the page → master-admin-app.js must map it to demoEmployees."
+    },
     {
       id:"s3-3-064-patron-merge-chrome",
       area:"Master Admin",

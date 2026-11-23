@@ -2146,11 +2146,11 @@
       "id": "help-master-demo-signin",
       "kind": "help",
       "label": "Demo sign-in code",
-      "blurb": "Master Admin → Entity Management → Demo Svc / Emp Mgmt. Use this when email codes are not arriving and you need to sign in as a demo employee (temp_role_number@floqr-demo.com). Unlock SOS2FA, search or pick the demo employee, press Generate code and give a reason. The code is sho",
+      "blurb": "Master Admin → Entity Management → Demo Worker Mgmt. Use this when email codes are not arriving and you need to sign in as a demo worker (temp_role_number@floqr-demo.com). Unlock SOS2FA, find or pick the demo worker, press Generate code and give a reason. The code is shown once, ",
       "href": "./master-admin.html?from=botdee#demoEmployees",
       "phrases": [
         "demo sign-in code",
-        "master admin entity management demo svc / emp mgmt. use this when email codes are not arriving and you need to sign in as a demo employee temp_role_number@floqr",
+        "master admin entity management demo worker mgmt. use this when email codes are not arriving and you need to sign in as a demo worker temp_role_number@floqr-demo",
         "demo employee code",
         "temp code",
         "demo sign in",
@@ -2161,6 +2161,9 @@
         "log in as demo account",
         "demo svc emp mgmt",
         "demo employees",
+        "demo worker mgmt",
+        "demo worker management",
+        "demo workers",
         "demo service member",
         "temp waitress",
         "floqr-demo",
@@ -2169,7 +2172,6 @@
         "email code not arriving",
         "sendgrid not working",
         "demo account password",
-        "demo svc / emp mgmt",
         "help-master-demo-signin"
       ]
     },

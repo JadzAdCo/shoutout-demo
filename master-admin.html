@@ -71,7 +71,7 @@
             <button class="admin-subtab" data-panel="clubOnboarding" type="button" data-i18n="master.onboarding">Entity Onboarding</button>
             <button class="admin-subtab" data-panel="templateManagement" type="button" data-i18n="master.templates">Template Management</button>
             <button class="admin-subtab" data-panel="recommendationModeration" type="button" data-i18n="master.recommendations">Unapproved Recommendations</button>
-            <button class="admin-subtab" data-panel="demoEmployees" type="button" data-i18n="master.demoEmployees">Demo Svc / Emp Mgmt</button>
+            <button class="admin-subtab" data-panel="demoEmployees" type="button" data-i18n="master.demoEmployees">Demo Worker Mgmt</button>
           </div>
         </div>
         <div class="admin-tab-group" data-tab-group="shoutouts" data-default-panel="shoutoutCompletedLog">
@@ -850,24 +850,25 @@
       <section id="demoEmployees" class="admin-panel-section" data-entity-mgmt-gated="true">
         <!-- Design notes: .cursor/rules/design-notes-demo-signin.mdc -->
         <div class="card">
-          <p class="eyebrow">Entity management · demo employees</p>
+          <p class="eyebrow">Entity management · demo workers</p>
           <h2
+            data-i18n="master.demoEmployees"
             data-floqr-help-id="help-master-demo-signin"
             data-floqr-help-title="Demo sign-in code"
-            data-floqr-help-search="demo employee code|temp code|demo sign in|sign in as demo|demo sign-in code|demo service member|floqr-demo"
-            data-floqr-help-body="Use this when email codes are not arriving and you need to sign in as a demo employee (temp_role_number@floqr-demo.com). Search or pick the demo employee, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features &amp; Services audit trail. Real patron accounts cannot get a code here."
-          >Demo Svc / Emp Mgmt</h2>
+            data-floqr-help-search="demo worker mgmt|demo worker management|demo employee code|temp code|demo sign in|sign in as demo|demo sign-in code|demo service member|floqr-demo"
+            data-floqr-help-body="Use this when email codes are not arriving and you need to sign in as a demo worker (temp_role_number@floqr-demo.com). Find or pick the demo worker, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features &amp; Services audit trail. Real patron accounts cannot get a code here. Same-mobile patron Search lives on Reports → Duplicate Records → Patron accounts (same mobile)."
+          >Demo Worker Mgmt</h2>
           <p id="demoEmpStatus" class="status" aria-live="polite"></p>
           <div class="demo-emp-search-row">
-            <label>Search demo employees
+            <label data-i18n="master.demoEmployees.find">Find demo worker
               <input id="demoEmpSearch" type="search" autocomplete="off" placeholder="Name, email, role, or club"/>
             </label>
-            <label>Select demo employee
+            <label data-i18n="master.demoEmployees.select">Select demo worker
               <select id="demoEmpSelect"></select>
             </label>
             <button id="demoEmpGenerateSelectedBtn" class="primary" type="button">Generate code</button>
           </div>
-          <p class="sub small">Showing <span id="demoEmpCount">0</span> demo employees. Click a row to select it.</p>
+          <p class="sub small">Showing <span id="demoEmpCount">0</span> demo workers. Click a row to select it.</p>
           <div id="demoEmpList" class="demo-emp-list"></div>
         </div>
 

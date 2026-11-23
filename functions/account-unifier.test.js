@@ -100,6 +100,8 @@ test("callables, rules, classification, and Master Admin UI are wired", () => {
   const html = read("master-admin.html");
   assert.match(html, /id="patronAccountMerge"/);
   assert.match(html, /patron-account-merge.js/);
+  const demoSection = html.slice(html.indexOf('<section id="demoEmployees"'), html.indexOf("</section>", html.indexOf('<section id="demoEmployees"')));
+  assert.doesNotMatch(demoSection, /id="patronAccountMerge"|master\.accountMerge\.lookup/);
   const mergeCard = html.slice(html.indexOf('id="duplicateRecords"'), html.indexOf('id="diagnostics"'));
   assert.match(mergeCard, /id="patronAccountMerge"/);
   assert.match(mergeCard, /patron-merge-col[\s\S]*patronMergeLookupSurvivorBtn[\s\S]*patron-merge-col[\s\S]*patronMergeLookupDuplicateBtn/);

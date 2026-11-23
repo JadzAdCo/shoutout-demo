@@ -164,13 +164,18 @@ test("Welcome-card code strings exist in all 11 chrome packs", () => {
   }
 });
 
-test("Demo Svc / Emp Mgmt is an SOS2FA-gated Entity Management subtab with help beside the heading", () => {
+test("Demo Worker Mgmt is an SOS2FA-gated Entity Management subtab with help beside the heading", () => {
   const html = read("master-admin.html");
   const group = html.slice(html.indexOf('id="entityManagementSubtabs"'), html.indexOf("</div>", html.indexOf('id="entityManagementSubtabs"')));
-  assert.match(group, /data-panel="demoEmployees" type="button" data-i18n="master\.demoEmployees">Demo Svc \/ Emp Mgmt<\/button>/);
+  assert.match(group, /data-panel="demoEmployees" type="button" data-i18n="master\.demoEmployees">Demo Worker Mgmt<\/button>/);
   const section = html.slice(html.indexOf('<section id="demoEmployees"'), html.indexOf("</section>", html.indexOf('<section id="demoEmployees"')));
   assert.match(section, /data-entity-mgmt-gated="true"/);
   assert.match(section, /data-floqr-help-id="help-master-demo-signin"/);
+  assert.match(section, />Demo Worker Mgmt</);
+  assert.match(section, /data-i18n="master\.demoEmployees\.find">Find demo worker/);
+  assert.match(section, /data-i18n="master\.demoEmployees\.select">Select demo worker/);
+  assert.doesNotMatch(section, /id="patronAccountMerge"|master\.accountMerge\.lookup|Find patron/);
+  assert.doesNotMatch(section, />Search demo employees</);
   for (const id of ["demoEmpSearch", "demoEmpSelect", "demoEmpList", "demoEmpGenerateSelectedBtn", "demoEmpRole", "demoEmpNumber", "demoEmpManualGenerateBtn", "demoEmpCode", "demoEmpCountdown", "demoEmpCopyCodeBtn", "demoEmpRecent"]) {
     assert.match(section, new RegExp(`id="${id}"`), id);
   }
@@ -185,6 +190,10 @@ test("Demo Svc / Emp Mgmt is an SOS2FA-gated Entity Management subtab with help 
     assert.match(list, /"demoEmployees"/, `${file} gates the panel behind SOS2FA`);
   }
   assert.match(read("master-admin-app.js"), /panelId === "demoEmployees"\) \{\s*window\.FLOQRMasterDemoEmployees\?\.mount\?\.\(\);/);
+  const app = read("master-admin-app.js");
+  assert.match(app, /raw === "demoWorkerMgmt"\) return "demoEmployees"/);
+  assert.match(app, /panelId === "demoWorkerMgmt"\) panelId = "demoEmployees"/);
+  assert.match(app, /demoEmployees: "Demo Worker Mgmt"/);
 });
 
 test("demo employee tab: SOS2FA before data, reason prompt before the callable, no code kept", () => {
@@ -225,9 +234,13 @@ test("demo employee roster: 80 packaged accounts, Firestore profiles merge in, s
   assert.equal(api.parseDemoEmail("temp_dj_1@floqr-demo.com.evil.io"), null);
 });
 
-test("Demo Svc / Emp Mgmt tab label exists in all 11 chrome packs", () => {
-  const count = (read("floqr-i18n.js").match(/"master\.demoEmployees":/g) || []).length;
-  assert.equal(count, 11);
+test("Demo Worker Mgmt tab label exists in all 11 chrome packs", () => {
+  const src = read("floqr-i18n.js");
+  assert.equal((src.match(/"master\.demoEmployees":/g) || []).length, 11);
+  assert.equal((src.match(/"master\.demoEmployees\.find":/g) || []).length, 11);
+  assert.equal((src.match(/"master\.demoEmployees\.select":/g) || []).length, 11);
+  assert.match(src, /"master\.demoEmployees": "Demo Worker Mgmt"/);
+  assert.doesNotMatch(src, /"master\.demoEmployees": "Demo Svc \/ Emp Mgmt"/);
 });
 
 test("old demo-signin.html redirects to the Master Admin tab", () => {
@@ -244,8 +257,12 @@ test("BOT DEE help entry is Master Admin only and classified", () => {
   const entry = win.FLOQRHelpRepository.entries().find(row => row.id === "help-master-demo-signin");
   assert.ok(entry);
   assert.deepEqual([...entry.audiences], ["masterAdmin"]);
-  for (const phrase of ["demo employee code", "temp code", "demo sign in", "sign in as demo"]) assert.ok(entry.searchPhrases.includes(phrase), phrase);
+  for (const phrase of ["demo employee code", "temp code", "demo sign in", "sign in as demo", "demo worker mgmt"]) assert.ok(entry.searchPhrases.includes(phrase), phrase);
+  assert.equal(entry.links[0].label, "Demo Worker Mgmt");
   assert.match(entry.links[0].href, /master-admin\.html\?.*#demoEmployees$/);
+  assert.match(entry.body, /Demo Worker Mgmt/);
+  assert.match(entry.body, /Patron accounts \(same mobile\)/);
+  assert.doesNotMatch(entry.body, /Demo Svc \/ Emp Mgmt/);
   assert.doesNotMatch(entry.body, /sha256|challenge|EMAIL_OTP_PEPPER|design note/i);
   const classes = JSON.parse(read("functions/botdee-content-classes.json"));
   assert.deepEqual(classes.help["help-master-demo-signin"], ["masterAdmin"]);
