@@ -186,6 +186,54 @@ test("template-specific jersey, Heist name, and Football Intro fields", () => {
   assert.equal(parsedJersey.jerseyNumber, "99");
 });
 
+test("history kit words do not force a jersey template onto a Traditional throw", () => {
+  const filled = headless.fillFromConversation([
+    {role: "user", text: "Spain is playing tonight"},
+    {role: "user", text: "we are going to Aurelia"},
+    {role: "user", text: "happy birthday Maya"}
+  ], "throw a shoutout");
+  assert.notEqual(filled.templateId, "soccerJersey");
+  assert.equal(filled.jerseyTeamId, "");
+  assert.equal(filled.clubQuery, "temp-democlub-1");
+  assert.equal(filled.message, "happy birthday Maya");
+  const draft = headless.mergeInteractiveDraft({}, filled, {freshThrow: false});
+  assert.deepEqual(headless.interactiveNeeds(draft), []);
+});
+
+test("follow-up fills the asked collectableInput slot", () => {
+  const jersey = headless.mergeInteractiveDraft({}, {
+    clubQuery: "heist-washington-dc",
+    templateId: "soccerJersey",
+    jerseyTeamId: "soccerMorocco",
+    jerseyName: "NYX"
+  });
+  assert.deepEqual(headless.interactiveNeeds(jersey), ["jerseyNumber"]);
+  const parsed = headless.parseShoutOutExecute("99");
+  headless.applyBareInteractiveReply(jersey, parsed, "99");
+  assert.equal(parsed.jerseyNumber, "99");
+  const next = headless.mergeInteractiveDraft(jersey, parsed, {freshThrow: false});
+  assert.deepEqual(headless.interactiveNeeds(next), []);
+
+  const kitAsk = headless.mergeInteractiveDraft({}, {
+    clubQuery: "heist-washington-dc",
+    templateId: "soccerJersey"
+  });
+  const kit = headless.parseShoutOutExecute("Morocco");
+  headless.applyBareInteractiveReply(kitAsk, kit, "Morocco");
+  assert.equal(kit.jerseyTeamId, "soccerMorocco");
+});
+
+test("ready-state no cancels the ShoutOut", () => {
+  const draft = headless.mergeInteractiveDraft({}, headless.parseShoutOutExecute(
+    "throw a shoutout at Decades that says Happy birthday Maya"
+  ));
+  assert.deepEqual(headless.interactiveNeeds(draft), []);
+  const noReady = headless.parseShoutOutExecute("no");
+  headless.applyBareInteractiveReply(draft, noReady, "no");
+  assert.equal(noReady.cancel, true);
+  assert.equal(noReady.confirmSubmit, false);
+});
+
 test("catalog patron input families match headless lists", () => {
   const inputs = require("./shoutout-template-inputs");
   const shared = read("shared-data.js");

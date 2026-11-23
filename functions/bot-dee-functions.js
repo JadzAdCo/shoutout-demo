@@ -324,28 +324,19 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
       smartViews: [view]
     });
   }
+  const priorNeeds = previousDraft ? headless.interactiveNeeds(previousDraft, templateRow) : [];
+  if (headless.isBareNegative(userPrompt) && parsed.confirmSubmit !== true && previousDraft && !priorNeeds.length) {
+    try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
+    return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
+      model: "headless-draft",
+      toolRounds: 0,
+      smartViews: [],
+      shoutOutPreview: "closed"
+    });
+  }
   if (!confirm) {
     try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
     const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "ready", needs: []});
-    return shoutOutSmartOutcome(
-      "ShoutOut SMARTpreview is ready. Reply throw it to send, or cancel the shoutout.",
-      lang,
-      {model: "headless-draft", toolRounds: 0, smartViews: [view]}
-    );
-  }
-  if (headless.isBareNegative(userPrompt) && parsed.confirmSubmit !== true) {
-    const priorNeeds = previousDraft ? headless.interactiveNeeds(previousDraft, templateRow) : [];
-    if (!priorNeeds.length) {
-      try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
-      return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
-        model: "headless-draft",
-        toolRounds: 0,
-        smartViews: [],
-        shoutOutPreview: "closed"
-      });
-    }
-    try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
-    const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "ready"});
     return shoutOutSmartOutcome(
       "ShoutOut SMARTpreview is ready. Reply throw it to send, or cancel the shoutout.",
       lang,

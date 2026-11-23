@@ -616,11 +616,22 @@ function isBareNegative(raw) {
   return /^(no|nope|nah|skip)[.!?]*$/i.test(String(raw || "").trim());
 }
 
-/** Map a bare yes/no onto the current SMARTpreview step. Never mint on “yes” while extras remain. */
-function applyBareInteractiveReply(draft, parsed, raw) {
+function isControlReply(raw) {
+  return isBareAffirmative(raw)
+    || isBareNegative(raw)
+    || isConfirmSubmitPrompt(raw)
+    || isCancelShoutOutPrompt(raw);
+}
+
+function bareSlotText(raw, max) {
+  return stripMessageWrap(raw).slice(0, max);
+}
+
+/** Map a follow-up (yes/no or the asked collectableInput) onto the current step. Never mint on “yes”. */
+function applyBareInteractiveReply(draft, parsed, raw, templateRow) {
   const next = parsed && typeof parsed === "object" ? parsed : {};
   if (!draft) return next;
-  const step = interactiveNeeds(draft)[0] || "";
+  const step = interactiveNeeds(draft, templateRow)[0] || "";
   if (isBareAffirmative(raw)) {
     if (step === "handle") next.handleDecision = next.handleDecision || "include";
     else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
@@ -628,9 +639,34 @@ function applyBareInteractiveReply(draft, parsed, raw) {
       next.mediaDecision = next.mediaDecision || "compose";
     }
     else if (!step) next.confirmSubmit = false;
-  } else if (isBareNegative(raw)) {
+    return next;
+  }
+  if (isBareNegative(raw)) {
     if (step === "handle") next.handleDecision = next.handleDecision || "skip";
     else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
+    else if (!step) next.cancel = true;
+    return next;
+  }
+  if (!step || isControlReply(raw)) return next;
+  const text = String(raw || "").trim();
+  if (!text) return next;
+  if (step === "club" && !next.clubQuery) {
+    next.clubQuery = extractAliasClub(text) || extractAtClub(text)
+      || (!extractCelebrationMessage(text) && text.length <= 80 ? text : "");
+  } else if (step === "message" && !next.message) {
+    next.message = extractCelebrationMessage(text) || extractQuotedMessage(text) || bareSlotText(text, 400);
+  } else if (step === "jerseyTeamId" && !next.jerseyTeamId) {
+    next.jerseyTeamId = extractJerseyTeam(text) || text;
+  } else if (step === "jerseyName" && !next.jerseyName) {
+    next.jerseyName = extractJerseyName(text) || bareSlotText(text, 16).toUpperCase();
+  } else if (step === "jerseyNumber" && !next.jerseyNumber) {
+    const labeled = extractJerseyNumber(text);
+    const bare = /^[A-Za-z0-9*]{1,2}$/.test(text) ? text.toUpperCase() : "";
+    next.jerseyNumber = labeled || bare;
+  } else if (step === "playerName" && !next.playerName) {
+    next.playerName = extractPlayerName(text) || bareSlotText(text, 40);
+  } else if (step === "company" && !next.company) {
+    next.company = bareSlotText(text, 18).toUpperCase();
   }
   return next;
 }
@@ -676,8 +712,11 @@ function parseShoutOutExecute(raw) {
   const atPhrase = extractAtClub(prefix);
   const atClub = extractAliasClub(atPhrase) || atPhrase;
   const aliasClub = extractAliasClub(prefix) || extractAliasClub(source);
+  const jerseyHint = extractTemplateHint(prefix) === "soccerJersey"
+    || extras.templateId === "soccerJersey"
+    || /\b(?:jersey|kit)\b/i.test(source);
   const templateId = extractTemplateHint(prefix) || extras.templateId
-    || (jerseyTeamId || jerseyName || jerseyNumber ? "soccerJersey" : "");
+    || (jerseyHint && (jerseyTeamId || jerseyName || jerseyNumber) ? "soccerJersey" : "");
   return {
     clubQuery: atClub || aliasClub,
     message,
@@ -739,9 +778,10 @@ function fillFromConversation(turns, currentPrompt) {
     if (parsed.attribution) filled.attribution = parsed.attribution;
     if (parsed.mediaDecision) filled.mediaDecision = parsed.mediaDecision;
     if (parsed.mediaUrl) filled.mediaUrl = parsed.mediaUrl;
-    if (parsed.jerseyTeamId) filled.jerseyTeamId = parsed.jerseyTeamId;
-    if (parsed.jerseyName) filled.jerseyName = parsed.jerseyName;
-    if (parsed.jerseyNumber) filled.jerseyNumber = parsed.jerseyNumber;
+    const jerseyTurn = parsed.templateId === "soccerJersey" || filled.templateId === "soccerJersey";
+    if (parsed.jerseyTeamId && jerseyTurn) filled.jerseyTeamId = parsed.jerseyTeamId;
+    if (parsed.jerseyName && jerseyTurn) filled.jerseyName = parsed.jerseyName;
+    if (parsed.jerseyNumber && jerseyTurn) filled.jerseyNumber = parsed.jerseyNumber;
     if (parsed.playerName) filled.playerName = parsed.playerName;
     if (parsed.confirmSubmit) filled.confirmSubmit = true;
     if (parsed.skipExtras) filled.skipExtras = true;

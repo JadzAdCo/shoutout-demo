@@ -168,6 +168,7 @@ test("ShoutOut SMARTpreview LED is display.html composer preview and updates on 
   assert.doesNotMatch(session, /parsed\.confirmSubmit = true/);
   assert.match(session, /isBareNegative\(userPrompt\)/);
   const tryFn = session.slice(session.indexOf("async function tryHeadlessShoutOut"), session.indexOf("function localSession"));
+  assert.ok(tryFn.indexOf("isBareNegative") < tryFn.indexOf("if (!confirm)"));
   assert.ok(tryFn.indexOf("isBareNegative") < tryFn.indexOf("startShoutOutCheckout"));
   assert.match(session, /result\?\.ok && \(result\.checkoutUrl \|\| result\.shoutoutId\)/);
   const chatStart = chat.indexOf("function startNewChat");
