@@ -33,7 +33,7 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.064";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.065";
   const PREVIEW_LINKS_PACKAGE = "s3.3.064";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.065",
+      title: "s3.3.065 — SMARTvisual Studio SOS2FA session on Save",
+      checks: [
+        {label:"Studio getSessionId", file:"smartvisuals-studio.js", includes:["getSessionId?.(SOS_SCOPE)", "function studioCallable(", "getIdToken(true)", "publishSmartVisualDraft"]},
+        {label:"Studio SOS2FA gate", file:"sos2fa.js", includes:["\"smartvisualStudio\"", "sessionId: (scope) => getSessionId"]},
+        {label:"Master Admin panel list", file:"master-admin-app.js", includes:["\"smartvisualStudio\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-065-smartvisuals-studio-sos2fa"]}
+      ]
+    },
     {
       version: "s3.3.064",
       title: "s3.3.064 — SMARTvisual Studio Create/Edit JPEG/PNG/WebP backgrounds",
@@ -3848,7 +3858,16 @@
       changed:"Create/Edit and Milan preview ? now have help for the remaining form (name + upload types). Rights / source is not a submit field. Art upload is not SVG-only: SMARTbackgrounds accept SVG, JPEG, PNG, and WebP; SMARTstencils stay SVG. Server sanitizeSmartVisualUpload matches the client types.",
       howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js and floqr-i18n-help.js ?v=s3.3.064. Sign in as Master Admin. 2) Open Create / Edit. Tap the heading ? — Create / Edit SMARTvisuals help (name required; SMARTbackgrounds SVG/JPEG/PNG/WebP; stencils SVG), not an empty popout. There is no Rights / source field. 3) Control label is Art upload, not SVG upload. File picker accept includes jpeg/png/webp. Pick a .webp or .jpg SMARTbackground — must not show File rejected: not-svg. Pick SVG with <script> — rejected. SMARTstencil + JPEG — stencil-requires-svg. 4) Open Library → Milan. The preview ? has the same Create/Edit help. 5) Functions deploy needed for a real draft persist. Mark Succeed/Failed.",
       expected:"Create/Edit and Milan ? show help. Rights / source is gone. JPEG, PNG, and WebP SMARTbackgrounds are not rejected as not-svg. Stencils stay SVG. Display URLs have no ?v=.",
-      troubleshoot:"Empty ? → cached master-admin.html / botdee-help-repository.js / floqr-i18n-help.js. JPEG still not-svg → client still file.text()+SVG sniff, or Functions still sanitizeSvg only (needs [firebase-deploy] [firebase-deploy-smartvisuals]). WebP works locally but callable denies → Functions not this SHA. Stencil JPEG accepted → stop; stencil-requires-svg must fire. Rights / source still on the form → this SHA not served."
+      troubleshoot:"Empty ? → cached master-admin.html / botdee-help-repository.js / floqr-i18n-help.js. JPEG still not-svg → client still file.text()+SVG sniff, or Functions still sanitizeSvg only (needs [firebase-deploy] [firebase-deploy-smartvisuals]). WebP works locally but callable denies → Functions not this SHA. Stencil JPEG accepted → stop; stencil-requires-svg must fire. Rights / source still on the form → this SHA not served. 'Entity Management requires a valid SOS2FA session' after Save → live Studio still calls FLOQRSOS2FA.sessionId() (needs s3.3.065). Unlock SOS2FA on Studio, then Save."
+    },
+    {
+      id:"s3-3-065-smartvisuals-studio-sos2fa",
+      area:"Master Admin",
+      feature:"SMARTvisual Studio SOS2FA session on Save",
+      changed:"Milan.webp was not rejected. Live Studio called FLOQRSOS2FA.sessionId() which does not exist, so publishSmartVisualDraft sent an empty sos2faSessionId and Functions returned permission-denied 'Entity Management requires a valid SOS2FA session.' Studio now uses getSessionId('entityManagement'), refreshes the ID token, and passes sos2faSessionId on publishSmartVisualDraft / classifySmartVisual. A valid session is reused — no new code request.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js, sos2fa.js, and master-admin-app.js ?v=s3.3.065. 2) Sign in as Master Admin. If SOS2FA is already unlocked from Entity Management, do not Request SOS2FA Code again — Studio must reuse that session. 3) Create / Edit: Name Milan, type SMARTbackground, Art upload Milan.webp. Submit. Reason prompt. Save. Status should be Draft queued for review, not 'Entity Management requires a valid SOS2FA session.' 4) Mark Succeed/Failed.",
+      expected:"WebP SMARTbackground saves to smartVisualDrafts after SOS2FA unlock + reason. Empty session never reaches the reason prompt. Display URLs have no ?v=.",
+      troubleshoot:"Same SOS2FA sentence after Save → cached smartvisuals-studio.js still has sessionId()?. Unlock first. Session expired (different sentence: 'SOS2FA session expired') → Request a new SOS2FA code. File rejected → not this bug; check type SMARTbackground and RIFF/WEBP magic. No Functions redeploy needed for this client fix."
     },
     {
       id:"s3-3-063-place-smartview-compact",

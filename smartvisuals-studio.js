@@ -36,6 +36,46 @@
     return document.getElementById(id);
   }
 
+  const SOS_SCOPE = "entityManagement";
+
+  function sosSessionId() {
+    return String(root.FLOQRSOS2FA?.getSessionId?.(SOS_SCOPE) || "");
+  }
+
+  function needSos2fa(status) {
+    if (sosSessionId()) return false;
+    try { root.FLOQRSOS2FA?.requireUnlock?.(SOS_SCOPE); } catch (_) {}
+    if (status) {
+      status.textContent = t(
+        "sv.studioNeedSos2fa",
+        "Entity Management requires a valid SOS2FA session. Request a new SOS2FA code."
+      );
+    }
+    return true;
+  }
+
+  async function refreshAuthToken() {
+    const user = root.firebase?.auth?.()?.currentUser;
+    if (user?.getIdToken) await user.getIdToken(true);
+  }
+
+  async function studioCallable(name, data) {
+    const sos2faSessionId = sosSessionId();
+    if (!sos2faSessionId) {
+      const err = new Error(t(
+        "sv.studioNeedSos2fa",
+        "Entity Management requires a valid SOS2FA session. Request a new SOS2FA code."
+      ));
+      err.code = "sos2fa-missing";
+      throw err;
+    }
+    await refreshAuthToken();
+    return firebase.app().functions("us-central1").httpsCallable(name)({
+      ...data,
+      sos2faSessionId
+    });
+  }
+
   function assets() {
     return (catalog && catalog.assets) || [];
   }
@@ -175,6 +215,7 @@
       if (status) status.textContent = t("sv.studioNeedReason", "Reason prompt module missing — nothing was saved.");
       return;
     }
+    if (needSos2fa(status)) return;
     const kind = byId("svStudioPlaceKind")?.value || "venue";
     const reason = await reasonPrompt.ask({
       summary: t("sv.studioPlaceSummary", "SMARTvisuals: set Place SMARTview background"),
@@ -185,18 +226,14 @@
       return;
     }
     try {
-      const callable = firebase.app().functions("us-central1").httpsCallable("setSmartVisualOverride");
-      const sos = root.FLOQRSOS2FA?.sessionId?.();
       const stencilId = asset.pairedStencilId
         ? (String(asset.pairedStencilId).startsWith("st-") ? asset.pairedStencilId : `st-${asset.pairedStencilId}`)
         : "st-location";
-      const result = await callable({
+      const result = await studioCallable("setSmartVisualOverride", {
         roomKey: `placeSmartView:${kind}`,
         backgroundId: asset.id,
         stencilId,
-        reason,
-        sos2faSessionId: sos,
-        clientKind: "agent"
+        reason
       });
       if (status) status.textContent = t("sv.placeBgSaved", "Place SMARTview background saved.")
         + ` (${result.data?.backgroundId || asset.id})`;
@@ -319,6 +356,7 @@
         if (status) status.textContent = t("sv.studioNeedReason", "Reason prompt module missing — nothing was saved.");
         return;
       }
+      if (needSos2fa(status)) return;
       const reason = await reasonPrompt.ask({
         summary: t("sv.studioPublishSummary", "SMARTvisuals: submit draft for review"),
         minLength: 8
@@ -328,23 +366,19 @@
         return;
       }
       try {
-        const callable = firebase.app().functions("us-central1").httpsCallable("publishSmartVisualDraft");
-        const sos = root.FLOQRSOS2FA?.sessionId?.();
         const payload = {
           name,
           description: byId("svStudioDesc")?.value || "",
           type: assetType,
           tags: String(byId("svStudioTags")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-          reason,
-          sos2faSessionId: sos,
-          clientKind: "agent"
+          reason
         };
         if (media.svg) payload.svg = media.svg;
         if (media.imageBase64) {
           payload.imageBase64 = media.imageBase64;
           payload.contentType = media.contentType;
         }
-        const result = await callable(payload);
+        const result = await studioCallable("publishSmartVisualDraft", payload);
         if (status) status.textContent = t("sv.studioQueued", "Draft queued for review ({id}). Not visible to patrons.").replace("{id}", result.data?.id || "");
       } catch (err) {
         if (status) status.textContent = err?.message || t("sv.studioDenied", "Publish denied.");
@@ -430,7 +464,7 @@
     });
   }
 
-  root.FLOQRSmartVisualStudio = {load, setPage};
+  root.FLOQRSmartVisualStudio = {load, setPage, studioCallable, classify: payload => studioCallable("classifySmartVisual", payload || {})};
 
   document.addEventListener("DOMContentLoaded", () => {
     if (byId("smartvisualStudio")) load().catch(err => console.warn("SMARTvisual Studio", err));
