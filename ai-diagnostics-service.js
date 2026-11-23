@@ -239,7 +239,9 @@
         {label:"Place card renderer", file:"botdee-smartview.js", includes:["function renderPlaceCard(", "botdee-sv-place", "resolvePlaceCard"]},
         {label:"Place card CSS", file:"botdee-smartview.css", includes:["--sv-place-bg", ".botdee-sv-place-chrome"]},
         {label:"Studio Place preview/assign", file:"smartvisuals-studio.js", includes:["previewPlaceCard", "placeSmartView:", "setSmartVisualOverride"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-063-place-smartview-compact"]}
+        {label:"Headless SMARTview host", file:"botdee-smartview-headless.html", includes:["data-floqr-public", "FLOQRBotDeeSmartView.mount"]},
+        {label:"Headless authorized-text cards", file:"botdee-smartview-headless.js", includes:["cardsFromAuthorizedText", "Robotaxi fleet"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-063-place-smartview-compact", "s3-3-063-headless-smartview"]}
       ]
     },
     {
@@ -3856,6 +3858,15 @@
       howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.063. Sign in with BOT DEE access. 2) Ask for Aurelia (FLOQR demo club) or clubs in Washington DC. Expect a tight card: kind + Aurelia, two-line blurb, FLOQR 4.8, Open FLOQR Public Page. Chrome icon is 28px, not a full-width empty well. Scenic art is illustration behind the copy, not black empty. 3) Master Admin → SMARTvisual Studio → pick a published SMARTbackground → Preview in Place SMARTview. Optionally Use as Place SMARTview background (SOS2FA + reason). 4) Phone ~390 and desktop ~1280. Display URLs have no ?v=. 5) Mark Succeed/Failed. Live override stamp needs Functions deploy of executeBotSession / attachVenueSearch.",
       expected:"Compact Place card with SMARTbackground. No giant empty media well. Studio can preview and assign the background. Features SMARTview catalog page is unchanged.",
       troubleshoot:"Still a tall empty well → cached botdee-smartview.css / .js before renderPlaceCard, or Master Admin mock catalog still serving chrome JPG images (needs this SHA). Black with no illustration → catalog.json not loaded (ensureCatalog) or Functions not stamping smartBackgroundId and city classify missed. Studio assign saved but chat unchanged → Functions deploy pending; packaged city/kind defaults still apply on Pages. Assigned Features SMARTview by mistake → wrong surface (features-smartview.html)."
+    },
+    {
+      id:"s3-3-063-headless-smartview",
+      area:"BOT DEE",
+      feature:"Headless SMARTview from authorized text",
+      changed:"Public botdee-smartview-headless.html turns authorized text into compact Place/info SMARTview cards (fixed template, SMARTbackground, no photo well). Query ?mode=headless&q=… needs no Search sign-in. Not Features catalog. Gemini off.",
+      howToTest:"1) After Pages publish, open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=headless&q=SPAAVS%20should%20budget%20for%20becoming%20an%20approved%20Mobility%20Hub%20infrastructure%20and%20integration%20partner%2C%20rather%20than%20assume%20it%20must%20manufacture%20autonomous%20docking%20equipment%20or%20operate%20its%20own%20Robotaxi%20fleet. Hard-refresh until botdee-smartview-headless.js?v=s3.3.063. No sign-in. 2) Expect four compact cards: Product SPAAVS, Travel Mobility Hub, Product Autonomous docking equipment, Vehicle Robotaxi fleet. 28px chrome, two-line blurbs, scenic SMARTbackground, no photo well, no ratings invented. 3) Open ?mode=interactive, tap Load SPAAVS sample, Render SMARTview — same cards. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html for this test.",
+      expected:"Four compact SMARTview cards from the SPAAVS sentence. Sign-in not required. Robotaxi and SPAAVS untranslated. Display URLs unchanged (this host is not an LED board).",
+      troubleshoot:"404 → Pages still on a SHA before botdee-smartview-headless.html (needs this PR on origin/main). Empty host → cached page without the module, or q= missing. Tall photo well → cached botdee-smartview.css before compact Place template. Cards on Search / Features catalog → wrong URL."
     },
     {
       id:"s3-3-040-people-alias-match",
