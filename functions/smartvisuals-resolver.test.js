@@ -8,7 +8,7 @@ const path = require("path");
 const root = path.resolve(__dirname, "..");
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const resolver = require("./smartvisuals-resolver");
-const {sanitizeSvg} = require("./smartvisuals-svg-sanitize");
+const {sanitizeSvg, sanitizeRaster, sanitizeSmartVisualUpload} = require("./smartvisuals-svg-sanitize");
 const catalog = require("./smartvisuals/catalog.json");
 const registry = require("./smartvisuals/registry.json");
 
@@ -169,10 +169,14 @@ test("Search, BOT DEE, and Master Admin Studio are wired", () => {
 test("T09 publish path requires SOS2FA helper and sanitizer (no client write)", () => {
   const src = read("functions/smartvisuals-functions.js");
   assert.match(src, /assertAdmin\(request, "smartvisual\.publish"\)/);
-  assert.match(src, /sanitizeSvg/);
+  assert.match(src, /sanitizeSmartVisualUpload/);
   assert.match(src, /REASON_MIN = 8/);
   assert.match(src, /svgXml/);
   assert.match(src, /svgChecksumSha256/);
+  assert.match(src, /imageBase64/);
+  assert.match(src, /imageChecksumSha256/);
+  assert.match(src, /Name is required/);
+  assert.doesNotMatch(src, /Rights \/ source is required/);
   assert.match(read("firestore.rules"), /match \/smartVisualDrafts\/\{id\}/);
   assert.match(read("firestore.rules"), /allow write: if false/);
 });
@@ -183,6 +187,35 @@ test("sanitizeSvg returns the sanitized SVG text so drafts can persist it", () =
   assert.equal(out.ok, true);
   assert.equal(out.svg, xml);
   assert.ok(out.bytes > 0);
+});
+
+test("SMARTbackground raster JPEG/PNG/WebP is accepted; stencils stay SVG", () => {
+  const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01]);
+  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d]);
+  const webp = Buffer.concat([
+    Buffer.from("RIFF"),
+    Buffer.from([12, 0, 0, 0]),
+    Buffer.from("WEBP"),
+    Buffer.from("xxxx")
+  ]);
+  assert.equal(sanitizeRaster(jpeg).contentType, "image/jpeg");
+  assert.equal(sanitizeRaster(png).contentType, "image/png");
+  assert.equal(sanitizeRaster(webp).contentType, "image/webp");
+  assert.equal(sanitizeRaster(Buffer.from("<svg></svg>")).reason, "unsupported-type");
+  assert.equal(sanitizeSmartVisualUpload({imageBase64: jpeg.toString("base64")}, {assetType: "background"}).ok, true);
+  assert.equal(sanitizeSmartVisualUpload({imageBase64: jpeg.toString("base64")}, {assetType: "stencil"}).reason, "stencil-requires-svg");
+  assert.equal(sanitizeSmartVisualUpload({svg: "<div>not svg</div>"}, {assetType: "background"}).reason, "not-svg");
+  const html = read("master-admin.html");
+  assert.match(html, /accept="image\/svg\+xml,image\/jpeg,image\/png,image\/webp/);
+  assert.match(html, /data-i18n="sv.studioUploadLabel"/);
+  assert.match(html, /data-floqr-help-id="help-smartvisuals-create"/);
+  assert.doesNotMatch(html, /data-floqr-help-id="help-smartvisuals-rights"/);
+  assert.doesNotMatch(html, /id="svStudioLicense"/);
+  assert.doesNotMatch(read("functions/smartvisuals-functions.js"), /Rights \/ source is required/);
+  assert.match(read("smartvisuals-studio.js"), /readUpload/);
+  assert.match(read("smartvisuals-studio.js"), /imageBase64/);
+  assert.doesNotMatch(read("smartvisuals-studio.js"), /SVG rejected:/);
+  assert.doesNotMatch(read("smartvisuals-studio.js"), /svStudioLicense/);
 });
 
 test("BOT DEE loads visual catalog without a Search notification host", () => {

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.063";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.063";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.064";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.064";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.064",
+      title: "s3.3.064 — SMARTvisual Studio Create/Edit JPEG/PNG/WebP backgrounds",
+      checks: [
+        {label:"Create/Edit help + Art upload", file:"master-admin.html", includes:["help-smartvisuals-create", "sv.studioUploadLabel", "image/jpeg,image/png,image/webp"]},
+        {label:"Studio readUpload raster path", file:"smartvisuals-studio.js", includes:["function readUpload", "imageBase64", "stencil-requires-svg"]},
+        {label:"Server media sanitizer", file:"functions/smartvisuals-svg-sanitize.js", includes:["sanitizeSmartVisualUpload", "image/webp", "stencil-requires-svg"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-064-smartvisuals-studio-upload"]}
+      ]
+    },
     {
       version: "s3.3.063",
       title: "s3.3.063 — Compact Place SMARTview + Studio SMARTbackground",
@@ -3824,10 +3834,19 @@
       id:"s3-3-038-smartvisuals-studio",
       area:"Master Admin",
       feature:"SMARTvisual Studio",
-      changed:"Master Admin → SMARTvisual Studio lists 26 stencils + 34 backgrounds, tagging examples (Cancun / Paris Fashion Week / dining / Seattle LA / San Dego / Burningman), SVG sanitizer + SOS2FA + reason on draft submit. Ads tab previews mock fill from authorized tags; AdSense not loaded. Drafts never appear on Search.",
-      howToTest:"1) Sign in as Master Admin. Open https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio. 2) Library shows published kit art as images. Search/filter works. 3) Tagging & Resolver: Cancun Trip → travel/flight + Fly to Cancun ad; Paris Fashion Week → fashion; Dinner reservations → dining; Seattle LA → collision/neutral generic ad; San Dego → San Diego; Burningman → burning-man without official affiliation. 4) Create: upload an SVG with <script> — rejected. Valid SVG + name + license → reason prompt; without SOS2FA, Functions deny and the git registry is unchanged. 5) Ads tab shows mockFill true, AdSense off, and sample banners. 6) Preview in Search SMARTnotification opens ?smartvisualInvite=cancun. 7) Mark Succeed/Failed. Studio draft persist needs Functions deploy.",
+      changed:"Master Admin → SMARTvisual Studio lists 26 stencils + 34 backgrounds, tagging examples (Cancun / Paris Fashion Week / dining / Seattle LA / San Dego / Burningman), media sanitizer + SOS2FA + reason on draft submit. Ads tab previews mock fill from authorized tags; AdSense not loaded. Drafts never appear on Search.",
+      howToTest:"1) Sign in as Master Admin. Open https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio. 2) Library shows published kit art as images. Search/filter works. 3) Tagging & Resolver: Cancun Trip → travel/flight + Fly to Cancun ad; Paris Fashion Week → fashion; Dinner reservations → dining; Seattle LA → collision/neutral generic ad; San Dego → San Diego; Burningman → burning-man without official affiliation. 4) Create: upload an SVG with <script> — rejected. Valid SVG + name → reason prompt; without SOS2FA, Functions deny and the git registry is unchanged. 5) Ads tab shows mockFill true, AdSense off, and sample banners. 6) Preview in Search SMARTnotification opens ?smartvisualInvite=cancun. 7) Mark Succeed/Failed. Studio draft persist needs Functions deploy.",
       expected:"Studio is Master Admin only. Patrons only see published registry assets. Malicious SVG never publishes. Ads are labeled mock samples, not AdSense.",
       troubleshoot:"Empty library → smartvisuals/catalog.json missing on the served origin. Submit succeeded without SOS2FA → stop; publishSmartVisualDraft must assertAdmin. Script SVG accepted → sanitizer not wired. Search overlay missing after Preview → index.html host or smartvisuals-view.js cache. Blank Ad chrome → selectAd not wired."
+    },
+    {
+      id:"s3-3-064-smartvisuals-studio-upload",
+      area:"Master Admin",
+      feature:"SMARTvisual Studio Create/Edit — JPEG/PNG/WebP",
+      changed:"Create/Edit and Milan preview ? now have help for the remaining form (name + upload types). Rights / source is not a submit field. Art upload is not SVG-only: SMARTbackgrounds accept SVG, JPEG, PNG, and WebP; SMARTstencils stay SVG. Server sanitizeSmartVisualUpload matches the client types.",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js and floqr-i18n-help.js ?v=s3.3.064. Sign in as Master Admin. 2) Open Create / Edit. Tap the heading ? — Create / Edit SMARTvisuals help (name required; SMARTbackgrounds SVG/JPEG/PNG/WebP; stencils SVG), not an empty popout. There is no Rights / source field. 3) Control label is Art upload, not SVG upload. File picker accept includes jpeg/png/webp. Pick a .webp or .jpg SMARTbackground — must not show File rejected: not-svg. Pick SVG with <script> — rejected. SMARTstencil + JPEG — stencil-requires-svg. 4) Open Library → Milan. The preview ? has the same Create/Edit help. 5) Functions deploy needed for a real draft persist. Mark Succeed/Failed.",
+      expected:"Create/Edit and Milan ? show help. Rights / source is gone. JPEG, PNG, and WebP SMARTbackgrounds are not rejected as not-svg. Stencils stay SVG. Display URLs have no ?v=.",
+      troubleshoot:"Empty ? → cached master-admin.html / botdee-help-repository.js / floqr-i18n-help.js. JPEG still not-svg → client still file.text()+SVG sniff, or Functions still sanitizeSvg only (needs [firebase-deploy] [firebase-deploy-smartvisuals]). WebP works locally but callable denies → Functions not this SHA. Stencil JPEG accepted → stop; stencil-requires-svg must fire. Rights / source still on the form → this SHA not served."
     },
     {
       id:"s3-3-063-place-smartview-compact",

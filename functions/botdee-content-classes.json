@@ -486,6 +486,9 @@
     "help-sinema-virtual-set": [
       "patron"
     ],
+    "help-smartvisuals-create": [
+      "masterAdmin"
+    ],
     "help-smartvisuals-notification": [
       "patron",
       "serviceMember",
@@ -776,6 +779,9 @@
     ],
     "help-shoutout": [
       "patron"
+    ],
+    "help-smartvisuals-create": [
+      "masterAdmin"
     ],
     "help-smartvisuals-notification": [
       "patron"

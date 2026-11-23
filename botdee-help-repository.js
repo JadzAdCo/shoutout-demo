@@ -506,8 +506,21 @@
     {
       id: "help-smartvisuals-studio",
       title: "SMARTvisual Studio",
-      body: "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Preview in Place SMARTview shows the compact club/place card. Use as Place SMARTview background writes a published SMARTbackground (SOS2FA + reason) so venue cards are not an empty black well. Drafts need license, sanitizer, SOS2FA, and a reason before review. Patrons only see published registry assets. Ads are a separate labeled slot filled with a mock sample from authorized tags; AdSense stays off.",
-      searchPhrases: ["smartvisual studio", "asset registry", "smartvisuals library", "publish stencil", "place smartview background", "venue card background"],
+      body: "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Preview in Place SMARTview shows the compact club/place card. Use as Place SMARTview background writes a published SMARTbackground (SOS2FA + reason) so venue cards are not an empty black well. Drafts need a name, sanitizer, SOS2FA, and a reason before review. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP; SMARTstencils stay SVG. Patrons only see published registry assets. Ads are a separate labeled slot filled with a mock sample from authorized tags; AdSense stays off.",
+      searchPhrases: ["smartvisual studio", "asset registry", "smartvisuals library", "publish stencil", "place smartview background", "venue card background", "jpeg png webp"],
+      links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#smartvisualStudio"
+    },
+    {
+      id: "help-smartvisuals-create",
+      title: "Create / Edit SMARTvisuals",
+      body: "Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark.",
+      searchPhrases: [
+        "create smartbackground", "edit smartvisual", "svg jpeg png webp", "milan background",
+        "submit for review", "art upload", "create / edit"
+      ],
       links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",

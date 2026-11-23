@@ -298,6 +298,10 @@
     ["clubEmployeeDesignations", "workerPhone", "ownClubAdmin", 1, "Staff member phone number"],
     ["smartVisualDrafts", "svgXml", "master", 0, "Sanitized unpublished SVG markup for Studio Review; patrons never read"],
     ["smartVisualDrafts", "svgChecksumSha256", "master", 0, "SHA-256 of the sanitized draft SVG"],
+    ["smartVisualDrafts", "imageBase64", "master", 0, "Unpublished SMARTbackground raster (JPEG/PNG/WebP) for Studio Review; patrons never read"],
+    ["smartVisualDrafts", "imageChecksumSha256", "master", 0, "SHA-256 of the unpublished raster draft"],
+    ["smartVisualDrafts", "contentType", "master", 0, "Draft media type image/svg+xml | image/jpeg | image/png | image/webp"],
+    ["smartVisualDrafts", "license", "master", 0, "Optional leftover provenance on older drafts; not required on submit; not patron PII"],
     ["featuresSmartviewApprovals", "publicCopy", "master", 0, "Reviewer-approved patron-facing feature copy; no PR bodies or secrets"],
     ["featuresSmartviewApprovals", "publicCopyReviewer", "master", 1, "Master Admin email that approved Features SMARTview copy"]
   ];

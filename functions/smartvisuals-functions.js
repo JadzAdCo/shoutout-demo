@@ -7,7 +7,7 @@ const crypto = require("crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 const resolver = require("./smartvisuals-resolver");
-const {sanitizeSvg} = require("./smartvisuals-svg-sanitize");
+const {sanitizeSmartVisualUpload} = require("./smartvisuals-svg-sanitize");
 const catalog = require("./smartvisuals/catalog.json");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -74,10 +74,9 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
   if (reason.length < REASON_MIN) deny("invalid-argument", "A reason of at least 8 characters is required.");
   const name = text(request.data?.name, 80);
   const license = text(request.data?.license, 240);
-  const svg = String(request.data?.svg || "");
+  const assetType = text(request.data?.type, 20) || "stencil";
   if (!name) deny("invalid-argument", "Name is required.");
-  if (!license) deny("invalid-argument", "License / provenance is required.");
-  const sanit = sanitizeSvg(svg);
+  const sanit = sanitizeSmartVisualUpload(request.data || {}, {assetType});
   if (!sanit.ok) {
     await db.collection(COLLECTIONS.audit).add({
       eventType: "smartvisual.upload_denied",
@@ -87,12 +86,18 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
       createdAtMs: Date.now(),
       createdAt: FieldValue.serverTimestamp()
     });
-    deny("invalid-argument", `SVG rejected (${sanit.reason}).`);
+    deny("invalid-argument", `File rejected (${sanit.reason}).`);
   }
   const id = text(request.data?.id, 80) || `draft_${Date.now()}`;
   const expectedRev = Number(request.data?.revision || 0);
-  const svgXml = String(sanit.svg || "");
-  const svgChecksumSha256 = crypto.createHash("sha256").update(svgXml, "utf8").digest("hex");
+  const isSvg = sanit.kind !== "raster";
+  const svgXml = isSvg ? String(sanit.svg || "") : "";
+  const imageBase64 = isSvg ? "" : String(sanit.imageBase64 || "");
+  const checksumInput = isSvg ? svgXml : imageBase64;
+  const checksumSha256 = crypto.createHash("sha256").update(checksumInput, "utf8").digest("hex");
+  const svgChecksumSha256 = isSvg ? checksumSha256 : "";
+  const imageChecksumSha256 = isSvg ? "" : checksumSha256;
+  const contentType = sanit.contentType || (isSvg ? "image/svg+xml" : "application/octet-stream");
   const ref = db.collection(COLLECTIONS.drafts).doc(id);
   await db.runTransaction(async tx => {
     const snap = await tx.get(ref);
@@ -100,26 +105,37 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
     if (snap.exists && current !== expectedRev) {
       deny("failed-precondition", "Revision conflict — reload and retry.");
     }
-    tx.set(ref, {
+    const row = {
       id,
       name,
       description: text(request.data?.description, 400),
-      type: text(request.data?.type, 20) || "stencil",
+      type: assetType,
       tags: Array.isArray(request.data?.tags) ? request.data.tags.map(v => text(v, 40)).slice(0, 12) : [],
-      license,
       approvalStatus: "review",
       bytes: sanit.bytes,
       svgXml,
       svgChecksumSha256,
-      contentType: "image/svg+xml",
+      imageBase64,
+      imageChecksumSha256,
+      contentType,
       revision: current + 1,
       updatedByEmail: email,
       sos2faSessionId: sessionId,
       reason,
       updatedAt: FieldValue.serverTimestamp()
-    }, {merge: true});
+    };
+    if (license) row.license = license;
+    tx.set(ref, row, {merge: true});
   });
-  return {ok: true, id, status: "review", bytes: sanit.bytes, svgChecksumSha256};
+  return {
+    ok: true,
+    id,
+    status: "review",
+    bytes: sanit.bytes,
+    contentType,
+    svgChecksumSha256: svgChecksumSha256 || undefined,
+    imageChecksumSha256: imageChecksumSha256 || undefined
+  };
 });
 
 exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
