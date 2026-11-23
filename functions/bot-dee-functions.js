@@ -2,7 +2,8 @@
    Tools: contextualSearch + VIP / ShoutOut / FloqCAST / checkout (each re-validates role).
    Durable threads: getBotDeeThread + persist under botDeeThreads/{uid}.
    Master Admin: setBotDeeSettings (idle pause) under SOS2FA.
-   s3.3.047: Mingl session invites + shared tab. */
+   s3.3.047: Mingl session invites + shared tab.
+   s3.3.063: Place SMARTview attachVenueSearch SMARTbackground stamp. */
 "use strict";
 
 const admin = require("firebase-admin");
