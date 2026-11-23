@@ -110,6 +110,8 @@ test("callables, rules, classification, and Master Admin UI are wired", () => {
   const app = read("master-admin-app.js");
   assert.match(app, /panelId === "patronAccountMerge"\) panelId = "duplicateRecords"/);
   assert.match(app, /raw === "patronAccountMerge"\) return "duplicateRecords"/);
+  assert.match(app, /closest\("#patronAccountMerge"\)\) setText\("patronAccountMergeStatus"/);
+  assert.match(app, /else if \(target\.closest\("#duplicateRecords"\)\) setText\("duplicateRecordStatus"/);
   const i18n = read("floqr-i18n.js");
   assert.match(i18n, /"master\.accountMerge\.sub": "Same mobile means the same person\. Preview, then merge into one uid\. Firebase Auth is not deleted until a Master Admin confirms\."/);
   assert.match(i18n, /"master\.accountMerge\.authKept": "Auth users stay until a Master Admin confirms a live Auth delete\."/);

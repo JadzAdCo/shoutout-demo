@@ -495,7 +495,8 @@
       if (target.closest("#appLogging")) setText("appLoggingStatus", message);
       if (target.closest("#diagnosticsFloqCast")) setText("floqcastDiagStatus", message);
       if (target.closest("#diagnosticsShoutOut")) setText("shoutoutDiagStatus", message);
-      if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
+      if (target.closest("#patronAccountMerge")) setText("patronAccountMergeStatus", message);
+      else if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling") && !skipLiveStatus) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
     }, true);
