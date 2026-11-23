@@ -52,6 +52,7 @@ test("v6 people-search intent: Who am I / Who is / generic person / unrelated", 
   assert.equal(cards.classifyPeopleSearchIntent("search for events tonight").intent, "none");
   assert.equal(cards.classifyPeopleSearchIntent("find events").intent, "none");
   assert.equal(cards.classifyPeopleSearchIntent("find my table").intent, "none");
+  assert.equal(cards.classifyPeopleSearchIntent("Sushi restaurants in Washington DC").intent, "none");
 });
 
 test("what do you know of / tell me about name lookups become People cards, not products", () => {
@@ -351,7 +352,10 @@ test("private/blocked getPeopleSmartView path returns empty views (no name leak)
 
 test("executeBotSession attaches people search before Gemini and skips mock catalog", () => {
   const src = fs.readFileSync(path.join(__dirname, "bot-dee-functions.js"), "utf8");
+  assert.match(src, /attachVenueSearch/);
+  assert.match(src, /venueAttached && venueAttached\.handled/);
   assert.match(src, /attachPeopleSearch/);
+  assert.ok(src.indexOf("attachVenueSearch") < src.indexOf("attachPeopleSearch"));
   assert.match(src, /people-smartcard/);
   assert.match(src, /!outcome\.smartViews/);
   assert.match(src, /peopleSearch: outcome\.peopleSearch/);

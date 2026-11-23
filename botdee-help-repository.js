@@ -750,6 +750,20 @@
       page: "patron-portal.html"
     },
     {
+      id: "help-botdee-place-search",
+      title: "Ask BOT DEE for FLOQR venues",
+      body: "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open their FLOQR public page. Patron photos and ShoutOut / VIP pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so.",
+      searchPhrases: [
+        "sushi restaurants", "sushi in washington dc", "restaurants in dc",
+        "clubs in washington dc", "dining search", "find a club", "japanese restaurant",
+        "bot dee venues", "bot dee restaurants"
+      ],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
       id: "help-botdee-page",
       title: "BOT DEE",
       body: "Chat with BOT DEE on the BOT DEE page in plain words: events and clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, your profile, staff schedules, or Club Admin tools. Press Enter to send a message; Shift+Enter starts a new line. Type help (like version) and BOT DEE explains itself and asks what you want help with. BOT DEE chats like a person (try How are you?) and only looks things up when you ask how to do something in FLOQR. If you are signed in, BOT DEE keeps this chat when you refresh or open another phone. After the pause timer, BOT DEE can recap where you left off — pause does not delete the chat, memories, or workflows. BOT DEE asks how it can help at the start of a conversation (and again if you come back after a pause). Mid-chat replies stay short. Answers use classification for your account. Signed-in BOT DEE uses the same public volunteered profile datapoints you can see (music, food, travel, hobbies, and the rest of Privacy datapoint sharing) — never email, phone, card numbers, or GPS. The + at the top right opens saved chats. Collapse and New chat only hide the canvas — BOT DEE still keeps that history and uses it on Send. Export or delete stays in My BOT DEE. Saved chats, memories, and approved facts live in My Profile → Feature & Orders → My BOT DEE. Tap a photo in the chat to pop it out into a separate window. Close with X or Close to see the chat again.",
