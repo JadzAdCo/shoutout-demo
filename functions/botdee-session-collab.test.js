@@ -152,6 +152,9 @@ test("collab votes persist in a room transaction; hold gate fails closed", () =>
   const session = read("functions/bot-dee-functions.js");
   assert.match(session, /Could not confirm the room vote/);
   assert.match(session, /This Room SMARTview is not open for that hold/);
+  assert.match(session, /if \(!written\?\.ok\)/);
+  assert.match(session, /const latest = await store.loadRoom\(joinedRoomId\)/);
+  assert.match(session, /canCommitSharedChoice\(latest.data\)/);
   assert.doesNotMatch(
     session,
     /room vote gate failed[\s\S]{0,120}if \(!merged\.holdId && !wantsHold/
@@ -160,4 +163,6 @@ test("collab votes persist in a room transaction; hold gate fails closed", () =>
   assert.match(smart, /function applyCollabToVipCard/);
   assert.match(smart, /wasGuest !== guest/);
   assert.match(smart, /function watchVipRoom/);
+  assert.match(smart, /liveCard.isConnected/);
+  assert.match(smart, /!card.isConnected/);
 });

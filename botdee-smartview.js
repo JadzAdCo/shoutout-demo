@@ -1968,7 +1968,9 @@
   }
 
   function applyCollabToVipCard(card, collab, roomId) {
-    if (!card || !collab) return;
+    if (!card || !collab || !card.isConnected) return;
+    const dock = vipPreviewHost();
+    if (!dock || dock.hidden || !dock.contains(card)) return;
     const guest = collab.viewerIsHost !== true;
     const view = {
       ...(card._vipView || lastVipView || {}),
@@ -2027,7 +2029,11 @@
       const fn = functionsCallable("getBotDeeRoom");
       if (!fn) return;
       const data = (await fn({roomId}))?.data || {};
-      if (data.collab) applyCollabToVipCard(card, data.collab, roomId);
+      const live = vipPreviewHost();
+      const liveCard = live?.querySelector(".botdee-sv-vip");
+      if (!liveCard || !liveCard.isConnected || live.hidden) return;
+      if ((liveCard.getAttribute("data-rs-room") || "") !== String(roomId)) return;
+      if (data.collab) applyCollabToVipCard(liveCard, data.collab, roomId);
     } catch (_) {}
   }
 

@@ -779,9 +779,9 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
             {model: "headless-draft", toolRounds: 0, smartViews: [view]}
           );
         }
-        const proposed = sessionCore.proposeSharedTransaction({
-          room: live.data,
-          actorUid: uid,
+        const written = await store.proposeSharedTransaction({
+          uid,
+          roomId: joinedRoomId,
           kind: "vip",
           snapshot: {
             venueName,
@@ -792,26 +792,29 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
             partySize: merged.partySize,
             maxCapacity: merged.maxCapacity,
             mode: "ready"
-          },
-          nowMs: Date.now()
+          }
         });
-        if (!proposed.ok) {
+        if (!written?.ok) {
           try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
           const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
-          return vipSmartOutcome(sessionCore.denialMessage(proposed.reason), lang, {
-            model: "headless-draft",
-            toolRounds: 0,
-            smartViews: [view]
-          });
+          return vipSmartOutcome(
+            sessionCore.denialMessage(written?.error || written?.reason) ||
+              "Could not confirm the room vote. Hold it stays with the host after 60% yes. Try again.",
+            lang,
+            {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+          );
         }
-        await store.proposeSharedTransaction({
-          uid,
-          roomId: joinedRoomId,
-          kind: "vip",
-          snapshot: proposed.sharedTransaction.snapshot
-        });
-        live.data.sharedTransaction = proposed.sharedTransaction;
-        const gate = sessionCore.canCommitSharedChoice(live.data);
+        const latest = await store.loadRoom(joinedRoomId);
+        if (!latest || !sessionCore.isCurrentMember(latest.data, uid) || !sessionCore.isHostActor(latest.data, uid)) {
+          try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+          const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
+          return vipSmartOutcome(
+            "This Room SMARTview is not open for that hold. Vote with the group, or leave the room first.",
+            lang,
+            {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+          );
+        }
+        const gate = sessionCore.canCommitSharedChoice(latest.data);
         if (!gate.ok) {
           try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
           const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
