@@ -231,7 +231,7 @@
       return "featuresBotDee";
     }
     if (raw === "patronAccountMerge") return "duplicateRecords";
-    if (raw === "demoWorkerMgmt") return "demoEmployees";
+    if (raw === "demoWorkerMgmt" || raw === "demoPatronAccountMerge") return "demoEmployees";
     return raw;
   }
 
@@ -320,7 +320,7 @@
       if (panelId === "featuresServices") panelId = "featuresReleaseControl";
       /* Card id, not a panel — Duplicate Records hosts Patron accounts (same mobile). */
       if (panelId === "patronAccountMerge") panelId = "duplicateRecords";
-      if (panelId === "demoWorkerMgmt") panelId = "demoEmployees";
+      if (panelId === "demoWorkerMgmt" || panelId === "demoPatronAccountMerge") panelId = "demoEmployees";
       if (!panelId || !byId(panelId)) return;
       rememberMasterDeepLink(panelId);
       document.querySelectorAll(".admin-panel-section").forEach((x) => x.classList.remove("active"));
@@ -498,8 +498,11 @@
       if (target.closest("#appLogging")) setText("appLoggingStatus", message);
       if (target.closest("#diagnosticsFloqCast")) setText("floqcastDiagStatus", message);
       if (target.closest("#diagnosticsShoutOut")) setText("shoutoutDiagStatus", message);
-      if (target.closest("#patronAccountMerge")) setText("patronAccountMergeStatus", message);
-      else if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
+      const mergeRoot = target.closest("[data-patron-account-merge]");
+      if (mergeRoot) {
+        const mergeStatus = mergeRoot.querySelector("[data-merge-status]");
+        if (mergeStatus) mergeStatus.textContent = message;
+      } else if (target.closest("#duplicateRecords")) setText("duplicateRecordStatus", message);
       if (target.closest("#aiCrawling") && !skipLiveStatus) setText("aiDiscoveryStatus", message);
       if (target.closest("#staleRecordCleanup")) setText("staleRecordCleanupStatus", message);
     }, true);

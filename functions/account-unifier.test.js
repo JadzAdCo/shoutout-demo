@@ -99,9 +99,15 @@ test("callables, rules, classification, and Master Admin UI are wired", () => {
   assert.match(dc, /patronAccountUnifier/);
   const html = read("master-admin.html");
   assert.match(html, /id="patronAccountMerge"/);
+  assert.match(html, /id="demoPatronAccountMerge"/);
+  assert.equal((html.match(/data-patron-account-merge/g) || []).length, 2);
   assert.match(html, /patron-account-merge.js/);
   const demoSection = html.slice(html.indexOf('<section id="demoEmployees"'), html.indexOf("</section>", html.indexOf('<section id="demoEmployees"')));
-  assert.doesNotMatch(demoSection, /id="patronAccountMerge"|master\.accountMerge\.lookup/);
+  assert.match(demoSection, /id="demoPatronAccountMerge"/);
+  assert.match(demoSection, /data-i18n="master\.accountMerge\.lookup"/);
+  assert.match(demoSection, /data-merge-action="preview"/);
+  assert.match(demoSection, /data-merge-action="merge"/);
+  assert.doesNotMatch(demoSection, /id="patronAccountMerge"/);
   const mergeCard = html.slice(html.indexOf('id="duplicateRecords"'), html.indexOf('id="diagnostics"'));
   assert.match(mergeCard, /id="patronAccountMerge"/);
   assert.match(mergeCard, /patron-merge-col[\s\S]*patronMergeLookupSurvivorBtn[\s\S]*patron-merge-col[\s\S]*patronMergeLookupDuplicateBtn/);
@@ -112,8 +118,9 @@ test("callables, rules, classification, and Master Admin UI are wired", () => {
   const app = read("master-admin-app.js");
   assert.match(app, /panelId === "patronAccountMerge"\) panelId = "duplicateRecords"/);
   assert.match(app, /raw === "patronAccountMerge"\) return "duplicateRecords"/);
-  assert.match(app, /closest\("#patronAccountMerge"\)\) setText\("patronAccountMergeStatus"/);
+  assert.match(app, /closest\("\[data-patron-account-merge\]"\)/);
   assert.match(app, /else if \(target\.closest\("#duplicateRecords"\)\) setText\("duplicateRecordStatus"/);
+  assert.match(read("patron-account-merge.js"), /querySelectorAll\("\[data-patron-account-merge\]"\)/);
   const i18n = read("floqr-i18n.js");
   assert.match(i18n, /"master\.accountMerge\.sub": "Same mobile means the same person\. Preview, then merge into one uid\. Firebase Auth is not deleted until a Master Admin confirms\."/);
   assert.match(i18n, /"master\.accountMerge\.authKept": "Auth users stay until a Master Admin confirms a live Auth delete\."/);

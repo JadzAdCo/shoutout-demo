@@ -1993,11 +1993,11 @@
     {
       id: "help-master-demo-signin",
       title: "Demo sign-in code",
-      body: "Master Admin → Entity Management → Demo Worker Mgmt. Use this when email codes are not arriving and you need to sign in as a demo worker (temp_role_number@floqr-demo.com). Unlock SOS2FA, find or pick the demo worker, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features & Services audit trail and listed under Recent codes issued. Real patron accounts cannot get a code here. Same-mobile patron Search is on Reports → Duplicate Records → Patron accounts (same mobile), not on this tab.",
+      body: "Master Admin → Entity Management → Demo Worker Mgmt. Use this when email codes are not arriving and you need to sign in as a demo worker (temp_role_number@floqr-demo.com). Unlock SOS2FA, find or pick the demo worker, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features & Services audit trail and listed under Recent codes issued. Real patron accounts cannot get a code here. This tab also has Patron accounts (same mobile): Find patron, Preview merge, and Merge patron accounts. Duplicate Records keeps the same merge card.",
       searchPhrases: [
         "demo employee code", "temp code", "demo sign in", "sign in as demo", "demo sign-in code", "demo sign in code",
         "demo signin", "sign in as demo account", "log in as demo account", "demo svc emp mgmt", "demo employees",
-        "demo worker mgmt", "demo worker management", "demo workers",
+        "demo worker mgmt", "demo worker management", "demo workers", "find patron", "merge patron accounts",
         "demo service member", "temp waitress", "floqr-demo", "demo account login", "test account code",
         "email code not arriving", "sendgrid not working", "demo account password"
       ],
@@ -2180,7 +2180,10 @@
       searchPhrases: [
         "merge accounts", "duplicate patron", "same phone", "MsLorna", "Lorna", "phone unifier"
       ],
-      links: [{label: "Duplicate Records", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#duplicateRecords"}],
+      links: [
+        {label: "Demo Worker Mgmt", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#demoEmployees", search: "find patron"},
+        {label: "Duplicate Records", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#duplicateRecords"}
+      ],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
       page: "master-admin.html"

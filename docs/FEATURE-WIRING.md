@@ -67,7 +67,7 @@ Resume: `@gdpr$` / `$residency$`. Rule: `.cursor/rules/gdpr-data-residency.mdc`.
 |---|---|
 | Unifier | Normalized E.164 on `phoneIndex/{p{digits}}` + `users.phoneE164`. Client `phone` remains writable; E.164 / merge fields are backend-only. |
 | Patron | Search + My Profile require mobile (`validateMobile({required:true})`). `claimPatronPhone` before `users` save. `phone_in_use` signs out and returns to `./?profileRequired=sign-in&phoneInUse=1`. Merged docs (`accountStatus: merged` / `mergedInto`) bounce to existing sign-in. Helper `floqr-account-unifier.js`. |
-| Master Admin | Duplicate Records (`master-admin.html#duplicateRecords`, alias `#patronAccountMerge`) → **Patron accounts (same mobile)** card `#patronAccountMerge` **inside** that panel only. One **Find patron** per column (keep uid / merge-away uid). This is the only same-mobile patron Search — Demo Worker Mgmt does not host it. SOS2FA + `FLOQRReasonPrompt`. Callables `lookupPatronAccounts`, `previewPatronAccountMerge`, `mergePatronAccounts`. Moves Mingl connections, beta `features` union (incl. `mingl`), Inbox `recipientUid`, BOT DEE rooms/threads, blocks. **Never deletes Firebase Auth** (`authDeleted: false`). Chrome copy is operator-neutral (Master Admin, not a named person). |
+| Master Admin | Combined on **Demo Worker Mgmt** (`#demoEmployees`, card `#demoPatronAccountMerge`) and still on Duplicate Records (`#duplicateRecords`, alias `#patronAccountMerge`) so the card does not leak onto other tabs. One **Find patron** per column plus Preview / Merge. SOS2FA + `FLOQRReasonPrompt`. Callables `lookupPatronAccounts`, `previewPatronAccountMerge`, `mergePatronAccounts`. Moves Mingl connections, beta `features` union (incl. `mingl`), Inbox `recipientUid`, BOT DEE rooms/threads, blocks. **Never deletes Firebase Auth** (`authDeleted: false`). Chrome copy is operator-neutral (Master Admin, not a named person). |
 | Audit | Chained `account.merged` on `featureServiceAuditLogs`. Unchained `account.phone_claimed` / `account.phone_denied`. Agent clients stamp `actorEmail: "agent"`. No client IP on `users` or `phoneIndex`. |
 | Rules | `phoneIndex` Functions-only. `mergedInto`, `mergedFromUids`, `accountStatus`, `linkedAuthUids`, `phoneE164`, `phoneNormalized` in `hasBackendOnlyIdentityFields`. |
 | Deploy | Functions subset tag `[firebase-deploy-accounts]` (claim/lookup/preview/merge). Pages cache-bust s3.3.068. |
@@ -84,7 +84,7 @@ Master Admin → Entity Management → **Demo Worker Mgmt**. One-time sign-in co
 | Layer | Wiring |
 |---|---|
 | Surfaces | Nav pill + panel h1 `master.demoEmployees` (“Demo Worker Mgmt”). Panel id / hash **`#demoEmployees`** (unchanged). Alias `#demoWorkerMgmt` → same panel. Redirect `demo-signin.html` → `#demoEmployees`. |
-| Lookup | **Find demo worker** (`#demoEmpSearch`) + **Generate code** — demo roster only. Not the same-mobile patron Search. |
+| Lookup | **Find demo worker** (`#demoEmpSearch`) + **Generate code**, and same-mobile **Find patron** / Preview / Merge (`#demoPatronAccountMerge`). Duplicate Records keeps `#patronAccountMerge`. |
 | Client | `master-demo-employees.js` (`FLOQRMasterDemoEmployees.mount`). SOS2FA Entity Management gate. Reason via `FLOQRReasonPrompt` after Generate. |
 | Backend | `issueDemoSignInCode`. Audit `demo.signin_code_issued`. |
 | Help | `help-master-demo-signin` (masterAdmin). BOT DEE link label Demo Worker Mgmt, hash `#demoEmployees`. |

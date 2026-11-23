@@ -347,6 +347,7 @@
     if (!db) db = firebase.firestore();
     bindUi();
     fillManualPickers();
+    root.FLOQRPatronAccountMerge?.bind?.();
     if (!unlocked()) {
       clearResult();
       return;

@@ -174,7 +174,11 @@ test("Demo Worker Mgmt is an SOS2FA-gated Entity Management subtab with help bes
   assert.match(section, />Demo Worker Mgmt</);
   assert.match(section, /data-i18n="master\.demoEmployees\.find">Find demo worker/);
   assert.match(section, /data-i18n="master\.demoEmployees\.select">Select demo worker/);
-  assert.doesNotMatch(section, /id="patronAccountMerge"|master\.accountMerge\.lookup|Find patron/);
+  assert.match(section, /id="demoPatronAccountMerge"/);
+  assert.match(section, /data-i18n="master\.accountMerge\.lookup">Find patron/);
+  assert.match(section, /data-merge-action="preview"[^>]*>Preview merge/);
+  assert.match(section, /data-merge-action="merge"[^>]*>Merge patron accounts/);
+  assert.doesNotMatch(section, /id="patronAccountMerge"/);
   assert.doesNotMatch(section, />Search demo employees</);
   for (const id of ["demoEmpSearch", "demoEmpSelect", "demoEmpList", "demoEmpGenerateSelectedBtn", "demoEmpRole", "demoEmpNumber", "demoEmpManualGenerateBtn", "demoEmpCode", "demoEmpCountdown", "demoEmpCopyCodeBtn", "demoEmpRecent"]) {
     assert.match(section, new RegExp(`id="${id}"`), id);
@@ -191,8 +195,8 @@ test("Demo Worker Mgmt is an SOS2FA-gated Entity Management subtab with help bes
   }
   assert.match(read("master-admin-app.js"), /panelId === "demoEmployees"\) \{\s*window\.FLOQRMasterDemoEmployees\?\.mount\?\.\(\);/);
   const app = read("master-admin-app.js");
-  assert.match(app, /raw === "demoWorkerMgmt"\) return "demoEmployees"/);
-  assert.match(app, /panelId === "demoWorkerMgmt"\) panelId = "demoEmployees"/);
+  assert.match(app, /raw === "demoWorkerMgmt" \|\| raw === "demoPatronAccountMerge"\) return "demoEmployees"/);
+  assert.match(app, /panelId === "demoWorkerMgmt" \|\| panelId === "demoPatronAccountMerge"\) panelId = "demoEmployees"/);
   assert.match(app, /demoEmployees: "Demo Worker Mgmt"/);
 });
 
@@ -262,6 +266,9 @@ test("BOT DEE help entry is Master Admin only and classified", () => {
   assert.match(entry.links[0].href, /master-admin\.html\?.*#demoEmployees$/);
   assert.match(entry.body, /Demo Worker Mgmt/);
   assert.match(entry.body, /Patron accounts \(same mobile\)/);
+  assert.match(entry.body, /Find patron/);
+  assert.match(entry.body, /Preview merge/);
+  assert.match(entry.body, /Merge patron accounts/);
   assert.doesNotMatch(entry.body, /Demo Svc \/ Emp Mgmt/);
   assert.doesNotMatch(entry.body, /sha256|challenge|EMAIL_OTP_PEPPER|design note/i);
   const classes = JSON.parse(read("functions/botdee-content-classes.json"));

@@ -2164,15 +2164,15 @@
         "demo worker mgmt",
         "demo worker management",
         "demo workers",
+        "find patron",
+        "merge patron accounts",
         "demo service member",
         "temp waitress",
         "floqr-demo",
         "demo account login",
         "test account code",
         "email code not arriving",
-        "sendgrid not working",
-        "demo account password",
-        "help-master-demo-signin"
+        "sendgrid not working"
       ]
     },
     {
@@ -2424,7 +2424,7 @@
       "kind": "help",
       "label": "Patron account merge",
       "blurb": "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted unti",
-      "href": "./master-admin.html?from=botdee#duplicateRecords",
+      "href": "./master-admin.html?from=botdee#demoEmployees",
       "phrases": [
         "patron account merge",
         "mslorna and another lorna gmail can be the same person with two auth uids. master admin looks up both accounts previews then merges firestore into one surviving",
@@ -2434,6 +2434,7 @@
         "mslorna",
         "lorna",
         "phone unifier",
+        "demo worker mgmt",
         "duplicate records",
         "help-patron-account-merge"
       ]
