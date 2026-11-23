@@ -971,6 +971,26 @@
       page: "botdee.html#botDeeChatPage"
     },
     {
+      id: "help-botdee-room-collab",
+      title: "Share a headless booking in Room SMARTview",
+      body: "When you are in a Room SMARTview, the host's VIP reserV or ShoutOut picks appear for everyone in the session. Members vote Yes or No. Hold it and pay stay with the host — joining and voting are not a payment. BOT DEE never takes card numbers. Stripe still opens in a pop-out.",
+      searchPhrases: ["vote the table", "share vip reserv", "vote host pick", "headless booking vote", "shared picks room smartview"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-room-elect-host",
+      title: "Elect a Room SMARTview host",
+      body: "Anyone in the session can be host. Nominate yourself or another joined member. A candidate becomes host at 60 percent of currently joined members (rounded up). If the host leaves, remaining members elect a new host — the room stays open. Kick and End stay with the elected host.",
+      searchPhrases: ["make me host", "elect host", "vote for host", "60 percent host", "change room host"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
       id: "help-botdee-smartview",
       title: "View my SMARTview",
       body: "View my SMARTview shows your People card from public-within-FLOQR fields, using the same Profile Media as your FLOQR public page — not venue or restaurant mocks. Edit my SMARTsummary changes the text in your default profile language. Save translates it to every other FLOQR language, including English. Master Admin → Features → BOT DEE → SMARTviews is where labeled mock venue and restaurant cards live. There is no live Places or Yelp.",

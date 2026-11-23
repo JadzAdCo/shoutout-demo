@@ -294,6 +294,10 @@ jobs:
               closeBotDeeRoomTab \
               postBotDeeRoomTurn \
               revokeBotDeeRoomInvite \
+              proposeBotDeeRoomTransaction \
+              voteBotDeeRoomTransaction \
+              nominateBotDeeRoomHost \
+              voteBotDeeRoomHost \
               createFloqrCheckoutSession
             echo "BOT DEE hasUsedBotDee persist + six-phase + later-fill slot + Mingl session invites deploy tagged"
           fi
@@ -372,6 +376,10 @@ jobs:
               closeBotDeeRoomTab \
               postBotDeeRoomTurn \
               revokeBotDeeRoomInvite \
+              proposeBotDeeRoomTransaction \
+              voteBotDeeRoomTransaction \
+              nominateBotDeeRoomHost \
+              voteBotDeeRoomHost \
               createFloqrCheckoutSession
             do
               if ! printf '%s\n' "${FNS[@]}" | grep -qx "$f"; then

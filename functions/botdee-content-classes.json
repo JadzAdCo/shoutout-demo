@@ -103,6 +103,18 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-room-collab": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "help-botdee-room-elect-host": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-room-smartview": [
       "masterAdmin",
       "patron",
@@ -670,6 +682,12 @@
       "patron"
     ],
     "help-botdee-place-search": [
+      "patron"
+    ],
+    "help-botdee-room-collab": [
+      "patron"
+    ],
+    "help-botdee-room-elect-host": [
       "patron"
     ],
     "help-botdee-room-smartview": [

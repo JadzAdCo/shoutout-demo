@@ -493,16 +493,36 @@ async function acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs}) 
   };
 }
 
+async function syncHostRole(roomId, prevHost, nextHost) {
+  const prev = core.text(prevHost, 80);
+  const next = core.text(nextHost, 80);
+  if (prev && prev !== next) {
+    await memberRef(roomId, prev).set({role: "guest"}, {merge: true});
+  }
+  if (next) {
+    await memberRef(roomId, next).set({role: "host"}, {merge: true});
+  }
+}
+
 async function leaveRoom({uid, roomId, actorEmail, actorRole}) {
   const live = await loadRoom(roomId);
   if (!live) return {ok: false, error: "not_found"};
-  if (core.text(live.data.hostUid, 80) === core.text(uid, 80)) {
-    return endRoom({uid, roomId, actorEmail, actorRole, closeReason: "host_leave"});
-  }
   if (!core.isCurrentMember(live.data, uid)) return {ok: false, error: "not_member"};
-  const next = core.currentMembers(live.data).filter(id => id !== core.text(uid, 80));
-  await roomRef(live.id).set({memberUids: next, updatedAtMs: Date.now()}, {merge: true});
-  await memberRef(live.id, uid).set({leftAtMs: Date.now()}, {merge: true});
+  const exit = core.applyMemberExit(live.data, uid);
+  if (exit.end) {
+    return endRoom({uid, roomId, actorEmail, actorRole, force: true});
+  }
+  const prevHost = core.text(live.data.hostUid, 80);
+  const patch = {
+    memberUids: exit.memberUids,
+    hostUid: exit.hostUid,
+    hostBallot: exit.hostBallot,
+    updatedAtMs: Date.now()
+  };
+  if (exit.sharedTransaction) patch.sharedTransaction = exit.sharedTransaction;
+  await roomRef(live.id).set(patch, {merge: true});
+  await memberRef(live.id, uid).set({leftAtMs: Date.now(), role: "guest"}, {merge: true});
+  if (exit.hostChanged) await syncHostRole(live.id, prevHost, exit.hostUid);
   await writeAudit({
     eventType: "botdee.room_left",
     actorUid: uid,
@@ -511,18 +531,29 @@ async function leaveRoom({uid, roomId, actorEmail, actorRole}) {
     targetId: live.id,
     reason: "leave"
   });
-  return {ok: true, left: true, room: core.publicRoom(live.id, {...live.data, memberUids: next})};
+  return {
+    ok: true,
+    left: true,
+    hostChanged: !!exit.hostChanged,
+    room: core.publicRoom(live.id, {...live.data, ...patch}, {viewerUid: uid})
+  };
 }
 
 async function kickMember({hostUid, roomId, targetUid, actorEmail, actorRole}) {
   const live = await loadRoom(roomId);
   if (!live) return {ok: false, error: "not_found"};
-  if (core.text(live.data.hostUid, 80) !== core.text(hostUid, 80)) return {ok: false, error: "not_host"};
+  if (!core.isHostActor(live.data, hostUid)) return {ok: false, error: "not_host"};
   const target = core.text(targetUid, 80);
   if (!target || target === core.text(hostUid, 80)) return {ok: false, error: "not_member"};
   if (!core.isCurrentMember(live.data, target)) return {ok: false, error: "not_member"};
-  const next = core.currentMembers(live.data).filter(id => id !== target);
-  await roomRef(live.id).set({memberUids: next, updatedAtMs: Date.now()}, {merge: true});
+  const exit = core.applyMemberExit(live.data, target);
+  const patch = {
+    memberUids: exit.memberUids,
+    hostBallot: exit.hostBallot,
+    updatedAtMs: Date.now()
+  };
+  if (exit.sharedTransaction) patch.sharedTransaction = exit.sharedTransaction;
+  await roomRef(live.id).set(patch, {merge: true});
   await memberRef(live.id, target).set({leftAtMs: Date.now(), kickedAtMs: Date.now()}, {merge: true});
   try {
     const threads = require("./bot-dee-thread");
@@ -538,7 +569,12 @@ async function kickMember({hostUid, roomId, targetUid, actorEmail, actorRole}) {
     reason: "kick",
     detail: {targetUid: target}
   });
-  return {ok: true, kicked: true, targetUid: target, room: core.publicRoom(live.id, {...live.data, memberUids: next})};
+  return {
+    ok: true,
+    kicked: true,
+    targetUid: target,
+    room: core.publicRoom(live.id, {...live.data, ...patch}, {viewerUid: hostUid})
+  };
 }
 
 async function revokePendingInvites(roomId) {
@@ -578,7 +614,10 @@ async function closeRoomRow(live, {status, closeReason, actorUid, actorEmail, ac
 async function endRoom({uid, roomId, actorEmail, actorRole, force, closeReason}) {
   const live = await loadRoom(roomId);
   if (!live) return {ok: false, error: "not_found"};
-  if (core.text(live.data.hostUid, 80) !== core.text(uid, 80)) return {ok: false, error: "not_host"};
+  const actor = core.text(uid, 80);
+  const members = core.currentMembers(live.data);
+  const lastMember = members.length <= 1 && core.isCurrentMember(live.data, actor);
+  if (!core.isHostActor(live.data, actor) && !force && !lastMember) return {ok: false, error: "not_host"};
   const tabSnap = await tabRef(live.id).get();
   if (tabSnap.exists && !force) {
     const lineSnap = await tabRef(live.id).collection("lines").limit(40).get();
@@ -1107,11 +1146,146 @@ async function rsvpRoom({uid, roomId, token, rsvp, actorEmail, actorRole, nowMs}
 
 async function setGuestCanInvite({hostUid, roomId, targetUid, canInvite}) {
   const live = await loadRoom(roomId);
-  if (!live || core.text(live.data.hostUid, 80) !== core.text(hostUid, 80)) {
+  if (!live || !core.isHostActor(live.data, hostUid)) {
     return {ok: false, error: "not_host"};
   }
   await memberRef(live.id, targetUid).set({canInvite: canInvite !== false}, {merge: true});
   return {ok: true};
+}
+
+async function proposeSharedTransaction({uid, roomId, kind, snapshot, actorEmail, actorRole}) {
+  const live = await loadRoom(roomId);
+  if (!live) return {ok: false, error: "not_found"};
+  const result = core.proposeSharedTransaction({
+    room: live.data,
+    actorUid: uid,
+    kind,
+    snapshot,
+    nowMs: Date.now()
+  });
+  if (!result.ok) return {ok: false, error: result.reason};
+  await roomRef(live.id).set({
+    sharedTransaction: result.sharedTransaction,
+    updatedAtMs: Date.now()
+  }, {merge: true});
+  await writeAudit({
+    eventType: "botdee.choice_proposed",
+    actorUid: uid,
+    actorEmail,
+    actorRole,
+    targetId: live.id,
+    reason: "propose",
+    detail: {kind: result.sharedTransaction.kind, choiceId: result.sharedTransaction.choiceId}
+  });
+  const next = {...live.data, sharedTransaction: result.sharedTransaction};
+  return {
+    ok: true,
+    room: core.publicRoom(live.id, next, {viewerUid: uid}),
+    collab: core.publicCollab(next, uid)
+  };
+}
+
+async function voteSharedTransaction({uid, roomId, ballot, choiceId, actorEmail, actorRole}) {
+  const live = await loadRoom(roomId);
+  if (!live) return {ok: false, error: "not_found"};
+  const result = core.voteSharedTransaction({
+    room: live.data,
+    actorUid: uid,
+    ballot,
+    choiceId
+  });
+  if (!result.ok) return {ok: false, error: result.reason};
+  await roomRef(live.id).set({
+    sharedTransaction: result.sharedTransaction,
+    updatedAtMs: Date.now()
+  }, {merge: true});
+  await writeAudit({
+    eventType: "botdee.choice_voted",
+    actorUid: uid,
+    actorEmail,
+    actorRole,
+    targetId: live.id,
+    reason: result.tally.passed ? "passed" : "vote",
+    detail: {choiceId: result.sharedTransaction.choiceId, ballot: core.text(ballot, 8), yes: result.tally.yes}
+  });
+  const next = {...live.data, sharedTransaction: result.sharedTransaction};
+  return {
+    ok: true,
+    tally: result.tally,
+    room: core.publicRoom(live.id, next, {viewerUid: uid}),
+    collab: core.publicCollab(next, uid)
+  };
+}
+
+async function nominateHost({uid, roomId, candidateUid, actorEmail, actorRole}) {
+  const live = await loadRoom(roomId);
+  if (!live) return {ok: false, error: "not_found"};
+  const prevHost = core.text(live.data.hostUid, 80);
+  const result = core.nominateHost({
+    room: live.data,
+    actorUid: uid,
+    candidateUid,
+    nowMs: Date.now()
+  });
+  if (!result.ok) return {ok: false, error: result.reason};
+  await roomRef(live.id).set({
+    hostUid: result.hostUid,
+    hostBallot: result.hostBallot,
+    updatedAtMs: Date.now()
+  }, {merge: true});
+  if (result.elected) await syncHostRole(live.id, prevHost, result.hostUid);
+  await writeAudit({
+    eventType: result.elected ? "botdee.host_elected" : "botdee.host_nominated",
+    actorUid: uid,
+    actorEmail,
+    actorRole,
+    targetId: live.id,
+    reason: result.elected ? "elected" : "nominate",
+    detail: {candidateUid: core.text(candidateUid || uid, 80), yes: result.tally.yes, needed: result.tally.needed}
+  });
+  const next = {...live.data, hostUid: result.hostUid, hostBallot: result.hostBallot};
+  return {
+    ok: true,
+    elected: result.elected,
+    tally: result.tally,
+    room: core.publicRoom(live.id, next, {viewerUid: uid}),
+    collab: core.publicCollab(next, uid)
+  };
+}
+
+async function voteHost({uid, roomId, ballot, actorEmail, actorRole}) {
+  const live = await loadRoom(roomId);
+  if (!live) return {ok: false, error: "not_found"};
+  const prevHost = core.text(live.data.hostUid, 80);
+  const result = core.voteHost({
+    room: live.data,
+    actorUid: uid,
+    ballot
+  });
+  if (!result.ok) return {ok: false, error: result.reason};
+  await roomRef(live.id).set({
+    hostUid: result.hostUid,
+    hostBallot: result.hostBallot,
+    updatedAtMs: Date.now()
+  }, {merge: true});
+  if (result.elected) await syncHostRole(live.id, prevHost, result.hostUid);
+  await writeAudit({
+    eventType: result.elected ? "botdee.host_elected" : "botdee.host_voted",
+    actorUid: uid,
+    actorEmail,
+    actorRole,
+    targetId: live.id,
+    reason: result.elected ? "elected" : "vote",
+    detail: {candidateUid: core.text(live.data.hostBallot?.candidateUid, 80), yes: result.tally.yes}
+  });
+  const next = {...live.data, hostUid: result.hostUid, hostBallot: result.hostBallot};
+  return {
+    ok: true,
+    elected: result.elected,
+    tally: result.tally,
+    room: core.publicRoom(live.id, next, {viewerUid: uid}),
+    collab: core.publicCollab(next, uid)
+  };
 }
 
 module.exports = {
@@ -1156,5 +1330,10 @@ module.exports = {
   listNotifications,
   expireRooms,
   rsvpRoom,
-  setGuestCanInvite
+  setGuestCanInvite,
+  syncHostRole,
+  proposeSharedTransaction,
+  voteSharedTransaction,
+  nominateHost,
+  voteHost
 };

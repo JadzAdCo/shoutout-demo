@@ -209,6 +209,8 @@ test("BOT DEE subset deploy lists first-time session callables and tab checkout"
   assert.match(workflow, /createBotDeeRoomInvite/);
   assert.match(workflow, /acceptBotDeeRoomInvite/);
   assert.match(workflow, /kickBotDeeRoomMember/);
+  assert.match(workflow, /nominateBotDeeRoomHost/);
+  assert.match(workflow, /voteBotDeeRoomTransaction/);
   assert.match(workflow, /createFloqrCheckoutSession/);
   assert.match(workflow, /startBotDeeRoom/);
   assert.match(workflow, /scheduleBotDeeRoom/);
@@ -237,6 +239,14 @@ test("client join captures room=&t= and Inbox is not a ShoutOut CTA", () => {
   assert.match(read("functions/index.js"), /acceptBotDeeRoomInvite/);
   assert.match(read("functions/commerce-functions.js"), /botDeeRoomTab/);
   assert.match(read("functions/commerce-functions.js"), /assertFeatureAccess\(request\.auth, "mingl"/);
+});
+
+test("collab votes and host election are Functions-write", () => {
+  assert.match(read("functions/botdee-session-core.js"), /HOST_ELECTION_RATIO = 0\.6/);
+  assert.match(read("functions/botdee-session-store.js"), /proposeSharedTransaction/);
+  assert.match(read("functions/botdee-session-store.js"), /nominateHost/);
+  assert.match(read("functions/index.js"), /voteBotDeeRoomHost/);
+  assert.match(read("botdee-smartview.js"), /Make me host/);
 });
 
 test("callables re-check botDee + mingl; guests cannot end", () => {
