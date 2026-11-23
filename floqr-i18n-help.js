@@ -243,7 +243,7 @@
       },
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
-        body: "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Док показывает живой LED-шаблон (тот же предпросмотр Display 1) и обновляется при выборе шаблона, @handle или текст/фото. Ответьте в чате или нажмите чип. Фото и видео по-прежнему через compose. Настоящий headless-запрос FloqR или третьей стороны эту карточку не использует — площадка, текст и опции в одном запросе."
+        body: "Когда вы бросаете ShoutOut в чате BOT DEE, бот берёт список полей этого шаблона. Контекст чата заполняет площадку, текст shoutout, имена и номера. BOT DEE спрашивает только недостающие обязательные поля по одному — без волшебной фразы. Traditional нужны площадка и текст shoutout. Когда список готов, ShoutOut SMARTpreview готов; ответьте throw it (или skip extras). @handle на Traditional необязателен. Фото, джерси, Football Intro, Heist name-only и Baller's Alert имеют свои обязательные поля; фото-борды по-прежнему через compose. One-shot FloqR или третьей стороны по-прежнему передаёт площадку, текст вывески и опции в одном запросе."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV из чата BOT DEE",
@@ -773,7 +773,7 @@
       },
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
-        body: "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Het dock toont het echte LED-sjabloon (dezelfde Display 1-composervoorvertoning) en werkt bij als u sjabloon, @handle of tekst vs foto kiest. Antwoord in de chat of tik een chip. Foto en video blijven compose. Een echte headless throw van FloqR of een derde gebruikt deze kaart niet — venue, bericht en optionele extras in één verzoek."
+        body: "Als u in BOT DEE een ShoutOut gooit, gebruikt BOT DEE de patron-invoerlijst van dat sjabloon. Chatcontext vult venue, shoutout-tekst, namen en nummers. BOT DEE vraagt alleen ontbrekende verplichte velden, één voor één — geen toverzinnen. Traditional heeft een venue en shoutout-tekst nodig. Als de lijst compleet is, is ShoutOut SMARTpreview klaar; antwoord throw it (of skip extras). @handle is optioneel op Traditional. Foto, jersey, Football Intro, Heist name-only en Baller's Alert hebben eigen verplichte velden; fotoborden blijven compose. Een FloqR- of derde-party one-shot stuurt venue, bordtekst en optionele extras in één verzoek."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV vanuit BOT DEE-chat",
@@ -1302,8 +1302,8 @@
         body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-shoutout-headless-smartview": {
-        title: "ShoutOut SMARTpreview",
-        body: "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Le dock affiche le vrai modèle LED (la même prévisualisation composeur Display 1) et se met à jour quand vous choisissez un modèle, un @handle ou texte vs photo. Répondez dans le chat ou touchez une puce. Photo et vidéo passent par compose. Un envoi headless FloqR ou tiers n’utilise pas cette carte — envoyez lieu, message et extras optionnels en une requête."
+        title: "SMARTpreview ShoutOut",
+        body: "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE utilise la liste d'entrées patrons de ce modèle. Le contexte du chat remplit le lieu, le texte du shoutout, les noms et les numéros. BOT DEE ne demande que les champs requis manquants, un à la fois — aucune phrase magique. Traditional a besoin d'un lieu et du texte du shoutout. Quand la liste est complète, ShoutOut SMARTpreview est prêt ; répondez throw it (ou skip extras) pour envoyer. @handle est optionnel sur Traditional. Photo, jersey, Football Intro, Heist name-only et Baller's Alert ont leurs propres champs ; les boards photo passent par compose. Un envoi FloqR ou tiers en une requête envoie encore lieu, texte du panneau et extras optionnels."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV depuis le chat BOT DEE",
@@ -1833,7 +1833,7 @@
       },
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
-        body: "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Das Dock zeigt die echte LED-Vorlage (dieselbe Display-1-Composer-Vorschau) und aktualisiert sich, wenn Sie Vorlage, @handle oder Text/Foto wählen. Antworten Sie im Chat oder tippen Sie einen Chip. Foto/Video bleibt Compose. Ein echter Headless-Wurf von FloqR oder Dritten nutzt diese Karte nicht — Venue, Text und optionale Extras in einer Anfrage."
+        body: "Wenn Sie in BOT DEE einen ShoutOut werfen, nutzt BOT DEE die Patron-Eingabeliste dieser Vorlage. Chat-Kontext füllt Venue, ShoutOut-Text, Namen und Nummern. BOT DEE fragt nur fehlende Pflichtfelder, eines nach dem anderen — kein Zaubersatz. Traditional braucht Venue und ShoutOut-Text. Wenn die Liste voll ist, ist ShoutOut SMARTpreview bereit; antworten Sie throw it (oder skip extras). @handle ist bei Traditional optional. Foto, Jersey, Football Intro, Heist name-only und Baller's Alert haben eigene Pflichtfelder; Fotoboards bleiben Compose. Ein FloqR- oder Drittanbieter-One-Shot sendet Venue, Schildtext und optionale Extras in einer Anfrage."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV aus dem BOT DEE-Chat",
@@ -2362,8 +2362,8 @@
         body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-shoutout-headless-smartview": {
-        title: "ShoutOut SMARTpreview",
-        body: "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. El dock muestra la plantilla LED real (la misma vista previa de compositor de Display 1) y se actualiza al elegir plantilla, @handle o texto vs foto. Responda en el chat o toque un chip. Foto y vídeo siguen en compose. Un envío headless de FloqR o de un tercero no usa esta tarjeta: local, mensaje y extras opcionales en una petición."
+        title: "SMARTpreview de ShoutOut",
+        body: "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE usa la lista de entradas de patrón de esa plantilla. El contexto del chat rellena local, texto del shoutout, nombres y números. BOT DEE pide solo los campos requeridos que faltan, uno a uno — no hay frase mágica. Traditional necesita local y texto del shoutout. Cuando la lista está completa, ShoutOut SMARTpreview está listo; responda throw it (o skip extras). @handle es opcional en Traditional. Foto, jersey, Football Intro, Heist name-only y Baller's Alert tienen sus propios campos; los tableros con foto siguen en compose. Un envío FloqR o de un tercero en una petición sigue enviando local, texto del cartel y extras opcionales."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV desde el chat de BOT DEE",
@@ -2892,8 +2892,8 @@
         body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-shoutout-headless-smartview": {
-        title: "ShoutOut SMARTpreview",
-        body: "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Il dock mostra il vero template LED (la stessa anteprima composer di Display 1) e si aggiorna quando scegli template, @handle o testo vs foto. Rispondi in chat o tocca un chip. Foto e video restano su compose. Un throw headless FloqR o di terzi non usa questa scheda — locale, messaggio ed extra opzionali in una richiesta."
+        title: "SMARTpreview ShoutOut",
+        body: "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE usa l'elenco di input patron di quel modello. Il contesto della chat riempie venue, testo shoutout, nomi e numeri. BOT DEE chiede solo i campi obbligatori mancanti, uno alla volta — nessuna frase magica. Traditional serve venue e testo shoutout. Quando l'elenco è completo, ShoutOut SMARTpreview è pronto; rispondi throw it (o skip extras). @handle è opzionale su Traditional. Foto, jersey, Football Intro, Heist name-only e Baller's Alert hanno i propri campi; i board con foto restano su compose. Un one-shot FloqR o di terzi invia ancora venue, testo del cartello ed extra opzionali in una richiesta."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV dalla chat BOT DEE",
@@ -3422,8 +3422,8 @@
         body: "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
       },
       "help-shoutout-headless-smartview": {
-        title: "ShoutOut SMARTpreview",
-        body: "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. O dock mostra o modelo LED real (a mesma pré-visualização do compositor Display 1) e atualiza quando escolhe modelo, @handle ou texto vs foto. Responda no chat ou toque num chip. Foto e vídeo continuam no compose. Um envio headless FloqR ou de terceiros não usa este cartão — venue, mensagem e extras opcionais num pedido."
+        title: "SMARTpreview ShoutOut",
+        body: "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE usa a lista de entradas de patron desse modelo. O contexto do chat preenche venue, texto do shoutout, nomes e números. O BOT DEE pede só os campos obrigatórios em falta, um de cada vez — sem frase mágica. Traditional precisa de venue e texto do shoutout. Quando a lista está completa, o ShoutOut SMARTpreview está pronto; responda throw it (ou skip extras). @handle é opcional no Traditional. Foto, jersey, Football Intro, Heist name-only e Baller's Alert têm os seus campos; boards com foto continuam no compose. Um envio FloqR ou de terceiros ainda envia venue, texto do letreiro e extras opcionais num pedido."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV a partir do chat BOT DEE",
@@ -3953,7 +3953,7 @@
       },
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
-        body: "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Το dock δείχνει το πραγματικό LED πρότυπο (την ίδια προεπισκόπηση Display 1) και ενημερώνεται όταν επιλέγετε πρότυπο, @handle ή κείμενο/φωτογραφία. Απαντήστε στη συνομιλία ή πατήστε chip. Φωτογραφία/βίντεο μένουν στο compose. Ένα πραγματικό headless throw από FloqR ή τρίτο δεν χρησιμοποιεί αυτή την κάρτα — χώρος, μήνυμα και προαιρετικά extras σε ένα αίτημα."
+        body: "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, το BOT DEE χρησιμοποιεί τη λίστα πεδίων του προτύπου. Το πλαίσιο της συνομιλίας συμπληρώνει χώρο, κείμενο shoutout, ονόματα και αριθμούς. Το BOT DEE ρωτά μόνο τα υποχρεωτικά που λείπουν, ένα τη φορά — χωρίς μαγική φράση. Το Traditional θέλει χώρο και κείμενο shoutout. Όταν η λίστα είναι πλήρης, το ShoutOut SMARTpreview είναι έτοιμο· απαντήστε throw it (ή skip extras). Το @handle είναι προαιρετικό στο Traditional. Φωτογραφία, φανέλα, Football Intro, Heist name-only και Baller's Alert έχουν δικά τους πεδία· οι πινακίδες με φωτογραφία μένουν στο compose. Ένα one-shot FloqR ή τρίτου στέλνει χώρο, κείμενο πινακίδας και προαιρετικά extras σε ένα αίτημα."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV από τη συνομιλία BOT DEE",
@@ -4483,7 +4483,7 @@
       },
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
-        body: "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Dock pokazuje żywy szablon LED (ten sam podgląd Display 1) i odświeża się po wyborze szablonu, @handle albo tekst vs zdjęcie. Odpowiedz na czacie albo stuknij chip. Zdjęcie i wideo nadal przez compose. Prawdziwy headless z FloqR lub strony trzeciej nie używa tej karty — lokal, treść i opcjonalne dodatki w jednym żądaniu."
+        body: "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE używa listy pól patron tego szablonu. Kontekst czatu wypełnia venue, tekst shoutout, imiona i numery. BOT DEE pyta tylko o brakujące wymagane pola, po jednym — bez magicznego zdania. Traditional potrzebuje venue i tekstu shoutout. Gdy lista jest kompletna, ShoutOut SMARTpreview jest gotowy; odpowiedz throw it (albo skip extras). @handle jest opcjonalne na Traditional. Zdjęcie, jersey, Football Intro, Heist name-only i Baller's Alert mają własne pola; tablice ze zdjęciem nadal przez compose. One-shot FloqR lub strony trzeciej nadal wysyła venue, tekst tablicy i opcjonalne dodatki w jednym żądaniu."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV z czatu BOT DEE",
@@ -5013,7 +5013,7 @@
       },
       "help-shoutout-headless-smartview": {
         title: "ShoutOut SMARTpreview",
-        body: "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. يعرض الإرساء قالب LED الحي (نفس معاينة Display 1) ويتحدّث عند اختيار القالب أو @handle أو نص مقابل صورة. أجب في الدردشة أو اضغط شريحة. الصورة والفيديو ما زالا عبر compose. الرمي headless الحقيقي من FloqR أو طرف ثالث لا يستخدم هذه البطاقة — المكان والرسالة والإضافات الاختيارية في طلب واحد."
+        body: "عندما ترمي ShoutOut في دردشة BOT DEE يستخدم BOT DEE قائمة حقول ذلك القالب. سياق الدردشة يملأ المكان ونص الـ shoutout والأسماء والأرقام. يسأل BOT DEE فقط عن الحقول المطلوبة الناقصة واحداً تلو الآخر — بلا جملة سحرية. Traditional يحتاج مكاناً ونص shoutout. عندما تكتمل القائمة يكون ShoutOut SMARTpreview جاهزاً؛ أجب throw it (أو skip extras) للإرسال. @handle اختياري على Traditional. الصورة والقميص وFootball Intro وHeist name-only وBaller's Alert لها حقولها؛ لوحات الصور ما زالت عبر compose. طلب FloqR أو طرف ثالث دفعة واحدة ما زال يرسل المكان ونص اللافتة والإضافات الاختيارية في طلب واحد."
       },
       "help-botdee-headless-vip": {
         title: "VIP reserV من محادثة BOT DEE",

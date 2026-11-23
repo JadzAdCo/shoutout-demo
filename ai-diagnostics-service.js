@@ -502,6 +502,17 @@
       ]
     },
     {
+      version: "s3.3.063",
+      title: "s3.3.063 — Headless ShoutOut uses each template's patron input list",
+      checks: [
+        {label:"Template input families", file:"functions/shoutout-template-inputs.js", includes:["classicBoard", "soccerJersey", "footballIntro", "ballersAlert"]},
+        {label:"Catalog stamp", file:"shared-data.js", includes:["FLOQRTemplatePatronInputs", "patronInputs"]},
+        {label:"Fill from conversation", file:"functions/headless-shoutout-core.js", includes:["fillFromConversation", "interactiveNeeds"]},
+        {label:"BOT DEE uses history", file:"functions/bot-dee-functions.js", includes:["fillFromConversation", "conversationTurns"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-063-headless-template-inputs"]}
+      ]
+    },
+    {
       version: "s3.3.045",
       title: "s3.3.045 — ShoutOut SMARTpreview live LED template (display.html preview=1)",
       checks: [
@@ -4100,6 +4111,15 @@
       howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.css / bot-dee-chat.js ?v=s3.3.046. Sign in with BOT DEE + VIP reserV. 2) Ask Who is Don Banyong — People SMARTview details box hugs Music / Nightlife / Sports / Events and Hip hop tags; no empty bands above, between, or below those chips. 3) New chat: VIP reserV at Aurelia → Mezzanine. Expect a table list (V1–V4, AURELIA SUITE), not “section wasn’t found.” Reply V1 then hold it. I agree must not ask for card numbers. 4) Open Room SMARTview → Confirm — join link appears. Opening botdee.html?join= while signed in joins without charging. Session must not pause with “I’ll pause here for now” while the VIP dock or room card is open. 5) Throw a shoutout still works in the same chat. 6) Mark Succeed/Failed.",
       expected:"Tight People card. Headless VIP lists Mezzanine tables and can hold V1. Room Confirm mints a join link. Idle does not drop an in-progress VIP/room/shoutout. No card numbers in chat. Display URLs have no ?v=.",
       troubleshoot:"Empty chip bands remain → cached botdee-smartview.css still has 6.4em tag height. Mezzanine miss → Functions executeBotSession not this SHA (tryHeadlessVip / resolveSectionQuery missing). Idle pause mid-VIP → cached bot-dee-chat.js without hasOpenWorkflow. Confirm still “not live” → ROOMS_LIVE false or botdee-room-live not deployed. Join 404 → Firestore rules botDeeRooms not published."
+    },
+    {
+      id:"s3-3-063-headless-template-inputs",
+      area:"BOT DEE",
+      feature:"Headless ShoutOut uses each template's patron inputs",
+      changed:"s3.3.063 — BOT DEE fills ShoutOut fields from the template patron-input list (required vs optional), not a canned throw phrase. Chat context (venue, shoutout text, names, numbers) fills first; BOT DEE asks only the next missing required field. Traditional = venue + shoutout text. Jersey / Heist name-only / Football Intro / Baller's Alert / photo boards keep their own required inputs. Preview then throw it. FloqR one-shot stays a payload.",
+      howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js ?v=s3.3.063. Sign in with BOT DEE + ShoutOut. 2) In one chat say we are going to Aurelia tonight, then happy birthday Maya, then throw a shoutout — expect ShoutOut SMARTpreview ready (venue Aurelia + birthday text), NOT a request for a magic that says sentence and NOT questions for template/@handle/photo. 3) Reply throw it — pending My ShoutOuts (free Traditional). 4) Start a jersey throw with kit + name but no number — BOT DEE asks only for the number. 5) FloqR/API one-shot still defaults Traditional without the card. 6) Mark Succeed/Failed.",
+      expected:"Context fills Traditional. Ask only missing required fields. Template-specific lists (jersey number, Heist name, Football Intro photos). No canned throw phrase. Display URLs never ?v=.",
+      troubleshoot:"Still asking template/@handle after venue+text → executeBotSession not this SHA (still s3.3.044 extras). Bare throw ignores Aurelia/birthday in thread → fillFromConversation not deployed. Jersey never asks number → patronInputs not stamped / soccerJersey family missing. Photo board silently submits → required media/facePhoto/teamPhotos must stay required."
     },
     {
       id:"s3-3-045-smartpreview-live-led",

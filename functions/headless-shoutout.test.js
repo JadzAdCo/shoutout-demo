@@ -125,6 +125,88 @@ test("missing club or message is a needs list, not a checkout", () => {
   assert.ok(both.missing.includes("message"));
 });
 
+test("context fills Traditional club and shoutout text without a magic sentence", () => {
+  const filled = headless.fillFromConversation([
+    {role: "user", text: "happy birthday Maya"},
+    {role: "assistant", text: "Nice — I can throw that as a ShoutOut."},
+    {role: "user", text: "we are going to Aurelia tonight"}
+  ], "throw a shoutout");
+  assert.equal(filled.clubQuery, "temp-democlub-1");
+  assert.equal(filled.message, "happy birthday Maya");
+  const draft = headless.mergeInteractiveDraft({}, filled, {freshThrow: false});
+  assert.deepEqual(headless.interactiveNeeds(draft), []);
+  assert.equal(headless.missingAsk(headless.interactiveNeeds(draft)).includes("throw it"), true);
+});
+
+test("ask only the next missing required field", () => {
+  const missingClub = headless.mergeInteractiveDraft({}, {message: "Happy birthday Maya"});
+  assert.deepEqual(headless.interactiveNeeds(missingClub), ["club"]);
+  assert.equal(headless.missingAsk(["club", "message"]), "Which venue should this ShoutOut play on?");
+  const missingCopy = headless.mergeInteractiveDraft({}, {clubQuery: "temp-democlub-1"});
+  assert.deepEqual(headless.interactiveNeeds(missingCopy), ["message"]);
+  assert.match(headless.missingAsk(["message"]), /shoutout text|sign/i);
+  assert.doesNotMatch(headless.missingAsk(["message"]), /LED copy/i);
+});
+
+test("template-specific jersey, Heist name, and Football Intro fields", () => {
+  const jersey = headless.mergeInteractiveDraft({}, {
+    clubQuery: "heist-washington-dc",
+    templateId: "soccerJersey",
+    jerseyTeamId: "soccerMorocco",
+    jerseyName: "NYX"
+  });
+  assert.deepEqual(headless.inputsForDraft(jersey).required, ["club", "jerseyTeamId", "jerseyName", "jerseyNumber"]);
+  assert.deepEqual(headless.interactiveNeeds(jersey), ["jerseyNumber"]);
+  assert.match(headless.missingAsk(headless.interactiveNeeds(jersey)), /number/i);
+
+  const heist = headless.mergeInteractiveDraft({}, {
+    clubQuery: "heist-washington-dc",
+    templateId: "heistVaultDollars",
+    playerName: "@Maya"
+  });
+  assert.deepEqual(headless.interactiveNeeds(heist), []);
+  assert.deepEqual(headless.inputsForDraft(heist).required, ["club", "playerName"]);
+
+  const football = headless.composeShoutOutPayload({
+    clubLocationId: "temp-democlub-1",
+    venue: {locationName: "Aurelia", templates: ["zebbiesFootballTeamIntro"]},
+    message: "Go team",
+    templateId: "zebbiesFootballTeamIntro"
+  });
+  assert.equal(football.ok, false);
+  assert.ok(football.missing.includes("teamPhotos"));
+  assert.equal(football.composerOnly, true);
+
+  const parsedJersey = headless.parseShoutOutExecute(
+    "throw a jersey shoutout at Heist name NYX number 99 Morocco"
+  );
+  assert.equal(parsedJersey.templateId, "soccerJersey");
+  assert.equal(parsedJersey.jerseyTeamId, "soccerMorocco");
+  assert.equal(parsedJersey.jerseyName, "NYX");
+  assert.equal(parsedJersey.jerseyNumber, "99");
+});
+
+test("catalog patron input families match headless lists", () => {
+  const inputs = require("./shoutout-template-inputs");
+  const shared = read("shared-data.js");
+  assert.match(shared, /FLOQRTemplatePatronInputs/);
+  assert.match(shared, /patronInputs/);
+  assert.deepEqual(inputs.forTemplate({id: "blackwhite"}).required, ["club", "message"]);
+  assert.deepEqual(inputs.forTemplate({id: "soccerJersey", jerseyNameField: true}).required, [
+    "club", "jerseyTeamId", "jerseyName", "jerseyNumber"
+  ]);
+  assert.deepEqual(inputs.forTemplate({id: "ballersAlert", requiresFacePhoto: true}).required, [
+    "club", "facePhoto", "playerName"
+  ]);
+  assert.deepEqual(inputs.forTemplate({id: "zebbiesFootballTeamIntro", layout: "football-team-intro"}).required, [
+    "club", "teamPhotos"
+  ]);
+  assert.deepEqual(inputs.forTemplate({id: "heistVaultDollars", nameOnly: true}).required, ["club", "playerName"]);
+  assert.deepEqual(inputs.forTemplate({id: "birthdayMedia", supportsMedia: true}).required, [
+    "club", "message", "media"
+  ]);
+});
+
 test("startShoutOutCheckout and FloqR callable accept flat club + message", () => {
   const tools = read("functions/bot-dee-tools.js");
   assert.match(tools, /composeShoutOutPayload/);
@@ -134,7 +216,10 @@ test("startShoutOutCheckout and FloqR callable accept flat club + message", () =
   assert.doesNotMatch(tools, /tab=queue/);
   assert.match(tools, /pendingShoutout_\$\{uid\}_\$\{id\}/);
   assert.match(tools, /\.set\(note, \{merge: true\}\)/);
-  assert.match(tools, /args\?\.mainText \|\| args\?\.message/);
+  assert.match(tools, /args\?\.mainText/);
+  assert.match(tools, /args\?\.message/);
+  assert.match(tools, /args\?\.playerName/);
+  assert.match(tools, /args\?\.jerseyName/);
   assert.match(tools, /does not submit as a free board/);
   assert.match(tools, /userPrompt/);
   const adminApp = read("admin-app.js");
@@ -163,6 +248,7 @@ test("startShoutOutCheckout and FloqR callable accept flat club + message", () =
   const session = read("functions/bot-dee-functions.js");
   assert.match(session, /tryHeadlessShoutOut/);
   assert.match(session, /isShoutOutExecutePrompt\(userPrompt\)/);
+  assert.match(session, /fillFromConversation/);
 
   const pay = read("payment-service.js");
   assert.match(pay, /createHeadlessShoutOutCheckout/);

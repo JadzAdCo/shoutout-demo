@@ -284,7 +284,7 @@
     ["botDeeThreads", "chatTitles", "ownMaster", 1, "User-chosen display titles for + Chats rows keyed by minted conversationId (cv_ uuid); Functions-write; owner uid only; never sent to Gemini"],
     ["botDeeThreads", "currentConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the current slice; minted once; Functions-write"],
     ["botDeeThreads", "archiveConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the previous slice after idle rotate; Functions-write"],
-    ["botDeeThreads", "headlessShoutOutDraft", "ownMaster", 1, "In-progress BOT DEE headless ShoutOut draft (venue, message, template, handle decision, media choice); Functions-write; no IP; cleared on submit/cancel"],
+    ["botDeeThreads", "headlessShoutOutDraft", "ownMaster", 1, "In-progress BOT DEE headless ShoutOut draft (venue, shoutout text, template-required patron inputs, jersey/name/photo fields, optional handle); Functions-write; no IP; cleared on submit/cancel"],
     ["botDeeThreads", "headlessVipDraft", "ownMaster", 1, "In-progress BOT DEE headless VIP reserV draft (club, night, section, party, holdId); Functions-write; no IP; cleared on checkout/cancel"],
     ["botDeeThreads", "joinedRoomId", "ownMaster", 0, "Active Room SMARTview id for this uid; Functions-write"],
     ["botDeeThreads", "joinedRoomConversationId", "ownMaster", 0, "Conversation that owns the Room SMARTview pointer; cleared on new chat / leave / end; Functions-write"],

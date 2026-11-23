@@ -2007,6 +2007,35 @@ window.FLOQRTextLayout = {
   }
 };
 
+window.FLOQRTemplatePatronInputs = {
+  familyOf(template = {}) {
+    const t = template || {};
+    const id = String(t.id || t.templateId || "");
+    if (t.nameOnly === true || id === "heistVaultDollars" || id === "heistRedLux") return "nameOnly";
+    if (t.layout === "football-team-intro" || id === "zebbiesFootballTeamIntro") return "footballIntro";
+    if (t.requiresFacePhoto === true || t.ballerAlert === true || /^ballersAlert/i.test(id)) return "ballersAlert";
+    if (t.jerseyNameField === true || t.layout === "soccer-jersey" || t.layout === "nfl-jersey" || /^(soccer|nba|nfl)/i.test(id)) {
+      return "soccerJersey";
+    }
+    if (t.supportsMedia === true || t.supportsImage === true || t.supportsVideo === true || t.layout === "split-media") {
+      return "splitMedia";
+    }
+    return "classicBoard";
+  },
+  lists: {
+    classicBoard: {required: ["club", "message"], optional: ["handle"]},
+    splitMedia: {required: ["club", "message", "media"], optional: ["handle"]},
+    soccerJersey: {required: ["club", "jerseyTeamId", "jerseyName", "jerseyNumber"], optional: ["handle", "message"]},
+    nameOnly: {required: ["club", "playerName"], optional: ["handle"]},
+    ballersAlert: {required: ["club", "facePhoto", "playerName"], optional: ["company", "handle"]},
+    footballIntro: {required: ["club", "teamPhotos"], optional: ["message", "handle"]}
+  },
+  forTemplate(template = {}) {
+    if (template.patronInputs && Array.isArray(template.patronInputs.required)) return template.patronInputs;
+    return this.lists[this.familyOf(template)] || this.lists.classicBoard;
+  }
+};
+
 Object.entries(window.SHOUTOUT_TEMPLATES || {}).forEach(([key, template]) => {
   const normalizeModifiable = (row) => {
     if (row.IsModifiable === 0 || row.IsModifiable === false) {
@@ -2027,6 +2056,8 @@ Object.entries(window.SHOUTOUT_TEMPLATES || {}).forEach(([key, template]) => {
     return;
   }
   window.FLOQRScreenDatapoints.classify(template);
+  template.patronInputs = window.FLOQRTemplatePatronInputs.forTemplate(template);
+  template.patronInputFamily = window.FLOQRTemplatePatronInputs.familyOf(template);
   template.textProfileId = template.templateKind;
   template.textLayoutVersion = window.FLOQRTextLayout.version;
   template.textCompatibleScreenFormatIds = window.FLOQRScreenDatapoints.templateFormatIds(template);

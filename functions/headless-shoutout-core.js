@@ -1,6 +1,10 @@
 /* Headless ShoutOut compose — venue + message (+ optional template/screen)
-   from chat or FloqR pages. No Firebase. Checkout vs free submit is the caller. */
+   from chat or FloqR pages. Patron inputs come from each template's list
+   (required vs optional). Chat context fills fields; ask only missing required.
+   No Firebase. Checkout vs free submit is the caller. */
 "use strict";
+
+const templateInputs = require("./shoutout-template-inputs");
 
 const DEFAULT_TEMPLATE_ID = "blackwhite";
 
@@ -53,6 +57,66 @@ const HEADLESS_TEXT_TEMPLATES = Object.freeze({
     allowEmoji: true,
     halloweenFinale: true,
     defaultBackgroundUrl: "./images/halloween/classic-halloween-2x1.svg"
+  },
+  birthdayMedia: {
+    name: "Happy Birthday with image/video placeholder",
+    className: "celebration-media",
+    priceCents: 0,
+    identityRail: true,
+    supportsMedia: true
+  },
+  soccerJersey: {
+    name: "Soccer Jersey",
+    className: "soccer-jersey sports-jersey jersey-photo-back",
+    priceCents: 3000,
+    identityRail: true,
+    jerseyNameField: true,
+    jerseyNumberField: true
+  },
+  zebbiesFootballTeamIntro: {
+    name: "Football Intro",
+    className: "football-team-intro",
+    priceCents: 3000,
+    identityRail: true,
+    layout: "football-team-intro"
+  },
+  heistVaultNight: {
+    name: "Locked Up",
+    className: "classic-bw",
+    priceCents: 3000,
+    identityRail: true,
+    defaultBackgroundUrl: "./images/heist/heist-jail-bars.png"
+  },
+  heistPoliceCar: {
+    name: "Police Car Arrest",
+    className: "classic-bw",
+    priceCents: 3000,
+    identityRail: true,
+    defaultBackgroundUrl: "./images/heist/heist-police-car.png"
+  },
+  heistInterrogation: {
+    name: "I Aint No Snitch",
+    className: "classic-bw",
+    priceCents: 3000,
+    identityRail: true,
+    defaultBackgroundUrl: "./images/heist/heist-interrogation.png"
+  },
+  heistVaultDollars: {
+    name: "Tengo muchos dólares",
+    className: "classic-bw",
+    priceCents: 3000,
+    identityRail: true,
+    nameOnly: true,
+    typedLine: "Tengo muchos dólares... I just did a heist!",
+    defaultBackgroundUrl: "./images/heist/vault-night.jpg"
+  },
+  ballersAlert: {
+    name: "Baller's Alert",
+    className: "baller-card baller-alert",
+    priceCents: 10000,
+    identityRail: true,
+    requiresFacePhoto: true,
+    ballerAlert: true
   }
 });
 
@@ -69,10 +133,40 @@ const TEMPLATE_ALIASES = Object.freeze({
   corporate: "corporate",
   halloween: "classicHalloween",
   "classic halloween": "classicHalloween",
-  classichalloween: "classicHalloween"
+  classichalloween: "classicHalloween",
+  jersey: "soccerJersey",
+  soccer: "soccerJersey",
+  "soccer jersey": "soccerJersey",
+  football: "zebbiesFootballTeamIntro",
+  "football intro": "zebbiesFootballTeamIntro",
+  heist: "heistVaultNight",
+  "locked up": "heistVaultNight",
+  "tengo muchos": "heistVaultDollars",
+  "tengo muchos dolares": "heistVaultDollars",
+  ballers: "ballersAlert",
+  "ballers alert": "ballersAlert",
+  "baller's alert": "ballersAlert"
 });
 
-const COMPOSER_ONLY_RE = /^(zebbiesFootballTeamIntro|soccer|nba|nfl|ballersAlert|blackCard|heist|birthdayMedia|anniversaryMedia|engagementMedia|fianceMedia)/i;
+const JERSEY_TEAM_ALIASES = Object.freeze({
+  morocco: "soccerMorocco",
+  spain: "soccerSpain",
+  cameroon: "soccerCameroon",
+  nigeria: "soccerNigeria",
+  tanzania: "soccerTanzania",
+  egypt: "soccerEgypt",
+  ghana: "soccerGhana",
+  senegal: "soccerSenegal",
+  kenya: "soccerKenya",
+  chelsea: "soccerChelsea",
+  psg: "soccerParisSaintGermain",
+  "paris saint germain": "soccerParisSaintGermain",
+  monaco: "soccerMonaco",
+  "ivory coast": "soccerIvoryCoast",
+  "dr congo": "soccerDRCongo"
+});
+
+const JERSEY_TEAM_NEEDLES = Object.keys(JERSEY_TEAM_ALIASES).sort((a, b) => b.length - a.length);
 
 const CLUB_NAME_ALIASES = Object.freeze({
   aurelia: "temp-democlub-1",
@@ -155,10 +249,6 @@ function pickScreenFormat(venue = {}, requested = "") {
   return "led-96x48";
 }
 
-function isComposerOnlyTemplate(templateId = "") {
-  return COMPOSER_ONLY_RE.test(String(templateId || ""));
-}
-
 function resolveTemplateId(raw = "") {
   const id = String(raw || "").trim();
   if (!id) return "";
@@ -167,15 +257,26 @@ function resolveTemplateId(raw = "") {
   return alias || "";
 }
 
+function catalogShapeFor(id = "") {
+  const meta = HEADLESS_TEXT_TEMPLATES[id] || {};
+  return {
+    id,
+    name: meta.name,
+    className: meta.className,
+    priceCents: meta.priceCents || 0,
+    nameOnly: meta.nameOnly === true,
+    jerseyNameField: meta.jerseyNameField === true,
+    jerseyNumberField: meta.jerseyNumberField === true,
+    requiresFacePhoto: meta.requiresFacePhoto === true,
+    ballerAlert: meta.ballerAlert === true,
+    supportsMedia: meta.supportsMedia === true,
+    layout: meta.layout || "",
+    typedLine: meta.typedLine || ""
+  };
+}
+
 function pickTemplate(venue = {}, requested = "") {
   const explicit = String(requested || "").trim();
-  if (explicit && isComposerOnlyTemplate(explicit)) {
-    return {
-      composerOnly: true,
-      templateId: explicit,
-      reason: "That template needs photos or extra fields on compose. Open ShoutOut compose to finish it."
-    };
-  }
   let id = resolveTemplateId(explicit);
   if (!id) id = DEFAULT_TEMPLATE_ID;
   const meta = HEADLESS_TEXT_TEMPLATES[id] || HEADLESS_TEXT_TEMPLATES[DEFAULT_TEMPLATE_ID];
@@ -185,6 +286,8 @@ function pickTemplate(venue = {}, requested = "") {
     id = DEFAULT_TEMPLATE_ID;
   }
   const chosen = HEADLESS_TEXT_TEMPLATES[id] || meta;
+  const shape = catalogShapeFor(id);
+  const inputs = templateInputs.forTemplate(shape);
   return {
     composerOnly: false,
     templateId: id,
@@ -196,7 +299,15 @@ function pickTemplate(venue = {}, requested = "") {
     identityAnimationSeconds: chosen.identityAnimationSeconds || 6,
     allowEmoji: chosen.allowEmoji === true,
     halloweenFinale: chosen.halloweenFinale === true,
-    defaultBackgroundUrl: chosen.defaultBackgroundUrl || ""
+    defaultBackgroundUrl: chosen.defaultBackgroundUrl || "",
+    nameOnly: chosen.nameOnly === true,
+    typedLine: chosen.typedLine || "",
+    jerseyNameField: chosen.jerseyNameField === true,
+    requiresFacePhoto: chosen.requiresFacePhoto === true,
+    supportsMedia: chosen.supportsMedia === true,
+    layout: chosen.layout || "",
+    patronInputs: inputs,
+    patronInputFamily: templateInputs.familyOf(shape)
   };
 }
 
@@ -268,6 +379,92 @@ function extractColonMessage(raw) {
   return match ? stripMessageWrap(match[1]) : "";
 }
 
+function looksLikeQuestion(raw) {
+  return /\?/.test(String(raw || "")) || /^(?:what|who|where|when|why|how|can you|could you)\b/i.test(String(raw || "").trim());
+}
+
+function extractCelebrationMessage(raw) {
+  const source = stripMessageWrap(raw);
+  if (!source || looksLikeQuestion(source)) return "";
+  if (/\b(?:throw|send|post|compose|buy|pay for)\b.{0,48}\bshout\s*out\b/i.test(source)
+    && !/\b(?:happy|congrats|congratulations|we love you|love you)\b/i.test(source)) {
+    return "";
+  }
+  if (/^\s*(?:happy(?:\s+\w+)?|congratulations?|congrats|we love you|love you|best wishes|go\s+\w+)(?:\s+.+)?$/i.test(source)
+    && source.length <= 200) {
+    return source;
+  }
+  const embedded = source.match(
+    /\b((?:happy(?:\s+(?:birthday|anniversary|engagement|halloween|graduation|new year))?|congratulations?|congrats|we love you|love you)\b[^"”]{0,160})$/i
+  );
+  return embedded ? stripMessageWrap(embedded[1]) : "";
+}
+
+function extractBareThrowMessage(raw) {
+  const source = String(raw || "");
+  if (!/\b(?:throw|send|post|compose|buy|pay for)\s+(?:an?\s+)?(?:\w+\s+)?shout\s*outs?\b/i.test(source)) {
+    return "";
+  }
+  let rest = source
+    .replace(/^\s*(?:please\s+)?(?:throw|send|post|compose|buy|pay for)\s+(?:an?\s+)?(?:\w+\s+)?shout\s*outs?\b/i, "")
+    .replace(/^\s*(?:at|@)\s+[A-Za-z0-9][A-Za-z0-9 .,'&-]{1,80}?(?=\s+(?:that says|saying|that reads|message|text|:)|[.?]|,|$)/i, "")
+    .replace(/^\s*[,:\-–]\s*/, "")
+    .replace(/\s+(?:with|include|add|put|use)\s+(?:my\s+)?(?:@?handle|floqr card|attribution)\b.*$/i, "")
+    .replace(/\s+(?:text only|with a photo|with a video|with an image|no handle|skip extras)\b.*$/i, "")
+    .trim();
+  if (!rest || /^(please|thanks|now|tonight|today)$/i.test(rest)) return "";
+  if (/^(that says|saying|that reads|message|text)\b/i.test(rest)) {
+    return extractSaysMessage(`board ${rest}`);
+  }
+  if (extractQuotedMessage(rest)) return extractQuotedMessage(rest);
+  if (extractCelebrationMessage(rest)) return extractCelebrationMessage(rest);
+  if (looksLikeQuestion(rest) || rest.length > 180) return "";
+  if (/\b(?:template|handle|photo|video|jersey|football intro)\b/i.test(rest)) return "";
+  return stripMessageWrap(rest);
+}
+
+function extractJerseyTeam(raw) {
+  const folded = ` ${normalizeClubNeedle(raw)} `;
+  if (folded === "  ") return "";
+  for (const needle of JERSEY_TEAM_NEEDLES) {
+    if (folded.includes(` ${needle} `)) return JERSEY_TEAM_ALIASES[needle];
+  }
+  const idMatch = String(raw || "").match(/\b(soccer[A-Za-z0-9]+)\b/);
+  return idMatch ? idMatch[1] : "";
+}
+
+function extractJerseyName(raw) {
+  const match = String(raw || "").match(
+    /\b(?:name(?:\s+on(?:\s+the)?(?:\s+back)?)?|player)\s*[:\-–]?\s*([A-Za-z][A-Za-z'-]{0,15})(?=\s+(?:number|num|#|\d)|[,\s]|$)/i
+  );
+  return match ? stripMessageWrap(match[1]).toUpperCase().slice(0, 8) : "";
+}
+
+function extractJerseyNumber(raw) {
+  const labeled = String(raw || "").match(/\b(?:number|num|#)\s*[:\-–]?\s*([A-Za-z0-9*]{1,2})\b/i);
+  if (labeled) return labeled[1].toUpperCase();
+  const hash = String(raw || "").match(/(?:^|\s)#(\d{1,2})\b/);
+  return hash ? hash[1] : "";
+}
+
+function extractPlayerName(raw) {
+  const labeled = String(raw || "").match(
+    /\b(?:name|handle)\s*[:\-–]?\s*(@?[A-Za-z][A-Za-z0-9._' -]{1,24})\b/i
+  );
+  if (labeled) return stripMessageWrap(labeled[1]);
+  const at = String(raw || "").match(/(?:^|\s)(@[A-Za-z0-9._]{2,24})\b/);
+  return at ? at[1] : "";
+}
+
+function isLikelyVenueOnlyTurn(raw) {
+  const source = stripMessageWrap(raw);
+  if (!source) return false;
+  if (extractAliasClub(source) && source.length <= 80 && !extractCelebrationMessage(source)) {
+    return !/\b(?:throw|send|shout)\b/i.test(source);
+  }
+  return false;
+}
+
 function extractAliasClub(raw) {
   const folded = ` ${normalizeClubNeedle(raw)} `;
   if (folded === "  ") return "";
@@ -309,6 +506,17 @@ function extractTemplateHint(raw) {
     || new RegExp(`\\b${verbs}(?: a)? halloween\\b`).test(folded)) {
     return "classicHalloween";
   }
+  if (/\b(?:soccer\s+jersey|jersey shoutout|jersey board)\b/.test(folded)
+    || new RegExp(`\\b${verbs}(?: a)? jersey\\b`).test(folded)) {
+    return "soccerJersey";
+  }
+  if (/\bfootball intro\b/.test(folded) || new RegExp(`\\b${verbs}(?: a)? football\\b`).test(folded)) {
+    return "zebbiesFootballTeamIntro";
+  }
+  if (/\btengo muchos\b/.test(folded) || /\bvault (?:night|dollars)\b/.test(folded)) {
+    return "heistVaultDollars";
+  }
+  if (/\bballer's alert\b|\bballers alert\b/.test(folded)) return "ballersAlert";
   const named = [
     ["traditional", "blackwhite"],
     ["birthday", "birthday"],
@@ -405,8 +613,10 @@ function applyBareInteractiveReply(draft, parsed, raw) {
   if (isBareAffirmative(raw)) {
     if (step === "handle") next.handleDecision = next.handleDecision || "include";
     else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
-    else if (step === "template") next.templateId = next.templateId || DEFAULT_TEMPLATE_ID;
-    else if (!step) next.confirmSubmit = true;
+    else if (step === "teamPhotos" || step === "facePhoto" || step === "compose") {
+      next.mediaDecision = next.mediaDecision || "compose";
+    }
+    else if (!step) next.confirmSubmit = false;
   } else if (isBareNegative(raw)) {
     if (step === "handle") next.handleDecision = next.handleDecision || "skip";
     else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
@@ -440,30 +650,107 @@ function stripExtrasFromMessage(raw) {
 function parseShoutOutExecute(raw) {
   const source = String(raw || "").trim();
   const extras = parseShoutOutExtras(source);
+  const jerseyTeamId = extractJerseyTeam(source);
+  const jerseyName = extractJerseyName(source);
+  const jerseyNumber = extractJerseyNumber(source);
+  const playerName = extractPlayerName(source);
   const message = stripExtrasFromMessage(
-    extractQuotedMessage(source) || extractSaysMessage(source) || extractColonMessage(source)
+    extractQuotedMessage(source)
+    || extractSaysMessage(source)
+    || extractColonMessage(source)
+    || extractCelebrationMessage(source)
+    || extractBareThrowMessage(source)
   );
   const prefix = venuePrefix(source, message);
   const atPhrase = extractAtClub(prefix);
   const atClub = extractAliasClub(atPhrase) || atPhrase;
-  const aliasClub = extractAliasClub(prefix);
+  const aliasClub = extractAliasClub(prefix) || extractAliasClub(source);
+  const templateId = extractTemplateHint(prefix) || extras.templateId
+    || (jerseyTeamId || jerseyName || jerseyNumber ? "soccerJersey" : "");
   return {
     clubQuery: atClub || aliasClub,
     message,
-    templateId: extractTemplateHint(prefix) || extras.templateId,
+    templateId,
     screenFormatId: extractScreenHint(prefix) || extras.screenFormatId,
     handleDecision: extras.handleDecision,
     attribution: extras.attribution,
     mediaDecision: extras.mediaDecision,
     mediaUrl: extras.mediaUrl,
+    jerseyTeamId,
+    jerseyName,
+    jerseyNumber,
+    playerName: playerName || (templateId === "heistVaultDollars" || templateId === "ballersAlert" ? message : ""),
     confirmSubmit: extras.confirmSubmit,
     skipExtras: extras.skipExtras,
     cancel: extras.cancel
   };
 }
 
+function userTurns(turns) {
+  return (Array.isArray(turns) ? turns : [])
+    .filter(row => row && (row.role === "user" || row.role === "patron"))
+    .map(row => String(row.text || row.content || row.prompt || "").trim())
+    .filter(Boolean);
+}
+
+function fillFromConversation(turns, currentPrompt) {
+  const texts = userTurns(turns);
+  const current = String(currentPrompt || "").trim();
+  if (current) texts.push(current);
+  const filled = {
+    clubQuery: "",
+    message: "",
+    templateId: "",
+    screenFormatId: "",
+    handleDecision: "",
+    attribution: "",
+    mediaDecision: "",
+    mediaUrl: "",
+    jerseyTeamId: "",
+    jerseyName: "",
+    jerseyNumber: "",
+    playerName: "",
+    confirmSubmit: false,
+    skipExtras: false,
+    cancel: false
+  };
+  texts.forEach(text => {
+    const parsed = parseShoutOutExecute(text);
+    if (parsed.clubQuery) filled.clubQuery = parsed.clubQuery;
+    else if (isLikelyVenueOnlyTurn(text) && extractAliasClub(text)) {
+      filled.clubQuery = extractAliasClub(text);
+    }
+    if (parsed.message) filled.message = parsed.message;
+    else if (extractCelebrationMessage(text)) filled.message = extractCelebrationMessage(text);
+    if (parsed.templateId) filled.templateId = parsed.templateId;
+    if (parsed.screenFormatId) filled.screenFormatId = parsed.screenFormatId;
+    if (parsed.handleDecision) filled.handleDecision = parsed.handleDecision;
+    if (parsed.attribution) filled.attribution = parsed.attribution;
+    if (parsed.mediaDecision) filled.mediaDecision = parsed.mediaDecision;
+    if (parsed.mediaUrl) filled.mediaUrl = parsed.mediaUrl;
+    if (parsed.jerseyTeamId) filled.jerseyTeamId = parsed.jerseyTeamId;
+    if (parsed.jerseyName) filled.jerseyName = parsed.jerseyName;
+    if (parsed.jerseyNumber) filled.jerseyNumber = parsed.jerseyNumber;
+    if (parsed.playerName) filled.playerName = parsed.playerName;
+    if (parsed.confirmSubmit) filled.confirmSubmit = true;
+    if (parsed.skipExtras) filled.skipExtras = true;
+    if (parsed.cancel) filled.cancel = true;
+  });
+  if (current) {
+    const latest = parseShoutOutExecute(current);
+    filled.confirmSubmit = latest.confirmSubmit === true;
+    filled.skipExtras = latest.skipExtras === true;
+    filled.cancel = latest.cancel === true;
+    if (latest.handleDecision) filled.handleDecision = latest.handleDecision;
+    if (latest.mediaDecision) filled.mediaDecision = latest.mediaDecision;
+    if (latest.templateId) filled.templateId = latest.templateId;
+  }
+  return filled;
+}
+
 function emptyInteractiveDraft() {
   return {
+    active: true,
     clubQuery: "",
     message: "",
     templateId: "",
@@ -473,6 +760,12 @@ function emptyInteractiveDraft() {
     attribution: "",
     mediaDecision: "",
     mediaUrl: "",
+    jerseyTeamId: "",
+    jerseyName: "",
+    jerseyNumber: "",
+    playerName: "",
+    company: "",
+    facePhotoUrl: "",
     skipExtras: false
   };
 }
@@ -481,11 +774,13 @@ function clipInteractiveDraft(draft = {}) {
   const row = draft && typeof draft === "object" ? draft : {};
   const templateId = resolveTemplateId(row.templateId) || "";
   const mediaUrl = /^https:\/\//i.test(String(row.mediaUrl || "")) ? text(row.mediaUrl, 500) : "";
+  const facePhotoUrl = /^https:\/\//i.test(String(row.facePhotoUrl || "")) ? text(row.facePhotoUrl, 500) : "";
   const handleDecision = row.handleDecision === "include" || row.handleDecision === "skip" ? row.handleDecision : "";
   let mediaDecision = "";
   if (row.mediaDecision === "none" || row.mediaDecision === "compose") mediaDecision = row.mediaDecision;
-  else if (mediaUrl) mediaDecision = "url";
+  else if (mediaUrl || facePhotoUrl) mediaDecision = "url";
   return {
+    active: row.active !== false,
     clubQuery: text(row.clubQuery || row.clubLocationId, 120),
     message: text(row.message || row.mainText, 400),
     templateId,
@@ -495,6 +790,12 @@ function clipInteractiveDraft(draft = {}) {
     attribution: text(row.attribution, 80),
     mediaDecision,
     mediaUrl,
+    jerseyTeamId: text(row.jerseyTeamId, 80),
+    jerseyName: text(row.jerseyName || row.jerseyPatronName, 16).toUpperCase(),
+    jerseyNumber: text(row.jerseyNumber, 4).toUpperCase().slice(0, 2),
+    playerName: text(row.playerName, 40),
+    company: text(row.company, 18).toUpperCase(),
+    facePhotoUrl: facePhotoUrl || mediaUrl,
     skipExtras: row.skipExtras === true
   };
 }
@@ -502,9 +803,10 @@ function clipInteractiveDraft(draft = {}) {
 function mergeInteractiveDraft(previous, parsed = {}, extras = {}) {
   const club = text(parsed.clubQuery || extras.clubQuery, 120);
   const message = text(parsed.message || extras.message, 400);
-  const freshThrow = !!(club && message);
-  const base = freshThrow ? emptyInteractiveDraft() : clipInteractiveDraft(previous);
-  const next = {...base};
+  const currentHasBoth = extras.freshThrow === true
+    || (extras.freshThrow !== false && !!(text(parsed.clubQuery, 120) && text(parsed.message, 400)));
+  const base = currentHasBoth ? emptyInteractiveDraft() : clipInteractiveDraft(previous);
+  const next = {...base, active: true};
   if (club) next.clubQuery = club;
   if (message) next.message = message;
   const templateId = resolveTemplateId(parsed.templateId || extras.templateId || "") || "";
@@ -529,30 +831,82 @@ function mergeInteractiveDraft(previous, parsed = {}, extras = {}) {
     next.mediaUrl = mediaUrl;
     next.mediaDecision = "url";
   }
+  const jerseyTeamId = text(parsed.jerseyTeamId || extras.jerseyTeamId, 80);
+  if (jerseyTeamId) next.jerseyTeamId = jerseyTeamId;
+  const jerseyName = text(parsed.jerseyName || extras.jerseyName, 16);
+  if (jerseyName) next.jerseyName = jerseyName;
+  const jerseyNumber = text(parsed.jerseyNumber || extras.jerseyNumber, 4);
+  if (jerseyNumber) next.jerseyNumber = jerseyNumber;
+  const playerName = text(parsed.playerName || extras.playerName, 40);
+  if (playerName) next.playerName = playerName;
+  const company = text(parsed.company || extras.company, 18);
+  if (company) next.company = company;
+  const facePhotoUrl = /^https:\/\//i.test(String(parsed.facePhotoUrl || extras.facePhotoUrl || ""))
+    ? text(parsed.facePhotoUrl || extras.facePhotoUrl, 500)
+    : "";
+  if (facePhotoUrl) next.facePhotoUrl = facePhotoUrl;
   if (parsed.skipExtras === true || extras.skipExtras === true) next.skipExtras = true;
   return clipInteractiveDraft(next);
 }
 
+function isVipLikePrompt(raw) {
+  return /\b(?:book|hold|reserv)\b/i.test(String(raw || ""))
+    && /\b(?:table|vip|section|mezzanine)\b/i.test(String(raw || ""));
+}
+
 function isInteractiveFollowUp(raw, draft) {
   const row = clipInteractiveDraft(draft);
-  if (!row.clubQuery || !row.message) return false;
+  if (!row.active && !row.clubQuery && !row.message && !row.jerseyName && !row.playerName) return false;
+  if (isVipLikePrompt(raw)) return false;
+  if (/\b(?:how|help|what is|instructions?|explain)\b/i.test(String(raw || "")) && !extractCelebrationMessage(raw)) {
+    return false;
+  }
   const extras = parseShoutOutExtras(raw);
   if (extras.cancel || extras.confirmSubmit || extras.skipExtras) return true;
   if (extras.templateId || extras.handleDecision || extras.mediaDecision || extras.screenFormatId) return true;
   if (isBareAffirmative(raw) || isBareNegative(raw)) return true;
+  if (extractAliasClub(raw) || extractJerseyTeam(raw) || extractJerseyName(raw) || extractJerseyNumber(raw)) return true;
+  if (extractCelebrationMessage(raw) || extractQuotedMessage(raw) || extractPlayerName(raw)) return true;
+  const needs = interactiveNeeds(row);
+  if (needs[0] && String(raw || "").trim()) return true;
   return false;
+}
+
+function inputsForDraft(draft) {
+  const row = clipInteractiveDraft(draft);
+  const templateId = row.templateId || DEFAULT_TEMPLATE_ID;
+  const shape = catalogShapeFor(templateId);
+  return templateInputs.forTemplate(shape);
+}
+
+function fieldFilled(row, fieldId) {
+  switch (String(fieldId || "")) {
+    case "club": return !!row.clubQuery;
+    case "message": return !!row.message;
+    case "handle":
+      return !!row.handleDecision && (row.handleDecision !== "include" || !!row.attribution);
+    case "media": return !!row.mediaDecision || !!row.mediaUrl;
+    case "jerseyTeamId": return !!row.jerseyTeamId;
+    case "jerseyName": return !!row.jerseyName;
+    case "jerseyNumber": return !!row.jerseyNumber;
+    case "playerName": return !!(row.playerName || row.message);
+    case "facePhoto": return !!(row.facePhotoUrl || row.mediaUrl);
+    case "teamPhotos": return false;
+    case "company": return !!row.company;
+    case "compose": return false;
+    default: return true;
+  }
 }
 
 function interactiveNeeds(draft) {
   const row = clipInteractiveDraft(draft);
+  const inputs = inputsForDraft(row);
   const needs = [];
-  if (!row.clubQuery) needs.push("club");
-  if (!row.message) needs.push("message");
+  inputs.required.forEach(fieldId => {
+    if (!fieldFilled(row, fieldId)) needs.push(fieldId);
+  });
   if (row.mediaDecision === "compose") needs.push("compose");
-  if (row.skipExtras) return needs;
-  if (!row.templateChosen) needs.push("template");
-  if (!row.handleDecision || (row.handleDecision === "include" && !row.attribution)) needs.push("handle");
-  if (!row.mediaDecision) needs.push("media");
+  if (row.skipExtras) return needs.filter(id => inputs.required.includes(id) || id === "compose");
   return needs;
 }
 
@@ -573,6 +927,12 @@ function formatHandle(value) {
   return raw ? `@${raw}` : "";
 }
 
+function isComposerOnlyTemplate(templateId = "") {
+  const id = resolveTemplateId(templateId) || String(templateId || "").trim();
+  const family = templateInputs.familyOf(catalogShapeFor(id));
+  return family === "footballIntro" || family === "ballersAlert" || family === "splitMedia";
+}
+
 function shoutOutComposeHref(clubLocationId) {
   const id = String(clubLocationId || "").trim();
   return id
@@ -591,36 +951,55 @@ function composeShoutOutPayload({
   attribution,
   attributionChoice,
   mediaUrl,
-  mediaType
+  mediaType,
+  jerseyTeamId,
+  jerseyName,
+  jerseyNumber,
+  playerName,
+  facePhotoUrl
 } = {}) {
   const parsed = parseShoutOutExecute(userPrompt || "");
   const club = text(clubLocationId || parsed.clubQuery, 120);
-  const main = text(message || parsed.message, 400);
+  const main = text(message || parsed.message || playerName || parsed.playerName, 400);
   const requestedTemplate = text(templateId || parsed.templateId, 80);
   const requestedScreen = canonicalFormatId(screenFormatId || parsed.screenFormatId);
   const wantHandle = includeAttribution === true || includeAttribution === 1 || includeAttribution === "1"
     || parsed.handleDecision === "include";
   const skipHandle = includeAttribution === false || parsed.handleDecision === "skip";
   const handleText = formatHandle(attribution || parsed.attribution);
-  const missing = [];
-  if (!club) missing.push("club");
-  if (!main) missing.push("message");
+  const picked = pickTemplate(venue, requestedTemplate);
+  const jerseyTeam = text(jerseyTeamId || parsed.jerseyTeamId, 80);
+  const jerseyPatronName = text(jerseyName || parsed.jerseyName, 16).toUpperCase();
+  const jerseyMark = text(jerseyNumber || parsed.jerseyNumber, 4).toUpperCase().slice(0, 2);
+  const nameOnBoard = text(playerName || parsed.playerName || (picked.nameOnly ? main : ""), 40);
+  const pickedPhoto = text(facePhotoUrl || mediaUrl || parsed.mediaUrl, 500);
+  const draftForNeeds = clipInteractiveDraft({
+    clubQuery: club,
+    message: main,
+    templateId: picked.templateId,
+    templateChosen: true,
+    screenFormatId: requestedScreen,
+    handleDecision: skipHandle ? "skip" : (wantHandle ? "include" : ""),
+    attribution: handleText,
+    mediaUrl: pickedPhoto,
+    jerseyTeamId: jerseyTeam,
+    jerseyName: jerseyPatronName,
+    jerseyNumber: jerseyMark,
+    playerName: nameOnBoard,
+    facePhotoUrl: pickedPhoto
+  });
+  const missing = interactiveNeeds({
+    ...draftForNeeds,
+    skipExtras: true
+  });
   if (missing.length) {
+    const photoNeed = missing.includes("facePhoto") || missing.includes("teamPhotos") || missing.includes("media");
     return {
       ok: false,
       missing,
-      parsed,
-      composeHref: shoutOutComposeHref(club)
-    };
-  }
-  const picked = pickTemplate(venue, requestedTemplate);
-  if (picked.composerOnly) {
-    return {
-      ok: false,
-      missing: [],
-      composerOnly: true,
+      composerOnly: photoNeed,
       templateId: picked.templateId,
-      reason: picked.reason,
+      reason: missingAsk(missing),
       parsed,
       composeHref: shoutOutComposeHref(club)
     };
@@ -634,7 +1013,8 @@ function composeShoutOutPayload({
     240
   );
   const streetAddress = text(venue.streetAddress || venue.addressLine1 || "", 160);
-  const mainText = fitMainText(main, caps);
+  const boardCopy = picked.nameOnly ? (nameOnBoard || main) : (jerseyPatronName && picked.jerseyNameField ? jerseyPatronName : main);
+  const mainText = fitMainText(boardCopy, caps);
   const attributionText = wantHandle && !skipHandle ? handleText : "";
   const includeHandle = wantHandle && !skipHandle && !!attributionText;
   const httpsMedia = /^https:\/\//i.test(String(mediaUrl || parsed.mediaUrl || ""))
@@ -696,7 +1076,14 @@ function composeShoutOutPayload({
       backgroundUrl: picked.defaultBackgroundUrl || "",
       defaultBackgroundUrl: picked.defaultBackgroundUrl || "",
       mainText,
-      subText: "",
+      subText: jerseyMark,
+      jerseyTeamId: jerseyTeam,
+      jerseyPatronName,
+      jerseyName: jerseyPatronName,
+      jerseyNumber: jerseyMark,
+      playerName: nameOnBoard,
+      typedLine: picked.typedLine || "",
+      nameOnly: picked.nameOnly === true,
       priceCents: picked.priceCents || 0,
       headless: true,
       source: "headless"
@@ -705,23 +1092,9 @@ function composeShoutOutPayload({
 }
 
 function missingAsk(needs = []) {
-  const set = new Set(needs);
-  if (set.has("compose")) {
-    return "That board needs a photo or video on compose. Open ShoutOut compose to finish it, or reply text only to stay on a letter board.";
-  }
-  if (set.has("club") && set.has("message")) {
-    return "I can throw the ShoutOut from chat once I have the club and the message. Which venue, and what should it say?";
-  }
-  if (set.has("club")) return "Which venue should this ShoutOut play on?";
-  if (set.has("message")) return "What should the ShoutOut say on the board?";
-  const extras = [];
-  if (set.has("template")) extras.push("a template (Traditional is the default; Neon, Birthday, Gold, VIP, Graduation, Corporate, or Halloween $15)");
-  if (set.has("handle")) extras.push("whether to include your @handle on the FloqR card");
-  if (set.has("media")) extras.push("text only, or a photo/video via compose");
-  if (extras.length) {
-    return `A few ShoutOut details still open: ${extras.join("; ")}. Reply in chat, or say throw it to use Traditional with no handle.`;
-  }
-  return "I need a bit more to throw that ShoutOut from chat.";
+  const first = String((Array.isArray(needs) ? needs : [])[0] || "");
+  if (!first) return "ShoutOut SMARTpreview is ready. Reply throw it to send, or cancel the shoutout.";
+  return templateInputs.fieldAsk(first);
 }
 
 function newReferenceNumber(now = new Date()) {
@@ -768,6 +1141,10 @@ module.exports = {
   mergeInteractiveDraft,
   isInteractiveFollowUp,
   interactiveNeeds,
+  inputsForDraft,
+  fillFromConversation,
+  extractCelebrationMessage,
+  extractJerseyTeam,
   listHeadlessTemplates,
   formatHandle,
   isConfirmSubmitPrompt,

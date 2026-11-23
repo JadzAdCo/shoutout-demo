@@ -505,11 +505,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Das Dock zeigt die echte LED-Vorlage (dieselbe Display-1-Composer-Vorschau) un"
+          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, nutzt BOT DEE die Patron-Eingabeliste dieser Vorlage. Chat-Kontext füllt Venue, ShoutOut-Text, Namen und Nummern. BOT DEE fragt nur fehlende Pflichtfelder, eines nach dem anderen — kein Zaubersatz. Traditional braucht Venue und ShoutOut-"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, fragt BOT DEE Vorlage, @handle auf der FloqR-Karte und Text-only oder Foto/Video. ShoutOut SMARTpreview dockt über dem Composer an und bleibt bei diesem Chat. Das Dock zeigt die echte LED-Vorlage (dieselbe Display-1-Composer-Vorschau) un"
+          "blurb": "Wenn Sie in BOT DEE einen ShoutOut werfen, nutzt BOT DEE die Patron-Eingabeliste dieser Vorlage. Chat-Kontext füllt Venue, ShoutOut-Text, Namen und Nummern. BOT DEE fragt nur fehlende Pflichtfelder, eines nach dem anderen — kein Zaubersatz. Traditional braucht Venue und ShoutOut-"
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV aus dem BOT DEE-Chat",
@@ -1631,12 +1631,12 @@
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
         },
         "help:help-shoutout-headless-smartview": {
-          "label": "ShoutOut SMARTpreview",
-          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Le dock affiche le vr"
+          "label": "SMARTpreview ShoutOut",
+          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE utilise la liste d'entrées patrons de ce modèle. Le contexte du chat remplit le lieu, le texte du shoutout, les noms et les numéros. BOT DEE ne demande que les champs requis manquants, un à la fois — aucune phrase magiqu"
         },
         "intent:help-shoutout-headless-smartview": {
-          "label": "ShoutOut SMARTpreview",
-          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE demande le modèle, votre @handle sur la carte FloqR, et si le board est texte seul ou photo/vidéo. ShoutOut SMARTpreview se cale au-dessus du compositeur et suit ce chat pendant que vous remplissez. Le dock affiche le vr"
+          "label": "SMARTpreview ShoutOut",
+          "blurb": "Quand vous lancez un ShoutOut dans le chat BOT DEE, BOT DEE utilise la liste d'entrées patrons de ce modèle. Le contexte du chat remplit le lieu, le texte du shoutout, les noms et les numéros. BOT DEE ne demande que les champs requis manquants, un à la fois — aucune phrase magiqu"
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV depuis le chat BOT DEE",
@@ -2758,12 +2758,12 @@
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
         },
         "help:help-shoutout-headless-smartview": {
-          "label": "ShoutOut SMARTpreview",
-          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. El dock muestra la plantilla LED real (la misma vista previa de"
+          "label": "SMARTpreview de ShoutOut",
+          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE usa la lista de entradas de patrón de esa plantilla. El contexto del chat rellena local, texto del shoutout, nombres y números. BOT DEE pide solo los campos requeridos que faltan, uno a uno — no hay frase mágica. Traditional ne"
         },
         "intent:help-shoutout-headless-smartview": {
-          "label": "ShoutOut SMARTpreview",
-          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE pide la plantilla, su @handle en la tarjeta FloqR y si el tablero es solo texto o foto/vídeo. ShoutOut SMARTpreview se ancla sobre el compositor y sigue este chat. El dock muestra la plantilla LED real (la misma vista previa de"
+          "label": "SMARTpreview de ShoutOut",
+          "blurb": "Al lanzar un ShoutOut en el chat de BOT DEE, BOT DEE usa la lista de entradas de patrón de esa plantilla. El contexto del chat rellena local, texto del shoutout, nombres y números. BOT DEE pide solo los campos requeridos que faltan, uno a uno — no hay frase mágica. Traditional ne"
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV desde el chat de BOT DEE",
@@ -3885,12 +3885,12 @@
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
         },
         "help:help-shoutout-headless-smartview": {
-          "label": "ShoutOut SMARTpreview",
-          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Il dock mostra il vero template LED (la stessa anteprima composer di"
+          "label": "SMARTpreview ShoutOut",
+          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE usa l'elenco di input patron di quel modello. Il contesto della chat riempie venue, testo shoutout, nomi e numeri. BOT DEE chiede solo i campi obbligatori mancanti, uno alla volta — nessuna frase magica. Traditional serve venue e"
         },
         "intent:help-shoutout-headless-smartview": {
-          "label": "ShoutOut SMARTpreview",
-          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE chiede il modello, il @handle sulla scheda FloqR e se il board è solo testo o foto/video. ShoutOut SMARTpreview si ancora sopra il composer e segue questa chat. Il dock mostra il vero template LED (la stessa anteprima composer di"
+          "label": "SMARTpreview ShoutOut",
+          "blurb": "Quando lanci uno ShoutOut in chat BOT DEE, BOT DEE usa l'elenco di input patron di quel modello. Il contesto della chat riempie venue, testo shoutout, nomi e numeri. BOT DEE chiede solo i campi obbligatori mancanti, uno alla volta — nessuna frase magica. Traditional serve venue e"
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV dalla chat BOT DEE",
@@ -5012,12 +5012,12 @@
           "blurb": "Search or choose a FLOQR club for your ShoutOut. The first four are nearest (GPS). Cards show LED display sizes supported and whether patrons can create custom ShoutOuts. Select a venue to continue to templates."
         },
         "help:help-shoutout-headless-smartview": {
-          "label": "ShoutOut SMARTpreview",
-          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. O dock mostra o modelo LED real (a mesma pré-visualização do compositor Display 1)"
+          "label": "SMARTpreview ShoutOut",
+          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE usa a lista de entradas de patron desse modelo. O contexto do chat preenche venue, texto do shoutout, nomes e números. O BOT DEE pede só os campos obrigatórios em falta, um de cada vez — sem frase mágica. Traditional precisa de "
         },
         "intent:help-shoutout-headless-smartview": {
-          "label": "ShoutOut SMARTpreview",
-          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE pede o modelo, o @handle no cartão FloqR e se o board é só texto ou foto/vídeo. ShoutOut SMARTpreview fica acima do compositor e segue este chat. O dock mostra o modelo LED real (a mesma pré-visualização do compositor Display 1)"
+          "label": "SMARTpreview ShoutOut",
+          "blurb": "Quando lança um ShoutOut no chat BOT DEE, o BOT DEE usa a lista de entradas de patron desse modelo. O contexto do chat preenche venue, texto do shoutout, nomes e números. O BOT DEE pede só os campos obrigatórios em falta, um de cada vez — sem frase mágica. Traditional precisa de "
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV a partir do chat BOT DEE",
@@ -6140,11 +6140,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Док показывает живой LED-шаблон (тот же предпросмотр Display 1) и обновляется при выборе "
+          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот берёт список полей этого шаблона. Контекст чата заполняет площадку, текст shoutout, имена и номера. BOT DEE спрашивает только недостающие обязательные поля по одному — без волшебной фразы. Traditional нужны площадка и текст shoutout."
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот спрашивает шаблон, @handle на карточке FloqR и текст или фото/видео. ShoutOut SMARTpreview закрепляется над полем ввода и остаётся в этом чате. Док показывает живой LED-шаблон (тот же предпросмотр Display 1) и обновляется при выборе "
+          "blurb": "Когда вы бросаете ShoutOut в чате BOT DEE, бот берёт список полей этого шаблона. Контекст чата заполняет площадку, текст shoutout, имена и номера. BOT DEE спрашивает только недостающие обязательные поля по одному — без волшебной фразы. Traditional нужны площадка и текст shoutout."
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV из чата BOT DEE",
@@ -7267,11 +7267,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Το dock δείχνει το πραγματικό LED πρότυπο (την ίδια προεπισκόπηση Display 1"
+          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, το BOT DEE χρησιμοποιεί τη λίστα πεδίων του προτύπου. Το πλαίσιο της συνομιλίας συμπληρώνει χώρο, κείμενο shoutout, ονόματα και αριθμούς. Το BOT DEE ρωτά μόνο τα υποχρεωτικά που λείπουν, ένα τη φορά — χωρίς μαγική φράση. Το Traditional"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, ρωτά πρότυπο, @handle στην κάρτα FloqR και κείμενο ή φωτογραφία/βίντεο. Το ShoutOut SMARTpreview δένεται πάνω από τον composer και ακολουθεί αυτή τη συνομιλία. Το dock δείχνει το πραγματικό LED πρότυπο (την ίδια προεπισκόπηση Display 1"
+          "blurb": "Όταν ρίχνετε ShoutOut στη συνομιλία BOT DEE, το BOT DEE χρησιμοποιεί τη λίστα πεδίων του προτύπου. Το πλαίσιο της συνομιλίας συμπληρώνει χώρο, κείμενο shoutout, ονόματα και αριθμούς. Το BOT DEE ρωτά μόνο τα υποχρεωτικά που λείπουν, ένα τη φορά — χωρίς μαγική φράση. Το Traditional"
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV από τη συνομιλία BOT DEE",
@@ -8394,11 +8394,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Dock pokazuje żywy szablon LED (ten sam podgląd Display 1) i odświeża się"
+          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE używa listy pól patron tego szablonu. Kontekst czatu wypełnia venue, tekst shoutout, imiona i numery. BOT DEE pyta tylko o brakujące wymagane pola, po jednym — bez magicznego zdania. Traditional potrzebuje venue i tekstu shoutout. G"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE pyta o szablon, @handle na karcie FloqR i czy tablica to sam tekst, czy zdjęcie/wideo. ShoutOut SMARTpreview dokuje nad polem wpisu i zostaje przy tym czacie. Dock pokazuje żywy szablon LED (ten sam podgląd Display 1) i odświeża się"
+          "blurb": "Gdy rzucasz ShoutOut na czacie BOT DEE, BOT DEE używa listy pól patron tego szablonu. Kontekst czatu wypełnia venue, tekst shoutout, imiona i numery. BOT DEE pyta tylko o brakujące wymagane pola, po jednym — bez magicznego zdania. Traditional potrzebuje venue i tekstu shoutout. G"
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV z czatu BOT DEE",
@@ -9521,11 +9521,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Het dock toont het echte LED-sjabloon (dezelfde Display 1-composervoorvertoning) en werkt"
+          "blurb": "Als u in BOT DEE een ShoutOut gooit, gebruikt BOT DEE de patron-invoerlijst van dat sjabloon. Chatcontext vult venue, shoutout-tekst, namen en nummers. BOT DEE vraagt alleen ontbrekende verplichte velden, één voor één — geen toverzinnen. Traditional heeft een venue en shoutout-te"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "Als u in BOT DEE een ShoutOut gooit, vraagt BOT DEE het sjabloon, uw @handle op de FloqR-kaart, en tekst-only of foto/video. ShoutOut SMARTpreview dockt boven de composer en volgt deze chat. Het dock toont het echte LED-sjabloon (dezelfde Display 1-composervoorvertoning) en werkt"
+          "blurb": "Als u in BOT DEE een ShoutOut gooit, gebruikt BOT DEE de patron-invoerlijst van dat sjabloon. Chatcontext vult venue, shoutout-tekst, namen en nummers. BOT DEE vraagt alleen ontbrekende verplichte velden, één voor één — geen toverzinnen. Traditional heeft een venue en shoutout-te"
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV vanuit BOT DEE-chat",
@@ -10648,11 +10648,11 @@
         },
         "help:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. يعرض الإرساء قالب LED الحي (نفس معاينة Display 1) ويتحدّث عند اختيار القالب أو @handle أو نص مقابل صورة. أجب في"
+          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يستخدم BOT DEE قائمة حقول ذلك القالب. سياق الدردشة يملأ المكان ونص الـ shoutout والأسماء والأرقام. يسأل BOT DEE فقط عن الحقول المطلوبة الناقصة واحداً تلو الآخر — بلا جملة سحرية. Traditional يحتاج مكاناً ونص shoutout. عندما تكتمل القائمة يكون S"
         },
         "intent:help-shoutout-headless-smartview": {
           "label": "ShoutOut SMARTpreview",
-          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يطلب القالب و@handle على بطاقة FloqR وهل اللوحة نص فقط أم صورة/فيديو. ShoutOut SMARTpreview يثبت فوق حقل الكتابة ويتبع هذه الدردشة. يعرض الإرساء قالب LED الحي (نفس معاينة Display 1) ويتحدّث عند اختيار القالب أو @handle أو نص مقابل صورة. أجب في"
+          "blurb": "عندما ترمي ShoutOut في دردشة BOT DEE يستخدم BOT DEE قائمة حقول ذلك القالب. سياق الدردشة يملأ المكان ونص الـ shoutout والأسماء والأرقام. يسأل BOT DEE فقط عن الحقول المطلوبة الناقصة واحداً تلو الآخر — بلا جملة سحرية. Traditional يحتاج مكاناً ونص shoutout. عندما تكتمل القائمة يكون S"
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV من محادثة BOT DEE",

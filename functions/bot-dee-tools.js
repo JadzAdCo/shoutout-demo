@@ -343,7 +343,20 @@ async function startShoutOutCheckout(args, sessionRequest) {
       || parsed.clubQuery,
     120
   );
-  const message = text(existing?.mainText || args?.mainText || args?.message || args?.text || payload.mainText || payload.message || parsed.message, 400);
+  const message = text(
+    existing?.mainText
+    || args?.mainText
+    || args?.message
+    || args?.text
+    || payload.mainText
+    || payload.message
+    || parsed.message
+    || args?.playerName
+    || args?.jerseyName
+    || parsed.playerName
+    || parsed.jerseyName,
+    400
+  );
   const templateId = text(
     existing?.template || existing?.templateId || args?.templateId || payload.templateId || parsed.templateId,
     80
@@ -400,7 +413,12 @@ async function startShoutOutCheckout(args, sessionRequest) {
     attribution,
     attributionChoice: text(args?.attributionChoice || existing?.attributionChoice, 40),
     mediaUrl,
-    mediaType
+    mediaType,
+    jerseyTeamId: text(args?.jerseyTeamId || existing?.jerseyTeamId || parsed.jerseyTeamId, 80),
+    jerseyName: text(args?.jerseyName || existing?.jerseyPatronName || parsed.jerseyName, 16),
+    jerseyNumber: text(args?.jerseyNumber || existing?.jerseyNumber || parsed.jerseyNumber, 4),
+    playerName: text(args?.playerName || existing?.playerName || parsed.playerName, 40),
+    facePhotoUrl: text(args?.facePhotoUrl || existing?.facePhotoUrl, 500)
   });
   if (!composed.ok) {
     return {
