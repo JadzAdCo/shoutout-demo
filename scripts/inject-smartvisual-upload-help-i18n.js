@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 "use strict";
-/* One-shot: Create/Edit + Rights/source chrome + help for SMARTvisual Studio uploads. */
+/* HISTORICAL one-shot. Do not re-run: Rights / source was removed from Create/Edit. */
+throw new Error("Do not re-run. Rights / source was removed from SMARTvisual Studio Create/Edit.");
 const fs = require("fs");
 const path = require("path");
 const ROOT = path.resolve(__dirname, "..");

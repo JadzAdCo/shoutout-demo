@@ -1,7 +1,7 @@
 [
   {
     "id": "s3.3.064",
-    "text": "s3.3.064: SMARTvisual Studio Create/Edit help for Rights/source; SMARTbackground JPEG/PNG/WebP uploads",
+    "text": "s3.3.064: SMARTvisual Studio Create/Edit JPEG/PNG/WebP SMARTbackgrounds; Rights/source field removed",
     "audiences": [
       "other"
     ]

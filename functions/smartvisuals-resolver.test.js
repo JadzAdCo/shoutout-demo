@@ -175,7 +175,8 @@ test("T09 publish path requires SOS2FA helper and sanitizer (no client write)", 
   assert.match(src, /svgChecksumSha256/);
   assert.match(src, /imageBase64/);
   assert.match(src, /imageChecksumSha256/);
-  assert.match(src, /Rights \/ source is required/);
+  assert.match(src, /Name is required/);
+  assert.doesNotMatch(src, /Rights \/ source is required/);
   assert.match(read("firestore.rules"), /match \/smartVisualDrafts\/\{id\}/);
   assert.match(read("firestore.rules"), /allow write: if false/);
 });
@@ -208,10 +209,13 @@ test("SMARTbackground raster JPEG/PNG/WebP is accepted; stencils stay SVG", () =
   assert.match(html, /accept="image\/svg\+xml,image\/jpeg,image\/png,image\/webp/);
   assert.match(html, /data-i18n="sv.studioUploadLabel"/);
   assert.match(html, /data-floqr-help-id="help-smartvisuals-create"/);
-  assert.match(html, /data-floqr-help-id="help-smartvisuals-rights"/);
+  assert.doesNotMatch(html, /data-floqr-help-id="help-smartvisuals-rights"/);
+  assert.doesNotMatch(html, /id="svStudioLicense"/);
+  assert.doesNotMatch(read("functions/smartvisuals-functions.js"), /Rights \/ source is required/);
   assert.match(read("smartvisuals-studio.js"), /readUpload/);
   assert.match(read("smartvisuals-studio.js"), /imageBase64/);
   assert.doesNotMatch(read("smartvisuals-studio.js"), /SVG rejected:/);
+  assert.doesNotMatch(read("smartvisuals-studio.js"), /svStudioLicense/);
 });
 
 test("BOT DEE loads visual catalog without a Search notification host", () => {

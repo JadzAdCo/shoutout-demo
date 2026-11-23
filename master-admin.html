@@ -1715,7 +1715,7 @@
             data-floqr-help-id="help-smartvisuals-studio"
             data-floqr-help-title="SMARTvisual Studio"
             data-floqr-help-search="smartvisuals|smartstencils|smartbackgrounds|smartview invitation|asset registry"
-            data-floqr-help-body="SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need Rights / source, sanitizer, SOS2FA, and a reason before review. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP; SMARTstencils stay SVG. Patrons only see published registry assets. Ads stay a separate labeled slot and are off."
+            data-floqr-help-body="SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Drafts need a name, sanitizer, SOS2FA, and a reason before review. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP; SMARTstencils stay SVG. Patrons only see published registry assets. Ads stay a separate labeled slot and are off."
             data-i18n="master.smartvisualStudio">SMARTvisual Studio</h2>
           <p class="sub small" data-i18n="master.smartvisualStudioIntro">Approved SMARTstencils and SMARTbackgrounds. Drafts never reach patrons until an audited publish. Scenic art is illustration, not photography.</p>
           <div class="sv-studio-tabs" role="tablist" aria-label="SMARTvisual Studio">
@@ -1747,8 +1747,8 @@
               <h3 data-i18n="master.smartvisualCreate"
                 data-floqr-help-id="help-smartvisuals-create"
                 data-floqr-help-title="Create / Edit SMARTvisuals"
-                data-floqr-help-search="create smartbackground|edit smartvisual|svg jpeg png webp|milan background|rights source"
-                data-floqr-help-body="Create or edit a SMARTstencil or SMARTbackground draft. Name and Rights / source are required before Submit for review. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark.">Create / Edit</h3>
+                data-floqr-help-search="create smartbackground|edit smartvisual|svg jpeg png webp|milan background|art upload"
+                data-floqr-help-body="Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark.">Create / Edit</h3>
               <form id="svStudioCreateForm">
                 <label><span data-i18n="sv.studioNameLabel">Name *</span> <input id="svStudioName" required maxlength="80"/></label>
                 <label><span data-i18n="sv.studioDescLabel">Description</span> <textarea id="svStudioDesc" rows="2" maxlength="400"></textarea></label>
@@ -1759,13 +1759,6 @@
                   </select>
                 </label>
                 <label><span data-i18n="sv.studioTagsLabel">Tags</span> <input id="svStudioTags" placeholder="travel, beach"/></label>
-                <label>
-                  <span class="label-inline-row">
-                    <span data-i18n="sv.studioRightsLabel">Rights / source *</span>
-                    <button type="button" class="floqr-help-popout" data-floqr-help-id="help-smartvisuals-rights" data-floqr-help-title="Rights / source" data-floqr-help-body="Rights / source records who owns this art. Write Original FLOQR illustration when FLOQR created it, or the licensed source (creator, license, and URL) when it is not original. Required to submit. Scenic SMARTvisuals are illustration, not photography and not an official destination or Fashion Week mark." data-floqr-help-search="rights source|license|provenance|who owns|original floqr illustration|licensed source" aria-label="Help">?</button>
-                  </span>
-                  <input id="svStudioLicense" required maxlength="240" placeholder="Original FLOQR illustration"/>
-                </label>
                 <label>
                   <span data-i18n="sv.studioUploadLabel">Art upload</span>
                   <input id="svStudioSvg" type="file" accept="image/svg+xml,image/jpeg,image/png,image/webp,.svg,.jpg,.jpeg,.png,.webp"/>
@@ -1800,8 +1793,8 @@
             <h3 data-i18n="sv.studioDetail"
               data-floqr-help-id="help-smartvisuals-create"
               data-floqr-help-title="Create / Edit SMARTvisuals"
-              data-floqr-help-search="milan preview|smartbackground preview|rights source|create edit"
-              data-floqr-help-body="Create or edit a SMARTstencil or SMARTbackground draft. Name and Rights / source are required before Submit for review. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark.">Asset detail / live preview</h3>
+              data-floqr-help-search="milan preview|smartbackground preview|art upload|create edit"
+              data-floqr-help-body="Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark.">Asset detail / live preview</h3>
             <div id="svStudioDetail"></div>
             <div id="svStudioLivePreview" hidden></div>
           </div>

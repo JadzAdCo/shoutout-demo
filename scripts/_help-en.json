@@ -521,10 +521,6 @@
   },
   "help-smartvisuals-create": {
     "title": "Create / Edit SMARTvisuals",
-    "body": "Create or edit a SMARTstencil or SMARTbackground draft. Name and Rights / source are required before Submit for review. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark."
-  },
-  "help-smartvisuals-rights": {
-    "title": "Rights / source",
-    "body": "Rights / source records who owns this art. Write Original FLOQR illustration when FLOQR created it, or the licensed source (creator, license, and URL) when it is not original. Required to submit. Scenic SMARTvisuals are illustration, not photography and not an official destination or Fashion Week mark."
+    "body": "Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark."
   }
 }

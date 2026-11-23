@@ -76,7 +76,6 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
   const license = text(request.data?.license, 240);
   const assetType = text(request.data?.type, 20) || "stencil";
   if (!name) deny("invalid-argument", "Name is required.");
-  if (!license) deny("invalid-argument", "Rights / source is required.");
   const sanit = sanitizeSmartVisualUpload(request.data || {}, {assetType});
   if (!sanit.ok) {
     await db.collection(COLLECTIONS.audit).add({
@@ -106,13 +105,12 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
     if (snap.exists && current !== expectedRev) {
       deny("failed-precondition", "Revision conflict — reload and retry.");
     }
-    tx.set(ref, {
+    const row = {
       id,
       name,
       description: text(request.data?.description, 400),
       type: assetType,
       tags: Array.isArray(request.data?.tags) ? request.data.tags.map(v => text(v, 40)).slice(0, 12) : [],
-      license,
       approvalStatus: "review",
       bytes: sanit.bytes,
       svgXml,
@@ -125,7 +123,9 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
       sos2faSessionId: sessionId,
       reason,
       updatedAt: FieldValue.serverTimestamp()
-    }, {merge: true});
+    };
+    if (license) row.license = license;
+    tx.set(ref, row, {merge: true});
   });
   return {
     ok: true,

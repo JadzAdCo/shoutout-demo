@@ -494,9 +494,6 @@
       "serviceMember",
       "venueAdmin"
     ],
-    "help-smartvisuals-rights": [
-      "masterAdmin"
-    ],
     "help-smartvisuals-room": [
       "patron",
       "serviceMember",
@@ -788,9 +785,6 @@
     ],
     "help-smartvisuals-notification": [
       "patron"
-    ],
-    "help-smartvisuals-rights": [
-      "masterAdmin"
     ],
     "help-smartvisuals-room": [
       "patron"

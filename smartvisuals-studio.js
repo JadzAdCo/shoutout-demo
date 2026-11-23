@@ -91,8 +91,8 @@
     box.innerHTML = `
       <h3 data-floqr-help-id="help-smartvisuals-create"
         data-floqr-help-title="Create / Edit SMARTvisuals"
-        data-floqr-help-search="milan preview|smartbackground preview|rights source|create edit"
-        data-floqr-help-body="Create or edit a SMARTstencil or SMARTbackground draft. Name and Rights / source are required before Submit for review. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark.">${esc(asset.name)}</h3>
+        data-floqr-help-search="milan preview|smartbackground preview|art upload|create edit"
+        data-floqr-help-body="Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark.">${esc(asset.name)}</h3>
       <p class="sub small">${esc(asset.id)} · rev ${esc(String(catalog.revision || 1))} · ${esc(asset.approvalStatus)}</p>
       <img src="./${esc(asset.path)}" alt="${esc(asset.name)}" class="sv-studio-preview"/>
       <p>${esc((asset.tags || []).join(", "))}</p>
@@ -167,7 +167,7 @@
   async function assignPlaceBackground(asset) {
     const status = byId("svStudioPlaceStatus");
     if (!asset || asset.type !== "background") {
-      if (status) status.textContent = t("sv.studioNeedMeta", "Name and license are required.");
+      if (status) status.textContent = t("sv.studioDenied", "Publish denied.");
       return;
     }
     const reasonPrompt = root.FLOQRReasonPrompt;
@@ -304,11 +304,10 @@
       const status = byId("svStudioCreateStatus");
       const file = byId("svStudioSvg")?.files?.[0];
       const name = byId("svStudioName")?.value || "";
-      const license = byId("svStudioLicense")?.value || "";
       const assetType = byId("svStudioType")?.value || "stencil";
       const reasonPrompt = root.FLOQRReasonPrompt;
-      if (!name.trim() || !license.trim()) {
-        if (status) status.textContent = t("sv.studioNeedMeta", "Name and rights / source are required.");
+      if (!name.trim()) {
+        if (status) status.textContent = t("sv.studioNeedMeta", "Name is required.");
         return;
       }
       const media = await readUpload(file, assetType);
@@ -333,7 +332,6 @@
         const sos = root.FLOQRSOS2FA?.sessionId?.();
         const payload = {
           name,
-          license,
           description: byId("svStudioDesc")?.value || "",
           type: assetType,
           tags: String(byId("svStudioTags")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
