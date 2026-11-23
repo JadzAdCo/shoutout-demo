@@ -40,12 +40,28 @@
     return INJECTION.some(re => re.test(raw));
   }
 
+  function finishClip(hay, start, end, limit) {
+    let clip = hay.slice(start, end).trim();
+    if (start > 0) clip = clip.replace(/^[,.;:–—-]+\s*/, "");
+    const trailing = end < hay.length;
+    if (trailing) clip = clip.replace(/[,.;:–—-]+$/, "");
+    const ellipsis = trailing ? "…" : "";
+    const budget = Math.max(1, limit - ellipsis.length);
+    if (clip.length <= budget) return clip + ellipsis;
+    let out = clip.slice(0, budget);
+    const space = out.lastIndexOf(" ");
+    if (space >= 24) out = out.slice(0, space);
+    return `${out.replace(/[,.;:–—-]+$/, "")}…`;
+  }
+
   function clipAround(source, match, max) {
     const hay = String(source || "");
     const needle = String(match || "");
+    const limit = Math.max(8, Number(max) || SUMMARY_MAX);
+    if (!hay) return "";
     const idx = hay.indexOf(needle);
-    if (idx < 0) return text(hay, max);
-    const pad = Math.max(24, Math.floor((max - needle.length) / 2));
+    if (idx < 0) return finishClip(hay, 0, hay.length, limit);
+    const pad = Math.max(24, Math.floor((limit - needle.length) / 2));
     let start = Math.max(0, idx - pad);
     let end = Math.min(hay.length, idx + needle.length + pad);
     if (start > 0) {
@@ -56,10 +72,7 @@
       const space = hay.indexOf(" ", end);
       if (space >= 0) end = space;
     }
-    let clip = hay.slice(start, end).trim();
-    if (start > 0) clip = clip.replace(/^[,.;:–—-]+\s*/, "");
-    if (end < hay.length) clip = `${clip.replace(/[,.;:–—-]+$/, "")}…`;
-    return text(clip, max);
+    return finishClip(hay, start, end, limit);
   }
 
   function cardPayload({kind, title, summary}) {
@@ -154,6 +167,7 @@
     SCHEMA_VERSION,
     SPAAVS_SAMPLE,
     cardsFromAuthorizedText,
+    clipAround,
     modeFromSearch,
     queryFromSearch
   };

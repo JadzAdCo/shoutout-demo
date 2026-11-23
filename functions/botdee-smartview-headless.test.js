@@ -81,6 +81,25 @@ test("public host is sign-in free and not Search / Features catalog", () => {
   assert.match(js, /geminiUsed: false/);
 });
 
+test("clipAround keeps ellipsis inside max and does not mid-word cut", () => {
+  const long = "alpha bravo charlie delta echo foxtrot golf hotel india juliet kilo lima mike november oscar papa quebec romeo sierra tango";
+  const clip = headless.clipAround(long, "juliet", 80);
+  assert.ok(clip.length <= 80, clip);
+  assert.match(clip, /juliet/);
+  assert.match(clip, /…$/);
+  const body = clip.replace(/…$/, "");
+  assert.ok(long.includes(body));
+  const after = long[long.indexOf(body) + body.length];
+  assert.ok(after === undefined || after === " ");
+  headless.cardsFromAuthorizedText(long + " " + SPAAVS).views.forEach(row => {
+    assert.ok(row.summary.length <= 160, row.summary);
+    if (row.summary.endsWith("…")) {
+      const slice = row.summary.slice(0, -1);
+      assert.doesNotMatch(slice, /\s$/);
+    }
+  });
+});
+
 test("SPAAVS sentence is not a BOT DEE dining/venue place search", () => {
   const folded = SPAAVS.toLowerCase();
   ["sushi", "restaurant", "dining", "club", "lounge", "nightlife", "venue", "bar"].forEach(cue => {
