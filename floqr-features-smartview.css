@@ -93,11 +93,31 @@
   outline:3px solid var(--accent,#00d4fe);
   outline-offset:2px;
 }
-.floqr-fsv-sheet[hidden]{display:none}
-.floqr-fsv-detail{
+/* Host .card uses backdrop-filter, which would trap position:fixed. Keep the
+   overlay on the viewport so Close and the backdrop receive pointer events. */
+.floqr-fsv-mount.card{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  transform:none !important;
+  filter:none !important;
+  contain:none !important;
+  overflow:visible;
+}
+.floqr-fsv-sheet{
   position:fixed;
-  right:16px;
-  top:12vh;
+  inset:0;
+  z-index:10060;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-end;
+  padding:12vh 16px 16px;
+  background:rgba(4,8,20,.55);
+}
+.floqr-fsv-sheet[hidden]{display:none!important}
+.floqr-fsv-detail{
+  position:relative;
+  right:auto;
+  top:auto;
   width:min(420px, calc(100vw - 24px));
   max-height:76vh;
   overflow:auto;
@@ -106,11 +126,15 @@
   background:var(--card,#111);
   color:var(--text,#e5e7eb);
   border:1px solid var(--accent,#00d4fe);
-  z-index:40;
+  z-index:1;
+  pointer-events:auto;
 }
 .floqr-fsv-close{
   min-height:44px;
   min-width:44px;
+  position:relative;
+  z-index:2;
+  pointer-events:auto;
 }
 .floqr-fsv-dl{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0}
 .floqr-fsv-dl dt{font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#c4c4c4)}
@@ -121,6 +145,15 @@
 .floqr-fsv-root[data-fsv-layout="inline"] .floqr-fsv-grid{
   grid-template-columns:1fr;
 }
+.floqr-fsv-root[data-fsv-layout="inline"] .floqr-fsv-sheet{
+  position:relative;
+  inset:auto;
+  z-index:5;
+  display:block;
+  padding:0;
+  background:transparent;
+}
+.floqr-fsv-root[data-fsv-layout="inline"] .floqr-fsv-sheet[hidden]{display:none!important}
 .floqr-fsv-root[data-fsv-layout="inline"] .floqr-fsv-detail{
   position:relative;
   top:auto;
@@ -133,11 +166,12 @@
 }
 @media (max-width:600px){
   .floqr-fsv-grid{grid-template-columns:1fr}
+  .floqr-fsv-sheet{
+    align-items:flex-end;
+    justify-content:stretch;
+    padding:0;
+  }
   .floqr-fsv-detail{
-    top:auto;
-    right:0;
-    left:0;
-    bottom:0;
     width:100%;
     max-height:80vh;
     border-radius:16px 16px 0 0;

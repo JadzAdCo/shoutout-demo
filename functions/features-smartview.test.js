@@ -282,6 +282,12 @@ test("UI, BOT DEE, and Master Admin hosts are wired without hardcoded nav versio
   assert.match(read("botdee.html"), /preload[^>]+features-smartview\/catalog\.json/);
   assert.match(read("features-smartview.html"), /if \(!firebase\.apps\.length\) firebase\.initializeApp\(firebaseConfig\);/);
   assert.match(read("features-smartview.html"), /FLOQRSessionShell\.bind/);
+  assert.match(read("features-smartview.html"), /data-floqr-public/);
+  assert.match(read("features-smartview.html"), /autoRedirect:\s*false/);
+  assert.match(read("features-smartview.html"), /mountCatalog\(\);/);
+  assert.match(read("floqr-features-smartview.js"), /function closeSheet/);
+  assert.match(read("floqr-features-smartview.js"), /hasHostAttr/);
+  assert.match(read("floqr-features-smartview.css"), /backdrop-filter:\s*none/);
   assert.doesNotMatch(read("features-smartview.html"), /<a\b[^>]*href="[^"]*[?&]v=/);
   assert.match(read("functions/index.js"), /getFeaturesSmartViewCatalog/);
   assert.match(read("firestore.rules"), /match \/featuresSmartviewApprovals\/\{id\}/);
@@ -303,8 +309,12 @@ function fakeHost() {
     classList: {add() {}},
     __jumps: [],
     __tabs: [],
+    __closes: [],
+    hasAttribute(name) {
+      return Object.prototype.hasOwnProperty.call(host.attributes, name);
+    },
     getAttribute(name) {
-      return Object.prototype.hasOwnProperty.call(host.attributes, name) ? host.attributes[name] : "";
+      return Object.prototype.hasOwnProperty.call(host.attributes, name) ? host.attributes[name] : null;
     },
     setAttribute(name, value) {
       host.attributes[name] = String(value);
@@ -321,6 +331,9 @@ function fakeHost() {
       } else if (sel === "[data-fsv-view]") {
         attr = "data-fsv-view";
         bucket = "__tabs";
+      } else if (sel === "[data-fsv-close]") {
+        attr = "data-fsv-close";
+        bucket = "__closes";
       } else {
         return [];
       }
@@ -523,6 +536,41 @@ test("What's new in Mingl survives apostrophe stripping", () => {
     assert.equal(pack.productName, "Mingl", prompt);
   });
   assert.equal(core.isFeaturesSmartViewPrompt("What changed in ShoutOut?"), true);
+});
+
+test("public projection keeps evidence-backed Before/Now without publicCopyApproved", () => {
+  const holds = catalog.features.find(row => row.id === "vip-reserv.holds");
+  assert.equal(holds.publicCopyApproved, false);
+  assert.ok(holds.previousBehavior);
+  assert.ok(holds.currentBehavior);
+  const pub = core.publicFeature(holds, {role: "patron"});
+  assert.equal(pub.previousBehavior, holds.previousBehavior);
+  assert.equal(pub.currentBehavior, holds.currentBehavior);
+  assert.equal(pub.publicCopyApproved, false);
+  assert.equal(pub.implementedLabel, core.DATE_NOT_VERIFIED);
+  const news = core.filterFeatures(core.publicProjection(catalog, {role: "patron"}).features, {view: "whatsNew"});
+  assert.equal(news.length, 0);
+});
+
+test("Close dismisses the detail sheet even when the URL has ?feature=", async () => {
+  const sandbox = loadUiSandbox();
+  sandbox.location.search = "?feature=vip-reserv.holds";
+  sandbox.location.href = "https://jadzadco.github.io/shoutout-demo/features-smartview.html?feature=vip-reserv.holds";
+  const host = fakeHost();
+  await sandbox.FLOQRFeaturesSmartView.mount(host, {
+    productId: "vip-reserv",
+    view: "all",
+    featureId: "vip-reserv.holds"
+  });
+  assert.equal(host.getAttribute("data-fsv-feature"), "vip-reserv.holds");
+  assert.match(host.innerHTML, /floqr-fsv-sheet is-open/);
+  assert.match(host.innerHTML, /data-fsv-close/);
+  const close = host.__closes[0];
+  assert.ok(close, "Close is wired");
+  close.fn({preventDefault() {}, stopPropagation() {}});
+  assert.equal(host.getAttribute("data-fsv-feature"), "");
+  assert.doesNotMatch(host.innerHTML, /floqr-fsv-sheet is-open/);
+  assert.match(host.innerHTML, /data-fsv-sheet hidden/);
 });
 
 test("deprecated and retired history is preserved in schema", () => {

@@ -501,7 +501,7 @@
   },
   "help-features-smartview": {
     "title": "Features SMARTview",
-    "body": "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status is Production when Enable Feature is on and Enable Beta Feature is off, Testing when both are on, Beta when only Enable Beta Feature is on, and In development when Enable Feature is off. Dates stay Not verified — do not invent a release date. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview and not Version SMARTview. Plans are never treated as shipped."
+    "body": "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. The catalog page opens without Search sign-in. Close dismisses the product detail sheet. Status is Production when Enable Feature is on and Enable Beta Feature is off, Testing when both are on, Beta when only Enable Beta Feature is on, and In development when Enable Feature is off. Dates stay Not verified — do not invent a release date. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview and not Version SMARTview. Plans are never treated as shipped."
   },
   "help-features-smartview-status": {
     "title": "Production, Testing, Beta, In development",

@@ -1,9 +1,9 @@
 {
   "schemaVersion": "floqr.featuresSmartView/1",
-  "catalogVersion": 2,
-  "warning": "Status is Production, Testing, Beta, or In development from Features & Services flags. Dates are not verified. Plans are not treated as shipped.",
-  "auditedAt": "2026-11-20",
-  "defaultBranchSha": "868bec33e874e57ab33b73f6127641df67edec66",
+  "catalogVersion": 3,
+  "warning": "Status is Production, Testing, Beta, or In development from Features & Services flags (packaged defaults unless a session loads live flags). Dates are not verified. Plans are not treated as shipped. Catalog copy is not publicCopyApproved.",
+  "auditedAt": "2026-11-23",
+  "defaultBranchSha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
   "products": [
     {
       "id": "bot-dee",
@@ -11,7 +11,11 @@
       "lifecycle": "beta",
       "statusVerified": false,
       "mission": "In-app concierge for search, help, and SMARTviews.",
-      "packaged": { "featureKey": "botDee", "IsFeatureEnabled": 1, "IsTestFeature": 1 },
+      "packaged": {
+        "featureKey": "botDee",
+        "IsFeatureEnabled": 1,
+        "IsTestFeature": 1
+      },
       "presentInRepo": true
     },
     {
@@ -20,7 +24,11 @@
       "lifecycle": "in_development",
       "statusVerified": false,
       "mission": "Patron connections and chat after both people accept.",
-      "packaged": { "featureKey": "mingl", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "packaged": {
+        "featureKey": "mingl",
+        "IsFeatureEnabled": 0,
+        "IsTestFeature": 1
+      },
       "presentInRepo": true
     },
     {
@@ -29,7 +37,11 @@
       "lifecycle": "in_development",
       "statusVerified": false,
       "mission": "Paid LED messages at a venue.",
-      "packaged": { "featureKey": "shoutOut", "IsFeatureEnabled": 1, "IsTestFeature": 0 },
+      "packaged": {
+        "featureKey": "shoutOut",
+        "IsFeatureEnabled": 1,
+        "IsTestFeature": 0
+      },
       "presentInRepo": true
     },
     {
@@ -38,7 +50,11 @@
       "lifecycle": "in_development",
       "statusVerified": false,
       "mission": "Venue pickup requests when the club and account allow RydR.",
-      "packaged": { "featureKey": "rydr", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "packaged": {
+        "featureKey": "rydr",
+        "IsFeatureEnabled": 0,
+        "IsTestFeature": 1
+      },
       "presentInRepo": true
     },
     {
@@ -47,7 +63,11 @@
       "lifecycle": "in_development",
       "statusVerified": false,
       "mission": "Live phone camera to the venue floqCast board on display2.",
-      "packaged": { "featureKey": "floqCast", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "packaged": {
+        "featureKey": "floqCast",
+        "IsFeatureEnabled": 0,
+        "IsTestFeature": 1
+      },
       "presentInRepo": true
     },
     {
@@ -56,7 +76,11 @@
       "lifecycle": "in_development",
       "statusVerified": false,
       "mission": "Table holds and deposits where a club is subscribed.",
-      "packaged": { "featureKey": "vipReservations", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "packaged": {
+        "featureKey": "vipReservations",
+        "IsFeatureEnabled": 0,
+        "IsTestFeature": 1
+      },
       "presentInRepo": true
     },
     {
@@ -65,7 +89,11 @@
       "lifecycle": "in_development",
       "statusVerified": false,
       "mission": "Virtual sets from FloqMedia Spatial Studio grants.",
-      "packaged": { "featureKey": "sinema", "IsFeatureEnabled": 0, "IsTestFeature": 1 },
+      "packaged": {
+        "featureKey": "sinema",
+        "IsFeatureEnabled": 0,
+        "IsTestFeature": 1
+      },
       "presentInRepo": true
     },
     {
@@ -86,32 +114,52 @@
       "shortDescription": "Signed-in patrons can chat with BOT DEE on botdee.html for help, search, and SMARTviews.",
       "accomplishment": "Gives a single in-app place to ask how FLOQR products work.",
       "patronBenefit": "You do not have to hunt through admin docs for basic how-tos.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "Satellite chat reuses the Search session. Feature key botDee is packaged Enabled + Test.",
+      "previousBehavior": "Help lived in page ? popouts and the Search FloqAi / BOT DEE tile. There was no dedicated botdee.html chat satellite.",
+      "currentBehavior": "Satellite botdee.html chats via executeBotSession. Packaged featureServices/botDee is IsFeatureEnabled 1 IsTestFeature 1 (Testing). Live Firestore flags were not read this run.",
       "lifecycle": "beta",
       "statusVerified": false,
       "verificationNotes": "Packaged featureServices/botDee {1,1}. Live Firestore flags were not read this run. Pages hosts botdee.html on main.",
-      "audienceRoles": ["patron", "betaTester", "masterAdmin"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "patron",
+        "betaTester",
+        "masterAdmin"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
-      "mergedAt": "",
+      "mergedAt": "2026-10-24T15:48:18Z",
       "releasedAt": "",
       "releaseDateVerified": false,
-      "featureFlags": ["botDee"],
+      "featureFlags": [
+        "botDee"
+      ],
       "sourceEvidence": [
         {
-          "kind": "doc",
-          "url": "https://github.com/JadzAdCo/shoutout-demo/blob/868bec33e874e57ab33b73f6127641df67edec66/functions/feature-services-core.js",
-          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
-          "observedAt": "2026-11-20",
-          "note": "Packaged catalog row botDee IsFeatureEnabled 1 IsTestFeature 1",
+          "kind": "pr",
+          "prNumber": 38,
+          "url": "https://github.com/JadzAdCo/shoutout-demo/pull/38",
+          "observedAt": "2026-10-24T15:48:18Z",
+          "note": "Merged. Not proof of first patron availability.",
+          "visibility": "internal"
+        },
+        {
+          "kind": "feature_flag",
+          "note": "functions/feature-services-core.js packaged botDee {1,1} on origin/main 4c20735a",
+          "sha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
+          "observedAt": "2026-11-23",
           "visibility": "public"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2,
+      "catalogVersion": 3,
       "history": [
-        { "type": "in_development", "at": "", "note": "Code on main; live audience not verified", "public": true }
+        {
+          "type": "in_development",
+          "at": "2026-10-24T15:48:18Z",
+          "note": "PR 38 merged executeBotSession chat. Merge is not a patron-availability date.",
+          "public": true
+        }
       ]
     },
     {
@@ -122,27 +170,34 @@
       "shortDescription": "Ver / Vers / Version opens a Version SMARTview card with live package stamps — not Features SMARTview.",
       "accomplishment": "Shows honest service status for BOT DEE and Gemini on this request.",
       "patronBenefit": "You can check which package this chat is on without a six-phase dump.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "Alias replies are card-only. What's New on that card is BOT DEE/Gemini notes only.",
+      "previousBehavior": "Ver / Vers / Version aliases dumped a six-phase engineer chat instead of a card.",
+      "currentBehavior": "Aliases open Version SMARTview only (FEATURE-WIRING s3.3.034). Distinct from Features SMARTview. First patron-available date is not verified.",
       "lifecycle": "in_development",
       "statusVerified": false,
-      "verificationNotes": "Distinct from Features SMARTview. Do not list Master Admin tools on Version What's New.",
-      "audienceRoles": ["patron"],
-      "supportedPlatforms": ["web"],
+      "verificationNotes": "Distinct from Features SMARTview. Do not list Master Admin tools on Version What's New. No availability date attached.",
+      "audienceRoles": [
+        "patron"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "releaseDateVerified": false,
-      "featureFlags": ["botDee"],
+      "featureFlags": [
+        "botDee"
+      ],
       "sourceEvidence": [
         {
           "kind": "doc",
-          "note": "functions/botdee-version-smartview.js on inspected SHA",
-          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
-          "observedAt": "2026-11-20",
+          "note": "docs/FEATURE-WIRING.md Version SMARTview s3.3.034 on origin/main 4c20735a",
+          "sha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
+          "observedAt": "2026-11-23",
           "visibility": "internal"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "releasedAt": ""
     },
     {
       "id": "bot-dee.people-smartview",
@@ -152,18 +207,24 @@
       "shortDescription": "Who is / What do you know of questions mount public-within-FLOQR People cards.",
       "accomplishment": "Looks up people by identity fields only (name, handle), not bios.",
       "patronBenefit": "You see the same public profile media as the public page, not a second profile.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "PR #141 merged identity-only scoring. Merged date is not a patron-availability date.",
+      "previousBehavior": "People lookup could match bio text (for example a bio that mentioned Don Julio).",
+      "currentBehavior": "PR 141 identity-only scoring: first name, last name, display name, FloqR / Mingl / social handles. Merged 2026-11-20T15:42:09Z. Merge is not a patron-availability date. Functions deploy from that SHA was not independently attested in the PR body.",
       "lifecycle": "in_development",
       "statusVerified": false,
       "verificationNotes": "Merged PR is not proof Functions were deployed from that SHA.",
-      "audienceRoles": ["patron"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "patron"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "mergedAt": "2026-11-20T15:42:09Z",
       "releasedAt": "",
       "releaseDateVerified": false,
-      "featureFlags": ["botDee"],
+      "featureFlags": [
+        "botDee"
+      ],
       "sourceEvidence": [
         {
           "kind": "pr",
@@ -176,7 +237,15 @@
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "history": [
+        {
+          "type": "in_development",
+          "at": "2026-11-20T15:42:09Z",
+          "note": "PR 141 merged. Deploy evidence not attached as an availability date.",
+          "public": true
+        }
+      ]
     },
     {
       "id": "bot-dee.room-smartview",
@@ -186,17 +255,25 @@
       "shortDescription": "Open Room SMARTview or plan a Cancun trip mounts a group session card. This is not Features SMARTview.",
       "accomplishment": "Invited Mingl friends can join a BOT DEE session. Join is not a payment.",
       "patronBenefit": "Friends can plan in one BOT DEE card instead of scattered chats — when the session path is available to you.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "Confirm + invite path exists in code. Live audience follows botDee + mingl gates.",
+      "previousBehavior": "Room / Cancun trip prompts were not this Features catalog. They open Room SMARTview, a different card.",
+      "currentBehavior": "PR 128 merged Room join + headless VIP 2026-11-19T21:23:03Z. Confirm + invite path exists in code. Live audience follows botDee + mingl gates. Not a Features SMARTview release.",
       "lifecycle": "in_development",
       "statusVerified": false,
-      "audienceRoles": ["patron", "betaTester"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "patron",
+        "betaTester"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "mergedAt": "2026-11-19T21:23:03Z",
       "releasedAt": "",
       "releaseDateVerified": false,
-      "featureFlags": ["botDee", "mingl"],
+      "featureFlags": [
+        "botDee",
+        "mingl"
+      ],
       "sourceEvidence": [
         {
           "kind": "pr",
@@ -209,7 +286,15 @@
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "history": [
+        {
+          "type": "in_development",
+          "at": "2026-11-19T21:23:03Z",
+          "note": "PR 128 merged. Not a Features SMARTview availability date.",
+          "public": true
+        }
+      ]
     },
     {
       "id": "mingl.connections",
@@ -219,26 +304,41 @@
       "shortDescription": "Mingl chat opens after both people accept. Packaged Mingl default is Off + Test.",
       "accomplishment": "Keeps chat behind a two-way accept and a Features & Services gate.",
       "patronBenefit": "Mingl stays hidden until the platform actually opened it for your account.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "Packaged featureServices/mingl {0,1}. Live flags may differ and were not read this run.",
+      "previousBehavior": "Not verified as a dated prior UX. Design notes require two-way accept before chat.",
+      "currentBehavior": "mingl-chat.html is a satellite. Packaged featureServices/mingl is IsFeatureEnabled 0 IsTestFeature 1 (Beta). Live flags were not read this run.",
       "lifecycle": "in_development",
       "statusVerified": false,
       "verificationNotes": "Do not treat Search tile presence for Master Admin QA as a public release.",
-      "audienceRoles": ["betaTester", "masterAdmin"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "betaTester",
+        "masterAdmin"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "releaseDateVerified": false,
-      "featureFlags": ["mingl"],
+      "featureFlags": [
+        "mingl"
+      ],
       "sourceEvidence": [
         {
           "kind": "feature_flag",
-          "note": "Packaged default Off. Live featureServices/mingl not read.",
-          "observedAt": "2026-11-20",
+          "note": "functions/feature-services-core.js packaged mingl {0,1} on origin/main 4c20735a",
+          "sha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
+          "observedAt": "2026-11-23",
+          "visibility": "public"
+        },
+        {
+          "kind": "doc",
+          "note": ".cursor/rules/design-notes-feature-services.mdc Mingl satellite mingl-chat.html",
+          "observedAt": "2026-11-23",
           "visibility": "internal"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "releasedAt": ""
     },
     {
       "id": "mingl.room-smartview-collab",
@@ -248,25 +348,34 @@
       "shortDescription": "Helps invited patrons plan in a shared BOT DEE workspace. Kit sample card — status not verified.",
       "accomplishment": "Shared decisions in Room SMARTview, not a second Mingl product.",
       "patronBenefit": "Reduces planning friction for groups when the session is available.",
-      "previousBehavior": "Hypothesis: planning spread across individual chats — not verified.",
-      "proposedBehavior": "Shared itinerary and optional later tab. Do not imply shipped GroupPay or 16-person calls.",
+      "previousBehavior": "Kit sample hypothesized planning spread across individual chats — not verified as a shipped prior UX.",
+      "proposedBehavior": "Shared itinerary remains proposed. Do not imply shipped GroupPay or 16-person calls.",
       "lifecycle": "in_development",
       "statusVerified": false,
-      "audienceRoles": ["betaTester"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "betaTester"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "releaseDateVerified": false,
-      "featureFlags": ["mingl", "botDee"],
+      "featureFlags": [
+        "mingl",
+        "botDee"
+      ],
       "sourceEvidence": [
         {
           "kind": "doc",
-          "note": "Kit compact-card example explicitly unverified",
+          "note": "Kit SMARTVIEW_UX_SPEC.md compact-card example explicitly unverified",
           "observedAt": "2026-11-20",
           "visibility": "internal"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "currentBehavior": "Room SMARTview collaboration is gated on mingl + botDee. Not a second Mingl product. GroupPay and 16-person calls are not this feature.",
+      "releasedAt": ""
     },
     {
       "id": "shoutout.venue-led",
@@ -276,27 +385,53 @@
       "shortDescription": "Paid LED messages play on venue Display 1. Packaged ShoutOut is Enabled and not a test feature.",
       "accomplishment": "Patrons can compose a ShoutOut for a club LED when the venue is enabled.",
       "patronBenefit": "Your message can appear on the club board after pay and club approve.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "Packaged shoutOut {1,0}. Live Firestore flags and first patron-available date are not verified.",
+      "previousBehavior": "Not verified as a dated prior UX. Design notes (feature-services) say only ShoutOut is live by default — that is packaged intent.",
+      "currentBehavior": "Packaged featureServices/shoutOut is IsFeatureEnabled 1 IsTestFeature 0. PR 145 maps that to Production on Features SMARTview. Pages hosts the composer. First patron-available date is not verified. Live Firestore flags were not read this run.",
       "lifecycle": "in_development",
       "statusVerified": false,
-      "verificationNotes": "Design notes say only ShoutOut is live by default. That is packaged intent, not a dated deployment attestation. Lifecycle is not Released until availability evidence is attached.",
-      "audienceRoles": ["patron"],
-      "supportedPlatforms": ["web", "led"],
+      "verificationNotes": "Owner: ShoutOut is Production. Mapping is flags, not a Dated Released lifecycle. Do not copy merge or Pages deploy time into Date implemented.",
+      "audienceRoles": [
+        "patron"
+      ],
+      "supportedPlatforms": [
+        "web",
+        "led"
+      ],
       "availability": "unknown",
       "releaseDateVerified": false,
-      "featureFlags": ["shoutOut"],
+      "featureFlags": [
+        "shoutOut"
+      ],
       "sourceEvidence": [
         {
           "kind": "feature_flag",
-          "note": "Packaged default live. Firestore live doc not read. Pages hosts composer.",
-          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
-          "observedAt": "2026-11-20",
+          "note": "Packaged shoutOut {1,0} in functions/feature-services-core.js FEATURE_CATALOG on 4c20735a",
+          "sha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
+          "observedAt": "2026-11-23",
+          "visibility": "public"
+        },
+        {
+          "kind": "pr",
+          "prNumber": 145,
+          "url": "https://github.com/JadzAdCo/shoutout-demo/pull/145",
+          "sha": "f20cb59e1f6821cdd998599776e57d5cb5217557",
+          "observedAt": "2026-11-22T21:08:30Z",
+          "note": "Merged Production mapping. Pages+Functions later on 4c20735a. Still not a first-available date.",
           "visibility": "internal"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "history": [
+        {
+          "type": "in_development",
+          "at": "2026-11-22T21:08:30Z",
+          "note": "PR 145 merged Production badge mapping. Not an availability date.",
+          "public": true
+        }
+      ],
+      "mergedAt": "2026-11-22T21:08:30Z",
+      "releasedAt": ""
     },
     {
       "id": "shoutout.headless-chat",
@@ -308,21 +443,32 @@
       "patronBenefit": "You can start a ShoutOut without leaving BOT DEE — when that path is available.",
       "lifecycle": "in_development",
       "statusVerified": false,
-      "audienceRoles": ["patron"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "patron"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "releaseDateVerified": false,
-      "featureFlags": ["shoutOut", "botDee"],
+      "featureFlags": [
+        "shoutOut",
+        "botDee"
+      ],
       "sourceEvidence": [
         {
           "kind": "doc",
-          "note": "Headless ShoutOut SMARTpreview on main; not a dated public release",
-          "observedAt": "2026-11-20",
+          "note": "Headless ShoutOut SMARTpreview on main; FEATURE-WIRING. Not a dated public release.",
+          "sha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
+          "observedAt": "2026-11-23",
           "visibility": "internal"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "previousBehavior": "ShoutOut compose lived on Search / composer pages, not in BOT DEE chat.",
+      "currentBehavior": "Throw a ShoutOut in BOT DEE with SMARTpreview. LED still waits on Club Admin Approve. First patron-available date is not verified.",
+      "releasedAt": ""
     },
     {
       "id": "rydr.pickup",
@@ -332,29 +478,36 @@
       "shortDescription": "Request a venue pickup when RydR is enabled for the club and your account. Packaged rydr is Beta.",
       "accomplishment": "Satellite pickup.html reuses the Search session for a signed-in pickup request.",
       "patronBenefit": "You can start a pickup from a club without a second login — when RydR is available to you.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "Packaged rydr {0,1}. Live Firestore flags were not read this run.",
+      "previousBehavior": "Not verified as a dated prior UX.",
+      "currentBehavior": "pickup.html / rydr.html satellites. Packaged rydr {0,1} = Beta. requestTeslaRobotaxiPickup asserts feature access. Live flags were not read this run.",
       "lifecycle": "in_development",
       "statusVerified": false,
       "verificationNotes": "Packaged featureServices/rydr {0,1}. Do not invent a first-available date.",
-      "audienceRoles": ["betaTester", "masterAdmin"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "betaTester",
+        "masterAdmin"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "mergedAt": "",
       "releasedAt": "",
       "releaseDateVerified": false,
-      "featureFlags": ["rydr"],
+      "featureFlags": [
+        "rydr"
+      ],
       "sourceEvidence": [
         {
           "kind": "feature_flag",
-          "note": "Packaged default IsFeatureEnabled 0 IsTestFeature 1. Pages hosts pickup.html.",
-          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
-          "observedAt": "2026-11-20",
-          "visibility": "internal"
+          "note": "Packaged rydr {0,1} in functions/feature-services-core.js on 4c20735a. Pages hosts pickup.html.",
+          "sha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
+          "observedAt": "2026-11-23",
+          "visibility": "public"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3
     },
     {
       "id": "floqcast.live",
@@ -364,29 +517,44 @@
       "shortDescription": "Search a venue, preview, pay, Club Admin approve, then go live on display2 only. Packaged floqCast is Beta.",
       "accomplishment": "Phone camera can appear on the secondary LED after pay and club approve.",
       "patronBenefit": "You can go live on the venue floqCast board when the club and your account allow it.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "Packaged floqCast {0,1}. Live pointer is locationId__secondary. Live Firestore flags were not read this run.",
+      "previousBehavior": "Not verified as a dated prior UX. Retired display names (supRstar) are storage ids only.",
+      "currentBehavior": "Search → preview → pay (~$20) → Club Admin approve → startFloqCastLive writes suprstrLive/{locationId}__secondary. display2 only. Packaged floqCast {0,1} = Beta. Live flags were not read this run.",
       "lifecycle": "in_development",
       "statusVerified": false,
       "verificationNotes": "Packaged featureServices/floqCast {0,1}. Brand is floqCast. Display 1 is never the live board. Do not invent a first-available date.",
-      "audienceRoles": ["betaTester", "masterAdmin"],
-      "supportedPlatforms": ["web", "led"],
+      "audienceRoles": [
+        "betaTester",
+        "masterAdmin"
+      ],
+      "supportedPlatforms": [
+        "web",
+        "led"
+      ],
       "availability": "unknown",
       "mergedAt": "",
       "releasedAt": "",
       "releaseDateVerified": false,
-      "featureFlags": ["floqCast"],
+      "featureFlags": [
+        "floqCast"
+      ],
       "sourceEvidence": [
         {
-          "kind": "feature_flag",
-          "note": "Packaged default IsFeatureEnabled 0 IsTestFeature 1. Pages hosts floqcast-search.html.",
-          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
-          "observedAt": "2026-11-20",
+          "kind": "doc",
+          "note": ".cursor/rules/floqcast.mdc product path on origin/main 4c20735a",
+          "sha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
+          "observedAt": "2026-11-23",
           "visibility": "internal"
+        },
+        {
+          "kind": "feature_flag",
+          "note": "Packaged floqCast {0,1} in functions/feature-services-core.js",
+          "sha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
+          "observedAt": "2026-11-23",
+          "visibility": "public"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3
     },
     {
       "id": "vip-reserv.holds",
@@ -396,18 +564,25 @@
       "shortDescription": "Hold a table, accept Terms, pay a deposit when the club requires it. Phase 2 code is on main.",
       "accomplishment": "Keeps inventory on a timed hold before checkout.",
       "patronBenefit": "You can reserve a published table when VIP reserV is enabled for that club and your account.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "Packaged vipReservations {0,1}. Club must also enable VIP. Live flags not read.",
+      "previousBehavior": "Not verified as a dated prior UX. Bars and DJ booths are never bookable (VIP floorplan ingest rule).",
+      "currentBehavior": "Phase 2: 30 min holds, Terms, FloqR Stripe deposit (orderType vipReservation). Packaged vipReservations {0,1} = Beta. Club must also enable VIP. Live flags and venue vipReservationsEnabled were not read this run.",
       "lifecycle": "in_development",
       "statusVerified": false,
       "verificationNotes": "Do not mark Released from conversation. GroupPay is not this feature.",
-      "audienceRoles": ["betaTester", "masterAdmin"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "betaTester",
+        "masterAdmin"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "mergedAt": "2026-10-17T15:01:34Z",
       "releasedAt": "",
       "releaseDateVerified": false,
-      "featureFlags": ["vipReservations"],
+      "featureFlags": [
+        "vipReservations"
+      ],
       "sourceEvidence": [
         {
           "kind": "pr",
@@ -420,7 +595,15 @@
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "history": [
+        {
+          "type": "in_development",
+          "at": "2026-10-17T15:01:34Z",
+          "note": "PR 2 Terms/flow merged. Not an availability date.",
+          "public": true
+        }
+      ]
     },
     {
       "id": "vip-reserv.headless",
@@ -432,13 +615,20 @@
       "patronBenefit": "You can start a hold in chat when VIP reserV is available to you.",
       "lifecycle": "in_development",
       "statusVerified": false,
-      "audienceRoles": ["betaTester"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "betaTester"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "mergedAt": "2026-11-20T15:51:37Z",
       "releasedAt": "",
       "releaseDateVerified": false,
-      "featureFlags": ["vipReservations", "botDee"],
+      "featureFlags": [
+        "vipReservations",
+        "botDee"
+      ],
       "sourceEvidence": [
         {
           "kind": "pr",
@@ -451,7 +641,17 @@
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "previousBehavior": "VIP booking was vip.html only; BOT DEE did not hold tables.",
+      "currentBehavior": "PR 134 merged 2026-11-20T15:51:37Z: book/hold phrasing, date rail, 2D map in BOT DEE. BOT DEE never takes card numbers. Functions deploy from that SHA not independently attested as first availability.",
+      "history": [
+        {
+          "type": "in_development",
+          "at": "2026-11-20T15:51:37Z",
+          "note": "PR 134 merged. Not an availability date.",
+          "public": true
+        }
+      ]
     },
     {
       "id": "si-nema.virtual-set",
@@ -461,19 +661,26 @@
       "shortDescription": "Load a granted FloqMedia Spatial Studio project as a virtual set. Geometry stays on FloqMedia.",
       "accomplishment": "FloqR stores a pin (projectId + revision), not a copy of photos or meshes.",
       "patronBenefit": "You can open a granted set in Si-nema when the feature is enabled for you.",
-      "previousBehavior": "Not verified",
-      "currentBehavior": "Satellite sinema.html exists. Packaged sinema {0,1}. Search tile stays hidden until flags allow.",
+      "previousBehavior": "No FloqR pin path. Spatial Studio grants live in FloqMedia, not this repo.",
+      "currentBehavior": "PR 84 merged 2026-11-15T08:01:44Z: FloqR OIDC + grant refs + Si-nema pins. Satellite sinema.html exists. Packaged sinema {0,1} = Beta. Production firestore.rules for Spatial still wait on owner approval per spatial-studio-architecture.mdc.",
       "proposedBehavior": "AI movie workflows from the kit sample are not shipped.",
       "lifecycle": "in_development",
       "statusVerified": false,
       "verificationNotes": "Si-nema product page is not Features SMARTview. Do not mark AI movie creation Released.",
-      "audienceRoles": ["betaTester", "masterAdmin"],
-      "supportedPlatforms": ["web"],
+      "audienceRoles": [
+        "betaTester",
+        "masterAdmin"
+      ],
+      "supportedPlatforms": [
+        "web"
+      ],
       "availability": "unknown",
       "mergedAt": "2026-11-15T08:01:44Z",
       "releasedAt": "",
       "releaseDateVerified": false,
-      "featureFlags": ["sinema"],
+      "featureFlags": [
+        "sinema"
+      ],
       "sourceEvidence": [
         {
           "kind": "pr",
@@ -486,7 +693,15 @@
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "history": [
+        {
+          "type": "in_development",
+          "at": "2026-11-15T08:01:44Z",
+          "note": "PR 84 merged. Not an availability date.",
+          "public": true
+        }
+      ]
     },
     {
       "id": "si-nema.ai-movie",
@@ -506,13 +721,16 @@
       "sourceEvidence": [
         {
           "kind": "doc",
-          "note": "SAMPLE_CATALOG.json exampleFeature; unverified",
-          "observedAt": "2026-11-20",
+          "note": ".cursor/rules/design-notes-aurelia-scene-standard.mdc — documentation standard only",
+          "observedAt": "2026-11-23",
           "visibility": "internal"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "previousBehavior": "Not a patron feature in this repository.",
+      "currentBehavior": "Aurelia VIP 3D STANDARD is a documentation / demo pipeline (reports/aurelia-scene-standard/), not a shipped Si-nema product path. Not app build, not Pages, not Functions unless the owner asks.",
+      "releasedAt": ""
     },
     {
       "id": "si-tube.viewing",
@@ -532,14 +750,17 @@
       "sourceEvidence": [
         {
           "kind": "doc",
-          "note": "Repo grep found no sitube product implementation on inspected SHA",
-          "sha": "868bec33e874e57ab33b73f6127641df67edec66",
-          "observedAt": "2026-11-20",
+          "note": "Repo has no sitube product implementation on origin/main 4c20735a",
+          "sha": "4c20735a2f0911bf9887bc980d4017a4013e604f",
+          "observedAt": "2026-11-23",
           "visibility": "internal"
         }
       ],
       "publicCopyApproved": false,
-      "catalogVersion": 2
+      "catalogVersion": 3,
+      "previousBehavior": "No prior Si-tube UX in this repository.",
+      "currentBehavior": "Named in the Features SMARTview kit only. No page, feature key, or callables on origin/main 4c20735a.",
+      "releasedAt": ""
     }
   ]
 }

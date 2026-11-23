@@ -279,9 +279,11 @@
       shortDescription: record.shortDescription,
       accomplishment: record.accomplishment,
       patronBenefit: record.patronBenefit,
-      previousBehavior: record.publicCopyApproved ? (record.previousBehavior || "") : "",
-      currentBehavior: record.publicCopyApproved ? (record.currentBehavior || "") : "",
-      proposedBehavior: record.publicCopyApproved ? (record.proposedBehavior || "") : "",
+      // Evidence-backed catalog facts stay visible on the Features page even when
+      // publicCopyApproved is false. What's New still requires editorial approval.
+      previousBehavior: record.previousBehavior || "",
+      currentBehavior: record.currentBehavior || "",
+      proposedBehavior: record.proposedBehavior || "",
       lifecycle: record.lifecycle,
       lifecycleLabel: lifecycleLabel(record.lifecycle, verified, flags),
       statusVerified: verified,

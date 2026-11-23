@@ -605,7 +605,7 @@ const HELP = {
   "help-features-smartview": {
     en: {
       title: "Features SMARTview",
-      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. Status stays Status not verified until availability is evidenced. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview and not Version SMARTview. Plans are never treated as shipped."
+      body: "Features SMARTview is the product catalog for BOT-DEE, Mingl, ShoutOut, RydR, floqCast, VIP reserV, Si-nema, and Si-tube. Open Overview, What's New, Feature Journey, All Features, Coming Soon, or Past/Retired. The catalog page opens without Search sign-in. Close dismisses the product detail sheet. Status stays Status not verified until availability is evidenced. What's New stays empty until a reviewer approves a verified release. This is not Room SMARTview and not Version SMARTview. Plans are never treated as shipped."
     },
     fr: {
       title: "Features SMARTview",
