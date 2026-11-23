@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.064 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.065 (stable)
 
+- s3.3.065: SMARTvisual Studio Save uses Entity Management SOS2FA session (getSessionId), not an empty sessionId()
 - s3.3.064: SMARTvisual Studio Create/Edit JPEG/PNG/WebP SMARTbackgrounds; Rights/source field removed
 - s3.3.063: Features SMARTview Close + evidence catalog; compact Place SMARTview cards with admin-editable SMARTbackgrounds
 - s3.3.062: Cache-bust stamps match the shipped search, Venue Command Center, and BOT DEE venue pages

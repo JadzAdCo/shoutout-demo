@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.065",
+    "text": "s3.3.065: SMARTvisual Studio Save uses Entity Management SOS2FA session (getSessionId), not an empty sessionId()",
+    "audiences": [
+      "other"
+    ]
+  },
+  {
     "id": "s3.3.064",
     "text": "s3.3.064: SMARTvisual Studio Create/Edit JPEG/PNG/WebP SMARTbackgrounds; Rights/source field removed",
     "audiences": [

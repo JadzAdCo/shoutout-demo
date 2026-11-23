@@ -2885,11 +2885,11 @@
       "id": "help-smartvisuals-studio",
       "kind": "help",
       "label": "SMARTvisual Studio",
-      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Preview in Place SMARTview shows the compact club/place card. Use as Place SMARTview background writes a published SMARTbackground (SOS2FA + reason) s",
+      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Save uses the same Entity Management SOS2FA session as other Master Admin saves — do not request a new code if already unlocked. Search and preview packaged art as images. Preview in Place SMAR",
       "href": "./master-admin.html",
       "phrases": [
         "smartvisual studio",
-        "smartvisual studio is the master admin library for smartstencils and smartbackgrounds. search and preview packaged art as images. preview in place smartview sho",
+        "smartvisual studio is the master admin library for smartstencils and smartbackgrounds. save uses the same entity management sos2fa session as other master admin",
         "asset registry",
         "smartvisuals library",
         "publish stencil",
