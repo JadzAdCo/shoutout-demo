@@ -3630,6 +3630,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-41-traditional-search-output-chrome",
+      area:"Site chrome / Search",
+      feature:"Traditional search-output pills + VIP/FloqCast venue cards match View Club",
+      changed:"Search-output .badge-row / .tag-row pills use View Club cyan ink + charcoal fill with !important (ShoutOut club cards, VIP venue cards, FloqCast, services). VIP full-card venue buttons keep white copy + cyan active border. FloqCast Select venue CTAs match.",
+      howToTest:"1) Site chrome Traditional; hard-refresh Search + vip.html + floqcast-search.html (styles.css / vip.css / floqcast-search.css ?v=s3.3.060). 2) ShoutOut location card: night pills (Thursday/Friday/Saturday) = cyan text on charcoal (same as View Club ink); View Club unchanged. 3) VIP reserV venue cards: Bookable/genre pills cyan; Select venue primary gradient; hover card gets thin cyan border. 4) FloqCast: Select venue = charcoal + cyan; selected card cyan ring; Go live stays primary gradient.",
+      expected:"All dynamic search-output secondary pills/CTAs match View Club Traditional chrome; primaries stay brand gradient.",
+      troubleshoot:"Still white pill text → hard refresh styles.css + vip.css + floqcast-search.css s3.3.060 (feature CSS loads after styles). Confirm html[data-floqr-chrome=traditional]."
+    },
+    {
       id:"s3-3-055-headless-vip-ux",
       area:"BOT DEE",
       feature:"Headless VIP reserV from natural reservation phrasing",
