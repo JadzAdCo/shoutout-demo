@@ -1,7 +1,8 @@
 "use strict";
 /* SMARTvisual media sanitizer — SVG (stencils + backgrounds) and JPEG/PNG/WebP (backgrounds).
    Reject scripts, foreignObject, handlers, external refs. Prefer <img src> for untrusted files.
-   Only vetted published icons may be inlined. Raster is magic-byte gated, never treated as SVG. */
+   Only vetted published icons may be inlined. Raster is magic-byte gated, never treated as SVG.
+   JPEG/PNG/WebP backgrounds persist on smartVisualDrafts via publishSmartVisualDraft. */
 
 const FORBIDDEN_TAG = /<\s*(script|foreignObject|iframe|object|embed|link|meta|style|handler|animate|set|use)\b/i;
 const EVENT_ATTR = /\bon[a-z]+\s*=/i;
