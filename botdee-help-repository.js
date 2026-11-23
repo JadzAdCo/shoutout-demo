@@ -506,7 +506,7 @@
     {
       id: "help-smartvisuals-studio",
       title: "SMARTvisual Studio",
-      body: "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Preview in Place SMARTview shows the compact club/place card. Use as Place SMARTview background writes a published SMARTbackground (SOS2FA + reason) so venue cards are not an empty black well. Drafts need a name, sanitizer, SOS2FA, and a reason before review. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP; SMARTstencils stay SVG. Patrons only see published registry assets. Ads are a separate labeled slot filled with a mock sample from authorized tags; AdSense stays off.",
+      body: "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Save uses the same Entity Management SOS2FA session as other Master Admin saves — do not request a new code if already unlocked. Search and preview packaged art as images. Preview in Place SMARTview shows the compact club/place card. Use as Place SMARTview background writes a published SMARTbackground (SOS2FA + reason) so venue cards are not an empty black well. Drafts need a name, sanitizer, SOS2FA, and a reason before review. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP; SMARTstencils stay SVG. Patrons only see published registry assets. Ads are a separate labeled slot filled with a mock sample from authorized tags; AdSense stays off.",
       searchPhrases: ["smartvisual studio", "asset registry", "smartvisuals library", "publish stencil", "place smartview background", "venue card background", "jpeg png webp"],
       links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
       audiences: ["masterAdmin"],

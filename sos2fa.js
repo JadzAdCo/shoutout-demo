@@ -28,7 +28,8 @@
     "adLiveCampaigns",
     "adStatsPanel",
     "adIntakePanel",
-    "adSettingsPanel"
+    "adSettingsPanel",
+    "smartvisualStudio"
   ];
 
   let uiBound = false;
@@ -385,6 +386,7 @@
     isEntityMgmtPanel,
     isUnlocked,
     getSessionId,
+    sessionId: (scope) => getSessionId(scope || "entityManagement"),
     unlock,
     lock,
     sendCode,

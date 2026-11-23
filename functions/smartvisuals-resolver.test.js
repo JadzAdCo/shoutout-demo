@@ -387,3 +387,26 @@ test("Place SMARTview uses published SMARTbackground, not a photo well", () => {
   assert.match(read("smartvisuals-studio.js"), /placeSmartView:/);
   assert.ok(catalog.taxonomy.placeCardDefaults.venue.backgroundId);
 });
+
+test("Studio send SOS2FA via getSessionId, not a missing sessionId() helper", () => {
+  const studio = read("smartvisuals-studio.js");
+  const sos = read("sos2fa.js");
+  const app = read("master-admin-app.js");
+  assert.match(studio, /getSessionId\?\.\(SOS_SCOPE\)/);
+  assert.match(studio, /function sosSessionId\(/);
+  assert.match(studio, /function needSos2fa\(/);
+  assert.match(studio, /async function studioCallable\(/);
+  assert.match(studio, /getIdToken\(true\)/);
+  assert.match(studio, /studioCallable\("publishSmartVisualDraft"/);
+  assert.match(studio, /classifySmartVisual/);
+  assert.match(studio, /httpsCallable\(name\)/);
+  assert.match(studio, /sv\.studioNeedSos2fa/);
+  assert.doesNotMatch(studio, /FLOQRSOS2FA\?\.sessionId\?\.\(\)/);
+  assert.doesNotMatch(studio, /clientKind: "agent"/);
+  assert.doesNotMatch(studio, /requestSos2faCode/);
+  assert.match(studio, /requireUnlock\?\.\(SOS_SCOPE\)/);
+  assert.match(sos, /"smartvisualStudio"/);
+  assert.match(sos, /sessionId: \(scope\) => getSessionId\(scope \|\| "entityManagement"\)/);
+  assert.match(app, /"smartvisualStudio"/);
+  assert.match(read("functions/sos2fa-functions.js"), /Entity Management requires a valid SOS2FA session/);
+});
