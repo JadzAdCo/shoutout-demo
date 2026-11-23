@@ -223,6 +223,22 @@ test("follow-up fills the asked collectableInput slot", () => {
   assert.equal(kit.jerseyTeamId, "soccerMorocco");
 });
 
+test("template switch does not fill the new overlay's first slot", () => {
+  const draft = headless.mergeInteractiveDraft({}, headless.parseShoutOutExecute(
+    "throw a shoutout at Decades that says Happy birthday Maya"
+  ));
+  assert.deepEqual(headless.interactiveNeeds(draft), []);
+  const parsed = headless.parseShoutOutExecute("jersey");
+  assert.equal(parsed.templateId, "soccerJersey");
+  const jerseyRow = headless.catalogShapeFor("soccerJersey");
+  headless.applyBareInteractiveReply(draft, parsed, "jersey", jerseyRow);
+  assert.equal(parsed.jerseyTeamId || "", "");
+  const next = headless.mergeInteractiveDraft(draft, parsed, {freshThrow: false});
+  assert.equal(next.templateId, "soccerJersey");
+  assert.equal(next.jerseyTeamId || "", "");
+  assert.ok(headless.interactiveNeeds(next).includes("jerseyTeamId"));
+});
+
 test("ready-state no cancels the ShoutOut", () => {
   const draft = headless.mergeInteractiveDraft({}, headless.parseShoutOutExecute(
     "throw a shoutout at Decades that says Happy birthday Maya"
@@ -431,6 +447,9 @@ test("startShoutOutCheckout and FloqR callable accept flat club + message", () =
   assert.match(session, /applyBareInteractiveReply\(previousDraft, parsed, userPrompt, askedRow\)/);
   assert.match(session, /isInteractiveFollowUp\(userPrompt, previousShoutDraft, previousShoutRow\)/);
   assert.match(session, /loadTemplateCollectableRow\(previousShoutDraft\.templateId\)/);
+  assert.match(session, /previousDraft\.templateId \|\| headless\.DEFAULT_TEMPLATE_ID/);
+  assert.doesNotMatch(session, /previousDraft\?\.templateId \|\| parsed\.templateId/);
+  assert.match(read("functions/headless-shoutout-core.js"), /isBareTemplateSwitch/);
 
   const pay = read("payment-service.js");
   assert.match(pay, /createHeadlessShoutOutCheckout/);

@@ -237,7 +237,9 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   const uid = session?.userId || session?.request?.auth?.uid || "";
   const parsed = headless.parseShoutOutExecute(userPrompt);
   const fromThread = headless.fillFromConversation(conversationTurns, userPrompt);
-  const askedTemplateId = previousDraft?.templateId || parsed.templateId || fromThread.templateId;
+  const askedTemplateId = previousDraft
+    ? (previousDraft.templateId || headless.DEFAULT_TEMPLATE_ID)
+    : (parsed.templateId || fromThread.templateId);
   const askedResolved = askedTemplateId || headless.DEFAULT_TEMPLATE_ID;
   const askedRow = previousTemplateRow
     && (previousTemplateRow.id === askedResolved || previousTemplateRow.templateId === askedResolved)

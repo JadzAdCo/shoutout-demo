@@ -627,11 +627,25 @@ function bareSlotText(raw, max) {
   return stripMessageWrap(raw).slice(0, max);
 }
 
+function draftTemplateId(draft) {
+  return resolveTemplateId(draft && draft.templateId) || DEFAULT_TEMPLATE_ID;
+}
+
+function isBareTemplateSwitch(raw, draft) {
+  const switched = extractStandaloneTemplate(raw);
+  if (!switched) return false;
+  return switched !== draftTemplateId(draft);
+}
+
 /** Map a follow-up (yes/no or the asked collectableInput) onto the current step. Never mint on “yes”. */
 function applyBareInteractiveReply(draft, parsed, raw, templateRow) {
   const next = parsed && typeof parsed === "object" ? parsed : {};
   if (!draft) return next;
-  const step = interactiveNeeds(draft, templateRow)[0] || "";
+  if (isBareTemplateSwitch(raw, draft)) return next;
+  const overlay = templateRow && typeof templateRow === "object"
+    ? templateRow
+    : catalogShapeFor(draftTemplateId(draft));
+  const step = interactiveNeeds(draft, overlay)[0] || "";
   if (isBareAffirmative(raw)) {
     if (step === "handle") next.handleDecision = next.handleDecision || "include";
     else if (step === "media") next.mediaDecision = next.mediaDecision || "none";
@@ -656,7 +670,8 @@ function applyBareInteractiveReply(draft, parsed, raw, templateRow) {
   } else if (step === "message" && !next.message) {
     next.message = extractCelebrationMessage(text) || extractQuotedMessage(text) || bareSlotText(text, 400);
   } else if (step === "jerseyTeamId" && !next.jerseyTeamId) {
-    next.jerseyTeamId = extractJerseyTeam(text) || text;
+    const kit = extractJerseyTeam(text);
+    next.jerseyTeamId = kit || (extractStandaloneTemplate(text) ? "" : text);
   } else if (step === "jerseyName" && !next.jerseyName) {
     next.jerseyName = extractJerseyName(text) || bareSlotText(text, 16).toUpperCase();
   } else if (step === "jerseyNumber" && !next.jerseyNumber) {
