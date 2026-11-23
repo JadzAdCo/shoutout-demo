@@ -118,6 +118,34 @@
   function relUrl(file) { return `${REL}/${file}`; }
   function absUrl(file) { return `${PAGES}/images/temp-qa/${file}`; }
 
+  /* Retired from live club-profile Gallery (Aurelia / temp-democlub-1): keep files for staff media, do not show as gallery tiles. */
+  const RETIRED_PUBLIC_GALLERY_FILES = [
+    "vip-donpapi-led-hbd.png",
+    "vip-donpapi-led-checking-in.png",
+    "vip-donpapi-led-carry.png",
+    "club-aurelia-vip-shoutout.png"
+  ];
+  const RETIRED_PUBLIC_GALLERY_TITLES = [
+    "DonPapi LED wall — busboys hold it in the air",
+    "DonPapi ShoutOut — DON CHECKING IN",
+    "VIP ShoutOut — FloqR....the App. We're Outside",
+    "VIP table LED — FloqR....the App. We're Outside"
+  ];
+
+  function isRetiredPublicGalleryItem(item) {
+    const url = String(item?.mediaUrl || item?.url || "").split("?")[0].toLowerCase();
+    const title = String(item?.title || "").trim();
+    if (RETIRED_PUBLIC_GALLERY_TITLES.includes(title)) return true;
+    return RETIRED_PUBLIC_GALLERY_FILES.some(file => {
+      const needle = String(file).toLowerCase();
+      return url.endsWith("/" + needle) || url.endsWith(needle);
+    });
+  }
+
+  function filterPublicGallery(items) {
+    return (Array.isArray(items) ? items : []).filter(item => item && !isRetiredPublicGalleryItem(item));
+  }
+
   function uniqueFiles(files = [], max = 8) {
     const out = [];
     const seen = new Set();
@@ -274,22 +302,18 @@
       mainMediaUrl: venue,
       mainMediaType: "image",
       publicGallery: [
-        {mediaUrl: url(PHOTOS.vipShoutout), mediaType: "image", slotType: "gallery", title: "DonPapi LED wall — busboys hold it in the air", galleryOrder: 1},
-        {mediaUrl: url(PHOTOS.vipShoutoutLed), mediaType: "image", slotType: "gallery", title: "DonPapi ShoutOut — DON CHECKING IN", galleryOrder: 2},
-        {mediaUrl: url(PHOTOS.vipShoutoutCarry), mediaType: "image", slotType: "gallery", title: "VIP ShoutOut — FloqR....the App. We're Outside", galleryOrder: 3},
-        {mediaUrl: url(PHOTOS.vipShoutoutTable), mediaType: "image", slotType: "gallery", title: "VIP table LED — FloqR....the App. We're Outside", galleryOrder: 4},
-        {mediaUrl: url(PHOTOS.portraitBirthday), mediaType: "image", slotType: "gallery", title: "Portrait LED wall 960×1900 — Happy Birthday", galleryOrder: 5},
-        {mediaUrl: url(PHOTOS.dualLed), mediaType: "image", slotType: "gallery", title: "VIP table — Maya's birthday crew + portrait LED wall", galleryOrder: 6},
-        {mediaUrl: url(PHOTOS.dualLedCarry), mediaType: "image", slotType: "gallery", title: "Go Maya — BusBoy with the Papi's ClubTech 64x48 photo ShoutOut", galleryOrder: 7},
-        {mediaUrl: galleryA, mediaType: "image", slotType: "gallery", title: "VIP Room", galleryOrder: 8},
-        {mediaUrl: galleryB, mediaType: "image", slotType: "gallery", title: "Entrance", galleryOrder: 9},
-        {mediaUrl: venue, mediaType: "image", slotType: "gallery", title: "Main room", galleryOrder: 10},
-        {mediaUrl: url(PHOTOS.bartenderPour), mediaType: "image", slotType: "gallery", title: "Barman", galleryOrder: 11},
-        {mediaUrl: url(PHOTOS.waitressFloor(n)), mediaType: "image", slotType: "gallery", title: "Waitress on the floor", galleryOrder: 12},
-        {mediaUrl: url(PHOTOS.djBooth(n)), mediaType: "image", slotType: "gallery", title: "Resident DJ booth", galleryOrder: 13},
-        {mediaUrl: url(PHOTOS.bottleExtra(n)), mediaType: "image", slotType: "gallery", title: "Bottle service", galleryOrder: 14},
-        {mediaUrl: url(PHOTOS.waiterTable(n)), mediaType: "image", slotType: "gallery", title: "VIP waiter", galleryOrder: 15},
-        {mediaUrl: url(PHOTOS.busboyLed), mediaType: "image", slotType: "gallery", title: "BusBoy - Papi's ClubTech Led 64x48 Mobile display", galleryOrder: 16}
+        {mediaUrl: url(PHOTOS.portraitBirthday), mediaType: "image", slotType: "gallery", title: "Portrait LED wall 960×1900 — Happy Birthday", galleryOrder: 1},
+        {mediaUrl: url(PHOTOS.dualLed), mediaType: "image", slotType: "gallery", title: "VIP table — Maya's birthday crew + portrait LED wall", galleryOrder: 2},
+        {mediaUrl: url(PHOTOS.dualLedCarry), mediaType: "image", slotType: "gallery", title: "Go Maya — BusBoy with the Papi's ClubTech 64x48 photo ShoutOut", galleryOrder: 3},
+        {mediaUrl: galleryA, mediaType: "image", slotType: "gallery", title: "VIP Room", galleryOrder: 4},
+        {mediaUrl: galleryB, mediaType: "image", slotType: "gallery", title: "Entrance", galleryOrder: 5},
+        {mediaUrl: venue, mediaType: "image", slotType: "gallery", title: "Main room", galleryOrder: 6},
+        {mediaUrl: url(PHOTOS.bartenderPour), mediaType: "image", slotType: "gallery", title: "Barman", galleryOrder: 7},
+        {mediaUrl: url(PHOTOS.waitressFloor(n)), mediaType: "image", slotType: "gallery", title: "Waitress on the floor", galleryOrder: 8},
+        {mediaUrl: url(PHOTOS.djBooth(n)), mediaType: "image", slotType: "gallery", title: "Resident DJ booth", galleryOrder: 9},
+        {mediaUrl: url(PHOTOS.bottleExtra(n)), mediaType: "image", slotType: "gallery", title: "Bottle service", galleryOrder: 10},
+        {mediaUrl: url(PHOTOS.waiterTable(n)), mediaType: "image", slotType: "gallery", title: "VIP waiter", galleryOrder: 11},
+        {mediaUrl: url(PHOTOS.busboyLed), mediaType: "image", slotType: "gallery", title: "BusBoy - Papi's ClubTech Led 64x48 Mobile display", galleryOrder: 12}
       ],
       extractedImages: [
         {url: logo, mediaUrl: logo, mediaType: "image", title: "Logo", slotType: "logo"},
@@ -397,7 +421,10 @@
     };
   }
 
-  const api = {PAGES, REL, CLUBS, PHOTOS, personRecord, clubRecord, userProfilePatch, personMediaFiles, relUrl, absUrl};
+  const api = {
+    PAGES, REL, CLUBS, PHOTOS, personRecord, clubRecord, userProfilePatch, personMediaFiles, relUrl, absUrl,
+    RETIRED_PUBLIC_GALLERY_FILES, RETIRED_PUBLIC_GALLERY_TITLES, isRetiredPublicGalleryItem, filterPublicGallery
+  };
   root.FLOQRTempQaShowcase = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof window !== "undefined" ? window : globalThis);

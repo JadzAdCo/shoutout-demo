@@ -78,6 +78,18 @@ test("Papi's ClubTech 64x48 busboy and Maya VIP room photos are wired and shippe
   const titles = club.publicGallery.map(item => item.title);
   assert.ok(titles.includes("BusBoy - Papi's ClubTech Led 64x48 Mobile display"));
   assert.ok(!titles.includes("Busboy — DonPapi LED wall"));
+  assert.equal(titles[0], "Portrait LED wall 960×1900 — Happy Birthday");
+  for (const gone of [
+    "DonPapi LED wall — busboys hold it in the air",
+    "DonPapi ShoutOut — DON CHECKING IN",
+    "VIP ShoutOut — FloqR....the App. We're Outside",
+    "VIP table LED — FloqR....the App. We're Outside"
+  ]) {
+    assert.ok(!titles.includes(gone), `retired gallery title gone: ${gone}`);
+  }
+  for (const file of ["vip-donpapi-led-hbd.png", "vip-donpapi-led-checking-in.png", "vip-donpapi-led-carry.png", "club-aurelia-vip-shoutout.png"]) {
+    assert.ok(!club.publicGallery.some(item => String(item.mediaUrl).includes(file)), `${file} not a gallery tile`);
+  }
   for (const file of ["busboy-papis-clubtech-64x48.jpg", "club-aurelia-vip-maya-guests.jpg", "club-aurelia-vip-maya-busboy-64x48.jpg"]) {
     assert.ok(club.publicGallery.some(item => String(item.mediaUrl).endsWith(`/images/temp-qa/${file}`)), `${file} in gallery`);
     assert.ok(fs.existsSync(path.join(root, "images", "temp-qa", file)), `${file} exists`);
@@ -85,6 +97,22 @@ test("Papi's ClubTech 64x48 busboy and Maya VIP room photos are wired and shippe
   const busboy = club.featuredStaff.find(person => person.publicProfileType === "busBoy");
   assert.ok(busboy, "busboy staff card");
   assert.doesNotMatch(JSON.stringify(busboy), /busboy-papis-clubtech/);
+});
+
+test("club profile gallery drops retired DonPapi/VIP shoutout tiles even from Firestore overlay", () => {
+  const src = read("club-profile-app.js");
+  assert.match(src, /filterRetiredGallery/);
+  assert.match(src, /resolvePublicGallery/);
+  assert.match(read("club-profile.html"), /floqr-temp-qa-showcase\.js\?v=s3\.3\.072/);
+  assert.match(read("club-profile.html"), /club-profile-app\.js\?v=s3\.3\.072/);
+  const showcase = loadShowcase();
+  const overlay = [
+    {mediaUrl: "https://example.test/vip-donpapi-led-hbd.png", title: "DonPapi LED wall — busboys hold it in the air", slotType: "gallery"},
+    {mediaUrl: "https://example.test/club-aurelia-portrait-birthday.png", title: "Portrait LED wall 960×1900 — Happy Birthday", slotType: "gallery"}
+  ];
+  const kept = showcase.filterPublicGallery(overlay);
+  assert.equal(kept.length, 1);
+  assert.equal(kept[0].title, "Portrait LED wall 960×1900 — Happy Birthday");
 });
 
 test("club profile page has no mojibake punctuation", () => {
