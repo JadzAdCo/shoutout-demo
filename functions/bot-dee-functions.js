@@ -863,7 +863,11 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
           consentId: merged.consentId,
           returnBase: session?.request?.data?.returnBase
         }, session.request);
-        try { await threadsMod.persistHeadlessVipDraft(uid, null); } catch (_) {}
+        if (checkout.checkoutUrl) {
+          try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+        } else {
+          try { await threadsMod.persistHeadlessVipDraft(uid, null); } catch (_) {}
+        }
         const view = vipView.buildVipSmartView({
           ...viewBase,
           mode: checkout.checkoutUrl ? "checkout" : "pass",

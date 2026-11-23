@@ -1813,7 +1813,11 @@
     }
     storeVipPopoutPayload(payload);
     let href = "./botdee-vip-popout.html";
-    try { href = new URL("botdee-vip-popout.html", location.href).href; } catch (_) {}
+    try {
+      const url = new URL("botdee-vip-popout.html", location.href);
+      if (kind) url.searchParams.set("kind", String(kind));
+      href = url.href;
+    } catch (_) {}
     let win = null;
     try { win = window.open(href, VIP_POPOUT_NAME, vipPopoutFeatures()); } catch (_) { win = null; }
     if (!win) {
@@ -1832,22 +1836,39 @@
     return {text: `${mm}:${ss}`, left};
   }
 
+  let vipHoldClock = 0;
+
+  function stopHoldClock() {
+    if (vipHoldClock) {
+      clearInterval(vipHoldClock);
+      vipHoldClock = 0;
+    }
+  }
+
   function startHoldClock(card, expiresAtMs) {
+    stopHoldClock();
     const el = card.querySelector("[data-vip-clock]");
     if (!el || !expiresAtMs) return;
     const tick = () => {
+      const live = vipPreviewHost()?.querySelector(".botdee-sv-vip") || card;
+      if (!live || !live.isConnected) {
+        stopHoldClock();
+        return;
+      }
       const {text: clock, left} = formatHoldClock(expiresAtMs);
-      el.textContent = t("botdee.vip.holdClock", "Hold {clock}").replace("{clock}", clock);
+      const clockEl = live.querySelector("[data-vip-clock]");
+      if (clockEl) clockEl.textContent = t("botdee.vip.holdClock", "Hold {clock}").replace("{clock}", clock);
       if (left <= 0) {
-        clearInterval(card._vipClock);
-        if (card.getAttribute("data-vip-mode") === "hold" && global.FLOQRBotDeeChat?.sendMessage) {
+        stopHoldClock();
+        const mode = live.getAttribute("data-vip-mode") || "";
+        const guest = live.getAttribute("data-guest-mode") === "1";
+        if (!guest && (mode === "hold" || mode === "checkout") && global.FLOQRBotDeeChat?.sendMessage) {
           global.FLOQRBotDeeChat.sendMessage("cancel");
         }
       }
     };
     tick();
-    clearInterval(card._vipClock);
-    card._vipClock = setInterval(tick, 1000);
+    vipHoldClock = setInterval(tick, 1000);
   }
 
   function renderVipCard(payload) {
@@ -1928,7 +1949,7 @@
       ${view.collab ? renderCollabStrip(view) : ""}
       <div class="botdee-sv-people-actions">
         ${cta}
-        ${!guest && mode === "hold" ? `<button type="button" class="botdee-sv-action" data-vip-prompt="cancel">${esc(t("botdee.vip.cancelHold", "Cancel hold"))}</button>` : ""}
+        ${!guest && (mode === "hold" || mode === "checkout") ? `<button type="button" class="botdee-sv-action" data-vip-prompt="cancel">${esc(t("botdee.vip.cancelHold", "Cancel hold"))}</button>` : ""}
         ${!guest && mode === "hold" ? `<button type="button" class="botdee-sv-action" data-vip-popout="terms">${esc(t("botdee.vip.termsOpen", "Read Terms"))}</button>` : ""}
         ${!guest && collapsed ? `<button type="button" class="botdee-sv-action" data-vip-prompt="change table">${esc(t("botdee.vip.changeTable", "Change table"))}</button>` : ""}
         <button type="button" class="botdee-sv-action" data-vip-popout="map">${esc(t("botdee.vip.openMap", "Open VIP reserV map"))}</button>
@@ -1985,6 +2006,7 @@
   }
 
   function clearVipPreviewDock() {
+    stopHoldClock();
     const el = vipPreviewHost();
     if (!el) return;
     el.hidden = true;
@@ -1999,6 +2021,7 @@
       if (!isLiveVipPreview(view)) clearVipPreviewDock();
       return false;
     }
+    stopHoldClock();
     el.hidden = false;
     el.classList.add("is-open");
     global.document?.body?.classList.add("botdee-vip-dock-open");

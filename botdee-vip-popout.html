@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex,nofollow"/>
   <meta name="referrer" content="no-referrer"/>
   <title>VIP reserV</title>
-  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.061"/>
-  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.061"/>
+  <link rel="stylesheet" href="./bot-dee-chat.css?v=s3.3.062"/>
+  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.062"/>
 </head>
 <body class="botdee-vip-popout-page" data-floqr-public>
 <main class="botdee-vip-popout">
@@ -104,7 +104,7 @@
     if (event.key === "Escape") { event.preventDefault(); closePopout(); }
   });
 
-  if (kind === "paid") {
+  if (kind === "paid" || kind === "pass") {
     document.title = labels.pass || "Your VIP reserV pass";
     var table = view.sectionLabel || view.sectionId || "";
     var venue = view.venueName || "";

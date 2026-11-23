@@ -193,7 +193,13 @@ test("VIP dock has a Hold it CTA and strips the demo slug", () => {
   assert.doesNotMatch(dockCss, /\.botdee-vip-dock\.is-open[\s\S]{0,80}flex:\s*0 0 auto/);
   const popout = read("botdee-vip-popout.html");
   assert.match(popout, /floqr-botdee-vip/);
-  assert.match(popout, /kind === "paid"/);
+  assert.match(popout, /kind === "paid" \|\| kind === "pass"/);
+  assert.match(smart, /function stopHoldClock/);
+  assert.match(smart, /mode === "hold" \|\| mode === "checkout"/);
+  assert.match(smart, /searchParams\.set\("kind"/);
+  const session = read("functions/bot-dee-functions.js");
+  assert.match(session, /if \(checkout\.checkoutUrl\) \{\s*try \{ await threadsMod\.persistHeadlessVipDraft\(uid, merged\);/);
+  assert.doesNotMatch(session, /persistHeadlessVipDraft\(uid, null\); \} catch \(_\) \{\}[\s\S]{0,80}mode: checkout\.checkoutUrl/);
   const commerce = read("functions/commerce-functions.js");
   assert.match(commerce, /botdee-vip-popout.html/);
   const fallback = read("functions/bot-dee-core.js");
