@@ -2149,11 +2149,11 @@
     {
       id: "help-patron-account-merge",
       title: "Patron account merge",
-      body: "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted until Don confirms. New sign-ups refuse a second account when the mobile is already claimed.",
+      body: "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted until a Master Admin confirms. New sign-ups refuse a second account when the mobile is already claimed.",
       searchPhrases: [
         "merge accounts", "duplicate patron", "same phone", "MsLorna", "Lorna", "phone unifier"
       ],
-      links: [{label: "Duplicate Records", href: pageUrl("./master-admin.html", {from: "botdee"})}],
+      links: [{label: "Duplicate Records", href: pageUrl("./master-admin.html", {from: "botdee"}) + "#duplicateRecords"}],
       audiences: ["masterAdmin"],
       source: "help-repository-seed",
       page: "master-admin.html"
