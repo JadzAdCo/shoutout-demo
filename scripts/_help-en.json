@@ -510,5 +510,9 @@
   "help-features-smartview-botdee": {
     "title": "Ask BOT DEE about a product",
     "body": "In BOT DEE say What can Mingl do, What can RydR do, What can floqCast do, What changed in ShoutOut, What is coming to Si-nema, or When was VIP reserV implemented. BOT DEE answers from the Features catalog with citations. It reports Production, Testing, Beta, or In development and will not treat a plan as shipped. Type Ver for Version SMARTview. Type Open Room SMARTview for a shared room. Those are different cards."
+  },
+  "help-venue-command-center": {
+    "title": "Venue Command Center",
+    "body": "Approve ShoutOuts, review venue performance, and reconcile account activity for this location."
   }
 }
