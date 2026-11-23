@@ -486,10 +486,16 @@
     "help-sinema-virtual-set": [
       "patron"
     ],
+    "help-smartvisuals-create": [
+      "masterAdmin"
+    ],
     "help-smartvisuals-notification": [
       "patron",
       "serviceMember",
       "venueAdmin"
+    ],
+    "help-smartvisuals-rights": [
+      "masterAdmin"
     ],
     "help-smartvisuals-room": [
       "patron",
@@ -777,8 +783,14 @@
     "help-shoutout": [
       "patron"
     ],
+    "help-smartvisuals-create": [
+      "masterAdmin"
+    ],
     "help-smartvisuals-notification": [
       "patron"
+    ],
+    "help-smartvisuals-rights": [
+      "masterAdmin"
     ],
     "help-smartvisuals-room": [
       "patron"

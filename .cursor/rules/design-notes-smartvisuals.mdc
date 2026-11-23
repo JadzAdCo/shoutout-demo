@@ -9,14 +9,14 @@ Resume: `@smartvisuals$` / `$smartvisuals$`. Official spellings (never translate
 
 ## What it is
 
-A **shared visual service**, not a Features & Services Search tile. Layers on `mingl` + `botDee`. Scenic art is **original SVG illustration**, not photography and not an official destination/Fashion Week/Burning Man mark.
+A **shared visual service**, not a Features & Services Search tile. Layers on `mingl` + `botDee`. Scenic art is **original FLOQR illustration**, not photography and not an official destination/Fashion Week/Burning Man mark. Packaged kit files are SVG. Studio Create/Edit for **SMARTbackgrounds** also accepts JPEG, PNG, and WebP drafts; **SMARTstencils** stay SVG (`currentColor`).
 
 ## Source of truth
 
 | Surface | Truth |
 |---|---|
 | Published assets | git `smartvisuals/registry.json` + `catalog.json` + SVG files (26 stencils, 34 backgrounds) |
-| Unpublished drafts | Firestore `smartVisualDrafts` (Master Admin read; Functions-write; sanitized `svgXml` + checksum so Review can preview) |
+| Unpublished drafts | Firestore `smartVisualDrafts` (Master Admin read; Functions-write; sanitized `svgXml` or raster `imageBase64` + checksum so Review can preview; `license` = Rights / source) |
 | Overrides / cache / ads / audit | `smartVisualOverrides`, `smartVisualSelections`, `smartVisualAdPolicy`, `smartVisualAuditLogs` |
 
 Default-deny: unpublished / unlicensed / unsanitized assets never resolve for patrons.
@@ -29,7 +29,7 @@ Default-deny: unpublished / unlicensed / unsanitized assets never resolve for pa
 
 1. **Search SMARTnotification** — `index.html` `#smartvisualNotificationHost`. Demo only: `?smartvisualInvite=cancun`. View Invitation / Not Now. No fabricated live rooms for all patrons.
 2. **Room SMARTview** — overlay + BOT DEE card hero from `authorizedTitle` / `authorizedDescription` on the request payload (current utterance; never private thread). `botdee.html` loads `smartvisuals/catalog.json` via `ensureCatalog()`. Natural Cancun trip talk (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends) must mount the same card as **Open Room SMARTview Cancun Trip** (title Cancun Trip, travel tags, `bg-bali` + `st-flight`, mock Ad Travel partner / Fly to Cancun). Not live flight booking. Do not hijack nightlife-only asks (VIP tables tonight).
-3. **Master Admin SMARTvisual Studio** — `#smartvisualStudio`. SOS2FA + `FLOQRReasonPrompt` to submit drafts. Ads tab previews mock fill from `getSmartVisualAdPolicy` / `selectAd`. Library: **Preview in Place SMARTview** and **Use as Place SMARTview background** (`setSmartVisualOverride` `roomKey` `placeSmartView:{kind}`).
+3. **Master Admin SMARTvisual Studio** — `#smartvisualStudio`. SOS2FA + `FLOQRReasonPrompt` to submit drafts. **Rights / source** (`license`) is required: who owns the art — `Original FLOQR illustration` vs a licensed source (creator, license, URL). Create/Edit `?` is `help-smartvisuals-create`; the field `?` is `help-smartvisuals-rights`. **Art upload** (not SVG-only): SMARTbackgrounds SVG/JPEG/PNG/WebP; SMARTstencils SVG. Server `sanitizeSmartVisualUpload` is the control — client `accept=` is UX only. Ads tab previews mock fill from `getSmartVisualAdPolicy` / `selectAd`. Library: **Preview in Place SMARTview** and **Use as Place SMARTview background** (`setSmartVisualOverride` `roomKey` `placeSmartView:{kind}`). Preview `?` uses the same Create/Edit help so Milan (and every asset) is not an empty popout.
 4. **Place SMARTview** — compact BOT DEE venue/place card (`botdee-smartview.js` `renderPlaceCard`, kinds venue / restaurant / hotel / event / travel / …). Fixed template: kind + name, 2-line blurb, ratings, public-page CTA, 28px chrome. Background is a published SMARTbackground (`resolvePlaceCard`), not a photo well and not empty black. Distinct from People, Room, and Features SMARTview.
 
 Join Now uses `FLOQRNav` (no `?v=`). Display URLs unchanged.
@@ -41,5 +41,5 @@ Labeled slot below Search SMARTnotification and Room SMARTview (BOT DEE + previe
 ## FIX PROMPT
 
 ```
-SMARTvisuals: git registry is published truth; Firestore drafts stay off patrons. Resolver deterministic, Gemini off on view. Search overlay only via ?smartvisualInvite=cancun. Cancun → bg-bali + st-flight. Private chat never classifies public art. Labeled Ad is a mock from authorized tags (selectAd + getSmartVisualAdPolicy); empty only for private/injection; AdSense off. Studio SOS2FA + reason. Resume @smartvisuals$.
+SMARTvisuals: git registry is published truth; Firestore drafts stay off patrons. Resolver deterministic, Gemini off on view. Search overlay only via ?smartvisualInvite=cancun. Cancun → bg-bali + st-flight. Private chat never classifies public art. Labeled Ad is a mock from authorized tags (selectAd + getSmartVisualAdPolicy); empty only for private/injection; AdSense off. Studio SOS2FA + reason. Rights / source required. SMARTbackgrounds SVG/JPEG/PNG/WebP; stencils SVG. Resume @smartvisuals$.
 ```

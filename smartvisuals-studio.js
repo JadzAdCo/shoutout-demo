@@ -89,11 +89,14 @@
     const box = byId("svStudioDetail");
     if (!box || !asset) return;
     box.innerHTML = `
-      <h3>${esc(asset.name)}</h3>
+      <h3 data-floqr-help-id="help-smartvisuals-create"
+        data-floqr-help-title="Create / Edit SMARTvisuals"
+        data-floqr-help-search="milan preview|smartbackground preview|rights source|create edit"
+        data-floqr-help-body="Create or edit a SMARTstencil or SMARTbackground draft. Name and Rights / source are required before Submit for review. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark.">${esc(asset.name)}</h3>
       <p class="sub small">${esc(asset.id)} · rev ${esc(String(catalog.revision || 1))} · ${esc(asset.approvalStatus)}</p>
       <img src="./${esc(asset.path)}" alt="${esc(asset.name)}" class="sv-studio-preview"/>
       <p>${esc((asset.tags || []).join(", "))}</p>
-      <p class="sub small">${esc(t("sv.licenseNote", "Original FLOQR illustration. Not a photograph or official mark."))}</p>
+      <p class="sub small" data-keep-visible="true">${esc(t("sv.licenseNote", "Original FLOQR illustration. Not a photograph or official mark."))}</p>
       <p class="sub small">${esc(t("sv.studioPlaceHint", "Place SMARTview cards use a published SMARTbackground, not an empty photo well. SOS2FA and a reason are required to save."))}</p>
       <p class="button-row sv-studio-place-row">
         <label class="sv-studio-place-kind">${esc(t("sv.placeBgKind", "Place card type"))}
@@ -117,6 +120,7 @@
       btn.addEventListener("click", () => previewSurface(btn.getAttribute("data-sv-preview"), asset));
     });
     box.querySelector("[data-sv-assign-place]")?.addEventListener("click", () => assignPlaceBackground(asset));
+    try { root.FLOQRHelpAttach?.mountAll?.(box); } catch (_) { /* optional */ }
   }
 
   function previewSurface(kind, asset) {
@@ -257,14 +261,19 @@
         ? `<p class="sub small">${esc(t("sv.studioEmpty", "No assets match."))}</p>`
         : rows.map(row => {
           const svg = String(row.svgXml || "");
-          const img = svg
-            ? `<img class="sv-studio-preview" src="${esc(svgPreviewSrc(svg))}" alt="${esc(row.name || row.id)}"/>`
+          const raster = String(row.imageBase64 || "");
+          const type = String(row.contentType || (svg ? "image/svg+xml" : ""));
+          const src = svg
+            ? svgPreviewSrc(svg)
+            : (raster ? `data:${esc(type || "image/jpeg")};base64,${raster.replace(/[^A-Za-z0-9+/=]/g, "")}` : "");
+          const img = src
+            ? `<img class="sv-studio-preview" src="${esc(src)}" alt="${esc(row.name || row.id)}"/>`
             : "";
           return `<article class="sv-studio-draft" data-sv-draft="${esc(row.id)}">
           <b>${esc(row.name || row.id)}</b>
-          <small>${esc(row.approvalStatus || "review")} · ${esc(String(row.bytes || 0))} bytes · ${esc(row.type || "")}</small>
+          <small>${esc(row.approvalStatus || "review")} · ${esc(String(row.bytes || 0))} bytes · ${esc(row.type || "")} · ${esc(type)}</small>
           ${img}
-          <p class="sub small">${esc(row.license || "")}</p>
+          <p class="sub small" data-keep-visible="true">${esc(row.license || "")}</p>
         </article>`;
         }).join("");
       host.innerHTML = hint + body;
@@ -296,16 +305,15 @@
       const file = byId("svStudioSvg")?.files?.[0];
       const name = byId("svStudioName")?.value || "";
       const license = byId("svStudioLicense")?.value || "";
+      const assetType = byId("svStudioType")?.value || "stencil";
       const reasonPrompt = root.FLOQRReasonPrompt;
       if (!name.trim() || !license.trim()) {
-        if (status) status.textContent = t("sv.studioNeedMeta", "Name and license are required.");
+        if (status) status.textContent = t("sv.studioNeedMeta", "Name and rights / source are required.");
         return;
       }
-      let svg = "";
-      if (file) svg = await file.text();
-      const sanit = svg ? (await importSanitize(svg)) : {ok: false, reason: "empty"};
-      if (svg && !sanit.ok) {
-        if (status) status.textContent = t("sv.studioSvgDenied", "SVG rejected: {reason}").replace("{reason}", sanit.reason);
+      const media = await readUpload(file, assetType);
+      if (!media.ok) {
+        if (status) status.textContent = t("sv.studioSvgDenied", "File rejected: {reason}").replace("{reason}", media.reason);
         return;
       }
       if (!reasonPrompt?.ask) {
@@ -323,17 +331,22 @@
       try {
         const callable = firebase.app().functions("us-central1").httpsCallable("publishSmartVisualDraft");
         const sos = root.FLOQRSOS2FA?.sessionId?.();
-        const result = await callable({
+        const payload = {
           name,
           license,
           description: byId("svStudioDesc")?.value || "",
-          type: byId("svStudioType")?.value || "stencil",
+          type: assetType,
           tags: String(byId("svStudioTags")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-          svg,
           reason,
           sos2faSessionId: sos,
           clientKind: "agent"
-        });
+        };
+        if (media.svg) payload.svg = media.svg;
+        if (media.imageBase64) {
+          payload.imageBase64 = media.imageBase64;
+          payload.contentType = media.contentType;
+        }
+        const result = await callable(payload);
         if (status) status.textContent = t("sv.studioQueued", "Draft queued for review ({id}). Not visible to patrons.").replace("{id}", result.data?.id || "");
       } catch (err) {
         if (status) status.textContent = err?.message || t("sv.studioDenied", "Publish denied.");
@@ -341,10 +354,50 @@
     });
   }
 
+  function sniffRasterBytes(bytes) {
+    if (!bytes || bytes.length < 3) return {ok: false, reason: "empty"};
+    if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return {ok: true, contentType: "image/jpeg"};
+    if (
+      bytes.length >= 8
+      && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47
+      && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a
+    ) return {ok: true, contentType: "image/png"};
+    const head = String.fromCharCode(...bytes.slice(0, 4));
+    const webp = bytes.length >= 12 ? String.fromCharCode(...bytes.slice(8, 12)) : "";
+    if (head === "RIFF" && webp === "WEBP") return {ok: true, contentType: "image/webp"};
+    return {ok: false, reason: "unsupported-type"};
+  }
+
   function importSanitize(svg) {
     const src = String(svg || "");
     const bad = /<\s*(script|foreignObject|iframe)|on[a-z]+\s*=|https?:\/\//i.test(src);
     return {ok: !bad && /<svg[\s>]/i.test(src), reason: bad ? "forbidden-tag" : (/<svg[\s>]/i.test(src) ? "ok" : "not-svg")};
+  }
+
+  function isSvgFile(file) {
+    const name = String(file?.name || "").toLowerCase();
+    const mime = String(file?.type || "").toLowerCase();
+    return mime.includes("svg") || name.endsWith(".svg");
+  }
+
+  async function readUpload(file, assetType) {
+    if (!file) return {ok: false, reason: "empty"};
+    if (isSvgFile(file)) {
+      const svg = await file.text();
+      const sanit = importSanitize(svg);
+      return sanit.ok ? {ok: true, svg} : sanit;
+    }
+    if (assetType === "stencil") return {ok: false, reason: "stencil-requires-svg"};
+    const buf = new Uint8Array(await file.arrayBuffer());
+    if (buf.length > 500 * 1024) return {ok: false, reason: "too-large"};
+    const sniff = sniffRasterBytes(buf);
+    if (!sniff.ok) return sniff;
+    let binary = "";
+    const chunk = 0x8000;
+    for (let i = 0; i < buf.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, buf.subarray(i, i + chunk));
+    }
+    return {ok: true, imageBase64: btoa(binary), contentType: sniff.contentType};
   }
 
   async function load() {

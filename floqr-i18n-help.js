@@ -2,9 +2,17 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.063";
+  const VERSION = "s3.3.064";
   const packs = {
     "ru": {
+      "help-smartvisuals-create": {
+        title: "Создать / изменить SMARTvisuals",
+        body: "Создайте или измените черновик SMARTstencil или SMARTbackground. Название и Права / источник обязательны до «Отправить на проверку». SMARTstencils только SVG. SMARTbackgrounds: SVG, JPEG, PNG или WebP. Файлы очищаются на сервере. Черновики не видны гостям до проверенной публикации. Это иллюстрация FLOQR, не фото и не официальный знак места или Fashion Week."
+      },
+      "help-smartvisuals-rights": {
+        title: "Права / источник",
+        body: "Права / источник фиксирует, кому принадлежит этот арт. Укажите Original FLOQR illustration, если его создал FLOQR, иначе лицензированный источник (автор, лицензия и URL). Обязательно для отправки. Сценические SMARTvisuals — иллюстрация, не фото и не официальный знак места или Fashion Week."
+      },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
         body: "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Подписанный образец Ad под карточкой следует тегам (Партнёр поездки / Летите в Cancun для Cancun Trip). Это не живой рекламодатель. Личный чат и инъекция оставляют слот пустым."
@@ -527,6 +535,14 @@
       }
     },
     "nl": {
+      "help-smartvisuals-create": {
+        title: "SMARTvisuals maken / bewerken",
+        body: "Maak of bewerk een SMARTstencil- of SMARTbackground-concept. Naam en Rechten / bron zijn verplicht vóór Ter review sturen. SMARTstencils moeten SVG zijn. SMARTbackgrounds accepteren SVG, JPEG, PNG of WebP. Bestanden worden op de server schoongemaakt. Concepten bereiken gasten pas na een gecontroleerde publicatie. De scene is FLOQR-illustratie, geen foto en geen officieel bestemming- of Fashion Week-merkteken."
+      },
+      "help-smartvisuals-rights": {
+        title: "Rechten / bron",
+        body: "Rechten / bron legt vast wie deze art bezit. Schrijf Original FLOQR illustration als FLOQR het maakte, anders de gelicentieerde bron (maker, licentie en URL). Verplicht om in te dienen. Scenic SMARTvisuals zijn illustratie, geen foto en geen officieel bestemming- of Fashion Week-merkteken."
+      },
       "help-smartvisuals-notification": {
         title: "Mingl Room SMARTnotification",
         body: "Op Zoeken kan een compacte Mingl Room-uitnodiging verschijnen. Uitnodiging bekijken opent Room SMARTview. Niet nu verbergt hem deze sessie. De art is SMARTbackground-illustratie met SMARTstencils — geen foto en geen officieel merkteken. Namen en RSVP komen alleen uit het room-record. Een gelabeld Ad-voorbeeld onder de kaart volgt de tags (Reispartner / Vlieg naar Cancun bij Cancun Trip). Geen echte adverteerder. Privéchat en injectie laten het vak leeg."
@@ -1049,6 +1065,14 @@
       }
     },
     "fr": {
+      "help-smartvisuals-create": {
+        title: "Créer / modifier SMARTvisuals",
+        body: "Créez ou modifiez un brouillon SMARTstencil ou SMARTbackground. Le nom et Droits / source sont requis avant Envoyer en revue. Les SMARTstencils doivent être en SVG. Les SMARTbackgrounds acceptent SVG, JPEG, PNG ou WebP. Les fichiers sont nettoyés côté serveur. Les brouillons n’atteignent pas les patrons avant une publication auditée. L’art est une illustration FLOQR, pas une photo ni une marque officielle de destination ou de Fashion Week."
+      },
+      "help-smartvisuals-rights": {
+        title: "Droits / source",
+        body: "Droits / source indique qui possède cet art. Indiquez Original FLOQR illustration si FLOQR l’a créé, ou la source sous licence (créateur, licence et URL) sinon. Obligatoire pour envoyer. Les SMARTvisuals de scène sont une illustration, pas une photo ni une marque officielle de destination ou de Fashion Week."
+      },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
         body: "Une invitation Mingl Room compacte peut s’afficher dans la Recherche. Voir l’invitation ouvre Room SMARTview. Pas maintenant la masque pour cette session. L’art est une illustration SMARTbackground avec SMARTstencils — pas une photo ni une marque officielle. Les noms et RSVP viennent uniquement du dossier de la room. Un exemple Ad étiqueté sous la carte suit les tags (Partenaire voyage / Envolez-vous vers Cancun pour Cancun Trip). Ce n’est pas un annonceur réel. Chat privé et injection laissent le slot vide."
@@ -1571,6 +1595,14 @@
       }
     },
     "de": {
+      "help-smartvisuals-create": {
+        title: "SMARTvisuals erstellen / bearbeiten",
+        body: "Erstellen oder bearbeiten Sie einen SMARTstencil- oder SMARTbackground-Entwurf. Name und Rechte / Quelle sind vor Zur Prüfung senden Pflicht. SMARTstencils müssen SVG sein. SMARTbackgrounds akzeptieren SVG, JPEG, PNG oder WebP. Dateien werden serverseitig geprüft. Entwürfe erreichen Gäste erst nach geprüfter Veröffentlichung. Die Szene ist FLOQR-Illustration, kein Foto und kein offizielles Destinations- oder Fashion-Week-Zeichen."
+      },
+      "help-smartvisuals-rights": {
+        title: "Rechte / Quelle",
+        body: "Rechte / Quelle hält fest, wem diese Kunst gehört. Schreiben Sie Original FLOQR illustration, wenn FLOQR sie erstellt hat, sonst die lizenzierte Quelle (Urheber, Lizenz und URL). Pflicht zum Absenden. Scenic SMARTvisuals sind Illustration, kein Foto und kein offizielles Destinations- oder Fashion-Week-Zeichen."
+      },
       "help-smartvisuals-notification": {
         title: "Mingl Room SMARTnotification",
         body: "Auf der Suche kann eine kompakte Mingl-Room-Einladung erscheinen. Einladung ansehen öffnet Room SMARTview. Nicht jetzt blendet sie für diese Sitzung aus. Die Grafik ist SMARTbackground-Illustration mit SMARTstencils — kein Foto, kein offizielles Zeichen. Namen und RSVP kommen nur aus dem Room-Datensatz. Ein gekennzeichnetes Ad-Beispiel unter der Karte folgt den Tags (Reisepartner / Fliegen Sie nach Cancun bei Cancun Trip). Kein echter Werbetreibender. Privater Chat und Injection lassen den Slot leer."
@@ -2093,6 +2125,14 @@
       }
     },
     "es": {
+      "help-smartvisuals-create": {
+        title: "Crear / editar SMARTvisuals",
+        body: "Cree o edite un borrador de SMARTstencil o SMARTbackground. Nombre y Derechos / fuente son obligatorios antes de Enviar a revisión. Los SMARTstencils deben ser SVG. Los SMARTbackgrounds aceptan SVG, JPEG, PNG o WebP. Los archivos se sanitizan en el servidor. Los borradores no llegan a patrons hasta una publicación auditada. El arte es ilustración FLOQR, no fotografía ni una marca oficial de destino o Fashion Week."
+      },
+      "help-smartvisuals-rights": {
+        title: "Derechos / fuente",
+        body: "Derechos / fuente registra quién posee este arte. Escriba Original FLOQR illustration si FLOQR lo creó, o la fuente con licencia (autor, licencia y URL) si no es original. Obligatorio para enviar. Los SMARTvisuals escénicos son ilustración, no fotografía ni una marca oficial de destino o Fashion Week."
+      },
       "help-smartvisuals-notification": {
         title: "SMARTnotification de Mingl Room",
         body: "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Un anuncio de muestra etiquetado bajo la tarjeta sigue las etiquetas (Socio de viaje / Vuela a Cancun para Cancun Trip). No es un anunciante real. El chat privado y la inyección dejan el hueco vacío."
@@ -2615,6 +2655,14 @@
       }
     },
     "it": {
+      "help-smartvisuals-create": {
+        title: "Crea / modifica SMARTvisuals",
+        body: "Crea o modifica una bozza SMARTstencil o SMARTbackground. Nome e Diritti / fonte sono obbligatori prima di Invia in revisione. Gli SMARTstencils devono essere SVG. Gli SMARTbackgrounds accettano SVG, JPEG, PNG o WebP. I file sono sanificati sul server. Le bozze non arrivano ai patron prima di una pubblicazione con audit. L’arte è illustrazione FLOQR, non foto né un marchio ufficiale di destinazione o Fashion Week."
+      },
+      "help-smartvisuals-rights": {
+        title: "Diritti / fonte",
+        body: "Diritti / fonte registra chi possiede quest’arte. Scrivi Original FLOQR illustration se l’ha creata FLOQR, altrimenti la fonte con licenza (autore, licenza e URL). Obbligatorio per inviare. Gli SMARTvisuals scenici sono illustrazione, non foto né un marchio ufficiale di destinazione o Fashion Week."
+      },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
         body: "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Un esempio Ad etichettato sotto la carta segue i tag (Partner di viaggio / Vola a Cancun per Cancun Trip). Non è un inserzionista reale. Chat privata e injection lasciano lo slot vuoto."
@@ -3137,6 +3185,14 @@
       }
     },
     "pt": {
+      "help-smartvisuals-create": {
+        title: "Criar / editar SMARTvisuals",
+        body: "Crie ou edite um rascunho SMARTstencil ou SMARTbackground. Nome e Direitos / origem são obrigatórios antes de Enviar para revisão. SMARTstencils têm de ser SVG. SMARTbackgrounds aceitam SVG, JPEG, PNG ou WebP. Os ficheiros são limpos no servidor. Rascunhos não chegam a patrons até uma publicação auditada. A arte é ilustração FLOQR, não fotografia nem marca oficial de destino ou Fashion Week."
+      },
+      "help-smartvisuals-rights": {
+        title: "Direitos / origem",
+        body: "Direitos / origem regista quem é dono desta arte. Escreva Original FLOQR illustration se a FLOQR a criou, ou a origem licenciada (autor, licença e URL) se não for original. Obrigatório para enviar. SMARTvisuals de cena são ilustração, não fotografia nem marca oficial de destino ou Fashion Week."
+      },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
         body: "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Um anúncio de amostra rotulado sob o cartão segue as tags (Parceiro de viagem / Voe para Cancun num Cancun Trip). Não é um anunciante real. Chat privado e injeção deixam o espaço vazio."
@@ -3659,6 +3715,14 @@
       }
     },
     "el": {
+      "help-smartvisuals-create": {
+        title: "Δημιουργία / επεξεργασία SMARTvisuals",
+        body: "Δημιουργήστε ή επεξεργαστείτε προσχέδιο SMARTstencil ή SMARTbackground. Το όνομα και Δικαιώματα / πηγή είναι υποχρεωτικά πριν την Υποβολή για έλεγχο. Τα SMARTstencils πρέπει να είναι SVG. Τα SMARTbackgrounds δέχονται SVG, JPEG, PNG ή WebP. Τα αρχεία καθαρίζονται στον διακομιστή. Τα προσχέδια δεν φτάνουν στους patrons πριν από ελεγμένη δημοσίευση. Η τέχνη είναι εικονογράφηση FLOQR, όχι φωτογραφία ούτε επίσημο σήμα προορισμού ή Fashion Week."
+      },
+      "help-smartvisuals-rights": {
+        title: "Δικαιώματα / πηγή",
+        body: "Τα Δικαιώματα / πηγή καταγράφουν ποιος κατέχει αυτή την τέχνη. Γράψτε Original FLOQR illustration αν την δημιούργησε η FLOQR, αλλιώς την αδειοδοτημένη πηγή (δημιουργός, άδεια και URL). Υποχρεωτικό για υποβολή. Τα σκηνικά SMARTvisuals είναι εικονογράφηση, όχι φωτογραφία ούτε επίσημο σήμα προορισμού ή Fashion Week."
+      },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
         body: "Στην Αναζήτηση μπορεί να εμφανιστεί συμπαγής πρόσκληση Mingl Room. Η προβολή ανοίγει το Room SMARTview. Όχι τώρα την κρύβει σε αυτή τη συνεδρία. Η εικόνα είναι εικονογράφηση SMARTbackground με SMARTstencils — όχι φωτογραφία ούτε επίσημο σήμα. Ονόματα και RSVP μόνο από την εγγραφή room. Ένα επισημασμένο δείγμα Ad κάτω από την κάρτα ακολουθεί τις ετικέτες (Ταξιδιωτικός συνεργάτης / Πτήση για Cancun στο Cancun Trip). Όχι πραγματικός διαφημιζόμενος. Ιδιωτική συνομιλία και injection αφήνουν το κενό."
@@ -4181,6 +4245,14 @@
       }
     },
     "pl": {
+      "help-smartvisuals-create": {
+        title: "Utwórz / edytuj SMARTvisuals",
+        body: "Utwórz lub edytuj szkic SMARTstencil albo SMARTbackground. Nazwa oraz Prawa / źródło są wymagane przed Wyślij do recenzji. SMARTstencils muszą być SVG. SMARTbackgrounds przyjmują SVG, JPEG, PNG lub WebP. Pliki są czyszczone na serwerze. Szkice nie trafiają do gości przed audytowaną publikacją. To ilustracja FLOQR, nie zdjęcie i nie oficjalny znak destynacji ani Fashion Week."
+      },
+      "help-smartvisuals-rights": {
+        title: "Prawa / źródło",
+        body: "Prawa / źródło zapisuje, kto jest właścicielem tej sztuki. Wpisz Original FLOQR illustration, gdy stworzył ją FLOQR, albo licencjonowane źródło (twórca, licencja i URL), gdy nie jest oryginalna. Wymagane do wysłania. Scenic SMARTvisuals to ilustracja, nie zdjęcie i nie oficjalny znak destynacji ani Fashion Week."
+      },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
         body: "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Oznakowana próbka Ad pod kartą idzie za tagami (Partner podróży / Leć do Cancun przy Cancun Trip). To nie żywy reklamodawca. Prywatny czat i iniekcja zostawiają slot pusty."
@@ -4703,6 +4775,14 @@
       }
     },
     "ar": {
+      "help-smartvisuals-create": {
+        title: "إنشاء / تعديل SMARTvisuals",
+        body: "أنشئ أو عدّل مسودة SMARTstencil أو SMARTbackground. الاسم والحقوق / المصدر مطلوبان قبل الإرسال للمراجعة. يجب أن تكون SMARTstencils بصيغة SVG. تقبل SMARTbackgrounds SVG أو JPEG أو PNG أو WebP. تُنظَّف الملفات على الخادم. لا تصل المسودات إلى الرواد قبل نشر مُدقَّق. الفن رسم FLOQR وليس صورة ولا علامة رسمية لوجهة أو لأسبوع الموضة."
+      },
+      "help-smartvisuals-rights": {
+        title: "الحقوق / المصدر",
+        body: "يسجّل الحقوق / المصدر من يملك هذا العمل. اكتب Original FLOQR illustration إذا أنشأته FLOQR، أو المصدر المرخّص (المنشئ والترخيص والرابط) إن لم يكن أصليًا. مطلوب للإرسال. فن SMARTvisuals المشهدي رسم توضيحي وليس صورة ولا علامة رسمية لوجهة أو لأسبوع الموضة."
+      },
       "help-smartvisuals-notification": {
         title: "SMARTnotification لـ Mingl Room",
         body: "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. عيّنة إعلان موسومة أسفل البطاقة تتبع الوسوم (شريك سفر / حلّق إلى Cancun لرحلة Cancun Trip). ليس معلنًا حيًا. الدردشة الخاصة والحقن يُبقيان الموضع فارغًا."

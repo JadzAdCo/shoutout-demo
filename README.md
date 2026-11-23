@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.063 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.064 (stable)
 
+- s3.3.064: SMARTvisual Studio Create/Edit help for Rights/source; SMARTbackground JPEG/PNG/WebP uploads
 - s3.3.063: Features SMARTview Close + evidence catalog; compact Place SMARTview cards with admin-editable SMARTbackgrounds
 - s3.3.062: Cache-bust stamps match the shipped search, Venue Command Center, and BOT DEE venue pages
 - s3.3.059: Features SMARTview Production (Prod) status
