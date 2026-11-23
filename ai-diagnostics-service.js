@@ -229,7 +229,9 @@
         {label:"Studio getSessionId", file:"smartvisuals-studio.js", includes:["getSessionId?.(SOS_SCOPE)", "function studioCallable(", "getIdToken(true)", "publishSmartVisualDraft"]},
         {label:"Studio SOS2FA gate", file:"sos2fa.js", includes:["\"smartvisualStudio\"", "sessionId: (scope) => getSessionId"]},
         {label:"Master Admin panel list", file:"master-admin-app.js", includes:["\"smartvisualStudio\""]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-065-smartvisuals-studio-sos2fa"]}
+        {label:"Headless host has no SPAAVS sample", file:"botdee-smartview-headless.html", includes:["data-floqr-public", "FLOQRBotDeeSmartView.mount"], notIncludes:["Load SPAAVS sample", "SPAAVS_SAMPLE"]},
+        {label:"Headless parser has no SPAAVS entity rules", file:"botdee-smartview-headless.js", includes:["cardsFromAuthorizedText", "fallbackCard"], notIncludes:["SPAAVS_SAMPLE", "Robotaxi fleet", "Mobility Hub"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-065-smartvisuals-studio-sos2fa", "s3-3-064-headless-smartview-no-spaavs"]}
       ]
     },
     {
@@ -250,7 +252,7 @@
         {label:"Place card CSS", file:"botdee-smartview.css", includes:["--sv-place-bg", ".botdee-sv-place-chrome"]},
         {label:"Studio Place preview/assign", file:"smartvisuals-studio.js", includes:["previewPlaceCard", "placeSmartView:", "setSmartVisualOverride"]},
         {label:"Headless SMARTview host", file:"botdee-smartview-headless.html", includes:["data-floqr-public", "FLOQRBotDeeSmartView.mount"]},
-        {label:"Headless authorized-text cards", file:"botdee-smartview-headless.js", includes:["cardsFromAuthorizedText", "Robotaxi fleet"]},
+        {label:"Headless authorized-text cards", file:"botdee-smartview-headless.js", includes:["cardsFromAuthorizedText", "fallbackCard"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-063-place-smartview-compact", "s3-3-063-headless-smartview"]}
       ]
     },
@@ -3879,13 +3881,22 @@
       troubleshoot:"Still a tall empty well → cached botdee-smartview.css / .js before renderPlaceCard, or Master Admin mock catalog still serving chrome JPG images (needs this SHA). Black with no illustration → catalog.json not loaded (ensureCatalog) or Functions not stamping smartBackgroundId and city classify missed. Studio assign saved but chat unchanged → Functions deploy pending; packaged city/kind defaults still apply on Pages. Assigned Features SMARTview by mistake → wrong surface (features-smartview.html)."
     },
     {
+      id:"s3-3-064-headless-smartview-no-spaavs",
+      area:"BOT DEE",
+      feature:"SPAAVS sample cards removed from headless SMARTview",
+      changed:"botdee-smartview-headless.html no longer mints Product SPAAVS / Travel Mobility Hub / Product Autonomous docking equipment / Vehicle Robotaxi fleet from the SPAAVS Mobility Hub sentence. Load SPAAVS sample is gone. The public host still paints one compact fallback card from pasted authorized text.",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive until botdee-smartview-headless.js?v=s3.3.065 and the page has no Load SPAAVS sample button. No sign-in. 2) Open the old SPAAVS q= URL if you still have it — do not expect four cards titled SPAAVS, Mobility Hub, Autonomous docking equipment, Robotaxi fleet. 3) Interactive: paste a short authorized sentence (not that SPAAVS sample), tap Render SMARTview — one compact card, 28px chrome, no photo well, no invented ratings or dates. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html.",
+      expected:"The four SPAAVS sample cards are gone. Host stays public. Generic authorized text still renders one compact SMARTview. Display URLs unchanged.",
+      troubleshoot:"Still four SPAAVS cards → cached botdee-smartview-headless.js from before this SHA. Hard-refresh. 404 → wrong URL. Load SPAAVS sample still visible → cached HTML. Empty host on generic paste → q= missing or prompt-injection filter hit (URLs are ignored)."
+    },
+    {
       id:"s3-3-063-headless-smartview",
       area:"BOT DEE",
       feature:"Headless SMARTview from authorized text",
-      changed:"Public botdee-smartview-headless.html turns authorized text into compact Place/info SMARTview cards (fixed template, SMARTbackground, no photo well). Query ?mode=headless&q=… needs no Search sign-in. Not Features catalog. Gemini off.",
-      howToTest:"1) After Pages publish, open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=headless&q=SPAAVS%20should%20budget%20for%20becoming%20an%20approved%20Mobility%20Hub%20infrastructure%20and%20integration%20partner%2C%20rather%20than%20assume%20it%20must%20manufacture%20autonomous%20docking%20equipment%20or%20operate%20its%20own%20Robotaxi%20fleet. Hard-refresh until botdee-smartview-headless.js?v=s3.3.064. No sign-in. 2) Expect four compact cards: Product SPAAVS, Travel Mobility Hub, Product Autonomous docking equipment, Vehicle Robotaxi fleet. 28px chrome, two-line blurbs, scenic SMARTbackground, no photo well, no ratings invented. 3) Open ?mode=interactive, tap Load SPAAVS sample, Render SMARTview — same cards. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html for this test.",
-      expected:"Four compact SMARTview cards from the SPAAVS sentence. Sign-in not required. Robotaxi and SPAAVS untranslated. Display URLs unchanged (this host is not an LED board).",
-      troubleshoot:"404 → Pages still on a SHA before botdee-smartview-headless.html (needs this PR on origin/main). Empty host → cached page without the module, or q= missing. Tall photo well → cached botdee-smartview.css before compact Place template. Cards on Search / Features catalog → wrong URL."
+      changed:"Public botdee-smartview-headless.html turns authorized text into compact Place/info SMARTview cards (fixed template, SMARTbackground, no photo well). Query ?mode=headless&q=… needs no Search sign-in. Not Features catalog. Gemini off. The SPAAVS four-card sample is retired; see s3-3-064-headless-smartview-no-spaavs.",
+      howToTest:"1) After Pages publish, open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive. Hard-refresh until botdee-smartview-headless.js?v=s3.3.065 and there is no Load SPAAVS sample button. No sign-in. 2) Paste a short authorized sentence and tap Render SMARTview. Expect one compact card (kind + name, two-line blurb, scenic SMARTbackground, 28px chrome). No photo well. No invented ratings. 3) Confirm there is no four-card SPAAVS mint. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html.",
+      expected:"Public headless host still renders compact SMARTview from authorized text. SPAAVS sample cards are not present. Sign-in not required. Display URLs unchanged (this host is not an LED board).",
+      troubleshoot:"404 → Pages still on a SHA before botdee-smartview-headless.html. Empty host → cached page without the module, or q= missing. Tall photo well → cached botdee-smartview.css before compact Place template. Four SPAAVS cards → cached JS from before this SHA. Cards on Search / Features catalog → wrong URL."
     },
     {
       id:"s3-3-040-people-alias-match",

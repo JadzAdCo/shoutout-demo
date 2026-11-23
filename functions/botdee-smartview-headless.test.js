@@ -2,49 +2,52 @@
 
 const {test} = require("node:test");
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
+const fs = require("fs");
+const path = require("path");
 
 const root = path.resolve(__dirname, "..");
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const headless = require("../botdee-smartview-headless.js");
 const smart = require("./botdee-smartview-core");
 
-const SPAAVS = headless.SPAAVS_SAMPLE;
+const GENERIC = "Approved compact SMARTview from authorized text for a public host.";
+const RETIRED_SPAAVS =
+  "SPAAVS should budget for becoming an approved Mobility Hub infrastructure and integration partner, rather than assume it must manufacture autonomous docking equipment or operate its own Robotaxi fleet.";
 
-test("SPAAVS sentence yields compact product / travel / vehicle cards", () => {
-  const result = headless.cardsFromAuthorizedText(SPAAVS);
+test("authorized text yields one compact fallback card", () => {
+  const result = headless.cardsFromAuthorizedText(GENERIC);
   assert.equal(result.ok, true);
   assert.equal(result.geminiUsed, false);
   assert.equal(result.sourceKind, "authorized-text");
+  assert.equal(result.views.length, 1);
+  const row = result.views[0];
+  assert.equal(row.kind, "product");
+  assert.deepEqual(smart.validatePayload(row), []);
+  assert.equal((row.images || []).length, 0);
+  assert.equal((row.ratings || []).length, 0);
+  assert.equal(row.floqrPublicData.geminiUsed, false);
+  assert.equal(row.floqrPublicData.authorizedText, true);
+  assert.ok(row.summary.length <= 160);
+});
+
+test("SPAAVS sentence no longer mints the four sample cards", () => {
+  assert.equal(headless.SPAAVS_SAMPLE, undefined);
+  const result = headless.cardsFromAuthorizedText(RETIRED_SPAAVS);
+  assert.equal(result.ok, true);
+  assert.equal(result.views.length, 1);
   const titles = result.views.map(row => `${row.kind}:${row.title}`);
-  assert.deepEqual(titles, [
+  assert.notDeepEqual(titles, [
     "product:SPAAVS",
     "travel:Mobility Hub",
     "product:Autonomous docking equipment",
     "vehicle:Robotaxi fleet"
   ]);
-  result.views.forEach(row => {
-    assert.deepEqual(smart.validatePayload(row), []);
-    assert.equal((row.images || []).length, 0);
-    assert.equal((row.ratings || []).length, 0);
-    assert.equal(row.floqrPublicData.geminiUsed, false);
-    assert.equal(row.floqrPublicData.authorizedText, true);
-    assert.ok(row.summary.length <= 160);
-  });
-  assert.match(result.views[0].summary, /SPAAVS/);
-  assert.match(result.views[3].title, /Robotaxi/);
-  assert.doesNotMatch(JSON.stringify(result.views), /Tesla/);
-});
-
-test("brands stay untranslated in the SPAAVS cards", () => {
-  const views = headless.cardsFromAuthorizedText(SPAAVS).views;
-  assert.equal(views[0].title, "SPAAVS");
-  assert.equal(views[1].title, "Mobility Hub");
-  assert.equal(views[3].title, "Robotaxi fleet");
-  const blob = JSON.stringify(views);
+  assert.equal(titles.some(title => title === "product:SPAAVS"), false);
+  assert.equal(titles.some(title => title === "travel:Mobility Hub"), false);
+  assert.equal(titles.some(title => title === "product:Autonomous docking equipment"), false);
+  assert.equal(titles.some(title => title === "vehicle:Robotaxi fleet"), false);
+  const blob = JSON.stringify(result.views);
   assert.doesNotMatch(blob, /Tesla/);
-  assert.doesNotMatch(blob, /RydR/);
 });
 
 test("prompt injection does not mint cards", () => {
@@ -64,10 +67,10 @@ test("mode defaults to headless when q is present", () => {
   assert.equal(headless.modeFromSearch("q=hello"), "headless");
   assert.equal(headless.modeFromSearch("mode=interactive&q=hello"), "interactive");
   assert.equal(headless.modeFromSearch(""), "interactive");
-  assert.equal(headless.queryFromSearch(`q=${encodeURIComponent(SPAAVS)}`), SPAAVS);
+  assert.equal(headless.queryFromSearch(`q=${encodeURIComponent(GENERIC)}`), GENERIC);
 });
 
-test("public host is sign-in free and not Search / Features catalog", () => {
+test("public host is sign-in free and has no SPAAVS sample path", () => {
   const html = read("botdee-smartview-headless.html");
   assert.match(html, /data-floqr-public/);
   assert.match(html, /botdee-smartview-headless\.js/);
@@ -76,9 +79,17 @@ test("public host is sign-in free and not Search / Features catalog", () => {
   assert.doesNotMatch(html, /features-smartview\.html/);
   assert.doesNotMatch(html, /executeBotSession/);
   assert.doesNotMatch(html, /profileRequired=sign-in/);
+  assert.doesNotMatch(html, /Load SPAAVS sample/);
+  assert.doesNotMatch(html, /svhSample/);
+  assert.doesNotMatch(html, /SPAAVS_SAMPLE/);
   const js = read("botdee-smartview-headless.js");
   assert.match(js, /cardsFromAuthorizedText/);
   assert.match(js, /geminiUsed: false/);
+  assert.doesNotMatch(js, /SPAAVS_SAMPLE/);
+  assert.doesNotMatch(js, /ENTITY_RULES/);
+  assert.doesNotMatch(js, /Mobility Hub/);
+  assert.doesNotMatch(js, /Autonomous docking equipment/);
+  assert.doesNotMatch(js, /Robotaxi fleet/);
 });
 
 test("clipAround keeps ellipsis inside max and does not mid-word cut", () => {
@@ -91,18 +102,8 @@ test("clipAround keeps ellipsis inside max and does not mid-word cut", () => {
   assert.ok(long.includes(body));
   const after = long[long.indexOf(body) + body.length];
   assert.ok(after === undefined || after === " ");
-  headless.cardsFromAuthorizedText(long + " " + SPAAVS).views.forEach(row => {
+  const result = headless.cardsFromAuthorizedText(long);
+  result.views.forEach(row => {
     assert.ok(row.summary.length <= 160, row.summary);
-    if (row.summary.endsWith("…")) {
-      const slice = row.summary.slice(0, -1);
-      assert.doesNotMatch(slice, /\s$/);
-    }
-  });
-});
-
-test("SPAAVS sentence is not a BOT DEE dining/venue place search", () => {
-  const folded = SPAAVS.toLowerCase();
-  ["sushi", "restaurant", "dining", "club", "lounge", "nightlife", "venue", "bar"].forEach(cue => {
-    assert.equal(new RegExp(`\\b${cue}\\b`).test(folded), false, cue);
   });
 });

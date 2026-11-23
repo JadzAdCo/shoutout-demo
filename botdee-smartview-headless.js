@@ -13,8 +13,6 @@
   const SUMMARY_MAX = 160;
   /* Schema requires sources.retrievedAt. This is the mock-catalog filler, not a live fetch. */
   const SCHEMA_RETRIEVED_AT = "2026-11-14T00:00:00.000Z";
-  const SPAAVS_SAMPLE =
-    "SPAAVS should budget for becoming an approved Mobility Hub infrastructure and integration partner, rather than assume it must manufacture autonomous docking equipment or operate its own Robotaxi fleet.";
 
   const INJECTION = [
     /ignore (?:previous|all) instructions/i,
@@ -23,13 +21,6 @@
     /javascript:/i,
     /https?:\/\/\S+/i,
     /data:text\/html/i
-  ];
-
-  const ENTITY_RULES = [
-    {id: "spaavs", re: /\bSPAAVS\b/, kind: "product", title: "SPAAVS"},
-    {id: "mobility-hub", re: /\bMobility Hub\b/i, kind: "travel", title: "Mobility Hub"},
-    {id: "docking", re: /\bautonomous docking equipment\b/i, kind: "product", title: "Autonomous docking equipment"},
-    {id: "robotaxi", re: /\bRobotaxi(?:\s+fleet)?\b/, kind: "vehicle", title: "Robotaxi fleet"}
   ];
 
   function text(value, max) {
@@ -101,24 +92,6 @@
     };
   }
 
-  function extractEntities(source) {
-    const views = [];
-    const seen = new Set();
-    ENTITY_RULES.forEach(rule => {
-      const hit = source.match(rule.re);
-      if (!hit) return;
-      const key = `${rule.kind}:${rule.title}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      views.push(cardPayload({
-        kind: rule.kind,
-        title: rule.title,
-        summary: clipAround(source, hit[0], SUMMARY_MAX)
-      }));
-    });
-    return views;
-  }
-
   function fallbackCard(source) {
     const words = source.split(" ").slice(0, 8).join(" ");
     return cardPayload({
@@ -136,14 +109,12 @@
     if (injectionHit(source)) {
       return {ok: false, reason: "prompt-injection-ignored", geminiUsed: false, views: []};
     }
-    const views = extractEntities(source);
-    if (!views.length) views.push(fallbackCard(source));
     return {
       ok: true,
       reason: "authorized-text",
       sourceKind: "authorized-text",
       geminiUsed: false,
-      views
+      views: [fallbackCard(source)]
     };
   }
 
@@ -165,7 +136,6 @@
 
   return {
     SCHEMA_VERSION,
-    SPAAVS_SAMPLE,
     cardsFromAuthorizedText,
     clipAround,
     modeFromSearch,

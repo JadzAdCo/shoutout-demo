@@ -87,6 +87,8 @@ test("headless SMARTview host is public and mounts compact cards", () => {
   assert.match(html, /botdee-smartview-headless\.js\?v=/);
   assert.match(html, /FLOQRBotDeeSmartView\.mount/);
   assert.doesNotMatch(html, /data-floqr-feature=/);
+  assert.doesNotMatch(html, /Load SPAAVS sample/);
+  assert.doesNotMatch(html, /SPAAVS_SAMPLE/);
 });
 
 test("place cards are compact templates without chrome photo wells", () => {

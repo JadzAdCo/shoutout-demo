@@ -57,7 +57,6 @@
     <textarea id="svhInput" maxlength="2000" placeholder="Paste authorized text…"></textarea>
     <div class="svh-actions">
       <button class="buttonlike" type="submit">Render SMARTview</button>
-      <button class="buttonlike" type="button" id="svhSample">Load SPAAVS sample</button>
     </div>
   </form>
   <p class="svh-status" id="svhStatus" role="status"></p>
@@ -114,10 +113,6 @@
         history.replaceState({}, "", url.pathname + url.search);
         paint(input.value);
         return next;
-      });
-      document.getElementById("svhSample").addEventListener("click", function () {
-        input.value = api.SPAAVS_SAMPLE;
-        input.focus();
       });
     })();
   </script>
