@@ -3630,6 +3630,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-2-42-venue-command-help-chrome",
+      area:"Club Admin",
+      feature:"Venue Command Center ? help; remove privilege banners",
+      changed:"Removed FLOQR Club Admin eyebrow, Location View label, and idle Master Admin verified status. Moved former subtitle into h1 ? help (help-venue-command-center) with venueAdmin+masterAdmin audiences and full locale packs. Access still hasClubAdminAccess; privilege tier not shown after gate.",
+      howToTest:"1) Hard-refresh admin.html?location=temp-democlub-1 (admin-app.js ?v=s3.3.061) as Club Admin or Master Admin. 2) Header shows Venue Command Center + ? only — no FLOQR Club Admin, no Location View, no Master Admin verified line, no grey subtitle paragraph. 3) Tap ? — body equals former Approve ShoutOuts… blurb (localized). 4) Unaffiliated account still hits venue gate; assigned admin still opens panel.",
+      expected:"Clean header; help ? has subtitle copy; access gate unchanged; no privilege disclosure string.",
+      troubleshoot:"Still see verified line → admin-app.js must setText(adminStatus,\"\") after gate. Missing ? → help-attach.js + help-venue-command-center in botdee-help-repository + floqr-i18n-help. Wrong language → run i18n-coverage-report.js."
+    },
+    {
       id:"s3-2-41-traditional-search-output-chrome",
       area:"Site chrome / Search",
       feature:"Traditional search-output pills + VIP/FloqCast venue cards match View Club",
