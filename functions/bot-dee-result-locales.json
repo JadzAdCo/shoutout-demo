@@ -71,6 +71,14 @@
           "label": "BOT DEE Datenschutz und Sitzung",
           "blurb": "Die fünfminütige Pause beendet die Live-Sitzung. Sie löscht nicht diesen angemeldeten Chat, Erinnerungen oder Workflows. Optionale Kopien unter Mein Profil → Funktionen & Bestellungen → My BOT DEE bleiben. Gäste bleiben flüchtig. Mingl-Chats werden hier nie kopiert. Enter sendet;"
         },
+        "help:help-botdee-place-search": {
+          "label": "BOT DEE nach FLOQR-Locations fragen",
+          "blurb": "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen die FLOQR-Public-Page. Patron-Fotos und ShoutOut-/VIP-Pitches bleiben weg, außer Sie haben dana"
+        },
+        "intent:help-botdee-place-search": {
+          "label": "BOT DEE nach FLOQR-Locations fragen",
+          "blurb": "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen die FLOQR-Public-Page. Patron-Fotos und ShoutOut-/VIP-Pitches bleiben weg, außer Sie haben dana"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (ver"
@@ -718,6 +726,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Club Admin Veranstaltungsortzuweisung",
           "blurb": "Club Admins öffnen das Venue Command Center nur für einen Club, dem sie zugewiesen sind. Beim Öffnen von admin.html ohne Veranstaltungsort wird nicht mehr standardmäßig Zebbies verwendet. Demokonten temp_clubadmin_N@floqr-demo.com sind temp-democlub-N zugeordnet. Nicht zugewiesen"
+        },
+        "help:help-venue-command-center": {
+          "label": "Venue Command Center",
+          "blurb": "ShoutOuts freigeben, Venue-Leistung prüfen und Kontoaktivität für diesen Standort abstimmen."
+        },
+        "intent:help-venue-command-center": {
+          "label": "Venue Command Center",
+          "blurb": "ShoutOuts freigeben, Venue-Leistung prüfen und Kontoaktivität für diesen Standort abstimmen."
         },
         "help:help-general-notifications": {
           "label": "Allgemeine Benachrichtigungen",
@@ -1166,6 +1182,14 @@
           "label": "Confidentialité et session BOT DEE",
           "blurb": "La pause de cinq minutes termine la session BOT DEE en direct. Elle ne supprime pas ce chat connecté, les souvenirs ni les workflows. Les copies dans Mon profil → Fonctions et commandes → My BOT DEE restent aussi. Les invités restent éphémères. Les discussions Mingl ne sont jamai"
         },
+        "help:help-botdee-place-search": {
+          "label": "Demander à BOT DEE des lieux FLOQR",
+          "blurb": "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent la page publique FLOQR. Photos de patrons et pitches ShoutOut / VIP restent hors suje"
+        },
+        "intent:help-botdee-place-search": {
+          "label": "Demander à BOT DEE des lieux FLOQR",
+          "blurb": "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent la page publique FLOQR. Photos de patrons et pitches ShoutOut / VIP restent hors suje"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute co"
@@ -1813,6 +1837,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Club Admin affectation du lieu",
           "blurb": "Les 3 joueurs n'ouvrent le Venue Command Center que pour le club auquel ils sont affectés. L'ouverture de admin.html sans lieu n'est plus par défaut Zebbies. Les comptes de démonstration temp_clubadmin_N@floqr-demo.com correspondent à temp-democlub-N. Les administrateurs non attr"
+        },
+        "help:help-venue-command-center": {
+          "label": "Centre de commande du lieu",
+          "blurb": "Approuvez les ShoutOuts, suivez les performances du lieu et rapprochez l'activité de ce club."
+        },
+        "intent:help-venue-command-center": {
+          "label": "Centre de commande du lieu",
+          "blurb": "Approuvez les ShoutOuts, suivez les performances du lieu et rapprochez l'activité de ce club."
         },
         "help:help-general-notifications": {
           "label": "Notifications générales",
@@ -2261,6 +2293,14 @@
           "label": "Privacidad y sesión de BOT DEE",
           "blurb": "La pausa de cinco minutos termina la sesión en vivo. No borra este chat con sesión iniciada, los recuerdos ni los flujos. Las copias en Mi perfil → Funciones y pedidos → My BOT DEE también se quedan. Los invitados siguen siendo efímeros. Los chats de Mingl nunca se copian aquí. I"
         },
+        "help:help-botdee-place-search": {
+          "label": "Preguntar a BOT DEE por locales FLOQR",
+          "blurb": "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren la página pública FLOQR. Las fotos de patrons y los pitches de ShoutOut / VIP no aparec"
+        },
+        "intent:help-botdee-place-search": {
+          "label": "Preguntar a BOT DEE por locales FLOQR",
+          "blurb": "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren la página pública FLOQR. Las fotos de patrons y los pitches de ShoutOut / VIP no aparec"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (pr"
@@ -2908,6 +2948,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Club Admin asignación de lugar",
           "blurb": "Los 3 solo abren el Centro de comando del lugar para un club al que están asignados. Abrir admin.html sin un lugar ya no es el predeterminado Zebbies. Las cuentas de demostración temp_clubadmin_N@floqr-demo.com se asignan a temp-democlub-N. Los administradores no asignados solici"
+        },
+        "help:help-venue-command-center": {
+          "label": "Venue Command Center",
+          "blurb": "Aprueba ShoutOuts, revisa el rendimiento del local y concilia la actividad de la cuenta de esta ubicación."
+        },
+        "intent:help-venue-command-center": {
+          "label": "Venue Command Center",
+          "blurb": "Aprueba ShoutOuts, revisa el rendimiento del local y concilia la actividad de la cuenta de esta ubicación."
         },
         "help:help-general-notifications": {
           "label": "Notificaciones generales",
@@ -3356,6 +3404,14 @@
           "label": "Privacy e sessione BOT DEE",
           "blurb": "La pausa di cinque minuti termina la sessione dal vivo. Non cancella questa chat da connesso, i ricordi o i flussi. Restano anche le copie in Il mio profilo → Funzioni e ordini → My BOT DEE. Gli ospiti restano effimeri. Le chat Mingl non vengono mai copiate qui. Invio invia; Maiu"
         },
+        "help:help-botdee-place-search": {
+          "label": "Chiedere a BOT DEE i locali FLOQR",
+          "blurb": "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono la pagina pubblica FLOQR. Foto dei patron e pitch ShoutOut / VIP restano fuori se non li hai chiesti. Se"
+        },
+        "intent:help-botdee-place-search": {
+          "label": "Chiedere a BOT DEE i locali FLOQR",
+          "blurb": "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono la pagina pubblica FLOQR. Foto dei patron e pitch ShoutOut / VIP restano fuori se non li hai chiesti. Se"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chatta con BOT DEE nella pagina BOT DEE con parole semplici: eventi e club, ShoutOut, Mingl, RydR, BartR, FloqCAST, il tuo profilo, gli orari del personale o gli strumenti Club Admin. Premi Invio per inviare; Maiusc+Invio inizia una nuova riga. BOT DEE chiacchiera come una person"
@@ -4003,6 +4059,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Club Admin assegnazione della sede",
           "blurb": "I 3 aprono il Venue Command Center solo per il club a cui sono assegnati. L'apertura di admin.html senza una sede non viene più impostata su Zebbies. I conti demo temp_clubadmin_N@floqr-demo.com sono mappati su temp-democlub-N. Gli amministratori non assegnati richiedono l'assegn"
+        },
+        "help:help-venue-command-center": {
+          "label": "Venue Command Center",
+          "blurb": "Approva ShoutOuts, esamina il rendimento della sede e riconcilia l'attività dell'account per questa sede."
+        },
+        "intent:help-venue-command-center": {
+          "label": "Venue Command Center",
+          "blurb": "Approva ShoutOuts, esamina il rendimento della sede e riconcilia l'attività dell'account per questa sede."
         },
         "help:help-general-notifications": {
           "label": "Notifiche generali",
@@ -4451,6 +4515,14 @@
           "label": "Privacidade e sessão BOT DEE",
           "blurb": "A pausa de cinco minutos termina a sessão ao vivo. Não apaga este chat com sessão iniciada, memórias ou fluxos. As cópias em O meu perfil → Funções e encomendas → My BOT DEE também ficam. Os convidados continuam efémeros. Os chats Mingl nunca são copiados para aqui. Enter envia; "
         },
+        "help:help-botdee-place-search": {
+          "label": "Perguntar ao BOT DEE por locais FLOQR",
+          "blurb": "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem a página pública FLOQR. Fotos de patrons e pitches de ShoutOut / VIP ficam de f"
+        },
+        "intent:help-botdee-place-search": {
+          "label": "Perguntar ao BOT DEE por locais FLOQR",
+          "blurb": "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem a página pública FLOQR. Fotos de patrons e pitches de ShoutOut / VIP ficam de f"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa ("
@@ -5098,6 +5170,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Club Admin atribuição de local",
           "blurb": "Club Adminsó abrem o Venue Command Center para um clube ao qual estão atribuídos. Abrir admin.html sem um local não é mais o padrão Zebbies. As contas de demonstração temp_clubadmin_N@floqr-demo.com são mapeadas para temp-democlub-N. Administradores não atribuídos solicitam atrib"
+        },
+        "help:help-venue-command-center": {
+          "label": "Centro de Comando do Local",
+          "blurb": "Aprovar ShoutOuts, avaliar o desempenho do local e reconciliar a atividade da conta para este local."
+        },
+        "intent:help-venue-command-center": {
+          "label": "Centro de Comando do Local",
+          "blurb": "Aprovar ShoutOuts, avaliar o desempenho do local e reconciliar a atividade da conta para este local."
         },
         "help:help-general-notifications": {
           "label": "Notificações Gerais",
@@ -5546,6 +5626,14 @@
           "label": "Конфиденциальность и сессия BOT DEE",
           "blurb": "Пауза в пять минут завершает живую сессию BOT DEE. Она не удаляет этот чат для вошедшего пользователя, воспоминания или рабочие процессы. Копии в «Мой профиль» → «Функции и заказы» → My BOT DEE тоже остаются. Гости остаются эфемерными. Чаты Mingl сюда не копируются. Enter отправл"
         },
+        "help:help-botdee-place-search": {
+          "label": "Спросить BOT DEE про площадки FLOQR",
+          "blurb": "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают публичную страницу клуба. Фото посетителей и питчи ShoutOut / VIP не показываются, если вы об этом н"
+        },
+        "intent:help-botdee-place-search": {
+          "label": "Спросить BOT DEE про площадки FLOQR",
+          "blurb": "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают публичную страницу клуба. Фото посетителей и питчи ShoutOut / VIP не показываются, если вы об этом н"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, FloqCAST, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как челов"
@@ -6193,6 +6281,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Назначение Club Admin на площадку",
           "blurb": "Club Admins открывают Venue Command Center только для назначенного клуба. Открытие admin.html без площадки больше не ведёт по умолчанию на Zebbies. Демо-аккаунты temp_clubadmin_N@floqr-demo.com соответствуют temp-democlub-N. Неназначенные админы запрашивают назначение у Master Ad"
+        },
+        "help:help-venue-command-center": {
+          "label": "Центр управления площадкой",
+          "blurb": "Одобряйте ShoutOuts, смотрите показатели площадки и сверяйте активность аккаунта для этой локации."
+        },
+        "intent:help-venue-command-center": {
+          "label": "Центр управления площадкой",
+          "blurb": "Одобряйте ShoutOuts, смотрите показатели площадки и сверяйте активность аккаунта для этой локации."
         },
         "help:help-general-notifications": {
           "label": "Общие уведомления",
@@ -6641,6 +6737,14 @@
           "label": "Απόρρητο και συνεδρία BOT DEE",
           "blurb": "Η παύση των πέντε λεπτών τελειώνει τη ζωντανή συνεδρία. Δεν διαγράφει αυτή τη συνομιλία για συνδεδεμένους, τις μνήμες ή τις ροές. Οι προαιρετικές αντιγραφές στο Προφίλ μου → Λειτουργίες και παραγγελίες → My BOT DEE μένουν κι αυτές. Οι επισκέπτες μένουν προσωρινοί. Οι συνομιλίες M"
         },
+        "help:help-botdee-place-search": {
+          "label": "Ρωτήστε τον BOT DEE για χώρους FLOQR",
+          "blurb": "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν τη δημόσια σελίδα FLOQR. Φωτογραφίες patrons και pitches ShoutOut / VIP μένουν εκτός εκτός αν τα ζητήσα"
+        },
+        "intent:help-botdee-place-search": {
+          "label": "Ρωτήστε τον BOT DEE για χώρους FLOQR",
+          "blurb": "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν τη δημόσια σελίδα FLOQR. Φωτογραφίες patrons και pitches ShoutOut / VIP μένουν εκτός εκτός αν τα ζητήσα"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκ"
@@ -7288,6 +7392,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Club Admin ανάθεση χώρου",
           "blurb": "Club Admin ανοίγει μόνο το Κέντρο Διοίκησης του Χώρου για μια λέσχη στην οποία έχουν ανατεθεί. Το άνοιγμα του admin.html χωρίς χώρο δεν είναι πλέον ως προεπιλογή Zebbies. Οι δοκιμαστικοί λογαριασμοί temp_clubadmin_N@floqr-demo.com αντιστοιχίζονται στο temp-democlub-N. Οι μη εκχωρ"
+        },
+        "help:help-venue-command-center": {
+          "label": "Κέντρο εντολών του χώρου διεξαγωγής",
+          "blurb": "Έγκριση ShoutOuts, έλεγχος απόδοσης χώρου και αντιστοίχιση δραστηριότητας λογαριασμού για αυτήν την τοποθεσία."
+        },
+        "intent:help-venue-command-center": {
+          "label": "Κέντρο εντολών του χώρου διεξαγωγής",
+          "blurb": "Έγκριση ShoutOuts, έλεγχος απόδοσης χώρου και αντιστοίχιση δραστηριότητας λογαριασμού για αυτήν την τοποθεσία."
         },
         "help:help-general-notifications": {
           "label": "Γενικές Ειδοποιήσεις",
@@ -7736,6 +7848,14 @@
           "label": "Prywatność i sesja BOT DEE",
           "blurb": "Pięciominutowa pauza kończy sesję na żywo. Nie usuwa tego czatu dla zalogowanych, wspomnień ani przepływów. Zostają też kopie w Mój profil → Funkcje i zamówienia → My BOT DEE. Goście pozostają tymczasowi. Czaty Mingl nigdy nie są tu kopiowane. Enter wysyła; Shift+Enter zaczyna no"
         },
+        "help:help-botdee-place-search": {
+          "label": "Zapytaj BOT DEE o lokale FLOQR",
+          "blurb": "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają publiczną stronę FLOQR. Zdjęcia patronów i pitch ShoutOut / VIP zostają pominięte, chyba że o nie p"
+        },
+        "intent:help-botdee-place-search": {
+          "label": "Zapytaj BOT DEE o lokale FLOQR",
+          "blurb": "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają publiczną stronę FLOQR. Zdjęcia patronów i pitch ShoutOut / VIP zostają pominięte, chyba że o nie p"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, FloqCAST, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are yo"
@@ -8383,6 +8503,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Club Admin przypisanie lokalu",
           "blurb": "Club Adminotwierza tylko Centrum Dowodzenia Miejsca dla klubu, do którego są przypisani. Otwarcie admin.html bez miejsca nie domyślnie ustawia już Zebbies. Konta demonstracyjne temp_clubadmin_N@floqr-demo.com mapują na temp-democlub-N. Nieprzypisani administratorzy proszą o przyp"
+        },
+        "help:help-venue-command-center": {
+          "label": "Centrum dowodzenia obiektem",
+          "blurb": "Zatwierdź ShoutOuts, sprawdź wydajność atrakcji i uzgodnij aktywność na koncie dla tej lokalizacji."
+        },
+        "intent:help-venue-command-center": {
+          "label": "Centrum dowodzenia obiektem",
+          "blurb": "Zatwierdź ShoutOuts, sprawdź wydajność atrakcji i uzgodnij aktywność na koncie dla tej lokalizacji."
         },
         "help:help-general-notifications": {
           "label": "Powiadomienia ogólne",
@@ -8831,6 +8959,14 @@
           "label": "BOT DEE privacy en sessie",
           "blurb": "De pauze van vijf minuten beëindigt de live BOT DEE-sessie. Ze verwijdert deze ingelogde chat, herinneringen of workflows niet. Optionele kopieën in Mijn profiel → Functies en bestellingen → My BOT DEE blijven ook. Gasten blijven tijdelijk. Mingl-chats worden hier nooit gekopieer"
         },
+        "help:help-botdee-place-search": {
+          "label": "Vraag BOT DEE naar FLOQR-venues",
+          "blurb": "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen de FLOQR-publiekspagina. Patronfoto’s en ShoutOut- / VIP-pitches blijven weg tenzij u daarnaar vroeg. Als er n"
+        },
+        "intent:help-botdee-place-search": {
+          "label": "Vraag BOT DEE naar FLOQR-venues",
+          "blurb": "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen de FLOQR-publiekspagina. Patronfoto’s en ShoutOut- / VIP-pitches blijven weg tenzij u daarnaar vroeg. Als er n"
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How ar"
@@ -9478,6 +9614,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Club Admin-venue toewijzing",
           "blurb": "Club Admins openen het Venue Command Center alleen voor een club waaraan ze zijn toegewezen. admin.html zonder venue opent niet langer standaard Zebbies. Demo-accounts temp_clubadmin_N@floqr-demo.com horen bij temp-democlub-N. Niet-toegewezen admins vragen toewijzing aan bij Mast"
+        },
+        "help:help-venue-command-center": {
+          "label": "Venue Command Center",
+          "blurb": "Keur ShoutOuts goed, bekijk venue-prestaties en stem accountactiviteit af voor deze locatie."
+        },
+        "intent:help-venue-command-center": {
+          "label": "Venue Command Center",
+          "blurb": "Keur ShoutOuts goed, bekijk venue-prestaties en stem accountactiviteit af voor deze locatie."
         },
         "help:help-general-notifications": {
           "label": "Algemene meldingen",
@@ -9926,6 +10070,14 @@
           "label": "خصوصية وجلسة BOT DEE",
           "blurb": "توقف الخمس دقائق ينهي جلسة BOT DEE المباشرة. لا يحذف هذه المحادثة للمستخدم المسجّل أو الذكريات أو مسارات العمل. تبقى النسخ الاختيارية في ملفي → الميزات والطلبات → My BOT DEE أيضًا. يبقى الضيوف مؤقتين. لا تُنسخ محادثات Mingl إلى هنا. Enter يرسل؛ Shift+Enter يبدأ سطرًا جديدًا. الاس"
         },
+        "help:help-botdee-place-search": {
+          "label": "اسأل BOT DEE عن أماكن FLOQR",
+          "blurb": "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح الصفحة العامة لـ FLOQR. صور الرواد وعروض ShoutOut / VIP لا تظهر إلا إذا طلبتها. إذا لم يُدرج المكان بعد، يقول BOT DEE ذلك."
+        },
+        "intent:help-botdee-place-search": {
+          "label": "اسأل BOT DEE عن أماكن FLOQR",
+          "blurb": "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح الصفحة العامة لـ FLOQR. صور الرواد وعروض ShoutOut / VIP لا تظهر إلا إذا طلبتها. إذا لم يُدرج المكان بعد، يقول BOT DEE ذلك."
+        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "تحدث مع BOT DEE في صفحة BOT DEE بكلمات بسيطة: الفعاليات والنوادي وShoutOut وMingl وRydR وBartR وFloqCAST وملفك الشخصي وجداول الطاقم وأدوات Club Admin. اضغط Enter للإرسال؛ Shift+Enter يبدأ سطرًا جديدًا. يتحدث BOT DEE كشخص (جرّب How are you?) ويبحث فقط عندما تسأل كيف تفعل شيئًا في "
@@ -10573,6 +10725,14 @@
         "intent:help-club-admin-affiliation": {
           "label": "Club Admin تعيين المكان",
           "blurb": "Club Admin يفتح فقط مركز قيادة المكان للنادي الذي يتم تعيينه له. فتح admin.html بدون مكان لم يعد يحدد Zebbies افتراضياً. حسابات العرض temp_clubadmin_N@floqr-demo.com تتطابق مع temp-democlub-N. المطالبين الذين لم يتم تعيينهم يطلبون التعيين من Master Admin."
+        },
+        "help:help-venue-command-center": {
+          "label": "مركز قيادة المنشأة",
+          "blurb": "الموافقة على ShoutOuts، ومراجعة أداء المكان، وتسوية نشاط الحساب لهذا الموقع."
+        },
+        "intent:help-venue-command-center": {
+          "label": "مركز قيادة المنشأة",
+          "blurb": "الموافقة على ShoutOuts، ومراجعة أداء المكان، وتسوية نشاط الحساب لهذا الموقع."
         },
         "help:help-general-notifications": {
           "label": "الإشعارات العامة",

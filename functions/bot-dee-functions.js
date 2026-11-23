@@ -1038,9 +1038,20 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     const vipFollowUp = !!(previousVipDraft
       && require("./headless-vip-core").isInteractiveFollowUp(userPrompt, previousVipDraft));
     const vipExecute = bot.isVipExecutePrompt(userPrompt) || vipFollowUp;
+    let venueAttached = null;
     let peopleAttached = null;
     const peopleIntent = peopleCards.classifyPeopleSearchIntent(userPrompt);
     if (!outcome && !shoutExecute && !vipExecute && !roomAttached.handled) {
+      try {
+        venueAttached = await require("./bot-dee-tools").attachVenueSearch({
+          query: userPrompt,
+          request
+        });
+      } catch (error) {
+        console.warn("BOT DEE venue search attach failed", error?.message || error);
+      }
+    }
+    if (!outcome && !shoutExecute && !vipExecute && !roomAttached.handled && !(venueAttached && venueAttached.handled)) {
       try {
         peopleAttached = await peopleCards.attachPeopleSearch({
           query: userPrompt,
@@ -1305,6 +1316,20 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
           geminiOnView: false
         };
       }
+    } else if (venueAttached && venueAttached.handled) {
+      outcome = {
+        reply: venueAttached.reply,
+        results: [],
+        media: venueAttached.media || [],
+        provider: "floqr-venues",
+        model: "placeSearch",
+        toolRounds: 0,
+        uiLanguage,
+        smartViews: venueAttached.smartViews || [],
+        replyKey: venueAttached.replyKey,
+        venueSearch: venueAttached.venueSearch,
+        geminiOnView: false
+      };
     } else if (peopleAttached && peopleAttached.handled) {
       outcome = {
         reply: peopleAttached.reply,
@@ -1493,6 +1518,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       smartViews: Array.isArray(outcome.smartViews) ? outcome.smartViews : [],
       shoutOutPreview: outcome.shoutOutPreview || "",
       peopleSearch: outcome.peopleSearch || null,
+      venueSearch: outcome.venueSearch || null,
       replyKey: outcome.replyKey || outcome.peopleSearch?.replyKey || "",
       geminiOnView: outcome.geminiOnView === true
     };

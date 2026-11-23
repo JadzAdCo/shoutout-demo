@@ -3630,6 +3630,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-035-botdee-place-search",
+      area:"BOT DEE",
+      feature:"Contextual FLOQR venue search (dining / clubs in a city)",
+      changed:"Sushi restaurants in Washington DC searches onboarded clubs (KATA) instead of patron photos + a VIP/ShoutOut dump. No Google/Yelp. Venue cards open club-profile.html?location= without ?v=.",
+      howToTest:"1) Hard-refresh botdee.html. Sign in with botDee. 2) Ask: Sushi restaurants in Washington DC. 3) Confirm venue card(s) for onboarded sushi (KATA DC) and a FLOQR Public Page link — not patron Profile Media tiles, not a ShoutOut/VIP pitch, not a duplicate link list under the card. 4) Ask Who is Lorna — people SMARTcard still works. 5) Ask clubs in Washington DC — nightlife venues, not a restaurant-guide refusal. 6) Ask Sushi restaurants in Miami and Ethiopian restaurants in DC — empty-catalog reply, not KATA. 7) Mark Succeed/Failed.",
+      expected:"Dining/place asks return onboarded FLOQR venues. Unknown city/cuisine says the catalog has no listing yet. People search still answers Who is. No product dump on sushi. Functions executeBotSession deployed with this SHA.",
+      troubleshoot:"Still a product dump + people photos → executeBotSession not on this SHA (need a BOT DEE Functions deploy from origin/main). Cached chat JS → hard-refresh. Empty sushi result → kata-washington-dc missing cuisine in clubLocations. Miami/Ethiopian returning KATA → leftoverTokens not deployed. Who is broken → people attach still after venue; dining classifier should return none for Who is. Duplicate club links under the card → results[] must stay empty so only SMARTviews render."
+    },
+    {
       id:"s3-2-42-venue-command-help-chrome",
       area:"Club Admin",
       feature:"Venue Command Center ? help; remove privilege banners",

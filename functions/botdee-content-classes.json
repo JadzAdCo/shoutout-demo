@@ -79,6 +79,12 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-place-search": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-privacy-assistant": [
       "masterAdmin",
       "patron",
@@ -649,6 +655,9 @@
       "patron"
     ],
     "help-app-language": [
+      "patron"
+    ],
+    "help-botdee-place-search": [
       "patron"
     ],
     "help-botdee-room-smartview": [
