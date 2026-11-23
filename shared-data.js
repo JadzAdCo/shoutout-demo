@@ -2008,6 +2008,22 @@ window.FLOQRTextLayout = {
 };
 
 window.FLOQRTemplatePatronInputs = {
+  // Firestore keys collectableInput1 … collectableInputN (N = collectableInputCount).
+  MAX_SLOTS: 16,
+  FIELD_ASK: {
+    club: "Which venue should this ShoutOut play on?",
+    message: "What should the shoutout text say on the sign?",
+    handle: "Include your @handle on the FloqR card?",
+    media: "Add a photo or video, or keep this a text sign?",
+    jerseyTeamId: "Which country or club kit should the jersey use?",
+    jerseyName: "What name goes on the jersey back?",
+    jerseyNumber: "What number goes on the jersey?",
+    playerName: "What name should the sign show?",
+    facePhoto: "Baller's Alert needs a face photo. Open compose to add it, or send an https photo URL.",
+    teamPhotos: "Football Intro needs four player photos. Open compose to add them.",
+    company: "Optional company line on the card?",
+    compose: "That board needs a photo on compose. Open ShoutOut compose to finish it, or reply with an https photo URL."
+  },
   familyOf(template = {}) {
     const t = template || {};
     const id = String(t.id || t.templateId || "");
@@ -2030,9 +2046,75 @@ window.FLOQRTemplatePatronInputs = {
     ballersAlert: {required: ["club", "facePhoto", "playerName"], optional: ["company", "handle"]},
     footballIntro: {required: ["club", "teamPhotos"], optional: ["message", "handle"]}
   },
+  parseSlot(raw, index) {
+    if (raw == null || raw === "") return null;
+    if (typeof raw === "string") {
+      const parts = raw.split("|");
+      const fieldId = String(parts[0] || "").trim();
+      if (!fieldId) return null;
+      const required = parts[1] === "0" || parts[1] === "optional" ? 0 : 1;
+      return {index, fieldId, required, prompt: parts.slice(2).join("|") || this.FIELD_ASK[fieldId] || ""};
+    }
+    if (typeof raw !== "object") return null;
+    const fieldId = String(raw.fieldId || raw.field || raw.id || raw.key || "").trim();
+    if (!fieldId) return null;
+    const required = raw.optional === true || raw.required === 0 || raw.required === "0" ? 0 : 1;
+    return {index, fieldId, required, prompt: String(raw.prompt || raw.label || this.FIELD_ASK[fieldId] || "").trim()};
+  },
+  slotsFrom(template = {}) {
+    const t = template || {};
+    const declared = Number(t.collectableInputCount);
+    const max = declared > 0 ? Math.min(this.MAX_SLOTS, declared) : this.MAX_SLOTS;
+    const slots = [];
+    for (let i = 1; i <= max; i++) {
+      const parsed = this.parseSlot(t["collectableInput" + i], i);
+      if (!parsed) {
+        if (declared > 0) continue;
+        break;
+      }
+      slots.push(parsed);
+    }
+    if (slots.length) return slots;
+    const lists = (t.patronInputs && Array.isArray(t.patronInputs.required))
+      ? t.patronInputs
+      : (this.lists[this.familyOf(t)] || this.lists.classicBoard);
+    const seeded = [];
+    const seen = new Set();
+    (lists.required || []).forEach(id => {
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      seeded.push({fieldId: id, required: 1, prompt: this.FIELD_ASK[id] || ""});
+    });
+    (lists.optional || []).forEach(id => {
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      seeded.push({fieldId: id, required: 0, prompt: this.FIELD_ASK[id] || ""});
+    });
+    return seeded;
+  },
+  stampTemplate(template = {}) {
+    const t = template || {};
+    const slots = this.slotsFrom(t);
+    const clearUntil = Math.max(Number(t.collectableInputCount) || 0, slots.length, this.MAX_SLOTS);
+    for (let i = 1; i <= clearUntil; i++) delete t["collectableInput" + i];
+    t.collectableInputCount = slots.length;
+    slots.forEach((slot, idx) => {
+      t["collectableInput" + (idx + 1)] = {
+        fieldId: slot.fieldId,
+        required: slot.required ? 1 : 0,
+        prompt: slot.prompt || this.FIELD_ASK[slot.fieldId] || ""
+      };
+    });
+    t.patronInputs = {
+      required: slots.filter(slot => slot.required === 1).map(slot => slot.fieldId),
+      optional: slots.filter(slot => slot.required !== 1).map(slot => slot.fieldId)
+    };
+    t.patronInputFamily = this.familyOf(t);
+    return t;
+  },
   forTemplate(template = {}) {
-    if (template.patronInputs && Array.isArray(template.patronInputs.required)) return template.patronInputs;
-    return this.lists[this.familyOf(template)] || this.lists.classicBoard;
+    const stamped = this.stampTemplate(Object.assign({}, template));
+    return stamped.patronInputs;
   }
 };
 
@@ -2056,8 +2138,7 @@ Object.entries(window.SHOUTOUT_TEMPLATES || {}).forEach(([key, template]) => {
     return;
   }
   window.FLOQRScreenDatapoints.classify(template);
-  template.patronInputs = window.FLOQRTemplatePatronInputs.forTemplate(template);
-  template.patronInputFamily = window.FLOQRTemplatePatronInputs.familyOf(template);
+  window.FLOQRTemplatePatronInputs.stampTemplate(template);
   template.textProfileId = template.templateKind;
   template.textLayoutVersion = window.FLOQRTextLayout.version;
   template.textCompatibleScreenFormatIds = window.FLOQRScreenDatapoints.templateFormatIds(template);

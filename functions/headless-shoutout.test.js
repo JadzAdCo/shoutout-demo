@@ -191,6 +191,7 @@ test("catalog patron input families match headless lists", () => {
   const shared = read("shared-data.js");
   assert.match(shared, /FLOQRTemplatePatronInputs/);
   assert.match(shared, /patronInputs/);
+  assert.match(shared, /collectableInput1/);
   assert.deepEqual(inputs.forTemplate({id: "blackwhite"}).required, ["club", "message"]);
   assert.deepEqual(inputs.forTemplate({id: "soccerJersey", jerseyNameField: true}).required, [
     "club", "jerseyTeamId", "jerseyName", "jerseyNumber"
@@ -205,6 +206,98 @@ test("catalog patron input families match headless lists", () => {
   assert.deepEqual(inputs.forTemplate({id: "birthdayMedia", supportsMedia: true}).required, [
     "club", "message", "media"
   ]);
+});
+
+test("templates stamp numbered collectableInput1..N keys", () => {
+  const inputs = require("./shoutout-template-inputs");
+  const expected = {
+    blackwhite: 3,
+    birthdayMedia: 4,
+    soccerJersey: 6,
+    heistVaultDollars: 3,
+    ballersAlert: 5,
+    zebbiesFootballTeamIntro: 4
+  };
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.blackwhite.collectableInputCount, 3);
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.blackwhite.collectableInput1.fieldId, "club");
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.blackwhite.collectableInput1.required, 1);
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.blackwhite.collectableInput2.fieldId, "message");
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.blackwhite.collectableInput3.fieldId, "handle");
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.blackwhite.collectableInput3.required, 0);
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.birthdayMedia.collectableInputCount, 4);
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.soccerJersey.collectableInputCount, 6);
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.heistVaultDollars.collectableInputCount, 3);
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.ballersAlert.collectableInputCount, 5);
+  assert.equal(headless.HEADLESS_TEXT_TEMPLATES.zebbiesFootballTeamIntro.collectableInputCount, 4);
+  Object.entries(expected).forEach(([id, n]) => {
+    const row = inputs.stampTemplate({
+      id,
+      ...(headless.HEADLESS_TEXT_TEMPLATES[id] || {})
+    });
+    assert.equal(row.collectableInputCount, n, `${id} N`);
+    for (let i = 1; i <= n; i++) {
+      const slot = row[`collectableInput${i}`];
+      assert.ok(slot && slot.fieldId, `${id} collectableInput${i}`);
+      assert.ok(slot.required === 0 || slot.required === 1, `${id} slot ${i} required 0|1`);
+      assert.ok(String(slot.prompt || "").length > 8, `${id} slot ${i} prompt`);
+    }
+  });
+});
+
+test("headless iterates collectableInput1..N instead of a family table", () => {
+  const custom = {
+    id: "customBoard",
+    className: "classic-bw",
+    collectableInputCount: 2,
+    collectableInput1: {fieldId: "club", required: 1, prompt: "Which venue?"},
+    collectableInput2: {fieldId: "jerseyNumber", required: 1, prompt: "What number goes on the jersey?"}
+  };
+  const filled = headless.mergeInteractiveDraft({}, {
+    clubQuery: "temp-democlub-1",
+    message: "Happy birthday Maya",
+    templateId: "blackwhite"
+  });
+  assert.deepEqual(headless.interactiveNeeds(filled), []);
+  assert.deepEqual(headless.interactiveNeeds(filled, custom), ["jerseyNumber"]);
+  assert.equal(headless.missingAsk(["jerseyNumber"], custom), "What number goes on the jersey?");
+  const numbered = headless.mergeInteractiveDraft(filled, {jerseyNumber: "99"});
+  assert.deepEqual(headless.interactiveNeeds(numbered, custom), []);
+  assert.doesNotMatch(headless.missingAsk(headless.interactiveNeeds(numbered, custom), custom), /LED copy/i);
+});
+
+test("Firestore/catalog collectableInput parity for seed templates", () => {
+  const inputs = require("./shoutout-template-inputs");
+  const vm = require("node:vm");
+  const sandbox = {window: {}};
+  sandbox.window = sandbox;
+  vm.runInNewContext(read("shared-data.js"), sandbox, {filename: "shared-data.js"});
+  const ids = [
+    "blackwhite",
+    "birthdayMedia",
+    "soccerJersey",
+    "heistVaultDollars",
+    "ballersAlert",
+    "zebbiesFootballTeamIntro"
+  ];
+  const expectedN = {blackwhite: 3, birthdayMedia: 4, soccerJersey: 6, heistVaultDollars: 3, ballersAlert: 5, zebbiesFootballTeamIntro: 4};
+  ids.forEach(id => {
+    const catalog = sandbox.SHOUTOUT_TEMPLATES[id];
+    assert.ok(catalog, id);
+    assert.equal(catalog.collectableInputCount, expectedN[id], `${id} catalog N`);
+    const server = inputs.stampTemplate(JSON.parse(JSON.stringify({...catalog, id})));
+    assert.equal(server.collectableInputCount, catalog.collectableInputCount);
+    for (let i = 1; i <= expectedN[id]; i++) {
+      assert.equal(catalog[`collectableInput${i}`].fieldId, server[`collectableInput${i}`].fieldId, `${id} ${i}`);
+      assert.equal(catalog[`collectableInput${i}`].required, server[`collectableInput${i}`].required, `${id} ${i} required`);
+    }
+    const headlessRow = headless.HEADLESS_TEXT_TEMPLATES[id];
+    if (headlessRow) {
+      assert.equal(headlessRow.collectableInputCount, catalog.collectableInputCount, `${id} headless N`);
+      for (let i = 1; i <= expectedN[id]; i++) {
+        assert.equal(headlessRow[`collectableInput${i}`].fieldId, catalog[`collectableInput${i}`].fieldId);
+      }
+    }
+  });
 });
 
 test("startShoutOutCheckout and FloqR callable accept flat club + message", () => {

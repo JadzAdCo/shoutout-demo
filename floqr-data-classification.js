@@ -319,7 +319,16 @@
     ["smartVisualDrafts", "publishedByEmail", "master", 1, "Master Admin email that published the queued draft"],
     ["smartVisualDrafts", "catalogAssetId", "master", 0, "Packaged registry id this draft overlays after approve (e.g. bg-milan)"],
     ["featuresSmartviewApprovals", "publicCopy", "master", 0, "Reviewer-approved patron-facing feature copy; no PR bodies or secrets"],
-    ["featuresSmartviewApprovals", "publicCopyReviewer", "master", 1, "Master Admin email that approved Features SMARTview copy"]
+    ["featuresSmartviewApprovals", "publicCopyReviewer", "master", 1, "Master Admin email that approved Features SMARTview copy"],
+    ["templates", "collectableInputCount", "public", 0, "N for collectableInput1..N on this ShoutOut template; seed + Master Admin write"],
+    ["templates", "collectableInput1", "public", 0, "Headless slot 1 {fieldId, required 0|1, prompt}; BOT DEE/Gemini collection"],
+    ["templates", "collectableInput2", "public", 0, "Headless slot 2 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput3", "public", 0, "Headless slot 3 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput4", "public", 0, "Headless slot 4 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput5", "public", 0, "Headless slot 5 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput6", "public", 0, "Headless slot 6 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput7", "public", 0, "Headless slot 7 {fieldId, required 0|1, prompt}; omit when N < 7"],
+    ["templates", "collectableInput8", "public", 0, "Headless slot 8 {fieldId, required 0|1, prompt}; omit when N < 8"]
   ];
 
   const CATALOG = ROWS.map(presetRow);

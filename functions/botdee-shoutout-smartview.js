@@ -111,7 +111,10 @@ function buildShoutOutSmartView(opts = {}) {
     jerseyName: draft.jerseyName || "",
     jerseyNumber: draft.jerseyNumber || "",
     playerName: draft.playerName || "",
-    patronInputs: headless.inputsForDraft(draft),
+    patronInputs: (() => {
+      const inputs = headless.inputsForDraft(draft, options.templateRow);
+      return {required: inputs.required, optional: inputs.optional};
+    })(),
     previewLines: previewLines(draft.message || draft.playerName || draft.jerseyName),
     boardSkin: boardSkin(draft.templateId || headless.DEFAULT_TEMPLATE_ID),
     currentStep: needs[0] || (mode === "draft" ? "throw" : ""),

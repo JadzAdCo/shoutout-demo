@@ -202,6 +202,7 @@ test("BOT DEE session collects extras before mint; FloqR callable stays one-shot
   assert.match(session, /isInteractiveFollowUp/);
   assert.match(session, /fillFromConversation/);
   assert.match(session, /conversationTurns/);
+  assert.match(session, /loadTemplateCollectableRow/);
   const commerce = read("functions/commerce-functions.js");
   assert.doesNotMatch(commerce, /interactiveNeeds/);
   assert.match(commerce, /notifyClubPendingHeadlessShoutOut/);

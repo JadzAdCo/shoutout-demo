@@ -1,7 +1,9 @@
-/* Headless ShoutOut compose — venue + message (+ optional template/screen)
-   from chat or FloqR pages. Patron inputs come from each template's list
-   (required vs optional). Chat context fills fields; ask only missing required.
-   No Firebase. Checkout vs free submit is the caller. */
+/* Headless ShoutOut compose — venue + shoutout text (+ optional template/screen)
+   from chat or FloqR pages. Collection list is collectableInput1..N on the
+   template (Firestore overlay when the caller loads templates/{id}). Family
+   tables seed those slots; runtime iterates the numbered fields. Chat context
+   fills first; ask only the next missing required slot. Checkout vs free
+   submit is the caller. */
 "use strict";
 
 const templateInputs = require("./shoutout-template-inputs");
@@ -33,9 +35,11 @@ const CLASSIC_BOARD_CAPS = Object.freeze({
   }
 });
 
-/** Catalog className / name must match shared-data.js or Preview + LED skip classic-bw. */
-const HEADLESS_TEXT_TEMPLATES = Object.freeze({
+/** Catalog className / name must match shared-data.js or Preview + LED skip classic-bw.
+    stampCatalog writes collectableInput1..N (seed). Runtime reads those fields. */
+const HEADLESS_TEXT_TEMPLATES = Object.freeze(templateInputs.stampCatalog({
   blackwhite: {
+    id: "blackwhite",
     name: "Traditional Black and White ShoutOut",
     className: "classic-bw",
     priceCents: 0,
@@ -111,6 +115,7 @@ const HEADLESS_TEXT_TEMPLATES = Object.freeze({
     defaultBackgroundUrl: "./images/heist/vault-night.jpg"
   },
   ballersAlert: {
+    id: "ballersAlert",
     name: "Baller's Alert",
     className: "baller-card baller-alert",
     priceCents: 10000,
@@ -118,7 +123,7 @@ const HEADLESS_TEXT_TEMPLATES = Object.freeze({
     requiresFacePhoto: true,
     ballerAlert: true
   }
-});
+}));
 
 const TEMPLATE_ALIASES = Object.freeze({
   blackwhite: "blackwhite",
@@ -257,25 +262,28 @@ function resolveTemplateId(raw = "") {
   return alias || "";
 }
 
-function catalogShapeFor(id = "") {
+function catalogShapeFor(id = "", overlay = null) {
   const meta = HEADLESS_TEXT_TEMPLATES[id] || {};
-  return {
+  const extra = overlay && typeof overlay === "object" ? overlay : {};
+  return templateInputs.stampTemplate({
+    ...meta,
+    ...extra,
     id,
-    name: meta.name,
-    className: meta.className,
-    priceCents: meta.priceCents || 0,
-    nameOnly: meta.nameOnly === true,
-    jerseyNameField: meta.jerseyNameField === true,
-    jerseyNumberField: meta.jerseyNumberField === true,
-    requiresFacePhoto: meta.requiresFacePhoto === true,
-    ballerAlert: meta.ballerAlert === true,
-    supportsMedia: meta.supportsMedia === true,
-    layout: meta.layout || "",
-    typedLine: meta.typedLine || ""
-  };
+    name: extra.name || meta.name,
+    className: extra.className || meta.className,
+    priceCents: extra.priceCents != null ? extra.priceCents : (meta.priceCents || 0),
+    nameOnly: extra.nameOnly === true || meta.nameOnly === true,
+    jerseyNameField: extra.jerseyNameField === true || meta.jerseyNameField === true,
+    jerseyNumberField: extra.jerseyNumberField === true || meta.jerseyNumberField === true,
+    requiresFacePhoto: extra.requiresFacePhoto === true || meta.requiresFacePhoto === true,
+    ballerAlert: extra.ballerAlert === true || meta.ballerAlert === true,
+    supportsMedia: extra.supportsMedia === true || meta.supportsMedia === true,
+    layout: extra.layout || meta.layout || "",
+    typedLine: extra.typedLine || meta.typedLine || ""
+  });
 }
 
-function pickTemplate(venue = {}, requested = "") {
+function pickTemplate(venue = {}, requested = "", overlay = null) {
   const explicit = String(requested || "").trim();
   let id = resolveTemplateId(explicit);
   if (!id) id = DEFAULT_TEMPLATE_ID;
@@ -286,7 +294,7 @@ function pickTemplate(venue = {}, requested = "") {
     id = DEFAULT_TEMPLATE_ID;
   }
   const chosen = HEADLESS_TEXT_TEMPLATES[id] || meta;
-  const shape = catalogShapeFor(id);
+  const shape = catalogShapeFor(id, overlay);
   const inputs = templateInputs.forTemplate(shape);
   return {
     composerOnly: false,
@@ -306,8 +314,11 @@ function pickTemplate(venue = {}, requested = "") {
     requiresFacePhoto: chosen.requiresFacePhoto === true,
     supportsMedia: chosen.supportsMedia === true,
     layout: chosen.layout || "",
-    patronInputs: inputs,
-    patronInputFamily: templateInputs.familyOf(shape)
+    patronInputs: {required: inputs.required, optional: inputs.optional},
+    patronInputFamily: templateInputs.familyOf(shape),
+    collectableInputCount: Number(shape.collectableInputCount) || inputs.slots.length,
+    slots: inputs.slots,
+    ...templateInputs.collectableFields(shape)
   };
 }
 
@@ -872,10 +883,15 @@ function isInteractiveFollowUp(raw, draft) {
   return false;
 }
 
-function inputsForDraft(draft) {
+function inputsForDraft(draft, templateRow) {
   const row = clipInteractiveDraft(draft);
-  const templateId = row.templateId || DEFAULT_TEMPLATE_ID;
-  const shape = catalogShapeFor(templateId);
+  const overlay = templateRow && typeof templateRow === "object" ? templateRow : null;
+  const templateId = text(overlay && (overlay.id || overlay.templateId), 80)
+    || row.templateId
+    || DEFAULT_TEMPLATE_ID;
+  const shape = overlay && templateInputs.hasNumberedSlots(overlay)
+    ? templateInputs.stampTemplate({...overlay, id: overlay.id || templateId})
+    : catalogShapeFor(templateId, overlay);
   return templateInputs.forTemplate(shape);
 }
 
@@ -898,15 +914,19 @@ function fieldFilled(row, fieldId) {
   }
 }
 
-function interactiveNeeds(draft) {
+function interactiveNeeds(draft, templateRow) {
   const row = clipInteractiveDraft(draft);
-  const inputs = inputsForDraft(row);
+  const inputs = inputsForDraft(row, templateRow);
+  const slots = Array.isArray(inputs.slots) ? inputs.slots : [];
   const needs = [];
-  inputs.required.forEach(fieldId => {
-    if (!fieldFilled(row, fieldId)) needs.push(fieldId);
+  slots.forEach(slot => {
+    if (Number(slot.required) === 1 && !fieldFilled(row, slot.fieldId)) needs.push(slot.fieldId);
   });
-  if (row.mediaDecision === "compose") needs.push("compose");
-  if (row.skipExtras) return needs.filter(id => inputs.required.includes(id) || id === "compose");
+  if (row.mediaDecision === "compose" && !needs.includes("compose")) needs.push("compose");
+  if (row.skipExtras) {
+    const requiredIds = slots.filter(slot => Number(slot.required) === 1).map(slot => slot.fieldId);
+    return needs.filter(id => requiredIds.includes(id) || id === "compose");
+  }
   return needs;
 }
 
@@ -927,10 +947,16 @@ function formatHandle(value) {
   return raw ? `@${raw}` : "";
 }
 
-function isComposerOnlyTemplate(templateId = "") {
+function isComposerOnlyTemplate(templateId = "", templateRow) {
   const id = resolveTemplateId(templateId) || String(templateId || "").trim();
-  const family = templateInputs.familyOf(catalogShapeFor(id));
-  return family === "footballIntro" || family === "ballersAlert" || family === "splitMedia";
+  const shape = templateRow && templateInputs.hasNumberedSlots(templateRow)
+    ? templateRow
+    : catalogShapeFor(id);
+  const slots = templateInputs.slotsFromTemplate(shape);
+  return slots.some(slot => (
+    Number(slot.required) === 1
+    && (slot.fieldId === "facePhoto" || slot.fieldId === "teamPhotos" || slot.fieldId === "media")
+  ));
 }
 
 function shoutOutComposeHref(clubLocationId) {
@@ -956,7 +982,8 @@ function composeShoutOutPayload({
   jerseyName,
   jerseyNumber,
   playerName,
-  facePhotoUrl
+  facePhotoUrl,
+  templateRow
 } = {}) {
   const parsed = parseShoutOutExecute(userPrompt || "");
   const club = text(clubLocationId || parsed.clubQuery, 120);
@@ -967,7 +994,7 @@ function composeShoutOutPayload({
     || parsed.handleDecision === "include";
   const skipHandle = includeAttribution === false || parsed.handleDecision === "skip";
   const handleText = formatHandle(attribution || parsed.attribution);
-  const picked = pickTemplate(venue, requestedTemplate);
+  const picked = pickTemplate(venue, requestedTemplate, templateRow);
   const jerseyTeam = text(jerseyTeamId || parsed.jerseyTeamId, 80);
   const jerseyPatronName = text(jerseyName || parsed.jerseyName, 16).toUpperCase();
   const jerseyMark = text(jerseyNumber || parsed.jerseyNumber, 4).toUpperCase().slice(0, 2);
@@ -991,7 +1018,7 @@ function composeShoutOutPayload({
   const missing = interactiveNeeds({
     ...draftForNeeds,
     skipExtras: true
-  });
+  }, templateRow || picked);
   if (missing.length) {
     const photoNeed = missing.includes("facePhoto") || missing.includes("teamPhotos") || missing.includes("media");
     return {
@@ -1091,10 +1118,10 @@ function composeShoutOutPayload({
   };
 }
 
-function missingAsk(needs = []) {
+function missingAsk(needs = [], templateRow) {
   const first = String((Array.isArray(needs) ? needs : [])[0] || "");
   if (!first) return "ShoutOut SMARTpreview is ready. Reply throw it to send, or cancel the shoutout.";
-  return templateInputs.fieldAsk(first);
+  return templateInputs.fieldAsk(first, templateRow);
 }
 
 function newReferenceNumber(now = new Date()) {
@@ -1118,6 +1145,8 @@ module.exports = {
   HEADLESS_TEXT_TEMPLATES,
   TEMPLATE_ALIASES,
   CLUB_NAME_ALIASES,
+  catalogShapeFor,
+  resolveTemplateId,
   parseShoutOutExecute,
   parseShoutOutExtras,
   parseHandleHint,

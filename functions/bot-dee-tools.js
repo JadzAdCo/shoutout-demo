@@ -11,6 +11,7 @@ const floqCast = require("./floqcast-functions").__floqCastHelpers;
 const checkout = require("./commerce-functions").__checkoutHelpers;
 const people = require("./people-directory-core");
 const headless = require("./headless-shoutout-core");
+const templateInputs = require("./shoutout-template-inputs");
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -124,6 +125,51 @@ async function requireClubLocationId(raw) {
   return resolved;
 }
 
+async function loadTemplateCollectableRow(templateId) {
+  const resolved = headless.resolveTemplateId(templateId)
+    || String(templateId || "").trim()
+    || headless.DEFAULT_TEMPLATE_ID;
+  const packaged = headless.catalogShapeFor(resolved);
+  try {
+    const snap = await db.collection("templates").doc(resolved).get();
+    if (snap.exists) {
+      return templateInputs.stampTemplate({...packaged, ...(snap.data() || {}), id: resolved});
+    }
+  } catch (_) {}
+  return packaged;
+}
+
+async function loadCollectableTemplateCards(ids) {
+  const wanted = (Array.isArray(ids) && ids.length)
+    ? [...new Set(ids.map(String).filter(Boolean))]
+    : Object.keys(headless.HEADLESS_TEXT_TEMPLATES);
+  const packagedById = {};
+  wanted.forEach(id => {
+    packagedById[id] = headless.catalogShapeFor(id);
+  });
+  try {
+    const refs = wanted.map(id => db.collection("templates").doc(id));
+    if (refs.length && typeof db.getAll === "function") {
+      const snaps = await db.getAll(...refs);
+      snaps.forEach((snap, i) => {
+        const id = wanted[i];
+        if (snap.exists) {
+          packagedById[id] = templateInputs.stampTemplate({
+            ...packagedById[id],
+            ...(snap.data() || {}),
+            id
+          });
+        }
+      });
+    } else {
+      for (const id of wanted) {
+        packagedById[id] = await loadTemplateCollectableRow(id);
+      }
+    }
+  } catch (_) {}
+  return wanted.map(id => templateInputs.collectableFields(packagedById[id]));
+}
+
 async function listShoutOutTemplates(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "shoutOut", sessionRequest);
   await featureGates.assertPatronFeature(sessionRequest.auth, "shoutOut");
@@ -139,21 +185,20 @@ async function listShoutOutTemplates(args, sessionRequest) {
     venueName = text(row.locationName || row.brandName || clubLocationId, 160);
     venueTemplateIds = Array.isArray(row.templates) ? row.templates.map(String) : [];
   }
-  // Packaged catalog ids from shared-data (browser); server returns deep-link for compose.
   const href = clubLocationId
     ? `./shoutout-search.html?from=botdee&location=${encodeURIComponent(clubLocationId)}`
     : "./shoutout-search.html?from=botdee";
+  const templates = await loadCollectableTemplateCards(venueTemplateIds);
   return {
     ok: true,
     tool: "listShoutOutTemplates",
     clubLocationId: clubLocationId || null,
     venueName: venueName || null,
-    templateIds: venueTemplateIds,
-    templateCount: venueTemplateIds ? venueTemplateIds.length : null,
+    templateIds: templates.map(row => row.id),
+    templateCount: templates.length,
+    templates,
     composeHref: href,
-    note: venueTemplateIds
-      ? "Use startShoutOutCheckout with clubLocationId + message (optional templateId / screenFormatId). Paid templates return checkoutUrl; free boards submit pending. Open composeHref only for photo / jersey / Football Intro / Heist / Baller's Alert."
-      : "Pass clubLocationId to list venue templates, or startShoutOutCheckout with a club name + message."
+    note: "Each template has collectableInput1..N {fieldId, required 0|1, prompt}. Fill those from conversation context. Ask only the next missing required slot. Never invent a canned throw phrase. Do not say LED copy — say shoutout text or sign verbiage. Use startShoutOutCheckout after required slots are filled (optional templateId / screenFormatId). Paid templates return checkoutUrl; free boards submit pending. Open composeHref only when a required photo slot cannot be filled in chat."
   };
 }
 
@@ -402,6 +447,7 @@ async function startShoutOutCheckout(args, sessionRequest) {
   );
   const mediaUrl = text(args?.mediaUrl || payload.mediaUrl || existing?.mediaUrl || parsed.mediaUrl, 500);
   const mediaType = text(args?.mediaType || payload.mediaType || existing?.mediaType, 20);
+  const templateRow = await loadTemplateCollectableRow(templateId);
   const composed = headless.composeShoutOutPayload({
     clubLocationId,
     venue,
@@ -414,6 +460,7 @@ async function startShoutOutCheckout(args, sessionRequest) {
     attributionChoice: text(args?.attributionChoice || existing?.attributionChoice, 40),
     mediaUrl,
     mediaType,
+    templateRow,
     jerseyTeamId: text(args?.jerseyTeamId || existing?.jerseyTeamId || parsed.jerseyTeamId, 80),
     jerseyName: text(args?.jerseyName || existing?.jerseyPatronName || parsed.jerseyName, 16),
     jerseyNumber: text(args?.jerseyNumber || existing?.jerseyNumber || parsed.jerseyNumber, 4),
@@ -1791,6 +1838,8 @@ module.exports = {
   TOOL_RUNNERS,
   runProductTool,
   listShoutOutTemplates,
+  loadTemplateCollectableRow,
+  loadCollectableTemplateCards,
   startShoutOutCheckout,
   getVipAvailability,
   createVipHold,

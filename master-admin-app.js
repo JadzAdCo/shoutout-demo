@@ -1638,6 +1638,17 @@
     if (Array.isArray(existingOwned.venueIds) && existingOwned.venueIds.length) {
       payload.venueIds = existingOwned.venueIds.map(String).filter(Boolean);
     }
+    const collectableSource = {...existingOwned, ...payload, id};
+    if (window.FLOQRTemplatePatronInputs?.stampTemplate) {
+      window.FLOQRTemplatePatronInputs.stampTemplate(collectableSource);
+      payload.collectableInputCount = collectableSource.collectableInputCount;
+      payload.patronInputs = collectableSource.patronInputs;
+      payload.patronInputFamily = collectableSource.patronInputFamily;
+      const slotCount = Number(collectableSource.collectableInputCount) || 0;
+      for (let i = 1; i <= slotCount; i++) {
+        payload["collectableInput" + i] = collectableSource["collectableInput" + i];
+      }
+    }
     await db.collection("templates").doc(id).set(payload, {merge:true});
     setText("templateManagementStatus", `${name} saved with ${lineCount} line(s), ${maxCharactersPerLine} characters per line, ${maxMainCharacters} main and ${maxSubCharacters} subtext characters, ${mainTextSizePercent}%/${subTextSizePercent}% text sizing, ${screenFormatIds.length} display type(s), and a ${payload.backgroundEditable ? "customizable" : "locked"} background.`);
     await loadManagedTemplates();

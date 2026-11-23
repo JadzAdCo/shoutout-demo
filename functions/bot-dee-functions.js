@@ -261,16 +261,18 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   const merged = headless.mergeInteractiveDraft(previousDraft, filled, {
     freshThrow: !!(parsed.clubQuery && parsed.message)
   });
-  const earlyNeeds = headless.interactiveNeeds(merged);
+  const templateRow = await tools.loadTemplateCollectableRow(merged.templateId);
+  const earlyNeeds = headless.interactiveNeeds(merged, templateRow);
   if (!merged.clubQuery) {
     try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
     const view = shoutView.buildShoutOutSmartView({
       draft: merged,
       needs: earlyNeeds.length ? earlyNeeds : ["club"],
       venueName: "",
-      mode: "draft"
+      mode: "draft",
+      templateRow
     });
-    return shoutOutSmartOutcome(headless.missingAsk(["club"]), lang, {
+    return shoutOutSmartOutcome(headless.missingAsk(["club"], templateRow), lang, {
       model: "headless-draft",
       toolRounds: 0,
       smartViews: [view]
@@ -295,17 +297,18 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
       merged.attribution = await tools.loadPatronShoutOutAttribution(uid);
     } catch (_) {}
   }
-  const needs = headless.interactiveNeeds(merged);
+  const needs = headless.interactiveNeeds(merged, templateRow);
   const viewBase = {
     draft: merged,
     needs,
-    venueName: merged.clubQuery
+    venueName: merged.clubQuery,
+    templateRow
   };
   if (needs.includes("compose") || merged.mediaDecision === "compose") {
     try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
     const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "draft"});
     const fallback = bot.shoutOutExecuteFallback(lang, allowed);
-    return shoutOutSmartOutcome(headless.missingAsk(["compose"]), lang, {
+    return shoutOutSmartOutcome(headless.missingAsk(["compose"], templateRow), lang, {
       results: fallback.results,
       model: "headless-draft",
       toolRounds: 0,
@@ -315,7 +318,7 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   if (needs.length) {
     try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
     const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "draft"});
-    return shoutOutSmartOutcome(headless.missingAsk(needs), lang, {
+    return shoutOutSmartOutcome(headless.missingAsk(needs, templateRow), lang, {
       model: "headless-draft",
       toolRounds: 0,
       smartViews: [view]
@@ -331,7 +334,7 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
     );
   }
   if (headless.isBareNegative(userPrompt) && parsed.confirmSubmit !== true) {
-    const priorNeeds = previousDraft ? headless.interactiveNeeds(previousDraft) : [];
+    const priorNeeds = previousDraft ? headless.interactiveNeeds(previousDraft, templateRow) : [];
     if (!priorNeeds.length) {
       try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
       return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {

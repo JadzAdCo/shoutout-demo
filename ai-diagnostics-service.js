@@ -505,10 +505,10 @@
       version: "s3.3.063",
       title: "s3.3.063 — Headless ShoutOut uses each template's patron input list",
       checks: [
-        {label:"Template input families", file:"functions/shoutout-template-inputs.js", includes:["classicBoard", "soccerJersey", "footballIntro", "ballersAlert"]},
-        {label:"Catalog stamp", file:"shared-data.js", includes:["FLOQRTemplatePatronInputs", "patronInputs"]},
-        {label:"Fill from conversation", file:"functions/headless-shoutout-core.js", includes:["fillFromConversation", "interactiveNeeds"]},
-        {label:"BOT DEE uses history", file:"functions/bot-dee-functions.js", includes:["fillFromConversation", "conversationTurns"]},
+        {label:"Template input families", file:"functions/shoutout-template-inputs.js", includes:["collectableInput", "classicBoard", "soccerJersey", "footballIntro", "ballersAlert"]},
+        {label:"Catalog stamp", file:"shared-data.js", includes:["FLOQRTemplatePatronInputs", "collectableInput1", "patronInputs"]},
+        {label:"Fill from conversation", file:"functions/headless-shoutout-core.js", includes:["fillFromConversation", "interactiveNeeds", "collectableInput"]},
+        {label:"BOT DEE uses history", file:"functions/bot-dee-functions.js", includes:["fillFromConversation", "conversationTurns", "loadTemplateCollectableRow"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-063-headless-template-inputs"]}
       ]
     },
@@ -4116,10 +4116,10 @@
       id:"s3-3-063-headless-template-inputs",
       area:"BOT DEE",
       feature:"Headless ShoutOut uses each template's patron inputs",
-      changed:"s3.3.063 — BOT DEE fills ShoutOut fields from the template patron-input list (required vs optional), not a canned throw phrase. Chat context (venue, shoutout text, names, numbers) fills first; BOT DEE asks only the next missing required field. Traditional = venue + shoutout text. Jersey / Heist name-only / Football Intro / Baller's Alert / photo boards keep their own required inputs. Preview then throw it. FloqR one-shot stays a payload.",
+      changed:"s3.3.063 — BOT DEE/Gemini collect from templates/{id} collectableInput1..N {fieldId, required 0|1, prompt}, not a canned throw phrase or a hardcoded family table. Chat context fills first; BOT DEE asks only the next missing required slot. Traditional N=3, photo N=4, jersey N=6, Heist name-only N=3, Baller's Alert N=5, Football Intro N=4. Preview then throw it. FloqR one-shot stays a payload.",
       howToTest:"1) After Pages + Functions deploy. Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js ?v=s3.3.063. Sign in with BOT DEE + ShoutOut. 2) In one chat say we are going to Aurelia tonight, then happy birthday Maya, then throw a shoutout — expect ShoutOut SMARTpreview ready (venue Aurelia + birthday text), NOT a request for a magic that says sentence and NOT questions for template/@handle/photo. 3) Reply throw it — pending My ShoutOuts (free Traditional). 4) Start a jersey throw with kit + name but no number — BOT DEE asks only for the number. 5) FloqR/API one-shot still defaults Traditional without the card. 6) Mark Succeed/Failed.",
       expected:"Context fills Traditional. Ask only missing required fields. Template-specific lists (jersey number, Heist name, Football Intro photos). No canned throw phrase. Display URLs never ?v=.",
-      troubleshoot:"Still asking template/@handle after venue+text → executeBotSession not this SHA (still s3.3.044 extras). Bare throw ignores Aurelia/birthday in thread → fillFromConversation not deployed. Jersey never asks number → patronInputs not stamped / soccerJersey family missing. Photo board silently submits → required media/facePhoto/teamPhotos must stay required."
+      troubleshoot:"Still asking template/@handle after venue+text → executeBotSession not this SHA (still s3.3.044 extras). Bare throw ignores Aurelia/birthday in thread → fillFromConversation not deployed. Jersey never asks number → collectableInput* not on templates/{id} (re-seed). Photo board silently submits → required media/facePhoto/teamPhotos slots must stay required=1. Gemini missing slot list → listShoutOutTemplates templates[].collectableInput1..N."
     },
     {
       id:"s3-3-045-smartpreview-live-led",
