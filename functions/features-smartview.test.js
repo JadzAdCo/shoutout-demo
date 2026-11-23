@@ -286,6 +286,8 @@ test("UI, BOT DEE, and Master Admin hosts are wired without hardcoded nav versio
   assert.match(read("features-smartview.html"), /autoRedirect:\s*false/);
   assert.match(read("features-smartview.html"), /mountCatalog\(\);/);
   assert.match(read("features-smartview.html"), /function hostAttr\(host, name, fallback\)/);
+  assert.match(read("features-smartview.html"), /else if \(host && host.hasAttribute\("data-fsv-feature"\)\)/);
+  assert.doesNotMatch(read("features-smartview.html"), /else mountOpts\.featureId = hostAttr\(host, "data-fsv-feature"/);
   assert.match(read("floqr-features-smartview.js"), /function closeSheet/);
   assert.match(read("floqr-features-smartview.js"), /hasHostAttr/);
   assert.match(read("floqr-features-smartview.js"), /ignoreGhostClick/);

@@ -77,7 +77,9 @@
         view: hostAttr(host, "data-fsv-view", params.get("view") || "") || "overview"
       };
       if (!mountedOnce) mountOpts.featureId = params.get("feature") || "";
-      else mountOpts.featureId = hostAttr(host, "data-fsv-feature", "");
+      else if (host && host.hasAttribute("data-fsv-feature")) {
+        mountOpts.featureId = host.getAttribute("data-fsv-feature") || "";
+      }
       mountedOnce = true;
       FLOQRFeaturesSmartView.mount("featuresSmartViewHost", mountOpts);
     }
