@@ -25,6 +25,10 @@ test("listShoutOutTemplates source resolves clubLocationId via requireClubLocati
   assert.match(src, /aurelia:\s*"temp-democlub-1"/);
   assert.match(src, /loadCollectableTemplateCards/);
   assert.match(src, /collectableInput1\.\.N/);
+  assert.match(src, /fallbackAll: !clubLocationId/);
+  assert.match(src, /if \(!wanted\.length\) return \[\]/);
+  assert.match(src, /isComposerOnlyTemplate\(templateId, overlay\)/);
+  assert.match(src, /loadTemplateCollectableRow\(templateId\)/);
 });
 
 test("isClubPublic rejects offboarded / unpublished clubs", () => {

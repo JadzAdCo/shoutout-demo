@@ -667,6 +667,8 @@ function applyBareInteractiveReply(draft, parsed, raw, templateRow) {
     next.playerName = extractPlayerName(text) || bareSlotText(text, 40);
   } else if (step === "company" && !next.company) {
     next.company = bareSlotText(text, 18).toUpperCase();
+  } else if (step && next[step] == null) {
+    next[step] = bareSlotText(text, 80);
   }
   return next;
 }
@@ -905,7 +907,7 @@ function isVipLikePrompt(raw) {
     && /\b(?:table|vip|section|mezzanine)\b/i.test(String(raw || ""));
 }
 
-function isInteractiveFollowUp(raw, draft) {
+function isInteractiveFollowUp(raw, draft, templateRow) {
   const row = clipInteractiveDraft(draft);
   if (!row.active && !row.clubQuery && !row.message && !row.jerseyName && !row.playerName) return false;
   if (isVipLikePrompt(raw)) return false;
@@ -918,7 +920,7 @@ function isInteractiveFollowUp(raw, draft) {
   if (isBareAffirmative(raw) || isBareNegative(raw)) return true;
   if (extractAliasClub(raw) || extractJerseyTeam(raw) || extractJerseyName(raw) || extractJerseyNumber(raw)) return true;
   if (extractCelebrationMessage(raw) || extractQuotedMessage(raw) || extractPlayerName(raw)) return true;
-  const needs = interactiveNeeds(row);
+  const needs = interactiveNeeds(row, templateRow);
   if (needs[0] && String(raw || "").trim()) return true;
   return false;
 }

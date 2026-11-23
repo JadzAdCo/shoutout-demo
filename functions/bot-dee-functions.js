@@ -227,7 +227,7 @@ function shoutOutSmartOutcome(reply, lang, extra = {}) {
   };
 }
 
-async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures, previousDraft, conversationTurns) {
+async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures, previousDraft, conversationTurns, previousTemplateRow) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const headless = require("./headless-shoutout-core");
@@ -237,7 +237,13 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   const uid = session?.userId || session?.request?.auth?.uid || "";
   const parsed = headless.parseShoutOutExecute(userPrompt);
   const fromThread = headless.fillFromConversation(conversationTurns, userPrompt);
-  headless.applyBareInteractiveReply(previousDraft, parsed, userPrompt);
+  const askedTemplateId = previousDraft?.templateId || parsed.templateId || fromThread.templateId;
+  const askedResolved = askedTemplateId || headless.DEFAULT_TEMPLATE_ID;
+  const askedRow = previousTemplateRow
+    && (previousTemplateRow.id === askedResolved || previousTemplateRow.templateId === askedResolved)
+    ? previousTemplateRow
+    : await tools.loadTemplateCollectableRow(askedTemplateId);
+  headless.applyBareInteractiveReply(previousDraft, parsed, userPrompt, askedRow);
   if ((parsed.cancel || fromThread.cancel) && previousDraft) {
     try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
     return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
@@ -261,7 +267,10 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   const merged = headless.mergeInteractiveDraft(previousDraft, filled, {
     freshThrow: !!(parsed.clubQuery && parsed.message)
   });
-  const templateRow = await tools.loadTemplateCollectableRow(merged.templateId);
+  const mergedId = merged.templateId || headless.DEFAULT_TEMPLATE_ID;
+  const templateRow = askedRow && (askedRow.id === mergedId || askedRow.templateId === mergedId)
+    ? askedRow
+    : await tools.loadTemplateCollectableRow(merged.templateId);
   const earlyNeeds = headless.interactiveNeeds(merged, templateRow);
   if (!merged.clubQuery) {
     try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
@@ -1076,8 +1085,16 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       roomId: stored.joinedRoomId || ""
     });
     const previousShoutDraft = stored.headlessShoutOutDraft || null;
+    let previousShoutRow = null;
+    if (previousShoutDraft) {
+      try {
+        previousShoutRow = await require("./bot-dee-tools").loadTemplateCollectableRow(previousShoutDraft.templateId);
+      } catch (_) {
+        previousShoutRow = null;
+      }
+    }
     const shoutFollowUp = !!(previousShoutDraft
-      && require("./headless-shoutout-core").isInteractiveFollowUp(userPrompt, previousShoutDraft));
+      && require("./headless-shoutout-core").isInteractiveFollowUp(userPrompt, previousShoutDraft, previousShoutRow));
     const shoutExecute = bot.isShoutOutExecutePrompt(userPrompt) || shoutFollowUp;
     const previousVipDraft = stored.headlessVipDraft || null;
     const vipFollowUp = !!(previousVipDraft
@@ -1115,7 +1132,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     } else if (shoutExecute) {
       try {
         outcome = await tryHeadlessShoutOut(
-          userPrompt, session, uiLanguage, allowedFeatures, previousShoutDraft, history
+          userPrompt, session, uiLanguage, allowedFeatures, previousShoutDraft, history, previousShoutRow
         );
       } catch (error) {
         console.warn("BOT DEE headless ShoutOut failed", error?.message || error);

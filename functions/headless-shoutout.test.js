@@ -292,6 +292,44 @@ test("templates stamp numbered collectableInput1..N keys", () => {
   });
 });
 
+test("Firestore overlay slots drive follow-up fill and composer-only", () => {
+  const overlay = {
+    id: "blackwhite",
+    collectableInputCount: 3,
+    collectableInput1: {fieldId: "club", required: 1, prompt: "Which venue?"},
+    collectableInput2: {fieldId: "message", required: 1, prompt: "What should the sign say?"},
+    collectableInput3: {fieldId: "jerseyNumber", required: 1, prompt: "What number goes on the jersey?"}
+  };
+  const draft = headless.mergeInteractiveDraft({}, {
+    clubQuery: "temp-democlub-1",
+    message: "Happy birthday Maya",
+    templateId: "blackwhite"
+  });
+  assert.deepEqual(headless.interactiveNeeds(draft), []);
+  assert.deepEqual(headless.interactiveNeeds(draft, overlay), ["jerseyNumber"]);
+  assert.equal(headless.isInteractiveFollowUp("99", draft), false);
+  assert.equal(headless.isInteractiveFollowUp("99", draft, overlay), true);
+  const parsed = headless.parseShoutOutExecute("99");
+  headless.applyBareInteractiveReply(draft, parsed, "99");
+  assert.equal(parsed.jerseyNumber || "", "");
+  headless.applyBareInteractiveReply(draft, parsed, "99", overlay);
+  assert.equal(parsed.jerseyNumber, "99");
+
+  assert.equal(headless.isComposerOnlyTemplate("blackwhite"), false);
+  assert.equal(headless.isComposerOnlyTemplate("blackwhite", {
+    id: "blackwhite",
+    collectableInputCount: 1,
+    collectableInput1: {fieldId: "media", required: 1, prompt: "Add a photo?"}
+  }), true);
+  assert.equal(headless.isComposerOnlyTemplate("birthdayMedia"), true);
+  assert.equal(headless.isComposerOnlyTemplate("birthdayMedia", {
+    id: "birthdayMedia",
+    collectableInputCount: 2,
+    collectableInput1: {fieldId: "club", required: 1, prompt: "Which venue?"},
+    collectableInput2: {fieldId: "message", required: 1, prompt: "What should the sign say?"}
+  }), false);
+});
+
 test("headless iterates collectableInput1..N instead of a family table", () => {
   const custom = {
     id: "customBoard",
@@ -390,6 +428,9 @@ test("startShoutOutCheckout and FloqR callable accept flat club + message", () =
   assert.match(session, /tryHeadlessShoutOut/);
   assert.match(session, /isShoutOutExecutePrompt\(userPrompt\)/);
   assert.match(session, /fillFromConversation/);
+  assert.match(session, /applyBareInteractiveReply\(previousDraft, parsed, userPrompt, askedRow\)/);
+  assert.match(session, /isInteractiveFollowUp\(userPrompt, previousShoutDraft, previousShoutRow\)/);
+  assert.match(session, /loadTemplateCollectableRow\(previousShoutDraft\.templateId\)/);
 
   const pay = read("payment-service.js");
   assert.match(pay, /createHeadlessShoutOutCheckout/);

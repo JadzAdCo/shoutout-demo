@@ -139,10 +139,13 @@ async function loadTemplateCollectableRow(templateId) {
   return packaged;
 }
 
-async function loadCollectableTemplateCards(ids) {
-  const wanted = (Array.isArray(ids) && ids.length)
-    ? [...new Set(ids.map(String).filter(Boolean))]
-    : Object.keys(headless.HEADLESS_TEXT_TEMPLATES);
+async function loadCollectableTemplateCards(ids, options = {}) {
+  const listed = Array.isArray(ids) ? [...new Set(ids.map(String).filter(Boolean))] : null;
+  const fallbackAll = options.fallbackAll === true || (options.fallbackAll !== false && listed == null);
+  const wanted = listed && listed.length
+    ? listed
+    : (fallbackAll ? Object.keys(headless.HEADLESS_TEXT_TEMPLATES) : []);
+  if (!wanted.length) return [];
   const packagedById = {};
   wanted.forEach(id => {
     packagedById[id] = headless.catalogShapeFor(id);
@@ -188,7 +191,9 @@ async function listShoutOutTemplates(args, sessionRequest) {
   const href = clubLocationId
     ? `./shoutout-search.html?from=botdee&location=${encodeURIComponent(clubLocationId)}`
     : "./shoutout-search.html?from=botdee";
-  const templates = await loadCollectableTemplateCards(venueTemplateIds);
+  const templates = await loadCollectableTemplateCards(venueTemplateIds, {
+    fallbackAll: !clubLocationId
+  });
   return {
     ok: true,
     tool: "listShoutOutTemplates",
@@ -272,11 +277,14 @@ async function notifyClubPendingHeadlessShoutOut({
   return {ok: true, recipients: recipients.length};
 }
 
-async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth, sessionRequest} = {}) {
+async function submitFreeHeadlessShoutOut({clubLocationId, shoutout, venue, auth, sessionRequest, templateRow} = {}) {
   const uid = text(auth?.uid, 120);
   if (!uid) throw new HttpsError("unauthenticated", "Sign in required.");
   const templateId = text(shoutout?.template || shoutout?.templateId, 80);
-  if (headless.isComposerOnlyTemplate(templateId) || Math.max(0, Math.round(Number(shoutout?.priceCents || 0))) > 0) {
+  const overlay = templateRow && typeof templateRow === "object"
+    ? templateRow
+    : await loadTemplateCollectableRow(templateId);
+  if (headless.isComposerOnlyTemplate(templateId, overlay) || Math.max(0, Math.round(Number(shoutout?.priceCents || 0))) > 0) {
     throw new HttpsError("failed-precondition", "This ShoutOut template does not submit as a free board.");
   }
   const email = text(auth?.token?.email || shoutout.submittedBy, 200).toLowerCase();
@@ -508,7 +516,8 @@ async function startShoutOutCheckout(args, sessionRequest) {
     shoutout,
     venue,
     auth: sessionRequest.auth,
-    sessionRequest
+    sessionRequest,
+    templateRow
   });
   return {
     ok: true,
