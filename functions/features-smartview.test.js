@@ -1,4 +1,5 @@
 "use strict";
+// Callable bundle deploy uses [firebase-deploy-smartview] on origin/main.
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
