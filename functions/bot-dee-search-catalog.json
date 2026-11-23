@@ -450,6 +450,44 @@
       ]
     },
     {
+      "sourceId": "help:help-botdee-room-collab",
+      "id": "help-botdee-room-collab",
+      "kind": "help",
+      "label": "Share a headless booking in Room SMARTview",
+      "blurb": "When you are in a Room SMARTview, the host's VIP reserV or ShoutOut picks appear for everyone in the session. Members vote Yes or No. Hold it and pay stay with the host — joining and voting are not a payment. BOT DEE never takes card numbers. Stripe still opens in a pop-out.",
+      "href": "./botdee.html",
+      "phrases": [
+        "share a headless booking in room smartview",
+        "when you are in a room smartview the host s vip reserv or shoutout picks appear for everyone in the session. members vote yes or no. hold it and pay stay with t",
+        "vote the table",
+        "share vip reserv",
+        "vote host pick",
+        "headless booking vote",
+        "shared picks room smartview",
+        "open bot dee",
+        "help-botdee-room-collab"
+      ]
+    },
+    {
+      "sourceId": "help:help-botdee-room-elect-host",
+      "id": "help-botdee-room-elect-host",
+      "kind": "help",
+      "label": "Elect a Room SMARTview host",
+      "blurb": "Anyone in the session can be host. Nominate yourself or another joined member. A candidate becomes host at 60 percent of currently joined members (rounded up). If the host leaves, remaining members elect a new host — the room stays open. Kick and End stay with the elected host.",
+      "href": "./botdee.html",
+      "phrases": [
+        "elect a room smartview host",
+        "anyone in the session can be host. nominate yourself or another joined member. a candidate becomes host at 60 percent of currently joined members rounded up . i",
+        "make me host",
+        "elect host",
+        "vote for host",
+        "60 percent host",
+        "change room host",
+        "open bot dee",
+        "help-botdee-room-elect-host"
+      ]
+    },
+    {
       "sourceId": "help:help-botdee-room-smartview",
       "id": "help-botdee-room-smartview",
       "kind": "help",
@@ -3041,6 +3079,42 @@
       ]
     },
     {
+      "sourceId": "intent:help-botdee-room-collab",
+      "id": "help-botdee-room-collab",
+      "kind": "help",
+      "label": "Vote shared VIP reserV picks",
+      "blurb": "In a Room SMARTview, members vote Yes or No on the host's VIP reserV or ShoutOut pick. Hold it and pay stay with the host. Joining and voting are not a payment.",
+      "href": "./botdee.html",
+      "phrases": [
+        "vote shared vip reserv picks",
+        "in a room smartview members vote yes or no on the host s vip reserv or shoutout pick. hold it and pay stay with the host. joining and voting are not a payment.",
+        "vote the table",
+        "share vip reserv",
+        "vote host pick",
+        "headless booking vote",
+        "shared picks",
+        "help-botdee-room-collab"
+      ]
+    },
+    {
+      "sourceId": "intent:help-botdee-room-elect-host",
+      "id": "help-botdee-room-elect-host",
+      "kind": "help",
+      "label": "Elect a Room SMARTview host",
+      "blurb": "Anyone in the session can be host. A candidate wins at 60 percent of currently joined members. If the host leaves, remaining members elect a new one — the room stays open.",
+      "href": "./botdee.html",
+      "phrases": [
+        "elect a room smartview host",
+        "anyone in the session can be host. a candidate wins at 60 percent of currently joined members. if the host leaves remaining members elect a new one the room sta",
+        "make me host",
+        "elect host",
+        "vote for host",
+        "60 percent host",
+        "change room host",
+        "help-botdee-room-elect-host"
+      ]
+    },
+    {
       "sourceId": "intent:help-botdee-room-smartview",
       "id": "help-botdee-room-smartview",
       "kind": "help",
@@ -3067,6 +3141,8 @@
         "schedule a room",
         "join now or set a schedule",
         "when does the room expire",
+        "vote the table",
+        "make me host",
         "help-botdee-room-smartview"
       ]
     },

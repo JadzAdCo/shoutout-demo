@@ -139,3 +139,25 @@ test("callables and client expose collab without vip.html", () => {
   assert.match(read("functions/data-classification-core.js"), /sharedTransaction/);
   assert.match(read("functions/data-classification-core.js"), /hostBallot/);
 });
+
+test("collab votes persist in a room transaction; hold gate fails closed", () => {
+  const store = read("functions/botdee-session-store.js");
+  assert.match(store, /async function mutateRoom/);
+  assert.match(store, /runTransaction/);
+  const voteFn = store.slice(store.indexOf("async function voteSharedTransaction"), store.indexOf("async function nominateHost"));
+  assert.match(voteFn, /mutateRoom/);
+  assert.match(voteFn, /sharedTransaction: voted.sharedTransaction/);
+  const hostFn = store.slice(store.indexOf("async function voteHost"), store.indexOf("module.exports"));
+  assert.match(hostFn, /mutateRoom/);
+  const session = read("functions/bot-dee-functions.js");
+  assert.match(session, /Could not confirm the room vote/);
+  assert.match(session, /This Room SMARTview is not open for that hold/);
+  assert.doesNotMatch(
+    session,
+    /room vote gate failed[\s\S]{0,120}if \(!merged\.holdId && !wantsHold/
+  );
+  const smart = read("botdee-smartview.js");
+  assert.match(smart, /function applyCollabToVipCard/);
+  assert.match(smart, /wasGuest !== guest/);
+  assert.match(smart, /function watchVipRoom/);
+});

@@ -1155,25 +1155,26 @@
     </div>`;
   }
 
+  function applyCollabToCard(card, collab, roomId, binders) {
+    if (!card || !collab) return;
+    if (card.getAttribute("data-kind") === "botDeeVip" || card.classList.contains("botdee-sv-vip")) {
+      applyCollabToVipCard(card, collab, roomId);
+      return;
+    }
+    const host = card.querySelector("[data-rs-collab]");
+    const html = renderCollabStrip({collab, guestMode: !collab.viewerIsHost});
+    if (host) host.outerHTML = html;
+    else card.querySelector(".botdee-sv-room-stats")?.insertAdjacentHTML("afterend", html);
+    bindCollabActions(card, binders);
+  }
+
   function bindCollabActions(card, {call, showToast, roomIdOf}) {
     const run = async (name, payload) => {
       const roomId = roomIdOf();
       if (!roomId) return;
       try {
         const data = await call(name, {roomId, ...payload});
-        if (data?.collab) {
-          const host = card.querySelector("[data-rs-collab]");
-          if (host) host.outerHTML = renderCollabStrip({collab: data.collab, guestMode: !data.collab.viewerIsHost});
-          bindCollabActions(card, {call, showToast, roomIdOf});
-          const hold = card.querySelector('[data-vip-prompt="hold it"]');
-          if (hold) {
-            if (card.getAttribute("data-guest-mode") === "1") hold.disabled = true;
-            else {
-              const ready = data.collab.canCommit === true || Number(data.collab.choiceTally?.memberCount || 0) <= 1;
-              hold.disabled = !ready;
-            }
-          }
-        }
+        if (data?.collab) applyCollabToCard(card, data.collab, roomId, {call, showToast, roomIdOf});
         if (data?.elected) showToast(t("botdee.room.hostElected", "New host elected"));
       } catch (error) {
         showToast(error?.message || t("botdee.room.collabFailed", "Could not record that vote"));
@@ -1704,13 +1705,7 @@
       if (!roomId) return;
       try {
         const data = await call("getBotDeeRoom", {roomId});
-        if (data?.collab) {
-          const host = card.querySelector("[data-rs-collab]");
-          const html = renderCollabStrip({collab: data.collab, guestMode: !data.collab.viewerIsHost});
-          if (host) host.outerHTML = html;
-          else card.querySelector(".botdee-sv-room-stats")?.insertAdjacentHTML("afterend", html);
-          bindCollabActions(card, {call, showToast, roomIdOf});
-        }
+        if (data?.collab) applyCollabToCard(card, data.collab, roomId, {call, showToast, roomIdOf});
       } catch (_) {}
     };
     hydrateCollab();
@@ -1957,6 +1952,85 @@
     </article>`;
   }
 
+  function vipCollabBinders(card, view) {
+    return {
+      call: async (name, payload) => {
+        const fn = functionsCallable(name);
+        if (!fn) throw new Error("offline");
+        return (await fn(payload))?.data || {};
+      },
+      showToast: message => {
+        const note = card.querySelector(".botdee-vip-terms, .botdee-so-sub");
+        if (note) note.textContent = message;
+      },
+      roomIdOf: () => card.getAttribute("data-rs-room") || view?.roomId || ""
+    };
+  }
+
+  function applyCollabToVipCard(card, collab, roomId) {
+    if (!card || !collab) return;
+    const guest = collab.viewerIsHost !== true;
+    const view = {
+      ...(card._vipView || lastVipView || {}),
+      collab,
+      guestMode: guest,
+      roomId: roomId || card.getAttribute("data-rs-room") || ""
+    };
+    const wasGuest = card.getAttribute("data-guest-mode") === "1";
+    if (wasGuest !== guest) {
+      dockVipPreview(view);
+      return;
+    }
+    const host = card.querySelector("[data-rs-collab]");
+    if (host) {
+      host.outerHTML = renderCollabStrip({collab, guestMode: guest});
+      bindCollabActions(card, vipCollabBinders(card, view));
+    }
+    const hold = card.querySelector('[data-vip-prompt="hold it"]');
+    if (hold) {
+      const ready = collab.canCommit === true || Number(collab.choiceTally?.memberCount || 0) <= 1;
+      hold.disabled = guest || !ready;
+    }
+    card._vipView = view;
+    lastVipView = view;
+  }
+
+  function stopVipRoomWatch() {
+    const el = vipPreviewHost();
+    if (!el || !el._rsCollabUnsub) return;
+    try { el._rsCollabUnsub(); } catch (_) {}
+    el._rsCollabUnsub = null;
+    el._rsCollabRoomId = "";
+  }
+
+  function watchVipRoom(roomId) {
+    const el = vipPreviewHost();
+    const id = String(roomId || "").trim();
+    if (!el || !id) return;
+    if (el._rsCollabRoomId === id && el._rsCollabUnsub) return;
+    stopVipRoomWatch();
+    el._rsCollabRoomId = id;
+    const db = global.firebase?.firestore?.();
+    if (!db) return;
+    try {
+      el._rsCollabUnsub = db.collection("botDeeRooms").doc(id).onSnapshot(() => {
+        refreshVipCollab(id);
+      });
+    } catch (_) {}
+  }
+
+  async function refreshVipCollab(roomId) {
+    const el = vipPreviewHost();
+    const card = el?.querySelector(".botdee-sv-vip");
+    if (!card || !roomId) return;
+    try {
+      const fn = functionsCallable("getBotDeeRoom");
+      if (!fn) return;
+      const data = (await fn({roomId}))?.data || {};
+      if (data.collab) applyCollabToVipCard(card, data.collab, roomId);
+    } catch (_) {}
+  }
+
   function bindVipCard(card, view) {
     if (!card || card.dataset.vipBound === "1") return;
     card.dataset.vipBound = "1";
@@ -1979,18 +2053,8 @@
       });
     });
     startHoldClock(card, Number(card.getAttribute("data-hold-expires") || 0));
-    bindCollabActions(card, {
-      call: async (name, payload) => {
-        const fn = functionsCallable(name);
-        if (!fn) throw new Error("offline");
-        return (await fn(payload))?.data || {};
-      },
-      showToast: message => {
-        const note = card.querySelector(".botdee-vip-terms, .botdee-so-sub");
-        if (note) note.textContent = message;
-      },
-      roomIdOf: () => card.getAttribute("data-rs-room") || view?.roomId || ""
-    });
+    bindCollabActions(card, vipCollabBinders(card, view));
+    watchVipRoom(card.getAttribute("data-rs-room") || view?.roomId || "");
   }
 
   function vipPreviewHost() {
@@ -2007,6 +2071,7 @@
 
   function clearVipPreviewDock() {
     stopHoldClock();
+    stopVipRoomWatch();
     const el = vipPreviewHost();
     if (!el) return;
     el.hidden = true;

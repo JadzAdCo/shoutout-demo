@@ -1153,138 +1153,199 @@ async function setGuestCanInvite({hostUid, roomId, targetUid, canInvite}) {
   return {ok: true};
 }
 
-async function proposeSharedTransaction({uid, roomId, kind, snapshot, actorEmail, actorRole}) {
-  const live = await loadRoom(roomId);
-  if (!live) return {ok: false, error: "not_found"};
-  const result = core.proposeSharedTransaction({
-    room: live.data,
-    actorUid: uid,
-    kind,
-    snapshot,
-    nowMs: Date.now()
+function collabDeny(reason) {
+  const code = core.text(reason, 40) || "failed";
+  const err = new Error(code);
+  err.code = code;
+  throw err;
+}
+
+function collabDenyResult(error) {
+  const reason = core.text((error && (error.code || error.message)) || "", 40);
+  if (COLLAB_DENY.has(reason)) return {ok: false, error: reason};
+  return null;
+}
+
+/** Read-modify-write the room doc so concurrent Yes/No ballots cannot drop each other. */
+
+async function mutateRoom(roomId, apply) {
+  const id = core.text(roomId, 80);
+  if (!id) collabDeny("not_found");
+  const ref = roomRef(id);
+  let out = null;
+  await db().runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) collabDeny("not_found");
+    out = apply(snap.data() || {});
+    if (!out || out.ok === false) collabDeny(out?.reason || "failed");
+    if (out.patch && typeof out.patch === "object") {
+      tx.set(ref, {...out.patch, updatedAtMs: Date.now()}, {merge: true});
+    }
+    out.roomId = id;
+    out.room = {...(snap.data() || {}), ...(out.patch || {})};
   });
-  if (!result.ok) return {ok: false, error: result.reason};
-  await roomRef(live.id).set({
-    sharedTransaction: result.sharedTransaction,
-    updatedAtMs: Date.now()
-  }, {merge: true});
+  return out;
+}
+
+async function proposeSharedTransaction({uid, roomId, kind, snapshot, actorEmail, actorRole}) {
+  let result;
+  try {
+    result = await mutateRoom(roomId, room => {
+      const proposed = core.proposeSharedTransaction({
+        room,
+        actorUid: uid,
+        kind,
+        snapshot,
+        nowMs: Date.now()
+      });
+      if (!proposed.ok) return proposed;
+      return {
+        ok: true,
+        ...proposed,
+        patch: {sharedTransaction: proposed.sharedTransaction}
+      };
+    });
+  } catch (error) {
+    const denied = collabDenyResult(error);
+    if (denied) return denied;
+    throw error;
+  }
   await writeAudit({
     eventType: "botdee.choice_proposed",
     actorUid: uid,
     actorEmail,
     actorRole,
-    targetId: live.id,
+    targetId: result.roomId,
     reason: "propose",
     detail: {kind: result.sharedTransaction.kind, choiceId: result.sharedTransaction.choiceId}
   });
-  const next = {...live.data, sharedTransaction: result.sharedTransaction};
   return {
     ok: true,
-    room: core.publicRoom(live.id, next, {viewerUid: uid}),
-    collab: core.publicCollab(next, uid)
+    room: core.publicRoom(result.roomId, result.room, {viewerUid: uid}),
+    collab: core.publicCollab(result.room, uid)
   };
 }
 
 async function voteSharedTransaction({uid, roomId, ballot, choiceId, actorEmail, actorRole}) {
-  const live = await loadRoom(roomId);
-  if (!live) return {ok: false, error: "not_found"};
-  const result = core.voteSharedTransaction({
-    room: live.data,
-    actorUid: uid,
-    ballot,
-    choiceId
-  });
-  if (!result.ok) return {ok: false, error: result.reason};
-  await roomRef(live.id).set({
-    sharedTransaction: result.sharedTransaction,
-    updatedAtMs: Date.now()
-  }, {merge: true});
+  let result;
+  try {
+    result = await mutateRoom(roomId, room => {
+      const voted = core.voteSharedTransaction({
+        room,
+        actorUid: uid,
+        ballot,
+        choiceId
+      });
+      if (!voted.ok) return voted;
+      return {
+        ok: true,
+        ...voted,
+        patch: {sharedTransaction: voted.sharedTransaction}
+      };
+    });
+  } catch (error) {
+    const denied = collabDenyResult(error);
+    if (denied) return denied;
+    throw error;
+  }
   await writeAudit({
     eventType: "botdee.choice_voted",
     actorUid: uid,
     actorEmail,
     actorRole,
-    targetId: live.id,
+    targetId: result.roomId,
     reason: result.tally.passed ? "passed" : "vote",
     detail: {choiceId: result.sharedTransaction.choiceId, ballot: core.text(ballot, 8), yes: result.tally.yes}
   });
-  const next = {...live.data, sharedTransaction: result.sharedTransaction};
   return {
     ok: true,
     tally: result.tally,
-    room: core.publicRoom(live.id, next, {viewerUid: uid}),
-    collab: core.publicCollab(next, uid)
+    room: core.publicRoom(result.roomId, result.room, {viewerUid: uid}),
+    collab: core.publicCollab(result.room, uid)
   };
 }
 
 async function nominateHost({uid, roomId, candidateUid, actorEmail, actorRole}) {
-  const live = await loadRoom(roomId);
-  if (!live) return {ok: false, error: "not_found"};
-  const prevHost = core.text(live.data.hostUid, 80);
-  const result = core.nominateHost({
-    room: live.data,
-    actorUid: uid,
-    candidateUid,
-    nowMs: Date.now()
-  });
-  if (!result.ok) return {ok: false, error: result.reason};
-  await roomRef(live.id).set({
-    hostUid: result.hostUid,
-    hostBallot: result.hostBallot,
-    updatedAtMs: Date.now()
-  }, {merge: true});
-  if (result.elected) await syncHostRole(live.id, prevHost, result.hostUid);
+  let result;
+  try {
+    result = await mutateRoom(roomId, room => {
+      const named = core.nominateHost({
+        room,
+        actorUid: uid,
+        candidateUid,
+        nowMs: Date.now()
+      });
+      if (!named.ok) return named;
+      return {
+        ok: true,
+        ...named,
+        prevHost: core.text(room.hostUid, 80),
+        patch: {hostUid: named.hostUid, hostBallot: named.hostBallot}
+      };
+    });
+  } catch (error) {
+    const denied = collabDenyResult(error);
+    if (denied) return denied;
+    throw error;
+  }
+  if (result.elected) await syncHostRole(result.roomId, result.prevHost, result.hostUid);
   await writeAudit({
     eventType: result.elected ? "botdee.host_elected" : "botdee.host_nominated",
     actorUid: uid,
     actorEmail,
     actorRole,
-    targetId: live.id,
+    targetId: result.roomId,
     reason: result.elected ? "elected" : "nominate",
     detail: {candidateUid: core.text(candidateUid || uid, 80), yes: result.tally.yes, needed: result.tally.needed}
   });
-  const next = {...live.data, hostUid: result.hostUid, hostBallot: result.hostBallot};
   return {
     ok: true,
     elected: result.elected,
     tally: result.tally,
-    room: core.publicRoom(live.id, next, {viewerUid: uid}),
-    collab: core.publicCollab(next, uid)
+    room: core.publicRoom(result.roomId, result.room, {viewerUid: uid}),
+    collab: core.publicCollab(result.room, uid)
   };
 }
 
 async function voteHost({uid, roomId, ballot, actorEmail, actorRole}) {
-  const live = await loadRoom(roomId);
-  if (!live) return {ok: false, error: "not_found"};
-  const prevHost = core.text(live.data.hostUid, 80);
-  const result = core.voteHost({
-    room: live.data,
-    actorUid: uid,
-    ballot
-  });
-  if (!result.ok) return {ok: false, error: result.reason};
-  await roomRef(live.id).set({
-    hostUid: result.hostUid,
-    hostBallot: result.hostBallot,
-    updatedAtMs: Date.now()
-  }, {merge: true});
-  if (result.elected) await syncHostRole(live.id, prevHost, result.hostUid);
+  let result;
+  try {
+    result = await mutateRoom(roomId, room => {
+      const voted = core.voteHost({
+        room,
+        actorUid: uid,
+        ballot
+      });
+      if (!voted.ok) return voted;
+      return {
+        ok: true,
+        ...voted,
+        prevHost: core.text(room.hostUid, 80),
+        candidateUid: core.text(room.hostBallot?.candidateUid, 80),
+        patch: {hostUid: voted.hostUid, hostBallot: voted.hostBallot}
+      };
+    });
+  } catch (error) {
+    const denied = collabDenyResult(error);
+    if (denied) return denied;
+    throw error;
+  }
+  if (result.elected) await syncHostRole(result.roomId, result.prevHost, result.hostUid);
   await writeAudit({
     eventType: result.elected ? "botdee.host_elected" : "botdee.host_voted",
     actorUid: uid,
     actorEmail,
     actorRole,
-    targetId: live.id,
+    targetId: result.roomId,
     reason: result.elected ? "elected" : "vote",
-    detail: {candidateUid: core.text(live.data.hostBallot?.candidateUid, 80), yes: result.tally.yes}
+    detail: {candidateUid: result.candidateUid, yes: result.tally.yes}
   });
-  const next = {...live.data, hostUid: result.hostUid, hostBallot: result.hostBallot};
   return {
     ok: true,
     elected: result.elected,
     tally: result.tally,
-    room: core.publicRoom(live.id, next, {viewerUid: uid}),
-    collab: core.publicCollab(next, uid)
+    room: core.publicRoom(result.roomId, result.room, {viewerUid: uid}),
+    collab: core.publicCollab(result.room, uid)
   };
 }
 
