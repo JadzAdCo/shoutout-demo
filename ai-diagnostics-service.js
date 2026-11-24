@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.077";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.077";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.078";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.078";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.078",
+      title: "s3.3.078 — Search SMARTnotification uses Miami Place SMARTview cards",
+      checks: [
+        {label:"Search Place cards", file:"smartvisuals-view.js", includes:["sv-place-cards", "placeCardsHtml", "displayTitle"]},
+        {label:"Canonical Miami title", file:"functions/botdee-room-smartview.js", includes:["destinationAuthorized", "humanizePlace"]},
+        {label:"publicNotification placeCards", file:"functions/botdee-session-core.js", includes:["searchPlaceCards", "placeCards"]},
+        {label:"Schedule persist visual", file:"functions/botdee-session-store.js", includes:["roomSearchVisualFields", "loadPlaceVisualOverride"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-078-search-miami-place-smartview", "s3.3.078"]}
+      ]
+    },
     {
       version: "s3.3.077",
       title: "s3.3.077 — Room SMARTview Invite chip stays greyed with Invite sent",
@@ -3846,6 +3857,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-078-search-miami-place-smartview",
+      area:"BOT DEE",
+      feature:"Search SMARTnotification Miami Place SMARTview cards",
+      changed:"s3.3.078 — A scheduled BOT DEE room whose authorized text names Miami paints Search SMARTnotification with Place SMARTview cards (bg-miami, Miami / Reservations pills, compact Place cards), not a Mingl Room template and not the raw chat prompt as the title. Compact card stays View Invitation / Not Now (Cancun hierarchy). Room overlay Join Now stays botdee.html?room= never mingl-chat.html. Already-scheduled rooms that stored the prompt as title are rewritten at listBotDeeRoomNotifications. Tracker SMA-31.",
+      howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/ until smartvisuals-view.js / botdee-room-smartview.js / index.html ?v=s3.3.078. Sign in with BOT DEE + Mingl. 2) On BOT DEE type Open a room smart card for reservations in Miami — Room SMARTview title Miami, plus Place SMARTview. Set a schedule. 3) Open Search without ?smartvisualInvite=cancun — compact SMARTnotification title Miami, bg-miami, Place SMARTview card(s) with miami tag, View Invitation / Not Now, no Ad. Pills are not Mingl Room. 4) View Invitation overlay still shows Place SMARTview cards. Join Now → botdee.html?room= not mingl-chat.html. 5) Phone ~390 matches Cancun compact hierarchy. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Search shows Miami Place SMARTview cards on the compact SMARTnotification. Title is Miami, not the chat prompt. Join Now stays on BOT DEE.",
+      troubleshoot:"Still Mingl Room / prompt title → cached smartvisuals-view.js before s3.3.078, or Functions not this SHA (publicNotification / destinationPlaceViews). Overlay Join Now opens mingl-chat → joinHref rewrite in openRoomOverlay. No Place cards → catalog.json not loaded (ensureCatalog) or listBotDeeRoomNotifications missing placeCards. VIP leftover on the BOT DEE turn is a different path (s3.3.076 attachVenueSearch)."
+    },
       {
       id:"s3-3-077-botdee-lorna-chip-ack",
       area:"BOT DEE",

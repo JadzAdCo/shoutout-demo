@@ -4,6 +4,7 @@ const {test} = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("fs");
 const path = require("path");
+const {createContext, runInContext} = require("vm");
 
 const root = path.resolve(__dirname, "..");
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
@@ -364,7 +365,9 @@ test("Search SMARTnotification is compact glass matching original Cancun card hi
   assert.doesNotMatch(notify, /sv-notify-copy[\s\S]*sv-title/);
   assert.match(notify, /sv\.viewInvitation/);
   assert.match(notify, /sv\.notNow/);
-  assert.doesNotMatch(notify, /sv-stencil/);
+  assert.doesNotMatch(notify, /class="sv-stencil"/);
+  assert.match(notify, /placeCardsHtml/);
+  assert.match(css, /\.sv-place-card/);
   assert.match(css, /\.sv-notify-body/);
   assert.match(css, /\.sv-notify \.sv-btn-primary/);
   assert.match(view, /listBotDeeRoomNotifications/);
@@ -506,4 +509,58 @@ test("Review / Publish has a visible Publish CTA after selecting a queued draft"
   const milan = JSON.parse(read("smartvisuals/catalog.json")).assets.find(a => a.id === "bg-milan");
   assert.equal(milan.name, "Milan");
   assert.equal(milan.type, "background");
+});
+
+test("Search SMARTnotification for a Miami room prompt uses Place SMARTview cards", () => {
+  const catalogJson = require("./smartvisuals/catalog.json");
+  const ctx = createContext({
+    document: {
+      readyState: "complete",
+      addEventListener() {},
+      getElementById() { return null; }
+    },
+    fetch: () => Promise.resolve({ok: true, json: async () => catalogJson}),
+    location: {search: "", hash: "", href: "https://example.test/"},
+    sessionStorage: {getItem: () => null, setItem() {}},
+    setTimeout() {},
+    FLOQRSmartVisualsCatalog: catalogJson,
+    FLOQRI18n: {t: (key, fallback) => fallback || key},
+    console
+  });
+  ctx.window = ctx;
+  ctx.self = ctx;
+  runInContext(read("smartvisuals-resolver.js"), ctx, {filename: "smartvisuals-resolver.js"});
+  runInContext(read("smartvisuals-view.js"), ctx, {filename: "smartvisuals-view.js"});
+  const payload = {
+    demo: false,
+    sourceKind: "authorized-room",
+    title: "Open a room smart card for reservations in Miami",
+    description: "Open a room smart card for reservations in Miami",
+    hostName: "Don",
+    scheduledLabel: "11/24/2026, 10:10 AM",
+    participantCount: 1,
+    smartNotification: 1,
+    joinHref: "./botdee.html?room=br_miami"
+  };
+  const compact = ctx.FLOQRSmartVisuals.renderNotification(payload);
+  assert.match(compact, /data-bg="bg-miami"/);
+  assert.match(compact, /<h2 class="sv-title">Miami<\/h2>/);
+  assert.match(compact, /plan reservations in Miami with BOT DEE/);
+  assert.doesNotMatch(compact, /Open a room smart card/);
+  assert.match(compact, /sv-place-card/);
+  assert.match(compact, /Place SMARTview/);
+  assert.match(compact, /data-sv-bg="bg-miami"/);
+  assert.match(compact, /sv-place-tag">miami/);
+  assert.match(compact, /View Invitation/);
+  assert.doesNotMatch(compact, /Mingl Room<\/span>/);
+  assert.doesNotMatch(compact, /mingl-chat\.html/);
+  const overlay = ctx.FLOQRSmartVisuals.renderRoom(payload);
+  assert.match(overlay, /data-bg="bg-miami"/);
+  assert.match(overlay, /<h2 class="sv-title">Miami<\/h2>/);
+  assert.doesNotMatch(overlay, /Open a room smart card/);
+  assert.match(overlay, /sv-place-card/);
+  assert.match(overlay, /Place SMARTview/);
+  assert.match(overlay, /Join Now/);
+  assert.doesNotMatch(overlay, /mingl-chat\.html/);
+  assert.match(read("botdee.html"), /smartvisuals-resolver\.js[\s\S]*botdee-room-smartview\.js/);
 });

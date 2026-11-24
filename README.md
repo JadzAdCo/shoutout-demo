@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.077 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.078 (stable)
 
+- s3.3.078: Search SMARTnotification for a Miami-tagged room uses Place SMARTview cards
 - s3.3.077: BOT DEE Room SMARTview Invite chip stays greyed with Invite sent (Lorna / MsLorna)
 - s3.3.076: BOT DEE named Invite lorna + Search SMARTnotification for scheduled rooms + Miami-tagged Place SMARTview on Room SMARTview city asks
 - s3.3.075: Room SMARTview shared picks + 60% host election, VIP session popouts

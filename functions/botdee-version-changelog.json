@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.078",
+    "text": "s3.3.078: Search SMARTnotification for a Miami-tagged room uses Place SMARTview cards",
+    "audiences": [
+      "botDee"
+    ]
+  },
+  {
     "id": "s3.3.077",
     "text": "s3.3.077: BOT DEE Room SMARTview Invite chip stays greyed with Invite sent (Lorna / MsLorna)",
     "audiences": [

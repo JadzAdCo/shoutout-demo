@@ -354,6 +354,19 @@ test("BOT DEE Room SMARTview Cancun and Paris resolve to kit art when catalog is
   assert.equal(bot.isVipExecutePrompt("Open a room smart card for reservations in Miami"), false);
 });
 
+test("Miami room-card prompt canonicalizes to Miami, not the chat prompt", () => {
+  const q = "Open a room smart card for reservations in Miami";
+  const view = room.buildRoomSmartView({utterance: q});
+  assert.equal(view.authorizedTitle, "Miami");
+  assert.match(view.authorizedDescription, /Miami/);
+  assert.match(view.authorizedDescription, /BOT DEE/);
+  assert.doesNotMatch(view.authorizedTitle, /Open a room/i);
+  const paris = room.buildRoomSmartView({utterance: "Open Room SMARTview for Paris Fashion Week"});
+  assert.match(paris.authorizedTitle, /Paris Fashion Week/i);
+  const cancun = room.buildRoomSmartView({utterance: "Open Room SMARTview Cancun Trip"});
+  assert.equal(cancun.authorizedTitle, "Cancun Trip");
+});
+
 test("chat wires Room SMARTview join without charging", () => {
   const chat = read("bot-dee-chat.js");
   assert.match(chat, /roomSmartViewDeclined/);
