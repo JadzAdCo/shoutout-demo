@@ -70,14 +70,14 @@ Resume: `@gdpr$` / `$residency$`. Rule: `.cursor/rules/gdpr-data-residency.mdc`.
 | Master Admin | Combined on **Demo Worker Mgmt** (`#demoEmployees`, card `#demoPatronAccountMerge`) and still on Duplicate Records (`#duplicateRecords`, alias `#patronAccountMerge`) so the card does not leak onto other tabs. One **Find patron** per column plus Preview / Merge. SOS2FA + `FLOQRReasonPrompt`. Callables `lookupPatronAccounts`, `previewPatronAccountMerge`, `mergePatronAccounts`. Moves Mingl connections, beta `features` union (incl. `mingl`), Inbox `recipientUid`, BOT DEE rooms/threads, blocks. **Never deletes Firebase Auth** (`authDeleted: false`). Chrome copy is operator-neutral (Master Admin, not a named person). |
 | Audit | Chained `account.merged` on `featureServiceAuditLogs`. Unchained `account.phone_claimed` / `account.phone_denied`. Agent clients stamp `actorEmail: "agent"`. No client IP on `users` or `phoneIndex`. |
 | Rules | `phoneIndex` Functions-only. `mergedInto`, `mergedFromUids`, `accountStatus`, `linkedAuthUids`, `phoneE164`, `phoneNormalized` in `hasBackendOnlyIdentityFields`. |
-| Deploy | Functions subset tag `[firebase-deploy-accounts]` (claim/lookup/preview/merge). Pages cache-bust s3.3.068. |
+| Deploy | Functions subset tag `[firebase-deploy-accounts]` (claim/lookup/preview/merge). Pages cache-bust s3.3.069. |
 | Help | `help-profile-mobile` (patron, required mobile) · `help-patron-account-merge` (masterAdmin, English). |
 | Classification | `phoneIndex` secret PII; `users` merge/E.164 fields; system job `patronAccountUnifier`. Movable in-region; no stored IP. |
 | Tests | `functions/account-unifier.test.js`, rules `phoneIndex` block, i18n chrome +12 keys × 11 langs. |
 
 Mingl Search tile for Lorna is a separate change (`floqr-feature-services.js`). After a Master Admin confirms the live merge, the surviving uid must keep `betaTesters.features.mingl=1`.
 
-## Demo Worker Mgmt (s3.3.065)
+## Demo Worker Mgmt (s3.3.069)
 
 Master Admin → Entity Management → **Demo Worker Mgmt**. One-time sign-in codes for `temp_*@floqr-demo.com` workers when email OTP is not arriving.
 

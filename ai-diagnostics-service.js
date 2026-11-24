@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.068";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.068";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.069";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.069";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -3721,7 +3721,7 @@
       area:"Master Admin",
       feature:"Demo Worker Mgmt combined roster + same-mobile merge",
       changed:"s3.3.066 — Entity Management tab is Demo Worker Mgmt (#demoEmployees; #demoWorkerMgmt aliases). The panel has Find demo worker + Generate code and Patron accounts (same mobile) Find patron / Preview merge / Merge patron accounts. Duplicate Records still has #patronAccountMerge so the card does not leak onto other tabs. Chrome does not name an operator.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / floqr-i18n.js / patron-account-merge.js ?v=s3.3.066. Unlock SOS2FA. 2) Entity Management → Demo Worker Mgmt. Heading says Demo Worker Mgmt. Confirm Find demo worker + Generate code AND Find patron (one per column) + Preview merge + Merge patron accounts. 3) Reports → Duplicate Records still has Patron accounts (same mobile). 4) Network Dashboard / Diagnostics / Beta & Testing do not show the merge card (Beta still has its own Find patron). 5) BOT DEE help hashes #demoEmployees. Display URLs have no ?v=.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / floqr-i18n.js / patron-account-merge.js ?v=s3.3.069. Unlock SOS2FA. 2) Entity Management → Demo Worker Mgmt. Heading says Demo Worker Mgmt. Confirm Find demo worker + Generate code AND Find patron (one per column) + Preview merge + Merge patron accounts. 3) Reports → Duplicate Records still has Patron accounts (same mobile). 4) Network Dashboard / Diagnostics / Beta & Testing do not show the merge card (Beta still has its own Find patron). 5) BOT DEE help hashes #demoEmployees. Display URLs have no ?v=.",
       expected:"One Demo Worker Mgmt surface with roster codes and same-mobile merge. Duplicate Records still has the merge card. Other tabs do not.",
       troubleshoot:"Old Demo Svc / Emp Mgmt label → cached master-admin.html / floqr-i18n.js. Merge card on every tab → #patronAccountMerge outside a panel. Demo Worker Mgmt missing Find patron → cached HTML before s3.3.066. Duplicate Records missing the card → stacked PR 157 placement lost. Buttons do nothing → patron-account-merge.js must bind [data-patron-account-merge]."
     },
