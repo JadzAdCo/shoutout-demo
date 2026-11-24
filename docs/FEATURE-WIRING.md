@@ -912,7 +912,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Security | `assertFeatureAccess(botDee)` + `mingl` on session callables and tab checkout. Token bound to `targetUid`; wrong account / expired / revoked / non-friend / **host block** / cap 8 / past schedule refuse. Search notifications invitee-scoped. Kicked uid removed from `memberUids` (cannot read events). Agent probes `actorRole: agent`. |
 | Observability | Manual Feature Tests `s3-3-050-botdee-mingl-session-invite`, `s3-3-051-botdee-cancun-trip-natural`, `s3-3-068-botdee-invite-self-member`, `s3-3-071-botdee-room-schedule`. |
 | Help | `help-botdee-room-smartview`, `-schedule`, `-invite`, `-join`, `-end`, `-tab`, `-who-pays`, `-kick`, `-share`; `help-smartvisuals-notification`, `help-smartvisuals-room` (11 langs). |
-| Deploy | Pages + Functions + Firestore rules `s3.3.071-botdee-room-schedule`. **Do not merge until Don says merge again.** Then `[firebase-deploy] [firebase-deploy-botdee]` from a clean `origin/main` archive. |
+| Deploy | Pages + Functions + Firestore rules `s3.3.071-botdee-room-schedule`. Don merge go-ahead Nov 24 2026. `[firebase-deploy] [firebase-deploy-botdee]` from a clean `origin/main` archive. |
 
 ---
 
