@@ -372,8 +372,10 @@ test("reason prompt copy exists in every chrome language", () => {
 
 test("help and rules document the s3.1.30 contract", () => {
   const repo = read("botdee-help-repository.js");
-  assert.match(repo, /Enable Beta Feature \(IsTestFeature\)/);
-  assert.match(repo, /"enable beta feature"/);
+  const master = read("functions/help-verbiage-master-source.json");
+  assert.doesNotMatch(repo, /Enable Beta Feature \(IsTestFeature\)/);
+  assert.match(master, /Enable Beta Feature \(IsTestFeature\)/);
+  assert.match(master, /"enable beta feature"/);
   const rule = read(".cursor/rules/reason-prompt-on-save.mdc");
   assert.match(rule, /alwaysApply: true/);
   assert.match(rule, /FLOQRReasonPrompt/);
