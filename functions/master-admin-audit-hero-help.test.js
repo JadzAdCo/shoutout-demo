@@ -153,7 +153,7 @@ test("All Locations help is Master Admin only in the Functions source and the se
 test("Master Admin audit/hero assets are cache-busted (s3.2.00 package)", () => {
   const html = read("master-admin.html");
   assert.match(html, /\.\/help-attach\.js\?v=s3\.\d+\.\d+"/);
-  for (const file of ["admin.css", "botdee-help-repository.js", "master-feature-services.js"]) {
+  for (const file of ["admin.css", "floqr-help-loader.js", "master-feature-services.js"]) {
     assert.match(html, new RegExp(`\\./${file.replace(/\./g, "\\.")}\\?v=s3\\.\\d+\\.\\d+"`));
   }
   assert.doesNotMatch(html, /display2?\.html\?location=[^"'\s<>]*[?&]v=/);

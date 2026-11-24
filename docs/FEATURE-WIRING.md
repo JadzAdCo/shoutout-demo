@@ -750,7 +750,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Job | `scheduledHelpVerbiageEnhance` every 15 minutes UTC. One Gemini call per run (`FLOQR_GEMINI_TEXT_MODEL`, default `gemini-3.6-flash`). Steps on that entry: drop repeated sentences, grammar pass, contextual rewrite. Auto-publishes when checks pass. Legal help is never sent. Gemini failure leaves the previous `lasttextenhun` and the flag at 1. |
 | Flag 0 | English `lasttextenhun` plus all 10 translations, together, for any patron / service member / venue admin audience. Master-only may stay English. |
 | Seed | Patron What's New lines and Version SMARTview help are the first `lasttextenhun` (`seeded: 1`, flag 1) until that entry's scheduled pass publishes. |
-| Pages | `help-verbiage-snapshot.js` and the copy inside `botdee-help-repository.js`. No master-only text. No Gemini on the version card, a `?` popout, or any paint path. |
+| Pages | `help-verbiage-snapshot.js` and the copy inside `botdee-help-repository.js` (source for tests and the pack builder). Pages load `floqr-help-loader.js` only. The first `?` fetches `floqr-help-runtime.js`, `floqr-i18n-help-runtime.js`, and one audience pack. A patron page requests `floqr-help-pack-patron.js` only. Venue-admin and service-member packs stay off that page. Master-only text is not in any pack. No Gemini on the version card, a `?` popout, or any paint path. Rebuild packs: `node scripts/build-help-audience-packs.js`. |
 | Read | Callable `getHelpVerbiage` (signed in, `filterContent`). `contextualSearch` replaces a result label/blurb from a published non-master `lasttextenhun` when the session loads it. |
 | Rules | `helpVerbiage` client read/write off. `helpVerbiageAudit` Master Admin read, client write off. Not `translationOverrides`. |
 | Audit | Help id, flag before/after, `lasttextenhun` before/after, source hash, model id, outcome. No client IP. Agent probes: `actorRole` / `actorEmail` `agent`. Gemini rows also go to `geminiApiAccessLogs`. |
@@ -764,7 +764,7 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 |---|---|
 | UI | Search still hosts the intent panel on `index.html` when used; `botdee.html` is **chat only** (Quick intent search removed s3.3.014). No `?` help bubble / no “Showing answers for…” scope line — type **help** (like **version**) for a local BOT DEE help reply |
 | Client | `intent-search.js` — `PRODUCT_INTENTS`, `HELP_INTENTS`, `aliases`, `searchPhrases`, prefix `phraseScore` / `aliasScore` |
-| Help seed | `botdee-help-repository.js` (loaded before `intent-search.js`) |
+| Help seed | `botdee-help-repository.js` stays the catalog. Search pages do not load it on first paint. The first `?` loads the signed-in audience pack, then `intent-search.js` can read `FLOQRHelpRepository`. |
 | Cache bust | `intent-search.js?v=` on `index.html` / `botdee.html` |
 
 ---
