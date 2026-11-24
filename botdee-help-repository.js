@@ -971,6 +971,26 @@
       page: "botdee.html#botDeeChatPage"
     },
     {
+      id: "help-botdee-room-collab",
+      title: "Share a headless booking in Room SMARTview",
+      body: "When you are in a Room SMARTview, the host's VIP reserV or ShoutOut picks appear for everyone in the session. Members vote Yes or No. Hold it and pay stay with the host — joining and voting are not a payment. BOT DEE never takes card numbers. Stripe still opens in a pop-out.",
+      searchPhrases: ["vote the table", "share vip reserv", "vote host pick", "headless booking vote", "shared picks room smartview"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
+      id: "help-botdee-room-elect-host",
+      title: "Elect a Room SMARTview host",
+      body: "Anyone in the session can be host. Nominate yourself or another joined member. A candidate becomes host at 60 percent of currently joined members (rounded up). If the host leaves, remaining members elect a new host — the room stays open. Kick and End stay with the elected host.",
+      searchPhrases: ["make me host", "elect host", "vote for host", "60 percent host", "change room host"],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
       id: "help-botdee-smartview",
       title: "View my SMARTview",
       body: "View my SMARTview shows your People card from public-within-FLOQR fields, using the same Profile Media as your FLOQR public page — not venue or restaurant mocks. Edit my SMARTsummary changes the text in your default profile language. Save translates it to every other FLOQR language, including English. Master Admin → Features → BOT DEE → SMARTviews is where labeled mock venue and restaurant cards live. There is no live Places or Yelp.",
@@ -1253,15 +1273,14 @@
     {
       id: "help-botdee-headless-vip",
       title: "VIP reserV from BOT DEE chat",
-      body: "Say book a table at Aurelia, hold a table, or I want a reservation in BOT DEE. The VIP reserV card shows nights, the 2D floor areas (Mezzanine, West Booths, Dance Floor, Bar Lounge), and tables. Tap a night, tap an area, tap a table (V1–V4 or AURELIA SUITE on the mezzanine), then Hold it, I agree to Terms, and pay if a deposit is required. Open VIP reserV map is the full pinch-zoom plan. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment.",
+      body: "Say book a table at Aurelia in BOT DEE and stay in this chat. The VIP reserV dock shows nights (closed nights stay listed), live table colors (green available, amber held, red booked), and party size clamped to that table. Tap a table to select it — only Hold it starts a 30-minute hold. I agree records Terms (legal text stays English) and Stripe opens in a pop-out; this chat stays. After pay, the pass returns to this chat. Map, Terms, pay, and pass are pop-outs, not vip.html. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment.",
       searchPhrases: [
         "headless vip", "vip from chat", "hold a table at aurelia", "book a table",
         "do a reservation", "mezzanine", "vip reserv bot dee", "book vip in bot dee",
-        "v1 aurelia", "hold it vip", "floor plan bot dee"
+        "v1 aurelia", "hold it vip", "floor plan bot dee", "vip popout", "cancel hold"
       ],
       links: [
-        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},
-        {label: "Open VIP reserV", href: pageUrl("./vip.html", {from: "botdee"})}
+        {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}
       ],
       source: "help-repository-seed",
       audiences: ["patron", "masterAdmin"]

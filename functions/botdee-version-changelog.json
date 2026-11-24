@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.075",
+    "text": "s3.3.075: Room SMARTview shared picks + 60% host election, VIP session popouts (rebased onto s3.3.074)",
+    "audiences": [
+      "botDee"
+    ]
+  },
+  {
     "id": "s3.3.074",
     "text": "s3.3.074: Headless ShoutOut collects from template collectableInput1..N",
     "audiences": [
@@ -9,6 +16,13 @@
   {
     "id": "s3.3.073",
     "text": "s3.3.073: Aurelia Gallery drops four DonPapi/VIP shoutout tiles; Happy Birthday Maya stays first",
+    "audiences": [
+      "other"
+    ]
+  },
+  {
+    "id": "s3.3.061",
+    "text": "s3.3.061: BOT DEE Room SMARTview shared picks + 60% host election",
     "audiences": [
       "other"
     ]

@@ -223,6 +223,22 @@
           "label": "Jetzt beitreten oder Zeitplan festlegen",
           "blurb": "Nach dem Room-SMARTview-Setup wählen Sie Jetzt beitreten oder Zeitplan festlegen. Jetzt beitreten öffnet die BOT DEE-Session sofort und legt keine Karte auf Search. Zeitplan festlegen ist der Start der BOT DEE-Room — nicht Shared Itinerary. Ein zukünftiger Zeitpunkt schaltet Sear"
         },
+        "help:help-botdee-room-collab": {
+          "label": "Headless-Buchung in Room SMARTview teilen",
+          "blurb": "In einer Room SMARTview sehen alle die VIP reserV- oder ShoutOut-Auswahl des Gastgebers. Mitglieder stimmen Ja oder Nein. Hold it und Bezahlen bleiben beim Gastgeber — Beitreten und Abstimmen ist keine Zahlung. BOT DEE nimmt niemals Kartennummern. Stripe öffnet in einem Pop-out."
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "Headless-Buchung in Room SMARTview teilen",
+          "blurb": "In einer Room SMARTview sehen alle die VIP reserV- oder ShoutOut-Auswahl des Gastgebers. Mitglieder stimmen Ja oder Nein. Hold it und Bezahlen bleiben beim Gastgeber — Beitreten und Abstimmen ist keine Zahlung. BOT DEE nimmt niemals Kartennummern. Stripe öffnet in einem Pop-out."
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "Room SMARTview-Gastgeber wählen",
+          "blurb": "Jeder in der Session kann Gastgeber sein. Nominiere dich oder ein anderes Mitglied. Ein Kandidat wird Gastgeber bei 60 % der aktuell beigetretenen Mitglieder (aufgerundet). Wenn der Gastgeber geht, wählen die übrigen einen neuen — der Room bleibt offen. Kick und End bleiben beim "
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "Room SMARTview-Gastgeber wählen",
+          "blurb": "Jeder in der Session kann Gastgeber sein. Nominiere dich oder ein anderes Mitglied. Ein Kandidat wird Gastgeber bei 60 % der aktuell beigetretenen Mitglieder (aufgerundet). Wenn der Gastgeber geht, wählen die übrigen einen neuen — der Room bleibt offen. Kick und End bleiben beim "
+        },
         "help:help-botdee-smartview-review": {
           "label": "SMARTsummary prüfen und korrigieren",
           "blurb": "Gemini entwirft nur aus öffentlichen FLOQR-Feldern — nie bei jedem Öffnen. Falsche Fakten: Feld in der Profilsichtbarkeit ausblenden oder Summary selbst ändern. Ihr Text wird nicht überschrieben. Profilkonflikte verlangen Prüfung. Falsche Karten im Overlay melden."
@@ -513,11 +529,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV aus dem BOT DEE-Chat",
-          "blurb": "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennu"
+          "blurb": "Sagen Sie book a table at Aurelia in BOT DEE und bleiben Sie in diesem Chat. Das VIP reserV-Dock zeigt Abende (geschlossene bleiben gelistet), Tischfarben (grün frei, amber Hold, rot gebucht) und die Gruppengröße bis zur Tischkapazität. Tisch antippen wählt — nur Hold it startet "
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV aus dem BOT DEE-Chat",
-          "blurb": "Sagen Sie VIP reserV oder hold a VIP table at Aurelia in BOT DEE. Nennen Sie Club, Abend und Tisch oder Bereich. Mezzanine ist ein Bereich — BOT DEE listet V1–V4 und AURELIA SUITE. Dann hold it, I agree zu Terms, und zahlen, wenn eine Kaution nötig ist. BOT DEE nimmt nie Kartennu"
+          "blurb": "Sagen Sie book a table at Aurelia in BOT DEE und bleiben Sie in diesem Chat. Das VIP reserV-Dock zeigt Abende (geschlossene bleiben gelistet), Tischfarben (grün frei, amber Hold, rot gebucht) und die Gruppengröße bis zur Tischkapazität. Tisch antippen wählt — nur Hold it startet "
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -1350,6 +1366,22 @@
           "label": "Rejoindre maintenant ou définir un horaire",
           "blurb": "Après la configuration Room SMARTview, choisissez Rejoindre maintenant ou Définir un horaire. Rejoindre maintenant ouvre la session BOT DEE tout de suite et ne met pas de carte sur Search. Définir un horaire, c’est le début de la room BOT DEE — pas Shared Itinerary. Une heure fut"
         },
+        "help:help-botdee-room-collab": {
+          "label": "Partager une réservation headless dans Room SMARTview",
+          "blurb": "Dans une Room SMARTview, les choix VIP reserV ou ShoutOut de l’hôte apparaissent pour tout le monde. Les membres votent Oui ou Non. Hold it et le paiement restent à l’hôte — rejoindre et voter n’est pas un paiement. BOT DEE ne prend jamais de numéros de carte. Stripe s’ouvre dans"
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "Partager une réservation headless dans Room SMARTview",
+          "blurb": "Dans une Room SMARTview, les choix VIP reserV ou ShoutOut de l’hôte apparaissent pour tout le monde. Les membres votent Oui ou Non. Hold it et le paiement restent à l’hôte — rejoindre et voter n’est pas un paiement. BOT DEE ne prend jamais de numéros de carte. Stripe s’ouvre dans"
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "Élire un hôte Room SMARTview",
+          "blurb": "N’importe qui dans la session peut être hôte. Proposez-vous ou un autre membre. Un candidat devient hôte à 60 % des membres actuellement présents (arrondi supérieur). Si l’hôte part, les autres élisent un nouvel hôte — la room reste ouverte. Kick et End restent à l’hôte élu."
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "Élire un hôte Room SMARTview",
+          "blurb": "N’importe qui dans la session peut être hôte. Proposez-vous ou un autre membre. Un candidat devient hôte à 60 % des membres actuellement présents (arrondi supérieur). Si l’hôte part, les autres élisent un nouvel hôte — la room reste ouverte. Kick et End restent à l’hôte élu."
+        },
         "help:help-botdee-smartview-review": {
           "label": "Relire et corriger un SMARTsummary",
           "blurb": "Gemini rédige uniquement à partir des champs publics dans FLOQR — jamais à chaque vue. Si un fait est faux, masquez le champ dans la visibilité du profil ou modifiez le résumé. Un texte rédigé par vous n’est pas écrasé. Un conflit de profil demande une relecture. Signalez une car"
@@ -1640,11 +1672,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV depuis le chat BOT DEE",
-          "blurb": "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de c"
+          "blurb": "Dites book a table at Aurelia dans BOT DEE et restez dans ce chat. Le dock VIP reserV montre les soirées (les fermées restent listées), les couleurs de tables (vert libre, ambre hold, rouge réservé) et la taille du groupe limitée à la table. Touchez une table pour la choisir — se"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV depuis le chat BOT DEE",
-          "blurb": "Dites VIP reserV ou hold a VIP table at Aurelia dans BOT DEE. Nommez le club, la soirée et la table ou la zone. Mezzanine est une zone — BOT DEE liste V1–V4 et AURELIA SUITE. Puis hold it, I agree aux Terms, et payez si un dépôt est requis. BOT DEE ne prend jamais de numéros de c"
+          "blurb": "Dites book a table at Aurelia dans BOT DEE et restez dans ce chat. Le dock VIP reserV montre les soirées (les fermées restent listées), les couleurs de tables (vert libre, ambre hold, rouge réservé) et la taille du groupe limitée à la table. Touchez une table pour la choisir — se"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -2477,6 +2509,22 @@
           "label": "Unirse ahora o fijar un horario",
           "blurb": "Tras configurar Room SMARTview, elija Unirse ahora o Fijar un horario. Unirse ahora abre la sesión BOT DEE ya y no pone una tarjeta en Search. Fijar un horario es cuando empieza la room BOT DEE — no Shared Itinerary. Una hora futura activa SMARTnotification de Search solo para us"
         },
+        "help:help-botdee-room-collab": {
+          "label": "Compartir una reserva headless en Room SMARTview",
+          "blurb": "En una Room SMARTview, las elecciones VIP reserV o ShoutOut del anfitrión aparecen para todos. Los miembros votan Sí o No. Hold it y el pago quedan con el anfitrión — unirse y votar no es un pago. BOT DEE nunca toma números de tarjeta. Stripe se abre en un pop-out."
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "Compartir una reserva headless en Room SMARTview",
+          "blurb": "En una Room SMARTview, las elecciones VIP reserV o ShoutOut del anfitrión aparecen para todos. Los miembros votan Sí o No. Hold it y el pago quedan con el anfitrión — unirse y votar no es un pago. BOT DEE nunca toma números de tarjeta. Stripe se abre en un pop-out."
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "Elegir un anfitrión de Room SMARTview",
+          "blurb": "Cualquiera en la sesión puede ser anfitrión. Nómate a ti o a otro miembro. Un candidato se convierte en anfitrión con el 60 % de los miembros actuales (redondeo hacia arriba). Si el anfitrión se va, el resto elige uno nuevo — la room sigue abierta. Kick y End quedan con el anfitr"
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "Elegir un anfitrión de Room SMARTview",
+          "blurb": "Cualquiera en la sesión puede ser anfitrión. Nómate a ti o a otro miembro. Un candidato se convierte en anfitrión con el 60 % de los miembros actuales (redondeo hacia arriba). Si el anfitrión se va, el resto elige uno nuevo — la room sigue abierta. Kick y End quedan con el anfitr"
+        },
         "help:help-botdee-smartview-review": {
           "label": "Revisar y corregir un SMARTsummary",
           "blurb": "Gemini redacta solo con campos públicos en FLOQR — no en cada vista. Si un dato es falso, oculte el campo o edite el resumen. Su texto no se sobrescribe. Un conflicto de perfil pide revisión. Informe una tarjeta incorrecta desde la superposición."
@@ -2767,11 +2815,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV desde el chat de BOT DEE",
-          "blurb": "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no"
+          "blurb": "Di book a table at Aurelia en BOT DEE y quédate en este chat. El dock de VIP reserV muestra noches (las cerradas siguen listadas), colores de mesa (verde libre, ámbar hold, rojo reservado) y el grupo limitado a la mesa. Toca una mesa para elegirla: solo Hold it inicia 30 minutos."
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV desde el chat de BOT DEE",
-          "blurb": "Di VIP reserV o hold a VIP table at Aurelia en BOT DEE. Nombra el club, la noche y la mesa o zona. Mezzanine es una zona: BOT DEE lista V1–V4 y AURELIA SUITE. Luego hold it, I agree a Terms, y paga si hay depósito. BOT DEE nunca pide números de tarjeta. Unirse a Room SMARTview no"
+          "blurb": "Di book a table at Aurelia en BOT DEE y quédate en este chat. El dock de VIP reserV muestra noches (las cerradas siguen listadas), colores de mesa (verde libre, ámbar hold, rojo reservado) y el grupo limitado a la mesa. Toca una mesa para elegirla: solo Hold it inicia 30 minutos."
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -3604,6 +3652,22 @@
           "label": "Entra ora o imposta un orario",
           "blurb": "Dopo il setup Room SMARTview, scegli Entra ora o Imposta un orario. Entra ora apre la sessione BOT DEE subito e non mette una scheda su Search. Imposta un orario è quando inizia la room BOT DEE — non Shared Itinerary. Un orario futuro attiva SMARTnotification di Search solo per t"
         },
+        "help:help-botdee-room-collab": {
+          "label": "Condividere una prenotazione headless in Room SMARTview",
+          "blurb": "In una Room SMARTview le scelte VIP reserV o ShoutOut dell’host appaiono a tutti. I membri votano Sì o No. Hold it e il pagamento restano all’host — unirsi e votare non è un pagamento. BOT DEE non prende mai numeri di carta. Stripe si apre in un pop-out."
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "Condividere una prenotazione headless in Room SMARTview",
+          "blurb": "In una Room SMARTview le scelte VIP reserV o ShoutOut dell’host appaiono a tutti. I membri votano Sì o No. Hold it e il pagamento restano all’host — unirsi e votare non è un pagamento. BOT DEE non prende mai numeri di carta. Stripe si apre in un pop-out."
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "Eleggere un host Room SMARTview",
+          "blurb": "Chiunque nella sessione può essere host. Candidati te stesso o un altro membro. Un candidato diventa host al 60% dei membri attualmente presenti (arrotondato per eccesso). Se l’host esce, gli altri eleggono un nuovo host — la room resta aperta. Kick e End restano all’host eletto."
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "Eleggere un host Room SMARTview",
+          "blurb": "Chiunque nella sessione può essere host. Candidati te stesso o un altro membro. Un candidato diventa host al 60% dei membri attualmente presenti (arrotondato per eccesso). Se l’host esce, gli altri eleggono un nuovo host — la room resta aperta. Kick e End restano all’host eletto."
+        },
         "help:help-botdee-smartview-review": {
           "label": "Rivedi e correggi lo SMARTsummary",
           "blurb": "Gemini bozza solo dai campi pubblici in FLOQR — non a ogni vista. Se un fatto è sbagliato, nascondi il campo o modifica il riassunto. Il tuo testo non viene sovrascritto. Un conflitto di profilo chiede revisione. Segnala una scheda errata dall’overlay."
@@ -3894,11 +3958,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV dalla chat BOT DEE",
-          "blurb": "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview "
+          "blurb": "Di’ book a table at Aurelia in BOT DEE e resta in questa chat. Il dock VIP reserV mostra le serate (quelle chiuse restano in elenco), i colori dei tavoli (verde libero, ambra hold, rosso prenotato) e il gruppo limitato al tavolo. Tocca un tavolo per sceglierlo: solo Hold it avvia"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV dalla chat BOT DEE",
-          "blurb": "Di’ VIP reserV o hold a VIP table at Aurelia in BOT DEE. Indica club, serata e tavolo o zona. Mezzanine è una zona: BOT DEE elenca V1–V4 e AURELIA SUITE. Poi hold it, I agree ai Terms, e paga se serve un deposito. BOT DEE non prende mai numeri di carta. Entrare in Room SMARTview "
+          "blurb": "Di’ book a table at Aurelia in BOT DEE e resta in questa chat. Il dock VIP reserV mostra le serate (quelle chiuse restano in elenco), i colori dei tavoli (verde libero, ambra hold, rosso prenotato) e il gruppo limitato al tavolo. Tocca un tavolo per sceglierlo: solo Hold it avvia"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -4731,6 +4795,22 @@
           "label": "Entrar agora ou definir um horário",
           "blurb": "Depois da configuração Room SMARTview, escolha Entrar agora ou Definir um horário. Entrar agora abre a sessão BOT DEE já e não põe um cartão na Search. Definir um horário é quando a room BOT DEE começa — não Shared Itinerary. Uma hora futura liga SMARTnotification da Search só pa"
         },
+        "help:help-botdee-room-collab": {
+          "label": "Partilhar uma reserva headless no Room SMARTview",
+          "blurb": "Num Room SMARTview, as escolhas VIP reserV ou ShoutOut do anfitrião aparecem para todos. Os membros votam Sim ou Não. Hold it e o pagamento ficam com o anfitrião — juntar-se e votar não é um pagamento. BOT DEE nunca pede números de cartão. O Stripe abre num pop-out."
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "Partilhar uma reserva headless no Room SMARTview",
+          "blurb": "Num Room SMARTview, as escolhas VIP reserV ou ShoutOut do anfitrião aparecem para todos. Os membros votam Sim ou Não. Hold it e o pagamento ficam com o anfitrião — juntar-se e votar não é um pagamento. BOT DEE nunca pede números de cartão. O Stripe abre num pop-out."
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "Eleger um anfitrião do Room SMARTview",
+          "blurb": "Qualquer pessoa na sessão pode ser anfitrião. Nomeie-se a si ou a outro membro. Um candidato torna-se anfitrião com 60% dos membros atuais (arredondado para cima). Se o anfitrião sair, os restantes elegem um novo — a room fica aberta. Kick e End ficam com o anfitrião eleito."
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "Eleger um anfitrião do Room SMARTview",
+          "blurb": "Qualquer pessoa na sessão pode ser anfitrião. Nomeie-se a si ou a outro membro. Um candidato torna-se anfitrião com 60% dos membros atuais (arredondado para cima). Se o anfitrião sair, os restantes elegem um novo — a room fica aberta. Kick e End ficam com o anfitrião eleito."
+        },
         "help:help-botdee-smartview-review": {
           "label": "Rever e corrigir o SMARTsummary",
           "blurb": "O Gemini redige só a partir de campos públicos no FLOQR — não em cada vista. Se um facto estiver errado, oculte o campo ou edite o resumo. O seu texto não é substituído. Um conflito de perfil pede revisão. Reporte um cartão errado na sobreposição."
@@ -5021,11 +5101,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV a partir do chat BOT DEE",
-          "blurb": "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SM"
+          "blurb": "Diga book a table at Aurelia no BOT DEE e fique neste chat. O dock VIP reserV mostra noites (fechadas continuam listadas), cores das mesas (verde livre, âmbar hold, vermelho reservado) e o grupo limitado à mesa. Toque numa mesa para a escolher — só Hold it inicia 30 minutos. I ag"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV a partir do chat BOT DEE",
-          "blurb": "Diga VIP reserV ou hold a VIP table at Aurelia no BOT DEE. Nomeie o clube, a noite e a mesa ou zona. Mezzanine é uma zona — BOT DEE lista V1–V4 e AURELIA SUITE. Depois hold it, I agree aos Terms, e pague se houver depósito. BOT DEE nunca pede números de cartão. Entrar num Room SM"
+          "blurb": "Diga book a table at Aurelia no BOT DEE e fique neste chat. O dock VIP reserV mostra noites (fechadas continuam listadas), cores das mesas (verde livre, âmbar hold, vermelho reservado) e o grupo limitado à mesa. Toque numa mesa para a escolher — só Hold it inicia 30 minutos. I ag"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -5858,6 +5938,22 @@
           "label": "Войти сейчас или задать расписание",
           "blurb": "После настройки Room SMARTview выберите Войти сейчас или Задать расписание. Войти сейчас открывает сессию BOT DEE сразу и не ставит карточку на Search. Задать расписание — старт room BOT DEE, не Shared Itinerary. Будущее время включает Search SMARTnotification только для вас и пр"
         },
+        "help:help-botdee-room-collab": {
+          "label": "Общий headless-заказ в Room SMARTview",
+          "blurb": "В Room SMARTview выбор хоста по VIP reserV или ShoutOut виден всем в сессии. Участники голосуют Да или Нет. Hold it и оплата остаются у хоста — вход и голос не платёж. BOT DEE никогда не берёт номера карт. Stripe открывается во всплывающем окне."
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "Общий headless-заказ в Room SMARTview",
+          "blurb": "В Room SMARTview выбор хоста по VIP reserV или ShoutOut виден всем в сессии. Участники голосуют Да или Нет. Hold it и оплата остаются у хоста — вход и голос не платёж. BOT DEE никогда не берёт номера карт. Stripe открывается во всплывающем окне."
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "Выбор хоста Room SMARTview",
+          "blurb": "Любой в сессии может быть хостом. Номинируйте себя или другого участника. Кандидат становится хостом при 60% текущих участников (округление вверх). Если хост уходит, остальные выбирают нового — room остаётся открытым. Kick и End остаются у избранного хоста."
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "Выбор хоста Room SMARTview",
+          "blurb": "Любой в сессии может быть хостом. Номинируйте себя или другого участника. Кандидат становится хостом при 60% текущих участников (округление вверх). Если хост уходит, остальные выбирают нового — room остаётся открытым. Kick и End остаются у избранного хоста."
+        },
         "help:help-botdee-smartview-review": {
           "label": "Проверить и исправить SMARTsummary",
           "blurb": "Gemini составляет черновик только из публичных полей FLOQR — не при каждом просмотре. Неверный факт: скройте поле или правьте описание. Ваш текст не перезаписывается. Конфликт профиля просит проверку. Сообщите о неверной карточке в оверлее."
@@ -6148,11 +6244,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV из чата BOT DEE",
-          "blurb": "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview"
+          "blurb": "Скажите book a table at Aurelia в BOT DEE и оставайтесь в этом чате. Док VIP reserV показывает вечера (закрытые тоже), цвета столов (зелёный свободно, янтарный hold, красный booked) и размер группы по вместимости. Нажмите стол, чтобы выбрать — только Hold it начинает 30-минутный "
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV из чата BOT DEE",
-          "blurb": "Скажите VIP reserV или hold a VIP table at Aurelia в BOT DEE. Назовите клуб, вечер и стол или зону. Mezzanine — зона: BOT DEE перечислит V1–V4 и AURELIA SUITE, затем hold it, I agree к Terms и оплата, если нужен депозит. BOT DEE никогда не берёт номера карт. Вход в Room SMARTview"
+          "blurb": "Скажите book a table at Aurelia в BOT DEE и оставайтесь в этом чате. Док VIP reserV показывает вечера (закрытые тоже), цвета столов (зелёный свободно, янтарный hold, красный booked) и размер группы по вместимости. Нажмите стол, чтобы выбрать — только Hold it начинает 30-минутный "
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -6985,6 +7081,22 @@
           "label": "Συμμετοχή τώρα ή ορισμός προγράμματος",
           "blurb": "Μετά το setup Room SMARTview επιλέξτε Συμμετοχή τώρα ή Ορισμός προγράμματος. Η συμμετοχή τώρα ανοίγει τη συνεδρία BOT DEE τώρα και δεν βάζει κάρτα στο Search. Ορισμός προγράμματος είναι η έναρξη του BOT DEE room — όχι Shared Itinerary. Μελλοντική ώρα ενεργοποιεί Search SMARTnotif"
         },
+        "help:help-botdee-room-collab": {
+          "label": "Κοινή headless κράτηση στο Room SMARTview",
+          "blurb": "Σε ένα Room SMARTview οι επιλογές VIP reserV ή ShoutOut του οικοδεσπότη φαίνονται σε όλους. Τα μέλη ψηφίζουν Ναι ή Όχι. Το Hold it και η πληρωμή μένουν στον οικοδεσπότη — η συμμετοχή και η ψήφος δεν είναι πληρωμή. Το BOT DEE δεν παίρνει ποτέ αριθμούς κάρτας. Το Stripe ανοίγει σε "
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "Κοινή headless κράτηση στο Room SMARTview",
+          "blurb": "Σε ένα Room SMARTview οι επιλογές VIP reserV ή ShoutOut του οικοδεσπότη φαίνονται σε όλους. Τα μέλη ψηφίζουν Ναι ή Όχι. Το Hold it και η πληρωμή μένουν στον οικοδεσπότη — η συμμετοχή και η ψήφος δεν είναι πληρωμή. Το BOT DEE δεν παίρνει ποτέ αριθμούς κάρτας. Το Stripe ανοίγει σε "
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "Εκλογή οικοδεσπότη Room SMARTview",
+          "blurb": "Οποιοσδήποτε στη συνεδρία μπορεί να είναι οικοδεσπότης. Προτείνετε τον εαυτό σας ή άλλο μέλος. Ένας υποψήφιος γίνεται οικοδεσπότης στο 60% των τρεχόντων μελών (στρογγυλοποίηση προς τα πάνω). Αν φύγει ο οικοδεσπότης, οι υπόλοιποι εκλέγουν νέο — το room μένει ανοιχτό. Kick και End "
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "Εκλογή οικοδεσπότη Room SMARTview",
+          "blurb": "Οποιοσδήποτε στη συνεδρία μπορεί να είναι οικοδεσπότης. Προτείνετε τον εαυτό σας ή άλλο μέλος. Ένας υποψήφιος γίνεται οικοδεσπότης στο 60% των τρεχόντων μελών (στρογγυλοποίηση προς τα πάνω). Αν φύγει ο οικοδεσπότης, οι υπόλοιποι εκλέγουν νέο — το room μένει ανοιχτό. Kick και End "
+        },
         "help:help-botdee-smartview-review": {
           "label": "Έλεγχος και διόρθωση SMARTsummary",
           "blurb": "Το Gemini συντάσσει μόνο από δημόσια πεδία FLOQR — όχι σε κάθε προβολή. Λάθος γεγονός: αποκρύψτε το πεδίο ή επεξεργαστείτε την περίληψη. Το κείμενό σας δεν αντικαθίσταται. Σύγκρουση προφίλ ζητά έλεγχο. Αναφέρετε λάθος κάρτα από την επικάλυψη."
@@ -7275,11 +7387,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV από τη συνομιλία BOT DEE",
-          "blurb": "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμού"
+          "blurb": "Πείτε book a table at Aurelia στο BOT DEE και μείνετε σε αυτή τη συνομιλία. Το dock VIP reserV δείχνει βραδιές (οι κλειστές μένουν στη λίστα), χρώματα τραπεζιών (πράσινο διαθέσιμο, κεχριμπάρι hold, κόκκινο booked) και μέγεθος παρέας μέχρι τη χωρητικότητα. Πατήστε τραπέζι για επιλ"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV από τη συνομιλία BOT DEE",
-          "blurb": "Πείτε VIP reserV ή hold a VIP table at Aurelia στο BOT DEE. Ονομάστε club, βραδιά και τραπέζι ή ζώνη. Το Mezzanine είναι ζώνη — το BOT DEE δείχνει V1–V4 και AURELIA SUITE. Έπειτα hold it, I agree στους Terms, και πληρωμή αν χρειάζεται κατάθεση. Το BOT DEE δεν παίρνει ποτέ αριθμού"
+          "blurb": "Πείτε book a table at Aurelia στο BOT DEE και μείνετε σε αυτή τη συνομιλία. Το dock VIP reserV δείχνει βραδιές (οι κλειστές μένουν στη λίστα), χρώματα τραπεζιών (πράσινο διαθέσιμο, κεχριμπάρι hold, κόκκινο booked) και μέγεθος παρέας μέχρι τη χωρητικότητα. Πατήστε τραπέζι για επιλ"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -8112,6 +8224,22 @@
           "label": "Dołącz teraz lub ustaw harmonogram",
           "blurb": "Po konfiguracji Room SMARTview wybierz Dołącz teraz lub Ustaw harmonogram. Dołącz teraz otwiera sesję BOT DEE od razu i nie kładzie karty na Search. Ustaw harmonogram to start room BOT DEE — nie Shared Itinerary. Przyszła godzina włącza Search SMARTnotification tylko dla Ciebie i"
         },
+        "help:help-botdee-room-collab": {
+          "label": "Udostępnij rezerwację headless w Room SMARTview",
+          "blurb": "W Room SMARTview wybory VIP reserV lub ShoutOut gospodarza widzą wszyscy. Członkowie głosują Tak lub Nie. Hold it i płatność zostają u gospodarza — dołączenie i głos to nie płatność. BOT DEE nigdy nie bierze numerów kart. Stripe otwiera się w pop-out."
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "Udostępnij rezerwację headless w Room SMARTview",
+          "blurb": "W Room SMARTview wybory VIP reserV lub ShoutOut gospodarza widzą wszyscy. Członkowie głosują Tak lub Nie. Hold it i płatność zostają u gospodarza — dołączenie i głos to nie płatność. BOT DEE nigdy nie bierze numerów kart. Stripe otwiera się w pop-out."
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "Wybierz gospodarza Room SMARTview",
+          "blurb": "Każdy w sesji może być gospodarzem. Nominuj siebie lub innego członka. Kandydat zostaje gospodarzem przy 60% aktualnych członków (zaokrąglenie w górę). Jeśli gospodarz wyjdzie, pozostali wybierają nowego — room zostaje otwarty. Kick i End zostają u wybranego gospodarza."
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "Wybierz gospodarza Room SMARTview",
+          "blurb": "Każdy w sesji może być gospodarzem. Nominuj siebie lub innego członka. Kandydat zostaje gospodarzem przy 60% aktualnych członków (zaokrąglenie w górę). Jeśli gospodarz wyjdzie, pozostali wybierają nowego — room zostaje otwarty. Kick i End zostają u wybranego gospodarza."
+        },
         "help:help-botdee-smartview-review": {
           "label": "Przejrzyj i popraw SMARTsummary",
           "blurb": "Gemini szkicuje tylko z publicznych pól FLOQR — nie przy każdym otwarciu. Błędny fakt: ukryj pole lub edytuj podsumowanie. Twój tekst nie jest nadpisywany. Konflikt profilu prosi o przegląd. Zgłoś błędną kartę z nakładki."
@@ -8402,11 +8530,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV z czatu BOT DEE",
-          "blurb": "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołąc"
+          "blurb": "Powiedz book a table at Aurelia w BOT DEE i zostań na tym czacie. Dock VIP reserV pokazuje wieczory (zamknięte zostają na liście), kolory stolików (zielony wolny, bursztyn hold, czerwony booked) i wielkość grupy do pojemności stolika. Dotknij stolika, aby wybrać — tylko Hold it z"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV z czatu BOT DEE",
-          "blurb": "Powiedz VIP reserV albo hold a VIP table at Aurelia w BOT DEE. Podaj klub, wieczór i stolik lub strefę. Mezzanine to strefa — BOT DEE wymieni V1–V4 i AURELIA SUITE. Potem hold it, I agree do Terms i zapłać, jeśli potrzebna jest kaucja. BOT DEE nigdy nie bierze numerów kart. Dołąc"
+          "blurb": "Powiedz book a table at Aurelia w BOT DEE i zostań na tym czacie. Dock VIP reserV pokazuje wieczory (zamknięte zostają na liście), kolory stolików (zielony wolny, bursztyn hold, czerwony booked) i wielkość grupy do pojemności stolika. Dotknij stolika, aby wybrać — tylko Hold it z"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -9239,6 +9367,22 @@
           "label": "Nu deelnemen of plan instellen",
           "blurb": "Na Room SMARTview-setup kies je Nu deelnemen of Plan instellen. Nu deelnemen opent de BOT DEE-sessie nu en zet geen kaart op Search. Plan instellen is wanneer de BOT DEE-room start — niet Shared Itinerary. Een toekomstig tijdstip zet Search SMARTnotification alleen aan voor jou e"
         },
+        "help:help-botdee-room-collab": {
+          "label": "Deel een headless boeking in Room SMARTview",
+          "blurb": "In een Room SMARTview zien alle leden de VIP reserV- of ShoutOut-keuzes van de host. Leden stemmen Ja of Nee. Hold it en betalen blijven bij de host — meedoen en stemmen is geen betaling. BOT DEE neemt nooit kaartnummers. Stripe opent in een pop-out."
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "Deel een headless boeking in Room SMARTview",
+          "blurb": "In een Room SMARTview zien alle leden de VIP reserV- of ShoutOut-keuzes van de host. Leden stemmen Ja of Nee. Hold it en betalen blijven bij de host — meedoen en stemmen is geen betaling. BOT DEE neemt nooit kaartnummers. Stripe opent in een pop-out."
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "Kies een Room SMARTview-host",
+          "blurb": "Iedereen in de sessie kan host zijn. Nomineer jezelf of een ander lid. Een kandidaat wordt host bij 60% van de huidige leden (naar boven afgerond). Als de host vertrekt, kiezen de overgebleven leden een nieuwe — de room blijft open. Kick en End blijven bij de gekozen host."
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "Kies een Room SMARTview-host",
+          "blurb": "Iedereen in de sessie kan host zijn. Nomineer jezelf of een ander lid. Een kandidaat wordt host bij 60% van de huidige leden (naar boven afgerond). Als de host vertrekt, kiezen de overgebleven leden een nieuwe — de room blijft open. Kick en End blijven bij de gekozen host."
+        },
         "help:help-botdee-smartview-review": {
           "label": "SMARTsummary controleren en corrigeren",
           "blurb": "Gemini stelt alleen op uit openbare FLOQR-velden — niet bij elke weergave. Verkeerd feit: veld verbergen of samenvatting zelf bewerken. Uw tekst wordt niet overschreven. Profielconflicten vragen om controle. Meld een foute kaart in de overlay."
@@ -9529,11 +9673,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV vanuit BOT DEE-chat",
-          "blurb": "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Ro"
+          "blurb": "Zeg book a table at Aurelia in BOT DEE en blijf in deze chat. Het VIP reserV-dock toont avonden (gesloten avonden blijven staan), live tafelkleuren (groen vrij, amber hold, rood geboekt) en groepsgrootte tot de tafelcapaciteit. Tik een tafel om te kiezen — alleen Hold it start ee"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV vanuit BOT DEE-chat",
-          "blurb": "Zeg VIP reserV of hold a VIP table at Aurelia in BOT DEE. Noem club, avond en tafel of zone. Mezzanine is een zone — BOT DEE toont V1–V4 en AURELIA SUITE. Daarna hold it, I agree bij Terms, en betalen als er een deposit nodig is. BOT DEE neemt nooit kaartnummers. Deelnemen aan Ro"
+          "blurb": "Zeg book a table at Aurelia in BOT DEE en blijf in deze chat. Het VIP reserV-dock toont avonden (gesloten avonden blijven staan), live tafelkleuren (groen vrij, amber hold, rood geboekt) en groepsgrootte tot de tafelcapaciteit. Tik een tafel om te kiezen — alleen Hold it start ee"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",
@@ -10366,6 +10510,22 @@
           "label": "انضم الآن أو عيّن جدولاً",
           "blurb": "بعد إعداد Room SMARTview اختر انضم الآن أو تعيين جدول. انضم الآن يفتح جلسة BOT DEE فوراً ولا يضع بطاقة على Search. تعيين جدول هو وقت بدء room BOT DEE — وليس Shared Itinerary. وقت مستقبلي يفعّل SMARTnotification في Search لك ولأصدقاء Mingl المدعوين فقط. الضيوف يؤكدون RSVP حتى تصبح"
         },
+        "help:help-botdee-room-collab": {
+          "label": "مشاركة حجز headless في Room SMARTview",
+          "blurb": "في Room SMARTview تظهر اختيارات المضيف لـ VIP reserV أو ShoutOut للجميع. يصوّت الأعضاء بنعم أو لا. يبقى Hold it والدفع لدى المضيف — الانضمام والتصويت ليسا دفعًا. BOT DEE لا يأخذ أرقام بطاقات أبدًا. يفتح Stripe في نافذة منبثقة."
+        },
+        "intent:help-botdee-room-collab": {
+          "label": "مشاركة حجز headless في Room SMARTview",
+          "blurb": "في Room SMARTview تظهر اختيارات المضيف لـ VIP reserV أو ShoutOut للجميع. يصوّت الأعضاء بنعم أو لا. يبقى Hold it والدفع لدى المضيف — الانضمام والتصويت ليسا دفعًا. BOT DEE لا يأخذ أرقام بطاقات أبدًا. يفتح Stripe في نافذة منبثقة."
+        },
+        "help:help-botdee-room-elect-host": {
+          "label": "انتخاب مضيف Room SMARTview",
+          "blurb": "أي شخص في الجلسة يمكن أن يكون مضيفًا. رشّح نفسك أو عضوًا آخر. يصبح المرشح مضيفًا عند 60٪ من الأعضاء الحاليين (تقريب لأعلى). إذا غادر المضيف، ينتخب الباقون مضيفًا جديدًا — تبقى الغرفة مفتوحة. يبقى Kick و End لدى المضيف المنتخب."
+        },
+        "intent:help-botdee-room-elect-host": {
+          "label": "انتخاب مضيف Room SMARTview",
+          "blurb": "أي شخص في الجلسة يمكن أن يكون مضيفًا. رشّح نفسك أو عضوًا آخر. يصبح المرشح مضيفًا عند 60٪ من الأعضاء الحاليين (تقريب لأعلى). إذا غادر المضيف، ينتخب الباقون مضيفًا جديدًا — تبقى الغرفة مفتوحة. يبقى Kick و End لدى المضيف المنتخب."
+        },
         "help:help-botdee-smartview-review": {
           "label": "مراجعة وتصحيح SMARTsummary",
           "blurb": "يصوغ Gemini من حقول FLOQR العامة فقط — ليس عند كل عرض. إن كان واقعًا خاطئًا أخفِ الحقل أو عدّل الملخص. لا يُستبدل نصك. تعارض الملف يطلب مراجعة. بلّغ عن بطاقة خاطئة من الطبقة."
@@ -10656,11 +10816,11 @@
         },
         "help:help-botdee-headless-vip": {
           "label": "VIP reserV من محادثة BOT DEE",
-          "blurb": "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
+          "blurb": "قل book a table at Aurelia في BOT DEE وابقَ في هذه المحادثة. رصيف VIP reserV يعرض الليالي (المغلقة تبقى مدرجة) وألوان الطاولات (أخضر متاح، عنبري hold، أحمر محجوز) وحجم المجموعة حتى سعة الطاولة. اضغط طاولة للاختيار — Hold it فقط يبدأ حجزاً لـ 30 دقيقة. I agree يسجّل Terms (النص ال"
         },
         "intent:help-botdee-headless-vip": {
           "label": "VIP reserV من محادثة BOT DEE",
-          "blurb": "قل VIP reserV أو hold a VIP table at Aurelia في BOT DEE. اذكر النادي والليلة والطاولة أو المنطقة. Mezzanine منطقة — BOT DEE يعرض V1–V4 وAURELIA SUITE. ثم hold it وI agree لـ Terms وادفع إن لزم عربون. BOT DEE لا يأخذ أرقام البطاقات. الانضمام إلى Room SMARTview ليس دفعاً."
+          "blurb": "قل book a table at Aurelia في BOT DEE وابقَ في هذه المحادثة. رصيف VIP reserV يعرض الليالي (المغلقة تبقى مدرجة) وألوان الطاولات (أخضر متاح، عنبري hold، أحمر محجوز) وحجم المجموعة حتى سعة الطاولة. اضغط طاولة للاختيار — Hold it فقط يبدأ حجزاً لـ 30 دقيقة. I agree يسجّل Terms (النص ال"
         },
         "help:help-features-smartview": {
           "label": "Features SMARTview",

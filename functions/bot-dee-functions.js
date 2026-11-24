@@ -418,6 +418,175 @@ function vipSmartOutcome(reply, lang, extra = {}) {
   };
 }
 
+function snapshotFromVipView(view) {
+  const row = view && typeof view === "object" ? view : {};
+  return {
+    venueName: row.venueName,
+    clubLocationId: row.clubLocationId,
+    night: row.night,
+    sectionId: row.sectionId,
+    sectionLabel: row.sectionLabel,
+    partySize: row.partySize,
+    maxCapacity: row.maxCapacity,
+    mode: row.mode
+  };
+}
+
+function snapshotFromShoutView(view) {
+  const row = view && typeof view === "object" ? view : {};
+  return {
+    venueName: row.venueName,
+    clubLocationId: row.clubLocationId || row.locationId,
+    templateId: row.templateId,
+    templateName: row.templateName,
+    handle: row.handle || row.attribution,
+    mode: row.mode
+  };
+}
+
+function parseCollabUtterance(prompt) {
+  const p = String(prompt || "").trim().toLowerCase();
+  if (/^(yes|vote yes|i vote yes)$/.test(p)) return {op: "vote_choice", ballot: "yes"};
+  if (/^(no|vote no|i vote no)$/.test(p)) return {op: "vote_choice", ballot: "no"};
+  if (/^(make me host|nominate me|i(?:'ll| will) host|elect me)$/.test(p)) return {op: "nominate", self: true};
+  if (/^(vote host yes|elect host)$/.test(p)) return {op: "vote_host", ballot: "yes"};
+  if (/^vote host no$/.test(p)) return {op: "vote_host", ballot: "no"};
+  return null;
+}
+
+async function handleCollabUtterance(uid, roomId, parsed, lang) {
+  const store = require("./botdee-session-store");
+  const sessionCore = require("./botdee-session-core");
+  const actor = {actorEmail: "", actorRole: "patron"};
+  let result;
+  if (parsed.op === "vote_choice") {
+    result = await store.voteSharedTransaction({uid, roomId, ballot: parsed.ballot, ...actor});
+  } else if (parsed.op === "nominate") {
+    result = await store.nominateHost({uid, roomId, candidateUid: uid, ...actor});
+  } else {
+    result = await store.voteHost({uid, roomId, ballot: parsed.ballot, ...actor});
+  }
+  if (!result || !result.ok) {
+    return {
+      reply: sessionCore.denialMessage(result?.error || "not_found"),
+      results: [],
+      provider: "local-room-collab",
+      model: "room-collab",
+      toolRounds: 0,
+      uiLanguage: lang,
+      smartViews: []
+    };
+  }
+  const live = await store.loadRoom(roomId);
+  const views = [];
+  if (live) {
+    const roomMod = require("./botdee-room-smartview");
+    const view = roomMod.buildRoomSmartView({
+      utterance: "",
+      hasActiveRoom: true,
+      participantCount: sessionCore.currentMembers(live.data).length,
+      roomId: live.id
+    });
+    if (view) {
+      view.roomId = live.id;
+      view.hasActiveRoom = true;
+      views.push(view);
+    }
+  }
+  const collab = result.collab;
+  let reply = "Vote recorded.";
+  if (parsed.op === "nominate") {
+    reply = result.elected
+      ? "You're the host now. Shared picks and Hold it are yours until the group elects someone else."
+      : "Nomination opened. 60% of currently joined members elects the host.";
+  } else if (parsed.op === "vote_host") {
+    reply = result.elected
+      ? "New host elected. They can share VIP reserV and ShoutOut picks for the group to vote."
+      : `Host vote: ${collab?.hostTally?.yes || 0} of ${collab?.hostTally?.needed || 0} needed.`;
+  } else {
+    reply = collab?.canCommit
+      ? "The group reached 60% yes. The host can Hold it."
+      : `Vote recorded: ${collab?.choiceTally?.yes || 0} of ${collab?.choiceTally?.needed || 0} yes needed.`;
+  }
+  return {
+    reply,
+    results: [],
+    provider: "local-room-collab",
+    model: "room-collab",
+    toolRounds: 0,
+    uiLanguage: lang,
+    smartViews: views
+  };
+}
+
+async function applyRoomCollabToOutcome(uid, roomId, outcome) {
+  if (!roomId || !outcome) return outcome;
+  const store = require("./botdee-session-store");
+  const sessionCore = require("./botdee-session-core");
+  const live = await store.loadRoom(roomId);
+  if (!live || !sessionCore.isCurrentMember(live.data, uid) || !sessionCore.roomIsOpen(live.data)) {
+    return outcome;
+  }
+  const views = Array.isArray(outcome.smartViews) ? outcome.smartViews.slice() : [];
+  const vipView = views.find(row => row && row.kind === "botDeeVip");
+  const shoutView = views.find(row => row && row.kind === "botDeeShoutOut");
+  if (sessionCore.isHostActor(live.data, uid) && vipView && vipView.mode !== "cancelled") {
+    try {
+      await store.proposeSharedTransaction({
+        uid,
+        roomId,
+        kind: "vip",
+        snapshot: snapshotFromVipView(vipView)
+      });
+    } catch (_) {}
+  } else if (sessionCore.isHostActor(live.data, uid) && shoutView) {
+    try {
+      await store.proposeSharedTransaction({
+        uid,
+        roomId,
+        kind: "shoutout",
+        snapshot: snapshotFromShoutView(shoutView)
+      });
+    } catch (_) {}
+  }
+  const latest = await store.loadRoom(roomId);
+  if (!latest) return outcome;
+  const collab = sessionCore.publicCollab(latest.data, uid);
+  views.forEach(view => {
+    if (!view) return;
+    if (view.kind === "botDeeVip" || view.kind === "botDeeShoutOut" || view.kind === "botDeeRoom") {
+      view.collab = collab;
+      view.guestMode = !collab.viewerIsHost;
+      view.roomId = roomId;
+    }
+  });
+  const alreadyVip = views.some(row => row && row.kind === "botDeeVip");
+  if (!alreadyVip && collab.sharedTransaction && collab.sharedTransaction.kind === "vip") {
+    try {
+      const vip = require("./botdee-vip-smartview");
+      const snap = collab.sharedTransaction.snapshot || {};
+      const draft = {
+        clubQuery: snap.clubLocationId,
+        night: snap.night,
+        sectionId: snap.sectionId,
+        sectionLabel: snap.sectionLabel,
+        partySize: snap.partySize,
+        maxCapacity: snap.maxCapacity
+      };
+      const shared = vip.buildVipSmartView({
+        draft,
+        venueName: snap.venueName,
+        mode: "ready"
+      });
+      shared.collab = collab;
+      shared.guestMode = !collab.viewerIsHost;
+      views.push(shared);
+    } catch (_) {}
+  }
+  outcome.smartViews = views;
+  return outcome;
+}
+
 function joinFailureOutcome(error, lang) {
   const map = {
     not_found: ["botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."],
@@ -457,7 +626,7 @@ function isPrivateBotDeeOutcome(outcome) {
   return false;
 }
 
-async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, previousDraft) {
+async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, previousDraft, joinedRoomId) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const headless = require("./headless-vip-core");
@@ -530,6 +699,10 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
     merged.sectionId = merged.matches[0].id;
     merged.sectionLabel = merged.matches[0].label;
   }
+  if (merged.sectionId && !merged.maxCapacity) {
+    merged.maxCapacity = headless.sectionCapacity(merged.clubQuery, merged.sectionId);
+  }
+  merged.partySize = headless.clampPartySize(merged.partySize || headless.DEFAULT_PARTY, merged.maxCapacity);
   const priorHoldId = String(previousDraft?.holdId || "").trim();
   merged = headless.detachStaleHold(previousDraft, merged);
   if (priorHoldId && priorHoldId !== merged.holdId) {
@@ -567,7 +740,18 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
   }
   const needs = headless.interactiveNeeds(merged);
   const venueName = headless.clubDisplayName(merged.clubQuery) || merged.clubQuery;
-  const viewBase = {draft: merged, needs, venueName};
+  let floor = null;
+  if (merged.clubQuery && merged.night) {
+    try {
+      floor = await tools.getVipFloorStatus({
+        clubLocationId: merged.clubQuery,
+        night: merged.night
+      }, session.request);
+    } catch (_) {
+      floor = null;
+    }
+  }
+  const viewBase = {draft: merged, needs, venueName, floor};
   if (needs.length) {
     try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
     const view = vipView.buildVipSmartView({...viewBase, mode: "draft"});
@@ -577,11 +761,90 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
       smartViews: [view]
     });
   }
-  const repeatingTable = !!(previousDraft && previousDraft.sectionId
-    && previousDraft.sectionId === merged.sectionId
-    && headless.isRepeatSelectedSection(userPrompt, merged));
-  const wantsHold = parsed.confirmHold || headless.isBareAffirmative(userPrompt) || repeatingTable;
+  const wantsHold = parsed.confirmHold;
   const wantsTerms = parsed.acceptTerms || headless.isAcceptTermsPrompt(userPrompt);
+  if (joinedRoomId && (wantsHold || wantsTerms)) {
+    try {
+      const store = require("./botdee-session-store");
+      const sessionCore = require("./botdee-session-core");
+      const live = await store.loadRoom(joinedRoomId);
+      if (live && sessionCore.isCurrentMember(live.data, uid)) {
+        if (!sessionCore.isHostActor(live.data, uid)) {
+          try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+          const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
+          view.guestMode = true;
+          return vipSmartOutcome(
+            "Only the host can Hold it or pay. Vote yes or no on the shared pick. Joining is not a payment.",
+            lang,
+            {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+          );
+        }
+        const written = await store.proposeSharedTransaction({
+          uid,
+          roomId: joinedRoomId,
+          kind: "vip",
+          snapshot: {
+            venueName,
+            clubLocationId: merged.clubQuery,
+            night: merged.night,
+            sectionId: merged.sectionId,
+            sectionLabel: merged.sectionLabel,
+            partySize: merged.partySize,
+            maxCapacity: merged.maxCapacity,
+            mode: "ready"
+          }
+        });
+        if (!written?.ok) {
+          try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+          const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
+          return vipSmartOutcome(
+            sessionCore.holdGateMessage(written?.error || written?.reason),
+            lang,
+            {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+          );
+        }
+        const latest = await store.loadRoom(joinedRoomId);
+        if (!latest || !sessionCore.isCurrentMember(latest.data, uid) || !sessionCore.isHostActor(latest.data, uid)) {
+          try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+          const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
+          return vipSmartOutcome(
+            "This Room SMARTview is not open for that hold. Vote with the group, or leave the room first.",
+            lang,
+            {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+          );
+        }
+        const gate = sessionCore.canCommitSharedChoice(latest.data);
+        if (!gate.ok) {
+          try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+          const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
+          return vipSmartOutcome(
+            gate.reason === "choice_not_ready"
+              ? `Need ${gate.tally.needed} yes from ${gate.tally.memberCount} joined members before Hold it (${gate.tally.yes} so far).`
+              : sessionCore.holdGateMessage(gate.reason),
+            lang,
+            {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+          );
+        }
+      } else {
+        try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+        const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
+        return vipSmartOutcome(
+          "This Room SMARTview is not open for that hold. Vote with the group, or leave the room first.",
+          lang,
+          {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+        );
+      }
+    } catch (error) {
+      console.warn("BOT DEE VIP room vote gate failed", error?.message || error);
+      try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+      const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
+      return vipSmartOutcome(
+        "Could not confirm the room vote. Hold it stays with the host after 60% yes. Try again.",
+        lang,
+        {model: "headless-draft", toolRounds: 0, smartViews: [view]}
+      );
+    }
+  }
   if (!merged.holdId && !wantsHold && !wantsTerms) {
     try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
     const view = vipView.buildVipSmartView({...viewBase, mode: "ready"});
@@ -591,7 +854,6 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
       {model: "headless-draft", toolRounds: 0, smartViews: [view]}
     );
   }
-  let holdLinks = [];
   if (!merged.holdId) {
     const hold = await tools.createVipHold({
       clubLocationId: merged.clubQuery,
@@ -613,7 +875,7 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
       });
     }
     merged.holdId = hold.holdId || hold.hold?.holdId || "";
-    holdLinks = bot.linksFromToolResult(hold, lang);
+    merged.holdExpiresAtMs = Math.max(0, Math.floor(Number(hold.expiresAtMs || hold.hold?.expiresAtMs) || 0));
   }
   if (merged.holdId && wantsTerms) {
     try {
@@ -625,20 +887,24 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
           consentId: merged.consentId,
           returnBase: session?.request?.data?.returnBase
         }, session.request);
-        const links = bot.linksFromToolResult(checkout, lang);
-        try { await threadsMod.persistHeadlessVipDraft(uid, null); } catch (_) {}
+        if (checkout.checkoutUrl) {
+          try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
+        } else {
+          try { await threadsMod.persistHeadlessVipDraft(uid, null); } catch (_) {}
+        }
         const view = vipView.buildVipSmartView({
           ...viewBase,
-          mode: "checkout",
+          mode: checkout.checkoutUrl ? "checkout" : "pass",
           checkoutUrl: checkout.checkoutUrl || "",
-          passHref: checkout.passHref || ""
+          reservationId: checkout.reservationId || "",
+          holdExpiresAtMs: merged.holdExpiresAtMs
         });
         return vipSmartOutcome(
           checkout.checkoutUrl
-            ? "VIP reserV is ready to pay. Open the secure link — I never take card numbers."
-            : (checkout.message || "VIP reserV hold is confirmed. Check your pass in My Profile."),
+            ? "VIP reserV is ready to pay. Stripe opens in a pop-out — this chat stays here. I never take card numbers."
+            : (checkout.message || `VIP reserV pass for ${merged.sectionLabel || merged.sectionId} at ${venueName}. Show this at the door.`),
           lang,
-          {results: links, smartViews: [view]}
+          {smartViews: [view]}
         );
       }
     } catch (error) {
@@ -646,11 +912,11 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
     }
   }
   try { await threadsMod.persistHeadlessVipDraft(uid, merged); } catch (_) {}
-  const view = vipView.buildVipSmartView({...viewBase, mode: "hold", draft: merged});
+  const view = vipView.buildVipSmartView({...viewBase, mode: "hold", draft: merged, holdExpiresAtMs: merged.holdExpiresAtMs});
   return vipSmartOutcome(
     `Held ${merged.sectionLabel || merged.sectionId} at ${venueName} for 30 minutes. Tap I agree to accept VIP Terms, then pay if a deposit is required.`,
     lang,
-    {results: holdLinks, smartViews: [view]}
+    {smartViews: [view]}
   );
 }
 
@@ -1093,6 +1359,14 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       && require("./headless-vip-core").isInteractiveFollowUp(userPrompt, previousVipDraft));
     const vipExecute = bot.isVipExecutePrompt(userPrompt) || vipFollowUp;
     let venueAttached = null;
+    const collabUtterance = stored.joinedRoomId ? parseCollabUtterance(userPrompt) : null;
+    if (!outcome && collabUtterance) {
+      try {
+        outcome = await handleCollabUtterance(uid, stored.joinedRoomId, collabUtterance, uiLanguage);
+      } catch (error) {
+        console.warn("BOT DEE room collab utterance failed", error?.message || error);
+      }
+    }
     let peopleAttached = null;
     const peopleIntent = peopleCards.classifyPeopleSearchIntent(userPrompt);
     if (!outcome && !shoutExecute && !vipExecute && !roomAttached.handled) {
@@ -1140,7 +1414,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     } else if (vipExecute) {
       try {
         outcome = await tryHeadlessVip(
-          userPrompt, session, uiLanguage, allowedFeatures, previousVipDraft
+          userPrompt, session, uiLanguage, allowedFeatures, previousVipDraft, stored.joinedRoomId
         );
       } catch (error) {
         console.warn("BOT DEE headless VIP failed", error?.message || error);
@@ -1586,6 +1860,13 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
             view.roomId = stored.joinedRoomId;
           }
         });
+      }
+      if (stored.joinedRoomId && outcome) {
+        try {
+          outcome = await applyRoomCollabToOutcome(uid, stored.joinedRoomId, outcome);
+        } catch (err) {
+          console.warn("BOT DEE room collab attach failed", err?.message || err);
+        }
       }
     } catch (_) {}
 

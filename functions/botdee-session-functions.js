@@ -38,7 +38,7 @@ async function requireSessionAuth(request) {
 function fail(reason) {
   const code = reason === "rate_limited" ? "resource-exhausted"
     : reason === "wrong_account" || reason === "not_host" || reason === "not_member" || reason === "not_assignee" ? "permission-denied"
-      : reason === "full" || reason === "closed" || reason === "unpaid_tab" || reason === "no_opt_in" || reason === "not_friend" || reason === "invite_disabled" || reason === "expired" || reason === "revoked" || reason === "used" || reason === "self" || reason === "already_member" || reason === "past" || reason === "already_open" || reason === "not_scheduled" || reason === "not_live" ? "failed-precondition"
+      : reason === "full" || reason === "closed" || reason === "unpaid_tab" || reason === "no_opt_in" || reason === "not_friend" || reason === "invite_disabled" || reason === "expired" || reason === "revoked" || reason === "used" || reason === "self" || reason === "already_member" || reason === "past" || reason === "already_open" || reason === "not_scheduled" || reason === "not_live" || reason === "no_choice" || reason === "stale_choice" || reason === "no_ballot" || reason === "choice_not_ready" ? "failed-precondition"
         : "not-found";
   throw new HttpsError(code, core.denialMessage(reason), {reason});
 }
@@ -417,6 +417,73 @@ exports.expireBotDeeRooms = onSchedule({
   const actor = {role: "system"};
   return store.expireRooms({actorRole: actor.role});
 });
+
+exports.proposeBotDeeRoomTransaction = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    const actor = actorFrom(request);
+    return unwrap(await store.proposeSharedTransaction({
+      uid,
+      roomId: core.text(request.data?.roomId, 80),
+      kind: core.text(request.data?.kind, 24),
+      snapshot: request.data?.snapshot && typeof request.data.snapshot === "object" ? request.data.snapshot : {},
+      actorEmail: actor.email,
+      actorRole: actor.role
+    }));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.voteBotDeeRoomTransaction = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    const actor = actorFrom(request);
+    return unwrap(await store.voteSharedTransaction({
+      uid,
+      roomId: core.text(request.data?.roomId, 80),
+      ballot: core.text(request.data?.ballot || request.data?.vote, 8),
+      choiceId: core.text(request.data?.choiceId, 80),
+      actorEmail: actor.email,
+      actorRole: actor.role
+    }));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.nominateBotDeeRoomHost = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    const actor = actorFrom(request);
+    return unwrap(await store.nominateHost({
+      uid,
+      roomId: core.text(request.data?.roomId, 80),
+      candidateUid: core.text(request.data?.candidateUid, 80) || uid,
+      actorEmail: actor.email,
+      actorRole: actor.role
+    }));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.voteBotDeeRoomHost = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    const actor = actorFrom(request);
+    return unwrap(await store.voteHost({
+      uid,
+      roomId: core.text(request.data?.roomId, 80),
+      ballot: core.text(request.data?.ballot || request.data?.vote, 8),
+      actorEmail: actor.email,
+      actorRole: actor.role
+    }));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
 
 exports.revokeBotDeeRoomInvite = onCall(CALL_OPTS, async request => {
   try {

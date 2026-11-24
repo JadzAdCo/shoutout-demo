@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.074";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.074";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.075";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.075";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,49 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.075",
+      title: "s3.3.075 — Room SMARTview collab + VIP popouts rebased onto collectableInput",
+      checks: [
+        {label:"Host election ratio", file:"functions/botdee-session-core.js", includes:["HOST_ELECTION_RATIO = 0.6", "holdGateMessage"]},
+        {label:"Collab callables", file:"functions/botdee-session-functions.js", includes:["proposeBotDeeRoomTransaction", "nominateBotDeeRoomHost"]},
+        {label:"Transactional votes", file:"functions/botdee-session-store.js", includes:["function mutateRoom", "scheduleRoom"]},
+        {label:"VIP popouts", file:"botdee-vip-popout.html", includes:["kind === \"paid\" || kind === \"pass\""]},
+        {label:"Collectable inputs still present", file:"shared-data.js", includes:["FLOQRTemplatePatronInputs", "collectableInput1"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-075-botdee-room-collab-rebase", "s3.3.075"]}
+      ]
+    },
+    {
+      version: "s3.3.062",
+      title: "s3.3.062 — BOT DEE VIP pass popout, checkout cancel, hold clock",
+      checks: [
+        {label:"Pass popout", file:"botdee-vip-popout.html", includes:["kind === \"paid\" || kind === \"pass\""]},
+        {label:"One hold clock", file:"botdee-smartview.js", includes:["function stopHoldClock", "searchParams.set(\"kind\""]},
+        {label:"Checkout keeps hold draft", file:"functions/bot-dee-functions.js", includes:["if (checkout.checkoutUrl)"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-062-botdee-vip-popout-hold", "s3.3.062"]}
+      ]
+    },
+    {
+      version: "s3.3.061",
+      title: "s3.3.061 — BOT DEE Room SMARTview shared picks + 60% host election",
+      checks: [
+        {label:"Host election ratio", file:"functions/botdee-session-core.js", includes:["HOST_ELECTION_RATIO = 0.6", "proposeSharedTransaction"]},
+        {label:"Collab callables", file:"functions/botdee-session-functions.js", includes:["nominateBotDeeRoomHost", "voteBotDeeRoomTransaction"]},
+        {label:"Room card votes", file:"botdee-smartview.js", includes:["renderCollabStrip", "data-guest-mode"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-061-botdee-room-collab", "s3.3.061"]}
+      ]
+    },
+    {
+      version: "s3.3.060",
+      title: "s3.3.060 — BOT DEE VIP session popouts (no vip.html)",
+      checks: [
+        {label:"VIP popout page", file:"botdee-vip-popout.html", includes:["floqr-botdee-vip", "kind === \"paid\" || kind === \"pass\""]},
+        {label:"Dock popouts not vip.html", file:"botdee-smartview.js", includes:["botdee-vip-popout.html", "data-vip-popout=\"pay\""], notIncludes:["vip.html"]},
+        {label:"Hold only from Hold it", file:"functions/bot-dee-functions.js", includes:["wantsHold = parsed.confirmHold", "getVipFloorStatus"]},
+        {label:"Stripe returns to popout", file:"functions/commerce-functions.js", includes:["botdee-vip-popout.html"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-060-botdee-vip-session-popouts", "s3.3.060"]}
+      ]
+    },
     {
       version: "s3.3.074",
       title: "s3.3.074 — Headless ShoutOut collectableInput1..N",
@@ -3780,6 +3823,42 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-075-botdee-room-collab-rebase",
+      area:"BOT DEE",
+      feature:"Room SMARTview shared picks + 60% host election on s3.3.074",
+      changed:"s3.3.075 — PR 147 rebased onto origin/main after 154 (Aurelia gallery) and 152 (collectableInput). Room SMARTview members vote Yes/No on the host VIP reserV or ShoutOut pick. Anyone can be host at 60% of currently joined members. Host leave keeps the room open. VIP map/Terms/Stripe/pass stay botdee-vip-popout.html. Schedule Join Now vs Set a schedule stays. Headless ShoutOut still uses collectableInput1..N.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js / botdee-vip-popout.html ?v=s3.3.075. Sign in with BOT DEE + Mingl + VIP reserV. 2) Confirm a Room SMARTview, Join Now or Set a schedule, invite a Mingl friend. Joining is not a payment. 3) Host: VIP reserV pick a table — Shared picks Yes/No. Guest votes. Hold it stays host-only until 60% yes. 4) Guest: Make me host. After 60% yes they can Hold it. Stripe is a pop-out, not vip.html. 5) Original host leaves — room stays open. 6) New chat throw a shoutout still uses collectableInput (Aurelia + birthday fills Traditional). 7) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Shared picks + 60% host election work on the same package as collectableInput and retired Aurelia gallery tiles. No vip.html. Schedule still works. Display URLs never ?v=.",
+      troubleshoot:"No Shared picks → cached botdee-smartview.js or Functions missing proposeBotDeeRoomTransaction. Guest Hold it works → Functions not this SHA. Host leave ends room → leaveRoom still auto-endRoom. Still asking template/@handle after venue+text → executeBotSession not this SHA. Functions deny mingl/botDee → Features & Services."
+    },
+    {
+      id:"s3-3-062-botdee-vip-popout-hold",
+      area:"BOT DEE",
+      feature:"VIP pass popout, Cancel hold during checkout, one hold clock",
+      changed:"s3.3.062 — Pass pop-out shows the pass (not the floor map). I agree keeps the hold draft through Stripe so Cancel hold still releases. One mm:ss clock on the dock (no leaked timers posting cancel). Guest clocks never send cancel.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-vip-popout.html ?v=s3.3.062. Sign in with BOT DEE + VIP reserV. New chat. 2) Hold a table at Aurelia → I agree. Pay securely opens Stripe. Cancel hold is still on the dock; tap it — hold releases and dock unmounts. 3) Hold again, I agree, finish test pay (4242…) — pop-out shows the pass, not the map. Dock Pass button also opens the pass. 4) Watch the countdown while tapping nights/tables — only one clock; expired hold sends one cancel. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Pass pop-out is a pass. Checkout can still Cancel hold. Clock does not keep firing cancel after the dock re-renders.",
+      troubleshoot:"Pass pop-out shows the map → cached botdee-vip-popout.html (need kind=pass). Cancel hold missing on Pay securely → cached botdee-smartview.js or Functions still persistHeadlessVipDraft(uid, null) at checkout. Hold expires twice / random cancel → old _vipClock on discarded cards. Functions deny vipReservations → Features & Services VIP still off."
+    },
+    {
+      id:"s3-3-061-botdee-room-collab",
+      area:"BOT DEE",
+      feature:"Shareable headless picks + 60% host election in Room SMARTview",
+      changed:"s3.3.061 — Room SMARTview members vote Yes/No on the host's VIP reserV or ShoutOut pick. Anyone can be host; 60% of currently joined members elects. Host leave keeps the room open for election. Guests see a read-only VIP dock + vote; Hold it / Stripe stay host-only pop-outs. Join is still not a payment.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js ?v=s3.3.062. Sign in with BOT DEE + Mingl + VIP reserV. 2) Confirm a Room SMARTview and invite a Mingl friend (host plus 7). Joining is not a payment. 3) Host: VIP reserV → pick a table. Shared picks appears with Yes/No. Guest votes Yes on the same chat. Hold it stays disabled until 60% yes (2 of 3, 3 of 5). 4) Guest: Make me host — after 60% of joined members vote yes, they become host and can Hold it. Stripe still opens in a pop-out; BOT DEE never takes card numbers. 5) Original host leaves — room stays open; remaining members elect. 6) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Shared VIP dock follows the room. Guests vote, they do not Hold it. 60% of currently joined members elects a host. Host leave does not kill the room when others remain. No vip.html.",
+      troubleshoot:"No Shared picks → cached botdee-smartview.js or Functions missing proposeBotDeeRoomTransaction. Guest Hold it works → Functions not this SHA (guestMode / isHostActor gate). New host still has no Hold it → dock must rebuild on viewerIsHost (applyCollabToVipCard), not only the Shared picks strip. Concurrent Yes votes drop below 60% → voteSharedTransaction must be a room transaction. Hold it succeeds after a room error → vote gate catch must return, not fall through to createVipHold. Host leave ends room → leaveRoom still auto-endRoom. Election never passes → denominator is joined members, not ballots cast; 2 people need both yes. Functions deny mingl/botDee → Features & Services."
+    },
+    {
+      id:"s3-3-060-botdee-vip-session-popouts",
+      area:"BOT DEE",
+      feature:"VIP reserV stays in the BOT DEE session with pop-outs",
+      changed:"s3.3.060 — Headless VIP dock: live table colors, closed nights on the rail, Terms summary, Cancel hold, mm:ss countdown, second tap on V1 does not hold, party clamped to table max, map collapses after pick, venue chips when no club is named, Stripe/map/Terms/pass in pop-outs (not vip.html). After pay the pass returns to this chat.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-vip-popout.html / floqr-i18n.js ?v=s3.3.060. Sign in with BOT DEE + VIP reserV. New chat. 2) Send VIP reserV with no club — dock lists Decades / Lima Twist / Aurelia. Tap Aurelia. 3) Closed nights stay on the rail labeled Closed. 4) Tap Mezzanine then V1 — table selects, map collapses, Change table appears. Tap V1 again — still selected, no hold until Hold it. 5) Hold it — countdown mm:ss and Cancel hold. 6) I agree / Read Terms opens a pop-out; Pay securely opens Stripe in a pop-out; BOT DEE chat stays. 7) Finish test pay (4242…) — pop-out shows the pass and the dock updates; chat never navigates to vip.html. 8) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"The whole VIP loop stays on botdee.html. Extra screens are pop-outs. V1 does not auto-hold. After pay, a pass is in the chat dock. No card numbers in chat.",
+      troubleshoot:"Opens vip.html → cached botdee-smartview.js or Functions still minting vip.html success_url (need botDeePopout + this SHA). V1 holds immediately → Functions still treating repeatingTable as confirmHold. No live colors → getVipFloorStatus / runGetVipAvailability not deployed. Pop-out blocked → allow pop-ups for this origin. Pass missing after pay → Stripe success_url not botdee-vip-popout.html?kind=paid. Functions deny vipReservations → Features & Services VIP still off."
+    },
     {
       id:"s3-3-074-headless-template-inputs",
       area:"BOT DEE",

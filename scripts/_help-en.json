@@ -487,6 +487,14 @@
     "title": "Share into Room SMARTview",
     "body": "Share this conversation never copies your private BOT DEE thread. BOT DEE shows a preview of selected shareable facts from this message, marked tentative. You can edit or drop facts. Nothing is published until rooms are live and you approve."
   },
+  "help-botdee-room-collab": {
+    "title": "Share a headless booking in Room SMARTview",
+    "body": "When you are in a Room SMARTview, the host's VIP reserV or ShoutOut picks appear for everyone in the session. Members vote Yes or No. Hold it and pay stay with the host — joining and voting are not a payment. BOT DEE never takes card numbers. Stripe still opens in a pop-out."
+  },
+  "help-botdee-room-elect-host": {
+    "title": "Elect a Room SMARTview host",
+    "body": "Anyone in the session can be host. Nominate yourself or another joined member. A candidate becomes host at 60 percent of currently joined members (rounded up). If the host leaves, remaining members elect a new host — the room stays open. Kick and End stay with the elected host."
+  },
   "help-smartvisuals-notification": {
     "title": "Mingl Room SMARTnotification",
     "body": "A compact Mingl Room Invitation can appear on Search when a Mingl friend scheduled a BOT DEE room you were invited to. View Invitation opens Room SMARTview. Join Now goes to BOT DEE, not Mingl chat. Not Now hides the card this tab; Inbox still has Review BOT DEE invite. The Cancun demo query is Studio-only. Art is illustration, not a photo. Join Now rooms without a schedule do not paint Search."

@@ -695,6 +695,35 @@ body.botdee-photo-popout-page {
   to { opacity: 1; transform: none; }
 }
 
+body.botdee-vip-popout-page {
+  margin: 0;
+  min-height: 100dvh;
+  background: #05080a;
+  color: #efffff;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+.botdee-vip-popout {
+  box-sizing: border-box;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  gap: 8px;
+}
+.botdee-vip-popout-body {
+  min-height: 0;
+  overflow: auto;
+}
+.botdee-vip-popout-body .botdee-vip-map {
+  height: min(62vh, 28rem);
+}
+.botdee-vip-popout-terms,
+.botdee-vip-popout-pass {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+
 .botdee-chat-status {
   min-height: 1.2em;
   margin: 0;

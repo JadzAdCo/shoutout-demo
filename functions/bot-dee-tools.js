@@ -533,6 +533,16 @@ async function startShoutOutCheckout(args, sessionRequest) {
   };
 }
 
+async function getVipFloorStatus(args, sessionRequest) {
+  await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
+  const clubLocationId = await requireClubLocationId(args?.clubLocationId || args?.locationName);
+  const headlessVip = require("./headless-vip-core");
+  const night = headlessVip.parseNight(args?.night) || headlessVip.tonightIso();
+  const vipFns = require("./vip-functions").__vipHelpers;
+  const result = await vipFns.runGetVipAvailability(asRequest(sessionRequest, {clubLocationId, night}));
+  return {ok: true, tool: "getVipFloorStatus", ...result};
+}
+
 async function getVipAvailability(args, sessionRequest) {
   await featureAccess.assertFeatureAccess(sessionRequest.auth, "vipReservations", sessionRequest);
   const clubLocationId = await requireClubLocationId(args?.clubLocationId || args?.locationName);
@@ -642,8 +652,8 @@ async function createVipCheckout(args, sessionRequest) {
       checkoutMode: "clubPos",
       checkoutUrl: null,
       passHref: result.reservationId
-        ? `./vip.html?vipPaid=1&collector=clubPos&reservationId=${encodeURIComponent(result.reservationId)}`
-        : "./vip.html?vipPaid=1&collector=clubPos",
+        ? `./botdee-vip-popout.html?kind=paid&collector=clubPos&reservationId=${encodeURIComponent(result.reservationId)}`
+        : "./botdee-vip-popout.html?kind=paid&collector=clubPos",
       ...result
     };
   }
@@ -663,7 +673,7 @@ async function createVipCheckout(args, sessionRequest) {
         paymentCollector: collector,
         checkoutMode: "noDeposit",
         checkoutUrl: null,
-        passHref: "./vip.html?vipPaid=1",
+        passHref: "./botdee-vip-popout.html?kind=paid",
         ...result
       };
     }
@@ -672,7 +682,7 @@ async function createVipCheckout(args, sessionRequest) {
   // floqrStripe / clubStripe (and charged manual CSV) → FloqR Checkout Session URL.
   const result = await checkout.runCreateFloqrCheckoutSession(asRequest(sessionRequest, {
     orderType: "vipReservation",
-    payload: {holdId, consentId},
+    payload: {holdId, consentId, botDeePopout: true},
     returnBase: args?.returnBase,
     correlationId: args?.correlationId
   }));
@@ -1855,6 +1865,7 @@ module.exports = {
   loadCollectableTemplateCards,
   startShoutOutCheckout,
   getVipAvailability,
+  getVipFloorStatus,
   createVipHold,
   releaseVipHold,
   recordVipConsent,

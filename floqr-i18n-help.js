@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.074";
+  const VERSION = "s3.3.075";
   const packs = {
     "ru": {
       "help-smartvisuals-create": {
@@ -100,6 +100,14 @@
       "help-botdee-room-smartview-schedule": {
         title: "Войти сейчас или задать расписание",
         body: "После настройки Room SMARTview выберите Войти сейчас или Задать расписание. Войти сейчас открывает сессию BOT DEE сразу и не ставит карточку на Search. Задать расписание — старт room BOT DEE, не Shared Itinerary. Будущее время включает Search SMARTnotification только для вас и приглашённых друзей Mingl. Гости RSVP, пока room не в эфире; затем Join Now открывает BOT DEE (не Mingl chat)."
+      },
+      "help-botdee-room-collab": {
+        title: "Общий headless-заказ в Room SMARTview",
+        body: "В Room SMARTview выбор хоста по VIP reserV или ShoutOut виден всем в сессии. Участники голосуют Да или Нет. Hold it и оплата остаются у хоста — вход и голос не платёж. BOT DEE никогда не берёт номера карт. Stripe открывается во всплывающем окне."
+      },
+      "help-botdee-room-elect-host": {
+        title: "Выбор хоста Room SMARTview",
+        body: "Любой в сессии может быть хостом. Номинируйте себя или другого участника. Кандидат становится хостом при 60% текущих участников (округление вверх). Если хост уходит, остальные выбирают нового — room остаётся открытым. Kick и End остаются у избранного хоста."
       },
       "help-botdee-smartview-review": {
         title: "Проверить и исправить SMARTsummary",
@@ -631,6 +639,14 @@
         title: "Nu deelnemen of plan instellen",
         body: "Na Room SMARTview-setup kies je Nu deelnemen of Plan instellen. Nu deelnemen opent de BOT DEE-sessie nu en zet geen kaart op Search. Plan instellen is wanneer de BOT DEE-room start — niet Shared Itinerary. Een toekomstig tijdstip zet Search SMARTnotification alleen aan voor jou en uitgenodigde Mingl-vrienden. Gasten RSVP tot de room live is; daarna opent Join Now BOT DEE (niet Mingl-chat)."
       },
+      "help-botdee-room-collab": {
+        title: "Deel een headless boeking in Room SMARTview",
+        body: "In een Room SMARTview zien alle leden de VIP reserV- of ShoutOut-keuzes van de host. Leden stemmen Ja of Nee. Hold it en betalen blijven bij de host — meedoen en stemmen is geen betaling. BOT DEE neemt nooit kaartnummers. Stripe opent in een pop-out."
+      },
+      "help-botdee-room-elect-host": {
+        title: "Kies een Room SMARTview-host",
+        body: "Iedereen in de sessie kan host zijn. Nomineer jezelf of een ander lid. Een kandidaat wordt host bij 60% van de huidige leden (naar boven afgerond). Als de host vertrekt, kiezen de overgebleven leden een nieuwe — de room blijft open. Kick en End blijven bij de gekozen host."
+      },
       "help-botdee-smartview-review": {
         title: "SMARTsummary controleren en corrigeren",
         body: "Gemini stelt alleen op uit openbare FLOQR-velden — niet bij elke weergave. Verkeerd feit: veld verbergen of samenvatting zelf bewerken. Uw tekst wordt niet overschreven. Profielconflicten vragen om controle. Meld een foute kaart in de overlay."
@@ -1160,6 +1176,14 @@
       "help-botdee-room-smartview-schedule": {
         title: "Rejoindre maintenant ou définir un horaire",
         body: "Après la configuration Room SMARTview, choisissez Rejoindre maintenant ou Définir un horaire. Rejoindre maintenant ouvre la session BOT DEE tout de suite et ne met pas de carte sur Search. Définir un horaire, c’est le début de la room BOT DEE — pas Shared Itinerary. Une heure future active SMARTnotification Search pour vous et les amis Mingl invités seulement. Les invités RSVP jusqu’à ce que la room soit en ligne ; Join Now ouvre alors BOT DEE (pas Mingl chat)."
+      },
+      "help-botdee-room-collab": {
+        title: "Partager une réservation headless dans Room SMARTview",
+        body: "Dans une Room SMARTview, les choix VIP reserV ou ShoutOut de l’hôte apparaissent pour tout le monde. Les membres votent Oui ou Non. Hold it et le paiement restent à l’hôte — rejoindre et voter n’est pas un paiement. BOT DEE ne prend jamais de numéros de carte. Stripe s’ouvre dans un pop-out."
+      },
+      "help-botdee-room-elect-host": {
+        title: "Élire un hôte Room SMARTview",
+        body: "N’importe qui dans la session peut être hôte. Proposez-vous ou un autre membre. Un candidat devient hôte à 60 % des membres actuellement présents (arrondi supérieur). Si l’hôte part, les autres élisent un nouvel hôte — la room reste ouverte. Kick et End restent à l’hôte élu."
       },
       "help-botdee-smartview-review": {
         title: "Relire et corriger un SMARTsummary",
@@ -1691,6 +1715,14 @@
         title: "Jetzt beitreten oder Zeitplan festlegen",
         body: "Nach dem Room-SMARTview-Setup wählen Sie Jetzt beitreten oder Zeitplan festlegen. Jetzt beitreten öffnet die BOT DEE-Session sofort und legt keine Karte auf Search. Zeitplan festlegen ist der Start der BOT DEE-Room — nicht Shared Itinerary. Ein zukünftiger Zeitpunkt schaltet Search SMARTnotification nur für Sie und eingeladene Mingl-Freunde ein. Gäste sagen zu, bis die Room live ist; dann öffnet Join Now BOT DEE (nicht Mingl-Chat)."
       },
+      "help-botdee-room-collab": {
+        title: "Headless-Buchung in Room SMARTview teilen",
+        body: "In einer Room SMARTview sehen alle die VIP reserV- oder ShoutOut-Auswahl des Gastgebers. Mitglieder stimmen Ja oder Nein. Hold it und Bezahlen bleiben beim Gastgeber — Beitreten und Abstimmen ist keine Zahlung. BOT DEE nimmt niemals Kartennummern. Stripe öffnet in einem Pop-out."
+      },
+      "help-botdee-room-elect-host": {
+        title: "Room SMARTview-Gastgeber wählen",
+        body: "Jeder in der Session kann Gastgeber sein. Nominiere dich oder ein anderes Mitglied. Ein Kandidat wird Gastgeber bei 60 % der aktuell beigetretenen Mitglieder (aufgerundet). Wenn der Gastgeber geht, wählen die übrigen einen neuen — der Room bleibt offen. Kick und End bleiben beim gewählten Gastgeber."
+      },
       "help-botdee-smartview-review": {
         title: "SMARTsummary prüfen und korrigieren",
         body: "Gemini entwirft nur aus öffentlichen FLOQR-Feldern — nie bei jedem Öffnen. Falsche Fakten: Feld in der Profilsichtbarkeit ausblenden oder Summary selbst ändern. Ihr Text wird nicht überschrieben. Profilkonflikte verlangen Prüfung. Falsche Karten im Overlay melden."
@@ -2220,6 +2252,14 @@
       "help-botdee-room-smartview-schedule": {
         title: "Unirse ahora o fijar un horario",
         body: "Tras configurar Room SMARTview, elija Unirse ahora o Fijar un horario. Unirse ahora abre la sesión BOT DEE ya y no pone una tarjeta en Search. Fijar un horario es cuando empieza la room BOT DEE — no Shared Itinerary. Una hora futura activa SMARTnotification de Search solo para usted y amigos Mingl invitados. Los invitados confirman RSVP hasta que la room esté en vivo; entonces Join Now abre BOT DEE (no Mingl chat)."
+      },
+      "help-botdee-room-collab": {
+        title: "Compartir una reserva headless en Room SMARTview",
+        body: "En una Room SMARTview, las elecciones VIP reserV o ShoutOut del anfitrión aparecen para todos. Los miembros votan Sí o No. Hold it y el pago quedan con el anfitrión — unirse y votar no es un pago. BOT DEE nunca toma números de tarjeta. Stripe se abre en un pop-out."
+      },
+      "help-botdee-room-elect-host": {
+        title: "Elegir un anfitrión de Room SMARTview",
+        body: "Cualquiera en la sesión puede ser anfitrión. Nómate a ti o a otro miembro. Un candidato se convierte en anfitrión con el 60 % de los miembros actuales (redondeo hacia arriba). Si el anfitrión se va, el resto elige uno nuevo — la room sigue abierta. Kick y End quedan con el anfitrión elegido."
       },
       "help-botdee-smartview-review": {
         title: "Revisar y corregir un SMARTsummary",
@@ -2751,6 +2791,14 @@
         title: "Entra ora o imposta un orario",
         body: "Dopo il setup Room SMARTview, scegli Entra ora o Imposta un orario. Entra ora apre la sessione BOT DEE subito e non mette una scheda su Search. Imposta un orario è quando inizia la room BOT DEE — non Shared Itinerary. Un orario futuro attiva SMARTnotification di Search solo per te e gli amici Mingl invitati. Gli ospiti RSVP finché la room è live; poi Join Now apre BOT DEE (non Mingl chat)."
       },
+      "help-botdee-room-collab": {
+        title: "Condividere una prenotazione headless in Room SMARTview",
+        body: "In una Room SMARTview le scelte VIP reserV o ShoutOut dell’host appaiono a tutti. I membri votano Sì o No. Hold it e il pagamento restano all’host — unirsi e votare non è un pagamento. BOT DEE non prende mai numeri di carta. Stripe si apre in un pop-out."
+      },
+      "help-botdee-room-elect-host": {
+        title: "Eleggere un host Room SMARTview",
+        body: "Chiunque nella sessione può essere host. Candidati te stesso o un altro membro. Un candidato diventa host al 60% dei membri attualmente presenti (arrotondato per eccesso). Se l’host esce, gli altri eleggono un nuovo host — la room resta aperta. Kick e End restano all’host eletto."
+      },
       "help-botdee-smartview-review": {
         title: "Rivedi e correggi lo SMARTsummary",
         body: "Gemini bozza solo dai campi pubblici in FLOQR — non a ogni vista. Se un fatto è sbagliato, nascondi il campo o modifica il riassunto. Il tuo testo non viene sovrascritto. Un conflitto di profilo chiede revisione. Segnala una scheda errata dall’overlay."
@@ -3280,6 +3328,14 @@
       "help-botdee-room-smartview-schedule": {
         title: "Entrar agora ou definir um horário",
         body: "Depois da configuração Room SMARTview, escolha Entrar agora ou Definir um horário. Entrar agora abre a sessão BOT DEE já e não põe um cartão na Search. Definir um horário é quando a room BOT DEE começa — não Shared Itinerary. Uma hora futura liga SMARTnotification da Search só para si e amigos Mingl convidados. Convidados RSVP até a room estar ao vivo; depois Join Now abre BOT DEE (não Mingl chat)."
+      },
+      "help-botdee-room-collab": {
+        title: "Partilhar uma reserva headless no Room SMARTview",
+        body: "Num Room SMARTview, as escolhas VIP reserV ou ShoutOut do anfitrião aparecem para todos. Os membros votam Sim ou Não. Hold it e o pagamento ficam com o anfitrião — juntar-se e votar não é um pagamento. BOT DEE nunca pede números de cartão. O Stripe abre num pop-out."
+      },
+      "help-botdee-room-elect-host": {
+        title: "Eleger um anfitrião do Room SMARTview",
+        body: "Qualquer pessoa na sessão pode ser anfitrião. Nomeie-se a si ou a outro membro. Um candidato torna-se anfitrião com 60% dos membros atuais (arredondado para cima). Se o anfitrião sair, os restantes elegem um novo — a room fica aberta. Kick e End ficam com o anfitrião eleito."
       },
       "help-botdee-smartview-review": {
         title: "Rever e corrigir o SMARTsummary",
@@ -3811,6 +3867,14 @@
         title: "Συμμετοχή τώρα ή ορισμός προγράμματος",
         body: "Μετά το setup Room SMARTview επιλέξτε Συμμετοχή τώρα ή Ορισμός προγράμματος. Η συμμετοχή τώρα ανοίγει τη συνεδρία BOT DEE τώρα και δεν βάζει κάρτα στο Search. Ορισμός προγράμματος είναι η έναρξη του BOT DEE room — όχι Shared Itinerary. Μελλοντική ώρα ενεργοποιεί Search SMARTnotification μόνο για εσάς και προσκεκλημένους φίλους Mingl. Οι επισκέπτες RSVP μέχρι το room να είναι live· μετά το Join Now ανοίγει BOT DEE (όχι Mingl chat)."
       },
+      "help-botdee-room-collab": {
+        title: "Κοινή headless κράτηση στο Room SMARTview",
+        body: "Σε ένα Room SMARTview οι επιλογές VIP reserV ή ShoutOut του οικοδεσπότη φαίνονται σε όλους. Τα μέλη ψηφίζουν Ναι ή Όχι. Το Hold it και η πληρωμή μένουν στον οικοδεσπότη — η συμμετοχή και η ψήφος δεν είναι πληρωμή. Το BOT DEE δεν παίρνει ποτέ αριθμούς κάρτας. Το Stripe ανοίγει σε pop-out."
+      },
+      "help-botdee-room-elect-host": {
+        title: "Εκλογή οικοδεσπότη Room SMARTview",
+        body: "Οποιοσδήποτε στη συνεδρία μπορεί να είναι οικοδεσπότης. Προτείνετε τον εαυτό σας ή άλλο μέλος. Ένας υποψήφιος γίνεται οικοδεσπότης στο 60% των τρεχόντων μελών (στρογγυλοποίηση προς τα πάνω). Αν φύγει ο οικοδεσπότης, οι υπόλοιποι εκλέγουν νέο — το room μένει ανοιχτό. Kick και End μένουν στον εκλεγμένο οικοδεσπότη."
+      },
       "help-botdee-smartview-review": {
         title: "Έλεγχος και διόρθωση SMARTsummary",
         body: "Το Gemini συντάσσει μόνο από δημόσια πεδία FLOQR — όχι σε κάθε προβολή. Λάθος γεγονός: αποκρύψτε το πεδίο ή επεξεργαστείτε την περίληψη. Το κείμενό σας δεν αντικαθίσταται. Σύγκρουση προφίλ ζητά έλεγχο. Αναφέρετε λάθος κάρτα από την επικάλυψη."
@@ -4341,6 +4405,14 @@
         title: "Dołącz teraz lub ustaw harmonogram",
         body: "Po konfiguracji Room SMARTview wybierz Dołącz teraz lub Ustaw harmonogram. Dołącz teraz otwiera sesję BOT DEE od razu i nie kładzie karty na Search. Ustaw harmonogram to start room BOT DEE — nie Shared Itinerary. Przyszła godzina włącza Search SMARTnotification tylko dla Ciebie i zaproszonych znajomych Mingl. Goście RSVP, aż room będzie na żywo; potem Join Now otwiera BOT DEE (nie Mingl chat)."
       },
+      "help-botdee-room-collab": {
+        title: "Udostępnij rezerwację headless w Room SMARTview",
+        body: "W Room SMARTview wybory VIP reserV lub ShoutOut gospodarza widzą wszyscy. Członkowie głosują Tak lub Nie. Hold it i płatność zostają u gospodarza — dołączenie i głos to nie płatność. BOT DEE nigdy nie bierze numerów kart. Stripe otwiera się w pop-out."
+      },
+      "help-botdee-room-elect-host": {
+        title: "Wybierz gospodarza Room SMARTview",
+        body: "Każdy w sesji może być gospodarzem. Nominuj siebie lub innego członka. Kandydat zostaje gospodarzem przy 60% aktualnych członków (zaokrąglenie w górę). Jeśli gospodarz wyjdzie, pozostali wybierają nowego — room zostaje otwarty. Kick i End zostają u wybranego gospodarza."
+      },
       "help-botdee-smartview-review": {
         title: "Przejrzyj i popraw SMARTsummary",
         body: "Gemini szkicuje tylko z publicznych pól FLOQR — nie przy każdym otwarciu. Błędny fakt: ukryj pole lub edytuj podsumowanie. Twój tekst nie jest nadpisywany. Konflikt profilu prosi o przegląd. Zgłoś błędną kartę z nakładki."
@@ -4870,6 +4942,14 @@
       "help-botdee-room-smartview-schedule": {
         title: "انضم الآن أو عيّن جدولاً",
         body: "بعد إعداد Room SMARTview اختر انضم الآن أو تعيين جدول. انضم الآن يفتح جلسة BOT DEE فوراً ولا يضع بطاقة على Search. تعيين جدول هو وقت بدء room BOT DEE — وليس Shared Itinerary. وقت مستقبلي يفعّل SMARTnotification في Search لك ولأصدقاء Mingl المدعوين فقط. الضيوف يؤكدون RSVP حتى تصبح الـ room مباشرة؛ ثم Join Now يفتح BOT DEE (وليس Mingl chat)."
+      },
+      "help-botdee-room-collab": {
+        title: "مشاركة حجز headless في Room SMARTview",
+        body: "في Room SMARTview تظهر اختيارات المضيف لـ VIP reserV أو ShoutOut للجميع. يصوّت الأعضاء بنعم أو لا. يبقى Hold it والدفع لدى المضيف — الانضمام والتصويت ليسا دفعًا. BOT DEE لا يأخذ أرقام بطاقات أبدًا. يفتح Stripe في نافذة منبثقة."
+      },
+      "help-botdee-room-elect-host": {
+        title: "انتخاب مضيف Room SMARTview",
+        body: "أي شخص في الجلسة يمكن أن يكون مضيفًا. رشّح نفسك أو عضوًا آخر. يصبح المرشح مضيفًا عند 60٪ من الأعضاء الحاليين (تقريب لأعلى). إذا غادر المضيف، ينتخب الباقون مضيفًا جديدًا — تبقى الغرفة مفتوحة. يبقى Kick و End لدى المضيف المنتخب."
       },
       "help-botdee-smartview-review": {
         title: "مراجعة وتصحيح SMARTsummary",

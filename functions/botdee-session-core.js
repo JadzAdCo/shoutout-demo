@@ -5,6 +5,7 @@
 const crypto = require("crypto");
 
 const MEMBER_CAP = 8;
+const HOST_ELECTION_RATIO = 0.6;
 const TOKEN_BYTES = 32;
 const INVITE_TTL_MS = 24 * 60 * 60 * 1000;
 const ROOM_TTL_MS = 4 * 60 * 60 * 1000;
@@ -171,6 +172,299 @@ function currentMembers(row) {
 
 function isCurrentMember(row, uid) {
   return currentMembers(row).includes(text(uid, 80));
+}
+
+function isHostActor(row, uid) {
+  return text(row?.hostUid, 80) === text(uid, 80) && !!text(uid, 80);
+}
+
+function votesNeeded(memberCount) {
+  const n = Math.max(0, Math.floor(Number(memberCount) || 0));
+  if (n <= 0) return 1;
+  return Math.max(1, Math.ceil(n * HOST_ELECTION_RATIO));
+}
+
+function clipVoteMap(raw) {
+  const out = {};
+  if (!raw || typeof raw !== "object") return out;
+  Object.keys(raw).slice(0, MEMBER_CAP).forEach(uid => {
+    const id = text(uid, 80);
+    const vote = text(raw[uid], 8).toLowerCase();
+    if (id && (vote === "yes" || vote === "no")) out[id] = vote;
+  });
+  return out;
+}
+
+function tallyVotes(members, votes) {
+  const ids = Array.isArray(members) ? members.map(id => text(id, 80)).filter(Boolean) : [];
+  const map = clipVoteMap(votes);
+  let yes = 0;
+  let no = 0;
+  ids.forEach(id => {
+    if (map[id] === "yes") yes += 1;
+    else if (map[id] === "no") no += 1;
+  });
+  const needed = votesNeeded(ids.length);
+  return {
+    memberCount: ids.length,
+    yes,
+    no,
+    needed,
+    ratio: HOST_ELECTION_RATIO,
+    passed: yes >= needed
+  };
+}
+
+function emptyHostBallot() {
+  return {candidateUid: "", openedAtMs: 0, votes: {}};
+}
+
+function clipHostBallot(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  return {
+    candidateUid: text(row.candidateUid, 80),
+    openedAtMs: Math.max(0, Math.floor(Number(row.openedAtMs) || 0)),
+    votes: clipVoteMap(row.votes)
+  };
+}
+
+function clipTransactionSnapshot(kind, snapshot) {
+  const row = snapshot && typeof snapshot === "object" ? snapshot : {};
+  if (kind === "shoutout") {
+    return {
+      venueName: text(row.venueName, 80),
+      clubLocationId: text(row.clubLocationId || row.clubQuery, 120),
+      templateId: text(row.templateId, 80),
+      templateName: text(row.templateName, 80),
+      handle: text(row.handle || row.attribution, 40),
+      mode: text(row.mode, 24)
+    };
+  }
+  return {
+    venueName: text(row.venueName, 80),
+    clubLocationId: text(row.clubLocationId || row.clubQuery, 120),
+    night: text(row.night, 12),
+    sectionId: text(row.sectionId, 80),
+    sectionLabel: text(row.sectionLabel, 80),
+    partySize: Math.max(0, Math.min(40, Math.floor(Number(row.partySize) || 0))),
+    maxCapacity: Math.max(0, Math.min(40, Math.floor(Number(row.maxCapacity) || 0))),
+    mode: text(row.mode, 24)
+  };
+}
+
+function choiceIdFromSnapshot(kind, snapshot) {
+  const clipped = clipTransactionSnapshot(kind, snapshot);
+  if (kind === "shoutout") {
+    return text(`${kind}|${clipped.clubLocationId}|${clipped.templateId}|${clipped.handle}`, 80);
+  }
+  return text(
+    `${kind}|${clipped.clubLocationId}|${clipped.night}|${clipped.sectionId}|${clipped.partySize}`,
+    80
+  );
+}
+
+function clipSharedTransaction(raw, {nowMs} = {}) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const kind = text(row.kind, 24) === "shoutout" ? "shoutout" : (text(row.kind, 24) === "vip" ? "vip" : "");
+  if (!kind) {
+    return {kind: "", choiceId: "", hostUid: "", proposedAtMs: 0, snapshot: {}, votes: {}};
+  }
+  const snapshot = clipTransactionSnapshot(kind, row.snapshot);
+  return {
+    kind,
+    choiceId: text(row.choiceId, 80) || choiceIdFromSnapshot(kind, snapshot),
+    hostUid: text(row.hostUid, 80),
+    proposedAtMs: Math.max(0, Math.floor(Number(row.proposedAtMs || nowMs) || 0)),
+    snapshot,
+    votes: clipVoteMap(row.votes)
+  };
+}
+
+function proposeSharedTransaction({room, actorUid, kind, snapshot, nowMs}) {
+  if (!roomIsOpen(room)) return {ok: false, reason: "closed"};
+  const actor = text(actorUid, 80);
+  if (!isCurrentMember(room, actor)) return {ok: false, reason: "not_member"};
+  if (!isHostActor(room, actor)) return {ok: false, reason: "not_host"};
+  const nextKind = text(kind, 24) === "shoutout" ? "shoutout" : "vip";
+  const proposed = clipSharedTransaction({
+    kind: nextKind,
+    hostUid: actor,
+    snapshot,
+    proposedAtMs: nowMs,
+    votes: {}
+  }, {nowMs});
+  const prev = clipSharedTransaction(room.sharedTransaction);
+  if (prev.choiceId && prev.choiceId === proposed.choiceId) {
+    return {
+      ok: true,
+      sharedTransaction: {
+        ...prev,
+        snapshot: proposed.snapshot,
+        hostUid: actor,
+        proposedAtMs: prev.proposedAtMs || proposed.proposedAtMs
+      }
+    };
+  }
+  proposed.votes = {[actor]: "yes"};
+  return {ok: true, sharedTransaction: proposed};
+}
+
+function voteSharedTransaction({room, actorUid, ballot, choiceId}) {
+  if (!roomIsOpen(room)) return {ok: false, reason: "closed"};
+  const actor = text(actorUid, 80);
+  if (!isCurrentMember(room, actor)) return {ok: false, reason: "not_member"};
+  const txn = clipSharedTransaction(room.sharedTransaction);
+  if (!txn.choiceId) return {ok: false, reason: "no_choice"};
+  if (choiceId && text(choiceId, 80) !== txn.choiceId) return {ok: false, reason: "stale_choice"};
+  const vote = text(ballot, 8).toLowerCase() === "no" ? "no" : "yes";
+  const next = {...txn, votes: clipVoteMap({...txn.votes, [actor]: vote})};
+  return {ok: true, sharedTransaction: next, tally: tallyVotes(currentMembers(room), next.votes)};
+}
+
+function canCommitSharedChoice(room) {
+  const members = currentMembers(room);
+  const tally = tallyVotes(members, clipSharedTransaction(room.sharedTransaction).votes);
+  if (members.length <= 1) return {ok: true, reason: "", tally};
+  const txn = clipSharedTransaction(room.sharedTransaction);
+  if (!txn.choiceId) return {ok: false, reason: "no_choice", tally};
+  if (!tally.passed) return {ok: false, reason: "choice_not_ready", tally};
+  return {ok: true, reason: "", tally};
+}
+
+function nominateHost({room, actorUid, candidateUid, nowMs}) {
+  if (!roomIsOpen(room)) return {ok: false, reason: "closed"};
+  const actor = text(actorUid, 80);
+  const candidate = text(candidateUid || actor, 80);
+  if (!isCurrentMember(room, actor) || !isCurrentMember(room, candidate)) {
+    return {ok: false, reason: "not_member"};
+  }
+  const ballot = clipHostBallot({
+    candidateUid: candidate,
+    openedAtMs: nowMs,
+    votes: {[actor]: "yes"}
+  });
+  const tally = tallyVotes(currentMembers(room), ballot.votes);
+  if (tally.passed) {
+    return {
+      ok: true,
+      hostUid: candidate,
+      hostBallot: emptyHostBallot(),
+      elected: true,
+      tally
+    };
+  }
+  return {
+    ok: true,
+    hostUid: text(room.hostUid, 80),
+    hostBallot: ballot,
+    elected: false,
+    tally
+  };
+}
+
+function voteHost({room, actorUid, ballot}) {
+  if (!roomIsOpen(room)) return {ok: false, reason: "closed"};
+  const actor = text(actorUid, 80);
+  if (!isCurrentMember(room, actor)) return {ok: false, reason: "not_member"};
+  const current = clipHostBallot(room.hostBallot);
+  if (!current.candidateUid) return {ok: false, reason: "no_ballot"};
+  if (!isCurrentMember(room, current.candidateUid)) return {ok: false, reason: "not_member"};
+  const vote = text(ballot, 8).toLowerCase() === "no" ? "no" : "yes";
+  const next = clipHostBallot({...current, votes: {...current.votes, [actor]: vote}});
+  const tally = tallyVotes(currentMembers(room), next.votes);
+  if (tally.passed) {
+    return {
+      ok: true,
+      hostUid: current.candidateUid,
+      hostBallot: emptyHostBallot(),
+      elected: true,
+      tally
+    };
+  }
+  return {
+    ok: true,
+    hostUid: text(room.hostUid, 80),
+    hostBallot: next,
+    elected: false,
+    tally
+  };
+}
+
+function applyMemberExit(room, departingUid) {
+  const gone = text(departingUid, 80);
+  const remaining = currentMembers(room).filter(id => id !== gone);
+  const txn = clipSharedTransaction(room.sharedTransaction);
+  if (txn.choiceId) {
+    const votes = {...txn.votes};
+    delete votes[gone];
+    txn.votes = clipVoteMap(votes);
+  }
+  let ballot = clipHostBallot(room.hostBallot);
+  const ballotVotes = {...ballot.votes};
+  delete ballotVotes[gone];
+  ballot.votes = clipVoteMap(ballotVotes);
+  if (ballot.candidateUid === gone) ballot = emptyHostBallot();
+  let hostUid = text(room.hostUid, 80);
+  let hostChanged = false;
+  if (!remaining.length) {
+    return {
+      end: true,
+      memberUids: [],
+      hostUid: "",
+      hostBallot: emptyHostBallot(),
+      sharedTransaction: txn.choiceId ? txn : null,
+      hostChanged: false
+    };
+  }
+  if (!hostUid || hostUid === gone || !remaining.includes(hostUid)) {
+    if (remaining.length === 1) {
+      hostUid = remaining[0];
+      ballot = emptyHostBallot();
+      hostChanged = true;
+    } else {
+      hostUid = "";
+      hostChanged = true;
+    }
+  }
+  return {
+    end: false,
+    memberUids: remaining,
+    hostUid,
+    hostBallot: ballot,
+    sharedTransaction: txn.choiceId ? txn : null,
+    hostChanged
+  };
+}
+
+function publicCollab(row, viewerUid) {
+  const viewer = text(viewerUid, 80);
+  const members = currentMembers(row);
+  const txn = clipSharedTransaction(row.sharedTransaction);
+  const ballot = clipHostBallot(row.hostBallot);
+  const choiceTally = tallyVotes(members, txn.votes);
+  const hostTally = ballot.candidateUid
+    ? tallyVotes(members, ballot.votes)
+    : {
+      memberCount: members.length,
+      yes: 0,
+      no: 0,
+      needed: votesNeeded(members.length),
+      ratio: HOST_ELECTION_RATIO,
+      passed: false
+    };
+  return {
+    electionRatio: HOST_ELECTION_RATIO,
+    hostUid: text(row.hostUid, 80),
+    hostVacant: !text(row.hostUid, 80),
+    viewerIsHost: isHostActor(row, viewer),
+    sharedTransaction: txn.choiceId ? txn : null,
+    hostBallot: ballot.candidateUid ? ballot : null,
+    choiceTally,
+    hostTally,
+    viewerChoiceVote: txn.votes[viewer] || "",
+    viewerHostVote: ballot.votes[viewer] || "",
+    canCommit: canCommitSharedChoice(row).ok
+  };
 }
 
 function canInviteMore(row, actorUid, memberRow) {
@@ -349,7 +643,8 @@ function publicRoom(id, row, extra = {}) {
     minglFriendsOnly: true,
     guestsCanInvite: true,
     tabOptIn: extra.tabOptIn === true,
-    charge: false
+    charge: false,
+    collab: publicCollab(row, extra.viewerUid || "")
   };
 }
 
@@ -524,13 +819,30 @@ function denialMessage(reason) {
     past: "Pick a future time for the BOT DEE room.",
     already_open: "This BOT DEE session is already live.",
     not_scheduled: "That BOT DEE room is not scheduled.",
-    not_live: "This BOT DEE room is not live yet."
+    not_live: "This BOT DEE room is not live yet.",
+    no_choice: "The host has not shared a pick to vote on yet.",
+    stale_choice: "That pick changed. Vote the current table or ShoutOut.",
+    no_ballot: "No host vote is open. Nominate someone first.",
+    choice_not_ready: "Need 60% yes from joined members before the host can hold."
   };
   return map[reason] || map.not_found;
 }
 
+
+function holdGateMessage(reason) {
+  const code = text(reason, 40);
+  if (code === "not_found" || code === "closed") {
+    return "This Room SMARTview is not open for that hold. Vote with the group, or leave the room first.";
+  }
+  if (code === "not_host" || code === "not_member" || code === "no_choice" || code === "stale_choice" || code === "choice_not_ready") {
+    return denialMessage(code);
+  }
+  return "Could not confirm the room vote. Hold it stays with the host after 60% yes. Try again.";
+}
+
 module.exports = {
   MEMBER_CAP,
+  HOST_ELECTION_RATIO,
   TOKEN_BYTES,
   INVITE_TTL_MS,
   ROOM_TTL_MS,
@@ -564,6 +876,22 @@ module.exports = {
   lastLogoutShouldClose,
   currentMembers,
   isCurrentMember,
+  isHostActor,
+  votesNeeded,
+  clipVoteMap,
+  tallyVotes,
+  emptyHostBallot,
+  clipHostBallot,
+  clipTransactionSnapshot,
+  choiceIdFromSnapshot,
+  clipSharedTransaction,
+  proposeSharedTransaction,
+  voteSharedTransaction,
+  canCommitSharedChoice,
+  nominateHost,
+  voteHost,
+  applyMemberExit,
+  publicCollab,
   canInviteMore,
   inviteeAllowed,
   classifyInviteTarget,
@@ -586,5 +914,6 @@ module.exports = {
   closeTabPlan,
   unpaidTabBlocksDelete,
   rateLimitOk,
-  denialMessage
+  denialMessage,
+  holdGateMessage
 };

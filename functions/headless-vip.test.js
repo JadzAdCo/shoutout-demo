@@ -92,14 +92,16 @@ test("Aurelia display name hides demo slug", () => {
   assert.equal(parsed.partySize, 4);
 });
 
-test("repeating the selected table is a hold, not a no-op", () => {
+test("repeating the selected table is a re-select, not an auto-hold", () => {
   const parsed = vip.parseVipExecute("VIP reserV at Aurelia");
   let draft = vip.mergeInteractiveDraft(null, parsed);
   draft = vip.applySectionMatch(draft, "V1").draft;
   assert.equal(draft.sectionId, "aurelia-v1");
   assert.equal(vip.isRepeatSelectedSection("V1", draft), true);
-  assert.equal(vip.isRepeatSelectedSection("v1", draft), true);
-  assert.equal(vip.isRepeatSelectedSection("Mezzanine", draft), false);
+  assert.equal(vip.isConfirmHoldPrompt("V1"), false);
+  assert.equal(vip.isConfirmHoldPrompt("hold it"), true);
+  assert.equal(vip.clampPartySize(12, 4), 4);
+  assert.ok(vip.listBookableVenues().some(row => row.id === "temp-democlub-1"));
 });
 
 test("Mezzanine follow-up after a VIP draft", () => {
@@ -126,7 +128,9 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   assert.match(session, /the VIP reserV hold/);
   assert.match(session, /mode: "cancelled"/);
   assert.match(session, /wantsTerms/);
-  assert.match(session, /isRepeatSelectedSection/);
+  assert.match(session, /wantsHold = parsed.confirmHold/);
+  assert.match(session, /getVipFloorStatus/);
+  assert.doesNotMatch(session, /repeatingTable/);
   assert.match(session, /clubDisplayName/);
   assert.match(session, /Tap Hold it/);
   assert.match(session, /VIP reserV could not place that hold/);
@@ -140,6 +144,10 @@ test("session intercepts headless VIP and fuzzy createVipHold", () => {
   assert.match(tools, /parseNight/);
   assert.match(tools, /That table could not be held/);
   assert.match(tools, /async function releaseVipHold/);
+  assert.match(tools, /async function getVipFloorStatus/);
+  assert.match(tools, /botDeePopout: true/);
+  assert.match(tools, /botdee-vip-popout.html/);
+  assert.doesNotMatch(tools, /passHref: "\.\/vip\.html/);
   assert.match(tools, /return toolError\(error\)/);
   const core = read("functions/bot-dee-core.js");
   assert.match(core, /getVipAvailability/);
@@ -166,16 +174,34 @@ test("VIP dock has a Hold it CTA and strips the demo slug", () => {
   assert.match(smart, /botdee-vip-map/);
   assert.match(smart, /botdee-vip-map-stage/);
   assert.doesNotMatch(smart, /background-position:\$\{posX\}/);
-  assert.match(smart, /mode === "cancelled"/);
+  assert.match(smart, /mode !== "cancelled"/);
   assert.match(smart, /botdee-vip-rail/);
   assert.match(smart, /data-vip-prompt="hold it"/);
   assert.match(smart, /data-vip-prompt="I agree"/);
+  assert.match(smart, /data-vip-popout="pay"/);
+  assert.match(smart, /data-vip-popout="map"/);
+  assert.match(smart, /botdee-vip-popout.html/);
+  assert.doesNotMatch(smart, /vip\.html/);
   assert.match(smart, /temp-democlub-1/i);
   const css = read("botdee-smartview.css");
   assert.match(css, /\.botdee-sv-vip \.botdee-sv-action-main/);
+  assert.match(css, /\.botdee-vip-seat\.is-booked/);
   const chat = read("bot-dee-chat.js");
   assert.match(chat, /documentElement\.clientHeight/);
   const dockCss = read("bot-dee-chat.css");
   assert.match(dockCss, /\.botdee-vip-dock\.is-open[\s\S]{0,180}--botdee-kb/);
   assert.doesNotMatch(dockCss, /\.botdee-vip-dock\.is-open[\s\S]{0,80}flex:\s*0 0 auto/);
+  const popout = read("botdee-vip-popout.html");
+  assert.match(popout, /floqr-botdee-vip/);
+  assert.match(popout, /kind === "paid" \|\| kind === "pass"/);
+  assert.match(smart, /function stopHoldClock/);
+  assert.match(smart, /mode === "hold" \|\| mode === "checkout"/);
+  assert.match(smart, /searchParams\.set\("kind"/);
+  const session = read("functions/bot-dee-functions.js");
+  assert.match(session, /if \(checkout\.checkoutUrl\) \{\s*try \{ await threadsMod\.persistHeadlessVipDraft\(uid, merged\);/);
+  assert.doesNotMatch(session, /persistHeadlessVipDraft\(uid, null\); \} catch \(_\) \{\}[\s\S]{0,80}mode: checkout\.checkoutUrl/);
+  const commerce = read("functions/commerce-functions.js");
+  assert.match(commerce, /botdee-vip-popout.html/);
+  const fallback = read("functions/bot-dee-core.js");
+  assert.doesNotMatch(fallback, /vip\.html\?from=botdee/);
 });

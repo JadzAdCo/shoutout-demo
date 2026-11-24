@@ -236,7 +236,7 @@ function isVipExecutePrompt(raw) {
 
 function isOverviewPrompt(raw) {
   const q = fold(raw);
-  return /^(all areas|overview|whole floor|full map|floor plan)$/.test(q);
+  return /^(all areas|overview|whole floor|full map|floor plan|change table|show map)$/.test(q);
 }
 
 function addDaysIso(iso, days) {
@@ -256,18 +256,24 @@ function formatNightChip(iso) {
   return dt.toLocaleDateString("en-US", {weekday: "short", month: "short", day: "numeric"});
 }
 
-function nightOptions(selectedIso, count = 7) {
+function nightOptions(selectedIso, count = 7, nightMeta = []) {
   const start = tonightIso();
   const selected = parseNight(selectedIso) || start;
   const want = Math.max(3, Math.min(14, Math.floor(Number(count) || 7)));
+  const meta = Array.isArray(nightMeta) ? nightMeta : [];
+  const byIso = new Map(meta.map(row => [parseNight(row.iso || row.night), row]).filter(pair => pair[0]));
   const out = [];
   for (let i = 0; i < want; i += 1) {
     const iso = addDaysIso(start, i);
+    const extra = byIso.get(iso) || {};
+    const closed = extra.closed === true || extra.open === false || extra.nightOpen === false;
     out.push({
       iso,
       prompt: iso === start ? "tonight" : iso,
       label: formatNightChip(iso),
-      selected: iso === selected
+      selected: iso === selected,
+      closed,
+      hours: text(extra.hours || extra.label, 40)
     });
   }
   return out;
@@ -319,9 +325,10 @@ function pickSelectedArea(plan, draft) {
   return null;
 }
 
-function mapLiteForClub(clubLocationId, draft) {
+function mapLiteForClub(clubLocationId, draft, opts = {}) {
   const plan = loadPlan(clubLocationId);
   if (!plan) return null;
+  const full = !!(opts && opts.full);
   const file = text(plan.image?.file, 200).replace(/^\.\//, "");
   const areas = (Array.isArray(plan.areas) ? plan.areas : []).map(area => ({
     id: text(area.id, 80),
@@ -329,13 +336,13 @@ function mapLiteForClub(clubLocationId, draft) {
     prompt: shortAreaName(area.name || area.defaultName || area.label),
     bounds: area.viewBox || area.bounds || area.rect || null
   })).filter(area => area.id && area.name);
-  const selected = pickSelectedArea(plan, draft);
+  const selected = full ? null : pickSelectedArea(plan, draft);
   const viewBox = selected
     ? (selected.viewBox || selected.bounds || selected.rect || {x: 0, y: 0, w: 1, h: 1})
     : {x: 0, y: 0, w: 1, h: 1};
   const ids = new Set(selected?.sectionIds || []);
   const tables = (Array.isArray(plan.sections) ? plan.sections : [])
-    .filter(row => row && row.bookable !== false && (!selected || ids.has(row.id)))
+    .filter(row => row && row.bookable !== false && (full || !selected || ids.has(row.id)))
     .map(row => {
       const rect = sectionRect(row);
       if (!rect || rect.w <= 0 || rect.h <= 0) return null;
@@ -344,6 +351,8 @@ function mapLiteForClub(clubLocationId, draft) {
         label: text(row.label || row.id, 80),
         prompt: text(row.label || row.id, 80),
         selected: row.id === clipInteractiveDraft(draft).sectionId,
+        maxCapacity: Math.max(0, Math.floor(Number(row.maxCapacity) || 0)),
+        status: "available",
         rect
       };
     })
@@ -354,8 +363,26 @@ function mapLiteForClub(clubLocationId, draft) {
     selectedAreaName: selected ? shortAreaName(selected.name || selected.defaultName) : "",
     viewBox,
     areas,
-    tables: selected ? tables : []
+    tables: (full || selected) ? tables : []
   };
+}
+
+function applyFloorStatus(map, sections = []) {
+  if (!map || typeof map !== "object") return map;
+  const byId = new Map((Array.isArray(sections) ? sections : []).map(row => [text(row.sectionId || row.id, 80), row]));
+  const tables = (Array.isArray(map.tables) ? map.tables : []).map(table => {
+    const hit = byId.get(text(table.id, 80));
+    if (!hit) return table;
+    const status = text(hit.status, 24) || "available";
+    return {
+      ...table,
+      status,
+      maxCapacity: Math.max(0, Math.floor(Number(hit.maxCapacity || table.maxCapacity) || 0)),
+      holdExpiresAtMs: Math.max(0, Math.floor(Number(hit.holdExpiresAtMs) || 0)),
+      selectable: status === "available" || status === "held"
+    };
+  });
+  return {...map, tables};
 }
 
 function isRepeatSelectedSection(raw, draft) {
@@ -390,6 +417,31 @@ function isBareAffirmative(raw) {
   return /^(yes|yep|yeah|ok|okay|sure|please|do it)$/i.test(String(raw || "").trim());
 }
 
+function listBookableVenues() {
+  return Object.keys(betaCatalog || {}).filter(id => {
+    const row = betaCatalog[id] || {};
+    return row && row.planFile && row.pending !== true;
+  }).map(id => ({
+    id,
+    name: clubDisplayName(id),
+    prompt: `at ${clubDisplayName(id)}`,
+    city: text(betaCatalog[id]?.city, 80)
+  }));
+}
+
+function sectionCapacity(clubLocationId, sectionId) {
+  const row = (sectionsForClub(clubLocationId) || []).find(item => item.id === text(sectionId, 80));
+  const cap = Math.max(0, Math.floor(Number(row?.maxCapacity || 0)));
+  return cap || 0;
+}
+
+function clampPartySize(size, maxCapacity) {
+  const cap = Math.max(0, Math.floor(Number(maxCapacity) || 0));
+  const n = Math.max(0, Math.min(40, Math.floor(Number(size) || 0)));
+  if (cap > 0 && n > cap) return cap;
+  return n;
+}
+
 function emptyDraft() {
   return {
     clubQuery: "",
@@ -398,8 +450,10 @@ function emptyDraft() {
     sectionLabel: "",
     sectionQuery: "",
     partySize: 0,
+    maxCapacity: 0,
     holdId: "",
     consentId: "",
+    holdExpiresAtMs: 0,
     matches: []
   };
 }
@@ -422,8 +476,10 @@ function clipInteractiveDraft(draft = {}) {
     sectionLabel: text(row.sectionLabel, 80),
     sectionQuery: text(row.sectionQuery, 80),
     partySize: Math.max(0, Math.min(40, Math.floor(Number(row.partySize) || 0))),
+    maxCapacity: Math.max(0, Math.min(40, Math.floor(Number(row.maxCapacity) || 0))),
     holdId: text(row.holdId, 80),
     consentId: text(row.consentId, 80),
+    holdExpiresAtMs: Math.max(0, Math.floor(Number(row.holdExpiresAtMs) || 0)),
     matches
   };
 }
@@ -440,8 +496,11 @@ function mergeInteractiveDraft(previous, parsed = {}) {
   if (Array.isArray(parsed.matches)) next.matches = clipInteractiveDraft({matches: parsed.matches}).matches;
   if (parsed.holdId) next.holdId = parsed.holdId;
   if (parsed.consentId) next.consentId = parsed.consentId;
+  if (parsed.holdExpiresAtMs) next.holdExpiresAtMs = Math.max(0, Math.floor(Number(parsed.holdExpiresAtMs) || 0));
   if (!next.night) next.night = tonightIso();
+  if (next.sectionId && !next.maxCapacity) next.maxCapacity = sectionCapacity(next.clubQuery, next.sectionId);
   if (!next.partySize) next.partySize = DEFAULT_PARTY;
+  next.partySize = clampPartySize(next.partySize, next.maxCapacity);
   return next;
 }
 
@@ -458,11 +517,14 @@ function interactiveNeeds(draft) {
 function isInteractiveFollowUp(raw, draft) {
   if (!draft || typeof draft !== "object") return false;
   const row = clipInteractiveDraft(draft);
-  if (!row.clubQuery) return false;
   const source = String(raw || "").trim();
   if (!source || source.length > 200) return false;
   if (isVipExecutePrompt(source) || isCancelVipPrompt(source) || isConfirmHoldPrompt(source) || isAcceptTermsPrompt(source)) {
     return true;
+  }
+  if (resolveClubQuery(source)) return true;
+  if (!row.clubQuery) {
+    return !!(parseNight(source) || parsePartySize(source) || isOverviewPrompt(source));
   }
   if (isOverviewPrompt(source)) return true;
   if (parseNight(source) || parsePartySize(source)) return true;
@@ -534,9 +596,12 @@ function applySectionMatch(draft, query) {
   if (match.ok && match.matches[0]) {
     next.sectionId = match.matches[0].id;
     next.sectionLabel = match.matches[0].label;
+    next.maxCapacity = Math.max(0, Math.floor(Number(match.matches[0].maxCapacity) || sectionCapacity(club, next.sectionId)));
+    next.partySize = clampPartySize(next.partySize || DEFAULT_PARTY, next.maxCapacity);
   } else {
     next.sectionId = "";
     next.sectionLabel = "";
+    next.maxCapacity = 0;
   }
   return {draft: next, match};
 }
@@ -570,6 +635,10 @@ module.exports = {
   addDaysIso,
   nightOptions,
   mapLiteForClub,
+  applyFloorStatus,
+  listBookableVenues,
+  clampPartySize,
+  sectionCapacity,
   emptyDraft,
   clipInteractiveDraft,
   mergeInteractiveDraft,

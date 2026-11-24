@@ -509,14 +509,9 @@ function vipExecuteFallback(lang, allowedFeatures) {
       model: "vipReservations"
     };
   }
-  const link = localizeActionLink({
-    label: "Open VIP reserV",
-    href: "./vip.html?from=botdee",
-    kind: "vip"
-  }, code);
   return {
-    reply: "I can hold a VIP table from chat — name the club, night, and table or area (Mezzanine, V1, C10). Joining a BOT DEE room is not a payment. You can also open the VIP reserV map.",
-    results: [link],
+    reply: "I can hold a VIP table from this BOT DEE chat — name the club, night, and table or area (Mezzanine, V1, C10). Map, Terms, Stripe, and the pass open as pop-outs. Joining a BOT DEE room is not a payment.",
+    results: [],
     provider: "local-vip",
     model: "vipReservations"
   };

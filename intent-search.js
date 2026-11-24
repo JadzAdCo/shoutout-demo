@@ -134,7 +134,7 @@
       featureKey: "vipReservations",
       label: "VIP reserV — book a VIP table",
       blurb: "Explore a club floor map and reserve a VIP table. Beta: Decades, Lima Twist Club, Aurelia.",
-      href: pageUrl("./vip.html", {from: "botdee"}),
+      href: pageUrl("./botdee.html", {from: "botdee"}),
       searchPhrases: [
         "vip reserv", "vipreserv", "vip table", "book a table", "book vip", "reserve a table",
         "do a reservation", "hold a table", "hold a table at aurelia",
@@ -262,7 +262,8 @@
         "join room smartview", "joined bot dee session", "confirm room smartview",
         "review bot dee invite", "let's plan our cancun trip", "let's plan a trip to cancun",
         "plan a cancun trip", "cancun trip with friends", "schedule a room",
-        "join now or set a schedule", "when does the room expire"
+        "join now or set a schedule", "when does the room expire",
+        "vote the table", "make me host"
       ],
       patterns: [
         /room\s*smart\s*view/,
@@ -292,6 +293,24 @@
         /join\s+at\s+scheduled\s+time/,
         /when\s+does\s+the\s+room\s+expire/
       ]
+    },
+    {
+      id: "help-botdee-room-collab",
+      kind: "help",
+      label: "Vote shared VIP reserV picks",
+      blurb: "In a Room SMARTview, members vote Yes or No on the host's VIP reserV or ShoutOut pick. Hold it and pay stay with the host. Joining and voting are not a payment.",
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
+      searchPhrases: ["vote the table", "share vip reserv", "vote host pick", "headless booking vote", "shared picks"],
+      patterns: [/vote\s+(the\s+)?(table|pick|host)/, /shared\s+picks/, /headless\s+booking/]
+    },
+    {
+      id: "help-botdee-room-elect-host",
+      kind: "help",
+      label: "Elect a Room SMARTview host",
+      blurb: "Anyone in the session can be host. A candidate wins at 60 percent of currently joined members. If the host leaves, remaining members elect a new one — the room stays open.",
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
+      searchPhrases: ["make me host", "elect host", "vote for host", "60 percent host", "change room host"],
+      patterns: [/make\s+me\s+host/, /elect\s+(a\s+)?host/, /60\s*percent\s+host/]
     },
     {
       id: "help-smartvisuals-notification",
@@ -1200,6 +1219,7 @@
     "help-botdee-room-smartview": ["patron"], "help-botdee-room-smartview-schedule": ["patron"], "help-botdee-room-smartview-invite": ["patron"], "help-botdee-room-smartview-join": ["patron"],
     "help-botdee-room-smartview-end": ["patron"], "help-botdee-room-smartview-tab": ["patron"], "help-botdee-room-smartview-who-pays": ["patron"],
     "help-botdee-room-smartview-kick": ["patron"], "help-botdee-room-smartview-share": ["patron"],
+    "help-botdee-room-collab": ["patron"], "help-botdee-room-elect-host": ["patron"],
     "help-botdee-headless-vip": ["patron"],
     "help-features-smartview": ["patron"], "help-features-smartview-status": ["patron"], "help-features-smartview-botdee": ["patron"],
     "help-smartvisuals-notification": ["patron"], "help-smartvisuals-room": ["patron"],

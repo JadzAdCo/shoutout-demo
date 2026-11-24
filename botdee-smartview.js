@@ -1114,6 +1114,98 @@
       <ul class="botdee-sv-room-needles">${rows.map(row => `<li>${esc(row.displayName || "")} · ${esc(t("botdee.rs.unresolved", "unresolved"))}</li>`).join("")}</ul>`;
   }
 
+  function collabTallyText(tally) {
+    return t("botdee.room.voteTally", "{yes} of {needed} yes ({members} joined)")
+      .replace("{yes}", String(Number(tally?.yes || 0)))
+      .replace("{needed}", String(Number(tally?.needed || 0)))
+      .replace("{members}", String(Number(tally?.memberCount || 0)));
+  }
+
+  function renderCollabStrip(view) {
+    const collab = view && view.collab && typeof view.collab === "object" ? view.collab : null;
+    if (!collab) return `<div class="botdee-sv-room-collab" data-rs-collab hidden></div>`;
+    const txn = collab.sharedTransaction;
+    const ballot = collab.hostBallot;
+    const label = txn
+      ? (txn.snapshot?.sectionLabel || txn.snapshot?.sectionId || txn.snapshot?.templateName || txn.snapshot?.venueName || txn.kind || "")
+      : "";
+    const choiceLine = txn
+      ? `<p class="botdee-sv-room-note">${esc(t("botdee.room.sharedChoice", "Host picked {label}").replace("{label}", label))}</p>
+         <p class="botdee-sv-room-note">${esc(collab.canCommit ? t("botdee.room.choicePassed", "Group agreed — host can hold") : t("botdee.room.choiceWaiting", "Waiting for 60% yes"))} · ${esc(collabTallyText(collab.choiceTally))}</p>
+         <div class="botdee-sv-room-controls">
+           <button type="button" class="botdee-sv-room-btn" data-rs-vote="yes">${esc(t("botdee.room.voteYes", "Yes"))}</button>
+           <button type="button" class="botdee-sv-room-btn" data-rs-vote="no">${esc(t("botdee.room.voteNo", "No"))}</button>
+         </div>`
+      : "";
+    const hostLine = collab.hostVacant
+      ? `<p class="botdee-sv-room-note">${esc(t("botdee.room.hostVacant", "No host — vote 60% to elect"))}</p>`
+      : "";
+    const guestHint = view.guestMode
+      ? `<p class="botdee-sv-room-note">${esc(t("botdee.room.guestVoteHint", "Vote the host's pick. Hold it stays with the host."))}</p>`
+      : "";
+    const elect = `<div class="botdee-sv-room-controls">
+        <button type="button" class="botdee-sv-room-btn" data-rs-nominate-self>${esc(t("botdee.room.nominateSelf", "Make me host"))}</button>
+        ${ballot ? `<button type="button" class="botdee-sv-room-btn" data-rs-host-vote="yes">${esc(t("botdee.room.voteYes", "Yes"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-host-vote="no">${esc(t("botdee.room.voteNo", "No"))}</button>` : ""}
+      </div>
+      ${ballot ? `<p class="botdee-sv-room-note">${esc(collabTallyText(collab.hostTally))}</p>` : ""}`;
+    return `<div class="botdee-sv-room-collab" data-rs-collab>
+      <h3>${esc(t("botdee.room.collabTitle", "Shared picks"))}</h3>
+      ${guestHint}${hostLine}${choiceLine}${elect}
+    </div>`;
+  }
+
+  function applyCollabToCard(card, collab, roomId, binders) {
+    if (!card || !collab) return;
+    if (card.getAttribute("data-kind") === "botDeeVip" || card.classList.contains("botdee-sv-vip")) {
+      applyCollabToVipCard(card, collab, roomId);
+      return;
+    }
+    const host = card.querySelector("[data-rs-collab]");
+    const html = renderCollabStrip({collab, guestMode: !collab.viewerIsHost});
+    if (host) host.outerHTML = html;
+    else card.querySelector(".botdee-sv-room-stats")?.insertAdjacentHTML("afterend", html);
+    bindCollabActions(card, binders);
+  }
+
+  function bindCollabActions(card, {call, showToast, roomIdOf}) {
+    const run = async (name, payload) => {
+      const roomId = roomIdOf();
+      if (!roomId) return;
+      try {
+        const data = await call(name, {roomId, ...payload});
+        if (data?.collab) applyCollabToCard(card, data.collab, roomId, {call, showToast, roomIdOf});
+        if (data?.elected) showToast(t("botdee.room.hostElected", "New host elected"));
+      } catch (error) {
+        showToast(error?.message || t("botdee.room.collabFailed", "Could not record that vote"));
+      }
+    };
+    card.querySelectorAll("[data-rs-vote]").forEach(btn => {
+      if (btn.dataset.rsBoundVote === "1") return;
+      btn.dataset.rsBoundVote = "1";
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        run("voteBotDeeRoomTransaction", {ballot: btn.getAttribute("data-rs-vote")});
+      });
+    });
+    card.querySelectorAll("[data-rs-host-vote]").forEach(btn => {
+      if (btn.dataset.rsBoundVote === "1") return;
+      btn.dataset.rsBoundVote = "1";
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        run("voteBotDeeRoomHost", {ballot: btn.getAttribute("data-rs-host-vote")});
+      });
+    });
+    card.querySelectorAll("[data-rs-nominate-self]").forEach(btn => {
+      if (btn.dataset.rsBoundVote === "1") return;
+      btn.dataset.rsBoundVote = "1";
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        run("nominateBotDeeRoomHost", {});
+      });
+    });
+  }
+
   function renderRoomCard(payload) {
     const view = payload && typeof payload === "object" ? payload : {};
     const count = Number(view.participantCount) || 0;
@@ -1147,6 +1239,7 @@
         <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.participants", "Participants"))}</span><b>${esc(String(count))} / ${esc(String(cap))}</b><small>${esc(t("botdee.rs.includingHost", "including host"))}</small></div>
         <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.roomStatus", "Room status"))}</span><b data-rs-status-b>${esc(status)}</b><small>${esc(scheduled ? (scheduleLabel || t("sv.scheduled", "Scheduled")) : (liveOpen || view.roomId ? t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests") : t("botdee.rs.notLiveNote", "Group rooms are not live yet")))}</small></div>
       </div>
+      ${activeRoom ? renderCollabStrip(view) : ""}
       ${denied ? `<p class="botdee-sv-room-note">${esc(t("botdee.rs.injectionDenied", "I can’t use private BOT DEE history or host memory for that. Room SMARTview only uses what this group later confirms."))}</p>` : ""}
       ${renderRoomNeedles(view)}
       ${share ? `<div class="botdee-sv-room-share"><h3>${esc(t("botdee.rs.sharePreview", "Share preview"))}</h3>${renderRoomFacts(view)}<p class="botdee-sv-room-note">${esc(t("botdee.rs.privacyNote", "Private BOT DEE messages, other members’ profiles, and SMARTsummary are not included."))}</p></div>` : ""}
@@ -1393,7 +1486,10 @@
           const kick = viewerIsHost && row.uid && row.uid !== hostUid
             ? ` <button type="button" class="botdee-sv-room-btn botdee-sv-room-danger" data-rs-kick-uid="${esc(row.uid)}">${esc(t("botdee.room.removeGuest", "Remove"))}</button>`
             : "";
-          return `<div>${esc(row.displayName || row.handle || row.uid)} · ${esc(role)}${kick}</div>`;
+          const nominate = row.uid
+            ? ` <button type="button" class="botdee-sv-room-btn" data-rs-nominate-uid="${esc(row.uid)}">${esc(t("botdee.room.nominateHost", "Nominate host"))}</button>`
+            : "";
+          return `<div>${esc(row.displayName || row.handle || row.uid)} · ${esc(role)}${kick}${nominate}</div>`;
         }).join("");
         host.querySelectorAll("[data-rs-kick-uid]").forEach(btn => {
           btn.addEventListener("click", async event => {
@@ -1404,6 +1500,20 @@
               fillMembers();
             } catch (error) {
               showToast(error?.message || t("botdee.room.kickFailed", "Could not remove that guest."));
+            }
+          });
+        });
+        host.querySelectorAll("[data-rs-nominate-uid]").forEach(btn => {
+          btn.addEventListener("click", async event => {
+            event.preventDefault();
+            try {
+              const data = await call("nominateBotDeeRoomHost", {roomId, candidateUid: btn.getAttribute("data-rs-nominate-uid")});
+              showToast(data?.elected
+                ? t("botdee.room.hostElected", "New host elected")
+                : t("botdee.room.youNominated", "Nomination opened. 60% of joined members elects the host."));
+              fillMembers();
+            } catch (error) {
+              showToast(error?.message || t("botdee.room.collabFailed", "Could not record that vote"));
             }
           });
         });
@@ -1589,17 +1699,43 @@
       }
     });
     if (card.getAttribute("data-rs-status") === "open" && roomIdOf()) startRoomPresence(roomIdOf());
+    bindCollabActions(card, {call, showToast, roomIdOf});
+    const hydrateCollab = async () => {
+      const roomId = roomIdOf();
+      if (!roomId) return;
+      try {
+        const data = await call("getBotDeeRoom", {roomId});
+        if (data?.collab) applyCollabToCard(card, data.collab, roomId, {call, showToast, roomIdOf});
+      } catch (_) {}
+    };
+    hydrateCollab();
+    const db = global.firebase?.firestore?.();
+    if (db && roomIdOf() && !card._rsCollabUnsub) {
+      try {
+        card._rsCollabUnsub = db.collection("botDeeRooms").doc(roomIdOf()).onSnapshot(() => { hydrateCollab(); });
+      } catch (_) {}
+    }
   }
 
   function isVipPayload(payload) {
     return !!(payload && typeof payload === "object" && payload.kind === "botDeeVip");
   }
 
-  function vipChip(prompt, selected, label) {
-    return `<button type="button" class="botdee-sv-tag botdee-vip-chip${selected ? " is-on" : ""}" data-vip-prompt="${esc(prompt)}">${esc(label || prompt)}</button>`;
+  function vipChip(prompt, selected, label, extraClass) {
+    const cls = extraClass ? ` ${extraClass}` : "";
+    return `<button type="button" class="botdee-sv-tag botdee-vip-chip${selected ? " is-on" : ""}${cls}" data-vip-prompt="${esc(prompt)}">${esc(label || prompt)}</button>`;
   }
 
-  function vipMapHtml(map) {
+  function vipSeatClass(table) {
+    const status = String(table?.status || "available");
+    if (table?.selected) return " is-on";
+    if (status === "booked") return " is-booked";
+    if (status === "held") return " is-held";
+    if (status === "closed") return " is-closed";
+    return "";
+  }
+
+  function vipMapHtml(map, {interactive} = {interactive: true}) {
     if (!map || typeof map !== "object" || !map.imageUrl) return "";
     const vb = map.viewBox && typeof map.viewBox === "object" ? map.viewBox : {x: 0, y: 0, w: 1, h: 1};
     const vw = Math.max(0.08, Number(vb.w) || 1);
@@ -1614,9 +1750,120 @@
       const top = (Number(r.y) || 0) * 100;
       const tw = (Number(r.w) || 0) * 100;
       const th = (Number(r.h) || 0) * 100;
-      return `<button type="button" class="botdee-vip-seat${table.selected ? " is-on" : ""}" style="left:${left}%;top:${top}%;width:${tw}%;height:${th}%" data-vip-prompt="${esc(table.prompt || table.label)}">${esc(table.label)}</button>`;
+      const status = String(table.status || "available");
+      const locked = status === "booked" || status === "closed";
+      const promptAttr = interactive && !locked
+        ? ` data-vip-prompt="${esc(table.prompt || table.label)}"`
+        : "";
+      const disabled = locked ? " disabled" : "";
+      return `<button type="button" class="botdee-vip-seat${vipSeatClass(table)}" style="left:${left}%;top:${top}%;width:${tw}%;height:${th}%"${promptAttr}${disabled} title="${esc(status)}">${esc(table.label)}</button>`;
     }).join("");
     return `<div class="botdee-vip-map" role="group" aria-label="${esc(t("botdee.vip.openMap", "Open VIP reserV map"))}"><div class="botdee-vip-map-stage" style="width:${sizeX}%;height:${sizeY}%;left:${posX}%;top:${posY}%;background-image:url('${esc(map.imageUrl)}')">${tables}</div></div>`;
+  }
+
+  const VIP_POPOUT_NAME = "botdeeVipPopout";
+  let vipPopoutWin = null;
+
+  function vipPopoutFeatures() {
+    const availW = window.screen?.availWidth || window.innerWidth || 980;
+    const availH = window.screen?.availHeight || window.innerHeight || 860;
+    const w = Math.min(980, Math.max(420, Math.round(availW * 0.72)));
+    const h = Math.min(860, Math.max(480, Math.round(availH * 0.82)));
+    const left = Math.max(0, Math.round((availW - w) / 2));
+    const top = Math.max(0, Math.round((availH - h) / 2));
+    return `popup=yes,width=${w},height=${h},left=${left},top=${top},noopener=no`;
+  }
+
+  function storeVipPopoutPayload(payload) {
+    try { global.__floqrBotDeeVipPopout = payload; } catch (_) {}
+    try { sessionStorage.setItem("floqr.botdeeVipPopout", JSON.stringify(payload)); } catch (_) {}
+  }
+
+  function openVipPopout(kind, view, sourceEl) {
+    const payload = {
+      kind: String(kind || "map"),
+      view: view && typeof view === "object" ? view : {},
+      labels: {
+        close: t("botdee.photoClose", "Close"),
+        map: t("botdee.vip.openMap", "Open VIP reserV map"),
+        terms: t("botdee.vip.termsTitle", "VIP reserV Terms"),
+        pass: t("botdee.vip.passTitle", "Your VIP reserV pass"),
+        pay: t("botdee.vip.pay", "Pay securely"),
+        stay: t("botdee.vip.checkoutStay", "Pay in the pop-out. This BOT DEE chat stays open.")
+      }
+    };
+    if (kind === "pay") {
+      const url = String(view?.checkoutUrl || "").trim();
+      if (!url) return false;
+      storeVipPopoutPayload({kind: "paid", view, labels: payload.labels});
+      let win = null;
+      try { win = window.open(url, VIP_POPOUT_NAME, vipPopoutFeatures()); } catch (_) { win = null; }
+      if (!win) {
+        global.FLOQRBotDeeChat?.setStatus?.(t("botdee.vip.payPopupBlocked", "Allow pop-up windows to pay. The chat stays behind."));
+        return false;
+      }
+      vipPopoutWin = win;
+      try { win.focus(); } catch (_) {}
+      return true;
+    }
+    storeVipPopoutPayload(payload);
+    let href = "./botdee-vip-popout.html";
+    try {
+      const url = new URL("botdee-vip-popout.html", location.href);
+      if (kind) url.searchParams.set("kind", String(kind));
+      href = url.href;
+    } catch (_) {}
+    let win = null;
+    try { win = window.open(href, VIP_POPOUT_NAME, vipPopoutFeatures()); } catch (_) { win = null; }
+    if (!win) {
+      global.FLOQRBotDeeChat?.setStatus?.(t("botdee.photoPopoutBlocked", "Allow pop-up windows to enlarge the photo. The chat stays behind."));
+      return false;
+    }
+    vipPopoutWin = win;
+    try { win.focus(); } catch (_) {}
+    return true;
+  }
+
+  function formatHoldClock(expiresAtMs) {
+    const left = Math.max(0, Math.floor(((Number(expiresAtMs) || 0) - Date.now()) / 1000));
+    const mm = String(Math.floor(left / 60)).padStart(2, "0");
+    const ss = String(Math.floor(left % 60)).padStart(2, "0");
+    return {text: `${mm}:${ss}`, left};
+  }
+
+  let vipHoldClock = 0;
+
+  function stopHoldClock() {
+    if (vipHoldClock) {
+      clearInterval(vipHoldClock);
+      vipHoldClock = 0;
+    }
+  }
+
+  function startHoldClock(card, expiresAtMs) {
+    stopHoldClock();
+    const el = card.querySelector("[data-vip-clock]");
+    if (!el || !expiresAtMs) return;
+    const tick = () => {
+      const live = vipPreviewHost()?.querySelector(".botdee-sv-vip") || card;
+      if (!live || !live.isConnected) {
+        stopHoldClock();
+        return;
+      }
+      const {text: clock, left} = formatHoldClock(expiresAtMs);
+      const clockEl = live.querySelector("[data-vip-clock]");
+      if (clockEl) clockEl.textContent = t("botdee.vip.holdClock", "Hold {clock}").replace("{clock}", clock);
+      if (left <= 0) {
+        stopHoldClock();
+        const mode = live.getAttribute("data-vip-mode") || "";
+        const guest = live.getAttribute("data-guest-mode") === "1";
+        if (!guest && (mode === "hold" || mode === "checkout") && global.FLOQRBotDeeChat?.sendMessage) {
+          global.FLOQRBotDeeChat.sendMessage("cancel");
+        }
+      }
+    };
+    tick();
+    vipHoldClock = setInterval(tick, 1000);
   }
 
   function renderVipCard(payload) {
@@ -1626,68 +1873,211 @@
     const nights = Array.isArray(view.nights) ? view.nights : [];
     const areas = Array.isArray(map?.areas) ? map.areas : [];
     const matches = Array.isArray(view.matches) ? view.matches : [];
+    const venues = Array.isArray(view.venues) ? view.venues : [];
+    const collapsed = !!view.collapsed && !!view.sectionId;
     const tableChips = (matches.length ? matches : (map?.tables || [])).slice(0, 8)
       .map(row => vipChip(row.label || row.prompt || row.id, row.id === view.sectionId || row.selected))
       .join("");
-    const nightChips = nights.map(row => vipChip(row.prompt, !!row.selected, row.label)).join("");
+    const nightChips = nights.map(row => {
+      const label = row.closed
+        ? `${row.label || row.prompt} · ${t("botdee.vip.closedNight", "Closed")}`
+        : row.label;
+      return vipChip(row.prompt, !!row.selected, label, row.closed ? "is-closed" : "");
+    }).join("");
     const areaChips = areas.map(row => vipChip(row.prompt, row.id === map.selectedAreaId, row.name)).join("");
-    const vipHref = resolveSameOriginHref(view.vipHref || "./vip.html?from=botdee");
-    const payHref = resolveSameOriginHref(view.checkoutUrl || "");
+    const venueChips = venues.map(row => vipChip(row.prompt || `at ${row.name}`, row.id === view.clubLocationId, row.name)).join("");
     const venue = String(view.venueName || "").replace(/temp-democlub-1/i, "Aurelia").trim();
+    const cap = Math.max(0, Math.floor(Number(view.maxCapacity) || 0));
     const party = Math.max(1, Math.floor(Number(view.partySize) || 2));
-    const cta = payHref
-      ? `<a class="botdee-sv-action botdee-sv-action-main" href="${esc(payHref)}">${esc(t("botdee.vip.pay", "Pay securely"))}</a>`
-      : (mode === "hold"
-        ? `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-prompt="I agree">${esc(t("botdee.vip.agree", "I agree"))}</button>`
-        : `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-prompt="hold it">${esc(t("botdee.vip.holdIt", "Hold it"))}</button>`);
+    const maxParty = cap > 0 ? cap : 40;
+    const payUrl = String(view.checkoutUrl || "").trim();
+    const guest = view.guestMode === true;
+    const needsVote = !guest && view.collab && Number(view.collab.choiceTally?.memberCount || 0) > 1 && view.collab.canCommit !== true;
+    const cta = guest
+      ? ""
+      : (payUrl
+        ? `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-popout="pay">${esc(t("botdee.vip.pay", "Pay securely"))}</button>`
+        : (mode === "hold"
+          ? `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-prompt="I agree">${esc(t("botdee.vip.agree", "I agree"))}</button>`
+          : (mode === "pass"
+            ? `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-popout="pass">${esc(t("botdee.vip.passTitle", "Your VIP reserV pass"))}</button>`
+            : `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-vip-prompt="hold it"${needsVote ? " disabled" : ""}>${esc(t("botdee.vip.holdIt", "Hold it"))}</button>`)));
+    const voteNote = needsVote
+      ? `<p class="botdee-vip-terms">${esc(t("botdee.room.holdNeedsVote", "Need 60% yes from joined members before Hold it"))}</p>`
+      : "";
     const areaNav = map?.selectedAreaId
       ? `${vipChip("all areas", false, t("botdee.vip.allAreas", "All areas"))}${areaChips}`
       : areaChips;
-    return `<article class="botdee-sv-vip" data-kind="botDeeVip" data-vip-mode="${esc(mode)}">
+    const holdClock = view.holdExpiresAtMs
+      ? `<p class="botdee-vip-clock" data-vip-clock></p>`
+      : "";
+    const terms = mode === "hold"
+      ? `<p class="botdee-vip-terms">${esc(t("botdee.vip.termsHint", "I agree records VIP Terms and opens Stripe in a pop-out. BOT DEE never takes card numbers."))}</p>`
+      : "";
+    const needsClub = (Array.isArray(view.needs) ? view.needs : []).includes("club") || !view.clubLocationId;
+    const kicker = needsClub
+      ? t("botdee.vip.venuesHint", "Tap a club, then a night and table.")
+      : t("botdee.vip.mapHint", "Tap a night, then an area, then a table.");
+    const collapseClass = collapsed ? " is-collapsed" : "";
+    const passLine = mode === "pass" || mode === "checkout"
+      ? `<p class="botdee-vip-pass">${esc(t("botdee.vip.passReady", "Table {table} at {venue} — show this at the door.").replace("{table}", view.sectionLabel || view.sectionId || "").replace("{venue}", venue))}</p>`
+      : "";
+    return `<article class="botdee-sv-vip${collapseClass}${guest ? " is-guest" : ""}" data-kind="botDeeVip" data-vip-mode="${esc(mode)}" data-hold-expires="${esc(String(view.holdExpiresAtMs || 0))}" data-rs-room="${esc(view.roomId || "")}" data-guest-mode="${guest ? "1" : "0"}">
       <h2 class="botdee-so-title">${esc(t("botdee.vip.title", "VIP reserV"))}</h2>
       <p class="botdee-so-sub">${esc(venue || t("botdee.vip.hint", "Hold a table from this chat. Joining a room is not a payment."))}</p>
-      <p class="botdee-vip-kicker">${esc(t("botdee.vip.mapHint", "Tap a night, then an area, then a table."))}</p>
+      <p class="botdee-vip-kicker">${esc(kicker)}</p>
+      ${needsClub ? `<div class="botdee-vip-rail" aria-label="${esc(t("botdee.vip.chooseVenue", "Choose a venue"))}">${venueChips}</div>` : ""}
       <div class="botdee-vip-rail" aria-label="${esc(t("botdee.vip.night", "Night"))}">${nightChips || vipChip("tonight", true, t("botdee.vip.tonight", "Tonight"))}</div>
-      <div class="botdee-vip-rail" aria-label="${esc(t("botdee.vip.pickArea", "Area"))}">${areaNav}</div>
-      ${vipMapHtml(map)}
+      ${needsClub ? "" : `<div class="botdee-vip-expand">${collapsed ? "" : `<div class="botdee-vip-rail" aria-label="${esc(t("botdee.vip.pickArea", "Area"))}">${areaNav}</div>${vipMapHtml(map, {interactive: !guest})}`}</div>`}
       <div class="botdee-so-row"><span>${esc(t("botdee.vip.section", "Table"))}</span><strong>${esc(view.sectionLabel || view.sectionId || (map?.selectedAreaName || "—"))}</strong></div>
-      <div class="botdee-sv-tags">${tableChips}</div>
+      ${collapsed || needsClub ? "" : `<div class="botdee-sv-tags">${tableChips}</div>`}
       <div class="botdee-vip-party">
         <span>${esc(t("botdee.vip.party", "Party"))}</span>
-        <button type="button" class="botdee-vip-step" data-vip-prompt="${Math.max(1, party - 1)} guests" aria-label="-">−</button>
-        <strong>${esc(String(party))}</strong>
-        <button type="button" class="botdee-vip-step" data-vip-prompt="${Math.min(40, party + 1)} guests" aria-label="+">+</button>
+        ${guest ? "" : `<button type="button" class="botdee-vip-step" data-vip-prompt="${Math.max(1, party - 1)} guests" aria-label="-">−</button>`}
+        <strong>${esc(String(party))}${cap ? ` <span class="botdee-vip-cap">${esc(t("botdee.vip.partyMax", "Max {n}").replace("{n}", String(cap)))}</span>` : ""}</strong>
+        ${guest ? "" : `<button type="button" class="botdee-vip-step" data-vip-prompt="${Math.min(maxParty, party + 1)} guests" aria-label="+">+</button>`}
       </div>
+      ${holdClock}
+      ${terms}
+      ${voteNote}
+      ${passLine}
+      ${view.collab ? renderCollabStrip(view) : ""}
       <div class="botdee-sv-people-actions">
         ${cta}
-        <a class="botdee-sv-action" href="${esc(vipHref)}">${esc(t("botdee.vip.openMap", "Open VIP reserV map"))}</a>
+        ${!guest && (mode === "hold" || mode === "checkout") ? `<button type="button" class="botdee-sv-action" data-vip-prompt="cancel">${esc(t("botdee.vip.cancelHold", "Cancel hold"))}</button>` : ""}
+        ${!guest && mode === "hold" ? `<button type="button" class="botdee-sv-action" data-vip-popout="terms">${esc(t("botdee.vip.termsOpen", "Read Terms"))}</button>` : ""}
+        ${!guest && collapsed ? `<button type="button" class="botdee-sv-action" data-vip-prompt="change table">${esc(t("botdee.vip.changeTable", "Change table"))}</button>` : ""}
+        <button type="button" class="botdee-sv-action" data-vip-popout="map">${esc(t("botdee.vip.openMap", "Open VIP reserV map"))}</button>
       </div>
     </article>`;
   }
 
-  function bindVipCard(card) {
+  function vipCollabBinders(card, view) {
+    return {
+      call: async (name, payload) => {
+        const fn = functionsCallable(name);
+        if (!fn) throw new Error("offline");
+        return (await fn(payload))?.data || {};
+      },
+      showToast: message => {
+        const note = card.querySelector(".botdee-vip-terms, .botdee-so-sub");
+        if (note) note.textContent = message;
+      },
+      roomIdOf: () => card.getAttribute("data-rs-room") || view?.roomId || ""
+    };
+  }
+
+  function applyCollabToVipCard(card, collab, roomId) {
+    if (!card || !collab || !card.isConnected) return;
+    const dock = vipPreviewHost();
+    if (!dock || dock.hidden || !dock.contains(card)) return;
+    const guest = collab.viewerIsHost !== true;
+    const view = {
+      ...(card._vipView || lastVipView || {}),
+      collab,
+      guestMode: guest,
+      roomId: roomId || card.getAttribute("data-rs-room") || ""
+    };
+    const wasGuest = card.getAttribute("data-guest-mode") === "1";
+    if (wasGuest !== guest) {
+      dockVipPreview(view);
+      return;
+    }
+    const host = card.querySelector("[data-rs-collab]");
+    if (host) {
+      host.outerHTML = renderCollabStrip({collab, guestMode: guest});
+      bindCollabActions(card, vipCollabBinders(card, view));
+    }
+    const hold = card.querySelector('[data-vip-prompt="hold it"]');
+    if (hold) {
+      const ready = collab.canCommit === true || Number(collab.choiceTally?.memberCount || 0) <= 1;
+      hold.disabled = guest || !ready;
+    }
+    card._vipView = view;
+    lastVipView = view;
+  }
+
+  function stopVipRoomWatch() {
+    const el = vipPreviewHost();
+    if (!el || !el._rsCollabUnsub) return;
+    try { el._rsCollabUnsub(); } catch (_) {}
+    el._rsCollabUnsub = null;
+    el._rsCollabRoomId = "";
+  }
+
+  function watchVipRoom(roomId) {
+    const el = vipPreviewHost();
+    const id = String(roomId || "").trim();
+    if (!el || !id) return;
+    if (el._rsCollabRoomId === id && el._rsCollabUnsub) return;
+    stopVipRoomWatch();
+    el._rsCollabRoomId = id;
+    const db = global.firebase?.firestore?.();
+    if (!db) return;
+    try {
+      el._rsCollabUnsub = db.collection("botDeeRooms").doc(id).onSnapshot(() => {
+        refreshVipCollab(id);
+      });
+    } catch (_) {}
+  }
+
+  async function refreshVipCollab(roomId) {
+    const el = vipPreviewHost();
+    const card = el?.querySelector(".botdee-sv-vip");
+    if (!card || !roomId) return;
+    try {
+      const fn = functionsCallable("getBotDeeRoom");
+      if (!fn) return;
+      const data = (await fn({roomId}))?.data || {};
+      const live = vipPreviewHost();
+      const liveCard = live?.querySelector(".botdee-sv-vip");
+      if (!liveCard || !liveCard.isConnected || live.hidden) return;
+      if ((liveCard.getAttribute("data-rs-room") || "") !== String(roomId)) return;
+      if (data.collab) applyCollabToVipCard(liveCard, data.collab, roomId);
+    } catch (_) {}
+  }
+
+  function bindVipCard(card, view) {
     if (!card || card.dataset.vipBound === "1") return;
     card.dataset.vipBound = "1";
+    card._vipView = view || {};
+    if (card.getAttribute("data-guest-mode") === "1") {
+      card.querySelectorAll("[data-vip-prompt]").forEach(btn => { btn.disabled = true; });
+    }
     card.querySelectorAll("[data-vip-prompt]").forEach(btn => {
       btn.addEventListener("click", event => {
         event.preventDefault();
+        if (btn.disabled) return;
         const prompt = btn.getAttribute("data-vip-prompt") || "";
         if (prompt && global.FLOQRBotDeeChat?.sendMessage) global.FLOQRBotDeeChat.sendMessage(prompt);
       });
     });
+    card.querySelectorAll("[data-vip-popout]").forEach(btn => {
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        openVipPopout(btn.getAttribute("data-vip-popout"), card._vipView, btn);
+      });
+    });
+    startHoldClock(card, Number(card.getAttribute("data-hold-expires") || 0));
+    bindCollabActions(card, vipCollabBinders(card, view));
+    watchVipRoom(card.getAttribute("data-rs-room") || view?.roomId || "");
   }
 
   function vipPreviewHost() {
     return global.document?.getElementById("botDeeVipPreviewDock") || null;
   }
 
+  let lastVipView = null;
+
   function isLiveVipPreview(view) {
     if (!isVipPayload(view)) return false;
     const mode = String(view.mode || "draft");
-    return mode === "draft" || mode === "ready" || mode === "hold";
+    return mode !== "cancelled";
   }
 
   function clearVipPreviewDock() {
+    stopHoldClock();
+    stopVipRoomWatch();
     const el = vipPreviewHost();
     if (!el) return;
     el.hidden = true;
@@ -1702,11 +2092,13 @@
       if (!isLiveVipPreview(view)) clearVipPreviewDock();
       return false;
     }
+    stopHoldClock();
     el.hidden = false;
     el.classList.add("is-open");
     global.document?.body?.classList.add("botdee-vip-dock-open");
+    lastVipView = view;
     el.innerHTML = renderVipCard({...view, surface: "dock"});
-    bindVipCard(el.querySelector(".botdee-sv-vip"));
+    bindVipCard(el.querySelector(".botdee-sv-vip"), view);
     return true;
   }
 
@@ -1718,15 +2110,39 @@
       dockVipPreview(live);
       return {docked: true, inline: list.filter(row => !isVipPayload(row))};
     }
-    const closed = vips.some(row => {
-      const mode = String(row.mode || "");
-      return mode === "cancelled" || mode === "checkout";
-    });
-    if (closed || vips.length) clearVipPreviewDock();
+    if (vips.length) clearVipPreviewDock();
     return {
       docked: false,
-      inline: list.filter(row => !isVipPayload(row) || String(row.mode || "") === "checkout")
+      inline: list.filter(row => !isVipPayload(row))
     };
+  }
+
+  function bindVipPopoutListener() {
+    if (global.__floqrVipPopoutBound || !global.addEventListener) return;
+    global.__floqrVipPopoutBound = true;
+    global.addEventListener("message", event => {
+      if (event.origin !== location.origin) return;
+      const data = event.data;
+      if (!data || data.source !== "floqr-botdee-vip") return;
+      if (data.kind === "prompt" && data.prompt && global.FLOQRBotDeeChat?.sendMessage) {
+        global.FLOQRBotDeeChat.sendMessage(String(data.prompt));
+        return;
+      }
+      if (data.kind === "paid") {
+        const next = {
+          ...(lastVipView || {}),
+          kind: "botDeeVip",
+          mode: "pass",
+          checkoutUrl: "",
+          reservationId: data.reservationId || data.orderId || ""
+        };
+        dockVipPreview(next);
+        return;
+      }
+      if (data.kind === "payCancel") {
+        dockVipPreview({...(lastVipView || {}), kind: "botDeeVip", mode: "hold", checkoutUrl: ""});
+      }
+    });
   }
 
   function renderPlaceCard(payload) {
@@ -2387,7 +2803,12 @@
     });
     el.querySelectorAll(".botdee-sv-room").forEach(card => bindRoomCard(card));
     el.querySelectorAll(".botdee-sv-shoutout").forEach(card => bindShoutOutCard(card));
-    el.querySelectorAll(".botdee-sv-vip").forEach(card => bindVipCard(card));
+    const vipViews = list.filter(isVipPayload);
+    let vipIndex = 0;
+    el.querySelectorAll(".botdee-sv-vip").forEach(card => {
+      bindVipCard(card, vipViews[vipIndex] || {});
+      vipIndex += 1;
+    });
     const cards = el.querySelectorAll(".botdee-sv-people");
     let index = 0;
     list.forEach(payload => {
@@ -2408,6 +2829,7 @@
   }
 
   if (global.document) bindOverlayDocument(global.document);
+  bindVipPopoutListener();
   if (global.document && !global.__floqrSmartViewChromeBound) {
     global.__floqrSmartViewChromeBound = true;
     global.addEventListener("floqr-chrome-change", () => {
