@@ -717,6 +717,20 @@ body.botdee-vip-popout-page {
 .botdee-vip-popout-body .botdee-vip-map {
   height: min(62vh, 28rem);
 }
+.botdee-vip-popout-page .botdee-vip-map-section {
+  min-height: 0;
+  overflow: auto;
+}
+.botdee-vip-popout-page .botdee-vip-map-section[hidden] {
+  display: none !important;
+}
+.botdee-vip-popout-page .botdee-vip-map-section .stage {
+  min-height: 220px;
+}
+.botdee-vip-popout-page .botdee-vip-popout-body h1 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
 .botdee-vip-popout-terms,
 .botdee-vip-popout-pass {
   margin: 0;
