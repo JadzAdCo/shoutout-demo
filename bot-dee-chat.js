@@ -1432,6 +1432,9 @@
       if (data.shoutOutPreview === "closed") {
         global.FLOQRBotDeeSmartView?.clearShoutOutPreviewDock?.();
       }
+      if (global.FLOQRHelpLoader && typeof global.FLOQRHelpLoader.ensure === "function" && currentUiLanguage() !== "en") {
+        try { await global.FLOQRHelpLoader.ensure(); } catch (error) {}
+      }
       appendBubble("bot", reply, localizeResults(peopleCard ? [] : data.results), media, views, peopleSearch);
       pushHistory("model", reply);
       if (reply) visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});

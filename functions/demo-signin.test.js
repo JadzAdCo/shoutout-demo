@@ -185,7 +185,7 @@ test("Demo Worker Mgmt is an SOS2FA-gated Entity Management subtab with help bes
   }
   assert.doesNotMatch(section, /id="demoReason"|placeholder="Why/, "reason is asked after Generate, never a standing input");
   assert.match(html, /href="\.\/master-demo-employees\.css\?v=s3\.\d+\.\d+"/);
-  const order = ["floqr-temp-qa-showcase.js", "sos2fa.js", "botdee-help-repository.js", "help-attach.js", "master-admin-app.js", "floqr-reason-prompt.js", "master-demo-employees.js"]
+  const order = ["floqr-temp-qa-showcase.js", "sos2fa.js", "floqr-help-loader.js", "help-attach.js", "master-admin-app.js", "floqr-reason-prompt.js", "master-demo-employees.js"]
     .map(file => html.indexOf(`src="./${file}?v=`));
   order.forEach((at, i) => assert.ok(at > 0 && (i === 0 || at > order[i - 1]), `script order ${i}`));
   for (const file of ["sos2fa.js", "master-admin-app.js"]) {

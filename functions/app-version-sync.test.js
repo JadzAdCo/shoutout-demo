@@ -140,7 +140,7 @@ test("pages load floqr-nav.js before the BOT DEE link builders", () => {
   const bad = htmlPages().flatMap((name) => {
     const html = read(name);
     const nav = html.search(/src="\.\/floqr-nav\.js/);
-    return ["botdee-help-repository.js", "intent-search.js"]
+    return ["floqr-help-loader.js", "intent-search.js"]
       .filter((dep) => {
         const at = html.indexOf(`src="./${dep}`);
         return at >= 0 && (nav < 0 || nav > at);

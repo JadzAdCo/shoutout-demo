@@ -84,7 +84,7 @@ test("BOT DEE page is a guarded satellite with chat only (no Quick intent search
   const order = [
     "firebase-config.js",
     "floqr-session-shell.js",
-    "botdee-help-repository.js",
+    "floqr-help-loader.js",
     "floqr-feature-services.js",
     "botdee-personalization-ui.js",
     "bot-dee-chat.js",
