@@ -37,9 +37,9 @@ async function requireSessionAuth(request) {
 function fail(reason) {
   const code = reason === "rate_limited" ? "resource-exhausted"
     : reason === "wrong_account" || reason === "not_host" || reason === "not_member" || reason === "not_assignee" ? "permission-denied"
-      : reason === "full" || reason === "closed" || reason === "unpaid_tab" || reason === "no_opt_in" || reason === "not_friend" || reason === "invite_disabled" || reason === "expired" || reason === "revoked" || reason === "used" ? "failed-precondition"
+      : reason === "full" || reason === "closed" || reason === "unpaid_tab" || reason === "no_opt_in" || reason === "not_friend" || reason === "invite_disabled" || reason === "expired" || reason === "revoked" || reason === "used" || reason === "self" || reason === "already_member" ? "failed-precondition"
         : "not-found";
-  throw new HttpsError(code, core.denialMessage(reason));
+  throw new HttpsError(code, core.denialMessage(reason), {reason});
 }
 
 function unwrap(result) {
@@ -153,8 +153,28 @@ exports.endBotDeeRoom = onCall(CALL_OPTS, async request => {
 exports.listBotDeeRoomFriends = onCall(CALL_OPTS, async request => {
   try {
     const uid = await requireSessionAuth(request);
-    const friends = await store.listMinglFriends(uid);
-    return {ok: true, friends};
+    const roomId = core.text(request.data?.roomId, 80);
+    let memberUids = [];
+    let roomFull = false;
+    if (roomId) {
+      const live = await store.loadRoom(roomId);
+      if (live && core.isCurrentMember(live.data, uid)) {
+        memberUids = core.currentMembers(live.data);
+        roomFull = memberUids.length >= core.MEMBER_CAP;
+      }
+    }
+    const friends = core.decorateFriendInviteState(await store.listMinglFriends(uid), {
+      actorUid: uid,
+      memberUids
+    });
+    return {
+      ok: true,
+      viewerUid: uid,
+      friends,
+      roomFull,
+      memberCount: memberUids.length,
+      participantCap: core.MEMBER_CAP
+    };
   } catch (error) {
     throw asHttps(error);
   }

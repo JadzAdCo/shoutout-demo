@@ -847,12 +847,13 @@
     {
       id: "help-botdee-room-smartview",
       title: "Room SMARTview",
-      body: "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends). That opens the same Room SMARTview as Open Room SMARTview Cancun Trip — travel art and a sample Travel partner / Fly to Cancun Ad, not live flight or hotel booking. VIP tables tonight stay nightlife, not a trip card. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme.",
+      body: "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends). That opens the same Room SMARTview as Open Room SMARTview Cancun Trip — travel art and a sample Travel partner / Fly to Cancun Ad, not live flight or hotel booking. VIP tables tonight stay nightlife, not a trip card. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme. A session starts when you Confirm. It stays open until the host taps End Room, or until about four hours after it opened. There is no scheduled start time, and the room does not close when the last guest logs out. Shared Itinerary is night-out notes, not a calendar. Room Permissions is host-managed invite rules, not a schedule.",
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
         "group chat bot dee", "talk to bot dee together", "invite mingl friends",
         "let's plan our cancun trip", "let's plan a trip to cancun", "plan a cancun trip",
-        "cancun trip with friends"
+        "cancun trip with friends", "schedule a time", "when does the room expire",
+        "last person logs out", "one-time live session"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -889,8 +890,8 @@
                 {
       id: "help-botdee-room-smartview-invite",
       title: "Invite Mingl friends",
-      body: "After you confirm Room SMARTview, Invite shows your Mingl friends only. Each invite is bound to that friend and lands in Inbox as Review BOT DEE invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
-      searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation", "invite mingl friends", "review bot dee invite"],
+      body: "After you confirm Room SMARTview, Invite shows your Mingl friends only. Tap a friend to send an Inbox invite (Review BOT DEE invite). If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
+      searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation", "invite mingl friends", "review bot dee invite", "that's you", "already in this session", "cannot invite myself"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
@@ -909,7 +910,7 @@
     {
       id: "help-botdee-room-smartview-end",
       title: "End Room SMARTview",
-      body: "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first.",
+      body: "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first. A guest leaving or closing BOT DEE does not end the room. There is no scheduled start, and the room does not close when the last guest logs out — the host must tap End Room, or it expires about four hours after it opened.",
       searchPhrases: ["end this room", "close room smartview", "end group chat bot dee"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
