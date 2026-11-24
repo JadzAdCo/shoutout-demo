@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.068";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.068";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.070";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.070";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,14 +223,36 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.3.068",
-      title: "s3.3.068 — BOT DEE invite self vs already member",
+      version: "s3.3.070",
+      title: "s3.3.070 — BOT DEE invite self vs already member",
       checks: [
         {label:"Invite target states", file:"functions/botdee-session-core.js", includes:["classifyInviteTarget", "decorateFriendInviteState", "already_member", "That's you"]},
         {label:"Create invite uses classifyInviteTarget", file:"functions/botdee-session-store.js", includes:["classifyInviteTarget"]},
         {label:"Named invite from chat", file:"functions/botdee-room-live.js", includes:["function inviteNamedGuests"]},
         {label:"Chip states on Room SMARTview", file:"botdee-smartview.js", includes:["botdee.room.self", "botdee.room.alreadyMember", "data-rs-invite-state"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-068-botdee-invite-self-member"]}
+      ]
+    },
+    {
+      version: "s3.3.069",
+      title: "s3.3.069 — Demo Worker Mgmt: roster codes plus same-mobile Find / Preview / Merge",
+      checks: [
+        {label:"Demo Worker Mgmt combined cards", file:"master-admin.html", includes:["Demo Worker Mgmt", "demoEmpSearch", "id=\"demoPatronAccountMerge\"", "data-merge-action=\"lookup-survivor\""]},
+        {label:"Find demo worker + Generate code", file:"master-admin.html", includes:["master.demoEmployees.find", "demoEmpGenerateSelectedBtn"]},
+        {label:"Merge bind all cards", file:"patron-account-merge.js", includes:["data-patron-account-merge", "lookup-survivor"]},
+        {label:"Hash alias demoWorkerMgmt", file:"master-admin-app.js", includes:["demoWorkerMgmt", "demoEmployees"]},
+        {label:"Chrome packs", file:"floqr-i18n.js", includes:["Demo Worker Mgmt", "master.demoEmployees.find"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-065-demo-worker-mgmt"]}
+      ]
+    },
+    {
+      version: "s3.3.068",
+      title: "s3.3.068 — Patron merge card on Duplicate Records only; one Find patron per column",
+      checks: [
+        {label:"Merge card inside Duplicate Records", file:"master-admin.html", includes:["id=\"duplicateRecords\"", "id=\"patronAccountMerge\"", "patron-merge-col", "patronMergeLookupSurvivorBtn"]},
+        {label:"Hash alias to Duplicate Records", file:"master-admin-app.js", includes:["patronAccountMerge", "duplicateRecords"]},
+        {label:"Operator-neutral chrome", file:"floqr-i18n.js", includes:["until a Master Admin confirms"], notIncludes:["until Don confirms"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-064-patron-merge-chrome"]}
       ]
     },
     {
@@ -3706,6 +3728,24 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-065-demo-worker-mgmt",
+      area:"Master Admin",
+      feature:"Demo Worker Mgmt combined roster + same-mobile merge",
+      changed:"s3.3.066 — Entity Management tab is Demo Worker Mgmt (#demoEmployees; #demoWorkerMgmt aliases). The panel has Find demo worker + Generate code and Patron accounts (same mobile) Find patron / Preview merge / Merge patron accounts. Duplicate Records still has #patronAccountMerge so the card does not leak onto other tabs. Chrome does not name an operator.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / floqr-i18n.js / patron-account-merge.js ?v=s3.3.069. Unlock SOS2FA. 2) Entity Management → Demo Worker Mgmt. Heading says Demo Worker Mgmt. Confirm Find demo worker + Generate code AND Find patron (one per column) + Preview merge + Merge patron accounts. 3) Reports → Duplicate Records still has Patron accounts (same mobile). 4) Network Dashboard / Diagnostics / Beta & Testing do not show the merge card (Beta still has its own Find patron). 5) BOT DEE help hashes #demoEmployees. Display URLs have no ?v=.",
+      expected:"One Demo Worker Mgmt surface with roster codes and same-mobile merge. Duplicate Records still has the merge card. Other tabs do not.",
+      troubleshoot:"Old Demo Svc / Emp Mgmt label → cached master-admin.html / floqr-i18n.js. Merge card on every tab → #patronAccountMerge outside a panel. Demo Worker Mgmt missing Find patron → cached HTML before s3.3.066. Duplicate Records missing the card → stacked PR 157 placement lost. Buttons do nothing → patron-account-merge.js must bind [data-patron-account-merge]."
+    },
+    {
+      id:"s3-3-064-patron-merge-chrome",
+      area:"Master Admin",
+      feature:"Patron accounts (same mobile) only on Duplicate Records; one Find patron per column",
+      changed:"s3.3.064 — Merge card is inside Reports → Duplicate Records. One Find patron under Keep this uid and one under Merge this uid away. Chrome and help say Master Admin, not a named person. Merge still never deletes Firebase Auth.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / admin.css / floqr-i18n.js ?v=s3.3.069. Unlock SOS2FA. 2) Reports → Duplicate Records (#duplicateRecords). Patron accounts (same mobile) is inside that panel; each column has exactly one Find patron; Preview merge and Merge patron accounts sit below. 3) Open Network Dashboard, Diagnostics, and Features Mgmt → Beta & Testing — the merge card is not there (Beta still has its own Find patron search). Demo Worker Mgmt also shows Patron accounts (same mobile) on purpose. 4) Open #patronAccountMerge — lands on Duplicate Records with the card. 5) Confirm sub copy says Master Admin, not a named person. Display URLs have no ?v=.",
+      expected:"Card only on Duplicate Records. One Find patron per column. Operator-neutral copy. Auth still not deleted.",
+      troubleshoot:"Card still on every tab → #patronAccountMerge is outside #duplicateRecords (cached master-admin.html). Two Find patron in one row → cached HTML before s3.3.064. Still says Don → cached floqr-i18n.js / botdee-help-repository.js. #patronAccountMerge blanks the page → master-admin-app.js must map that hash to duplicateRecords."
+    },
+    {
       id:"s3-3-035-botdee-place-search",
       area:"BOT DEE",
       feature:"Contextual FLOQR venue search (dining / clubs in a city)",
@@ -3763,10 +3803,10 @@
       id:"s3-3-052-patron-phone-unifier",
       area:"Accounts",
       feature:"Required mobile unifies patrons; Master Admin merge does not delete Auth",
-      changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Live Lorna merge waits for a separate Don confirmation after deploy.",
-      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.053. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until Don separately confirms after deploy. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
+      changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Live Lorna merge waits for a separate Master Admin confirmation after deploy.",
+      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.053. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until a Master Admin separately confirms after deploy. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
       expected:"Mobile required. Duplicate phone cannot create a second live profile. Preview shows both uids and does not delete Auth. Merge is Master Admin + SOS2FA + reason only.",
-      troubleshoot:"Save still optional phone → cached patron-app.js / patron-portal-app.js. Second account created → Functions claimPatronPhone / phoneIndex rules not this SHA. Merge button works without SOS2FA → stop; lookupPatronAccounts must assertSos2faSession. Auth user vanished → mergePatronAccounts must not call deleteUser; revert and wait for Don."
+      troubleshoot:"Save still optional phone → cached patron-app.js / patron-portal-app.js. Second account created → Functions claimPatronPhone / phoneIndex rules not this SHA. Merge button works without SOS2FA → stop; lookupPatronAccounts must assertSos2faSession. Auth user vanished → mergePatronAccounts must not call deleteUser; revert and wait for a Master Admin."
     },
     {
       id:"s3-3-052-mingl-search-tile",
@@ -3776,6 +3816,15 @@
       howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/ until floqr-feature-services.js?v=s3.3.052. 2) Sign in as the same Auth user Master Admin ticked (check the email on the tester row — MsLorna and the other Lorna @gmail.com are different uids until merged). 3) Search should show Mingl with a Beta pill beside ShoutOut / BOT DEE / VIP. 4) Open the avatar / profile card — Mingl Chat must appear (data-floqr-feature-link=mingl via applyFeatureLinks). 5) Master Admin → Features Mgmt: Mingl Enable Feature 1 + Enable Beta 1. For each Lorna uid, Mingl checked → Save feature access. 6) Mark Succeed/Failed.",
       expected:"Granted tester sees Mingl on Search and on the profile avatar menu. Cinema (Si-nema) is a different tile. Signing in as the other Lorna uid without mingl:1 still hides Mingl on both surfaces.",
       troubleshoot:"No Mingl on Search or the profile card → confirm the signed-in email matches the tester row, then tick Mingl on THAT uid and Save. Tile still missing after grant → cached index.html / floqr-feature-services.js / patron-app.js before s3.3.052. Cinema showing instead → that is sinemaBtnCard, not a Mingl mixup. Enable Feature still 0 → packaged default is Off; Save Mingl on Release Control first."
+    },
+    {
+      id:"help-verbiage-enhance",
+      area:"BOT DEE",
+      feature:"Standing help verbiage enhancement",
+      changed:"Scheduled job rewrites one help entry at a time into helpVerbiage.lasttextenhun. Flag beenModsincelasttextenhun is 0 or 1. Patron What's New and Version sentences are the first lasttextenhun. Master-only help is off the public Pages script. Legal help is not sent to Gemini. No Gemini call while painting Ver or a ? popout.",
+      howToTest:"Before Functions deploy: run node --test functions/help-verbiage.test.js. Open help-verbiage-snapshot.js and confirm whatsnew-s3.3.055 and help-botdee-version-smartview, and confirm help-features-services is absent. Confirm botdee-help-repository.js has no audiences array that is only masterAdmin. After a later Functions deploy (not this PR): scheduledHelpVerbiageEnhance and getHelpVerbiage exist; a patron getHelpVerbiage of a master id is denied; Gemini failure leaves the previous sentence.",
+      expected:"Tests pass. Public snapshot has the shipped patron sentences and no master-only entry. The version card source does not call Gemini.",
+      troubleshoot:"Master help still in botdee-help-repository.js → rerun node scripts/build-help-verbiage-sources.js. Flag stuck at 1 → translations for de fr es it pt ru el pl nl ar are not stored yet, or the entry is legal, or Gemini rejected jargon. Blank help after a failure → lasttextenhun must stay; only a never-published id uses raw text."
     },
     {
       id:"botdee-whats-new-catalog",
@@ -3908,9 +3957,9 @@
       area:"BOT DEE",
       feature:"Room SMARTview invite — self vs already member",
       changed:"Tapping a Mingl friend named Don (or any friend chip) on Room SMARTview failed with generic Mingl friends only / invite already used when that chip was the host or already in the room. Chips now show That's you / Already in the room, listBotDeeRoomFriends returns inviteState, createBotDeeRoomInvite returns failed-precondition with reason, and chat invite Don can mint a real invite for a distinct Mingl friend (exact name match beats host first name).",
-      howToTest:"1) After Pages publish (Don merge), hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js / botdee.html ?v=s3.3.068. Sign in as Don Bans. 2) Open Room SMARTview. Friend chips: the host's own Don chip is disabled with That's you — tap toasts the same copy. 3) Invite a different Mingl friend; their chip becomes Already in the room (disabled). 4) Chat: invite Don — if a distinct friend is named Don, Inbox gets a Room SMARTview invite; if only the host matches, BOT DEE says That's you. 5) Confirm there is no Schedule a time or last-logout expiry control — room lasts up to 4 hours or until the host taps End Room. Display URLs have no ?v=. Mark Succeed/Failed.",
+      howToTest:"1) After Pages publish (Don merge), hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js / botdee.html ?v=s3.3.070. Sign in as Don Bans. 2) Open Room SMARTview. Friend chips: the host's own Don chip is disabled with That's you — tap toasts the same copy. 3) Invite a different Mingl friend; their chip becomes Already in the room (disabled). 4) Chat: invite Don — if a distinct friend is named Don, Inbox gets a Room SMARTview invite; if only the host matches, BOT DEE says That's you. 5) Confirm there is no Schedule a time or last-logout expiry control — room lasts up to 4 hours or until the host taps End Room. Display URLs have no ?v=. Mark Succeed/Failed.",
       expected:"Host can invite a distinct Mingl friend named Don. Self and already-member chips are blocked with clear copy. Chat named invite works. No scheduled-start or last-logout expiry (not built). Satellite session still FLOQRSessionShell.",
-      troubleshoot:"Still Mingl friends only on self → cached botdee-smartview.js / botdee.html before s3.3.068, or Functions not this SHA (listBotDeeRoomFriends / createBotDeeRoomInvite / executeBotSession). Chip tappable and invites self → decorateFriendInviteState missing. Chat invite Don no-ops → inviteNamedGuests not in executeBotSession. Functions deploy required for callables; Pages for chips."
+      troubleshoot:"Still Mingl friends only on self → cached botdee-smartview.js / botdee.html before s3.3.070, or Functions not this SHA (listBotDeeRoomFriends / createBotDeeRoomInvite / executeBotSession). Chip tappable and invites self → decorateFriendInviteState missing. Chat invite Don no-ops → inviteNamedGuests not in executeBotSession. Functions deploy required for callables; Pages for chips."
     },
     {
       id:"s3-3-067-smartvisuals-studio-review-publish",

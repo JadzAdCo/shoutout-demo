@@ -17,6 +17,8 @@ module.exports = {
   ...require("./venue-ingest-functions"),
   ...require("./data-classification-functions"),
   executeBotSession: require("./bot-dee-functions").executeBotSession,
+  scheduledHelpVerbiageEnhance: require("./help-verbiage-functions").scheduledHelpVerbiageEnhance,
+  getHelpVerbiage: require("./help-verbiage-functions").getHelpVerbiage,
   createBotDeeRoom: require("./botdee-session-functions").createBotDeeRoom,
   createBotDeeRoomInvite: require("./botdee-session-functions").createBotDeeRoomInvite,
   inviteBotDeeRoomGuest: require("./botdee-session-functions").inviteBotDeeRoomGuest,

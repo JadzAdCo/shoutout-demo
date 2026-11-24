@@ -8,14 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="./styles.css?v=s3.3.068"/>
-  <link rel="stylesheet" href="./admin.css?v=s3.3.068"/>
-  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.068"/>
-  <link rel="stylesheet" href="./floqr-features-smartview.css?v=s3.3.068"/>
-  <link rel="stylesheet" href="./smartvisuals-view.css?v=s3.3.068"/>
-  <link rel="stylesheet" href="./smartvisuals-studio.css?v=s3.3.068"/>
-  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.068"/>
-  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.068"/>  <script>    try{
+<link rel="stylesheet" href="./styles.css?v=s3.3.070"/>
+  <link rel="stylesheet" href="./admin.css?v=s3.3.070"/>
+  <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.070"/>
+  <link rel="stylesheet" href="./floqr-features-smartview.css?v=s3.3.070"/>
+  <link rel="stylesheet" href="./smartvisuals-view.css?v=s3.3.070"/>
+  <link rel="stylesheet" href="./smartvisuals-studio.css?v=s3.3.070"/>
+  <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.070"/>
+  <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.070"/>  <script>    try{
       var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
       var __floqrChromeRaw=localStorage.getItem("floqr.isSiteChrome");
       var __floqrChrome=__floqrChromeMap[__floqrChromeRaw];
@@ -71,7 +71,7 @@
             <button class="admin-subtab" data-panel="clubOnboarding" type="button" data-i18n="master.onboarding">Entity Onboarding</button>
             <button class="admin-subtab" data-panel="templateManagement" type="button" data-i18n="master.templates">Template Management</button>
             <button class="admin-subtab" data-panel="recommendationModeration" type="button" data-i18n="master.recommendations">Unapproved Recommendations</button>
-            <button class="admin-subtab" data-panel="demoEmployees" type="button" data-i18n="master.demoEmployees">Demo Svc / Emp Mgmt</button>
+            <button class="admin-subtab" data-panel="demoEmployees" type="button" data-i18n="master.demoEmployees">Demo Worker Mgmt</button>
           </div>
         </div>
         <div class="admin-tab-group" data-tab-group="shoutouts" data-default-panel="shoutoutCompletedLog">
@@ -850,25 +850,66 @@
       <section id="demoEmployees" class="admin-panel-section" data-entity-mgmt-gated="true">
         <!-- Design notes: .cursor/rules/design-notes-demo-signin.mdc -->
         <div class="card">
-          <p class="eyebrow">Entity management · demo employees</p>
+          <p class="eyebrow">Entity management · demo workers</p>
           <h2
+            data-i18n="master.demoEmployees"
             data-floqr-help-id="help-master-demo-signin"
             data-floqr-help-title="Demo sign-in code"
-            data-floqr-help-search="demo employee code|temp code|demo sign in|sign in as demo|demo sign-in code|demo service member|floqr-demo"
-            data-floqr-help-body="Use this when email codes are not arriving and you need to sign in as a demo employee (temp_role_number@floqr-demo.com). Search or pick the demo employee, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features &amp; Services audit trail. Real patron accounts cannot get a code here."
-          >Demo Svc / Emp Mgmt</h2>
+            data-floqr-help-search="demo worker mgmt|demo worker management|demo employee code|temp code|demo sign in|sign in as demo|demo sign-in code|demo service member|floqr-demo"
+            data-floqr-help-body="Use this when email codes are not arriving and you need to sign in as a demo worker (temp_role_number@floqr-demo.com). Find or pick the demo worker, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features &amp; Services audit trail. Real patron accounts cannot get a code here. Same-mobile Find patron, Preview merge, and Merge patron accounts are on this tab under Patron accounts (same mobile)."
+          >Demo Worker Mgmt</h2>
           <p id="demoEmpStatus" class="status" aria-live="polite"></p>
           <div class="demo-emp-search-row">
-            <label>Search demo employees
+            <label data-i18n="master.demoEmployees.find">Find demo worker
               <input id="demoEmpSearch" type="search" autocomplete="off" placeholder="Name, email, role, or club"/>
             </label>
-            <label>Select demo employee
+            <label data-i18n="master.demoEmployees.select">Select demo worker
               <select id="demoEmpSelect"></select>
             </label>
             <button id="demoEmpGenerateSelectedBtn" class="primary" type="button">Generate code</button>
           </div>
-          <p class="sub small">Showing <span id="demoEmpCount">0</span> demo employees. Click a row to select it.</p>
+          <p class="sub small">Showing <span id="demoEmpCount">0</span> demo workers. Click a row to select it.</p>
           <div id="demoEmpList" class="demo-emp-list"></div>
+        </div>
+
+        <div class="card" data-patron-account-merge id="demoPatronAccountMerge">
+          <h2 class="help-label">
+            <span class="help-label-text" data-i18n="master.accountMerge.title">Patron accounts (same mobile)</span>
+            <details class="help-popout inline-help-popout" data-floqr-help-id="help-patron-account-merge">
+              <summary>?</summary>
+              <div>Same mobile means the same person. Look up both Auth/Firestore accounts, preview, then merge into one uid. Mingl friends, beta grants, Inbox, and BOT DEE follow the surviving uid. Firebase Auth is not deleted until a Master Admin confirms.</div>
+            </details>
+          </h2>
+          <p class="sub small" data-i18n="master.accountMerge.sub">Same mobile means the same person. Preview, then merge into one uid. Firebase Auth is not deleted until a Master Admin confirms.</p>
+          <p class="sub small" data-i18n="master.accountMerge.authKept">Auth users stay until a Master Admin confirms a live Auth delete.</p>
+          <div class="patron-merge-grid">
+            <div class="patron-merge-col">
+              <label data-i18n="master.accountMerge.survivor">Keep this uid
+                <input data-merge-field="survivorQuery" placeholder="email, @handle, uid, or +E.164"/>
+                <input data-merge-field="survivorUid" placeholder="survivor uid"/>
+              </label>
+              <div class="queue-actions">
+                <button type="button" data-merge-action="lookup-survivor" data-i18n="master.accountMerge.lookup">Find patron</button>
+              </div>
+              <div data-merge-field="survivorResults" class="report-block"></div>
+            </div>
+            <div class="patron-merge-col">
+              <label data-i18n="master.accountMerge.duplicate">Merge this uid away
+                <input data-merge-field="duplicateQuery" placeholder="email, @handle, uid, or +E.164"/>
+                <input data-merge-field="duplicateUid" placeholder="duplicate uid"/>
+              </label>
+              <div class="queue-actions">
+                <button type="button" data-merge-action="lookup-duplicate" data-i18n="master.accountMerge.lookup">Find patron</button>
+              </div>
+              <div data-merge-field="duplicateResults" class="report-block"></div>
+            </div>
+          </div>
+          <div class="queue-actions">
+            <button type="button" data-merge-action="preview" data-i18n="master.accountMerge.preview">Preview merge</button>
+            <button type="button" class="primary" data-merge-action="merge" data-i18n="master.accountMerge.merge">Merge patron accounts</button>
+          </div>
+          <p data-merge-status class="status"></p>
+          <div data-merge-field="preview" class="report-block"></div>
         </div>
 
         <div class="card">
@@ -2135,39 +2176,47 @@
           <div id="duplicateMergeDiagnosticReport" class="report-block"></div>
           <div id="duplicateRecordResults" class="report-block"></div>
         </div>
-      </section>
 
-        <div class="card" id="patronAccountMerge">
+        <div class="card" data-patron-account-merge id="patronAccountMerge">
           <h2 class="help-label">
             <span class="help-label-text" data-i18n="master.accountMerge.title">Patron accounts (same mobile)</span>
             <details class="help-popout inline-help-popout" data-floqr-help-id="help-patron-account-merge">
               <summary>?</summary>
-              <div>Same mobile means the same person. Look up both Auth/Firestore accounts, preview, then merge into one uid. Mingl friends, beta grants, Inbox, and BOT DEE follow the surviving uid. Firebase Auth is not deleted until Don confirms.</div>
+              <div>Same mobile means the same person. Look up both Auth/Firestore accounts, preview, then merge into one uid. Mingl friends, beta grants, Inbox, and BOT DEE follow the surviving uid. Firebase Auth is not deleted until a Master Admin confirms.</div>
             </details>
           </h2>
-          <p class="sub small" data-i18n="master.accountMerge.sub">Same mobile means the same person. Preview, then merge into one uid. Firebase Auth is not deleted until Don confirms.</p>
-          <p class="sub small" data-i18n="master.accountMerge.authKept">Auth users stay until Don confirms a live Auth delete.</p>
-          <div class="profile-grid">
-            <label data-i18n="master.accountMerge.survivor">Keep this uid
-              <input id="patronMergeSurvivorQuery" placeholder="email, @handle, uid, or +E.164"/>
-              <input id="patronMergeSurvivorUid" placeholder="survivor uid"/>
-            </label>
-            <label data-i18n="master.accountMerge.duplicate">Merge this uid away
-              <input id="patronMergeDuplicateQuery" placeholder="email, @handle, uid, or +E.164"/>
-              <input id="patronMergeDuplicateUid" placeholder="duplicate uid"/>
-            </label>
+          <p class="sub small" data-i18n="master.accountMerge.sub">Same mobile means the same person. Preview, then merge into one uid. Firebase Auth is not deleted until a Master Admin confirms.</p>
+          <p class="sub small" data-i18n="master.accountMerge.authKept">Auth users stay until a Master Admin confirms a live Auth delete.</p>
+          <div class="patron-merge-grid">
+            <div class="patron-merge-col">
+              <label data-i18n="master.accountMerge.survivor">Keep this uid
+                <input id="patronMergeSurvivorQuery" data-merge-field="survivorQuery" placeholder="email, @handle, uid, or +E.164"/>
+                <input id="patronMergeSurvivorUid" data-merge-field="survivorUid" placeholder="survivor uid"/>
+              </label>
+              <div class="queue-actions">
+                <button id="patronMergeLookupSurvivorBtn" type="button" data-merge-action="lookup-survivor" data-i18n="master.accountMerge.lookup">Find patron</button>
+              </div>
+              <div id="patronMergeSurvivorResults" data-merge-field="survivorResults" class="report-block"></div>
+            </div>
+            <div class="patron-merge-col">
+              <label data-i18n="master.accountMerge.duplicate">Merge this uid away
+                <input id="patronMergeDuplicateQuery" data-merge-field="duplicateQuery" placeholder="email, @handle, uid, or +E.164"/>
+                <input id="patronMergeDuplicateUid" data-merge-field="duplicateUid" placeholder="duplicate uid"/>
+              </label>
+              <div class="queue-actions">
+                <button id="patronMergeLookupDuplicateBtn" type="button" data-merge-action="lookup-duplicate" data-i18n="master.accountMerge.lookup">Find patron</button>
+              </div>
+              <div id="patronMergeDuplicateResults" data-merge-field="duplicateResults" class="report-block"></div>
+            </div>
           </div>
           <div class="queue-actions">
-            <button id="patronMergeLookupSurvivorBtn" type="button" data-i18n="master.accountMerge.lookup">Find patron</button>
-            <button id="patronMergeLookupDuplicateBtn" type="button" data-i18n="master.accountMerge.lookup">Find patron</button>
-            <button id="patronMergePreviewBtn" type="button" data-i18n="master.accountMerge.preview">Preview merge</button>
-            <button id="patronMergeRunBtn" class="primary" type="button" data-i18n="master.accountMerge.merge">Merge patron accounts</button>
+            <button id="patronMergePreviewBtn" type="button" data-merge-action="preview" data-i18n="master.accountMerge.preview">Preview merge</button>
+            <button id="patronMergeRunBtn" class="primary" type="button" data-merge-action="merge" data-i18n="master.accountMerge.merge">Merge patron accounts</button>
           </div>
-          <p id="patronAccountMergeStatus" class="status"></p>
-          <div id="patronMergeSurvivorResults" class="report-block"></div>
-          <div id="patronMergeDuplicateResults" class="report-block"></div>
-          <div id="patronAccountMergePreview" class="report-block"></div>
+          <p id="patronAccountMergeStatus" data-merge-status class="status"></p>
+          <div id="patronAccountMergePreview" data-merge-field="preview" class="report-block"></div>
         </div>
+      </section>
 
       <section id="diagnostics" class="admin-panel-section">
         <div class="card">
@@ -2403,69 +2452,69 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.3.068"></script>
-<script src="./firebase-config.js?v=s3.3.068"></script>
-<script src="./floqr-chrome-scheme.js?v=s3.3.068"></script>
-<script src="./floqr-chrome-audit.js?v=s3.3.068"></script>
-<script src="./floqr-app-check.js?v=s3.3.068"></script>
-<script src="./floqr-nav.js?v=s3.3.068"></script>
-<script src="./floqr-save-busy.js?v=s3.3.068"></script>
-<script src="./global-profile-status.js?v=s3.3.068"></script>
-<script src="./floqr-temp-qa-showcase.js?v=s3.3.068"></script>
-<script src="./shared-data.js?v=s3.3.068"></script>
-<script src="./feature-gates.js?v=s3.3.068"></script>
-<script src="./sos2fa.js?v=s3.3.068"></script>
-<script src="./entity-management.js?v=s3.3.068"></script>
-<script src="./ai-service.js?v=s3.3.068"></script>
-<script src="./ai-index-service.js?v=s3.3.068"></script>
-<script src="./ai-search-service.js?v=s3.3.068"></script>
-<script src="./floqr-venue-datapoints.js?v=s3.3.068"></script>
-<script src="./floqr-discovery-gates.js?v=s3.3.068"></script>
-<script src="./ai-discovery-service.js?v=s3.3.068"></script>
-<script src="./floqr-action-feedback.js?v=s3.3.068"></script>
-<script src="./botdee-help-repository.js?v=s3.3.068"></script>
-<script src="./floqr-i18n-help.js?v=s3.3.068"></script>
-<script src="./help-attach.js?v=s3.3.068"></script>
-<script src="./helper-popouts.js?v=s3.3.068"></script>
-<script src="./floqr-ad-pricing.js?v=s3.3.068"></script>
-<script src="./dc-spot-ad-campaigns.js?v=s3.3.068"></script>
-<script src="./floqr-privacy-prefs.js?v=s3.3.068"></script>
-<script src="./ad-campaigns.js?v=s3.3.068"></script>
-<script src="./ai-diagnostics-service.js?v=s3.3.068"></script>
-<script src="./master-admin-rollup.js?v=s3.3.068"></script>
-<script src="./duplicate-record-service.js?v=s3.3.068"></script>
-<script src="./patron-account-merge.js?v=s3.3.068"></script>
-<script src="./floqr-logger.js?v=s3.3.068"></script>
-<script src="./payment-service.js?v=s3.3.068"></script>
-<script src="./floqr-access-notice.js?v=s3.3.068"></script>
-<script src="./master-admin-app.js?v=s3.3.068"></script>
-<script src="./master-ad-management.js?v=s3.3.068"></script>
-<script src="./master-admin-translation-overrides.js?v=s3.3.068"></script>
-<script src="./floqr-feature-services.js?v=s3.3.068"></script>
-<script src="./floqr-reason-prompt.js?v=s3.3.068"></script>
-<script src="./botdee-smartview.js?v=s3.3.068"></script>
-<script src="./features-smartview-core.js?v=s3.3.068"></script>
-<script src="./floqr-features-smartview.js?v=s3.3.068"></script>
-<script src="./smartvisuals-resolver.js?v=s3.3.068"></script>
-<script src="./smartvisuals-view.js?v=s3.3.068"></script>
-<script src="./smartvisuals-studio.js?v=s3.3.068"></script>
-<script src="./botdee-upgrade-ui.js?v=s3.3.068"></script>
-<script src="./master-feature-services.js?v=s3.3.068"></script>
-<script src="./master-demo-employees.js?v=s3.3.068"></script>
-<script src="./floqr-data-classification.js?v=s3.3.068"></script>
-<script src="./master-data-classification.js?v=s3.3.068"></script>
-<script src="./master-admin-shoutouts.js?v=s3.3.068"></script>
-<script src="./floqr-critical-log-blink.js?v=s3.3.068"></script>
-<script src="./master-display-security.js?v=s3.3.068"></script>
-<script src="./master-diagnostics-panels.js?v=s3.3.068"></script>
-<script src="./master-services-extension.js?v=s3.3.068"></script>
-<script src="./master-logging-extension.js?v=s3.3.068"></script>
-<script src="./master-floqcast-logging.js?v=s3.3.068"></script>
-<script src="./master-shoutout-logging.js?v=s3.3.068"></script>
-<script src="./master-aicrawl-logging.js?v=s3.3.068"></script>
-<script src="./master-mail-logging.js?v=s3.3.068"></script>
-<script src="./master-twilio-logging.js?v=s3.3.068"></script>
-<script src="./notification-center.js?v=s3.3.068"></script>
-<script src="./profile-access-guard.js?v=s3.3.068"></script><script>  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));</script>
+<script src="./floqr-i18n.js?v=s3.3.070"></script>
+<script src="./firebase-config.js?v=s3.3.070"></script>
+<script src="./floqr-chrome-scheme.js?v=s3.3.070"></script>
+<script src="./floqr-chrome-audit.js?v=s3.3.070"></script>
+<script src="./floqr-app-check.js?v=s3.3.070"></script>
+<script src="./floqr-nav.js?v=s3.3.070"></script>
+<script src="./floqr-save-busy.js?v=s3.3.070"></script>
+<script src="./global-profile-status.js?v=s3.3.070"></script>
+<script src="./floqr-temp-qa-showcase.js?v=s3.3.070"></script>
+<script src="./shared-data.js?v=s3.3.070"></script>
+<script src="./feature-gates.js?v=s3.3.070"></script>
+<script src="./sos2fa.js?v=s3.3.070"></script>
+<script src="./entity-management.js?v=s3.3.070"></script>
+<script src="./ai-service.js?v=s3.3.070"></script>
+<script src="./ai-index-service.js?v=s3.3.070"></script>
+<script src="./ai-search-service.js?v=s3.3.070"></script>
+<script src="./floqr-venue-datapoints.js?v=s3.3.070"></script>
+<script src="./floqr-discovery-gates.js?v=s3.3.070"></script>
+<script src="./ai-discovery-service.js?v=s3.3.070"></script>
+<script src="./floqr-action-feedback.js?v=s3.3.070"></script>
+<script src="./botdee-help-repository.js?v=s3.3.070"></script>
+<script src="./floqr-i18n-help.js?v=s3.3.070"></script>
+<script src="./help-attach.js?v=s3.3.070"></script>
+<script src="./helper-popouts.js?v=s3.3.070"></script>
+<script src="./floqr-ad-pricing.js?v=s3.3.070"></script>
+<script src="./dc-spot-ad-campaigns.js?v=s3.3.070"></script>
+<script src="./floqr-privacy-prefs.js?v=s3.3.070"></script>
+<script src="./ad-campaigns.js?v=s3.3.070"></script>
+<script src="./ai-diagnostics-service.js?v=s3.3.070"></script>
+<script src="./master-admin-rollup.js?v=s3.3.070"></script>
+<script src="./duplicate-record-service.js?v=s3.3.070"></script>
+<script src="./patron-account-merge.js?v=s3.3.070"></script>
+<script src="./floqr-logger.js?v=s3.3.070"></script>
+<script src="./payment-service.js?v=s3.3.070"></script>
+<script src="./floqr-access-notice.js?v=s3.3.070"></script>
+<script src="./master-admin-app.js?v=s3.3.070"></script>
+<script src="./master-ad-management.js?v=s3.3.070"></script>
+<script src="./master-admin-translation-overrides.js?v=s3.3.070"></script>
+<script src="./floqr-feature-services.js?v=s3.3.070"></script>
+<script src="./floqr-reason-prompt.js?v=s3.3.070"></script>
+<script src="./botdee-smartview.js?v=s3.3.070"></script>
+<script src="./features-smartview-core.js?v=s3.3.070"></script>
+<script src="./floqr-features-smartview.js?v=s3.3.070"></script>
+<script src="./smartvisuals-resolver.js?v=s3.3.070"></script>
+<script src="./smartvisuals-view.js?v=s3.3.070"></script>
+<script src="./smartvisuals-studio.js?v=s3.3.070"></script>
+<script src="./botdee-upgrade-ui.js?v=s3.3.070"></script>
+<script src="./master-feature-services.js?v=s3.3.070"></script>
+<script src="./master-demo-employees.js?v=s3.3.070"></script>
+<script src="./floqr-data-classification.js?v=s3.3.070"></script>
+<script src="./master-data-classification.js?v=s3.3.070"></script>
+<script src="./master-admin-shoutouts.js?v=s3.3.070"></script>
+<script src="./floqr-critical-log-blink.js?v=s3.3.070"></script>
+<script src="./master-display-security.js?v=s3.3.070"></script>
+<script src="./master-diagnostics-panels.js?v=s3.3.070"></script>
+<script src="./master-services-extension.js?v=s3.3.070"></script>
+<script src="./master-logging-extension.js?v=s3.3.070"></script>
+<script src="./master-floqcast-logging.js?v=s3.3.070"></script>
+<script src="./master-shoutout-logging.js?v=s3.3.070"></script>
+<script src="./master-aicrawl-logging.js?v=s3.3.070"></script>
+<script src="./master-mail-logging.js?v=s3.3.070"></script>
+<script src="./master-twilio-logging.js?v=s3.3.070"></script>
+<script src="./notification-center.js?v=s3.3.070"></script>
+<script src="./profile-access-guard.js?v=s3.3.070"></script><script>  document.addEventListener("DOMContentLoaded", () => window.FLOQRNav?.applyGlobalBack("floqrGlobalBack"));</script>
 </body>
 </html>

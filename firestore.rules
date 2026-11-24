@@ -2102,6 +2102,17 @@ service cloud.firestore {
  );
  }
 
+ // Enhanced help. Admin SDK only. Patrons do not read this collection.
+ // Master-only lasttextenhun is not copied into Pages.
+ match /helpVerbiage/{id} {
+ allow read, write: if false;
+ }
+ // Enhancement audit. Master Admin read. No client writes. No client IP stored.
+ match /helpVerbiageAudit/{id} {
+ allow read: if isMasterAdmin();
+ allow create, update, delete: if false;
+ }
+
  // Master Admin manifest docs (demo account codes, etc.) — Admin SDK writes; client read for Master Admin.
  match /system/{docId} {
  allow read: if isMasterAdmin();

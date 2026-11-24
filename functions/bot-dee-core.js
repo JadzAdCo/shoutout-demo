@@ -8,6 +8,7 @@ const guard = require("./botdee-privilege-guard");
 const BOTDEE_CONTENT = require("./botdee-content-classes.json");
 const SEARCH_CATALOG = require("./bot-dee-search-catalog.json");
 const RESULT_LOCALES = require("./bot-dee-result-locales.json");
+const helpVerbiage = require("./help-verbiage-core");
 
 const MAX_HISTORY = 12;
 const MAX_STORED_EVENTS = 24;
@@ -960,7 +961,17 @@ async function runTool(name, args, session) {
       guard.geminiGroundingRole(session.role),
       allowed
     );
-    return guard.stripPrivilegeFromToolResult(localizeSearchPayload(search, session?.uiLanguage, allowed));
+    let published = search;
+    if (typeof session?.loadHelpVerbiage === "function") {
+      try {
+        const ids = (search.results || []).map(row => row && row.id).filter(Boolean);
+        const records = await session.loadHelpVerbiage(ids);
+        published = {...search, results: helpVerbiage.applyPublishedVerbiage(search.results, records || {})};
+      } catch (_) {
+        published = search;
+      }
+    }
+    return guard.stripPrivilegeFromToolResult(localizeSearchPayload(published, session?.uiLanguage, allowed));
   }
   if (name === "lookupPublicProfiles") {
     const tools = require("./bot-dee-tools");

@@ -1,0 +1,359 @@
+[
+  {
+    "id": "help-botdee-version-smartview",
+    "audiences": [
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "Version SMARTview",
+      "body": "Type Ver, Vers, or Version — capitals do not matter. BOT DEE shows the version card. A longer question like “what is your version?” still shows that card."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "help-botdee-version-smartview-status",
+    "audiences": [
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "Version SMARTview status is a live probe",
+      "body": "Service status is probed on this Version request: Functions and package reachable with Gemini configured → Operational; Functions and package up but Gemini not configured → Degraded; Functions not in this request → Unavailable. It is never a static Not checked label. AI model shows the configured Gemini model id for this deployment even when this turn did not generate. Frontend and backend package stamps can differ; both are labeled. Master Admin may see extra diagnostics after Technical Details — patrons do not."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "help-botdee-version-smartview-tabs",
+    "audiences": [
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "Version SMARTview tabs",
+      "body": "Overview describes BOT DEE and opens Technical Details without leaving chat. What's New lists verified BOT DEE and Gemini changes only — not Master Admin, beta tester tools, or other FLOQR product notes. Help repeats the Ver / Vers / Version command. Switching tabs or expanding details keeps your unsent draft and scroll. The card uses your Site Chrome — there is no second theme."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.055",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.055",
+      "body": "s3.3.055: VIP reserV — book or hold a table interactively with BOT DEE, including the night you want, the 2D floor map, and cancel, which removes the booking panel."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.054",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.054",
+      "body": "s3.3.054: BOT DEE people search matches names and handles only, not bios, and shows smaller cards when several people match."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.051",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.051",
+      "body": "s3.3.051: Talk about a Cancun trip with BOT DEE and Room SMARTview opens — the same card as Open Room SMARTview Cancun Trip."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.050",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.050",
+      "body": "s3.3.050: BOT DEE Mingl session invites (friends only, host plus 7 guests, guests can invite) + FloqR Stripe shared tab"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.046",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.046",
+      "body": "s3.3.046: People SMARTview spacing is tighter, you can book VIP reserV from BOT DEE chat, and you can join a Room SMARTview."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.045",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.045",
+      "body": "s3.3.045: ShoutOut SMARTpreview shows the live LED template and updates as you edit"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.044",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.044",
+      "body": "s3.3.044: ShoutOut SMARTpreview in BOT DEE asks for the template, the @handle, and a photo or video."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.043",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.043",
+      "body": "s3.3.043: Throw a ShoutOut in BOT DEE chat. It uses the same ShoutOut page, Club Admin inbox, and LED."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.041",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.041",
+      "body": "s3.3.041: BOT DEE + FloqR headless ShoutOut (club + message → Stripe or pending)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.040",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.040",
+      "body": "s3.3.040: People lookup matches legal name, display name, handle, what-about"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.039",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.039",
+      "body": "s3.3.039: People card stacked layout (photo, name+handle, compact SMARTsummary)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.038",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.038",
+      "body": "s3.3.038: BOT DEE throw a ShoutOut from chat (no stacked help dump)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.037",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.037",
+      "body": "s3.3.037: BOT DEE SMARTview transcript scroll + rename saved chats"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.036",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.036",
+      "body": "s3.3.036: BOT DEE history collapse (+ / − Chats nest, Back to Search, recall kept)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.034",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.034",
+      "body": "s3.3.034: Version SMARTview card only; real Gemini model id"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.033",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.033",
+      "body": "s3.3.033: BOT DEE Room SMARTview intent routing (confirmation card; group rooms not live)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.032",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.032",
+      "body": "s3.3.032: BOT DEE Version SMARTview (Ver / Vers / Version aliases, honest stamps)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.031",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.031",
+      "body": "s3.3.031: SMARTview spelling + public-page Profile Media on People cards"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.030",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.030",
+      "body": "s3.3.030: My BOT DEE View my SMARTview (real patron card, mocks stay on Master Admin)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.029",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.029",
+      "body": "s3.3.029: My BOT DEE iOS demeanor radios (custom 22px grid, cache-bust from s3.3.028)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.028",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.028",
+      "body": "s3.3.028: People SMARTview v2 (inline patron card, owner edit, translation queue, Site Chrome)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.027",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.027",
+      "body": "s3.3.027: BOT DEE recall after 300s pause — retrieve stored events, recap last two turns, discussed vs booked"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.026",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.026",
+      "body": "s3.3.026: BOT DEE first-use overlay + My BOT DEE prefs"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.025",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.025",
+      "body": "s3.3.025: BOT DEE personalization (name/demeanor/recap), short composer, Hello sir greeting, privacy Help"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  }
+]

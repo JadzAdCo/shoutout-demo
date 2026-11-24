@@ -1,4 +1,4 @@
-/* Master Admin → Entity Management → Demo Svc / Emp Mgmt: one-time sign-in codes for demo employees.
+/* Master Admin → Entity Management → Demo Worker Mgmt: one-time sign-in codes for demo workers.
    Design notes: .cursor/rules/design-notes-demo-signin.mdc */
 (function (root) {
   "use strict";
@@ -109,7 +109,7 @@
     try {
       const snap = await db.collection("users").where("email", ">=", "temp_").where("email", "<", "temp`").limit(400).get();
       snap.forEach(doc => { rows = mergeProfile(rows, doc.id, doc.data() || {}); });
-      setStatus(`${rows.length} demo employees · ${rows.filter(row => row.hasProfile).length} with a FLOQR profile.`);
+      setStatus(`${rows.length} demo workers · ${rows.filter(row => row.hasProfile).length} with a FLOQR profile.`);
     } catch (error) {
       setStatus(`Showing the packaged demo roster — profiles could not be read (${error?.message || error}).`);
     }
@@ -140,7 +140,7 @@
     const list = byId("demoEmpList");
     if (!list) return;
     if (!rows.length) {
-      list.innerHTML = `<p class="sub">No demo employee matches. Pick a role and club number below instead.</p>`;
+      list.innerHTML = `<p class="sub">No demo worker matches. Pick a role and club number below instead.</p>`;
       return;
     }
     list.innerHTML = rows.map(row => `
@@ -336,7 +336,7 @@
       clearResult();
       return;
     }
-    setStatus("Loading demo employees…");
+    setStatus("Loading demo workers…");
     await loadProfiles();
     renderRoster();
     loadRecent();
@@ -347,6 +347,7 @@
     if (!db) db = firebase.firestore();
     bindUi();
     fillManualPickers();
+    root.FLOQRPatronAccountMerge?.bind?.();
     if (!unlocked()) {
       clearResult();
       return;

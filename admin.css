@@ -409,6 +409,9 @@ h3.help-label{
 
 /* v26 promoter guest list additions */
 .profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.profile-grid label{display:grid;gap:7px}.profile-grid input,.profile-grid select{width:100%}
+.patron-merge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.patron-merge-col{display:grid;gap:8px;align-content:start}
+.patron-merge-col .queue-actions{margin-top:0}
 
 /* v28 guest invitee rows */
 .soft-card{background:rgba(255,255,255,.05);margin:16px 0;padding:16px;border:1px solid var(--line);border-radius:18px}
@@ -566,7 +569,7 @@ html.floqr-desktop-browser a.admin-tab-link.buttonlike{
     flex:0 0 auto;flex-shrink:0;width:auto!important;max-width:none;min-width:max-content;
     min-height:44px;white-space:nowrap;scroll-snap-align:start
   }
-  .admin-grid,.profile-grid,.media-template-grid,.metric-grid{grid-template-columns:1fr!important}
+  .admin-grid,.profile-grid,.patron-merge-grid,.media-template-grid,.metric-grid{grid-template-columns:1fr!important}
   .report-table div{display:grid;grid-template-columns:1fr;gap:4px}
   .report-table strong{text-align:left}
   .queue-item{padding:14px;border-radius:16px}
@@ -575,7 +578,7 @@ html.floqr-desktop-browser a.admin-tab-link.buttonlike{
 
 @media(min-width:641px) and (max-width:1180px){
   .admin-grid{grid-template-columns:1fr}
-  .profile-grid,.media-template-grid,.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .profile-grid,.patron-merge-grid,.media-template-grid,.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 /* v29.06 club template background permissions and curated variants */

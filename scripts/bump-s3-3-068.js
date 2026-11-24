@@ -5,7 +5,7 @@ const path = require("path");
 const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
 const NEXT = "s3.3.068";
 const NEXT_NUM = "3.3.068";
-const NOTE = "Invite Mingl friends chips say That's you or Already in this session; no scheduled start";
+const NOTE = "Patron merge card only on Duplicate Records; one Find patron per column; Master Admin copy (not Don)";
 const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
 function transformHtml(src) {
@@ -50,7 +50,6 @@ function run(root) {
     .replace(/^# CURRENT PACKAGE: FLOQR ShoutOut s3\.\d+\.\d+[^\n]*/m, `# CURRENT PACKAGE: FLOQR ShoutOut ${NEXT} (stable)`)
     .replace(/^(- s3\.\d+\.\d+:)/m, `- ${NEXT}: ${NOTE}\n$1`));
   edit("functions/i18n-coverage.test.js", src => src
-    .replace(/assert\.equal\(chrome\.enKeys, \d+\)/, "assert.equal(chrome.enKeys, 1994)")
     .replace(/test\("floqr-i18n VERSION is s3\.\d+\.\d+; help packs remain s3\.\d+\.\d+"/, `test("floqr-i18n and help VERSION are ${NEXT}"`)
     .replace(/floqr-i18n and help VERSION are s3\.\d+\.\d+/, `floqr-i18n and help VERSION are ${NEXT}`)
     .replace(/assert\.match\(i18n, \/const VERSION\\s\*=\\s\*"s3\.\d+\.\d+"\/\)/g, `assert.match(i18n, /const VERSION\\s*=\\s*"${NEXT}"/)`)
@@ -62,7 +61,7 @@ function run(root) {
     rows.unshift({
       id: NEXT,
       text: `${NEXT}: ${NOTE}`,
-      audiences: ["botDee"]
+      audiences: ["other"]
     });
     return `${JSON.stringify(rows, null, 2)}\n`;
   });

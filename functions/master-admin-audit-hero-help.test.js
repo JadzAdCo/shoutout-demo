@@ -127,10 +127,12 @@ test("help popouts reset heading typography in the shared help-attach module", (
   assert.match(css, /:where\(\.card,\.notice,\.login-card,\.queue-item\):where\(:has\(details\.help-popout\[open\]\)\)\{position:relative;z-index:40\}/);
 });
 
-test("All Locations help is Master Admin only in the repository and the server content classes", () => {
+test("All Locations help is Master Admin only in the Functions source and the server content classes", () => {
   const repo = loadRepository();
-  const entry = repo.entries().find(row => row.id === HELP_ID);
-  assert.ok(entry, "repository entry must exist");
+  assert.equal(repo.entries().find(row => row.id === HELP_ID), undefined, "master-only help stays off the public Pages script");
+  const master = JSON.parse(read("functions/help-verbiage-master-source.json"));
+  const entry = master.find(row => row.id === HELP_ID);
+  assert.ok(entry, "master source entry must exist");
   assert.equal(entry.title, "All Locations");
   assert.deepEqual([...entry.audiences], ["masterAdmin"]);
   assert.match(entry.body, /Total Locations/);
