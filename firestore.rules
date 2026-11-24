@@ -2102,6 +2102,10 @@ service cloud.firestore {
  );
  }
 
+ // Raw Master Admin help catalog. Admin SDK only. Not a Pages file.
+ match /helpVerbiageMasterSource/{id} {
+ allow read, write: if false;
+ }
  // Enhanced help. Admin SDK only. Patrons do not read this collection.
  // Master-only lasttextenhun is not copied into Pages.
  match /helpVerbiage/{id} {

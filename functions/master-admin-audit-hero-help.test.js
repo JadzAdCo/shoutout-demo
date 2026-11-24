@@ -130,16 +130,13 @@ test("help popouts reset heading typography in the shared help-attach module", (
 test("All Locations help is Master Admin only in the Functions source and the server content classes", () => {
   const repo = loadRepository();
   assert.equal(repo.entries().find(row => row.id === HELP_ID), undefined, "master-only help stays off the public Pages script");
-  const master = JSON.parse(read("functions/help-verbiage-master-source.json"));
-  const entry = master.find(row => row.id === HELP_ID);
-  assert.ok(entry, "master source entry must exist");
-  assert.equal(entry.title, "All Locations");
-  assert.deepEqual([...entry.audiences], ["masterAdmin"]);
-  assert.match(entry.body, /Total Locations/);
-  assert.doesNotMatch(entry.body, /design notes|\.mdc|hash/i);
-  for (const phrase of ["all locations", "network intelligence center", "location picker", "network dashboard locations", "which venue am i looking at"]) {
-    assert.ok(entry.searchPhrases.includes(phrase), `missing search phrase ${phrase}`);
-  }
+  assert.equal(fs.existsSync(path.join(root, "functions/help-verbiage-master-source.json")), false);
+  const audiences = JSON.parse(read("functions/help-verbiage-master-audiences.json"));
+  const listed = audiences.find(row => row.id === HELP_ID);
+  assert.ok(listed, "master audience id must stay classified");
+  assert.deepEqual(listed.audiences, ["masterAdmin"]);
+  assert.equal(listed.body, undefined);
+  const entry = {id: HELP_ID, title: "All Locations", body: "Master Admin network locations.", audiences: ["masterAdmin"], searchPhrases: ["all locations"]};
   assert.equal(repo.canAccessHelpEntry(entry, {IsMasterAdmin: 1}), true);
   for (const flags of [{IsPatron: 1}, {IsServiceMember: 1}, {IsVenueAdmin: 1}, {}]) {
     assert.equal(repo.canAccessHelpEntry(entry, flags), false, JSON.stringify(flags));

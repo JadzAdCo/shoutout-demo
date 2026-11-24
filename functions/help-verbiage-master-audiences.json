@@ -1,0 +1,248 @@
+[
+  {
+    "id": "help-ad-campaign-mgmt",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-ad-campaign-status-badge",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-ai-crawl-gemini",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-app-language",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-bot-dee-mgmt",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-botdee-audience-sections",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-chrome-audit",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-club-messaging-logs",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-data-classification",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-feature-promote-live",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-features-services",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-heist-enable-64x48",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-mail-logging",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-ad-approval",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-ad-intake",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-ad-live",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-ad-settings",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-ad-stats",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-aicrawl-diagnostics",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-completed-log",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-demo-signin",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-floqcast-diagnostics",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-network-intelligence",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-ops-status",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-shoutout-diagnostics",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-master-shoutout-retention",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-network-promoters",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-onboarding",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-patron-account-merge",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-smartvisuals-create",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-smartvisuals-place-assign",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-smartvisuals-studio",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-sos2fa-entity-mgmt",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-sos2fa-request-channels",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-translation-overrides",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-twilio-compliance-logs",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-twilio-logging",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-venue-crawl-datapoints",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-venue-links",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-venue-onboarding",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
+    "id": "help-vip-receipt-sms-redaction-fixes",
+    "audiences": [
+      "masterAdmin"
+    ]
+  }
+]

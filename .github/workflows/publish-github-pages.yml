@@ -1,7 +1,6 @@
-# Publishes the site without functions/help-verbiage-master-source.json.
-# The scheduled function still reads that file from the Functions bundle.
-# Pages source must be GitHub Actions. The legacy main-branch build publishes
-# every tracked file, including this JSON.
+# Publishes the site. functions/help-verbiage-master-source.json is not in git.
+# The stage step fails if that path comes back. Master Admin raw help is in
+# Firestore helpVerbiageMasterSource/catalog, read by the scheduled function.
 name: Publish GitHub Pages
 
 on:
@@ -31,12 +30,12 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Stage site and keep the function file in git
+      - name: Stage site and keep master help out of git
         run: |
           node scripts/stage-pages-site.js "$RUNNER_TEMP/pages-site"
           test ! -e "$RUNNER_TEMP/pages-site/functions/help-verbiage-master-source.json"
+          test ! -e functions/help-verbiage-master-source.json
           test -f "$RUNNER_TEMP/pages-site/index.html"
-          test -f functions/help-verbiage-master-source.json
 
   deploy:
     name: Publish GitHub Pages
@@ -63,6 +62,7 @@ jobs:
         run: |
           node scripts/stage-pages-site.js "$RUNNER_TEMP/pages-site"
           test ! -e "$RUNNER_TEMP/pages-site/functions/help-verbiage-master-source.json"
+          test ! -e functions/help-verbiage-master-source.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

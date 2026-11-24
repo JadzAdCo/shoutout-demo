@@ -39,9 +39,21 @@ function auditActorFromRequest(request, roleFallback) {
   };
 }
 
-function loadCatalog() {
+const MASTER_SOURCE_COLLECTION = "helpVerbiageMasterSource";
+const MASTER_SOURCE_DOC = "catalog";
+
+async function loadMasterRows(db) {
+  if (!db || typeof db.collection !== "function") return [];
+  dc.systemJob("helpVerbiageEnhance", MASTER_SOURCE_COLLECTION);
+  const snap = await db.collection(MASTER_SOURCE_COLLECTION).doc(MASTER_SOURCE_DOC).get();
+  const data = snap && snap.exists ? (snap.data() || {}) : {};
+  const rows = Array.isArray(data.entries) ? data.entries : [];
+  return rows.filter(row => row && row.id && core.isMasterOnly(row.audiences) && !core.isLegalVerbiage(row));
+}
+
+async function loadCatalog(db) {
   const publicRows = require("./help-verbiage-public-source.json");
-  const masterRows = require("./help-verbiage-master-source.json");
+  const masterRows = await loadMasterRows(db);
   const changelog = require("./botdee-version-changelog.json");
   const whatsNewCatalog = require("./botdee-whats-new-catalog");
   const help = [...publicRows, ...masterRows].filter(row => row && row.id && !core.isLegalVerbiage(row));
@@ -123,7 +135,7 @@ async function runScheduledEnhance(options = {}) {
   const fetchImpl = options.fetchImpl || global.fetch;
   const apiKey = options.apiKey != null ? String(options.apiKey) : String(process.env.GEMINI_API_KEY || "");
   const now = options.now || Date.now();
-  const bundle = options.catalog || loadCatalog();
+  const bundle = options.catalog || await loadCatalog(db);
   const entries = (bundle.entries || []).filter(entry => !core.isLegalVerbiage(entry));
   const seeds = new Map((bundle.seeds || []).map(row => [row.id, row]));
   dc.systemJob("helpVerbiageEnhance", core.COLLECTION);
@@ -326,6 +338,9 @@ module.exports = {
   readHelpForViewer,
   loadPublishedMap,
   loadCatalog,
+  loadMasterRows,
+  MASTER_SOURCE_COLLECTION,
+  MASTER_SOURCE_DOC,
   isAgentClient,
   auditActorFromRequest,
   firestoreBody

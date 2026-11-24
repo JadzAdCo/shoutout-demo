@@ -69,6 +69,7 @@
     ["geminiApiAccessLogs", "master", 0, "Gemini API success/failure access audit (30-day; Master Admin or FloqR Admin)"],
     ["helpVerbiage", "secret", 0, "Enhanced help copy (lasttextenhun). Admin SDK only. Callable filters by audience. Not public. No patron PII. Master-only text is not copied to Pages."],
     ["helpVerbiageAudit", "master", 0, "Help verbiage enhancement audit (help id, flag, before/after, model). Master Admin read. No client IP. No patron profile."],
+    ["helpVerbiageMasterSource", "secret", 0, "Raw Master Admin help catalog. Admin SDK only. Client read and write off. Not published to Pages or git."],
     ["approvedShoutOutLibrary", "public", 0, "Approved ShoutOut ideas"],
     ["audienceCampaigns", "clubAdmin", 0, "Club audience campaigns"],
     ["betaInvites", "master", 1, "Beta tester invitations"],
@@ -655,7 +656,7 @@
     shoutoutStories: {purpose: "Show approved ShoutOuts as Mingl Gist stories without the submitter's contact details", collections: ["shoutouts"]},
     patronAccountUnifier: {purpose: "Claim a required mobile as the patron record unifier and merge duplicate Auth accounts without deleting Auth or storing client IP", collections: ["users", "phoneIndex", "betaTesters", "minglConnections", "inboxNotifications", "botDeeThreads", "botDeeRooms", "botDeeRoomMembers", "botDeeRoomInvites", "userBlocks", "usercharacter_analysis", "featureServiceAuditLogs", "featureServiceAuditHead"]},
     featuresSmartViewIngest: {purpose: "Stamp editorial approval or rollback for Features SMARTview public copy without publishing git catalog automatically", collections: ["featuresSmartviewApprovals", "featuresSmartviewDrafts", "featuresSmartviewAuditLogs"]},
-    helpVerbiageEnhance: {purpose: "Rewrite one changed help entry at a time and store lasttextenhun. No patron PII, secrets, chat, or client IP.", collections: ["helpVerbiage", "helpVerbiageAudit", "geminiApiAccessLogs", "appLogs"]}
+    helpVerbiageEnhance: {purpose: "Rewrite one changed help entry at a time and store lasttextenhun. No patron PII, secrets, chat, or client IP.", collections: ["helpVerbiage", "helpVerbiageAudit", "helpVerbiageMasterSource", "geminiApiAccessLogs", "appLogs"]}
   };
 
   function systemJob(job, collection) {

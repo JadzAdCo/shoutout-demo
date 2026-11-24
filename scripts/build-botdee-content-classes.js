@@ -37,7 +37,7 @@ function sortedObject(entries) {
 }
 
 function masterHelpAudiences(root = ROOT) {
-  const file = path.join(root, "functions", "help-verbiage-master-source.json");
+  const file = path.join(root, "functions", "help-verbiage-master-audiences.json");
   if (!fs.existsSync(file)) return [];
   const rows = JSON.parse(fs.readFileSync(file, "utf8"));
   return (Array.isArray(rows) ? rows : []).map(row => [String(row.id || ""), [...(row.audiences || [])].sort()]);

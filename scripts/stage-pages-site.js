@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /* Copy the site for GitHub Pages.
-   Raw Master Admin help stays in git for scheduledHelpVerbiageEnhance
-   (require of functions/help-verbiage-master-source.json) and is not copied
-   into the published tree, so Pages has no URL for that file. */
+   functions/help-verbiage-master-source.json is not in git. If it reappears,
+   this stage still leaves it out of the published tree. */
 "use strict";
 
 const fs = require("fs");
