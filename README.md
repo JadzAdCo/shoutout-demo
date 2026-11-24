@@ -1,4 +1,4 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.075 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.076 (stable)
 
 - s3.3.075: Room SMARTview shared picks + 60% host election, VIP session popouts
 - s3.3.074: Headless ShoutOut collects from template collectableInput1..N

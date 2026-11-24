@@ -33,6 +33,9 @@ test("intent matrix: explicit / strong / contextual / none / commands / injectio
     ["Tell me about group reservations", "none"],
     ["What is a room?", "none"],
     ["Invite two more friends", "command"],
+    ["Invite lorna", "setup"],
+    ["invite @lornaawuro", "setup"],
+    ["open a room smart card", "setup"],
     ["Who is in this room?", "command"],
     ["What have we decided?", "command"],
     ["Who's paying?", "command"],
@@ -95,6 +98,18 @@ test("share preview is selected facts only — no private thread or SMARTsummary
   assert.equal(view.actions.create, false);
   assert.ok(view.sharePreview.facts.some(row => /Mykonos/i.test(row.label) && row.tentative));
   assert.doesNotMatch(JSON.stringify(view), /usercharacter_analysis|botDeeThreads/);
+});
+
+test("Invite lorna is a named Room SMARTview invite, not VIP", () => {
+  const classified = room.classifyRoomIntent("Invite lorna");
+  assert.equal(classified.command, "invite");
+  assert.equal(classified.route, "setup");
+  assert.equal(classified.namedNeedles[0].displayName.toLowerCase(), "lorna");
+  const live = room.classifyRoomIntent("Invite lorna", {hasActiveRoom: true});
+  assert.equal(live.route, "command");
+  assert.equal(live.command, "invite");
+  assert.equal(room.extractNamedNeedles("invite @lornaawuro")[0].displayName.toLowerCase(), "lornaawuro");
+  assert.equal(room.classifyRoomIntent("open a room smart card").route, "setup");
 });
 
 test("declined offer is not repeated; explicit Open still works", () => {
@@ -329,6 +344,14 @@ test("BOT DEE Room SMARTview Cancun and Paris resolve to kit art when catalog is
     utterance: "Open Room SMARTview"
   }));
   assert.match(generic, /data-sv-bg="bg-mingl-room"/);
+  const miamiHtml = ctx.FLOQRBotDeeSmartView.renderCard(room.buildRoomSmartView({
+    utterance: "Open a room smart card for reservations in Miami"
+  }));
+  assert.match(miamiHtml, /data-sv-bg="bg-miami"/);
+  assert.match(miamiHtml, /data-sv-place-tags="1"/);
+  assert.match(miamiHtml, /<span class="botdee-sv-tag">miami<\/span>/);
+  assert.equal(room.classifyRoomIntent("Open a room smart card for reservations in Miami").route, "setup");
+  assert.equal(bot.isVipExecutePrompt("Open a room smart card for reservations in Miami"), false);
 });
 
 test("chat wires Room SMARTview join without charging", () => {

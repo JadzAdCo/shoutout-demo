@@ -49,6 +49,14 @@
       ]
     },
     {
+      "collectionGroup": "botDeeRooms",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hostUid", "order": "ASCENDING" },
+        { "fieldPath": "smartNotification", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "botDeeRoomInvites",
       "queryScope": "COLLECTION",
       "fields": [

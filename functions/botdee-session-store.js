@@ -848,6 +848,25 @@ async function hostDisplayName(uid) {
   return core.publicPerson(uid, snap.exists ? snap.data() : {}).displayName || "Host";
 }
 
+async function persistActorRoom(uid, roomId, conversationId) {
+  try {
+    const threads = require("./bot-dee-thread");
+    await threads.persistJoinedRoomId(uid, roomId, conversationId);
+  } catch (_) {}
+}
+
+async function latestInviteableHostRoom({uid, nowMs}) {
+  const viewer = core.text(uid, 80);
+  const now = Number(nowMs || Date.now());
+  if (!viewer) return null;
+  const hosted = await systemCollection("botDeeRooms").where("hostUid", "==", viewer).limit(80).get();
+  const rows = hosted.docs
+    .map(doc => ({id: doc.id, data: doc.data() || {}}))
+    .filter(row => core.roomIsInviteable(row.data, now) && core.isCurrentMember(row.data, viewer))
+    .sort((a, b) => Number(b.data.updatedAtMs || a.data.scheduledStartMs || 0) - Number(a.data.updatedAtMs || a.data.scheduledStartMs || 0));
+  return rows[0] || null;
+}
+
 async function scheduleRoom({hostUid, conversationId, title, authorizedTitle, authorizedDescription, scheduledStartMs, scheduledTimeZone, actorEmail, actorRole, nowMs}) {
   const uid = core.text(hostUid, 80);
   const now = Number(nowMs || Date.now());
@@ -892,6 +911,7 @@ async function scheduleRoom({hostUid, conversationId, title, authorizedTitle, au
     detail: {scheduledStartMs: Number(scheduledStartMs), scheduledTimeZone: zone},
     nowMs: now
   });
+  await persistActorRoom(uid, roomId, conversationId);
   return {ok: true, room: core.publicRoom(roomId, row)};
 }
 
@@ -918,6 +938,7 @@ async function startRoom({uid, roomId, conversationId, title, authorizedTitle, a
         reason: "join_now",
         nowMs: now
       });
+      await persistActorRoom(actor, created.room.roomId, conversationId);
     }
     return created;
   }
@@ -956,6 +977,7 @@ async function startRoom({uid, roomId, conversationId, title, authorizedTitle, a
     reason: "start",
     nowMs: now
   });
+  await persistActorRoom(actor, live.id, conversationId || live.data.conversationId);
   return {ok: true, room: core.publicRoom(live.id, next)};
 }
 
@@ -1023,8 +1045,17 @@ async function listNotifications({uid, nowMs}) {
   const viewer = core.text(uid, 80);
   const now = Number(nowMs || Date.now());
   if (!viewer) return {ok: true, notifications: []};
-  const hosted = await systemCollection("botDeeRooms").where("hostUid", "==", viewer).limit(20).get();
-  const invites = await systemCollection("botDeeRoomInvites").where("targetUid", "==", viewer).limit(40).get();
+  let hosted;
+  try {
+    hosted = await systemCollection("botDeeRooms")
+      .where("hostUid", "==", viewer)
+      .where("smartNotification", "==", 1)
+      .limit(40)
+      .get();
+  } catch (_) {
+    hosted = await systemCollection("botDeeRooms").where("hostUid", "==", viewer).limit(80).get();
+  }
+  const invites = await systemCollection("botDeeRoomInvites").where("targetUid", "==", viewer).limit(80).get();
   const roomIds = new Map();
   hosted.docs.forEach(doc => roomIds.set(doc.id, {doc, via: "host"}));
   for (const inv of invites.docs) {
@@ -1048,6 +1079,9 @@ async function listNotifications({uid, nowMs}) {
       hostName,
       viewerRole,
       joinHref: core.roomHref(roomId, ""),
+      inviteeLine: viewerRole === "host"
+        ? `${hostName} scheduled a Mingl Room.`
+        : `${hostName} invited you to join a Mingl Room.`,
       rsvp: viewerRole === "host" ? "accepted" : core.text(meta.invite?.rsvp || meta.invite?.status, 20),
       scheduledLabel: Number(row.scheduledStartMs || 0)
         ? new Date(Number(row.scheduledStartMs)).toLocaleString("en-US", {timeZone: row.scheduledTimeZone || "UTC"})
@@ -1389,6 +1423,8 @@ module.exports = {
   rescheduleRoom,
   touchPresence,
   listNotifications,
+  latestInviteableHostRoom,
+  persistActorRoom,
   expireRooms,
   rsvpRoom,
   setGuestCanInvite,

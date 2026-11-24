@@ -883,7 +883,15 @@ const FOOD_GENERIC = new Set(["food", "foods", "eat", "eats", "eating"]);
 
 const VENUE_CUES = new Set([
   "club", "clubs", "lounge", "lounges", "nightlife", "nightclub", "nightclubs",
-  "venue", "venues", "bar", "bars", "disco", "discos"
+  "venue", "venues", "bar", "bars", "disco", "discos",
+  "reservation", "reservations", "reserve"
+]);
+
+const PLACE_LEFTOVER_STOP = new Set([
+  ...PLACE_STOP,
+  "room", "rooms", "smart", "card", "cards", "smartview", "smartcard",
+  "group", "reservation", "reservations", "reserve", "booking", "book",
+  "together", "session"
 ]);
 
 const CUISINE_ALIASES = Object.freeze({
@@ -935,6 +943,22 @@ function matchPlaces(needle) {
     tokens.push("new york", "nyc", "manhattan");
     consumed.push("new", "york", "nyc", "manhattan", "city");
   }
+  const CITY_HITS = [
+    {re: /\bmiami\s+beach\b|\bsouth beach\b|\bsobe\b/, tokens: ["miami", "miami beach"], consumed: ["miami", "beach", "south", "sobe"]},
+    {re: /\bmiami\b/, tokens: ["miami"], consumed: ["miami"]},
+    {re: /\bparis\b/, tokens: ["paris"], consumed: ["paris"]},
+    {re: /\bibiza\b/, tokens: ["ibiza"], consumed: ["ibiza"]},
+    {re: /\blondon\b/, tokens: ["london"], consumed: ["london"]},
+    {re: /\batlanta\b/, tokens: ["atlanta"], consumed: ["atlanta"]},
+    {re: /\blas vegas\b|\bvegas\b/, tokens: ["vegas", "las vegas"], consumed: ["las", "vegas"]},
+    {re: /\bcancun\b/, tokens: ["cancun"], consumed: ["cancun"]},
+    {re: /\bmykonos\b/, tokens: ["mykonos"], consumed: ["mykonos"]}
+  ];
+  CITY_HITS.forEach(hit => {
+    if (!hit.re.test(needle)) return;
+    tokens.push(...hit.tokens);
+    consumed.push(...hit.consumed);
+  });
   return {
     tokens: [...new Set(tokens)],
     consumed: [...new Set(consumed)]
@@ -980,7 +1004,7 @@ function leftoverQueryTokens(rawTokens, needle, placeTokens, cuisineTokens) {
   const known = new Set([...(placeTokens || []), ...(cuisineTokens || []), ...consumed]);
   return (rawTokens || []).filter(token => {
     if (!token || token.length < 3) return false;
-    if (PLACE_STOP.has(token) || GENERIC_DINING.has(token) || FOOD_GENERIC.has(token) || VENUE_CUES.has(token)) return false;
+    if (PLACE_STOP.has(token) || PLACE_LEFTOVER_STOP.has(token) || GENERIC_DINING.has(token) || FOOD_GENERIC.has(token) || VENUE_CUES.has(token)) return false;
     if (CUISINE_ALIASES[token] || CUISINE_ALIASES[token.replace(/s$/, "")]) return false;
     if (known.has(token) || consumed.has(token.replace(/\./g, ""))) return false;
     if ((placeTokens || []).some(place => place.includes(token))) return false;
@@ -1153,12 +1177,46 @@ async function loadPlaceBackgroundOverride(kind) {
   return row.backgroundId || "";
 }
 
+function mergeSmartViewTags(...lists) {
+  try {
+    return require("./smartvisuals-resolver").normalizeSmartViewTags(lists.flat());
+  } catch (_) {
+    const out = [];
+    const seen = new Set();
+    lists.flat().forEach(tag => {
+      const next = String(tag || "").trim().toLowerCase();
+      if (!next || seen.has(next)) return;
+      seen.add(next);
+      out.push(next);
+    });
+    return out;
+  }
+}
+
+function catalogTagsForBackground(backgroundId) {
+  const id = String(backgroundId || "").trim();
+  if (!id) return [];
+  try {
+    const resolver = require("./smartvisuals-resolver");
+    const catalog = resolver.loadCatalog();
+    const assets = catalog && Array.isArray(catalog.assets) ? catalog.assets : [];
+    const bg = assets.find(row => row && row.id === id);
+    return resolver.normalizeSmartViewTags(bg && bg.tags);
+  } catch (_) {
+    return [];
+  }
+}
+
 function applyPlaceVisualOverride(payload, override) {
   if (!payload || !override) return payload;
   const next = {};
   if (override.backgroundId) next.smartBackgroundId = override.backgroundId;
   if (override.stencilId) next.smartStencilId = override.stencilId;
-  if (Array.isArray(override.tags) && override.tags.length) next.smartTags = override.tags;
+  const prior = (payload.floqrPublicData && payload.floqrPublicData.smartTags) || [];
+  const assigned = Array.isArray(override.tags) ? override.tags : [];
+  const fromBg = catalogTagsForBackground(override.backgroundId || next.smartBackgroundId);
+  const merged = mergeSmartViewTags(prior, assigned, fromBg);
+  if (merged.length) next.smartTags = merged;
   if (!Object.keys(next).length) return payload;
   payload.floqrPublicData = Object.assign({}, payload.floqrPublicData || {}, next);
   return payload;
@@ -1171,10 +1229,82 @@ function applyPlaceBackgroundOverride(payload, backgroundId) {
   return applyPlaceVisualOverride(payload, {backgroundId, stencilId: "", tags: []});
 }
 
+function cityQueryLabels(placeTokens) {
+  const labels = [];
+  const tokens = Array.isArray(placeTokens) ? placeTokens : [];
+  if (tokens.includes("miami") || tokens.includes("miami beach")) labels.push("Miami", "Miami Beach");
+  if (tokens.includes("washington") || tokens.includes("dc")) labels.push("Washington");
+  if (tokens.includes("new york") || tokens.includes("nyc") || tokens.includes("manhattan")) labels.push("New York");
+  tokens.forEach(token => {
+    if (["dc", "washington", "nyc", "new york", "manhattan", "miami", "miami beach"].includes(token)) return;
+    const label = String(token || "").split(/\s+/).filter(Boolean)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+    if (label) labels.push(label);
+  });
+  return [...new Set(labels)];
+}
+
+function titleCasePlace(token) {
+  const raw = String(token || "").trim().toLowerCase();
+  if (!raw) return "";
+  if (raw === "dc" || raw === "washington") return "Washington, DC";
+  if (raw === "nyc" || raw === "new york" || raw === "manhattan") return "New York";
+  if (raw === "vegas" || raw === "las vegas") return "Las Vegas";
+  if (raw === "miami beach") return "Miami Beach";
+  return raw.split(/\s+/).map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+}
+
+function placeSearchAlongsideRoom(classified) {
+  return !!(classified && classified.intent && classified.intent !== "none" && (classified.placeTokens || []).length);
+}
+
+function destinationSmartView(classified) {
+  const token = (classified && classified.placeTokens || []).find(Boolean);
+  if (!token) return null;
+  const city = titleCasePlace(token);
+  const payload = {
+    kind: "venue",
+    title: city,
+    summary: `${city} · Place SMARTview`,
+    images: [],
+    floqrPublicData: {city, cuisine: [], cuisines: []},
+    canonicalFloqrPageId: "",
+    actions: [],
+    sources: [{provider: "floqr", reuseRights: "place"}]
+  };
+  try {
+    const visual = require("./smartvisuals-resolver").resolvePlaceCard(payload);
+    if (visual && visual.backgroundId) payload.floqrPublicData.smartBackgroundId = visual.backgroundId;
+    if (visual && visual.stencilId) payload.floqrPublicData.smartStencilId = visual.stencilId;
+    if (visual && Array.isArray(visual.tags) && visual.tags.length) {
+      payload.floqrPublicData.smartTags = visual.tags;
+    }
+  } catch (_) { /* catalog optional on this path */ }
+  return payload;
+}
+
+function destinationPlaceViews(query, overrideVisual) {
+  const classified = classifyPlaceSearchIntent(query);
+  if (!placeSearchAlongsideRoom(classified)) return [];
+  const dest = destinationSmartView(classified);
+  if (!dest) return [];
+  return [applyPlaceVisualOverride(dest, overrideVisual || emptyPlaceVisualOverride())];
+}
+
 async function searchPublicClubs(classified, limit = 5) {
+  const byId = new Map();
   const snap = await db.collection("clubLocations").limit(PUBLIC_PROFILE_SCAN).get();
-  const docs = snap.docs.map(doc => ({id: doc.id, data: doc.data() || {}}));
-  return rankPublicClubs(docs, classified, limit);
+  snap.docs.forEach(doc => byId.set(doc.id, {id: doc.id, data: doc.data() || {}}));
+  const labels = cityQueryLabels(classified && classified.placeTokens);
+  for (const label of labels.slice(0, 5)) {
+    try {
+      const extra = await db.collection("clubLocations").where("city", "==", label).limit(40).get();
+      extra.docs.forEach(doc => {
+        if (!byId.has(doc.id)) byId.set(doc.id, {id: doc.id, data: doc.data() || {}});
+      });
+    } catch (_) { /* city field query is a supplement; scan ranking still runs */ }
+  }
+  return rankPublicClubs([...byId.values()], classified, limit);
 }
 
 async function attachVenueSearch({query} = {}) {
@@ -1198,18 +1328,23 @@ async function attachVenueSearch({query} = {}) {
   try {
     overrideVisual = await loadPlaceVisualOverride("venue");
   } catch (_) { /* packaged resolver still stamps a SMARTbackground */ }
+  const smartViews = cards.map(card => applyPlaceVisualOverride(clubSmartView(card), overrideVisual));
+  if (!smartViews.length && placeSearchAlongsideRoom(classified)) {
+    const dest = destinationSmartView(classified);
+    if (dest) smartViews.push(applyPlaceVisualOverride(dest, overrideVisual));
+  }
   return {
     handled: true,
     classified,
     reply,
     replyKey: found ? "botdee.place.found" : "botdee.place.none",
     results: [],
-    smartViews: cards.map(card => applyPlaceVisualOverride(clubSmartView(card), overrideVisual)),
+    smartViews,
     media,
     venueSearch: {
       intent: classified.intent,
       replyKey: found ? "botdee.place.found" : "botdee.place.none",
-      count: cards.length
+      count: smartViews.length
     }
   };
 }
@@ -1874,6 +2009,9 @@ module.exports = {
   createFloqCastCheckout,
   lookupPublicProfiles,
   classifyPlaceSearchIntent,
+  placeSearchAlongsideRoom,
+  destinationSmartView,
+  destinationPlaceViews,
   clubHaystack,
   scoreClubForPlace,
   rankPublicClubs,

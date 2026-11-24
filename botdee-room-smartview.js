@@ -78,6 +78,9 @@ const EXPLICIT = [
   "start a group chat",
   "open room smartview",
   "open a room smartview",
+  "open a room smart card",
+  "open room smart card",
+  "room smart card",
   "create a room",
   "create room smartview",
   "make a group chat",
@@ -272,16 +275,16 @@ const NAME_STOP = /^(friends|others|everyone|them|us|people|guests|someone|anyon
 function extractNamedNeedles(raw) {
   const original = text(raw, 200);
   const invite = original.match(
-    /(?:invite|bring|add|remove|kick)\s+((?:[A-Z][\w.'-]+)(?:\s+and\s+[A-Z][\w.'-]+)*)/
+    /(?:invite|bring|add|remove|kick)\s+((?:@?[\w.'-]+)(?:\s+and\s+@?[\w.'-]+)*)/i
   );
   const canJoin = original.match(
-    /[Cc]an\s+((?:[A-Z][\w.'-]+)(?:\s+and\s+[A-Z][\w.'-]+)*)\s+join/
+    /[Cc]an\s+((?:@?[\w.'-]+)(?:\s+and\s+@?[\w.'-]+)*)\s+join/i
   );
   const chunk = (invite && invite[1]) || (canJoin && canJoin[1]) || "";
   if (!chunk) return [];
   return chunk
     .split(/\s+and\s+/i)
-    .map(name => text(name, 40))
+    .map(name => text(name, 40).replace(/^@+/, ""))
     .filter(name => name && !NAME_STOP.test(name) && !/^\d+$/.test(name))
     .slice(0, 8)
     .map(name => ({
@@ -336,6 +339,7 @@ function detectCommand(normalized, raw) {
     || /invite (?:two more|more) (?:friends|people)/.test(normalized)
     || /noch zwei freunde einladen/.test(normalized)
     || /inviter deux amis de plus/.test(normalized)
+    || /^(?:invite|bring)\s+\S+/.test(normalized)
   ) {
     return "invite";
   }
@@ -505,14 +509,16 @@ function classifyRoomIntent(raw, opts) {
 
   const command = detectCommand(normalized, raw);
   if (command) {
+    const namedNeedles = command === "kick" || command === "invite" ? extractNamedNeedles(raw) : [];
+    const setupInvite = command === "invite" && namedNeedles.length > 0 && !hasActiveRoom;
     const row = {
       ...empty,
-      level: "command",
-      route: command === "confirm" ? "confirm" : "command",
+      level: setupInvite ? "explicit" : "command",
+      route: setupInvite ? "setup" : (command === "confirm" ? "confirm" : "command"),
       command,
       handled: true,
-      needsConfirmation: command === "kick" || command === "end",
-      namedNeedles: command === "kick" || command === "invite" ? extractNamedNeedles(raw) : []
+      needsConfirmation: setupInvite || command === "kick" || command === "end",
+      namedNeedles
     };
     row.declineKey = declineKey(row);
     return row;
@@ -526,6 +532,8 @@ function classifyRoomIntent(raw, opts) {
     includesAny(normalized, EXPLICIT)
     || /^(?:open|create|start|make|launch|show)\s+(?:a\s+)?(?:group chat|room|room smartview)\b/.test(normalized)
     || /\broom smartview\b/.test(normalized)
+    || /\broom smart\s*card\b/.test(normalized)
+    || /\broom smartview card\b/.test(normalized)
   ) {
     level = "explicit";
   } else if (

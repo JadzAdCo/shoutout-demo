@@ -562,9 +562,14 @@
   function cardMatchesSmartViewTag(payload, tag) {
     const want = normalizeSmartViewTags(tag)[0] || "";
     if (!want) return true;
-    const tags = explicitPlaceTags(payload);
-    if (tags.includes(want)) return true;
-    return tagsForPlaceCard(payload, null, null).includes(want);
+    const explicit = explicitPlaceTags(payload);
+    if (explicit.includes(want)) return true;
+    const resolved = resolvePlaceCard(payload);
+    const tags = normalizeSmartViewTags([
+      ...explicit,
+      ...((resolved && resolved.tags) || [])
+    ]);
+    return tags.includes(want);
   }
 
   function classifyUsefulForPlace(classified) {
