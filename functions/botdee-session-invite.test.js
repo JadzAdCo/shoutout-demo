@@ -227,12 +227,15 @@ test("BOT DEE subset deploy lists first-time session callables and tab checkout"
 
 test("client join captures room=&t= and Inbox is not a ShoutOut CTA", () => {
   const chat = read("bot-dee-chat.js");
-  assert.match(chat, /acceptBotDeeRoomInvite/);
+  assert.match(chat, /completeSearchJoin/);
+  assert.match(chat, /startGroupSessionPoll/);
+  assert.match(chat, /pendingJoinRoomId/);
   assert.match(chat, /searchParams\.get\("t"\)/);
   assert.match(chat, /searchParams\.get\("room"\)/);
   assert.match(chat, /joinToken/);
   assert.doesNotMatch(chat, /acceptPendingInvite\(\)\.finally/);
-  assert.match(chat, /if \(joined && joined\.ok\)/);
+  assert.match(chat, /completeSearchJoin/);
+  assert.doesNotMatch(chat, /function acceptPendingInvite/);
   assert.match(read("patron-portal-app.js"), /Review BOT DEE invite/);
   assert.match(read("patron-portal-app.js"), /botdeeroominvite/);
   assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom\b/);
@@ -382,4 +385,46 @@ test("schedule callables, Search list, and Join Now never open mingl-chat", () =
   assert.match(read("functions/bot-dee-functions.js"), /roomIsInviteable\(liveRoom\)/);
   assert.match(read("botdee-help-repository.js"), /help-botdee-room-smartview-schedule/);
   assert.match(read("docs/FEATURE-WIRING.md"), /s3\.3\.071-botdee-room-schedule/);
+});
+
+test("Search Join Now attaches the existing BOT DEE session for group chat", () => {
+  const store = read("functions/botdee-session-store.js");
+  const session = read("functions/bot-dee-functions.js");
+  const chat = read("bot-dee-chat.js");
+  const view = read("smartvisuals-view.js");
+  const card = read("botdee-smartview.js");
+  const liveFns = read("functions/botdee-session-functions.js");
+  assert.match(store, /async function attachSession/);
+  assert.match(store, /function loadMemberTurns/);
+  assert.match(store, /alreadyMember: true/);
+  assert.match(store, /scheduleStartDue/);
+  assert.match(store, /publicSearchParticipants/);
+  assert.match(session, /attachSession/);
+  assert.match(session, /stored\.joinedRoomId !== joinRoomId/);
+  assert.match(chat, /completeSearchJoin/);
+  assert.match(chat, /startGroupSessionPoll/);
+  assert.doesNotMatch(chat, /function acceptPendingInvite/);
+  assert.match(card, /data-rs-roster/);
+  assert.match(card, /data-rs-transcript/);
+  assert.match(liveFns, /loadMemberTurns/);
+  assert.match(view, /payload\.liveInRoom \|\| !payload\.scheduledLabel/);
+  assert.doesNotMatch(view, /mingl-chat\.html\?/);
+  const live = core.publicNotification("br_x", room({
+    status: "open",
+    memberUids: ["host-1", "lorna-1"]
+  }), {
+    hostName: "Don",
+    participants: core.publicSearchParticipants([
+      {uid: "host-1", displayName: "Don Papi"},
+      {uid: "lorna-1", displayName: "Lorna"}
+    ], {live: true})
+  });
+  assert.equal(live.liveInRoom, true);
+  assert.equal(live.participants.length, 2);
+  assert.equal(live.participants[1].name, "Lorna");
+  assert.match(live.joinHref, /botdee\.html\?room=br_x/);
+  assert.doesNotMatch(live.joinHref, /mingl-chat/);
+  const due = {status: "scheduled", scheduledStartMs: 100, hostUid: "host-1", memberUids: ["host-1", "lorna-1"]};
+  assert.equal(core.scheduleStartDue(due, 200), true);
+  assert.equal(core.scheduleStartDue({...due, scheduledStartMs: 500}, 200), false);
 });

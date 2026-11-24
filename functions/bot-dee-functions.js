@@ -524,7 +524,7 @@ async function applyRoomCollabToOutcome(uid, roomId, outcome) {
   const store = require("./botdee-session-store");
   const sessionCore = require("./botdee-session-core");
   const live = await store.loadRoom(roomId);
-  if (!live || !sessionCore.isCurrentMember(live.data, uid) || !sessionCore.roomIsOpen(live.data)) {
+  if (!live || !sessionCore.isCurrentMember(live.data, uid) || !sessionCore.roomIsInviteable(live.data)) {
     return outcome;
   }
   const views = Array.isArray(outcome.smartViews) ? outcome.smartViews.slice() : [];
@@ -552,12 +552,22 @@ async function applyRoomCollabToOutcome(uid, roomId, outcome) {
   const latest = await store.loadRoom(roomId);
   if (!latest) return outcome;
   const collab = sessionCore.publicCollab(latest.data, uid);
+  const members = await store.publicMemberList(latest.data);
+  const turns = await store.loadMemberTurns(latest.id, members);
   views.forEach(view => {
     if (!view) return;
     if (view.kind === "botDeeVip" || view.kind === "botDeeShoutOut" || view.kind === "botDeeRoom") {
       view.collab = collab;
       view.guestMode = !collab.viewerIsHost;
       view.roomId = roomId;
+    }
+    if (view.kind === "botDeeRoom") {
+      view.members = members;
+      view.turns = turns;
+      view.participantCount = members.length || view.participantCount;
+      view.status = sessionCore.publicRoomStatus(latest.data);
+      view.viewerIsHost = sessionCore.isHostActor(latest.data, uid);
+      view.hasActiveRoom = true;
     }
   });
   const alreadyVip = views.some(row => row && row.kind === "botDeeVip");
@@ -597,7 +607,8 @@ function joinFailureOutcome(error, lang) {
     expired: ["botdee.room.expired", "That BOT DEE invite expired. Ask your Mingl friend to send a new one."],
     revoked: ["botdee.room.revoked", "That BOT DEE invite was revoked."],
     used: ["botdee.room.used", "That BOT DEE invite was already used."],
-    not_friend: ["botdee.room.notFriend", "BOT DEE session invites are Mingl friends only."]
+    not_friend: ["botdee.room.notFriend", "BOT DEE session invites are Mingl friends only."],
+    not_member: ["botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."]
   };
   const pair = map[error] || map.not_found;
   return {
@@ -1248,11 +1259,15 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     const roomConversationId = String(
       persistedConversationId || request.data?.conversationId || stored.currentConversationId || ""
     ).trim();
+    const joinToken = String(request.data?.joinToken || request.data?.inviteToken || "").trim();
+    const joinRoomId = String(request.data?.roomId || "").trim();
     if (
       stored.joinedRoomId
       && stored.joinedRoomConversationId
       && roomConversationId
       && stored.joinedRoomConversationId !== roomConversationId
+      && !joinToken
+      && stored.joinedRoomId !== joinRoomId
     ) {
       try { await threads.persistJoinedRoomId(uid, null); } catch (_) {}
       stored.joinedRoomId = "";
@@ -1271,37 +1286,54 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         console.warn("BOT DEE room load failed", error?.message || error);
       }
     }
-    const joinToken = String(request.data?.joinToken || request.data?.inviteToken || "").trim();
-    const joinRoomId = String(request.data?.roomId || "").trim();
-    if (joinToken) {
+    if (joinToken || joinRoomId) {
       try {
         await audit.assertFeatureAccess(request.auth, "mingl", request);
-        const joined = await roomLive.joinRoom({uid, token: joinToken, roomId: joinRoomId});
+        const sessionStore = require("./botdee-session-store");
+        const joined = await sessionStore.attachSession({
+          uid,
+          token: joinToken,
+          roomId: joinRoomId,
+          conversationId: roomConversationId,
+          actorEmail: request.auth?.token?.email || "",
+          actorRole: "patron"
+        });
         if (joined.ok) {
-          await threads.persistJoinedRoomId(uid, joined.room.roomId, roomConversationId);
           stored.joinedRoomId = joined.room.roomId;
           stored.joinedRoomConversationId = roomConversationId;
+          const names = (joined.members || []).map(row => row.displayName || row.handle).filter(Boolean);
           const view = roomMod.buildRoomSmartView({
             utterance: userPrompt,
             hasActiveRoom: true,
-            participantCount: joined.room.participantCount,
-            joinHref: joined.room.joinHref || ""
+            participantCount: names.length || joined.room.participantCount || 1,
+            joinHref: ""
           });
           view.hasActiveRoom = true;
-          view.roomsLive = true;
-          view.lifecycle = "active";
+          view.roomsLive = !joined.waiting;
+          view.lifecycle = joined.waiting ? "scheduled" : "active";
           view.joinHref = "";
-          view.participantCount = joined.room.participantCount;
+          view.participantCount = names.length || joined.room.participantCount;
           view.roomId = joined.room.roomId;
+          view.status = joined.room.status;
+          view.viewerIsHost = joined.room.hostUid === uid;
+          view.members = joined.members || [];
+          view.turns = joined.turns || [];
+          view.needsConfirmation = false;
           outcome = {
-            reply: "You're in this BOT DEE session with your Mingl friends. Joining does not charge anyone. Shared tab needs a separate opt-in.",
+            reply: joined.waiting
+              ? "You're in this BOT DEE session. It goes live at the scheduled time. Joining does not charge anyone."
+              : (names.length
+                ? `You're in this BOT DEE session with ${names.join(", ")}. Joining does not charge anyone. Shared tab needs a separate opt-in.`
+                : "You're in this BOT DEE session with your Mingl friends. Joining does not charge anyone. Shared tab needs a separate opt-in."),
             results: [],
             provider: "local-room-smartview",
             model: "roomJoin",
             toolRounds: 0,
             uiLanguage,
             smartViews: [view],
-            replyKey: "botdee.rs.joined",
+            members: joined.members || [],
+            turns: joined.turns || [],
+            replyKey: joined.waiting ? "botdee.rs.notLiveNote" : "botdee.rs.joined",
             geminiOnView: false
           };
         } else {
@@ -1310,41 +1342,6 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       } catch (error) {
         console.warn("BOT DEE room join failed", error?.message || error);
         outcome = joinFailureOutcome("not_found", uiLanguage);
-      }
-    } else if (joinRoomId) {
-      try {
-        await audit.assertFeatureAccess(request.auth, "mingl", request);
-        const live = await roomLive.loadRoom(joinRoomId);
-        if (live && live.status === "open" && roomLive.memberOf(live, uid)) {
-          await threads.persistJoinedRoomId(uid, live.roomId, roomConversationId);
-          stored.joinedRoomId = live.roomId;
-          stored.joinedRoomConversationId = roomConversationId;
-          const view = roomMod.buildRoomSmartView({
-            utterance: userPrompt,
-            hasActiveRoom: true,
-            participantCount: live.participantCount,
-            joinHref: ""
-          });
-          view.hasActiveRoom = true;
-          view.roomsLive = true;
-          view.lifecycle = "active";
-          view.joinHref = "";
-          view.participantCount = live.participantCount;
-          view.roomId = live.roomId;
-          outcome = {
-            reply: "You're in this BOT DEE session with your Mingl friends. Joining does not charge anyone. Shared tab needs a separate opt-in.",
-            results: [],
-            provider: "local-room-smartview",
-            model: "roomJoin",
-            toolRounds: 0,
-            uiLanguage,
-            smartViews: [view],
-            replyKey: "botdee.rs.joined",
-            geminiOnView: false
-          };
-        }
-      } catch (error) {
-        console.warn("BOT DEE room member attach failed", error?.message || error);
       }
     }
     const roomAttached = roomMod.buildRoomSession(userPrompt, {

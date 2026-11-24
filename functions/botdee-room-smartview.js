@@ -329,6 +329,12 @@ function shareableFactsFromUtterance(raw) {
 
 function detectCommand(normalized, raw) {
   if (
+    /^i joined this room smartview\b/.test(normalized)
+    || /^joined this room smartview\b/.test(normalized)
+  ) {
+    return "join";
+  }
+  if (
     /^(?:confirm room(?: smartview)?)$/.test(normalized)
     || /\bconfirm room smartview\b/.test(normalized)
   ) {
@@ -626,6 +632,7 @@ function replyFor(classified) {
     };
   }
   const commandCopy = {
+    join: ["botdee.rs.joined", "You're in this BOT DEE session with your Mingl friends. Joining does not charge anyone. Shared tab needs a separate opt-in."],
     invite: ["botdee.room.commandInvite", "Invite Mingl friends into this BOT DEE session. Not a public link. Cap is host plus 7 guests."],
     members: ["botdee.rs.commandMembers", "There is no active Room SMARTview yet, so there is no member list to show."],
     summarize: ["botdee.rs.commandSummary", "There are no room-only decisions yet. Private BOT DEE history is not used as a room summary."],

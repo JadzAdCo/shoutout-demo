@@ -31,8 +31,15 @@ async function createRoom({hostUid, conversationId, title}) {
   return store.createRoom({hostUid, conversationId, title});
 }
 
-async function joinRoom({uid, token, roomId}) {
-  return store.acceptInvite({uid, token, roomId: roomId || ""});
+async function joinRoom({uid, token, roomId, conversationId, actorEmail, actorRole}) {
+  return store.attachSession({
+    uid,
+    token,
+    roomId: roomId || "",
+    conversationId: conversationId || "",
+    actorEmail,
+    actorRole
+  });
 }
 
 async function loadRoom(roomId) {

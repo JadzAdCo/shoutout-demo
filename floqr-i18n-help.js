@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.077";
+  const VERSION = "s3.3.079";
   const packs = {
     "ru": {
       "help-smartvisuals-create": {
@@ -75,7 +75,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "Войти в сессию BOT DEE",
-        body: "Откройте приглашение Inbox, войдя как друг Mingl, которому оно отправлено. Чужой аккаунт, срок и отзыв отказывают. Вход в room — не вход в общий счёт и не согласие на оплату. BOT DEE никогда не берёт номера карт."
+        body: "Откройте приглашение Inbox или Search Join Now, войдя как друг Mingl, которому оно отправлено. Join Now открывает BOT DEE, не Mingl chat. Вы и приглашённые друзья Mingl делите групповой чат Room SMARTview; имена видят участники. Чужой аккаунт, срок и отзыв отказывают. Вход в room — не вход в общий счёт и не согласие на оплату. BOT DEE никогда не берёт номера карт."
       },
       "help-botdee-room-smartview-end": {
         title: "Завершить Room SMARTview",
@@ -613,7 +613,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "Deelnemen aan een BOT DEE-sessie",
-        body: "Open de Inbox-uitnodiging terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Verkeerd account, verlopen of ingetrokken weigert. Deelnemen aan de room is niet deelnemen aan een tab en keurt geen betaling goed. BOT DEE neemt nooit kaartnummers."
+        body: "Open de Inbox-uitnodiging of Search Join Now terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Join Now opent BOT DEE, niet Mingl chat. Jij en uitgenodigde Mingl-vrienden delen de Room SMARTview-groepschat; namen zijn zichtbaar voor leden. Verkeerd account, verlopen of ingetrokken weigert. Deelnemen aan de room is niet deelnemen aan een tab en keurt geen betaling goed. BOT DEE neemt nooit kaartnummers."
       },
       "help-botdee-room-smartview-end": {
         title: "Room SMARTview beëindigen",
@@ -1151,7 +1151,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "Rejoindre une session BOT DEE",
-        body: "Ouvrez l’invitation Inbox en étant connecté comme l’ami Mingl destinataire. Mauvais compte, expiration ou révocation refuse. Rejoindre la room n’est pas rejoindre une addition et n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte."
+        body: "Ouvrez l’invitation Inbox ou Search Join Now connecté comme l’ami Mingl destinataire. Join Now ouvre BOT DEE, pas Mingl chat. Vous et les amis Mingl invités partagez le chat de groupe Room SMARTview ; les noms s’affichent pour les membres. Mauvais compte, expiration ou révocation refuse. Rejoindre la room n’est pas rejoindre une addition et n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte."
       },
       "help-botdee-room-smartview-end": {
         title: "Terminer Room SMARTview",
@@ -1689,7 +1689,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "Einer BOT DEE-Sitzung beitreten",
-        body: "Öffne die Inbox-Einladung, angemeldet als der Mingl-Freund, dem sie gilt. Falsches Konto, Ablauf oder Widerruf lehnt ab. Der Room ist nicht der Tab und genehmigt keine Zahlung. BOT DEE nimmt niemals Kartennummern."
+        body: "Öffne die Inbox-Einladung oder Search Join Now, angemeldet als der Mingl-Freund, dem sie gilt. Join Now öffnet BOT DEE, nicht Mingl chat. Du und eingeladene Mingl-Freunde teilt den Room SMARTview-Gruppenchat; Namen sehen Mitglieder. Falsches Konto, Ablauf oder Widerruf lehnt ab. Der Room ist nicht der Tab und genehmigt keine Zahlung. BOT DEE nimmt niemals Kartennummern."
       },
       "help-botdee-room-smartview-end": {
         title: "Room SMARTview beenden",
@@ -2227,7 +2227,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "Unirse a una sesión BOT DEE",
-        body: "Abre la invitación de Inbox iniciado sesión como el amigo Mingl destinatario. Cuenta incorrecta, caducada o revocada se niega. Unirse a la room no es unirse a una cuenta ni aprobar un pago. BOT DEE nunca toma números de tarjeta."
+        body: "Abre la invitación de Inbox o Search Join Now iniciado sesión como el amigo Mingl destinatario. Join Now abre BOT DEE, no Mingl chat. Tú y los amigos Mingl invitados compartís el chat de grupo Room SMARTview; los nombres se ven para miembros. Cuenta incorrecta, caducada o revocada se niega. Unirse a la room no es unirse a una cuenta ni aprobar un pago. BOT DEE nunca toma números de tarjeta."
       },
       "help-botdee-room-smartview-end": {
         title: "Terminar Room SMARTview",
@@ -2765,7 +2765,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "Unisciti a una sessione BOT DEE",
-        body: "Apri l’invito Inbox autenticato come l’amico Mingl destinatario. Account sbagliato, scaduto o revocato rifiuta. Entrare nella room non è entrare in un conto e non approva un pagamento. BOT DEE non prende mai numeri di carta."
+        body: "Apri l’invito Inbox o Search Join Now autenticato come l’amico Mingl destinatario. Join Now apre BOT DEE, non Mingl chat. Tu e gli amici Mingl invitati condividete la chat di gruppo Room SMARTview; i nomi sono visibili ai membri. Account sbagliato, scaduto o revocato rifiuta. Entrare nella room non è entrare in un conto e non approva un pagamento. BOT DEE non prende mai numeri di carta."
       },
       "help-botdee-room-smartview-end": {
         title: "Termina Room SMARTview",
@@ -3303,7 +3303,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "Entrar numa sessão BOT DEE",
-        body: "Abra o convite do Inbox autenticado como o amigo Mingl destinatário. Conta errada, expirado ou revogado recusa. Entrar na room não é entrar numa conta nem aprovar um pagamento. BOT DEE nunca pega números de cartão."
+        body: "Abra o convite do Inbox ou Search Join Now autenticado como o amigo Mingl destinatário. Join Now abre BOT DEE, não Mingl chat. Tu e os amigos Mingl convidados partilham o chat de grupo Room SMARTview; os nomes aparecem para membros. Conta errada, expirado ou revogado recusa. Entrar na room não é entrar numa conta nem aprovar um pagamento. BOT DEE nunca pega números de cartão."
       },
       "help-botdee-room-smartview-end": {
         title: "Terminar Room SMARTview",
@@ -3841,7 +3841,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "Συμμετοχή σε συνεδρία BOT DEE",
-        body: "Ανοίξτε την πρόσκληση Inbox συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Λάθος λογαριασμός, λήξη ή ανάκληση αρνείται. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό ούτε έγκριση πληρωμής. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών."
+        body: "Ανοίξτε την πρόσκληση Inbox ή Search Join Now συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Το Join Now ανοίγει BOT DEE, όχι Mingl chat. Εσείς και οι προσκεκλημένοι φίλοι Mingl μοιράζεστε το group chat Room SMARTview· τα ονόματα φαίνονται στα μέλη. Λάθος λογαριασμός, λήξη ή ανάκληση αρνείται. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό ούτε έγκριση πληρωμής. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών."
       },
       "help-botdee-room-smartview-end": {
         title: "Τέλος Room SMARTview",
@@ -4379,7 +4379,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "Dołącz do sesji BOT DEE",
-        body: "Otwórz zaproszenie Inbox zalogowany jako znajomy Mingl, do którego je wysłano. Złe konto, wygaśnięcie lub odwołanie odmawia. Dołączenie do room to nie dołączenie do rachunku ani zgoda na płatność. BOT DEE nigdy nie bierze numerów kart."
+        body: "Otwórz zaproszenie Inbox lub Search Join Now zalogowany jako znajomy Mingl, do którego je wysłano. Join Now otwiera BOT DEE, nie Mingl chat. Ty i zaproszeni znajomi Mingl dzielicie czat grupowy Room SMARTview; imiona widzą członkowie. Złe konto, wygaśnięcie lub odwołanie odmawia. Dołączenie do room to nie dołączenie do rachunku ani zgoda na płatność. BOT DEE nigdy nie bierze numerów kart."
       },
       "help-botdee-room-smartview-end": {
         title: "Zakończ Room SMARTview",
@@ -4917,7 +4917,7 @@
       },
       "help-botdee-room-smartview-join": {
         title: "الانضمام إلى جلسة BOT DEE",
-        body: "افتح دعوة Inbox وأنت مسجّل كصديق Mingl المُرسَل إليه. الحساب الخطأ أو المنتهية أو الملغاة تُرفض. الانضمام إلى room ليس انضماماً إلى حساب مشترك ولا موافقة على دفع. BOT DEE لا يأخذ أرقام البطاقات أبداً."
+        body: "افتح دعوة Inbox أو Search Join Now وأنت مسجّل كصديق Mingl المُرسَل إليه. Join Now يفتح BOT DEE وليس Mingl chat. أنت وأصدقاء Mingl المدعوون تتشاركون دردشة مجموعة Room SMARTview؛ تظهر الأسماء للأعضاء. الحساب الخطأ أو المنتهية أو الملغاة تُرفض. الانضمام إلى room ليس انضماماً إلى حساب مشترك ولا موافقة على دفع. BOT DEE لا يأخذ أرقام البطاقات أبداً."
       },
       "help-botdee-room-smartview-end": {
         title: "إنهاء Room SMARTview",

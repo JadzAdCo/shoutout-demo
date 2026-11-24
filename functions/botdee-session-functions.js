@@ -192,11 +192,13 @@ exports.getBotDeeRoom = onCall(CALL_OPTS, async request => {
     const live = await store.loadRoom(core.text(request.data?.roomId, 80));
     if (!live || !(await store.viewerMayReadRoom(live, uid))) fail("not_member");
     const members = await store.publicMemberList(live.data);
+    const turns = await store.loadMemberTurns(live.id, members);
     const loadedTab = await store.loadTab(live.id);
     return {
       ok: true,
       room: core.publicRoom(live.id, live.data),
       members,
+      turns,
       viewerIsHost: core.text(live.data.hostUid, 80) === uid,
       tab: loadedTab.tab ? core.publicTab(loadedTab.tab, loadedTab.lines, uid) : null
     };

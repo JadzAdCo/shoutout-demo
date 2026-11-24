@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.077";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.077";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.079";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.079";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.079",
+      title: "s3.3.079 — Search Join Now attaches Room SMARTview group chat",
+      checks: [
+        {label:"Attach session", file:"functions/botdee-session-store.js", includes:["async function attachSession", "loadMemberTurns", "alreadyMember: true"]},
+        {label:"Join keeps roomId", file:"functions/bot-dee-functions.js", includes:["stored.joinedRoomId !== joinRoomId", "attachSession"]},
+        {label:"Search join waits for restore", file:"bot-dee-chat.js", includes:["completeSearchJoin", "startGroupSessionPoll", "pendingJoinRoomId"]},
+        {label:"Roster + transcript", file:"botdee-smartview.js", includes:["data-rs-roster", "data-rs-transcript"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-079-botdee-joined-group-chat", "s3.3.079"]}
+      ]
+    },
     {
       version: "s3.3.077",
       title: "s3.3.077 — Room SMARTview Invite chip stays greyed with Invite sent",
@@ -3846,6 +3857,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-079-botdee-joined-group-chat",
+      area:"BOT DEE",
+      feature:"Search Join Now opens the joined Room SMARTview group chat",
+      changed:"s3.3.079 — Search Join Now (botdee.html?room=, never mingl-chat.html) attaches the existing BOT DEE session. Host without a pending invite is already a member. Due scheduled rooms go live. Don and Lorna names show on the Room SMARTview card; group turns are shared. Join ack is not a new setup card. Overlay hides Join at Scheduled Time when live. Tracker SMA-32. Keep PR 172 Miami Place cards separate.",
+      howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh Search and https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js / smartvisuals-view.js ?v=s3.3.079. Sign in with BOT DEE + Mingl. 2) Host: scheduled Miami room with Lorna invited. After the start time, Search Join Now. Expect botdee.html?room= (not mingl-chat). Room SMARTview shows Don + Lorna names and a group transcript, not a fresh Join Now / Set a schedule card. 3) Lorna: Join Now from Search or Inbox — she sees the same roster and can send a message Don sees. 4) Overlay: Participants names, Live in Room without a past scheduled CTA. 5) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Join Now lands in the existing BOT DEE room. Both members see names and share the group chat. Not a private BOT DEE thread pretending to be a group.",
+      troubleshoot:"Still a new setup card → cached bot-dee-chat.js (completeSearchJoin must keep roomId until executeBotSession) or Functions not this SHA (attachSession / conversation mismatch). Count 2 but no names → getBotDeeRoom members missing or card without data-rs-roster. Messages not shared → room still scheduled (start due failed) or joinedRoomId not persisted. Join Now opens mingl-chat → smartvisuals-view.js joinHref rewrite."
+    },
       {
       id:"s3-3-077-botdee-lorna-chip-ack",
       area:"BOT DEE",

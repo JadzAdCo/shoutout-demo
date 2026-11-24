@@ -279,7 +279,7 @@
         <div class="sv-hero-scrim" aria-hidden="true"></div>
         <div class="sv-hero-copy">
           <div class="sv-pills">${pillHtml(visual)}
-            <span class="sv-pill"><img src="./smartvisuals/stencils/calendar.svg" alt=""/>${esc(t("sv.scheduled", "Scheduled"))}</span>
+            ${payload.liveInRoom ? "" : `<span class="sv-pill"><img src="./smartvisuals/stencils/calendar.svg" alt=""/>${esc(t("sv.scheduled", "Scheduled"))}</span>`}
           </div>
           <h2 class="sv-title">${esc(payload.title || t("sv.untitled", "Mingl Room"))}</h2>
           <p class="sv-blurb">${esc([t("sv.tagPlanning", "Planning"), t("sv.tagReservations", "Reservations"), t("sv.tagItinerary", "Itinerary")].join(" · "))}</p>
@@ -307,8 +307,8 @@
       </section>
       <div class="sv-join-row">
         <button type="button" class="sv-btn sv-btn-primary" data-sv-join>${esc(t("sv.joinNow", "Join Now"))}</button>
-        <span class="sv-join-or">${esc(t("sv.or", "or"))}</span>
-        <span class="sv-scheduled">📅 ${esc(t("sv.joinScheduled", "Join at Scheduled Time"))}<br>${esc(payload.scheduledLabel || "")}</span>
+        ${payload.liveInRoom || !payload.scheduledLabel ? "" : `<span class="sv-join-or">${esc(t("sv.or", "or"))}</span>
+        <span class="sv-scheduled">📅 ${esc(t("sv.joinScheduled", "Join at Scheduled Time"))}<br>${esc(payload.scheduledLabel || "")}</span>`}
       </div>
       ${adSlotHtml(payload, visual)}
     </article>`;
