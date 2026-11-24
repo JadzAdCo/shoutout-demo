@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.067 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.068 (stable)
 
+- s3.3.068: Invite Mingl friends chips say That's you or Already in this session; no scheduled start
 - s3.3.067: SMARTvisual Studio Review / Publish: select a queued SMARTbackground, visible Publish, SOS2FA + reason
 - s3.3.066: Place SMARTview stencil + background assignment and tags (Studio, compact cards, Features catalog filter)
 - s3.3.065: SMARTvisual Studio Save uses Entity Management SOS2FA session (getSessionId), not an empty sessionId()
