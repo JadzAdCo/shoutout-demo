@@ -28,6 +28,24 @@ test("Aurelia is the New York demo club", () => {
   assert.match(club.description, / in New York built/);
 });
 
+test("Aurelia public gallery starts at Happy Birthday Maya and omits the four DonPapi/VIP shoutout tiles", () => {
+  const showcase = loadShowcase();
+  const club = showcase.clubRecord(1, true);
+  const titles = club.publicGallery.map(item => item.title);
+  assert.equal(club.publicGallery.length, 12);
+  assert.equal(club.publicGallery[0].galleryOrder, 1);
+  assert.equal(titles[0], "Portrait LED wall 960×1900 — Happy Birthday");
+  assert.ok(titles.includes("VIP table — Maya's birthday crew + portrait LED wall"));
+  assert.ok(titles.includes("Go Maya — BusBoy with the Papi's ClubTech 64x48 photo ShoutOut"));
+  for (const gone of showcase.RETIRED_PUBLIC_GALLERY_TITLES) {
+    assert.ok(!titles.includes(gone), gone);
+  }
+  for (const file of showcase.RETIRED_PUBLIC_GALLERY_FILES) {
+    assert.ok(!club.publicGallery.some(item => String(item.mediaUrl).includes(file)), file);
+    assert.ok(showcase.isRetiredPublicGalleryItem({mediaUrl: `./images/temp-qa/${file}`}));
+  }
+});
+
 test("other temp demo clubs stay in Washington DC", () => {
   const club = loadShowcase().clubRecord(2, true);
   assert.equal(club.locationName, "Volt Room (Temp Demo 2)");

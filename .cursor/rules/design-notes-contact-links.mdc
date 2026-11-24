@@ -27,5 +27,6 @@ Resume: `@contact-links$`.
 | Go Maya — BusBoy with the Papi's ClubTech 64x48 photo ShoutOut | `club-aurelia-vip-maya-busboy-64x48.jpg` (`PHOTOS.dualLedCarry`) |
 
 - The busboy gallery slot uses `PHOTOS.busboyLed`; staff profile photos (`staff-andre.png` / `staff-jamal.png`) are unchanged.
+- **Retired gallery tiles (Aurelia):** do not show DonPapi LED wall / DON CHECKING IN / VIP ShoutOut FloqR / VIP table LED (`RETIRED_PUBLIC_GALLERY_FILES` in `floqr-temp-qa-showcase.js`). Keep Happy Birthday Maya + Papi's ClubTech 64×48. Club profile filters Firestore overlay + `clubMedia` so stale docs cannot resurrect those four cards.
 - Live club profiles read `clubLocations/{id}.publicGallery` from Firestore first; changing titles/files needs the seed (`floqr-temp-qa-showcase.js`) **and** the Firestore gallery rows, after the images are on `origin/main`.
 - Main's showcase file is patched with `scripts/apply-s3-1-17-showcase-gallery.js` (the workspace copy holds unpublished DonPapi stills).

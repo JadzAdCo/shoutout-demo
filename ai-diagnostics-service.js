@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.072";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.072";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.073";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.073";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.073",
+      title: "s3.3.073 — Aurelia Gallery retired DonPapi/VIP shoutout tiles",
+      checks: [
+        {label:"Retired gallery helper", file:"floqr-temp-qa-showcase.js", includes:["RETIRED_PUBLIC_GALLERY_FILES", "filterPublicGallery"]},
+        {label:"Club profile overlay filter", file:"club-profile-app.js", includes:["filterRetiredGallery", "resolvePublicGallery"]},
+        {label:"Club profile loads showcase", file:"club-profile.html", includes:["floqr-temp-qa-showcase.js", "club-profile-app.js"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-073-aurelia-gallery-retired-tiles"]}
+      ]
+    },
     {
       version: "s3.3.072",
       title: "s3.3.072 — Search SMARTnotification matches original compact Cancun card",
@@ -3749,6 +3759,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-073-aurelia-gallery-retired-tiles",
+      area:"Club Public Profile",
+      feature:"Aurelia Gallery without DonPapi/VIP shoutout tiles",
+      changed:"Removed four Gallery tiles from Aurelia (temp-democlub-1): DonPapi LED wall, DonPapi ShoutOut DON CHECKING IN, VIP ShoutOut FloqR, VIP table LED. Photos and captions gone. Happy Birthday Maya row and the rest of the gallery stay. Club profile drops those tiles from packaged seed, Firestore publicGallery overlay, and clubMedia.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/club-profile.html?location=temp-democlub-1 until floqr-temp-qa-showcase.js and club-profile-app.js ?v=s3.3.073. Sign in if asked. 2) Scroll to Gallery. Confirm the first tile is Portrait LED / Happy Birthday Maya (or Maya's birthday crew), not DonPapi LED wall / DON CHECKING IN / FloqR We're Outside. 3) Those four cards (image + caption) are absent. 4) Maya / Papi's ClubTech 64x48 tiles remain. 5) Display URLs have no ?v=. 6) Mark Succeed/Failed.",
+      expected:"Gallery starts at Happy Birthday Maya. The four DonPapi/VIP shoutout tiles are gone (photos and text). Remaining gallery tiles still show.",
+      troubleshoot:"Still see DonPapi LED wall as first cards → cached club-profile-app.js / floqr-temp-qa-showcase.js; hard-refresh. Confirm the page source includes filterRetiredGallery. Firestore overlay can keep old publicGallery until Pages has that filter. Re-seed seedTempDemoPack writes the trimmed publicGallery. Do not add ?v= to Display URLs."
+    },
     {
       id:"s3-3-065-demo-worker-mgmt",
       area:"Master Admin",

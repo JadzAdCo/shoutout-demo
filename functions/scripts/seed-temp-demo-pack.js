@@ -160,6 +160,15 @@ function showcaseDisplayName(role, n) {
   }
 }
 
+function showcasePublicGallery(n) {
+  try {
+    const gallery = require("../../floqr-temp-qa-showcase.js")?.clubRecord?.(n, true)?.publicGallery;
+    return Array.isArray(gallery) ? gallery : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 function displayName(role, n) {
   const named = showcaseDisplayName(role, n);
   if (named) return named;
@@ -360,6 +369,7 @@ function clubDoc(i, adminAccount, hoursWeek) {
     onboardingSource: "temp-demo-seed",
     logoUrl: `${ORIGIN}/assets/demo-temp/icons/temp_democlub_${i}.svg`,
     mainImageUrl: `${ORIGIN}/assets/demo-temp/avatars/temp_democlub_${i}.svg`,
+    ...(showcasePublicGallery(i) ? {publicGallery: showcasePublicGallery(i)} : {}),
     // Aurelia (temp-democlub-1): FloqMedia Stripe is the VIP deposit default for demos.
     ...(i === 1 ? {
       vipSettings: {

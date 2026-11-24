@@ -47,6 +47,18 @@
     return (window.SHOUTOUT_CLUB_LOCATIONS || {})[id] || {};
   }
 
+  function filterRetiredGallery(items) {
+    const filter = window.FLOQRTempQaShowcase?.filterPublicGallery;
+    if (typeof filter === "function") return filter(items);
+    return Array.isArray(items) ? items : [];
+  }
+
+  function resolvePublicGallery(packaged, overlay) {
+    const live = filterRetiredGallery(overlay);
+    if (live.length) return live;
+    return filterRetiredGallery(packaged);
+  }
+
   async function resolveLocation(id) {
     let key = id;
     try {
@@ -59,10 +71,14 @@
         const data = snap.data() || {};
         const canonical = String(data.canonicalLocationId || data.aliasOf || data.mergedInto || key).toLowerCase();
         if (canonical !== key) return resolveLocation(canonical);
-        return {id:snap.id, ...staticLocation(key), ...data};
+        const packaged = staticLocation(key);
+        const merged = {id:snap.id, ...packaged, ...data};
+        merged.publicGallery = resolvePublicGallery(packaged.publicGallery, data.publicGallery);
+        return merged;
       }
     } catch (e) {}
-    return {id:key, ...staticLocation(key)};
+    const packaged = staticLocation(key);
+    return {id:key, ...packaged, publicGallery: filterRetiredGallery(packaged.publicGallery)};
   }
 
   function eventTime(event = {}) {
@@ -275,7 +291,7 @@
 
   function renderGallery(media) {
     const fromClub = Array.isArray(club.publicGallery) ? club.publicGallery : [];
-    const gallery = [...media, ...fromClub]
+    const gallery = filterRetiredGallery([...media, ...fromClub])
       .filter(item => item && (item.slotType === "gallery" || item.mediaUrl) && item.slotType !== "main")
       .map((item, idx) => ({
         ...item,
