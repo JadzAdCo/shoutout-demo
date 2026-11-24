@@ -164,14 +164,19 @@ exports.listBotDeeRoomFriends = onCall(CALL_OPTS, async request => {
         roomFull = memberUids.length >= core.MEMBER_CAP;
       }
     }
+    const pendingUids = roomId && memberUids.length
+      ? await store.listPendingInviteeUids(roomId)
+      : [];
     const friends = core.decorateFriendInviteState(await store.listMinglFriends(uid), {
       actorUid: uid,
-      memberUids
+      memberUids,
+      pendingUids
     });
     return {
       ok: true,
       viewerUid: uid,
       friends,
+      pendingUids,
       roomFull,
       memberCount: memberUids.length,
       participantCap: core.MEMBER_CAP

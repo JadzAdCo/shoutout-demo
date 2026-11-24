@@ -89,9 +89,11 @@ async function inviteNamedGuests({uid, roomId, needles, actorEmail, actorRole}) 
   const live = await store.loadRoom(roomId);
   if (!live) return {ok: false, error: "not_found", hits: []};
   if (!core.isCurrentMember(live.data, uid)) return {ok: false, error: "not_member", hits: []};
+  const pendingUids = await store.listPendingInviteeUids(live.id);
   const friends = core.decorateFriendInviteState(await store.listMinglFriends(uid), {
     actorUid: uid,
-    memberUids: core.currentMembers(live.data)
+    memberUids: core.currentMembers(live.data),
+    pendingUids
   });
   const hits = core.matchNamedInvitees(friends, needles);
   if (hits.length !== 1) {
@@ -100,6 +102,9 @@ async function inviteNamedGuests({uid, roomId, needles, actorEmail, actorRole}) 
   const target = hits[0];
   if (target.inviteState === "self") return {ok: false, error: "self", hits, target};
   if (target.inviteState === "already_member") return {ok: false, error: "already_member", hits, target};
+  if (target.inviteState === "invited") {
+    return {ok: true, alreadySent: true, hits, target};
+  }
   const created = await store.createInvite({
     roomId: live.id,
     actorUid: uid,

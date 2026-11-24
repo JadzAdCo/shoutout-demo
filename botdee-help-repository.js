@@ -903,8 +903,8 @@
     {
       id: "help-botdee-room-smartview-invite",
       title: "Invite Mingl friends",
-      body: "After you confirm Room SMARTview (Join Now or Set a schedule), Invite shows your Mingl friends only. Tap a friend, or type Invite lorna, to send an Inbox invite (Review BOT DEE invite). That is a Room SMARTview command — it does not open VIP reserV or a People SMARTview Invite. If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
-      searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation", "invite mingl friends", "invite lorna", "review bot dee invite", "that's you", "already in this session", "cannot invite myself"],
+      body: "After you confirm Room SMARTview (Join Now or Set a schedule), Invite shows your Mingl friends only. Tap a friend, or type Invite lorna, to send an Inbox invite (Review BOT DEE invite). The chip stays greyed with Invite sent so you know it went — tapping again does not send a second invite. That is a Room SMARTview command — it does not open VIP reserV or a People SMARTview Invite. If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
+      searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation", "invite mingl friends", "invite lorna", "review bot dee invite", "that's you", "already in this session", "cannot invite myself", "invite sent", "greyed chip", "mslorna"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",

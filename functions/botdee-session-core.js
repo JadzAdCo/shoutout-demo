@@ -487,17 +487,19 @@ function inviteeAllowed({friendsWithInviter, blockedWithHost} = {}) {
   return {ok: true, reason: ""};
 }
 
-function classifyInviteTarget({actorUid = "", targetUid = "", memberUids = []} = {}) {
+function classifyInviteTarget({actorUid = "", targetUid = "", memberUids = [], pendingUids = []} = {}) {
   const actor = text(actorUid, 80);
   const target = text(targetUid, 80);
   if (!target) return {ok: false, reason: "not_found"};
   if (actor && target === actor) return {ok: false, reason: "self"};
   const members = (Array.isArray(memberUids) ? memberUids : []).map(id => text(id, 80)).filter(Boolean);
   if (members.includes(target)) return {ok: false, reason: "already_member"};
+  const pending = (Array.isArray(pendingUids) ? pendingUids : []).map(id => text(id, 80)).filter(Boolean);
+  if (pending.includes(target)) return {ok: false, reason: "invited"};
   return {ok: true, reason: "invite"};
 }
 
-function decorateFriendInviteState(friends, {actorUid = "", memberUids = []} = {}) {
+function decorateFriendInviteState(friends, {actorUid = "", memberUids = [], pendingUids = []} = {}) {
   const actor = text(actorUid, 80);
   const seen = new Set();
   const out = [];
@@ -505,7 +507,7 @@ function decorateFriendInviteState(friends, {actorUid = "", memberUids = []} = {
     const uid = text(row && row.uid, 80);
     if (!uid || uid === actor || seen.has(uid)) continue;
     seen.add(uid);
-    const state = classifyInviteTarget({actorUid: actor, targetUid: uid, memberUids});
+    const state = classifyInviteTarget({actorUid: actor, targetUid: uid, memberUids, pendingUids});
     out.push({
       uid,
       displayName: text(row.displayName, 80),
@@ -802,6 +804,7 @@ function denialMessage(reason) {
     blocked: "Invites are Mingl friends only.",
     self: "That's you — you're already in this BOT DEE session.",
     already_member: "That Mingl friend is already in this BOT DEE session.",
+    invited: "Invite already sent to that Mingl friend.",
     full: "This BOT DEE session is full (host plus 7 guests).",
     closed: "This BOT DEE session has ended.",
     not_member: "You are not in this BOT DEE session.",

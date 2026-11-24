@@ -540,7 +540,7 @@
       "id": "help-botdee-room-smartview-invite",
       "kind": "help",
       "label": "Invite Mingl friends",
-      "blurb": "After you confirm Room SMARTview (Join Now or Set a schedule), Invite shows your Mingl friends only. Tap a friend, or type Invite lorna, to send an Inbox invite (Review BOT DEE invite). That is a Room SMARTview command — it does not open VIP reserV or a People SMARTview Invite. I",
+      "blurb": "After you confirm Room SMARTview (Join Now or Set a schedule), Invite shows your Mingl friends only. Tap a friend, or type Invite lorna, to send an Inbox invite (Review BOT DEE invite). The chip stays greyed with Invite sent so you know it went — tapping again does not send a sec",
       "href": "./botdee.html",
       "phrases": [
         "invite mingl friends",
@@ -553,6 +553,9 @@
         "that s you",
         "already in this session",
         "cannot invite myself",
+        "invite sent",
+        "greyed chip",
+        "mslorna",
         "open bot dee",
         "help-botdee-room-smartview-invite"
       ]
