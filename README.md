@@ -1,5 +1,6 @@
 # CURRENT PACKAGE: FLOQR ShoutOut s3.3.075 (stable)
 
+- s3.3.075: Room SMARTview shared picks + 60% host election, VIP session popouts
 - s3.3.074: Headless ShoutOut collects from template collectableInput1..N
 - s3.3.073: Aurelia Gallery drops four DonPapi/VIP shoutout tiles; Happy Birthday Maya stays first
 - s3.3.072: Search SMARTnotification compact glass card matches the original Cancun phone layout; Damon stays demo-only

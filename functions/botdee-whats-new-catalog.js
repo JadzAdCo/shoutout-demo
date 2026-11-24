@@ -7,7 +7,7 @@
 
 const patron = require("./botdee-patron-language");
 const SCHEMA_VERSION = "floqr.botDeeWhatsNewCatalog/1";
-const WHATS_NEW_LIMIT = 8;
+const WHATS_NEW_LIMIT = 10;
 const TEXT_LIMIT = 280;
 
 const AUDIENCE = Object.freeze({
