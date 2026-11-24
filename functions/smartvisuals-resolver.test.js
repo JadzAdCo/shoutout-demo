@@ -162,6 +162,7 @@ test("Search, BOT DEE, and Master Admin Studio are wired", () => {
   assert.match(read("master-admin.html"), /data-panel="smartvisualStudio"/);
   assert.match(read("functions/index.js"), /classifySmartVisual/);
   assert.match(read("functions/index.js"), /publishSmartVisualDraft/);
+  assert.match(read("functions/index.js"), /approveSmartVisualDraft/);
   assert.match(read("firestore.rules"), /match \/smartVisualDrafts\/\{id\}/);
   assert.match(read("docs/FEATURE-WIRING.md"), /## SMARTvisuals/);
 });
@@ -424,6 +425,7 @@ test("Studio send SOS2FA via getSessionId, not a missing sessionId() helper", ()
   assert.match(studio, /async function studioCallable\(/);
   assert.match(studio, /getIdToken\(true\)/);
   assert.match(studio, /studioCallable\("publishSmartVisualDraft"/);
+  assert.match(studio, /studioCallable\("approveSmartVisualDraft"/);
   assert.match(studio, /classifySmartVisual/);
   assert.match(studio, /httpsCallable\(name\)/);
   assert.match(studio, /sv\.studioNeedSos2fa/);
@@ -435,4 +437,33 @@ test("Studio send SOS2FA via getSessionId, not a missing sessionId() helper", ()
   assert.match(sos, /sessionId: \(scope\) => getSessionId\(scope \|\| "entityManagement"\)/);
   assert.match(app, /"smartvisualStudio"/);
   assert.match(read("functions/sos2fa-functions.js"), /Entity Management requires a valid SOS2FA session/);
+});
+
+test("Review / Publish has a visible Publish CTA after selecting a queued draft", () => {
+  const studio = read("smartvisuals-studio.js");
+  const css = read("smartvisuals-studio.css");
+  const html = read("master-admin.html");
+  const fns = read("functions/smartvisuals-functions.js");
+  assert.match(studio, /id="svStudioPublishBtn"/);
+  assert.match(studio, /data-sv-publish-draft/);
+  assert.match(studio, /function selectReviewDraft/);
+  assert.match(studio, /function showDraftDetail/);
+  assert.match(studio, /function publishSelectedDraft/);
+  assert.match(studio, /studioCallable\("approveSmartVisualDraft"/);
+  assert.match(studio, /FLOQRReasonPrompt/);
+  assert.match(studio, /sv\.studioPublish/);
+  assert.match(studio, /needSos2fa\(status\)/);
+  assert.doesNotMatch(studio, /svStudioPublishBtn" hidden/);
+  assert.match(css, /\.sv-studio-publish/);
+  assert.match(css, /\.sv-studio-draft\.is-selected/);
+  assert.match(html, /data-sv-studio-page="review"/);
+  assert.match(html, /id="svStudioReview"/);
+  assert.match(fns, /exports\.approveSmartVisualDraft/);
+  assert.match(fns, /assertAdmin\(request, "smartvisual\.approve"\)/);
+  assert.match(fns, /approvalStatus: "published"/);
+  assert.match(fns, /catalogAssetId/);
+  assert.match(fns, /wantId = type === "stencil" \? `st-\$\{slug\}` : `bg-\$\{slug\}`/);
+  const milan = JSON.parse(read("smartvisuals/catalog.json")).assets.find(a => a.id === "bg-milan");
+  assert.equal(milan.name, "Milan");
+  assert.equal(milan.type, "background");
 });

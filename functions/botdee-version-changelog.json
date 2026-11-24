@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.067",
+    "text": "s3.3.067: SMARTvisual Studio Review / Publish: select a queued SMARTbackground, visible Publish, SOS2FA + reason",
+    "audiences": [
+      "other"
+    ]
+  },
+  {
     "id": "s3.3.066",
     "text": "s3.3.066: Place SMARTview stencil + background assignment and tags (Studio, compact cards, Features catalog filter)",
     "audiences": [

@@ -32,6 +32,25 @@ function deny(code, message) {
   throw new HttpsError(code, message);
 }
 
+function slugName(name) {
+  return text(name, 80).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function matchCatalogAsset(draft) {
+  const assets = Array.isArray(catalog.assets) ? catalog.assets : [];
+  const type = text(draft?.type, 20) || "background";
+  const name = text(draft?.name, 80);
+  const slug = slugName(name);
+  const wantId = type === "stencil" ? `st-${slug}` : `bg-${slug}`;
+  const lower = name.toLowerCase();
+  return assets.find(a => a && a.id === wantId)
+    || assets.find(a => a && a.type === type && String(a.name || "").toLowerCase() === lower)
+    || assets.find(a => a && (a.aliases || []).map(x => String(x).toLowerCase()).includes(slug))
+    || null;
+}
+
+exports.__smartvisualHelpers = {slugName, matchCatalogAsset};
+
 exports.classifySmartVisual = onCall(CALL_OPTS, async request => {
   if (!request.auth) deny("unauthenticated", "Sign in to classify SMARTvisuals.");
   const sourceKind = text(request.data?.sourceKind, 40) || "authorized-room";
@@ -136,6 +155,46 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
     svgChecksumSha256: svgChecksumSha256 || undefined,
     imageChecksumSha256: imageChecksumSha256 || undefined
   };
+});
+
+exports.approveSmartVisualDraft = onCall(CALL_OPTS, async request => {
+  const {email, sessionId} = await audit.assertAdmin(request, "smartvisual.approve");
+  const reason = text(request.data?.reason, 500);
+  if (reason.length < REASON_MIN) deny("invalid-argument", "A reason of at least 8 characters is required.");
+  const draftId = text(request.data?.draftId || request.data?.id, 80);
+  if (!draftId) deny("invalid-argument", "Draft id is required.");
+  const ref = db.collection(COLLECTIONS.drafts).doc(draftId);
+  const snap = await ref.get();
+  if (!snap.exists) deny("not-found", "Draft not found.");
+  const row = snap.data() || {};
+  const match = matchCatalogAsset(row);
+  const catalogAssetId = match ? String(match.id) : "";
+  if (String(row.approvalStatus || "") === "published") {
+    return {ok: true, id: draftId, status: "published", catalogAssetId: row.catalogAssetId || catalogAssetId, alreadyPublished: true};
+  }
+  const now = Date.now();
+  await ref.set({
+    approvalStatus: "published",
+    publishedAtMs: now,
+    publishedByEmail: email,
+    catalogAssetId,
+    reason,
+    sos2faSessionId: sessionId,
+    updatedByEmail: email,
+    updatedAt: FieldValue.serverTimestamp(),
+    revision: Number(row.revision || 0) + 1
+  }, {merge: true});
+  await db.collection(COLLECTIONS.audit).add({
+    eventType: "smartvisual.approved",
+    outcome: "success",
+    actorEmail: email,
+    targetId: draftId,
+    catalogAssetId,
+    reason,
+    createdAtMs: now,
+    createdAt: FieldValue.serverTimestamp()
+  });
+  return {ok: true, id: draftId, status: "published", catalogAssetId, alreadyPublished: false};
 });
 
 exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {

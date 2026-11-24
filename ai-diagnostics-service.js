@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.066";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.066";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.067";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.067";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.067",
+      title: "s3.3.067 — SMARTvisual Studio Review / Publish",
+      checks: [
+        {label:"Studio Review Publish CTA", file:"smartvisuals-studio.js", includes:["id=\"svStudioPublishBtn\"", "data-sv-publish-draft", "studioCallable(\"approveSmartVisualDraft\"", "function showDraftDetail"]},
+        {label:"Approve callable", file:"functions/smartvisuals-functions.js", includes:["exports.approveSmartVisualDraft", "smartvisual.approve", "catalogAssetId"]},
+        {label:"Index export", file:"functions/index.js", includes:["approveSmartVisualDraft"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-067-smartvisuals-studio-review-publish"]}
+      ]
+    },
     {
       version: "s3.3.066",
       title: "s3.3.066 — Place SMARTview stencil, background, and tags",
@@ -3881,6 +3891,15 @@
       howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js / botdee-smartview.js / botdee-smartview.css ?v=s3.3.066. 2) Library: filter by a tag chip. Open a published SMARTbackground or SMARTstencil. Place card type, SMARTbackground, SMARTstencil, and Tags are on the detail. Preview in Place SMARTview — compact Aurelia-style card with illustration, 28px stencil, tag chips, no photo well. 3) Save Place SMARTview assignment needs SOS2FA + reason (Functions deploy pending until Don asks). 4) Open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive — one compact card, no Load SPAAVS sample. 5) Features SMARTview catalog shows category tags and a tag filter. 6) Phone ~390 and desktop ~1280. Display URLs have no ?v=. Mark Succeed/Failed.",
       expected:"Studio can change stencil and background on the compact Place card and attach tags. Headless still mints one generic card, not four SPAAVS cards. Features catalog is the eight-product SMARTview, not Room SMARTvisuals.",
       troubleshoot:"No stencil/tag on the card → cached botdee-smartview.js/css before this SHA, or catalog.json not loaded (ensureCatalog). Save still background-only → cached smartvisuals-studio.js. Four SPAAVS cards → cached headless JS. Features page missing tag chips → cached floqr-features-smartview.js. Studio save SOS2FA sentence → unlock Entity Management first. Live venue chat unchanged after Save → Functions deploy of setSmartVisualOverride / executeBotSession pending."
+    },
+    {
+      id:"s3-3-067-smartvisuals-studio-review-publish",
+      area:"Master Admin",
+      feature:"SMARTvisual Studio Review / Publish",
+      changed:"Review / Publish listed queued Milan.webp drafts with no Publish button, so Asset detail stayed on the old packaged illustration. Selecting a row now fills Asset detail with that file. Publish is visible after select and on each queued row (not hidden solely because SOS2FA is locked). Publish runs SOS2FA + FLOQRReasonPrompt then approveSmartVisualDraft.",
+      howToTest:"1) After Pages publish (Don merge), hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js / smartvisuals-studio.css / floqr-i18n.js ?v=s3.3.067. Functions deploy of approveSmartVisualDraft is required for the save. 2) Sign in as Master Admin. Unlock Entity Management SOS2FA if needed — do not request a new code if already unlocked. 3) Open Review / Publish. Queued SMARTbackground drafts (Milan.webp) list with a Publish button on each row. 4) Click a row — Asset detail shows the WebP photo, not the old Milan illustration. Toolbar Publish enables. 5) Press Publish. Reason prompt. Save. Status: Published {id}. Asset detail shows this file. 6) Mark Succeed/Failed.",
+      expected:"Master Admin can publish a queued SMARTbackground from Review / Publish. Asset detail shows the selected photo. SOS2FA + reason required. Patrons still use git registry until Pages ships the file. Display URLs have no ?v=.",
+      troubleshoot:"No Publish button → cached smartvisuals-studio.js before s3.3.067. Button present but disabled and Asset detail still illustration → click the draft row first. SOS2FA sentence → unlock Entity Management; Studio uses getSessionId. Callable not-found → Functions deploy of approveSmartVisualDraft pending. Publish succeeded but live Search still old illustration → expected until Pages ships git registry; Studio overlay is Master Admin only."
     },
     {
       id:"s3-3-065-smartvisuals-studio-sos2fa",
