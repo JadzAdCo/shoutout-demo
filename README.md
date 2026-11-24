@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.068 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.069 (stable)
 
+- s3.3.069: Demo Worker Mgmt: Find demo worker + Generate code and same-mobile Find patron / Preview / Merge
 - s3.3.068: Patron merge card only on Duplicate Records; one Find patron per column; Master Admin copy (not Don)
 - s3.3.067: SMARTvisual Studio Review / Publish: select a queued SMARTbackground, visible Publish, SOS2FA + reason
 - s3.3.066: Place SMARTview stencil + background assignment and tags (Studio, compact cards, Features catalog filter)

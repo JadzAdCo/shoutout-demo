@@ -1,4 +1,4 @@
-/* Master Admin → Entity Management → Demo Svc / Emp Mgmt. */
+/* Master Admin → Entity Management → Demo Worker Mgmt. */
 .demo-emp-search-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
 .demo-emp-search-row label{flex:1 1 260px}
 .demo-emp-list{display:grid;gap:8px;max-height:420px;overflow:auto;margin-top:12px;padding-right:4px}

@@ -1,4 +1,5 @@
-/* Master Admin — merge duplicate patron Auth/Firestore accounts. SOS2FA + reason. Never deletes Auth. */
+/* Master Admin — merge duplicate patron Auth/Firestore accounts. SOS2FA + reason. Never deletes Auth.
+   Binds every [data-patron-account-merge] card (Demo Worker Mgmt + Duplicate Records). */
 (function (root) {
   "use strict";
 
@@ -13,8 +14,12 @@
     return root.FLOQRI18n?.t?.(key) || fallback;
   }
 
-  function setStatus(message) {
-    const el = byId("patronAccountMergeStatus");
+  function field(root, name) {
+    return root.querySelector(`[data-merge-field="${name}"]`);
+  }
+
+  function setStatus(root, message) {
+    const el = root.querySelector("[data-merge-status]");
     if (el) el.textContent = message || "";
   }
 
@@ -48,76 +53,81 @@
     </div>`;
   }
 
-  async function lookupSide(inputId, resultId) {
+  async function lookupSide(root, queryName, uidName, resultName) {
     if (!isUnlocked()) {
-      setStatus("Unlock Entity Management (SOS2FA) first.");
+      setStatus(root, "Unlock Entity Management (SOS2FA) first.");
       return;
     }
-    const query = byId(inputId)?.value.trim() || "";
+    const query = field(root, queryName)?.value.trim() || "";
     if (query.length < 2) {
-      setStatus("Type an email, handle, uid, or mobile.");
+      setStatus(root, "Type an email, handle, uid, or mobile.");
       return;
     }
-    setStatus("Looking up patron accounts…");
+    setStatus(root, "Looking up patron accounts…");
     try {
       const data = await call("lookupPatronAccounts", {query});
       const people = data.people || [];
       const first = people[0];
-      if (first && byId(inputId.replace("Query", "Uid"))) {
-        byId(inputId.replace("Query", "Uid")).value = first.uid;
+      const uidInput = field(root, uidName);
+      if (first && uidInput) uidInput.value = first.uid;
+      const results = field(root, resultName);
+      if (results) {
+        results.innerHTML = people.length
+          ? people.map(row => cardHtml(row.uid, row)).join("")
+          : `<p class="sub small">No patrons matched.</p>`;
       }
-      byId(resultId).innerHTML = people.length
-        ? people.map(row => cardHtml(row.uid, row)).join("")
-        : `<p class="sub small">No patrons matched.</p>`;
-      setStatus(people.length ? `Found ${people.length} account(s). Auth is not deleted by lookup.` : "No patrons matched.");
+      setStatus(root, people.length ? `Found ${people.length} account(s). Auth is not deleted by lookup.` : "No patrons matched.");
     } catch (error) {
-      setStatus(errorText(error));
+      setStatus(root, errorText(error));
     }
   }
 
-  async function previewMerge() {
+  async function previewMerge(root) {
     if (!isUnlocked()) {
-      setStatus("Unlock Entity Management (SOS2FA) first.");
+      setStatus(root, "Unlock Entity Management (SOS2FA) first.");
       return;
     }
-    const survivorUid = byId("patronMergeSurvivorUid")?.value.trim() || "";
-    const duplicateUid = byId("patronMergeDuplicateUid")?.value.trim() || "";
-    setStatus("Previewing merge…");
+    const survivorUid = field(root, "survivorUid")?.value.trim() || "";
+    const duplicateUid = field(root, "duplicateUid")?.value.trim() || "";
+    setStatus(root, "Previewing merge…");
     try {
       const data = await call("previewPatronAccountMerge", {
         survivorUid,
         duplicateUid,
-        survivorQuery: byId("patronMergeSurvivorQuery")?.value.trim() || "",
-        duplicateQuery: byId("patronMergeDuplicateQuery")?.value.trim() || ""
+        survivorQuery: field(root, "survivorQuery")?.value.trim() || "",
+        duplicateQuery: field(root, "duplicateQuery")?.value.trim() || ""
       });
-      if (data.survivor?.uid) byId("patronMergeSurvivorUid").value = data.survivor.uid;
-      if (data.duplicate?.uid) byId("patronMergeDuplicateUid").value = data.duplicate.uid;
-      byId("patronAccountMergePreview").innerHTML = [
-        `<p class="sub small">Recommended survivor: <code>${esc(data.recommendedSurvivorUid)}</code>. Auth deleted: ${data.authDeleted ? "yes" : "no"}.</p>`,
-        cardHtml(t("master.accountMerge.survivor", "Keep this uid"), data.survivor),
-        cardHtml(t("master.accountMerge.duplicate", "Merge this uid away"), data.duplicate),
-        `<p class="sub small">Would move: profile ${esc((data.wouldMove?.profileFields || []).join(", ") || "—")}; Mingl ${Number(data.wouldMove?.minglConnections || 0)}; Inbox ${Number(data.wouldMove?.inbox || 0)}.</p>`
-      ].join("");
-      setStatus("Preview only. Nothing was merged. Auth users stay.");
+      if (data.survivor?.uid && field(root, "survivorUid")) field(root, "survivorUid").value = data.survivor.uid;
+      if (data.duplicate?.uid && field(root, "duplicateUid")) field(root, "duplicateUid").value = data.duplicate.uid;
+      const preview = field(root, "preview");
+      if (preview) {
+        preview.innerHTML = [
+          `<p class="sub small">Recommended survivor: <code>${esc(data.recommendedSurvivorUid)}</code>. Auth deleted: ${data.authDeleted ? "yes" : "no"}.</p>`,
+          cardHtml(t("master.accountMerge.survivor", "Keep this uid"), data.survivor),
+          cardHtml(t("master.accountMerge.duplicate", "Merge this uid away"), data.duplicate),
+          `<p class="sub small">Would move: profile ${esc((data.wouldMove?.profileFields || []).join(", ") || "—")}; Mingl ${Number(data.wouldMove?.minglConnections || 0)}; Inbox ${Number(data.wouldMove?.inbox || 0)}.</p>`
+        ].join("");
+      }
+      setStatus(root, "Preview only. Nothing was merged. Auth users stay.");
     } catch (error) {
-      setStatus(errorText(error));
+      setStatus(root, errorText(error));
     }
   }
 
-  async function mergeAccounts() {
+  async function mergeAccounts(root) {
     if (!isUnlocked()) {
-      setStatus("Unlock Entity Management (SOS2FA) first.");
+      setStatus(root, "Unlock Entity Management (SOS2FA) first.");
       return;
     }
-    const survivorUid = byId("patronMergeSurvivorUid")?.value.trim() || "";
-    const duplicateUid = byId("patronMergeDuplicateUid")?.value.trim() || "";
+    const survivorUid = field(root, "survivorUid")?.value.trim() || "";
+    const duplicateUid = field(root, "duplicateUid")?.value.trim() || "";
     if (!survivorUid || !duplicateUid) {
-      setStatus("Set both uids from Preview first.");
+      setStatus(root, "Set both uids from Preview first.");
       return;
     }
     const promptApi = root.FLOQRReasonPrompt;
     if (!promptApi?.ask) {
-      setStatus("The reason window did not load. Reload the page and try again.");
+      setStatus(root, "The reason window did not load. Reload the page and try again.");
       return;
     }
     const reason = await promptApi.ask({
@@ -125,32 +135,41 @@
       minLength: REASON_MIN
     });
     if (!reason) {
-      setStatus("Cancelled — nothing was merged.");
+      setStatus(root, "Cancelled — nothing was merged.");
       return;
     }
-    const saveBtn = byId("patronMergeRunBtn");
+    const saveBtn = root.querySelector("[data-merge-action=\"merge\"]");
     const busy = root.FLOQRSaveBusy?.begin?.(saveBtn, {received: true});
-    setStatus("Merging Firestore records. Auth is not deleted.");
+    setStatus(root, "Merging Firestore records. Auth is not deleted.");
     try {
       const data = await call("mergePatronAccounts", {survivorUid, duplicateUid, reason});
-      setStatus(`Merged ${data.duplicateUid} into ${data.survivorUid}. Auth deleted: ${data.authDeleted ? "yes" : "no"}. Mingl ${Number(data.moved?.mingl || 0)}, inbox ${Number(data.moved?.inbox || 0)}.`);
+      setStatus(root, `Merged ${data.duplicateUid} into ${data.survivorUid}. Auth deleted: ${data.authDeleted ? "yes" : "no"}. Mingl ${Number(data.moved?.mingl || 0)}, inbox ${Number(data.moved?.inbox || 0)}.`);
     } catch (error) {
-      setStatus(errorText(error));
+      setStatus(root, errorText(error));
     } finally {
       busy?.idle?.();
     }
   }
 
+  function bindRoot(root) {
+    if (!root || root.dataset.mergeBound === "1") return;
+    root.dataset.mergeBound = "1";
+    root.querySelector("[data-merge-action=\"lookup-survivor\"]")?.addEventListener("click", () => {
+      lookupSide(root, "survivorQuery", "survivorUid", "survivorResults");
+    });
+    root.querySelector("[data-merge-action=\"lookup-duplicate\"]")?.addEventListener("click", () => {
+      lookupSide(root, "duplicateQuery", "duplicateUid", "duplicateResults");
+    });
+    root.querySelector("[data-merge-action=\"preview\"]")?.addEventListener("click", () => previewMerge(root));
+    root.querySelector("[data-merge-action=\"merge\"]")?.addEventListener("click", () => mergeAccounts(root));
+  }
+
   function bind() {
-    if (!byId("patronAccountMerge")) return;
-    byId("patronMergeLookupSurvivorBtn")?.addEventListener("click", () => lookupSide("patronMergeSurvivorQuery", "patronMergeSurvivorResults"));
-    byId("patronMergeLookupDuplicateBtn")?.addEventListener("click", () => lookupSide("patronMergeDuplicateQuery", "patronMergeDuplicateResults"));
-    byId("patronMergePreviewBtn")?.addEventListener("click", previewMerge);
-    byId("patronMergeRunBtn")?.addEventListener("click", mergeAccounts);
+    document.querySelectorAll("[data-patron-account-merge]").forEach(bindRoot);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
   else bind();
 
-  root.FLOQRPatronAccountMerge = {bind, previewMerge, mergeAccounts};
+  root.FLOQRPatronAccountMerge = {bind, bindRoot, previewMerge, mergeAccounts};
 })(typeof window !== "undefined" ? window : this);
