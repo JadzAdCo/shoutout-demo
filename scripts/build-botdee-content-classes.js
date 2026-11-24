@@ -36,9 +36,17 @@ function sortedObject(entries) {
   return Object.fromEntries(entries.sort(([a], [b]) => a.localeCompare(b)));
 }
 
+function masterHelpAudiences(root = ROOT) {
+  const file = path.join(root, "functions", "help-verbiage-master-source.json");
+  if (!fs.existsSync(file)) return [];
+  const rows = JSON.parse(fs.readFileSync(file, "utf8"));
+  return (Array.isArray(rows) ? rows : []).map(row => [String(row.id || ""), [...(row.audiences || [])].sort()]);
+}
+
 function buildManifest(root = ROOT) {
   const {repo, intents} = loadBrowserModules(root);
-  const help = sortedObject(repo.entries().map(entry => [entry.id, [...(entry.audiences || [])].sort()]));
+  const fromPages = repo.entries().map(entry => [entry.id, [...(entry.audiences || [])].sort()]);
+  const help = sortedObject([...fromPages, ...masterHelpAudiences(root)]);
   const intentIds = new Set([...intents.INTENTS.map(intent => intent.id), "venue-search"]);
   const map = intents.INTENT_AUDIENCES || {};
   const intentRows = sortedObject([...intentIds].map(id => [id, [...(map[id] || [])].sort()]));

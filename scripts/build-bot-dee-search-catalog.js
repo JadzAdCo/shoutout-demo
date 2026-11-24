@@ -28,8 +28,24 @@ function uniquePhrases(list) {
   return out;
 }
 
+function publishedHelp(root = ROOT) {
+  const file = path.join(root, "functions", "help-verbiage-public-snapshot.json");
+  if (!fs.existsSync(file)) return {};
+  const rows = JSON.parse(fs.readFileSync(file, "utf8"));
+  const map = {};
+  (Array.isArray(rows) ? rows : []).forEach(row => {
+    const audiences = Array.isArray(row && row.audiences) ? row.audiences : [];
+    if (audiences.length === 1 && audiences[0] === "masterAdmin") return;
+    const title = row && row.lasttextenhun && row.lasttextenhun.title;
+    const body = row && row.lasttextenhun && row.lasttextenhun.body;
+    if (row && row.id && title && body) map[row.id] = {title, body};
+  });
+  return map;
+}
+
 function buildCatalog(root = ROOT) {
   const {repo, intents} = loadBrowserModules(root);
+  const published = publishedHelp(root);
   const rows = [];
 
   (intents.INTENTS || []).forEach(intent => {
@@ -60,12 +76,13 @@ function buildCatalog(root = ROOT) {
     const id = String(entry.id || "").trim();
     if (!id) return;
     const link = (entry.links && entry.links[0] && entry.links[0].href) || "./botdee.html";
+    const copy = published[id];
     rows.push({
       sourceId: `help:${id}`,
       id,
       kind: "help",
-      label: String(entry.title || id).slice(0, 120),
-      blurb: String(entry.body || "").slice(0, 280),
+      label: String((copy && copy.title) || entry.title || id).slice(0, 120),
+      blurb: String((copy && copy.body) || entry.body || "").slice(0, 280),
       href: String(link).slice(0, 240),
       phrases: uniquePhrases([entry.title, entry.body, ...(entry.searchPhrases || []), id])
     });

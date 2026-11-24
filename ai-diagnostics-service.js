@@ -3767,6 +3767,15 @@
       troubleshoot:"No Mingl on Search or the profile card → confirm the signed-in email matches the tester row, then tick Mingl on THAT uid and Save. Tile still missing after grant → cached index.html / floqr-feature-services.js / patron-app.js before s3.3.052. Cinema showing instead → that is sinemaBtnCard, not a Mingl mixup. Enable Feature still 0 → packaged default is Off; Save Mingl on Release Control first."
     },
     {
+      id:"help-verbiage-enhance",
+      area:"BOT DEE",
+      feature:"Standing help verbiage enhancement",
+      changed:"Scheduled job rewrites one help entry at a time into helpVerbiage.lasttextenhun. Flag beenModsincelasttextenhun is 0 or 1. Patron What's New and Version sentences are the first lasttextenhun. Master-only help is off the public Pages script. Legal help is not sent to Gemini. No Gemini call while painting Ver or a ? popout.",
+      howToTest:"Before Functions deploy: run node --test functions/help-verbiage.test.js. Open help-verbiage-snapshot.js and confirm whatsnew-s3.3.055 and help-botdee-version-smartview, and confirm help-features-services is absent. Confirm botdee-help-repository.js has no audiences array that is only masterAdmin. After a later Functions deploy (not this PR): scheduledHelpVerbiageEnhance and getHelpVerbiage exist; a patron getHelpVerbiage of a master id is denied; Gemini failure leaves the previous sentence.",
+      expected:"Tests pass. Public snapshot has the shipped patron sentences and no master-only entry. The version card source does not call Gemini.",
+      troubleshoot:"Master help still in botdee-help-repository.js → rerun node scripts/build-help-verbiage-sources.js. Flag stuck at 1 → translations for de fr es it pt ru el pl nl ar are not stored yet, or the entry is legal, or Gemini rejected jargon. Blank help after a failure → lasttextenhun must stay; only a never-published id uses raw text."
+    },
+    {
       id:"botdee-whats-new-catalog",
       area:"BOT DEE",
       feature:"What's New lists BOT DEE and Gemini only",
