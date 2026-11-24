@@ -74,6 +74,26 @@
   text-decoration:none;
   font-weight:700;
 }
+.floqr-fsv-tags,.floqr-fsv-tag-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:6px 0 8px;
+}
+.floqr-fsv-tag{
+  min-height:28px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid color-mix(in srgb, var(--accent,#00d4fe) 40%, transparent);
+  background:transparent;
+  color:inherit;
+  font-size:.68rem;
+  cursor:pointer;
+}
+.floqr-fsv-tag.is-active{
+  border-color:var(--accent,#00d4fe);
+  background:color-mix(in srgb, var(--accent,#00d4fe) 22%, transparent);
+}
 .floqr-fsv-search{
   display:flex;
   flex-wrap:wrap;

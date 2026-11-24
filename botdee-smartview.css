@@ -105,6 +105,25 @@
   font-size: clamp(0.98rem, 4vw, 1.12rem);
   line-height: 1.15;
 }
+.botdee-sv-place-stencil {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: color-mix(in srgb, var(--floqr-ink, #05080a) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 45%, transparent);
+  filter: brightness(0) invert(1);
+}
+.botdee-sv-place .botdee-sv-tags {
+  gap: 0.18rem;
+}
+.botdee-sv-place .botdee-sv-tag {
+  padding: 0.08rem 0.38rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+}
 .botdee-sv-place .botdee-sv-mock {
   flex: 0 0 auto;
   max-width: 9.5rem;

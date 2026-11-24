@@ -124,7 +124,8 @@
       view: host.getAttribute("data-fsv-view") || params.get("view") || "overview",
       featureId: featureSet ? (host.getAttribute("data-fsv-feature") || "") : (params.get("feature") || ""),
       q: host.getAttribute("data-fsv-q") || "",
-      lifecycle: host.getAttribute("data-fsv-lifecycle") || ""
+      lifecycle: host.getAttribute("data-fsv-lifecycle") || "",
+      tag: host.getAttribute("data-fsv-tag") || ""
     };
   }
 
@@ -134,6 +135,7 @@
     if (next.featureId != null) host.setAttribute("data-fsv-feature", next.featureId);
     if (next.q != null) host.setAttribute("data-fsv-q", next.q);
     if (next.lifecycle != null) host.setAttribute("data-fsv-lifecycle", next.lifecycle);
+    if (next.tag != null) host.setAttribute("data-fsv-tag", next.tag);
   }
 
   function badgeClass(label) {
@@ -160,10 +162,17 @@
       ? `<a class="floqr-fsv-try" href="${esc(navUrl(row.tryRoute, row.productId === "shoutout" ? {start: "shoutout"} : {from: "features-smartview"}))}">${esc(t("fsv.tryFeature", "Try feature"))}</a>`
       : `<span class="floqr-fsv-note">${esc(t("fsv.noTry", "Try is hidden until this feature is available to you."))}</span>`;
     const ask = `<button type="button" class="buttonlike" data-fsv-ask="${esc(row.id)}">${esc(t("fsv.askBotDee", "Ask BOT DEE"))}</button>`;
+    const tags = Array.isArray(row.tags) ? row.tags : [];
+    const tagHtml = tags.length
+      ? `<div class="floqr-fsv-tags">${tags.map(tag =>
+        `<button type="button" class="floqr-fsv-tag" data-fsv-tag="${esc(tag)}">${esc(tag)}</button>`
+      ).join("")}</div>`
+      : "";
     return `<article class="floqr-fsv-card" data-fsv-open="${esc(row.id)}">
       <p class="floqr-fsv-kicker">${esc(row.productName)}</p>
       <h4 class="floqr-fsv-name">${esc(row.title)}</h4>
       <span class="floqr-fsv-badge ${badgeClass(row.lifecycleLabel)}">${esc(badgeText(row.lifecycleLabel))}</span>
+      ${tagHtml}
       <p class="floqr-fsv-mission">${esc(row.accomplishment || row.shortDescription)}</p>
       <p class="floqr-fsv-note">${esc(t("fsv.dateImplemented", "Date implemented"))}: ${esc(row.implementedLabel)}</p>
       ${opts && opts.actions === false ? "" : `<div class="floqr-fsv-actions">
@@ -286,7 +295,8 @@
       view: st.view === "overview" ? "all" : st.view,
       productId: st.productId,
       q: st.q,
-      lifecycle: st.lifecycle
+      lifecycle: st.lifecycle,
+      tag: st.tag
     });
     const open = rows.find(row => row.id === st.featureId) || proj.features.find(row => row.id === st.featureId);
     const overviewCards = st.view === "overview"
@@ -319,11 +329,22 @@
         ).join("")}
       </select>
     </form>` : "";
+    const tagSet = new Set();
+    (proj.features || []).forEach(row => (row.tags || []).forEach(tag => tagSet.add(tag)));
+    const tagRow = tagSet.size
+      ? `<div class="floqr-fsv-tag-row" role="group" aria-label="${esc(t("sv.placeTagsFilter", "Filter by tag"))}">
+          <button type="button" class="floqr-fsv-tag${st.tag ? "" : " is-active"}" data-fsv-tag="">${esc(t("sv.placeTagFilterAll", "All tags"))}</button>
+          ${[...tagSet].sort().map(tag =>
+            `<button type="button" class="floqr-fsv-tag${st.tag === tag ? " is-active" : ""}" data-fsv-tag="${esc(tag)}">${esc(tag)}</button>`
+          ).join("")}
+        </div>`
+      : "";
     host.innerHTML = `<div class="floqr-fsv-root" data-fsv-layout="${host.getAttribute("data-fsv-layout") || "page"}">
       ${productHero(product, rows.length, source.warning)}
       ${productSwitcher(proj, st.productId)}
       ${tabs(st.view)}
       ${search}
+      ${tagRow}
       ${grid}
       <div class="floqr-fsv-sheet${open ? " is-open" : ""}" data-fsv-sheet ${open ? "" : "hidden"}>${open ? detailHtml(open) : ""}</div>
     </div>`;
@@ -454,6 +475,13 @@
         render(host);
       });
     }
+    host.querySelectorAll("[data-fsv-tag]").forEach(btn => {
+      btn.addEventListener("click", event => {
+        event.stopPropagation();
+        setState(host, {tag: btn.getAttribute("data-fsv-tag") || ""});
+        render(host);
+      });
+    });
   }
 
   async function loadCatalog() {

@@ -27,6 +27,9 @@ test("authorized text yields one compact fallback card", () => {
   assert.equal((row.ratings || []).length, 0);
   assert.equal(row.floqrPublicData.geminiUsed, false);
   assert.equal(row.floqrPublicData.authorizedText, true);
+  assert.ok(row.floqrPublicData.smartBackgroundId);
+  assert.ok(row.floqrPublicData.smartStencilId);
+  assert.ok(Array.isArray(row.floqrPublicData.smartTags));
   assert.ok(row.summary.length <= 160);
 });
 

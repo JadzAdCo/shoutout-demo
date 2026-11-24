@@ -370,6 +370,24 @@ test("Place SMARTview uses published SMARTbackground, not a photo well", () => {
   assert.equal(stamped.backgroundId, "bg-vip-nightlife");
   assert.equal(stamped.reasonCode, "place-card-explicit");
 
+  const assigned = resolver.resolvePlaceCard({
+    kind: "venue",
+    title: "Aurelia",
+    floqrPublicData: {
+      city: "Washington, DC",
+      smartBackgroundId: "bg-paris",
+      smartStencilId: "st-flight",
+      smartTags: ["nightlife", "dc", "Nightlife", "!!"]
+    }
+  }, catalog);
+  assert.equal(assigned.backgroundId, "bg-paris");
+  assert.equal(assigned.stencilId, "st-flight");
+  assert.deepEqual(assigned.tags, ["nightlife", "dc"]);
+  assert.equal(assigned.reasonCode, "place-card-explicit");
+  assert.deepEqual(resolver.normalizeSmartViewTags("Travel, beach, Travel"), ["travel", "beach"]);
+  assert.equal(resolver.cardMatchesSmartViewTag(assigned, "nightlife"), true);
+  assert.equal(resolver.cardMatchesSmartViewTag(assigned, "spaavs"), false);
+
   const dining = resolver.resolvePlaceCard({kind: "restaurant", title: "District Kitchen"}, catalog);
   assert.equal(dining.backgroundId, "bg-dining");
   assert.ok(dining.reasonCode === "place-card-kind-default" || dining.reasonCode === "place-card-classified");
@@ -385,6 +403,14 @@ test("Place SMARTview uses published SMARTbackground, not a photo well", () => {
   assert.match(read("botdee-smartview.css"), /--sv-place-bg/);
   assert.match(read("smartvisuals-studio.js"), /Preview in Place SMARTview/);
   assert.match(read("smartvisuals-studio.js"), /placeSmartView:/);
+  assert.match(read("smartvisuals-studio.js"), /function assignPlaceVisual/);
+  assert.match(read("smartvisuals-studio.js"), /svStudioPlaceStencil/);
+  assert.match(read("smartvisuals-studio.js"), /svStudioPlaceTags/);
+  assert.doesNotMatch(read("smartvisuals-studio.js"), /SPAAVS_SAMPLE/);
+  assert.match(js, /botdee-sv-place-stencil/);
+  assert.match(js, /placeTagHtml/);
+  assert.match(read("botdee-smartview.css"), /botdee-sv-place-stencil/);
+  assert.match(read("functions/smartvisuals-functions.js"), /normalizeSmartViewTags/);
   assert.ok(catalog.taxonomy.placeCardDefaults.venue.backgroundId);
 });
 

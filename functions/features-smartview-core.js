@@ -276,6 +276,19 @@
       productName: productDisplayName(record.productId),
       title: record.title,
       category: record.category || "",
+      tags: (function () {
+        const extra = Array.isArray(record.tags) ? record.tags : [];
+        const raw = [record.category].concat(extra);
+        const out = [];
+        const seen = new Set();
+        raw.forEach(item => {
+          const tag = String(item || "").trim().toLowerCase().replace(/\s+/g, "-").slice(0, 40);
+          if (!tag || seen.has(tag)) return;
+          seen.add(tag);
+          out.push(tag);
+        });
+        return out;
+      })(),
       shortDescription: record.shortDescription,
       accomplishment: record.accomplishment,
       patronBenefit: record.patronBenefit,
@@ -395,6 +408,11 @@
     return (features || []).filter(row => {
       if (productId && row.productId !== productId) return false;
       if (query.lifecycle && row.lifecycleLabel !== query.lifecycle) return false;
+      if (query.tag) {
+        const want = String(query.tag || "").trim().toLowerCase();
+        const tags = Array.isArray(row.tags) ? row.tags : [];
+        if (want && !tags.includes(want) && row.category !== want) return false;
+      }
       if (view === "whatsNew") {
         return row.publicCopyApproved && row.lifecycle === "released" && row.releaseDateVerified;
       }
@@ -409,7 +427,7 @@
       }
       if (needle) {
         const hay = normalizePrompt([
-          row.title, row.shortDescription, row.accomplishment, row.patronBenefit, row.productName
+          row.title, row.shortDescription, row.accomplishment, row.patronBenefit, row.productName, (row.tags || []).join(" "), row.category
         ].join(" "));
         if (!hay.includes(needle)) return false;
       }
