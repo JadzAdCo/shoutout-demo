@@ -1038,11 +1038,28 @@ body.botdee-sv-overlay-open { overflow: hidden; }
   opacity: 0.55;
   cursor: not-allowed;
 }
+.botdee-sv-room-btn.is-blocked[data-rs-invite-state="invited"] {
+  opacity: 0.48;
+  filter: grayscale(0.45);
+}
 .botdee-sv-room [data-rs-friend-list] {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
   margin-top: 0.5rem;
+}
+.botdee-sv-room-ack {
+  flex: 1 1 100%;
+  margin: 0 0 0.1rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent, #00d4fe) 22%, transparent);
+  color: var(--text, #efffff);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+.botdee-sv-room-ack[data-kind="error"] {
+  background: color-mix(in srgb, #f45d64 28%, transparent);
 }
 .botdee-sv-room [data-rs-friend-list] .botdee-sv-room-btn {
   flex: 1 1 8.5rem;

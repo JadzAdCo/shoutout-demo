@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.076";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.076";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.077";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.077";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.077",
+      title: "s3.3.077 — Room SMARTview Invite chip stays greyed with Invite sent",
+      checks: [
+        {label:"Pending invitee uids", file:"functions/botdee-session-store.js", includes:["listPendingInviteeUids", "alreadySent: true"]},
+        {label:"Decorate invited chips", file:"functions/botdee-session-core.js", includes:["pendingUids", "reason: \"invited\""]},
+        {label:"Chip ack + local pending", file:"botdee-smartview.js", includes:["chipInvited", "rememberLocalInvited", "inviteSentAck"]},
+        {label:"Named invite already sent", file:"functions/botdee-room-live.js", includes:["inviteState === \"invited\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-077-botdee-lorna-chip-ack", "s3.3.077"]}
+      ]
+    },
     {
       version: "s3.3.076",
       title: "s3.3.076 — BOT DEE named invite + Search SMARTnotification + Miami Place SMARTview",
@@ -3835,6 +3846,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-077-botdee-lorna-chip-ack",
+      area:"BOT DEE",
+      feature:"Room SMARTview Invite chip acknowledgement (Lorna / MsLorna)",
+      changed:"s3.3.077 — Tapping a Mingl friend on the Room SMARTview guest list (MsLorna / Lorna) keeps the chip greyed with Invite sent. An inline Invite sent ack sits above the chips (not only the below-fold toast). A second tap does not mint another invite (createInvite alreadySent + pendingUids). Chat Invite lorna still sends / acknowledges the same Inbox Review BOT DEE invite. Tracker SMA-30.",
+      howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js / botdee.html ?v=s3.3.077. Sign in with BOT DEE + Mingl. 2) Open Room SMARTview, Join Now or Set a schedule, tap Invite. 3) Tap MsLorna (or Lorna) — chip must stay greyed with Invite sent; cyan 'Invite sent' line must stay visible above the list. Re-open Invite — chip still Invite sent, not a fresh tappable pill. 4) Type Invite lorna — still Inbox Review BOT DEE invite (not VIP / People SMARTview). 5) Phone ~390: ack is on-screen, not only below the fold. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"MsLorna stays greyed with Invite sent after tap. Re-open Invite still shows invited. Chat Invite lorna still works. No second Inbox row on a second chip tap.",
+      troubleshoot:"Chip flashes then reverts → cached botdee-smartview.js before s3.3.077 (fillFriends remount without pendingUids / local invited set). Invite sent missing → look for [data-rs-invite-ack] above chips; toast alone sits below End Room. Second invite minted → Functions not this SHA (createInvite alreadySent / listPendingInviteeUids). Chat Invite lorna fails → keep named invite path (inviteNamedGuests + extractNamedNeedles); this PR must not regress s3.3.076."
+    },
       {
       id:"s3-3-076-botdee-invite-search-notify",
       area:"BOT DEE",

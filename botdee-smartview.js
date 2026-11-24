@@ -1329,6 +1329,7 @@
     const reason = error?.details?.reason || error?.details?.error || "";
     if (reason === "self") return t("botdee.room.self", "That's you — you're already in this BOT DEE session.");
     if (reason === "already_member") return t("botdee.room.alreadyMember", "That Mingl friend is already in this BOT DEE session.");
+    if (reason === "invited" || reason === "used") return t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox.");
     if (reason === "full") return t("botdee.room.joinFull", "This BOT DEE session is full (host plus 7 guests).");
     if (reason === "not_friend") return t("botdee.room.notFriend", "BOT DEE session invites are Mingl friends only.");
     const msg = String(error?.message || "").trim();
@@ -1337,6 +1338,81 @@
     }
     return msg.replace(/^(INTERNAL|FAILED_PRECONDITION|PERMISSION_DENIED|NOT_FOUND|RESOURCE_EXHAUSTED):\s*/i, "").trim()
       || t("botdee.room.inviteFailed", "Could not send that invite.");
+  }
+
+  function invitedStorageKey(roomId) {
+    return `floqr.botdeeInvited.${String(roomId || "").trim()}`;
+  }
+
+  function loadLocalInvited(roomId) {
+    try {
+      const rows = JSON.parse(global.sessionStorage?.getItem(invitedStorageKey(roomId)) || "[]");
+      return Array.isArray(rows) ? rows.map(String).filter(Boolean) : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function rememberLocalInvited(roomId, uid) {
+    const id = String(uid || "").trim();
+    if (!roomId || !id) return;
+    const next = Array.from(new Set([...loadLocalInvited(roomId), id]));
+    try { global.sessionStorage?.setItem(invitedStorageKey(roomId), JSON.stringify(next)); } catch (_) {}
+  }
+
+  function forgetLocalInvited(roomId, uid) {
+    const id = String(uid || "").trim();
+    const next = loadLocalInvited(roomId).filter(row => row !== id);
+    try { global.sessionStorage?.setItem(invitedStorageKey(roomId), JSON.stringify(next)); } catch (_) {}
+  }
+
+  function inviteAlreadyAcked(error, result) {
+    if (result && (result.alreadySent === true || result.ok === true)) return true;
+    const reason = error?.details?.reason || error?.details?.error || "";
+    return reason === "invited" || reason === "used" || reason === "already_member";
+  }
+
+  function chipDisplayName(btn) {
+    return (btn?.getAttribute("data-rs-invite-name") || String(btn?.textContent || "").split("·")[0] || "").trim();
+  }
+
+  function markChipInvited(btn, sending) {
+    if (!btn) return;
+    const label = chipDisplayName(btn) || t("botdee.room.friend", "Mingl friend");
+    btn.setAttribute("data-rs-invite-name", label);
+    btn.classList.add("is-blocked");
+    btn.disabled = true;
+    btn.setAttribute("aria-disabled", "true");
+    btn.setAttribute("data-rs-invite-state", "invited");
+    btn.textContent = sending
+      ? `${label} · ${t("botdee.room.sendingInvite", "Sending…")}`
+      : `${label} · ${t("botdee.room.chipInvited", "Invite sent")}`;
+  }
+
+  function restoreChipInvite(btn) {
+    if (!btn) return;
+    const label = chipDisplayName(btn) || t("botdee.room.friend", "Mingl friend");
+    btn.classList.remove("is-blocked");
+    btn.disabled = false;
+    btn.removeAttribute("aria-disabled");
+    btn.setAttribute("data-rs-invite-state", "invite");
+    btn.textContent = label;
+  }
+
+  function showInviteAck(host, message, kind) {
+    if (!host) return;
+    let ack = host.querySelector("[data-rs-invite-ack]");
+    if (!ack) {
+      ack = document.createElement("p");
+      ack.className = "botdee-sv-room-ack";
+      ack.setAttribute("data-rs-invite-ack", "1");
+      host.prepend(ack);
+    }
+    ack.dataset.kind = kind || "ok";
+    ack.textContent = message;
+    if (typeof ack.scrollIntoView === "function") {
+      ack.scrollIntoView({block: "nearest", behavior: "smooth"});
+    }
   }
 
   function friendChipHtml(row, roomFull) {
@@ -1349,10 +1425,13 @@
     if (state === "already_member") {
       return `<button type="button" class="botdee-sv-room-btn is-blocked" data-rs-invite-state="already_member" aria-disabled="true">${esc(label)} · ${esc(t("botdee.room.chipMember", "Already in this session"))}</button>`;
     }
+    if (state === "invited") {
+      return `<button type="button" class="botdee-sv-room-btn is-blocked" data-rs-invite-uid="${esc(uid)}" data-rs-invite-name="${esc(label)}" data-rs-invite-state="invited" disabled aria-disabled="true">${esc(label)} · ${esc(t("botdee.room.chipInvited", "Invite sent"))}</button>`;
+    }
     if (roomFull) {
       return `<button type="button" class="botdee-sv-room-btn is-blocked" data-rs-invite-state="full" aria-disabled="true">${esc(label)}</button>`;
     }
-    return `<button type="button" class="botdee-sv-room-btn" data-rs-invite-uid="${esc(uid)}" data-rs-invite-state="invite">${esc(label)}</button>`;
+    return `<button type="button" class="botdee-sv-room-btn" data-rs-invite-uid="${esc(uid)}" data-rs-invite-name="${esc(label)}" data-rs-invite-state="invite">${esc(label)}</button>`;
   }
 
   let presenceTimer = 0;
@@ -1440,7 +1519,19 @@
         if (data.roomFull) {
           showToast(t("botdee.room.joinFull", "This BOT DEE session is full (host plus 7 guests)."));
         }
-        host.innerHTML = friends.map(row => friendChipHtml(row, !!data.roomFull)).join("");
+        const pending = new Set([
+          ...(Array.isArray(data.pendingUids) ? data.pendingUids : []),
+          ...loadLocalInvited(roomIdOf())
+        ].map(String));
+        friends.forEach(row => {
+          if (pending.has(String(row.uid || "")) && row.inviteState === "invite") {
+            row.inviteState = "invited";
+          }
+        });
+        const invitedAck = friends.some(row => row.inviteState === "invited")
+          ? `<p class="botdee-sv-room-ack" data-rs-invite-ack="1">${esc(t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox."))}</p>`
+          : "";
+        host.innerHTML = invitedAck + friends.map(row => friendChipHtml(row, !!data.roomFull)).join("");
         host.querySelectorAll("[data-rs-invite-state], [data-rs-invite-uid]").forEach(btn => {
           btn.addEventListener("click", async event => {
             event.preventDefault();
@@ -1449,32 +1540,60 @@
             const uid = btn.getAttribute("data-rs-invite-uid") || "";
             const state = btn.getAttribute("data-rs-invite-state") || "invite";
             if (state === "self") {
+              showInviteAck(host, t("botdee.room.self", "That's you — you're already in this BOT DEE session."), "ok");
               showToast(t("botdee.room.self", "That's you — you're already in this BOT DEE session."));
               return;
             }
             if (state === "already_member") {
+              showInviteAck(host, t("botdee.room.alreadyMember", "That Mingl friend is already in this BOT DEE session."), "ok");
               showToast(t("botdee.room.alreadyMember", "That Mingl friend is already in this BOT DEE session."));
               return;
             }
+            if (state === "invited") {
+              showInviteAck(host, t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox."), "ok");
+              showToast(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
+              return;
+            }
             if (state === "full") {
+              showInviteAck(host, t("botdee.room.joinFull", "This BOT DEE session is full (host plus 7 guests)."), "error");
               showToast(t("botdee.room.joinFull", "This BOT DEE session is full (host plus 7 guests)."));
               return;
             }
             if (!roomId) {
+              showInviteAck(host, t("botdee.room.confirmFirst", "Confirm the session first, then invite Mingl friends."), "error");
               showToast(t("botdee.room.confirmFirst", "Confirm the session first, then invite Mingl friends."));
               return;
             }
             if (!uid) {
+              showInviteAck(host, t("botdee.room.inviteFailed", "Could not send that invite."), "error");
               showToast(t("botdee.room.inviteFailed", "Could not send that invite."));
               return;
             }
-            btn.disabled = true;
+            rememberLocalInvited(roomId, uid);
+            markChipInvited(btn, true);
+            showInviteAck(host, t("botdee.room.sendingInvite", "Sending…"), "ok");
             try {
-              await call("createBotDeeRoomInvite", {roomId, targetUid: uid});
+              const sent = await call("createBotDeeRoomInvite", {roomId, targetUid: uid});
+              markChipInvited(btn, false);
+              const ack = t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox.");
+              showInviteAck(host, ack, "ok");
               showToast(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
+              if (sent && sent.alreadySent) {
+                showInviteAck(host, ack, "ok");
+              }
             } catch (error) {
-              btn.disabled = false;
-              showToast(inviteErrorCopy(error));
+              if (inviteAlreadyAcked(error)) {
+                markChipInvited(btn, false);
+                const ack = t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox.");
+                showInviteAck(host, ack, "ok");
+                showToast(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
+                return;
+              }
+              forgetLocalInvited(roomId, uid);
+              restoreChipInvite(btn);
+              const copy = inviteErrorCopy(error);
+              showInviteAck(host, copy, "error");
+              showToast(copy);
             }
           });
         });
@@ -2522,17 +2641,27 @@
           noteInvite(t("botdee.room.inviteFailed", "Could not send that invite."));
           return;
         }
-        inviteBtn.disabled = true;
+        rememberLocalInvited(roomId, targetUid);
+        markChipInvited(inviteBtn, true);
         const fn = functionsCallable("createBotDeeRoomInvite");
         if (!fn) {
-          inviteBtn.disabled = false;
+          forgetLocalInvited(roomId, targetUid);
+          restoreChipInvite(inviteBtn);
           noteInvite(t("botdee.room.inviteFailed", "Could not send that invite."));
           return;
         }
-        fn({roomId, targetUid}).then(() => {
-          noteInvite(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
+        fn({roomId, targetUid}).then(result => {
+          markChipInvited(inviteBtn, false);
+          noteInvite(t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox."));
+          return result;
         }).catch(error => {
-          inviteBtn.disabled = false;
+          if (inviteAlreadyAcked(error)) {
+            markChipInvited(inviteBtn, false);
+            noteInvite(t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox."));
+            return;
+          }
+          forgetLocalInvited(roomId, targetUid);
+          restoreChipInvite(inviteBtn);
           noteInvite(inviteErrorCopy(error));
         });
         return;

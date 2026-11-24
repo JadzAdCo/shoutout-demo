@@ -271,6 +271,17 @@ async function loadTurns(roomId, limit = 12) {
   return core.sanitizeRoomTurns(snap.docs.map(doc => doc.data()).reverse());
 }
 
+async function listPendingInviteeUids(roomId) {
+  const id = core.text(roomId, 80);
+  if (!id) return [];
+  const snap = await systemCollection("botDeeRoomInvites")
+    .where("roomId", "==", id)
+    .where("status", "==", "pending")
+    .limit(80)
+    .get();
+  return [...new Set(snap.docs.map(doc => core.text(doc.data()?.targetUid, 80)).filter(Boolean))];
+}
+
 async function createInvite({roomId, actorUid, targetUid, actorEmail, actorRole, nowMs}) {
   const now = Number(nowMs || Date.now());
   const roomSnap = await loadRoom(roomId);
@@ -285,6 +296,16 @@ async function createInvite({roomId, actorUid, targetUid, actorEmail, actorRole,
     memberUids: core.currentMembers(row)
   });
   if (!targetState.ok) return {ok: false, error: targetState.reason};
+  const pending = await findPendingInvite({uid: targetUid, roomId: roomSnap.id});
+  if (pending) {
+    return {
+      ok: true,
+      alreadySent: true,
+      inviteId: pending.id,
+      targetUid: core.text(targetUid, 80),
+      room: core.publicRoom(roomSnap.id, row)
+    };
+  }
   const friends = await friendGate(actorUid, targetUid);
   const hostUid = core.text(row.hostUid, 80);
   const blockedHost = hostUid && hostUid !== core.text(targetUid, 80)
@@ -1406,6 +1427,8 @@ module.exports = {
   appendSystemEvent,
   loadTurns,
   createInvite,
+  findPendingInvite,
+  listPendingInviteeUids,
   acceptInvite,
   leaveRoom,
   kickMember,

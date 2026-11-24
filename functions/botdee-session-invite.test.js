@@ -66,20 +66,29 @@ test("self-invite and already-member are distinct from used/not_friend", () => {
   assert.equal(core.classifyInviteTarget({actorUid: "host-1", targetUid: "host-1", memberUids: members}).reason, "self");
   assert.equal(core.classifyInviteTarget({actorUid: "host-1", targetUid: "guest-1", memberUids: members}).reason, "already_member");
   assert.equal(core.classifyInviteTarget({actorUid: "host-1", targetUid: "friend-2", memberUids: members}).ok, true);
+  assert.equal(core.classifyInviteTarget({
+    actorUid: "host-1",
+    targetUid: "lorna-1",
+    memberUids: members,
+    pendingUids: ["lorna-1"]
+  }).reason, "invited");
   assert.equal(core.denialMessage("self"), "That's you — you're already in this BOT DEE session.");
   assert.equal(core.denialMessage("already_member"), "That Mingl friend is already in this BOT DEE session.");
+  assert.equal(core.denialMessage("invited"), "Invite already sent to that Mingl friend.");
   const decorated = core.decorateFriendInviteState(
     [
       {uid: "host-1", displayName: "Don Bans"},
       {uid: "guest-1", displayName: "JuJu"},
       {uid: "friend-don", displayName: "Don"},
-      {uid: "friend-don", displayName: "Don duplicate"}
+      {uid: "friend-don", displayName: "Don duplicate"},
+      {uid: "lorna-1", displayName: "MsLorna"}
     ],
-    {actorUid: "host-1", memberUids: members}
+    {actorUid: "host-1", memberUids: members, pendingUids: ["lorna-1"]}
   );
   assert.deepEqual(decorated.map(row => `${row.uid}:${row.inviteState}`), [
     "guest-1:already_member",
-    "friend-don:invite"
+    "friend-don:invite",
+    "lorna-1:invited"
   ]);
   const hits = core.matchNamedInvitees(decorated, [{displayName: "Don"}]);
   assert.equal(hits.length, 1);
@@ -234,6 +243,14 @@ test("client join captures room=&t= and Inbox is not a ShoutOut CTA", () => {
   assert.match(read("botdee-smartview.js"), /botdee\.rs\.itineraryNotCalendar/);
   assert.match(read("botdee-smartview.js"), /botdee\.rs\.permissionsNotSchedule/);
   assert.match(read("botdee-smartview.js"), /data-rs-invite-state/);
+  assert.match(read("botdee-smartview.js"), /chipInvited/);
+  assert.match(read("botdee-smartview.js"), /inviteSentAck/);
+  assert.match(read("botdee-smartview.js"), /rememberLocalInvited/);
+  assert.match(read("functions/botdee-session-store.js"), /alreadySent: true/);
+  assert.match(read("functions/botdee-session-store.js"), /listPendingInviteeUids/);
+  assert.match(read("functions/botdee-session-functions.js"), /pendingUids/);
+  assert.match(read("functions/botdee-room-live.js"), /inviteState === "invited"/);
+  assert.match(read("botdee-help-repository.js"), /chip stays greyed with Invite sent/);
   assert.match(read("botdee-smartview.js"), /data-rs-kick-uid/);
   assert.match(read("botdee-smartview.js"), /kickBotDeeRoomMember/);
   assert.match(read("functions/index.js"), /acceptBotDeeRoomInvite/);
