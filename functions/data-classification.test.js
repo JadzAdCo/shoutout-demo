@@ -186,6 +186,9 @@ test("getBotDeeAccess resolves the tier server-side, keeps the botDee feature gu
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "joinedRoomId"));
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "joinedRoomConversationId"));
   assert.ok(dc.COLLECTIONS.includes("botDeeRooms"));
+  assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeRooms" && row.field === "placeCards"));
+  assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeRooms" && row.field === "smartBackgroundId"));
+  assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeRooms" && row.field === "smartTags"));
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "currentConversationId"));
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "archiveConversationId"));
   const index = fs.readFileSync(path.join(__dirname, "index.js"), "utf8");
