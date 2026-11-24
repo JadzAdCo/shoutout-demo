@@ -667,16 +667,184 @@ function publicRoom(id, row, extra = {}) {
   };
 }
 
+function loadSmartVisualsResolver() {
+  try {
+    return require("./smartvisuals-resolver");
+  } catch (_) {
+    return null;
+  }
+}
+
+function loadBotDeeTools() {
+  try {
+    return require("./bot-dee-tools");
+  } catch (_) {
+    return null;
+  }
+}
+
+function looksLikeRoomPrompt(raw) {
+  const s = text(raw, 200).toLowerCase();
+  if (!s) return false;
+  return /^(open|create|start|make|launch|show)\b/.test(s) || /\broom smart(?:view|\s*card)\b/.test(s);
+}
+
+function resolveRoomVisual(title, description) {
+  const resolver = loadSmartVisualsResolver();
+  if (!resolver || typeof resolver.resolve !== "function") return null;
+  try {
+    return resolver.resolve({
+      title: text(title, 120),
+      description: text(description, 240),
+      sourceKind: "authorized-room"
+    });
+  } catch (_) {
+    return null;
+  }
+}
+
+function displayRoomTitle(title, visual) {
+  const raw = text(title, 80);
+  const placeId = visual && Array.isArray(visual.placeIds) ? visual.placeIds[0] : "";
+  const fashionOrEvent = visual && (visual.category === "fashion" || visual.category === "event");
+  if (placeId && looksLikeRoomPrompt(raw) && !fashionOrEvent) {
+    try {
+      const resolver = loadSmartVisualsResolver();
+      const label = resolver && typeof resolver.humanizePlace === "function"
+        ? resolver.humanizePlace(placeId)
+        : "";
+      if (label) return text(label, 80);
+    } catch (_) { /* keep stored title */ }
+  }
+  return raw || "Mingl Room";
+}
+
+function displayRoomDescription(description, title) {
+  const raw = text(description, 240);
+  const label = text(title, 80);
+  if (!raw || !label || !looksLikeRoomPrompt(raw) || looksLikeRoomPrompt(label)) return raw;
+  const reserv = /\breserv/.test(raw.toLowerCase());
+  return reserv
+    ? `Let's plan reservations in ${label} with BOT DEE.`
+    : `Let's plan in ${label} with BOT DEE.`;
+}
+
+function sanitizePlaceCard(card) {
+  if (!card || typeof card !== "object") return null;
+  const title = text(card.title, 80);
+  if (!title) return null;
+  const pub = card.floqrPublicData && typeof card.floqrPublicData === "object" ? card.floqrPublicData : {};
+  const tags = Array.isArray(pub.smartTags)
+    ? pub.smartTags.map(tag => text(tag, 40).toLowerCase()).filter(Boolean).slice(0, 8)
+    : [];
+  const actions = Array.isArray(card.actions)
+    ? card.actions.slice(0, 3).map(action => {
+      const href = text(action && action.href, 240);
+      if (!href || /javascript:/i.test(href) || /[?&]v=/.test(href)) return null;
+      return {
+        id: text(action.id, 40),
+        label: text(action.label, 80),
+        href
+      };
+    }).filter(Boolean)
+    : [];
+  return {
+    kind: text(card.kind, 40) || "venue",
+    title,
+    summary: text(card.summary, 160),
+    floqrPublicData: {
+      city: text(pub.city, 80),
+      smartBackgroundId: text(pub.smartBackgroundId, 80),
+      smartStencilId: text(pub.smartStencilId, 80),
+      smartTags: tags
+    },
+    canonicalFloqrPageId: text(card.canonicalFloqrPageId, 80),
+    actions,
+    sources: [{provider: "floqr", reuseRights: "place"}]
+  };
+}
+
+function sanitizePlaceCards(list) {
+  if (!Array.isArray(list)) return [];
+  const out = [];
+  const seen = new Set();
+  list.forEach(card => {
+    const next = sanitizePlaceCard(card);
+    if (!next) return;
+    const key = `${next.kind}:${next.title.toLowerCase()}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(next);
+  });
+  return out.slice(0, 4);
+}
+
+function fallbackPlaceCards(visual) {
+  const resolver = loadSmartVisualsResolver();
+  const ids = visual && Array.isArray(visual.placeIds) ? visual.placeIds : [];
+  if (!resolver || !ids.length) return [];
+  return sanitizePlaceCards(ids.slice(0, 2).map(id => {
+    const city = typeof resolver.humanizePlace === "function" ? resolver.humanizePlace(id) : id;
+    const payload = {
+      kind: "venue",
+      title: city,
+      summary: `${city} · Place SMARTview`,
+      floqrPublicData: {city}
+    };
+    try {
+      const vis = resolver.resolvePlaceCard(payload);
+      if (vis && vis.backgroundId) payload.floqrPublicData.smartBackgroundId = vis.backgroundId;
+      if (vis && vis.stencilId) payload.floqrPublicData.smartStencilId = vis.stencilId;
+      if (vis && Array.isArray(vis.tags)) payload.floqrPublicData.smartTags = vis.tags;
+    } catch (_) { /* catalog optional */ }
+    return payload;
+  }));
+}
+
+function searchPlaceCards(title, description, row, extra) {
+  const stored = sanitizePlaceCards(extra && extra.placeCards || row && row.placeCards);
+  if (stored.length) return stored;
+  const query = `${text(title, 120)} ${text(description, 240)}`.trim();
+  try {
+    const tools = loadBotDeeTools();
+    if (tools && typeof tools.destinationPlaceViews === "function") {
+      const fromDest = sanitizePlaceCards(tools.destinationPlaceViews(query, extra && extra.placeVisualOverride));
+      if (fromDest.length) return fromDest;
+    }
+  } catch (_) { /* destination Place SMARTview is optional on this path */ }
+  return fallbackPlaceCards(extra && extra.visual);
+}
+
+function roomSearchVisualFields(title, description) {
+  const visual = resolveRoomVisual(title, description) || {};
+  const placeCards = searchPlaceCards(title, description, {}, {visual});
+  const tags = Array.isArray(visual.tags) ? visual.tags.map(tag => text(tag, 40)).filter(Boolean).slice(0, 12) : [];
+  return {
+    smartBackgroundId: text(visual.backgroundId, 80),
+    smartStencilId: text(visual.stencilId, 80),
+    smartTags: tags,
+    placeCards
+  };
+}
+
 function publicNotification(id, row, extra = {}) {
   const hostName = text(extra.hostName, 80) || "Host";
-  const title = text(row?.authorizedTitle || row?.title, 80) || "Mingl Room";
+  const storedTitle = text(row?.authorizedTitle || row?.title, 80);
+  const description = text(row?.authorizedDescription, 240);
+  const visual = extra.visual || resolveRoomVisual(storedTitle, description);
+  const title = displayRoomTitle(storedTitle, visual);
+  const descriptionOut = displayRoomDescription(description, title);
   const start = Number(row?.scheduledStartMs || 0) || 0;
+  const tags = Array.isArray(row?.smartTags) && row.smartTags.length
+    ? row.smartTags.map(tag => text(tag, 40)).filter(Boolean).slice(0, 12)
+    : (Array.isArray(visual && visual.tags) ? visual.tags : []);
+  const placeCards = searchPlaceCards(storedTitle, description, row, {...extra, visual});
   return {
     demo: false,
     sourceKind: "authorized-room",
     roomId: text(id, 80),
     title,
-    description: text(row?.authorizedDescription, 240),
+    description: descriptionOut,
     hostName,
     hostInitials: hostName.slice(0, 1).toUpperCase(),
     inviteeLine: extra.inviteeLine || `${hostName} invited you to join a Mingl Room.`,
@@ -689,7 +857,12 @@ function publicNotification(id, row, extra = {}) {
     joinHref: extra.joinHref || roomHref(id, extra.token || ""),
     viewerRole: text(extra.viewerRole, 20) || "invitee",
     rsvp: text(extra.rsvp, 20) || "",
-    participants: Array.isArray(extra.participants) ? extra.participants.slice(0, MEMBER_CAP) : []
+    participants: Array.isArray(extra.participants) ? extra.participants.slice(0, MEMBER_CAP) : [],
+    backgroundId: text(row?.smartBackgroundId || (visual && visual.backgroundId), 80),
+    stencilId: text(row?.smartStencilId || (visual && visual.stencilId), 80),
+    tags,
+    placeIds: Array.isArray(visual && visual.placeIds) ? visual.placeIds : [],
+    placeCards
   };
 }
 
@@ -929,6 +1102,13 @@ module.exports = {
   publicRoomStatus,
   publicRoom,
   publicNotification,
+  looksLikeRoomPrompt,
+  displayRoomTitle,
+  displayRoomDescription,
+  resolveRoomVisual,
+  roomSearchVisualFields,
+  sanitizePlaceCards,
+  searchPlaceCards,
   publicIntent,
   publicTab,
   publicTabLine,

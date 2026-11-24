@@ -187,6 +187,11 @@ function roomSeed({hostUid, conversationId, title, authorizedTitle, authorizedDe
       scheduledStartMs: status === "scheduled" ? start : 0
     }, now)
   };
+  const visual = core.roomSearchVisualFields(row.authorizedTitle, row.authorizedDescription);
+  if (visual.smartBackgroundId) row.smartBackgroundId = visual.smartBackgroundId;
+  if (visual.smartStencilId) row.smartStencilId = visual.smartStencilId;
+  if (Array.isArray(visual.smartTags) && visual.smartTags.length) row.smartTags = visual.smartTags;
+  if (Array.isArray(visual.placeCards) && visual.placeCards.length) row.placeCards = visual.placeCards;
   return row;
 }
 
@@ -1190,6 +1195,13 @@ async function listNotifications({uid, nowMs}) {
     if (id && !roomIds.has(id)) roomIds.set(id, {invite: row, via: "invitee"});
   }
   const notes = [];
+  let placeVisualOverride = null;
+  try {
+    const tools = require("./bot-dee-tools");
+    if (typeof tools.loadPlaceVisualOverride === "function") {
+      placeVisualOverride = await tools.loadPlaceVisualOverride("venue");
+    }
+  } catch (_) { /* Studio Place assignment is optional on Search list */ }
   for (const [id, meta] of roomIds) {
     const live = meta.doc ? {id, data: meta.doc.data() || {}} : await loadRoom(id);
     if (!live) continue;
@@ -1212,7 +1224,8 @@ async function listNotifications({uid, nowMs}) {
       scheduledLabel: !liveOpen && Number(row.scheduledStartMs || 0)
         ? new Date(Number(row.scheduledStartMs)).toLocaleString("en-US", {timeZone: row.scheduledTimeZone || "UTC"})
         : "",
-      participants: core.publicSearchParticipants(memberPeople, {live: liveOpen})
+      participants: core.publicSearchParticipants(memberPeople, {live: liveOpen}),
+      placeVisualOverride
     }));
   }
   notes.sort((a, b) => Number(a.scheduledStartMs || 0) - Number(b.scheduledStartMs || 0));

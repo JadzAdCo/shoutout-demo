@@ -646,6 +646,47 @@ function replyFor(classified) {
   return {key: pair[0], text: pair[1]};
 }
 
+function loadResolver() {
+  try {
+    if (typeof require === "function") return require("./smartvisuals-resolver");
+  } catch (_) { /* browser UMD loads resolver separately */ }
+  if (typeof globalThis !== "undefined") return globalThis.FLOQRSmartVisualsResolver || null;
+  return null;
+}
+
+function looksLikeRoomPrompt(raw) {
+  const s = String(raw || "").trim().toLowerCase();
+  if (!s) return false;
+  return /^(open|create|start|make|launch|show)\b/.test(s) || /\broom smart(?:view|\s*card)\b/.test(s);
+}
+
+function destinationAuthorized(raw, cleaned) {
+  const resolver = loadResolver();
+  if (!resolver || typeof resolver.resolve !== "function") return null;
+  if (!looksLikeRoomPrompt(cleaned)) return null;
+  let visual;
+  try {
+    visual = resolver.resolve({
+      title: cleaned,
+      description: cleaned,
+      sourceKind: "authorized-room"
+    });
+  } catch (_) {
+    return null;
+  }
+  if (!visual || visual.category === "fashion" || visual.category === "event") return null;
+  const placeId = Array.isArray(visual.placeIds) ? visual.placeIds[0] : "";
+  if (!placeId) return null;
+  const label = typeof resolver.humanizePlace === "function" ? resolver.humanizePlace(placeId) : "";
+  if (!label) return null;
+  const folded = normalizeUtterance(raw);
+  const reserv = /\breserv/.test(folded);
+  const description = reserv
+    ? `Let's plan reservations in ${label} with BOT DEE.`
+    : `Let's plan in ${label} with BOT DEE.`;
+  return {authorizedTitle: label, authorizedDescription: description};
+}
+
 function authorizedFromUtterance(raw, classified) {
   if (classified && classified.injection) {
     return {authorizedTitle: "", authorizedDescription: ""};
@@ -655,6 +696,8 @@ function authorizedFromUtterance(raw, classified) {
   }
   const cleaned = text(String(raw || "").replace(/https?:\/\/\S+/gi, " ").replace(/\s+/g, " "), 120);
   if (!cleaned) return {authorizedTitle: "", authorizedDescription: ""};
+  const dest = destinationAuthorized(raw, cleaned);
+  if (dest) return dest;
   return {authorizedTitle: cleaned, authorizedDescription: cleaned};
 }
 

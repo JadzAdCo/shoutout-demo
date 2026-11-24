@@ -332,6 +332,28 @@ test("Join Now does not notify Search; schedule does; TTL starts at live open", 
   assert.match(notify.joinHref, /botdee\.html\?room=br_room/);
   assert.doesNotMatch(notify.joinHref, /mingl-chat\.html/);
   assert.doesNotMatch(notify.joinHref, /[?&]v=/);
+  const miamiPrompt = "Open a room smart card for reservations in Miami";
+  const miamiNotify = core.publicNotification("br_miami", room({
+    status: "scheduled",
+    smartNotification: 1,
+    authorizedTitle: miamiPrompt,
+    authorizedDescription: miamiPrompt,
+    title: miamiPrompt,
+    scheduledStartMs: now + 60 * 60 * 1000,
+    liveOpenedAtMs: 0
+  }), {hostName: "Don", token: "tok"});
+  assert.equal(miamiNotify.title, "Miami");
+  assert.match(miamiNotify.description, /Let's plan reservations in Miami with BOT DEE/);
+  assert.doesNotMatch(miamiNotify.description, /Open a room smart card/);
+  assert.equal(miamiNotify.backgroundId, "bg-miami");
+  assert.ok(miamiNotify.placeIds.includes("miami"));
+  assert.ok(miamiNotify.tags.includes("miami"));
+  assert.ok(Array.isArray(miamiNotify.placeCards) && miamiNotify.placeCards.length >= 1);
+  assert.match(miamiNotify.placeCards[0].title, /Miami/i);
+  assert.equal(miamiNotify.placeCards[0].floqrPublicData.smartBackgroundId, "bg-miami");
+  assert.ok(miamiNotify.placeCards[0].floqrPublicData.smartTags.includes("miami"));
+  assert.match(miamiNotify.joinHref, /botdee\.html\?room=br_miami/);
+  assert.doesNotMatch(miamiNotify.joinHref, /mingl-chat\.html/);
 });
 
 test("schedule callables, Search list, and Join Now never open mingl-chat", () => {

@@ -234,6 +234,17 @@
       ]
     },
     {
+      version: "s3.3.078",
+      title: "s3.3.078 — Search SMARTnotification uses Miami Place SMARTview cards",
+      checks: [
+        {label:"Search Place cards", file:"smartvisuals-view.js", includes:["sv-place-cards", "placeCardsHtml", "displayTitle"]},
+        {label:"Canonical Miami title", file:"functions/botdee-room-smartview.js", includes:["destinationAuthorized", "humanizePlace"]},
+        {label:"publicNotification placeCards", file:"functions/botdee-session-core.js", includes:["searchPlaceCards", "placeCards"]},
+        {label:"Schedule persist visual", file:"functions/botdee-session-store.js", includes:["roomSearchVisualFields", "loadPlaceVisualOverride"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-078-search-miami-place-smartview", "s3.3.078"]}
+      ]
+    },
+    {
       version: "s3.3.077",
       title: "s3.3.077 — Room SMARTview Invite chip stays greyed with Invite sent",
       checks: [
@@ -3861,10 +3872,19 @@
       id:"s3-3-079-botdee-joined-group-chat",
       area:"BOT DEE",
       feature:"Search Join Now opens the joined Room SMARTview group chat",
-      changed:"s3.3.079 — Search Join Now (botdee.html?room=, never mingl-chat.html) attaches the existing BOT DEE session. Host without a pending invite is already a member. Due scheduled rooms go live. Don and Lorna names show on the Room SMARTview card; group turns are shared. Join ack is not a new setup card. Overlay hides Join at Scheduled Time when live. Tracker SMA-32. Keep PR 172 Miami Place cards separate.",
+      changed:"s3.3.079 — Search Join Now (botdee.html?room=, never mingl-chat.html) attaches the existing BOT DEE session. Host without a pending invite is already a member. Due scheduled rooms go live. Don and Lorna names show on the Room SMARTview card; group turns are shared. Join ack is not a new setup card. Overlay hides Join at Scheduled Time when live. Tracker SMA-32. Miami Place Search cards shipped in s3.3.078.",
       howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh Search and https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js / smartvisuals-view.js ?v=s3.3.079. Sign in with BOT DEE + Mingl. 2) Host: scheduled Miami room with Lorna invited. After the start time, Search Join Now. Expect botdee.html?room= (not mingl-chat). Room SMARTview shows Don + Lorna names and a group transcript, not a fresh Join Now / Set a schedule card. 3) Lorna: Join Now from Search or Inbox — she sees the same roster and can send a message Don sees. 4) Overlay: Participants names, Live in Room without a past scheduled CTA. 5) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
       expected:"Join Now lands in the existing BOT DEE room. Both members see names and share the group chat. Not a private BOT DEE thread pretending to be a group.",
       troubleshoot:"Still a new setup card → cached bot-dee-chat.js (completeSearchJoin must keep roomId until executeBotSession) or Functions not this SHA (attachSession / conversation mismatch). Count 2 but no names → getBotDeeRoom members missing or card without data-rs-roster. Messages not shared → room still scheduled (start due failed) or joinedRoomId not persisted. Join Now opens mingl-chat → smartvisuals-view.js joinHref rewrite."
+    },
+      {
+      id:"s3-3-078-search-miami-place-smartview",
+      area:"BOT DEE",
+      feature:"Search SMARTnotification Miami Place SMARTview cards",
+      changed:"s3.3.078 — A scheduled BOT DEE room whose authorized text names Miami paints Search SMARTnotification with Place SMARTview cards (bg-miami, Miami / Reservations pills, compact Place cards), not a Mingl Room template and not the raw chat prompt as the title. Compact card stays View Invitation / Not Now (Cancun hierarchy). Room overlay Join Now stays botdee.html?room= never mingl-chat.html. Already-scheduled rooms that stored the prompt as title are rewritten at listBotDeeRoomNotifications. Tracker SMA-31.",
+      howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/ until smartvisuals-view.js / botdee-room-smartview.js / index.html ?v=s3.3.079. Sign in with BOT DEE + Mingl. 2) On BOT DEE type Open a room smart card for reservations in Miami — Room SMARTview title Miami, plus Place SMARTview. Set a schedule. 3) Open Search without ?smartvisualInvite=cancun — compact SMARTnotification title Miami, bg-miami, Place SMARTview card(s) with miami tag, View Invitation / Not Now, no Ad. Pills are not Mingl Room. 4) View Invitation overlay still shows Place SMARTview cards. Join Now → botdee.html?room= not mingl-chat.html. 5) Phone ~390 matches Cancun compact hierarchy. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Search shows Miami Place SMARTview cards on the compact SMARTnotification. Title is Miami, not the chat prompt. Join Now stays on BOT DEE.",
+      troubleshoot:"Still Mingl Room / prompt title → cached smartvisuals-view.js before s3.3.078, or Functions not this SHA (publicNotification / destinationPlaceViews). Overlay Join Now opens mingl-chat → joinHref rewrite in openRoomOverlay. No Place cards → catalog.json not loaded (ensureCatalog) or listBotDeeRoomNotifications missing placeCards. VIP leftover on the BOT DEE turn is a different path (s3.3.076 attachVenueSearch)."
     },
       {
       id:"s3-3-077-botdee-lorna-chip-ack",

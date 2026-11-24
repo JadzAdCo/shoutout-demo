@@ -18,6 +18,7 @@ function byId(id) {
 test("screenshot mixed bullets: BOT DEE/Gemini stay, Master Admin / Save / Features SMARTview drop", () => {
   const stay = {
     "s3.3.079": true,
+    "s3.3.078": true,
     "s3.3.077": true,
     "s3.3.076": true,
     "s3.3.075": true,
@@ -46,7 +47,7 @@ test("screenshot mixed bullets: BOT DEE/Gemini stay, Master Admin / Save / Featu
     assert.equal(catalog.classifyItem(row).keep, false, id);
   });
   const shown = new Set(whatsNew.map(row => row.id));
-  ["s3.3.079", "s3.3.077", "s3.3.076", "s3.3.075", "s3.3.072", "s3.3.071", "s3.3.070"].forEach(id => {
+  ["s3.3.079", "s3.3.078", "s3.3.077", "s3.3.076", "s3.3.075", "s3.3.072", "s3.3.071", "s3.3.070"].forEach(id => {
     assert.equal(shown.has(id), true, `shown ${id}`);
   });
   Object.keys(drop).forEach(id => assert.equal(shown.has(id), false, `hidden ${id}`));

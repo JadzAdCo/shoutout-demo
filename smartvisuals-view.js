@@ -110,27 +110,120 @@
     return {...selection, ...urls};
   }
 
-  function pillHtml(visual) {
+  function looksLikeRoomPrompt(raw) {
+    const s = String(raw || "").trim().toLowerCase();
+    if (!s) return false;
+    return /^(open|create|start|make|launch|show)\b/.test(s) || /\broom smart(?:view|\s*card)\b/.test(s);
+  }
+
+  function displayTitle(payload, visual) {
+    const raw = String((payload && payload.title) || "").trim();
+    const placeId = visual && Array.isArray(visual.placeIds) ? visual.placeIds[0] : "";
+    const fashionOrEvent = visual && (visual.category === "fashion" || visual.category === "event");
+    if (placeId && looksLikeRoomPrompt(raw) && !fashionOrEvent) {
+      const label = resolver()?.humanizePlace?.(placeId);
+      if (label) return label;
+    }
+    return raw || t("sv.untitled", "Mingl Room");
+  }
+
+  function displayDescription(payload, title) {
+    const raw = String((payload && payload.description) || "").trim();
+    if (!raw || !title || !looksLikeRoomPrompt(raw) || looksLikeRoomPrompt(title)) return raw;
+    return /\breserv/.test(raw.toLowerCase())
+      ? `Let's plan reservations in ${title} with BOT DEE.`
+      : `Let's plan in ${title} with BOT DEE.`;
+  }
+
+  function pillHtml(visual, payload) {
     const tags = Array.isArray(visual.tags) ? visual.tags : [];
+    const hay = `${(payload && payload.title) || ""} ${(payload && payload.description) || ""}`.toLowerCase();
     const show = [];
+    const push = (label, icon) => {
+      if (!label || show.some(row => String(row.label).toLowerCase() === String(label).toLowerCase())) return;
+      show.push({label, icon});
+    };
+    const placeIds = Array.isArray(visual.placeIds) ? visual.placeIds : [];
+    placeIds.slice(0, 2).forEach(id => {
+      const label = resolver()?.humanizePlace?.(id);
+      push(label, visual.stencilUrl || "./smartvisuals/stencils/location.svg");
+    });
     if (visual.category === "travel" || tags.includes("travel")) {
-      show.push({label: t("sv.tagTravel", "Travel"), icon: visual.stencilUrl});
+      push(t("sv.tagTravel", "Travel"), visual.stencilUrl || "./smartvisuals/stencils/flight.svg");
     }
     if (visual.category === "fashion" || tags.includes("fashion")) {
-      show.push({label: t("sv.tagFashion", "Fashion"), icon: "./smartvisuals/stencils/fashion.svg"});
+      push(t("sv.tagFashion", "Fashion"), "./smartvisuals/stencils/fashion.svg");
     }
     if (tags.includes("planning") || visual.category === "travel") {
-      show.push({label: t("sv.tagPlanning", "Planning"), icon: "./smartvisuals/stencils/calendar.svg"});
+      push(t("sv.tagPlanning", "Planning"), "./smartvisuals/stencils/calendar.svg");
     }
-    if (tags.includes("reservation") || tags.includes("reservations")) {
-      show.push({label: t("sv.tagReservations", "Reservations"), icon: "./smartvisuals/stencils/reservation.svg"});
+    if (tags.includes("reservation") || tags.includes("reservations") || /\breserv/.test(hay)) {
+      push(t("sv.tagReservations", "Reservations"), "./smartvisuals/stencils/reservation.svg");
     }
     if (!show.length) {
-      show.push({label: t("sv.tagRoom", "Mingl Room"), icon: "./smartvisuals/stencils/people.svg"});
+      push(t("sv.tagRoom", "Mingl Room"), "./smartvisuals/stencils/people.svg");
     }
     return show.slice(0, 3).map(row => (
       `<span class="sv-pill"><img src="${esc(row.icon)}" alt=""/>${esc(row.label)}</span>`
     )).join("");
+  }
+
+  function placeCardsFor(payload, visual) {
+    const given = Array.isArray(payload && payload.placeCards) ? payload.placeCards : [];
+    if (given.length) return given.slice(0, 4);
+    const ids = visual && Array.isArray(visual.placeIds) ? visual.placeIds : [];
+    const r = resolver();
+    if (!r || !ids.length) return [];
+    return ids.slice(0, 2).map(id => {
+      const title = r.humanizePlace?.(id) || id;
+      return {
+        kind: "venue",
+        title,
+        summary: `${title} · Place SMARTview`,
+        floqrPublicData: {
+          city: title,
+          smartBackgroundId: visual.backgroundId || "",
+          smartStencilId: visual.stencilId || "",
+          smartTags: Array.isArray(visual.tags) ? visual.tags : []
+        }
+      };
+    });
+  }
+
+  function renderPlaceNotifyCard(card) {
+    const r = resolver();
+    const visual = r && typeof r.resolvePlaceCard === "function"
+      ? r.resolvePlaceCard(card, catalog())
+      : {backgroundId: "", stencilId: "", tags: []};
+    const urls = r && typeof r.urlsFor === "function"
+      ? r.urlsFor({
+        backgroundId: visual.backgroundId,
+        stencilId: visual.stencilId
+      }, catalog())
+      : {};
+    const tags = Array.isArray(visual.tags) && visual.tags.length
+      ? visual.tags
+      : (card.floqrPublicData && Array.isArray(card.floqrPublicData.smartTags) ? card.floqrPublicData.smartTags : []);
+    const tagHtml = tags.slice(0, 4).map(tag => `<span class="sv-place-tag">${esc(tag)}</span>`).join("");
+    const bg = urls.backgroundUrl
+      ? ` style="--sv-place-bg:url('${esc(urls.backgroundUrl)}')"`
+      : "";
+    const stencil = urls.stencilUrl
+      ? `<img class="sv-place-stencil" src="${esc(urls.stencilUrl)}" alt="" width="22" height="22"/>`
+      : "";
+    return `<article class="sv-place-card" data-kind="${esc(card.kind || "venue")}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}"${bg}>
+      <p class="sv-place-kind">Place SMARTview</p>
+      <h3>${esc(card.title || "")}</h3>
+      ${card.summary ? `<p class="sv-place-blurb">${esc(card.summary)}</p>` : ""}
+      ${tagHtml ? `<div class="sv-place-tags">${tagHtml}</div>` : ""}
+      ${stencil}
+    </article>`;
+  }
+
+  function placeCardsHtml(payload, visual) {
+    const cards = placeCardsFor(payload, visual);
+    if (!cards.length) return "";
+    return `<div class="sv-place-cards" data-sv-place-cards>${cards.map(renderPlaceNotifyCard).join("")}</div>`;
   }
 
   function peopleHtml(payload) {
@@ -216,8 +309,11 @@
   function renderNotification(payload) {
     const visual = resolveVisual(payload);
     const count = Number(payload.participantCount) || (payload.participants || []).length || 0;
+    const title = displayTitle(payload, visual);
+    const description = displayDescription(payload, title);
     /* Compact Search card matches the original phone SMARTnotification:
        header, thumbnail + title/blurb, time/participants, View Invitation / Not Now.
+       Destination rooms attach compact Place SMARTview cards (Miami / catalog city).
        No labeled Ad on this compact card (Room overlay keeps it). Damon is demo-only. */
     return `<article class="sv-notify" data-sv="notification" data-reason="${esc(visual.reasonCode || "")}" data-bg="${esc(visual.backgroundId || "")}">
       <div class="sv-notify-head">
@@ -238,12 +334,13 @@
           <img class="sv-bg" src="${esc(visual.backgroundUrl)}" alt="${esc(t("sv.scenicAlt", "Scenic illustration for this room. Not a photograph."))}"/>
           <div class="sv-hero-scrim" aria-hidden="true"></div>
           <div class="sv-hero-copy">
-            <div class="sv-pills">${pillHtml(visual)}</div>
-            <h2 class="sv-title">${esc(payload.title || t("sv.untitled", "Mingl Room"))}</h2>
+            <div class="sv-pills">${pillHtml(visual, payload)}</div>
+            <h2 class="sv-title">${esc(title)}</h2>
           </div>
         </div>
         <div class="sv-notify-copy">
-          <p class="sv-blurb">${esc(payload.description || "")}</p>
+          <p class="sv-blurb">${esc(description)}</p>
+          ${placeCardsHtml(payload, visual)}
         </div>
       </div>
       <div class="sv-meta">
@@ -261,7 +358,9 @@
     const visual = resolveVisual(payload);
     const host = payload.hostName || t("sv.host", "Host");
     const count = Number(payload.participantCount) || (payload.participants || []).length || 0;
-    return `<article class="sv-room" data-sv="room" data-reason="${esc(visual.reasonCode || "")}">
+    const title = displayTitle(payload, visual);
+    const description = displayDescription(payload, title);
+    return `<article class="sv-room" data-sv="room" data-reason="${esc(visual.reasonCode || "")}" data-bg="${esc(visual.backgroundId || "")}">
       <div class="sv-room-head">
         <div class="sv-kicker">
           <img class="sv-icon" src="./smartvisuals/stencils/people.svg" alt=""/>
@@ -278,18 +377,19 @@
         <img class="sv-stencil" src="${esc(visual.stencilUrl)}" alt=""/>
         <div class="sv-hero-scrim" aria-hidden="true"></div>
         <div class="sv-hero-copy">
-          <div class="sv-pills">${pillHtml(visual)}
+          <div class="sv-pills">${pillHtml(visual, payload)}
             ${payload.liveInRoom ? "" : `<span class="sv-pill"><img src="./smartvisuals/stencils/calendar.svg" alt=""/>${esc(t("sv.scheduled", "Scheduled"))}</span>`}
           </div>
-          <h2 class="sv-title">${esc(payload.title || t("sv.untitled", "Mingl Room"))}</h2>
+          <h2 class="sv-title">${esc(title)}</h2>
           <p class="sv-blurb">${esc([t("sv.tagPlanning", "Planning"), t("sv.tagReservations", "Reservations"), t("sv.tagItinerary", "Itinerary")].join(" · "))}</p>
         </div>
       </div>
+      ${placeCardsHtml(payload, visual)}
       <div class="sv-room-invitee">
         <div class="sv-avatar">${esc(payload.hostInitials || host.slice(0, 1))}</div>
         <div class="sv-invitee-copy">
           <b>${esc(host)} ${esc(t("sv.isInviting", "is inviting you to a Mingl Room."))}</b>
-          <span>${esc(payload.description || "")}</span>
+          <span>${esc(description)}</span>
         </div>
       </div>
       <div class="sv-part-head">
