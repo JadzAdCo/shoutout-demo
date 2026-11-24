@@ -103,8 +103,8 @@ test("club profile gallery drops retired DonPapi/VIP shoutout tiles even from Fi
   const src = read("club-profile-app.js");
   assert.match(src, /filterRetiredGallery/);
   assert.match(src, /resolvePublicGallery/);
-  assert.match(read("club-profile.html"), /floqr-temp-qa-showcase\.js\?v=s3\.3\.073/);
-  assert.match(read("club-profile.html"), /club-profile-app\.js\?v=s3\.3\.073/);
+  assert.match(read("club-profile.html"), /floqr-temp-qa-showcase\.js\?v=s3\.3\.074/);
+  assert.match(read("club-profile.html"), /club-profile-app\.js\?v=s3\.3\.074/);
   const showcase = loadShowcase();
   const overlay = [
     {mediaUrl: "https://example.test/vip-donpapi-led-hbd.png", title: "DonPapi LED wall — busboys hold it in the air", slotType: "gallery"},

@@ -4,7 +4,7 @@
 
   /* CURRENT PACKAGE. Bump this whenever README CURRENT PACKAGE bumps.
      Asset cache-bust only (script/link tags). Page links never carry ?v= (owner decision Oct 10 2026). */
-  const APP_V = "s3.3.073";
+  const APP_V = "s3.3.074";
   function navT(key, fallback) {
     try {
       const fn = global.FLOQRI18n?.t;

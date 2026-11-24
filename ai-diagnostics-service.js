@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.073";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.073";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.074";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.074";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.074",
+      title: "s3.3.074 — Headless ShoutOut collectableInput1..N",
+      checks: [
+        {label:"Template input families", file:"functions/shoutout-template-inputs.js", includes:["collectableInput", "classicBoard", "soccerJersey"]},
+        {label:"Catalog stamp", file:"shared-data.js", includes:["FLOQRTemplatePatronInputs", "collectableInput1"]},
+        {label:"Fill from conversation", file:"functions/headless-shoutout-core.js", includes:["fillFromConversation", "interactiveNeeds", "collectableInput"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-074-headless-template-inputs"]}
+      ]
+    },
     {
       version: "s3.3.073",
       title: "s3.3.073 — Aurelia Gallery retired DonPapi/VIP shoutout tiles",
@@ -3771,11 +3781,20 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-074-headless-template-inputs",
+      area:"BOT DEE",
+      feature:"Headless ShoutOut uses each template's patron inputs",
+      changed:"s3.3.074 — BOT DEE/Gemini collect from templates/{id} collectableInput1..N {fieldId, required 0|1, prompt}, not a canned throw phrase or a hardcoded family table. Chat context fills first; BOT DEE asks only the next missing required slot. Traditional N=3, photo N=4, jersey N=6, Heist name-only N=3, Baller's Alert N=5, Football Intro N=4. Preview then throw it. FloqR one-shot stays a payload.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js ?v=s3.3.074. Sign in with BOT DEE + ShoutOut. 2) In one chat say we are going to Aurelia tonight, then happy birthday Maya, then throw a shoutout — expect ShoutOut SMARTpreview ready (venue Aurelia + birthday text), NOT a request for a magic that says sentence and NOT questions for template/@handle/photo. 3) Reply throw it — pending My ShoutOuts (free Traditional). 4) Start a jersey throw with kit + name but no number — BOT DEE asks only for the number. 5) FloqR/API one-shot still defaults Traditional without the card. 6) Mark Succeed/Failed. Display URLs never ?v=.",
+      expected:"Context fills Traditional. Ask only missing required fields. Template-specific lists (jersey number, Heist name, Football Intro photos). No canned throw phrase. Display URLs never ?v=.",
+      troubleshoot:"Still asking template/@handle after venue+text → executeBotSession not this SHA. Bare throw ignores Aurelia/birthday in thread → fillFromConversation not deployed. Jersey never asks number → collectableInput* not on templates/{id} (re-seed). Photo board silently submits → required media/facePhoto/teamPhotos slots must stay required=1. Gemini missing slot list → listShoutOutTemplates templates[].collectableInput1..N."
+    },
+    {
       id:"s3-3-073-aurelia-gallery-retired-tiles",
       area:"Club Public Profile",
       feature:"Aurelia Gallery without DonPapi/VIP shoutout tiles",
       changed:"Removed four Gallery tiles from Aurelia (temp-democlub-1): DonPapi LED wall, DonPapi ShoutOut DON CHECKING IN, VIP ShoutOut FloqR, VIP table LED. Photos and captions gone. Happy Birthday Maya row and the rest of the gallery stay. Club profile drops those tiles from packaged seed, Firestore publicGallery overlay, and clubMedia.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/club-profile.html?location=temp-democlub-1 until floqr-temp-qa-showcase.js and club-profile-app.js ?v=s3.3.073. Sign in if asked. 2) Scroll to Gallery. Confirm the first tile is Portrait LED / Happy Birthday Maya (or Maya's birthday crew), not DonPapi LED wall / DON CHECKING IN / FloqR We're Outside. 3) Those four cards (image + caption) are absent. 4) Maya / Papi's ClubTech 64x48 tiles remain. 5) Display URLs have no ?v=. 6) Mark Succeed/Failed.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/club-profile.html?location=temp-democlub-1 until floqr-temp-qa-showcase.js and club-profile-app.js ?v=s3.3.074. Sign in if asked. 2) Scroll to Gallery. Confirm the first tile is Portrait LED / Happy Birthday Maya (or Maya's birthday crew), not DonPapi LED wall / DON CHECKING IN / FloqR We're Outside. 3) Those four cards (image + caption) are absent. 4) Maya / Papi's ClubTech 64x48 tiles remain. 5) Display URLs have no ?v=. 6) Mark Succeed/Failed.",
       expected:"Gallery starts at Happy Birthday Maya. The four DonPapi/VIP shoutout tiles are gone (photos and text). Remaining gallery tiles still show.",
       troubleshoot:"Still see DonPapi LED wall as first cards → cached club-profile-app.js / floqr-temp-qa-showcase.js; hard-refresh. Confirm the page source includes filterRetiredGallery. Firestore overlay can keep old publicGallery until Pages has that filter. Re-seed seedTempDemoPack writes the trimmed publicGallery. Do not add ?v= to Display URLs."
     },
