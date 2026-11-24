@@ -89,8 +89,9 @@ test("self-invite and already-member are distinct from used/not_friend", () => {
   assert.equal(core.ROOM_TTL_MS, 4 * 60 * 60 * 1000);
   assert.match(read("botdee-smartview.js"), /itineraryNotCalendar/);
   assert.match(read("botdee-smartview.js"), /permissionsNotSchedule/);
-  assert.match(read("botdee-help-repository.js"), /There is no scheduled start time/);
-  assert.doesNotMatch(read("functions/botdee-session-store.js"), /lastLogout|scheduleStart|scheduledStart/);
+  assert.match(read("botdee-help-repository.js"), /Join Now or Set a schedule/);
+  assert.match(read("functions/botdee-session-store.js"), /scheduledStartMs/);
+  assert.match(read("functions/botdee-session-store.js"), /lastLogoutShouldClose/);
 });
 
 test("Mingl friends only; blocked pairs cannot invite", () => {
@@ -209,6 +210,8 @@ test("BOT DEE subset deploy lists first-time session callables and tab checkout"
   assert.match(workflow, /acceptBotDeeRoomInvite/);
   assert.match(workflow, /kickBotDeeRoomMember/);
   assert.match(workflow, /createFloqrCheckoutSession/);
+  assert.match(workflow, /startBotDeeRoom/);
+  assert.match(workflow, /scheduleBotDeeRoom/);
 });
 
 test("client join captures room=&t= and Inbox is not a ShoutOut CTA", () => {
@@ -261,4 +264,82 @@ test("callables re-check botDee + mingl; guests cannot end", () => {
   assert.match(read("functions/botdee-session-store.js"), /classifyInviteTarget/);
   assert.match(read("functions/botdee-room-live.js"), /function kickMember/);
   assert.match(read("functions/botdee-room-live.js"), /resolveKickTarget/);
+});
+
+test("Join Now does not notify Search; schedule does; TTL starts at live open", () => {
+  const now = 1_700_000_000_000;
+  const joinNow = room({
+    status: "open",
+    smartNotification: 0,
+    liveOpenedAtMs: now,
+    expiresAtMs: now + core.ROOM_TTL_MS
+  });
+  const scheduled = room({
+    status: "scheduled",
+    smartNotification: 1,
+    scheduledStartMs: now + 60 * 60 * 1000,
+    liveOpenedAtMs: 0,
+    expiresAtMs: now + 60 * 60 * 1000 + core.ROOM_TTL_MS
+  });
+  assert.equal(core.roomNotifiesSearch(joinNow), false);
+  assert.equal(core.roomNotifiesSearch(scheduled), true);
+  assert.equal(core.roomIsInviteable(scheduled, now), true);
+  assert.equal(core.scheduleStartValid(now - 1, now), false);
+  assert.equal(core.scheduleStartValid(now + core.SCHEDULE_MIN_LEAD_MS + 1, now), true);
+  assert.equal(core.ttlExpiresAtMs({liveOpenedAtMs: now, scheduledStartMs: now + 99_000}, now), now + core.ROOM_TTL_MS);
+  assert.equal(core.ttlExpiresAtMs({scheduledStartMs: now + 3_600_000, liveOpenedAtMs: 0}, now), now + 3_600_000 + core.ROOM_TTL_MS);
+  assert.equal(core.PRESENCE_STALE_MS, 15 * 60 * 1000);
+  assert.equal(core.lastLogoutShouldClose(joinNow, [{uid: "host-1", lastPresenceAtMs: now}], now), false);
+  assert.equal(core.lastLogoutShouldClose(joinNow, [{uid: "host-1", lastPresenceAtMs: now - core.PRESENCE_STALE_MS}], now), true);
+  assert.equal(core.lastLogoutShouldClose(joinNow, [{uid: "host-1", leftAtMs: now}], now), true);
+  assert.equal(core.lastLogoutShouldClose(scheduled, [{uid: "host-1", lastPresenceAtMs: 0}], now), false);
+  assert.equal(core.denialMessage("past"), "Pick a future time for the BOT DEE room.");
+  assert.equal(core.denialMessage("already_open"), "This BOT DEE session is already live.");
+  assert.equal(core.denialMessage("not_scheduled"), "That BOT DEE room is not scheduled.");
+  assert.equal(core.denialMessage("not_live"), "This BOT DEE room is not live yet.");
+  const notify = core.publicNotification("br_room", scheduled, {hostName: "Don", token: "tok"});
+  assert.equal(notify.smartNotification, 1);
+  assert.match(notify.joinHref, /botdee\.html\?room=br_room/);
+  assert.doesNotMatch(notify.joinHref, /mingl-chat\.html/);
+  assert.doesNotMatch(notify.joinHref, /[?&]v=/);
+});
+
+test("schedule callables, Search list, and Join Now never open mingl-chat", () => {
+  const store = read("functions/botdee-session-store.js");
+  const fns = read("functions/botdee-session-functions.js");
+  const index = read("functions/index.js");
+  const workflow = read(".github/workflows/functions-ci.yml");
+  const view = read("smartvisuals-view.js");
+  const card = read("botdee-smartview.js");
+  assert.match(store, /function scheduleRoom/);
+  assert.match(store, /function startRoom/);
+  assert.match(store, /function listNotifications/);
+  assert.match(store, /smartNotification: 0/);
+  assert.match(store, /smartNotification: 1/);
+  assert.match(store, /expireRooms/);
+  assert.match(fns, /scheduleBotDeeRoom/);
+  assert.match(fns, /startBotDeeRoom/);
+  assert.match(fns, /rescheduleBotDeeRoom/);
+  assert.match(fns, /touchBotDeeRoomPresence/);
+  assert.match(fns, /listBotDeeRoomNotifications/);
+  assert.match(fns, /rsvpBotDeeRoomInvite/);
+  assert.match(fns, /expireBotDeeRooms/);
+  assert.match(fns, /expireBotDeeRooms = onSchedule/);
+  assert.match(index, /scheduleBotDeeRoom/);
+  assert.match(index, /listBotDeeRoomNotifications/);
+  assert.match(index, /expireBotDeeRooms/);
+  assert.match(workflow, /scheduleBotDeeRoom/);
+  assert.match(workflow, /listBotDeeRoomNotifications/);
+  assert.match(workflow, /expireBotDeeRooms/);
+  assert.match(card, /startBotDeeRoom/);
+  assert.match(card, /scheduleBotDeeRoom/);
+  assert.match(card, /data-rs-join-now/);
+  assert.match(card, /data-rs-set-schedule/);
+  assert.match(card, /touchBotDeeRoomPresence/);
+  assert.match(view, /listBotDeeRoomNotifications/);
+  assert.match(view, /botdee\.html/);
+  assert.doesNotMatch(view, /mingl-chat\.html\?/);
+  assert.match(view, /if \(\/mingl-chat\\.html\/i\.test\(href\)\)/);
+  assert.match(read("botdee-help-repository.js"), /help-botdee-room-smartview-schedule/);
+  assert.match(read("docs/FEATURE-WIRING.md"), /s3\.3\.071-botdee-room-schedule/);
 });

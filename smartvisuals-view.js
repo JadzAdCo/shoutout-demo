@@ -364,28 +364,81 @@
       onJoin() {
         overlay.hidden = true;
         overlay.innerHTML = "";
-        const href = root.FLOQRNav?.pageUrl?.("./mingl-chat.html", {from: "smartvisual"}) || "./mingl-chat.html?from=smartvisual";
+        const room = payload && payload.roomId ? String(payload.roomId) : "";
+        const token = payload && payload.token ? String(payload.token) : "";
+        const explicit = payload && payload.joinHref ? String(payload.joinHref) : "";
+        let href = explicit;
+        if (!href && room) {
+          href = root.FLOQRNav?.pageUrl?.("./botdee.html", token ? {room, t: token} : {room})
+            || `./botdee.html?room=${encodeURIComponent(room)}${token ? `&t=${encodeURIComponent(token)}` : ""}`;
+        }
+        if (!href) {
+          href = root.FLOQRNav?.pageUrl?.("./botdee.html", {from: "smartvisual"}) || "./botdee.html?from=smartvisual";
+        }
+        if (/mingl-chat\.html/i.test(href)) {
+          href = root.FLOQRNav?.pageUrl?.("./botdee.html", {from: "smartvisual"}) || "./botdee.html?from=smartvisual";
+        }
         location.href = href;
       }
     });
   }
 
+  function notificationHandlers(host, payload) {
+    return {
+      onDismiss() {
+        rememberDismiss();
+        host.hidden = true;
+        host.innerHTML = "";
+      },
+      onView() { openRoomOverlay(payload); }
+    };
+  }
+
+  function mountLiveNotifications(host) {
+    if (!host || requestedDemo() || dismissKey()) return;
+    const auth = root.firebase?.auth?.();
+    if (!auth) return;
+    const run = user => {
+      if (!user) return;
+      const gated = root.FLOQRFeatureServices;
+      const show = !gated || gated.canAccess?.("botDee") || gated.canAccess?.("mingl");
+      if (gated && gated.canAccess && !gated.canAccess("botDee")) return;
+      if (!show) return;
+      let fns;
+      try { fns = root.firebase.functions(); } catch (_) { return; }
+      const call = fns?.httpsCallable?.("listBotDeeRoomNotifications");
+      if (!call) return;
+      call({}).then(res => {
+        const rows = Array.isArray(res?.data?.notifications) ? res.data.notifications : [];
+        const payload = rows[0];
+        if (!payload || payload.demo === true) return;
+        if (dismissKey()) return;
+        ensureCatalog().then(() => {
+          mountNotification(host, payload, notificationHandlers(host, payload));
+        });
+      }).catch(() => {});
+    };
+    if (auth.currentUser) run(auth.currentUser);
+    else {
+      const unsub = auth.onAuthStateChanged(user => {
+        if (typeof unsub === "function") unsub();
+        run(user);
+      });
+    }
+  }
+
   function bootSearch() {
-    const demo = requestedDemo();
-    if (!demo || dismissKey()) return;
     const host = document.getElementById("smartvisualNotificationHost");
     if (!host) return;
-    ensureCatalog().then(() => {
-      const payload = syntheticCancun();
-      mountNotification(host, payload, {
-        onDismiss() {
-          rememberDismiss();
-          host.hidden = true;
-          host.innerHTML = "";
-        },
-        onView() { openRoomOverlay(payload); }
+    const demo = requestedDemo();
+    if (demo && !dismissKey()) {
+      ensureCatalog().then(() => {
+        const payload = syntheticCancun();
+        mountNotification(host, payload, notificationHandlers(host, payload));
       });
-    });
+      return;
+    }
+    mountLiveNotifications(host);
   }
 
   root.FLOQRSmartVisuals = {

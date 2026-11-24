@@ -254,14 +254,15 @@
       id: "help-botdee-room-smartview",
       kind: "help",
       label: "Room SMARTview",
-      blurb: "Type Open Room SMARTview, Start a group chat, or plan a Cancun trip in BOT DEE. Confirm, then invite Mingl friends. Joining is not a payment and does not open a shared tab.",
+      blurb: "Type Open Room SMARTview, Start a group chat, or plan a Cancun trip in BOT DEE. Then Join Now or Set a schedule. Joining is not a payment and does not open a shared tab.",
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
         "invite others to this chat", "invite mingl friends", "share this conversation",
         "join room smartview", "joined bot dee session", "confirm room smartview",
         "review bot dee invite", "let's plan our cancun trip", "let's plan a trip to cancun",
-        "plan a cancun trip", "cancun trip with friends"
+        "plan a cancun trip", "cancun trip with friends", "schedule a room",
+        "join now or set a schedule", "when does the room expire"
       ],
       patterns: [
         /room\s*smart\s*view/,
@@ -269,18 +270,38 @@
         /open\s+room\s+smartview/,
         /share\s+this\s+conversation/,
         /plan\s+(?:our\s+|a\s+)?(?:trip\s+to\s+)?cancun/,
-        /cancun\s+trip/
+        /cancun\s+trip/,
+        /schedule\s+a\s+room/,
+        /set\s+a\s+schedule/,
+        /join\s+at\s+scheduled\s+time/
+      ]
+    },
+    {
+      id: "help-botdee-room-smartview-schedule",
+      kind: "help",
+      label: "Join Now or set a schedule",
+      blurb: "Join Now opens the BOT DEE room now and does not paint Search. Set a schedule turns on Search SMARTnotification for host and invited Mingl friends. Shared Itinerary is night-out notes, not the room clock.",
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
+      searchPhrases: [
+        "schedule a room", "set a schedule", "join now or set a schedule",
+        "join at scheduled time", "when does the room expire", "mingl room invitation"
+      ],
+      patterns: [
+        /schedule\s+a\s+room/,
+        /set\s+a\s+schedule/,
+        /join\s+at\s+scheduled\s+time/,
+        /when\s+does\s+the\s+room\s+expire/
       ]
     },
     {
       id: "help-smartvisuals-notification",
       kind: "help",
       label: "Mingl Room SMARTnotification",
-      blurb: "Search can show a compact Mingl Room Invitation. View Invitation opens Room SMARTview. Art is illustration, not a photo.",
+      blurb: "Search shows a compact Mingl Room Invitation when a Mingl friend scheduled a room you were invited to. Join Now opens BOT DEE. Art is illustration, not a photo.",
       links: [{label: "Open Search", href: pageUrl("./", {start: "search"})}],
       searchPhrases: [
-        "smartnotification", "mingl room invitation", "view invitation", "cancun trip",
-        "smartvisuals", "smartstencils", "smartbackgrounds"
+        "smartnotification", "mingl room invitation", "view invitation", "join at scheduled time",
+        "cancun trip", "smartvisuals", "smartstencils", "smartbackgrounds"
       ],
       patterns: [
         /smart\s*notification/,
@@ -294,9 +315,9 @@
       id: "help-smartvisuals-room",
       kind: "help",
       label: "Room SMARTview with SMARTvisuals",
-      blurb: "Room SMARTview uses SMARTstencils and SMARTbackgrounds from the authorized room title. Join Now does not create a live room yet.",
+      blurb: "Room SMARTview uses SMARTstencils and SMARTbackgrounds from the authorized room title. Join Now on Search opens BOT DEE, not Mingl chat.",
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})}],
-      searchPhrases: ["room smartview invitation", "join now mingl", "cancun trip room"],
+      searchPhrases: ["room smartview invitation", "join now mingl", "join at scheduled time", "cancun trip room"],
       patterns: [/join\s+now/, /room\s+smartview\s+invitation/]
     },
     {
@@ -1176,7 +1197,7 @@
     "help-post-ad": ["patron"], "help-floqcast": ["patron"], "help-club-admin": ["patron"],
     "help-botdee-place-search": ["patron"],
     "help-botdee-version-smartview": ["patron"], "help-botdee-version-smartview-status": ["patron"], "help-botdee-version-smartview-tabs": ["patron"],
-    "help-botdee-room-smartview": ["patron"], "help-botdee-room-smartview-invite": ["patron"], "help-botdee-room-smartview-join": ["patron"],
+    "help-botdee-room-smartview": ["patron"], "help-botdee-room-smartview-schedule": ["patron"], "help-botdee-room-smartview-invite": ["patron"], "help-botdee-room-smartview-join": ["patron"],
     "help-botdee-room-smartview-end": ["patron"], "help-botdee-room-smartview-tab": ["patron"], "help-botdee-room-smartview-who-pays": ["patron"],
     "help-botdee-room-smartview-kick": ["patron"], "help-botdee-room-smartview-share": ["patron"],
     "help-botdee-headless-vip": ["patron"],

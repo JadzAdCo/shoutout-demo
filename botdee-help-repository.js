@@ -847,13 +847,13 @@
     {
       id: "help-botdee-room-smartview",
       title: "Room SMARTview",
-      body: "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends). That opens the same Room SMARTview as Open Room SMARTview Cancun Trip — travel art and a sample Travel partner / Fly to Cancun Ad, not live flight or hotel booking. VIP tables tonight stay nightlife, not a trip card. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme. A session starts when you Confirm. It stays open until the host taps End Room, or until about four hours after it opened. There is no scheduled start time, and the room does not close when the last guest logs out. Shared Itinerary is night-out notes, not a calendar. Room Permissions is host-managed invite rules, not a schedule.",
+      body: "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words. Confirm shows Join Now or Set a schedule. Join Now opens a Mingl-friends session now and does not paint Search. Set a schedule is when the BOT DEE room starts — not Shared Itinerary — and turns on Search SMARTnotification for you and invited Mingl friends. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme. A live room stays open until the host taps End Room, about four hours after it opens, or everyone has been gone about 15 minutes. Pausing private BOT DEE chat is separate.",
       searchPhrases: [
         "room smartview", "start a group chat", "open room smartview", "create a room",
         "group chat bot dee", "talk to bot dee together", "invite mingl friends",
         "let's plan our cancun trip", "let's plan a trip to cancun", "plan a cancun trip",
-        "cancun trip with friends", "schedule a time", "when does the room expire",
-        "last person logs out", "one-time live session"
+        "cancun trip with friends", "schedule a room", "join now or set a schedule",
+        "when does the room expire", "last person logs out", "one-time live session"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -863,10 +863,10 @@
     {
       id: "help-smartvisuals-notification",
       title: "Mingl Room SMARTnotification",
-      body: "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come only from the room record. A labeled Ad sample under the card follows the room tags (Travel partner / Fly to Cancun for a Cancun Trip). It is not a live advertiser. Private chat and prompt injection keep the slot empty.",
+      body: "A compact Mingl Room Invitation can appear on Search when a Mingl friend scheduled a BOT DEE room you were invited to. View Invitation opens Room SMARTview. Join Now goes to BOT DEE, not Mingl chat. Not Now hides the card this tab; Inbox still has Review BOT DEE invite. The Cancun demo query is Studio-only. Art is illustration, not a photo. Join Now rooms without a schedule do not paint Search.",
       searchPhrases: [
         "smartnotification", "smart notification", "mingl room invitation", "view invitation",
-        "cancun trip", "smartvisuals", "smartstencils", "smartbackgrounds",
+        "join at scheduled time", "cancun trip", "smartvisuals", "smartstencils", "smartbackgrounds",
         "travel partner", "fly to cancun", "labeled ad"
       ],
       links: [{label: "Open Search", href: pageUrl("./", {start: "search"})}],
@@ -877,9 +877,9 @@
     {
       id: "help-smartvisuals-room",
       title: "Room SMARTview with SMARTvisuals",
-      body: "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used to pick art. Group rooms are not live yet, so Join Now does not create a room or charge. A labeled Ad below is a sample from those tags (Travel partner / Fly to Cancun). It stays empty for private chat or injection and is not a live advertiser.",
+      body: "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. Join Now on Search opens BOT DEE (not Mingl chat) with room= and t=. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo. Private BOT DEE chat is never used to pick art. A labeled Ad below is a sample from those tags. It stays empty for private chat or injection and is not a live advertiser.",
       searchPhrases: [
-        "room smartview invitation", "join now mingl", "smartstencils", "smartbackgrounds",
+        "room smartview invitation", "join now mingl", "join at scheduled time", "smartstencils", "smartbackgrounds",
         "cancun trip room", "bot-dee itinerary", "travel partner", "exclusive mingl room deals"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
@@ -888,6 +888,19 @@
       page: "index.html#categoryPage"
     },
                 {
+      id: "help-botdee-room-smartview-schedule",
+      title: "Join Now or set a schedule",
+      body: "After Room SMARTview setup, choose Join Now or Set a schedule. Join Now opens the BOT DEE session now and does not put a card on Search. Set a schedule is when the BOT DEE room starts — not Shared Itinerary. Saving a future time turns on Search SMARTnotification for you and invited Mingl friends only. Guests RSVP until the room is live, then Join Now opens BOT DEE (not Mingl chat).",
+      searchPhrases: [
+        "join now or set a schedule", "set a schedule", "schedule a room",
+        "join at scheduled time", "smartnotification search", "when does the room start"
+      ],
+      links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
+      audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
+      source: "help-repository-seed",
+      page: "botdee.html#botDeeChatPage"
+    },
+    {
       id: "help-botdee-room-smartview-invite",
       title: "Invite Mingl friends",
       body: "After you confirm Room SMARTview, Invite shows your Mingl friends only. Tap a friend to send an Inbox invite (Review BOT DEE invite). If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
@@ -910,8 +923,8 @@
     {
       id: "help-botdee-room-smartview-end",
       title: "End Room SMARTview",
-      body: "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first. A guest leaving or closing BOT DEE does not end the room. There is no scheduled start, and the room does not close when the last guest logs out — the host must tap End Room, or it expires about four hours after it opened.",
-      searchPhrases: ["end this room", "close room smartview", "end group chat bot dee"],
+      body: "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first. A live room stays open until End Room, about four hours after it opens, or everyone has been gone about 15 minutes. Pausing private BOT DEE chat is not room logout. A guest leaving does not end the room while the host is still present.",
+      searchPhrases: ["end this room", "close room smartview", "end group chat bot dee", "when does the room expire", "last person logs out"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",
