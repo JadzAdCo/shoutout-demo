@@ -750,11 +750,11 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Job | `scheduledHelpVerbiageEnhance` every 15 minutes UTC. One Gemini call per run (`FLOQR_GEMINI_TEXT_MODEL`, default `gemini-3.6-flash`). Steps on that entry: drop repeated sentences, grammar pass, contextual rewrite. Auto-publishes when checks pass. Legal help is never sent. Gemini failure leaves the previous `lasttextenhun` and the flag at 1. |
 | Flag 0 | English `lasttextenhun` plus all 10 translations, together, for any patron / service member / venue admin audience. Master-only may stay English. |
 | Seed | Patron What's New lines and Version SMARTview help are the first `lasttextenhun` (`seeded: 1`, flag 1) until that entry's scheduled pass publishes. |
-| Pages | `help-verbiage-snapshot.js` and the copy inside `botdee-help-repository.js`. No master-only text. No Gemini on the version card, a `?` popout, or any paint path. |
+| Pages | `help-verbiage-snapshot.js` and the copy inside `botdee-help-repository.js`. No master-only text. No Gemini on the version card, a `?` popout, or any paint path. `.github/workflows/publish-github-pages.yml` stages the site with `scripts/stage-pages-site.js` and does not upload `functions/help-verbiage-master-source.json`. |
 | Read | Callable `getHelpVerbiage` (signed in, `filterContent`). `contextualSearch` replaces a result label/blurb from a published non-master `lasttextenhun` when the session loads it. |
 | Rules | `helpVerbiage` client read/write off. `helpVerbiageAudit` Master Admin read, client write off. Not `translationOverrides`. |
 | Audit | Help id, flag before/after, `lasttextenhun` before/after, source hash, model id, outcome. No client IP. Agent probes: `actorRole` / `actorEmail` `agent`. Gemini rows also go to `geminiApiAccessLogs`. |
-| Source split | Public entries: `functions/help-verbiage-public-source.json`. Master-only entries: `functions/help-verbiage-master-source.json` (not a Pages script). Rebuild: `node scripts/build-help-verbiage-sources.js`. |
+| Source split | Public entries: `functions/help-verbiage-public-source.json`. Master-only raw entries: `functions/help-verbiage-master-source.json`, read by `scheduledHelpVerbiageEnhance` through the Admin SDK bundle (`require`). That file is omitted from the Pages artifact. Rebuild: `node scripts/build-help-verbiage-sources.js`. |
 
 ## BOT DEE intent search (plain-language router)
 

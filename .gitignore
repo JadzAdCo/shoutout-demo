@@ -10,6 +10,7 @@ configstore/
 # Publish staging clones
 .publish-*/
 so-main-publish/
+_site/
 
 # Local scrape / scratch dumps (underscore-prefixed probe outputs)
 functions/scripts/_*.json

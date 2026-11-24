@@ -3,6 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const core = require("./help-verbiage-core");
 const fns = require("./help-verbiage-functions");
@@ -220,6 +221,27 @@ test("seeded What's New and Version sentences are the first lasttextenhun", () =
   ]);
   assert.equal(snapshot.some(row => row.id === "help-features-services"), false);
   assert.equal(snapshot.some(row => row.id === "whatsnew-s3.3.055"), true);
+});
+
+test("Pages stage omits the master help file the scheduled function still reads", () => {
+  const {stagePagesSite, OMITTED_FILES} = require("../scripts/stage-pages-site");
+  assert.deepEqual([...OMITTED_FILES], ["functions/help-verbiage-master-source.json"]);
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "floqr-pages-"));
+  const repo = path.join(tmp, "repo");
+  const dest = path.join(tmp, "site");
+  fs.mkdirSync(path.join(repo, "functions"), {recursive: true});
+  fs.writeFileSync(path.join(repo, "index.html"), "<html></html>");
+  fs.writeFileSync(path.join(repo, "functions", "help-verbiage-master-source.json"), "[{\"id\":\"help-features-services\"}]");
+  stagePagesSite(repo, dest);
+  assert.equal(fs.existsSync(path.join(dest, "functions", "help-verbiage-master-source.json")), false);
+  assert.equal(fs.readFileSync(path.join(dest, "index.html"), "utf8"), "<html></html>");
+  const master = JSON.parse(read("functions/help-verbiage-master-source.json"));
+  assert.ok(master.some(row => row.id === "help-features-services"));
+  assert.match(read("functions/help-verbiage-functions.js"), /require\("\.\/help-verbiage-master-source\.json"\)/);
+  const workflow = read(".github/workflows/publish-github-pages.yml");
+  assert.match(workflow, /node scripts\/stage-pages-site\.js/);
+  assert.match(workflow, /help-verbiage-master-source\.json/);
+  assert.doesNotMatch(workflow, /floqmediaOidcExchange|firebase deploy/);
 });
 
 test("public Pages files do not carry master-only help or a Gemini paint call", () => {
