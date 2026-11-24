@@ -1,0 +1,4805 @@
+{
+  "schemaVersion": "floqr.vipFloorPlan/2",
+  "status": "review",
+  "venue": {
+    "name": "Sh\u00f4ko Barcelona",
+    "city": "Barcelona",
+    "country": "Spain",
+    "clubLocationIdHint": "shoko-barcelona-spain",
+    "eventId": "shoko-nye-2027"
+  },
+  "image": {
+    "file": "vip-plans/shoko-barcelona-floor-map.png",
+    "widthPx": 705,
+    "heightPx": 402,
+    "source": "owner attachment Oct 28 2026 \u2014 Shoko Barcelona NYE'27 floor plan (image 1)"
+  },
+  "legendRef": "legend.json",
+  "coordinateSystem": "Normalized 0\u20131 of the image; origin top-left; circle = {cx,cy,rx,ry}; pixelBox = [x0,y0,x1,y1].",
+  "detection": "Color-blob segmentation of NYE map dots; SUPER VIP / KAI ZEN / DJ from gold rings; LA SU\u00cfTE from flyer legend (approx bottom-right).",
+  "nightPricing": {
+    "2026-12-31": {
+      "eventId": "shoko-nye-2027",
+      "eventName": "NYE'27 \u2014 New Year's Eve 2027",
+      "currency": "EUR",
+      "note": "NYE'27 table package list prices from Sh\u00f4ko flyer. minimumAmount = full NYE list; deposit/minimum reservation = 50% of NYE list. Regular nights use section.minimumAmount = NYE/4 (standard) with deposit = 25% of standard.",
+      "sections": {
+        "shoko-t01": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t02": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t03": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t04": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t05": {
+          "minimumAmountCents": 600000,
+          "depositCents": 300000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 8,
+          "maxCapacity": 8,
+          "colorTier": "magenta",
+          "listPriceEur": 6000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t06": {
+          "minimumAmountCents": 400000,
+          "depositCents": 200000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "purple",
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t07": {
+          "minimumAmountCents": 400000,
+          "depositCents": 200000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "purple",
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t08": {
+          "minimumAmountCents": 400000,
+          "depositCents": 200000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "purple",
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t09": {
+          "minimumAmountCents": 400000,
+          "depositCents": 200000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "purple",
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t10": {
+          "minimumAmountCents": 600000,
+          "depositCents": 300000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 8,
+          "maxCapacity": 8,
+          "colorTier": "magenta",
+          "listPriceEur": 6000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t11": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t12": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t13": {
+          "minimumAmountCents": 250000,
+          "depositCents": 125000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "green",
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t14": {
+          "minimumAmountCents": 400000,
+          "depositCents": 200000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "purple",
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t15": {
+          "minimumAmountCents": 400000,
+          "depositCents": 200000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "purple",
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t16": {
+          "minimumAmountCents": 400000,
+          "depositCents": 200000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "purple",
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t17": {
+          "minimumAmountCents": 400000,
+          "depositCents": 200000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "purple",
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t18": {
+          "minimumAmountCents": 400000,
+          "depositCents": 200000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "purple",
+          "listPriceEur": 4000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t19": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t20": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t21": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t22": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t23": {
+          "minimumAmountCents": 250000,
+          "depositCents": 125000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "green",
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t24": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t25": {
+          "minimumAmountCents": 800000,
+          "depositCents": 400000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 10,
+          "maxCapacity": 10,
+          "colorTier": "red",
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t26": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t27": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t28": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t29": {
+          "minimumAmountCents": 250000,
+          "depositCents": 125000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "green",
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t30": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t31": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t32": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t33": {
+          "minimumAmountCents": 350000,
+          "depositCents": 175000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "cyan",
+          "listPriceEur": 3500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t34": {
+          "minimumAmountCents": 250000,
+          "depositCents": 125000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "green",
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t35": {
+          "minimumAmountCents": 100000,
+          "depositCents": 50000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 2,
+          "maxCapacity": 2,
+          "colorTier": "lightyellow",
+          "listPriceEur": 1000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t36": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t37": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t38": {
+          "minimumAmountCents": 250000,
+          "depositCents": 125000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "green",
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t39": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t40": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t41": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t42": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t43": {
+          "minimumAmountCents": 350000,
+          "depositCents": 175000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "cyan",
+          "listPriceEur": 3500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t44": {
+          "minimumAmountCents": 800000,
+          "depositCents": 400000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 10,
+          "maxCapacity": 10,
+          "colorTier": "red",
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t45": {
+          "minimumAmountCents": 250000,
+          "depositCents": 125000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "green",
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t46": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t47": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t48": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t49": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t50": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t51": {
+          "minimumAmountCents": 800000,
+          "depositCents": 400000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 10,
+          "maxCapacity": 10,
+          "colorTier": "red",
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t52": {
+          "minimumAmountCents": 1200000,
+          "depositCents": 600000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 10,
+          "maxCapacity": 10,
+          "colorTier": "darkred",
+          "listPriceEur": 12000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t53": {
+          "minimumAmountCents": 250000,
+          "depositCents": 125000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "green",
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t54": {
+          "minimumAmountCents": 350000,
+          "depositCents": 175000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "cyan",
+          "listPriceEur": 3500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t55": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t56": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t57": {
+          "minimumAmountCents": 800000,
+          "depositCents": 400000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 10,
+          "maxCapacity": 10,
+          "colorTier": "red",
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t58": {
+          "minimumAmountCents": 250000,
+          "depositCents": 125000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "green",
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t59": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t60": {
+          "minimumAmountCents": 200000,
+          "depositCents": 100000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "lightgreen",
+          "listPriceEur": 2000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t61": {
+          "minimumAmountCents": 350000,
+          "depositCents": 175000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "cyan",
+          "listPriceEur": 3500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t62": {
+          "minimumAmountCents": 250000,
+          "depositCents": 125000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 4,
+          "maxCapacity": 4,
+          "colorTier": "green",
+          "listPriceEur": 2500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t63": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-t64": {
+          "minimumAmountCents": 150000,
+          "depositCents": 75000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 6,
+          "maxCapacity": 6,
+          "colorTier": "yellow",
+          "listPriceEur": 1500,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-sv1": {
+          "minimumAmountCents": 2000000,
+          "depositCents": 1000000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 15,
+          "maxCapacity": 15,
+          "colorTier": "supervip",
+          "listPriceEur": 20000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-sv2": {
+          "minimumAmountCents": 2000000,
+          "depositCents": 1000000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 15,
+          "maxCapacity": 15,
+          "colorTier": "supervip",
+          "listPriceEur": 20000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-kz": {
+          "minimumAmountCents": 800000,
+          "depositCents": 400000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 15,
+          "maxCapacity": 15,
+          "colorTier": "kaizen",
+          "listPriceEur": 8000,
+          "depositPercentOfMinimum": 50
+        },
+        "shoko-la-suite": {
+          "minimumAmountCents": 3000000,
+          "depositCents": 1500000,
+          "extraGuestFeeCents": 0,
+          "currency": "EUR",
+          "includedGuests": 30,
+          "maxCapacity": 30,
+          "colorTier": "suite",
+          "listPriceEur": 30000,
+          "depositPercentOfMinimum": 50
+        }
+      },
+      "depositPercentOfMinimum": 50
+    }
+  },
+  "areas": [
+    {
+      "id": "shoko-terraza",
+      "label": "TERRAZA",
+      "defaultName": "Terraza",
+      "name": "Terraza",
+      "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
+      "type": "area",
+      "shape": "rect",
+      "pixelBox": [
+        17,
+        19,
+        178,
+        380
+      ],
+      "rect": {
+        "x": 0.0247,
+        "y": 0.0473,
+        "w": 0.2287,
+        "h": 0.8996
+      },
+      "bounds": {
+        "x": 0.0247,
+        "y": 0.0473,
+        "w": 0.2287,
+        "h": 0.8996
+      },
+      "viewBox": {
+        "x": 0.0247,
+        "y": 0.0473,
+        "w": 0.2287,
+        "h": 0.8996
+      },
+      "polygon": [
+        [
+          0.0247,
+          0.0473
+        ],
+        [
+          0.25339999999999996,
+          0.0473
+        ],
+        [
+          0.25339999999999996,
+          0.9469
+        ],
+        [
+          0.0247,
+          0.9469
+        ]
+      ],
+      "sectionIds": [
+        "shoko-t01",
+        "shoko-t02",
+        "shoko-t03",
+        "shoko-t04",
+        "shoko-t19",
+        "shoko-t20",
+        "shoko-t21",
+        "shoko-t26",
+        "shoko-t27",
+        "shoko-t28",
+        "shoko-t31",
+        "shoko-t35",
+        "shoko-t37",
+        "shoko-t39",
+        "shoko-t40",
+        "shoko-t41",
+        "shoko-t44",
+        "shoko-t48",
+        "shoko-t49",
+        "shoko-t50",
+        "shoko-t63",
+        "shoko-t64"
+      ],
+      "nonBookableIds": [],
+      "photos": [],
+      "description": "Terraza"
+    },
+    {
+      "id": "shoko-lounge",
+      "label": "LOUNGE",
+      "defaultName": "Lounge",
+      "name": "Lounge",
+      "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
+      "type": "area",
+      "shape": "rect",
+      "pixelBox": [
+        182,
+        24,
+        462,
+        116
+      ],
+      "rect": {
+        "x": 0.2588,
+        "y": 0.0605,
+        "w": 0.3969,
+        "h": 0.23
+      },
+      "bounds": {
+        "x": 0.2588,
+        "y": 0.0605,
+        "w": 0.3969,
+        "h": 0.23
+      },
+      "viewBox": {
+        "x": 0.2588,
+        "y": 0.0605,
+        "w": 0.3969,
+        "h": 0.23
+      },
+      "polygon": [
+        [
+          0.2588,
+          0.0605
+        ],
+        [
+          0.6557,
+          0.0605
+        ],
+        [
+          0.6557,
+          0.2905
+        ],
+        [
+          0.2588,
+          0.2905
+        ]
+      ],
+      "sectionIds": [
+        "shoko-t05",
+        "shoko-t06",
+        "shoko-t07",
+        "shoko-t08",
+        "shoko-t09",
+        "shoko-t10",
+        "shoko-t14",
+        "shoko-t15",
+        "shoko-t16",
+        "shoko-t17",
+        "shoko-t18"
+      ],
+      "nonBookableIds": [],
+      "photos": [],
+      "description": "Lounge"
+    },
+    {
+      "id": "shoko-main",
+      "label": null,
+      "defaultName": "Main \u00b7 SUPER VIP",
+      "name": "Main \u00b7 SUPER VIP",
+      "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
+      "type": "vipArea",
+      "shape": "rect",
+      "pixelBox": [
+        192,
+        106,
+        515,
+        345
+      ],
+      "rect": {
+        "x": 0.2724,
+        "y": 0.266,
+        "w": 0.4587,
+        "h": 0.5935
+      },
+      "bounds": {
+        "x": 0.2724,
+        "y": 0.266,
+        "w": 0.4587,
+        "h": 0.5935
+      },
+      "viewBox": {
+        "x": 0.2724,
+        "y": 0.266,
+        "w": 0.4587,
+        "h": 0.5935
+      },
+      "polygon": [
+        [
+          0.2724,
+          0.266
+        ],
+        [
+          0.7311,
+          0.266
+        ],
+        [
+          0.7311,
+          0.8595
+        ],
+        [
+          0.2724,
+          0.8595
+        ]
+      ],
+      "sectionIds": [
+        "shoko-t25",
+        "shoko-t51",
+        "shoko-t52",
+        "shoko-t57",
+        "shoko-t61",
+        "shoko-sv1",
+        "shoko-sv2",
+        "shoko-kz"
+      ],
+      "nonBookableIds": [
+        "shoko-dj"
+      ],
+      "photos": [],
+      "description": "Main \u00b7 SUPER VIP"
+    },
+    {
+      "id": "shoko-right",
+      "label": null,
+      "defaultName": "Right lounge",
+      "name": "Right lounge",
+      "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
+      "type": "area",
+      "shape": "rect",
+      "pixelBox": [
+        496,
+        62,
+        674,
+        350
+      ],
+      "rect": {
+        "x": 0.7042,
+        "y": 0.1554,
+        "w": 0.2524,
+        "h": 0.7157
+      },
+      "bounds": {
+        "x": 0.7042,
+        "y": 0.1554,
+        "w": 0.2524,
+        "h": 0.7157
+      },
+      "viewBox": {
+        "x": 0.7042,
+        "y": 0.1554,
+        "w": 0.2524,
+        "h": 0.7157
+      },
+      "polygon": [
+        [
+          0.7042,
+          0.1554
+        ],
+        [
+          0.9566000000000001,
+          0.1554
+        ],
+        [
+          0.9566000000000001,
+          0.8711
+        ],
+        [
+          0.7042,
+          0.8711
+        ]
+      ],
+      "sectionIds": [
+        "shoko-t11",
+        "shoko-t12",
+        "shoko-t13",
+        "shoko-t22",
+        "shoko-t23",
+        "shoko-t24",
+        "shoko-t29",
+        "shoko-t30",
+        "shoko-t32",
+        "shoko-t33",
+        "shoko-t34",
+        "shoko-t36",
+        "shoko-t38",
+        "shoko-t42",
+        "shoko-t43",
+        "shoko-t45",
+        "shoko-t46",
+        "shoko-t47",
+        "shoko-t53",
+        "shoko-t54",
+        "shoko-t55",
+        "shoko-t56",
+        "shoko-t58",
+        "shoko-t59",
+        "shoko-t60",
+        "shoko-t62"
+      ],
+      "nonBookableIds": [],
+      "photos": [],
+      "description": "Right lounge"
+    },
+    {
+      "id": "shoko-suite",
+      "label": "LA SU\u00cfTE",
+      "defaultName": "LA SU\u00cfTE",
+      "name": "LA SU\u00cfTE",
+      "nameEditable": true,
+      "nameSetByUid": null,
+      "nameSetAtMs": null,
+      "type": "vipArea",
+      "shape": "rect",
+      "pixelBox": [
+        593,
+        337,
+        633,
+        377
+      ],
+      "rect": {
+        "x": 0.8416,
+        "y": 0.8402,
+        "w": 0.0567,
+        "h": 0.0995
+      },
+      "bounds": {
+        "x": 0.8416,
+        "y": 0.8402,
+        "w": 0.0567,
+        "h": 0.0995
+      },
+      "viewBox": {
+        "x": 0.8416,
+        "y": 0.8402,
+        "w": 0.0567,
+        "h": 0.0995
+      },
+      "polygon": [
+        [
+          0.8416,
+          0.8402
+        ],
+        [
+          0.8983,
+          0.8402
+        ],
+        [
+          0.8983,
+          0.9397
+        ],
+        [
+          0.8416,
+          0.9397
+        ]
+      ],
+      "sectionIds": [
+        "shoko-la-suite"
+      ],
+      "nonBookableIds": [],
+      "photos": [],
+      "description": "LA SU\u00cfTE"
+    }
+  ],
+  "sections": [
+    {
+      "id": "shoko-t01",
+      "label": "T01",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1104,
+        "cy": 0.0971,
+        "rx": 0.0262,
+        "ry": 0.0224
+      },
+      "pixelBox": [
+        61,
+        32,
+        94,
+        46
+      ],
+      "bounds": {
+        "x": 0.0842,
+        "y": 0.0747,
+        "w": 0.0524,
+        "h": 0.0448
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T01 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t02",
+      "label": "T02",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1634,
+        "cy": 0.0971,
+        "rx": 0.027,
+        "ry": 0.0224
+      },
+      "pixelBox": [
+        98,
+        32,
+        132,
+        46
+      ],
+      "bounds": {
+        "x": 0.1364,
+        "y": 0.0747,
+        "w": 0.054,
+        "h": 0.0448
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T02 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t03",
+      "label": "T03",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.2147,
+        "cy": 0.0971,
+        "rx": 0.0262,
+        "ry": 0.0224
+      },
+      "pixelBox": [
+        135,
+        32,
+        168,
+        46
+      ],
+      "bounds": {
+        "x": 0.1885,
+        "y": 0.0747,
+        "w": 0.0524,
+        "h": 0.0448
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T03 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t04",
+      "label": "T04",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.0603,
+        "cy": 0.1255,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        35,
+        34,
+        50,
+        67
+      ],
+      "bounds": {
+        "x": 0.0468,
+        "y": 0.0795,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T04 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t05",
+      "label": "T05",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.2872,
+        "cy": 0.1105,
+        "rx": 0.0277,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        185,
+        36,
+        220,
+        53
+      ],
+      "bounds": {
+        "x": 0.2595,
+        "y": 0.0844,
+        "w": 0.0554,
+        "h": 0.0522
+      },
+      "maxCapacity": 8,
+      "includedGuests": 8,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE magenta \u00b7 8 PAX",
+      "colorTier": "magenta",
+      "minimumAmount": {
+        "amountCents": 150000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (6000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T05 (magenta tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1500,
+      "nyeListPriceEur": 6000
+    },
+    {
+      "id": "shoko-t06",
+      "label": "T06",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.3573,
+        "cy": 0.1103,
+        "rx": 0.0284,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        234,
+        36,
+        270,
+        53
+      ],
+      "bounds": {
+        "x": 0.3289,
+        "y": 0.0842,
+        "w": 0.0568,
+        "h": 0.0522
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
+      "colorTier": "purple",
+      "minimumAmount": {
+        "amountCents": 100000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T06 (purple tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
+    },
+    {
+      "id": "shoko-t07",
+      "label": "T07",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.4159,
+        "cy": 0.1103,
+        "rx": 0.0284,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        275,
+        36,
+        311,
+        53
+      ],
+      "bounds": {
+        "x": 0.3875,
+        "y": 0.0842,
+        "w": 0.0568,
+        "h": 0.0522
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
+      "colorTier": "purple",
+      "minimumAmount": {
+        "amountCents": 100000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T07 (purple tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
+    },
+    {
+      "id": "shoko-t08",
+      "label": "T08",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.4744,
+        "cy": 0.1103,
+        "rx": 0.0277,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        317,
+        36,
+        352,
+        53
+      ],
+      "bounds": {
+        "x": 0.4467,
+        "y": 0.0842,
+        "w": 0.0554,
+        "h": 0.0522
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
+      "colorTier": "purple",
+      "minimumAmount": {
+        "amountCents": 100000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T08 (purple tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
+    },
+    {
+      "id": "shoko-t09",
+      "label": "T09",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.5304,
+        "cy": 0.1104,
+        "rx": 0.0284,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        356,
+        36,
+        392,
+        53
+      ],
+      "bounds": {
+        "x": 0.502,
+        "y": 0.0843,
+        "w": 0.0568,
+        "h": 0.0522
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
+      "colorTier": "purple",
+      "minimumAmount": {
+        "amountCents": 100000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T09 (purple tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
+    },
+    {
+      "id": "shoko-t10",
+      "label": "T10",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.6062,
+        "cy": 0.1105,
+        "rx": 0.0277,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        410,
+        36,
+        445,
+        53
+      ],
+      "bounds": {
+        "x": 0.5785,
+        "y": 0.0844,
+        "w": 0.0554,
+        "h": 0.0522
+      },
+      "maxCapacity": 8,
+      "includedGuests": 8,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE magenta \u00b7 8 PAX",
+      "colorTier": "magenta",
+      "minimumAmount": {
+        "amountCents": 150000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (6000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T10 (magenta tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1500,
+      "nyeListPriceEur": 6000
+    },
+    {
+      "id": "shoko-t11",
+      "label": "T11",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8821,
+        "cy": 0.2052,
+        "rx": 0.0156,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        613,
+        74,
+        631,
+        91
+      ],
+      "bounds": {
+        "x": 0.8665,
+        "y": 0.17909999999999998,
+        "w": 0.0312,
+        "h": 0.0522
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T11 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t12",
+      "label": "T12",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.9283,
+        "cy": 0.2067,
+        "rx": 0.0149,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        646,
+        74,
+        663,
+        92
+      ],
+      "bounds": {
+        "x": 0.9134,
+        "y": 0.1793,
+        "w": 0.0298,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T12 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t13",
+      "label": "T13",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.7951,
+        "cy": 0.2241,
+        "rx": 0.0135,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        553,
+        82,
+        568,
+        98
+      ],
+      "bounds": {
+        "x": 0.7816000000000001,
+        "y": 0.1992,
+        "w": 0.027,
+        "h": 0.0498
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
+      "colorTier": "green",
+      "minimumAmount": {
+        "amountCents": 62500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 15625,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T13 (green tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
+    },
+    {
+      "id": "shoko-t14",
+      "label": "T14",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.3515,
+        "cy": 0.2406,
+        "rx": 0.027,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        231,
+        89,
+        265,
+        105
+      ],
+      "bounds": {
+        "x": 0.32449999999999996,
+        "y": 0.2157,
+        "w": 0.054,
+        "h": 0.0498
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
+      "colorTier": "purple",
+      "minimumAmount": {
+        "amountCents": 100000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T14 (purple tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
+    },
+    {
+      "id": "shoko-t15",
+      "label": "T15",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.4028,
+        "cy": 0.2408,
+        "rx": 0.027,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        267,
+        89,
+        301,
+        105
+      ],
+      "bounds": {
+        "x": 0.37579999999999997,
+        "y": 0.21589999999999998,
+        "w": 0.054,
+        "h": 0.0498
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
+      "colorTier": "purple",
+      "minimumAmount": {
+        "amountCents": 100000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T15 (purple tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
+    },
+    {
+      "id": "shoko-t16",
+      "label": "T16",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.4533,
+        "cy": 0.2405,
+        "rx": 0.0262,
+        "ry": 0.0236
+      },
+      "pixelBox": [
+        303,
+        89,
+        336,
+        104
+      ],
+      "bounds": {
+        "x": 0.4271,
+        "y": 0.21689999999999998,
+        "w": 0.0524,
+        "h": 0.0472
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
+      "colorTier": "purple",
+      "minimumAmount": {
+        "amountCents": 100000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T16 (purple tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
+    },
+    {
+      "id": "shoko-t17",
+      "label": "T17",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.576,
+        "cy": 0.2407,
+        "rx": 0.027,
+        "ry": 0.0236
+      },
+      "pixelBox": [
+        389,
+        89,
+        423,
+        104
+      ],
+      "bounds": {
+        "x": 0.5489999999999999,
+        "y": 0.2171,
+        "w": 0.054,
+        "h": 0.0472
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
+      "colorTier": "purple",
+      "minimumAmount": {
+        "amountCents": 100000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T17 (purple tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
+    },
+    {
+      "id": "shoko-t18",
+      "label": "T18",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-lounge",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.6274,
+        "cy": 0.2406,
+        "rx": 0.027,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        425,
+        89,
+        459,
+        105
+      ],
+      "bounds": {
+        "x": 0.6003999999999999,
+        "y": 0.2157,
+        "w": 0.054,
+        "h": 0.0498
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE purple \u00b7 6 PAX",
+      "colorTier": "purple",
+      "minimumAmount": {
+        "amountCents": 100000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (4000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T18 (purple tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 1000,
+      "nyeListPriceEur": 4000
+    },
+    {
+      "id": "shoko-t19",
+      "label": "T19",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.0603,
+        "cy": 0.2631,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        35,
+        89,
+        50,
+        122
+      ],
+      "bounds": {
+        "x": 0.0468,
+        "y": 0.21710000000000002,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T19 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t20",
+      "label": "T20",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1153,
+        "cy": 0.2631,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        74,
+        89,
+        89,
+        122
+      ],
+      "bounds": {
+        "x": 0.1018,
+        "y": 0.21710000000000002,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T20 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t21",
+      "label": "T21",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1621,
+        "cy": 0.263,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        107,
+        89,
+        122,
+        122
+      ],
+      "bounds": {
+        "x": 0.14859999999999998,
+        "y": 0.21700000000000003,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T21 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t22",
+      "label": "T22",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8819,
+        "cy": 0.2797,
+        "rx": 0.0156,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        613,
+        103,
+        631,
+        121
+      ],
+      "bounds": {
+        "x": 0.8663000000000001,
+        "y": 0.2523,
+        "w": 0.0312,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T22 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t23",
+      "label": "T23",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8058,
+        "cy": 0.29,
+        "rx": 0.0142,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        560,
+        108,
+        576,
+        125
+      ],
+      "bounds": {
+        "x": 0.7916,
+        "y": 0.26389999999999997,
+        "w": 0.0284,
+        "h": 0.0522
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
+      "colorTier": "green",
+      "minimumAmount": {
+        "amountCents": 62500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 15625,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T23 (green tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
+    },
+    {
+      "id": "shoko-t24",
+      "label": "T24",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.9268,
+        "cy": 0.2952,
+        "rx": 0.0149,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        645,
+        110,
+        662,
+        128
+      ],
+      "bounds": {
+        "x": 0.9118999999999999,
+        "y": 0.26780000000000004,
+        "w": 0.0298,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T24 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t25",
+      "label": "T25",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "shoko-main",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.3947,
+        "cy": 0.3158,
+        "rx": 0.0277,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        261,
+        119,
+        296,
+        135
+      ],
+      "bounds": {
+        "x": 0.367,
+        "y": 0.29090000000000005,
+        "w": 0.0554,
+        "h": 0.0498
+      },
+      "maxCapacity": 10,
+      "includedGuests": 10,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE red \u00b7 10 PAX",
+      "colorTier": "red",
+      "minimumAmount": {
+        "amountCents": 200000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T25 (red tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
+    },
+    {
+      "id": "shoko-t26",
+      "label": "T26",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.0603,
+        "cy": 0.3574,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        35,
+        127,
+        50,
+        160
+      ],
+      "bounds": {
+        "x": 0.0468,
+        "y": 0.3114,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T26 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t27",
+      "label": "T27",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1153,
+        "cy": 0.3576,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        74,
+        127,
+        89,
+        160
+      ],
+      "bounds": {
+        "x": 0.1018,
+        "y": 0.3116,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T27 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t28",
+      "label": "T28",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1621,
+        "cy": 0.3576,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        107,
+        127,
+        122,
+        160
+      ],
+      "bounds": {
+        "x": 0.14859999999999998,
+        "y": 0.3116,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T28 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t29",
+      "label": "T29",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8163,
+        "cy": 0.3598,
+        "rx": 0.0135,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        568,
+        136,
+        583,
+        153
+      ],
+      "bounds": {
+        "x": 0.8028000000000001,
+        "y": 0.3337,
+        "w": 0.027,
+        "h": 0.0522
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
+      "colorTier": "green",
+      "minimumAmount": {
+        "amountCents": 62500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 15625,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T29 (green tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
+    },
+    {
+      "id": "shoko-t30",
+      "label": "T30",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.883,
+        "cy": 0.3593,
+        "rx": 0.0149,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        614,
+        136,
+        631,
+        153
+      ],
+      "bounds": {
+        "x": 0.8681,
+        "y": 0.3332,
+        "w": 0.0298,
+        "h": 0.0522
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T30 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t31",
+      "label": "T31",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.2251,
+        "cy": 0.38,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        151,
+        136,
+        166,
+        169
+      ],
+      "bounds": {
+        "x": 0.21159999999999998,
+        "y": 0.334,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T31 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t32",
+      "label": "T32",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.9268,
+        "cy": 0.373,
+        "rx": 0.0149,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        645,
+        141,
+        662,
+        159
+      ],
+      "bounds": {
+        "x": 0.9118999999999999,
+        "y": 0.3456,
+        "w": 0.0298,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T32 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t33",
+      "label": "T33",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.7538,
+        "cy": 0.399,
+        "rx": 0.0199,
+        "ry": 0.0535
+      },
+      "pixelBox": [
+        519,
+        141,
+        543,
+        180
+      ],
+      "bounds": {
+        "x": 0.7339,
+        "y": 0.34550000000000003,
+        "w": 0.0398,
+        "h": 0.107
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE cyan \u00b7 6 PAX",
+      "colorTier": "cyan",
+      "minimumAmount": {
+        "amountCents": 87500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (3500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 21875,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T33 (cyan tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 875,
+      "nyeListPriceEur": 3500
+    },
+    {
+      "id": "shoko-t34",
+      "label": "T34",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8244,
+        "cy": 0.4231,
+        "rx": 0.0142,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        573,
+        162,
+        589,
+        178
+      ],
+      "bounds": {
+        "x": 0.8102,
+        "y": 0.3982,
+        "w": 0.0284,
+        "h": 0.0498
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
+      "colorTier": "green",
+      "minimumAmount": {
+        "amountCents": 62500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 15625,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T34 (green tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
+    },
+    {
+      "id": "shoko-t35",
+      "label": "T35",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.059,
+        "cy": 0.4402,
+        "rx": 0.0121,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        35,
+        169,
+        48,
+        185
+      ],
+      "bounds": {
+        "x": 0.0469,
+        "y": 0.4153,
+        "w": 0.0242,
+        "h": 0.0498
+      },
+      "maxCapacity": 2,
+      "includedGuests": 2,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light yellow \u00b7 2 PAX",
+      "colorTier": "lightyellow",
+      "minimumAmount": {
+        "amountCents": 25000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 6250,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T35 (lightyellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 250,
+      "nyeListPriceEur": 1000
+    },
+    {
+      "id": "shoko-t36",
+      "label": "T36",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8838,
+        "cy": 0.4409,
+        "rx": 0.0156,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        614,
+        168,
+        632,
+        186
+      ],
+      "bounds": {
+        "x": 0.8682000000000001,
+        "y": 0.41350000000000003,
+        "w": 0.0312,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T36 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t37",
+      "label": "T37",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.2251,
+        "cy": 0.4831,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        151,
+        178,
+        166,
+        211
+      ],
+      "bounds": {
+        "x": 0.21159999999999998,
+        "y": 0.4371,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T37 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t38",
+      "label": "T38",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8291,
+        "cy": 0.4892,
+        "rx": 0.0135,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        577,
+        188,
+        592,
+        205
+      ],
+      "bounds": {
+        "x": 0.8156,
+        "y": 0.4631,
+        "w": 0.027,
+        "h": 0.0522
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
+      "colorTier": "green",
+      "minimumAmount": {
+        "amountCents": 62500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 15625,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T38 (green tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
+    },
+    {
+      "id": "shoko-t39",
+      "label": "T39",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.0603,
+        "cy": 0.5261,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        35,
+        195,
+        50,
+        228
+      ],
+      "bounds": {
+        "x": 0.0468,
+        "y": 0.4801,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T39 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t40",
+      "label": "T40",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1142,
+        "cy": 0.5261,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        73,
+        195,
+        88,
+        228
+      ],
+      "bounds": {
+        "x": 0.1007,
+        "y": 0.4801,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T40 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t41",
+      "label": "T41",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1621,
+        "cy": 0.526,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        107,
+        195,
+        122,
+        228
+      ],
+      "bounds": {
+        "x": 0.14859999999999998,
+        "y": 0.48000000000000004,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T41 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t42",
+      "label": "T42",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.9267,
+        "cy": 0.5311,
+        "rx": 0.0149,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        645,
+        205,
+        662,
+        222
+      ],
+      "bounds": {
+        "x": 0.9117999999999999,
+        "y": 0.505,
+        "w": 0.0298,
+        "h": 0.0522
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T42 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t43",
+      "label": "T43",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.7512,
+        "cy": 0.6063,
+        "rx": 0.0177,
+        "ry": 0.0535
+      },
+      "pixelBox": [
+        519,
+        224,
+        540,
+        263
+      ],
+      "bounds": {
+        "x": 0.7334999999999999,
+        "y": 0.5528,
+        "w": 0.0354,
+        "h": 0.107
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE cyan \u00b7 6 PAX",
+      "colorTier": "cyan",
+      "minimumAmount": {
+        "amountCents": 87500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (3500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 21875,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T43 (cyan tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 875,
+      "nyeListPriceEur": 3500
+    },
+    {
+      "id": "shoko-t44",
+      "label": "T44",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.2107,
+        "cy": 0.6166,
+        "rx": 0.0149,
+        "ry": 0.0498
+      },
+      "pixelBox": [
+        140,
+        230,
+        157,
+        266
+      ],
+      "bounds": {
+        "x": 0.1958,
+        "y": 0.5668000000000001,
+        "w": 0.0298,
+        "h": 0.0996
+      },
+      "maxCapacity": 10,
+      "includedGuests": 10,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE red \u00b7 10 PAX",
+      "colorTier": "red",
+      "minimumAmount": {
+        "amountCents": 200000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T44 (red tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
+    },
+    {
+      "id": "shoko-t45",
+      "label": "T45",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8223,
+        "cy": 0.6184,
+        "rx": 0.0142,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        572,
+        240,
+        588,
+        257
+      ],
+      "bounds": {
+        "x": 0.8081,
+        "y": 0.5922999999999999,
+        "w": 0.0284,
+        "h": 0.0522
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
+      "colorTier": "green",
+      "minimumAmount": {
+        "amountCents": 62500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 15625,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T45 (green tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
+    },
+    {
+      "id": "shoko-t46",
+      "label": "T46",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8817,
+        "cy": 0.6255,
+        "rx": 0.0149,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        613,
+        243,
+        630,
+        260
+      ],
+      "bounds": {
+        "x": 0.8668,
+        "y": 0.5993999999999999,
+        "w": 0.0298,
+        "h": 0.0522
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T46 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t47",
+      "label": "T47",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.9269,
+        "cy": 0.6253,
+        "rx": 0.0149,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        645,
+        242,
+        662,
+        260
+      ],
+      "bounds": {
+        "x": 0.9119999999999999,
+        "y": 0.5979,
+        "w": 0.0298,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T47 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t48",
+      "label": "T48",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.0603,
+        "cy": 0.6283,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        35,
+        236,
+        50,
+        269
+      ],
+      "bounds": {
+        "x": 0.0468,
+        "y": 0.5822999999999999,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T48 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t49",
+      "label": "T49",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1141,
+        "cy": 0.6282,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        73,
+        236,
+        88,
+        269
+      ],
+      "bounds": {
+        "x": 0.1006,
+        "y": 0.5821999999999999,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T49 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t50",
+      "label": "T50",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1621,
+        "cy": 0.6284,
+        "rx": 0.0135,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        107,
+        236,
+        122,
+        269
+      ],
+      "bounds": {
+        "x": 0.14859999999999998,
+        "y": 0.5823999999999999,
+        "w": 0.027,
+        "h": 0.092
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T50 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t51",
+      "label": "T51",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "shoko-main",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.3008,
+        "cy": 0.6354,
+        "rx": 0.0284,
+        "ry": 0.0261
+      },
+      "pixelBox": [
+        194,
+        247,
+        230,
+        264
+      ],
+      "bounds": {
+        "x": 0.27240000000000003,
+        "y": 0.6093,
+        "w": 0.0568,
+        "h": 0.0522
+      },
+      "maxCapacity": 10,
+      "includedGuests": 10,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE red \u00b7 10 PAX",
+      "colorTier": "red",
+      "minimumAmount": {
+        "amountCents": 200000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T51 (red tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
+    },
+    {
+      "id": "shoko-t52",
+      "label": "T52",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "shoko-main",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.3749,
+        "cy": 0.6338,
+        "rx": 0.0206,
+        "ry": 0.0224
+      },
+      "pixelBox": [
+        251,
+        248,
+        276,
+        262
+      ],
+      "bounds": {
+        "x": 0.3543,
+        "y": 0.6114,
+        "w": 0.0412,
+        "h": 0.0448
+      },
+      "maxCapacity": 10,
+      "includedGuests": 10,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE dark red \u00b7 10 PAX",
+      "colorTier": "darkred",
+      "minimumAmount": {
+        "amountCents": 300000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (12000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 75000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T52 (darkred tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 3000,
+      "nyeListPriceEur": 12000
+    },
+    {
+      "id": "shoko-t53",
+      "label": "T53",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8105,
+        "cy": 0.6919,
+        "rx": 0.0135,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        564,
+        270,
+        579,
+        286
+      ],
+      "bounds": {
+        "x": 0.797,
+        "y": 0.6669999999999999,
+        "w": 0.027,
+        "h": 0.0498
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
+      "colorTier": "green",
+      "minimumAmount": {
+        "amountCents": 62500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 15625,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T53 (green tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
+    },
+    {
+      "id": "shoko-t54",
+      "label": "T54",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.7326,
+        "cy": 0.7127,
+        "rx": 0.0213,
+        "ry": 0.0522
+      },
+      "pixelBox": [
+        504,
+        268,
+        530,
+        306
+      ],
+      "bounds": {
+        "x": 0.7113,
+        "y": 0.6605,
+        "w": 0.0426,
+        "h": 0.1044
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE cyan \u00b7 6 PAX",
+      "colorTier": "cyan",
+      "minimumAmount": {
+        "amountCents": 87500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (3500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 21875,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T54 (cyan tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 875,
+      "nyeListPriceEur": 3500
+    },
+    {
+      "id": "shoko-t55",
+      "label": "T55",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8824,
+        "cy": 0.7118,
+        "rx": 0.0156,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        613,
+        277,
+        631,
+        295
+      ],
+      "bounds": {
+        "x": 0.8668,
+        "y": 0.6844,
+        "w": 0.0312,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T55 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t56",
+      "label": "T56",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.9271,
+        "cy": 0.7122,
+        "rx": 0.0149,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        645,
+        277,
+        662,
+        295
+      ],
+      "bounds": {
+        "x": 0.9122,
+        "y": 0.6848000000000001,
+        "w": 0.0298,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T56 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t57",
+      "label": "T57",
+      "type": "vipTable",
+      "bookable": true,
+      "areaId": "shoko-main",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.6592,
+        "cy": 0.7527,
+        "rx": 0.022,
+        "ry": 0.046
+      },
+      "pixelBox": [
+        451,
+        286,
+        478,
+        319
+      ],
+      "bounds": {
+        "x": 0.6372,
+        "y": 0.7067,
+        "w": 0.044,
+        "h": 0.092
+      },
+      "maxCapacity": 10,
+      "includedGuests": 10,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE red \u00b7 10 PAX",
+      "colorTier": "red",
+      "minimumAmount": {
+        "amountCents": 200000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T57 (red tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
+    },
+    {
+      "id": "shoko-t58",
+      "label": "T58",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.7918,
+        "cy": 0.7581,
+        "rx": 0.0142,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        550,
+        297,
+        566,
+        313
+      ],
+      "bounds": {
+        "x": 0.7776,
+        "y": 0.7332,
+        "w": 0.0284,
+        "h": 0.0498
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
+      "colorTier": "green",
+      "minimumAmount": {
+        "amountCents": 62500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 15625,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T58 (green tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
+    },
+    {
+      "id": "shoko-t59",
+      "label": "T59",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.8807,
+        "cy": 0.7952,
+        "rx": 0.0135,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        613,
+        311,
+        628,
+        329
+      ],
+      "bounds": {
+        "x": 0.8672000000000001,
+        "y": 0.7678,
+        "w": 0.027,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T59 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t60",
+      "label": "T60",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.9266,
+        "cy": 0.7942,
+        "rx": 0.0149,
+        "ry": 0.0274
+      },
+      "pixelBox": [
+        645,
+        310,
+        662,
+        328
+      ],
+      "bounds": {
+        "x": 0.9117,
+        "y": 0.7668,
+        "w": 0.0298,
+        "h": 0.0548
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE light green \u00b7 4 PAX",
+      "colorTier": "lightgreen",
+      "minimumAmount": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 12500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T60 (lightgreen tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 500,
+      "nyeListPriceEur": 2000
+    },
+    {
+      "id": "shoko-t61",
+      "label": "T61",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-main",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.7028,
+        "cy": 0.8098,
+        "rx": 0.0248,
+        "ry": 0.051
+      },
+      "pixelBox": [
+        480,
+        307,
+        511,
+        344
+      ],
+      "bounds": {
+        "x": 0.6779999999999999,
+        "y": 0.7587999999999999,
+        "w": 0.0496,
+        "h": 0.102
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE cyan \u00b7 6 PAX",
+      "colorTier": "cyan",
+      "minimumAmount": {
+        "amountCents": 87500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (3500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 21875,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T61 (cyan tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 875,
+      "nyeListPriceEur": 3500
+    },
+    {
+      "id": "shoko-t62",
+      "label": "T62",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-right",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.773,
+        "cy": 0.8214,
+        "rx": 0.0142,
+        "ry": 0.0249
+      },
+      "pixelBox": [
+        537,
+        322,
+        553,
+        338
+      ],
+      "bounds": {
+        "x": 0.7588,
+        "y": 0.7965,
+        "w": 0.0284,
+        "h": 0.0498
+      },
+      "maxCapacity": 4,
+      "includedGuests": 4,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE green \u00b7 4 PAX",
+      "colorTier": "green",
+      "minimumAmount": {
+        "amountCents": 62500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (2500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 15625,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T62 (green tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 625,
+      "nyeListPriceEur": 2500
+    },
+    {
+      "id": "shoko-t63",
+      "label": "T63",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.0531,
+        "cy": 0.8944,
+        "rx": 0.0191,
+        "ry": 0.0386
+      },
+      "pixelBox": [
+        26,
+        346,
+        49,
+        373
+      ],
+      "bounds": {
+        "x": 0.034,
+        "y": 0.8558,
+        "w": 0.0382,
+        "h": 0.0772
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T63 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-t64",
+      "label": "T64",
+      "type": "table",
+      "bookable": true,
+      "areaId": "shoko-terraza",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.1767,
+        "cy": 0.8972,
+        "rx": 0.0163,
+        "ry": 0.0386
+      },
+      "pixelBox": [
+        115,
+        346,
+        134,
+        373
+      ],
+      "bounds": {
+        "x": 0.1604,
+        "y": 0.8586,
+        "w": 0.0326,
+        "h": 0.0772
+      },
+      "maxCapacity": 6,
+      "includedGuests": 6,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 NYE yellow \u00b7 6 PAX",
+      "colorTier": "yellow",
+      "minimumAmount": {
+        "amountCents": 37500,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (1500\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 9375,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko table T64 (yellow tier on NYE map)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [],
+        "note": "NYE prices apply only on 2026-12-31"
+      },
+      "standardPriceEur": 375,
+      "nyeListPriceEur": 1500
+    },
+    {
+      "id": "shoko-sv1",
+      "label": "SUPER VIP 1",
+      "type": "vipArea",
+      "bookable": true,
+      "areaId": "shoko-main",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.403,
+        "cy": 0.4383,
+        "rx": 0.0596,
+        "ry": 0.1045
+      },
+      "pixelBox": [
+        242,
+        134,
+        326,
+        218
+      ],
+      "bounds": {
+        "x": 0.34340000000000004,
+        "y": 0.33380000000000004,
+        "w": 0.1192,
+        "h": 0.209
+      },
+      "maxCapacity": 15,
+      "includedGuests": 15,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 SUPER VIP 1 \u00b7 15 PAX",
+      "colorTier": "supervip",
+      "minimumAmount": {
+        "amountCents": 500000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (20000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 125000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko SUPER VIP 1 (NYE package)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [
+          "2026-12-31"
+        ]
+      },
+      "standardPriceEur": 5000,
+      "nyeListPriceEur": 20000
+    },
+    {
+      "id": "shoko-sv2",
+      "label": "SUPER VIP 2",
+      "type": "vipArea",
+      "bookable": true,
+      "areaId": "shoko-main",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.5759,
+        "cy": 0.3393,
+        "rx": 0.0596,
+        "ry": 0.1045
+      },
+      "pixelBox": [
+        364,
+        94,
+        448,
+        178
+      ],
+      "bounds": {
+        "x": 0.5163,
+        "y": 0.2348,
+        "w": 0.1192,
+        "h": 0.209
+      },
+      "maxCapacity": 15,
+      "includedGuests": 15,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 SUPER VIP 2 \u00b7 15 PAX",
+      "colorTier": "supervip",
+      "minimumAmount": {
+        "amountCents": 500000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (20000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 125000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko SUPER VIP 2 (NYE package)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [
+          "2026-12-31"
+        ]
+      },
+      "standardPriceEur": 5000,
+      "nyeListPriceEur": 20000
+    },
+    {
+      "id": "shoko-kz",
+      "label": "KAI ZEN",
+      "type": "vipArea",
+      "bookable": true,
+      "areaId": "shoko-main",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.3943,
+        "cy": 0.5266,
+        "rx": 0.034,
+        "ry": 0.0597
+      },
+      "pixelBox": [
+        254,
+        187,
+        302,
+        235
+      ],
+      "bounds": {
+        "x": 0.36029999999999995,
+        "y": 0.4669,
+        "w": 0.068,
+        "h": 0.1194
+      },
+      "maxCapacity": 15,
+      "includedGuests": 15,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 KAI ZEN \u00b7 15 PAX",
+      "colorTier": "kaizen",
+      "minimumAmount": {
+        "amountCents": 200000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (8000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 50000,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "Sh\u00f4ko KAI ZEN (NYE package)",
+      "photos": [],
+      "availability": {
+        "defaultNights": [
+          "2026-12-31"
+        ]
+      },
+      "standardPriceEur": 2000,
+      "nyeListPriceEur": 8000
+    },
+    {
+      "id": "shoko-la-suite",
+      "label": "LA SU\u00cfTE",
+      "type": "vipArea",
+      "bookable": true,
+      "areaId": "shoko-suite",
+      "shape": "rect",
+      "rect": {
+        "x": 0.78,
+        "y": 0.82,
+        "w": 0.18,
+        "h": 0.14
+      },
+      "pixelBox": [
+        549,
+        329,
+        676,
+        385
+      ],
+      "bounds": {
+        "x": 0.78,
+        "y": 0.82,
+        "w": 0.18,
+        "h": 0.14
+      },
+      "maxCapacity": 30,
+      "includedGuests": 30,
+      "capacityPlaceholder": false,
+      "capacityNote": "NYE'27 legend \u00b7 LA SU\u00cfTE \u00b7 30 PAX (position approximate \u2014 suite is a separate room on the flyer map)",
+      "colorTier": "suite",
+      "minimumAmount": {
+        "amountCents": 750000,
+        "currency": "EUR",
+        "placeholder": false,
+        "note": "Standard (non-NYE) table price \u2014 1/4 of NYE'27 list (30000\u20ac). Regular nights."
+      },
+      "extraGuestFee": null,
+      "deposit": {
+        "amountCents": 187500,
+        "currency": "EUR",
+        "placeholder": false,
+        "percentOfMinimum": 25,
+        "note": "Minimum reservation / deposit = 25% of standard price on non-NYE nights"
+      },
+      "description": "LA SU\u00cfTE private room \u2014 NYE package 30.000\u20ac / 30 PAX",
+      "photos": [],
+      "availability": {
+        "defaultNights": [
+          "2026-12-31"
+        ]
+      },
+      "standardPriceEur": 7500,
+      "nyeListPriceEur": 30000
+    }
+  ],
+  "nonBookable": [
+    {
+      "id": "shoko-dj",
+      "label": "DJ",
+      "name": "DJ",
+      "type": "djBooth",
+      "state": "djBooth",
+      "bookable": false,
+      "areaId": "shoko-main",
+      "reason": "DJ booth \u2014 never bookable",
+      "shape": "circle",
+      "circle": {
+        "cx": 0.5011,
+        "cy": 0.2677,
+        "rx": 0.0397,
+        "ry": 0.0697
+      },
+      "pixelBox": [
+        325,
+        79,
+        381,
+        135
+      ]
+    }
+  ],
+  "ignoredArtifacts": [
+    "NYE'27 wordmark",
+    "ENTRADA labels",
+    "gold wall strokes"
+  ],
+  "openQuestions": [
+    "Confirm LA SU\u00cfTE map position (suite is a separate enclosure on the flyer; placed approx bottom-right on image 1).",
+    "Confirm whether listed \u20ac amounts are full prepaid packages or minimum spend with separate deposit.",
+    "Regular-night prices intentionally unset \u2014 Club Admin / VIP Manager will set later."
+  ],
+  "counts": {
+    "bookableSections": 68,
+    "byType": {
+      "table": 60,
+      "vipTable": 4,
+      "vipArea": 4
+    },
+    "areas": 5,
+    "nonBookable": 1,
+    "djBooths": 1,
+    "nyePricedSections": 68
+  },
+  "pricingPolicy": {
+    "currency": "EUR",
+    "nyeNight": "2026-12-31",
+    "standardVsNye": "standard = NYE list / 4 (NYE is ~400% of standard)",
+    "regularDepositPercentOfStandard": 25,
+    "nyeDepositPercentOfNyeList": 50
+  }
+}

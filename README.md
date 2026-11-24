@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.079 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.080 (stable)
 
+- s3.3.080: BOT DEE VIP reserV map at Aurelia loads vip-plans/aurelia.json (phone area view); no stub sheet
 - s3.3.079: Search Join Now attaches the existing BOT DEE Room SMARTview group chat (Don + Lorna names + shared turns)
 - s3.3.078: Search SMARTnotification for a Miami-tagged room uses Place SMARTview cards
 - s3.3.077: BOT DEE Room SMARTview Invite chip stays greyed with Invite sent (Lorna / MsLorna)

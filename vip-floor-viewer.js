@@ -485,6 +485,11 @@
       view.cy = (y0 + y1) / 2;
     }
     applyView(true);
+    const onSelect = window.FLOQRVipFloorViewer?.onSelect;
+    if (typeof onSelect === "function" && item.bookable) {
+      try { onSelect({sectionId: item.id, item, bookable: true}); } catch (_) {}
+      return;
+    }
     showInfo(item);
   }
 
@@ -500,7 +505,11 @@
   async function load(file, area, sel) {
     legend = legend || await getJson("legend.json");
     const next = await getJson(file);
-    if (!legend || !next) { info.hidden = false; info.textContent = `Could not load ${file}.`; return; }
+    if (!legend || !next) {
+      if (info) { info.hidden = false; info.textContent = `Could not load ${file}.`; }
+      return;
+    }
+    if (!map || !chips || !stage) return;
     plan = next; planFile = file; states = DEMO_STATES[file] || {};
     W = plan.image.widthPx; H = plan.image.heightPx;
     document.querySelectorAll("[data-plan]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.plan === file)));
@@ -508,7 +517,8 @@
     buildLegend();
     buildChips();
     buildMinimap();
-    setMode(area || (isPhone() ? plan.areas[0].id : "all"));
+    const firstArea = Array.isArray(plan.areas) && plan.areas[0] ? plan.areas[0].id : "all";
+    setMode(area || (isPhone() ? firstArea : "all"));
     if (sel) select(sel, true);
   }
 
@@ -525,21 +535,27 @@
   window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => plan && fit(), 120); });
   // A page scrollbar appearing after the list renders narrows the stage; refit so phone targets stay ≥ 44px.
   let stageWidth = 0;
-  new ResizeObserver(() => {
-    if (!plan || stage.clientWidth === stageWidth) return;
-    stageWidth = stage.clientWidth;
-    fit();
-  }).observe(stage);
-  const bootPlan = window.FLOQR_VIP_BOOT?.plan || params.get("plan") || "decades.json";
-  const bootArea = window.FLOQR_VIP_BOOT?.area || params.get("area");
-  const bootSel = window.FLOQR_VIP_BOOT?.sel || params.get("sel");
-  load(bootPlan, bootArea, bootSel);
+  if (stage) {
+    new ResizeObserver(() => {
+      if (!plan || stage.clientWidth === stageWidth) return;
+      stageWidth = stage.clientWidth;
+      fit();
+    }).observe(stage);
+  }
+  const skipBoot = !!window.FLOQR_VIP_SKIP_BOOT;
+  if (!skipBoot) {
+    const bootPlan = window.FLOQR_VIP_BOOT?.plan || params.get("plan") || "decades.json";
+    const bootArea = window.FLOQR_VIP_BOOT?.area || params.get("area");
+    const bootSel = window.FLOQR_VIP_BOOT?.sel || params.get("sel");
+    load(bootPlan, bootArea, bootSel);
+  }
   window.FLOQRVipFloorViewer = {
     load,
     select,
     setMode,
     closePopout,
     getPlan: () => plan,
+    onSelect: null,
     setLivePricing: next => {
       livePricing = next && typeof next === "object" ? next : {};
       if (plan && selectedId) {

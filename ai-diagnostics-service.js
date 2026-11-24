@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.079";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.079";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.080";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.080";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.080",
+      title: "s3.3.080 — BOT DEE VIP reserV map shows Aurelia floor plan",
+      checks: [
+        {label:"Popout loads floor viewer", file:"botdee-vip-popout.html", includes:["vip-floor-viewer.js", "FLOQR_VIP_SKIP_BOOT", "aurelia.json"], notIncludes:["Open VIP reserV from BOT DEE chat to see the floor"]},
+        {label:"Dock hydrates Pages plan", file:"botdee-smartview.js", includes:["hydrateVipMap", "searchParams.set(\"plan\"", "searchParams.set(\"location\"", "VIP_PLAN_BY_CLUB"], notIncludes:["noopener=no"]},
+        {label:"Viewer skip-boot + onSelect", file:"vip-floor-viewer.js", includes:["FLOQR_VIP_SKIP_BOOT", "onSelect"]},
+        {label:"Functions packaged plans", file:"functions/headless-vip-core.js", includes:["path.join(__dirname, \"vip-plans\"", "path.join(__dirname, \"..\", \"vip-plans\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-080-botdee-vip-aurelia-map", "s3.3.080"]}
+      ]
+    },
     {
       version: "s3.3.079",
       title: "s3.3.079 — Search Join Now attaches Room SMARTview group chat",
@@ -3868,6 +3879,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-080-botdee-vip-aurelia-map",
+      area:"BOT DEE",
+      feature:"VIP reserV floor map at Aurelia from BOT DEE",
+      changed:"s3.3.080 — Open VIP reserV map from BOT DEE at Aurelia loads vip-plans/aurelia.json in vip-floor-viewer (phone first-area). Dock hydrates the 2D plan from Pages when the callable map is missing. No blank stub sheet. Tracker SMA-34.",
+      howToTest:"1) After Pages publish (Functions optional for this map). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-vip-popout.html / vip-floor-viewer.js ?v=s3.3.080. Sign in with BOT DEE + VIP reserV. New chat. 2) Send at Aurelia (or book a table at Aurelia). VIP reserV dock names Aurelia. 3) Tap a later open night (not Tonight Closed). Area chips and a floor thumbnail must appear — not nights then an empty Table only. 4) Tap Open VIP reserV map. Expect the Aurelia 2D plan (West Booths first on phone), green tables, area chips, pinch-zoom. Not a blank page titled Open VIP reserV map that says open from chat. 5) Tap Mezzanine then V1 — dock Table becomes V1. Hold it still waits for Hold it. 6) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Aurelia BOT DEE VIP shows the floor map on the dock and in the map pop-out. Phone opens an area. Table taps select in chat. No stub overlay.",
+      troubleshoot:"Blank stub sheet → cached botdee-vip-popout.html still has the open-from-chat paragraph, or popout URL missing plan=aurelia.json. Dock still has no area chips → cached botdee-smartview.js (hydrateVipMap) or vip-plans/aurelia.json 404 on Pages. Viewer is decades → plan= query not set (need location=temp-democlub-1). Functions still omit map.imageUrl until deploy; Pages hydrate covers the dock. Functions deny vipReservations → Features & Services VIP still off."
+    },
       {
       id:"s3-3-079-botdee-joined-group-chat",
       area:"BOT DEE",
