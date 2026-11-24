@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.067";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.067";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.069";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.069";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,28 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.069",
+      title: "s3.3.069 — Demo Worker Mgmt: roster codes plus same-mobile Find / Preview / Merge",
+      checks: [
+        {label:"Demo Worker Mgmt combined cards", file:"master-admin.html", includes:["Demo Worker Mgmt", "demoEmpSearch", "id=\"demoPatronAccountMerge\"", "data-merge-action=\"lookup-survivor\""]},
+        {label:"Find demo worker + Generate code", file:"master-admin.html", includes:["master.demoEmployees.find", "demoEmpGenerateSelectedBtn"]},
+        {label:"Merge bind all cards", file:"patron-account-merge.js", includes:["data-patron-account-merge", "lookup-survivor"]},
+        {label:"Hash alias demoWorkerMgmt", file:"master-admin-app.js", includes:["demoWorkerMgmt", "demoEmployees"]},
+        {label:"Chrome packs", file:"floqr-i18n.js", includes:["Demo Worker Mgmt", "master.demoEmployees.find"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-065-demo-worker-mgmt"]}
+      ]
+    },
+    {
+      version: "s3.3.068",
+      title: "s3.3.068 — Patron merge card on Duplicate Records only; one Find patron per column",
+      checks: [
+        {label:"Merge card inside Duplicate Records", file:"master-admin.html", includes:["id=\"duplicateRecords\"", "id=\"patronAccountMerge\"", "patron-merge-col", "patronMergeLookupSurvivorBtn"]},
+        {label:"Hash alias to Duplicate Records", file:"master-admin-app.js", includes:["patronAccountMerge", "duplicateRecords"]},
+        {label:"Operator-neutral chrome", file:"floqr-i18n.js", includes:["until a Master Admin confirms"], notIncludes:["until Don confirms"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-064-patron-merge-chrome"]}
+      ]
+    },
     {
       version: "s3.3.067",
       title: "s3.3.067 — SMARTvisual Studio Review / Publish",
@@ -3695,6 +3717,24 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-065-demo-worker-mgmt",
+      area:"Master Admin",
+      feature:"Demo Worker Mgmt combined roster + same-mobile merge",
+      changed:"s3.3.066 — Entity Management tab is Demo Worker Mgmt (#demoEmployees; #demoWorkerMgmt aliases). The panel has Find demo worker + Generate code and Patron accounts (same mobile) Find patron / Preview merge / Merge patron accounts. Duplicate Records still has #patronAccountMerge so the card does not leak onto other tabs. Chrome does not name an operator.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / floqr-i18n.js / patron-account-merge.js ?v=s3.3.069. Unlock SOS2FA. 2) Entity Management → Demo Worker Mgmt. Heading says Demo Worker Mgmt. Confirm Find demo worker + Generate code AND Find patron (one per column) + Preview merge + Merge patron accounts. 3) Reports → Duplicate Records still has Patron accounts (same mobile). 4) Network Dashboard / Diagnostics / Beta & Testing do not show the merge card (Beta still has its own Find patron). 5) BOT DEE help hashes #demoEmployees. Display URLs have no ?v=.",
+      expected:"One Demo Worker Mgmt surface with roster codes and same-mobile merge. Duplicate Records still has the merge card. Other tabs do not.",
+      troubleshoot:"Old Demo Svc / Emp Mgmt label → cached master-admin.html / floqr-i18n.js. Merge card on every tab → #patronAccountMerge outside a panel. Demo Worker Mgmt missing Find patron → cached HTML before s3.3.066. Duplicate Records missing the card → stacked PR 157 placement lost. Buttons do nothing → patron-account-merge.js must bind [data-patron-account-merge]."
+    },
+    {
+      id:"s3-3-064-patron-merge-chrome",
+      area:"Master Admin",
+      feature:"Patron accounts (same mobile) only on Duplicate Records; one Find patron per column",
+      changed:"s3.3.064 — Merge card is inside Reports → Duplicate Records. One Find patron under Keep this uid and one under Merge this uid away. Chrome and help say Master Admin, not a named person. Merge still never deletes Firebase Auth.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / admin.css / floqr-i18n.js ?v=s3.3.069. Unlock SOS2FA. 2) Reports → Duplicate Records (#duplicateRecords). Patron accounts (same mobile) is inside that panel; each column has exactly one Find patron; Preview merge and Merge patron accounts sit below. 3) Open Network Dashboard, Diagnostics, and Features Mgmt → Beta & Testing — the merge card is not there (Beta still has its own Find patron search). Demo Worker Mgmt also shows Patron accounts (same mobile) on purpose. 4) Open #patronAccountMerge — lands on Duplicate Records with the card. 5) Confirm sub copy says Master Admin, not a named person. Display URLs have no ?v=.",
+      expected:"Card only on Duplicate Records. One Find patron per column. Operator-neutral copy. Auth still not deleted.",
+      troubleshoot:"Card still on every tab → #patronAccountMerge is outside #duplicateRecords (cached master-admin.html). Two Find patron in one row → cached HTML before s3.3.064. Still says Don → cached floqr-i18n.js / botdee-help-repository.js. #patronAccountMerge blanks the page → master-admin-app.js must map that hash to duplicateRecords."
+    },
+    {
       id:"s3-3-035-botdee-place-search",
       area:"BOT DEE",
       feature:"Contextual FLOQR venue search (dining / clubs in a city)",
@@ -3752,10 +3792,10 @@
       id:"s3-3-052-patron-phone-unifier",
       area:"Accounts",
       feature:"Required mobile unifies patrons; Master Admin merge does not delete Auth",
-      changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Live Lorna merge waits for a separate Don confirmation after deploy.",
-      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.053. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until Don separately confirms after deploy. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
+      changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Live Lorna merge waits for a separate Master Admin confirmation after deploy.",
+      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.053. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until a Master Admin separately confirms after deploy. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
       expected:"Mobile required. Duplicate phone cannot create a second live profile. Preview shows both uids and does not delete Auth. Merge is Master Admin + SOS2FA + reason only.",
-      troubleshoot:"Save still optional phone → cached patron-app.js / patron-portal-app.js. Second account created → Functions claimPatronPhone / phoneIndex rules not this SHA. Merge button works without SOS2FA → stop; lookupPatronAccounts must assertSos2faSession. Auth user vanished → mergePatronAccounts must not call deleteUser; revert and wait for Don."
+      troubleshoot:"Save still optional phone → cached patron-app.js / patron-portal-app.js. Second account created → Functions claimPatronPhone / phoneIndex rules not this SHA. Merge button works without SOS2FA → stop; lookupPatronAccounts must assertSos2faSession. Auth user vanished → mergePatronAccounts must not call deleteUser; revert and wait for a Master Admin."
     },
     {
       id:"s3-3-052-mingl-search-tile",

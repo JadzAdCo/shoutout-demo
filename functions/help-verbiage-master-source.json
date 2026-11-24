@@ -614,7 +614,7 @@
   {
     "id": "help-master-demo-signin",
     "title": "Demo sign-in code",
-    "body": "Master Admin → Entity Management → Demo Svc / Emp Mgmt. Use this when email codes are not arriving and you need to sign in as a demo employee (temp_role_number@floqr-demo.com). Unlock SOS2FA, search or pick the demo employee, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features & Services audit trail and listed under Recent codes issued. Real patron accounts cannot get a code here.",
+    "body": "Master Admin → Entity Management → Demo Worker Mgmt. Use this when email codes are not arriving and you need to sign in as a demo worker (temp_role_number@floqr-demo.com). Unlock SOS2FA, find or pick the demo worker, press Generate code and give a reason. The code is shown once, works for 10 minutes and only for that demo account. Then open a private (incognito) window, go to Search → Continue with your own Email, type the demo email, press I already have a code, enter the code and press Verify and Continue. Every code issued is written to the Features & Services audit trail and listed under Recent codes issued. Real patron accounts cannot get a code here. This tab also has Patron accounts (same mobile): Find patron, Preview merge, and Merge patron accounts. Duplicate Records keeps the same merge card.",
     "audiences": [
       "masterAdmin"
     ],
@@ -630,6 +630,11 @@
       "log in as demo account",
       "demo svc emp mgmt",
       "demo employees",
+      "demo worker mgmt",
+      "demo worker management",
+      "demo workers",
+      "find patron",
+      "merge patron accounts",
       "demo service member",
       "temp waitress",
       "floqr-demo",
@@ -639,11 +644,11 @@
       "sendgrid not working",
       "demo account password",
       "Demo sign-in code",
-      "Demo Svc / Emp Mgmt"
+      "Demo Worker Mgmt"
     ],
     "links": [
       {
-        "label": "Demo Svc / Emp Mgmt",
+        "label": "Demo Worker Mgmt",
         "href": "./master-admin.html?from=botdee#demoEmployees"
       }
     ],
@@ -892,7 +897,7 @@
   {
     "id": "help-patron-account-merge",
     "title": "Patron account merge",
-    "body": "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted until Don confirms. New sign-ups refuse a second account when the mobile is already claimed.",
+    "body": "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted until a Master Admin confirms. New sign-ups refuse a second account when the mobile is already claimed.",
     "audiences": [
       "masterAdmin"
     ],
@@ -904,12 +909,17 @@
       "Lorna",
       "phone unifier",
       "Patron account merge",
+      "Demo Worker Mgmt",
       "Duplicate Records"
     ],
     "links": [
       {
+        "label": "Demo Worker Mgmt",
+        "href": "./master-admin.html?from=botdee#demoEmployees"
+      },
+      {
         "label": "Duplicate Records",
-        "href": "./master-admin.html?from=botdee"
+        "href": "./master-admin.html?from=botdee#duplicateRecords"
       }
     ],
     "page": "master-admin.html",

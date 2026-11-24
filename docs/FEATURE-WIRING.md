@@ -8,7 +8,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 |---|---|
 | Live Pages | `https://jadzadco.github.io/shoutout-demo/` |
 | Firebase | `shoutoutdemo-5b402` · Functions `us-central1` |
-| Last registry touch | 2026-11-20 |
+| Last registry touch | 2026-11-23 |
 | Local copy | `http://127.0.0.1:4173/` — same files as Pages; browser calls still use live Firebase. See `docs/FLOQR-TECHNICAL-BIBLE.md` §13.4. |
 
 ---
@@ -61,21 +61,35 @@ Resume: `@gdpr$` / `$residency$`. Rule: `.cursor/rules/gdpr-data-residency.mdc`.
 
 ## Patron phone unifier + account merge (s3.3.052)
 
-**Purpose:** One mobile = one person. Duplicate Auth/Firestore patrons (e.g. MsLorna vs another Lorna Gmail) are merged by Master Admin. New sign-up / profile complete refuses a second account when the E.164 mobile is already claimed. **Do not run the live Lorna merge or delete Auth until Don asks.**
+**Purpose:** One mobile = one person. Duplicate Auth/Firestore patrons (e.g. MsLorna vs another Lorna Gmail) are merged by Master Admin. New sign-up / profile complete refuses a second account when the E.164 mobile is already claimed. **Do not run the live Lorna merge or delete Auth until a Master Admin confirms.**
 
 | Layer | Wiring |
 |---|---|
 | Unifier | Normalized E.164 on `phoneIndex/{p{digits}}` + `users.phoneE164`. Client `phone` remains writable; E.164 / merge fields are backend-only. |
 | Patron | Search + My Profile require mobile (`validateMobile({required:true})`). `claimPatronPhone` before `users` save. `phone_in_use` signs out and returns to `./?profileRequired=sign-in&phoneInUse=1`. Merged docs (`accountStatus: merged` / `mergedInto`) bounce to existing sign-in. Helper `floqr-account-unifier.js`. |
-| Master Admin | Duplicate Records → **Patron accounts (same mobile)**. SOS2FA + `FLOQRReasonPrompt`. Callables `lookupPatronAccounts`, `previewPatronAccountMerge`, `mergePatronAccounts`. Moves Mingl connections, beta `features` union (incl. `mingl`), Inbox `recipientUid`, BOT DEE rooms/threads, blocks. **Never deletes Firebase Auth** (`authDeleted: false`). |
+| Master Admin | Combined on **Demo Worker Mgmt** (`#demoEmployees`, card `#demoPatronAccountMerge`) and still on Duplicate Records (`#duplicateRecords`, alias `#patronAccountMerge`) so the card does not leak onto other tabs. One **Find patron** per column plus Preview / Merge. SOS2FA + `FLOQRReasonPrompt`. Callables `lookupPatronAccounts`, `previewPatronAccountMerge`, `mergePatronAccounts`. Moves Mingl connections, beta `features` union (incl. `mingl`), Inbox `recipientUid`, BOT DEE rooms/threads, blocks. **Never deletes Firebase Auth** (`authDeleted: false`). Chrome copy is operator-neutral (Master Admin, not a named person). |
 | Audit | Chained `account.merged` on `featureServiceAuditLogs`. Unchained `account.phone_claimed` / `account.phone_denied`. Agent clients stamp `actorEmail: "agent"`. No client IP on `users` or `phoneIndex`. |
 | Rules | `phoneIndex` Functions-only. `mergedInto`, `mergedFromUids`, `accountStatus`, `linkedAuthUids`, `phoneE164`, `phoneNormalized` in `hasBackendOnlyIdentityFields`. |
-| Deploy | Functions subset tag `[firebase-deploy-accounts]` (claim/lookup/preview/merge). **Do not tag or deploy until Don asks.** Pages cache-bust s3.3.052. |
+| Deploy | Functions subset tag `[firebase-deploy-accounts]` (claim/lookup/preview/merge). Pages cache-bust s3.3.069. |
 | Help | `help-profile-mobile` (patron, required mobile) · `help-patron-account-merge` (masterAdmin, English). |
 | Classification | `phoneIndex` secret PII; `users` merge/E.164 fields; system job `patronAccountUnifier`. Movable in-region; no stored IP. |
 | Tests | `functions/account-unifier.test.js`, rules `phoneIndex` block, i18n chrome +12 keys × 11 langs. |
 
-Mingl Search tile for Lorna is a separate change (`floqr-feature-services.js`). After Don confirms the live merge, the surviving uid must keep `betaTesters.features.mingl=1`.
+Mingl Search tile for Lorna is a separate change (`floqr-feature-services.js`). After a Master Admin confirms the live merge, the surviving uid must keep `betaTesters.features.mingl=1`.
+
+## Demo Worker Mgmt (s3.3.069)
+
+Master Admin → Entity Management → **Demo Worker Mgmt**. One-time sign-in codes for `temp_*@floqr-demo.com` workers when email OTP is not arriving.
+
+| Layer | Wiring |
+|---|---|
+| Surfaces | Nav pill + panel h1 `master.demoEmployees` (“Demo Worker Mgmt”). Panel id / hash **`#demoEmployees`** (unchanged). Alias `#demoWorkerMgmt` → same panel. Redirect `demo-signin.html` → `#demoEmployees`. |
+| Lookup | **Find demo worker** (`#demoEmpSearch`) + **Generate code**, and same-mobile **Find patron** / Preview / Merge (`#demoPatronAccountMerge`). Duplicate Records keeps `#patronAccountMerge`. |
+| Client | `master-demo-employees.js` (`FLOQRMasterDemoEmployees.mount`). SOS2FA Entity Management gate. Reason via `FLOQRReasonPrompt` after Generate. |
+| Backend | `issueDemoSignInCode`. Audit `demo.signin_code_issued`. |
+| Help | `help-master-demo-signin` (masterAdmin). BOT DEE link label Demo Worker Mgmt, hash `#demoEmployees`. |
+| Chrome | `master.demoEmployees` / `.find` / `.select` in all 11 langs. Operator-neutral (no named person). |
+| Tests | `functions/demo-signin.test.js`. Diagnostics `s3-3-065-demo-worker-mgmt`. |
 
 ---
 
