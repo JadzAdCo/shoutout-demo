@@ -1,0 +1,77 @@
+# Publishes the site. functions/help-verbiage-master-source.json is not in git.
+# The stage step fails if that path comes back. Master Admin raw help is in
+# Firestore helpVerbiageMasterSource/catalog, read by the scheduled function.
+name: Publish GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stage:
+    name: Stage site without master help source
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Stage site and keep master help out of git
+        run: |
+          node scripts/stage-pages-site.js "$RUNNER_TEMP/pages-site"
+          test ! -e "$RUNNER_TEMP/pages-site/functions/help-verbiage-master-source.json"
+          test ! -e functions/help-verbiage-master-source.json
+          test -f "$RUNNER_TEMP/pages-site/index.html"
+
+  deploy:
+    name: Publish GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: stage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Stage site without the master help file
+        run: |
+          node scripts/stage-pages-site.js "$RUNNER_TEMP/pages-site"
+          test ! -e "$RUNNER_TEMP/pages-site/functions/help-verbiage-master-source.json"
+          test ! -e functions/help-verbiage-master-source.json
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/pages-site
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

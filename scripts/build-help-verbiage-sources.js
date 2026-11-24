@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-/* Split Master Admin–only help out of the public Pages script and refresh
-   the Functions source catalogs plus the public lasttextenhun snapshot.
-   Usage: node scripts/build-help-verbiage-sources.js [--check] */
+/* Refresh the public help catalogs and the public lasttextenhun snapshot.
+   Master Admin raw text is not written here. It lives in Firestore
+   helpVerbiageMasterSource/catalog. Usage: node scripts/build-help-verbiage-sources.js [--check] */
 "use strict";
 
 const fs = require("fs");
@@ -13,7 +13,8 @@ const {buildCatalog, serialize: serializeCatalog} = require("./build-bot-dee-sea
 const ROOT = path.resolve(__dirname, "..");
 const REPO = path.join(ROOT, "botdee-help-repository.js");
 const PUBLIC_OUT = path.join(ROOT, "functions", "help-verbiage-public-source.json");
-const MASTER_OUT = path.join(ROOT, "functions", "help-verbiage-master-source.json");
+const MASTER_JSON = path.join(ROOT, "functions", "help-verbiage-master-source.json");
+const MASTER_AUDIENCES = path.join(ROOT, "functions", "help-verbiage-master-audiences.json");
 const SNAPSHOT = path.join(ROOT, "help-verbiage-snapshot.js");
 const SNAPSHOT_JSON = path.join(ROOT, "functions", "help-verbiage-public-snapshot.json");
 const CLASSES = path.join(ROOT, "functions", "botdee-content-classes.json");
@@ -54,50 +55,6 @@ function pack(entry) {
     page: entry.page || "",
     source: entry.source || ""
   };
-}
-
-function endOfObject(src, start) {
-  let depth = 0;
-  let quote = "";
-  for (let i = start; i < src.length; i += 1) {
-    const ch = src[i];
-    if (quote) {
-      if (ch === "\\") {
-        i += 1;
-        continue;
-      }
-      if (ch === quote) quote = "";
-      continue;
-    }
-    if (ch === "\"" || ch === "'" || ch === "`") {
-      quote = ch;
-      continue;
-    }
-    if (ch === "{") depth += 1;
-    else if (ch === "}") {
-      depth -= 1;
-      if (depth === 0) return i;
-    }
-  }
-  throw new Error("Unclosed help object");
-}
-
-function stripMasterEntries(src, ids) {
-  let out = src;
-  ids.forEach(id => {
-    const needle = `id: "${id}"`;
-    const at = out.indexOf(needle);
-    if (at < 0) return;
-    const start = out.lastIndexOf("{", at);
-    const end = endOfObject(out, start);
-    let cut = end + 1;
-    while (out[cut] === " " || out[cut] === "\t" || out[cut] === "\r") cut += 1;
-    if (out[cut] === ",") cut += 1;
-    if (out[cut] === "\r") cut += 1;
-    if (out[cut] === "\n") cut += 1;
-    out = out.slice(0, start) + out.slice(cut);
-  });
-  return out;
 }
 
 function snapshotModule(records) {
@@ -150,11 +107,14 @@ function rebuildDerived() {
 }
 
 function check() {
+  if (fs.existsSync(MASTER_JSON)) {
+    throw new Error("functions/help-verbiage-master-source.json must not be in git. Seed Firestore instead.");
+  }
   const publicRows = JSON.parse(fs.readFileSync(PUBLIC_OUT, "utf8"));
-  const masterRows = JSON.parse(fs.readFileSync(MASTER_OUT, "utf8"));
+  const masterAudiences = JSON.parse(fs.readFileSync(MASTER_AUDIENCES, "utf8"));
   const live = loadEntries(REPO).map(pack).sort((a, b) => a.id.localeCompare(b.id));
   const liveIds = new Set(live.map(row => row.id));
-  masterRows.forEach(row => {
+  masterAudiences.forEach(row => {
     if (!isMasterOnly(row)) throw new Error(`${row.id} is not master-only`);
     if (liveIds.has(row.id)) throw new Error(`${row.id} is still in the Pages script`);
   });
@@ -167,30 +127,23 @@ function check() {
   if (!embedded.includes(JSON.stringify(snapshot[0] && snapshot[0].id))) {
     throw new Error("Pages script is missing the public snapshot");
   }
-  console.log(`help verbiage sources ok (${publicRows.length} public, ${masterRows.length} master, ${snapshot.length} snapshot)`);
+  console.log(`help verbiage sources ok (${publicRows.length} public, ${masterAudiences.length} master audiences, ${snapshot.length} snapshot)`);
 }
 
 function extract() {
   const before = loadEntries(REPO);
-  const master = before.filter(isMasterOnly).map(pack).sort((a, b) => a.id.localeCompare(b.id));
-  if (!master.length && fs.existsSync(MASTER_OUT)) {
-    const publicRows = before.filter(entry => !isMasterOnly(entry)).map(pack).sort((a, b) => a.id.localeCompare(b.id));
-    writeJson(PUBLIC_OUT, publicRows);
-    writeSnapshot(buildSnapshotRecords());
-    rebuildDerived();
-    return;
+  const master = before.filter(isMasterOnly);
+  if (master.length) {
+    throw new Error(`Master-only help is in the Pages script (${master.map(row => row.id).join(", ")}). Remove it there and seed Firestore with scripts/seed-help-verbiage-master.js. This script does not write functions/help-verbiage-master-source.json.`);
   }
-  writeJson(MASTER_OUT, master);
-  const stripped = stripMasterEntries(fs.readFileSync(REPO, "utf8"), master.map(row => row.id));
-  fs.writeFileSync(REPO, stripped);
-  const after = loadEntries(REPO);
-  const leaked = after.filter(isMasterOnly);
-  if (leaked.length) throw new Error(`still public: ${leaked.map(row => row.id).join(", ")}`);
-  const publicRows = after.map(pack).sort((a, b) => a.id.localeCompare(b.id));
+  if (fs.existsSync(MASTER_JSON)) {
+    throw new Error("Refusing to leave functions/help-verbiage-master-source.json in the tree.");
+  }
+  const publicRows = before.map(pack).sort((a, b) => a.id.localeCompare(b.id));
   writeJson(PUBLIC_OUT, publicRows);
   writeSnapshot(buildSnapshotRecords());
   rebuildDerived();
-  console.log(`Wrote ${publicRows.length} public, ${master.length} master`);
+  console.log(`Wrote ${publicRows.length} public help entries`);
 }
 
 if (process.argv.includes("--check")) check();

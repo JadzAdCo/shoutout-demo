@@ -752,9 +752,9 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 | Seed | Patron What's New lines and Version SMARTview help are the first `lasttextenhun` (`seeded: 1`, flag 1) until that entry's scheduled pass publishes. |
 | Pages | `help-verbiage-snapshot.js` and the copy inside `botdee-help-repository.js`. No master-only text. No Gemini on the version card, a `?` popout, or any paint path. |
 | Read | Callable `getHelpVerbiage` (signed in, `filterContent`). `contextualSearch` replaces a result label/blurb from a published non-master `lasttextenhun` when the session loads it. |
-| Rules | `helpVerbiage` client read/write off. `helpVerbiageAudit` Master Admin read, client write off. Not `translationOverrides`. |
+| Rules | `helpVerbiage` client read/write off. `helpVerbiageMasterSource` client read/write off. `helpVerbiageAudit` Master Admin read, client write off. Not `translationOverrides`. |
 | Audit | Help id, flag before/after, `lasttextenhun` before/after, source hash, model id, outcome. No client IP. Agent probes: `actorRole` / `actorEmail` `agent`. Gemini rows also go to `geminiApiAccessLogs`. |
-| Source split | Public entries: `functions/help-verbiage-public-source.json`. Master-only entries: `functions/help-verbiage-master-source.json` (not a Pages script). Rebuild: `node scripts/build-help-verbiage-sources.js`. |
+| Source split | Public entries: `functions/help-verbiage-public-source.json`. Master-only raw title and body: Firestore `helpVerbiageMasterSource/catalog`, read by `scheduledHelpVerbiageEnhance` with the Admin SDK. `functions/help-verbiage-master-audiences.json` stores id and audience only. Seed from a local file that is not committed: `node scripts/seed-help-verbiage-master.js --file <path>` (add `--apply --confirm-project shoutoutdemo-5b402` to write). Rebuild public catalogs: `node scripts/build-help-verbiage-sources.js`. |
 
 ## BOT DEE intent search (plain-language router)
 

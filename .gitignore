@@ -10,6 +10,7 @@ configstore/
 # Publish staging clones
 .publish-*/
 so-main-publish/
+_site/
 
 # Local scrape / scratch dumps (underscore-prefixed probe outputs)
 functions/scripts/_*.json
@@ -60,6 +61,7 @@ scripts/__pycache__/
 # Accounts management profile (real values stay local)
 config/accounts-profile.local.json
 config/*.local.json
+config/help-verbiage-master.local.json
 
 # Features SMARTview unverified ingest (never patron-facing)
 features-smartview/ingest-cache.json

@@ -3,6 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const core = require("./help-verbiage-core");
 const fns = require("./help-verbiage-functions");
@@ -222,6 +223,60 @@ test("seeded What's New and Version sentences are the first lasttextenhun", () =
   assert.equal(snapshot.some(row => row.id === "whatsnew-s3.3.055"), true);
 });
 
+test("master help text is not in git and the scheduled job reads Firestore", async () => {
+  const {stagePagesSite, OMITTED_FILES} = require("../scripts/stage-pages-site");
+  const seed = require("../scripts/seed-help-verbiage-master");
+  assert.equal(fs.existsSync(path.join(root, "functions/help-verbiage-master-source.json")), false);
+  assert.doesNotMatch(read("functions/help-verbiage-functions.js"), /help-verbiage-master-source\.json/);
+  assert.match(read("functions/help-verbiage-functions.js"), /helpVerbiageMasterSource/);
+  const audiences = JSON.parse(read("functions/help-verbiage-master-audiences.json"));
+  assert.ok(audiences.some(row => row.id === "help-features-services"));
+  assert.equal(audiences.some(row => row.body || row.title), false);
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "floqr-pages-"));
+  const repo = path.join(tmp, "repo");
+  const dest = path.join(tmp, "site");
+  fs.mkdirSync(path.join(repo, "functions"), {recursive: true});
+  fs.writeFileSync(path.join(repo, "index.html"), "<html></html>");
+  fs.writeFileSync(path.join(repo, "functions", "help-verbiage-master-source.json"), "[{\"id\":\"help-features-services\"}]");
+  stagePagesSite(repo, dest);
+  assert.deepEqual([...OMITTED_FILES], ["functions/help-verbiage-master-source.json"]);
+  assert.equal(fs.existsSync(path.join(dest, "functions", "help-verbiage-master-source.json")), false);
+  const outside = path.join(tmp, "catalog.json");
+  fs.writeFileSync(outside, JSON.stringify([
+    {id: "help-features-services", title: "Features", body: "Master only body.", audiences: ["masterAdmin"], searchPhrases: ["enable beta feature"]}
+  ]));
+  const mixed = path.join(tmp, "mixed.json");
+  fs.writeFileSync(mixed, JSON.stringify([
+    {id: "help-features-services", title: "Features", body: "Master only body.", audiences: ["masterAdmin"]},
+    {id: "help-public-leak", title: "Public", body: "No.", audiences: ["patron"]}
+  ]));
+  const entries = seed.readEntries(outside);
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].id, "help-features-services");
+  assert.throws(() => seed.readEntries(mixed), /Master Admin only/);
+  assert.throws(() => seed.assertSeedFileAllowed(path.join(root, "functions/help-verbiage-functions.js")));
+  const db = {
+    collection(name) {
+      return {doc(id) {
+        return {async get() {
+          assert.equal(name, fns.MASTER_SOURCE_COLLECTION);
+          assert.equal(id, fns.MASTER_SOURCE_DOC);
+          return {exists: true, data: () => ({entries: [...entries, {id: "help-public-leak", title: "Public", body: "No.", audiences: ["patron"]}]})};
+        }};
+      }};
+    }
+  };
+  const loaded = await fns.loadCatalog(db);
+  assert.ok(loaded.entries.some(row => row.id === "help-features-services" && row.body === "Master only body."));
+  assert.equal(loaded.entries.some(row => row.id === "help-public-leak"), false);
+  const empty = await fns.loadCatalog({collection() { return {doc() { return {async get() { return {exists: false, data: () => ({})}; }}; }}; }});
+  assert.equal(empty.entries.some(row => row.id === "help-features-services"), false);
+  const workflow = read(".github/workflows/publish-github-pages.yml");
+  assert.match(workflow, /node scripts\/stage-pages-site\.js/);
+  assert.match(workflow, /test ! -e functions\/help-verbiage-master-source\.json/);
+  assert.doesNotMatch(workflow, /floqmediaOidcExchange|firebase deploy/);
+});
+
 test("public Pages files do not carry master-only help or a Gemini paint call", () => {
   const repo = read("botdee-help-repository.js");
   const snapshot = read("help-verbiage-snapshot.js");
@@ -235,6 +290,7 @@ test("public Pages files do not carry master-only help or a Gemini paint call", 
     assert.doesNotMatch(src, /generativelanguage\.googleapis/, file);
   }
   const rules = read("firestore.rules");
+  assert.match(rules, /match \/helpVerbiageMasterSource\/\{id\} \{\s*allow read, write: if false;/);
   assert.match(rules, /match \/helpVerbiage\/\{id\} \{\s*allow read, write: if false;/);
   assert.match(rules, /match \/helpVerbiageAudit\/\{id\} \{\s*allow read: if isMasterAdmin\(\);\s*allow create, update, delete: if false;/);
 });
@@ -242,6 +298,9 @@ test("public Pages files do not carry master-only help or a Gemini paint call", 
 test("system job refuses patron collections and the agent probe is not a patron", async () => {
   assert.throws(() => dc.systemJob("helpVerbiageEnhance", "users"));
   assert.equal(dc.normalize("helpVerbiage", null).isPublicAccessible, 0);
+  assert.equal(dc.normalize("helpVerbiageMasterSource", null).isPublicAccessible, 0);
+  assert.equal(dc.normalize("helpVerbiageMasterSource", null).isMasterAdminAccessible, 0);
+  assert.equal(dc.systemJob("helpVerbiageEnhance", "helpVerbiageMasterSource").collection, "helpVerbiageMasterSource");
   assert.equal(dc.normalize("helpVerbiageAudit", null).isMasterAdminAccessible, 1);
   const actor = fns.auditActorFromRequest({
     auth: {uid: "u1", token: {email: "person@example.com"}},
