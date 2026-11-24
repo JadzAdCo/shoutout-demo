@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.071",
+    "text": "s3.3.071: BOT DEE Room SMARTview: Join Now vs Set a schedule; Search SMARTnotification only if scheduled; Search Join Now opens botdee.html",
+    "audiences": [
+      "botDee"
+    ]
+  },
+  {
     "id": "s3.3.070",
     "text": "s3.3.070: BOT DEE Room SMARTview: invite chips say That's you or Already in this session; no scheduled start",
     "audiences": [

@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.070 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.071 (stable)
 
+- s3.3.071: BOT DEE Room SMARTview: Join Now vs Set a schedule; Search SMARTnotification only if scheduled; Search Join Now opens botdee.html
 - s3.3.070: BOT DEE Room SMARTview: invite chips say That's you or Already in this session; no scheduled start
 - s3.3.069: Demo Worker Mgmt: Find demo worker + Generate code and same-mobile Find patron / Preview / Merge
 - s3.3.068: Patron merge card only on Duplicate Records; one Find patron per column; Master Admin copy (not Don)

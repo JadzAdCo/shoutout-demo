@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.070";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.070";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.071";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.071";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.071",
+      title: "s3.3.071 — BOT DEE Room SMARTview schedule + Search Join Now",
+      checks: [
+        {label:"Schedule + Join Now core", file:"functions/botdee-session-core.js", includes:["PRESENCE_STALE_MS", "roomNotifiesSearch", "lastLogoutShouldClose", "scheduleStartValid"]},
+        {label:"Store schedule/start/list/expire", file:"functions/botdee-session-store.js", includes:["function scheduleRoom", "function startRoom", "function listNotifications", "function expireRooms", "smartNotification: 1"]},
+        {label:"Callables exported", file:"functions/index.js", includes:["scheduleBotDeeRoom", "startBotDeeRoom", "listBotDeeRoomNotifications", "expireBotDeeRooms"]},
+        {label:"Card Join Now vs Set a schedule", file:"botdee-smartview.js", includes:["startBotDeeRoom", "scheduleBotDeeRoom", "data-rs-join-now", "data-rs-set-schedule"]},
+        {label:"Search Join Now opens BOT DEE", file:"smartvisuals-view.js", includes:["listBotDeeRoomNotifications", "botdee.html", "mingl-chat.html"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-071-botdee-room-schedule"]}
+      ]
+    },
     {
       version: "s3.3.070",
       title: "s3.3.070 — BOT DEE invite self vs already member",
@@ -3953,12 +3965,21 @@
       troubleshoot:"No stencil/tag on the card → cached botdee-smartview.js/css before this SHA, or catalog.json not loaded (ensureCatalog). Save still background-only → cached smartvisuals-studio.js. Four SPAAVS cards → cached headless JS. Features page missing tag chips → cached floqr-features-smartview.js. Studio save SOS2FA sentence → unlock Entity Management first. Live venue chat unchanged after Save → Functions deploy of setSmartVisualOverride / executeBotSession pending."
     },
     {
+      id:"s3-3-071-botdee-room-schedule",
+      area:"BOT DEE",
+      feature:"Room SMARTview Join Now vs Set a schedule",
+      changed:"Room SMARTview setup is Join Now or Set a schedule. Join Now opens a live Mingl-friends BOT DEE room and does not paint Search. Set a schedule (future datetime) is the only path that sets smartNotification 1 and lists on Search SMARTnotification for host + invited Mingl friends. Search Join Now opens botdee.html?room=&t= never mingl-chat.html. 4h TTL starts at live open. Last-logout close is additive (every remaining member gone or presence older than 15 minutes). Invite chips That's you / Already in this session from s3.3.070 stay.",
+      howToTest:"1) After Pages publish (do not merge until Don says merge again), hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css / floqr-i18n.js / botdee.html ?v=s3.3.071. Functions deploy of scheduleBotDeeRoom / startBotDeeRoom / listBotDeeRoomNotifications / expireBotDeeRooms is required for live rooms. 2) Sign in with BOT DEE + Mingl. Open Room SMARTview. Confirm Join Now and Set a schedule. Friend chips still That's you / Already in this session. 3) Join Now — room goes live; Search must not show a SMARTnotification for that room. 4) New card: Set a schedule to a future time, invite a Mingl friend. Sign in as that friend on Search — compact invitation appears. Join Now opens botdee.html?room= not mingl-chat.html. 5) Shared Itinerary still says it is night-out notes, not the room clock. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Join Now rooms stay off Search. Scheduled rooms notify host + invitees on Search. Search Join Now lands on BOT DEE. Chips still block self / already-member. Satellite FLOQRSessionShell. 4h TTL from live open; last-logout 15 min additive.",
+      troubleshoot:"No Join Now / Set a schedule → cached botdee-smartview.js before s3.3.071. Join Now paints Search → Functions not this SHA (createRoom/startRoom still smartNotification 1) or listBotDeeRoomNotifications not deployed. Search Join Now opens mingl-chat → cached smartvisuals-view.js. Schedule save past time → expected failed-precondition past. Callable not-found → Functions deploy from origin/main after Don merges. Chips gone → rebase onto main after PR 163 missed."
+    },
+    {
       id:"s3-3-068-botdee-invite-self-member",
       area:"BOT DEE",
       feature:"Room SMARTview invite — self vs already member",
       changed:"Tapping a Mingl friend named Don (or any friend chip) on Room SMARTview failed with generic Mingl friends only / invite already used when that chip was the host or already in the room. Chips now show That's you / Already in the room, listBotDeeRoomFriends returns inviteState, createBotDeeRoomInvite returns failed-precondition with reason, and chat invite Don can mint a real invite for a distinct Mingl friend (exact name match beats host first name).",
-      howToTest:"1) After Pages publish (Don merge), hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js / botdee.html ?v=s3.3.070. Sign in as Don Bans. 2) Open Room SMARTview. Friend chips: the host's own Don chip is disabled with That's you — tap toasts the same copy. 3) Invite a different Mingl friend; their chip becomes Already in the room (disabled). 4) Chat: invite Don — if a distinct friend is named Don, Inbox gets a Room SMARTview invite; if only the host matches, BOT DEE says That's you. 5) Confirm there is no Schedule a time or last-logout expiry control — room lasts up to 4 hours or until the host taps End Room. Display URLs have no ?v=. Mark Succeed/Failed.",
-      expected:"Host can invite a distinct Mingl friend named Don. Self and already-member chips are blocked with clear copy. Chat named invite works. No scheduled-start or last-logout expiry (not built). Satellite session still FLOQRSessionShell.",
+      howToTest:"1) After Pages publish (Don merge), hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js / botdee.html ?v=s3.3.071. Sign in as Don Bans. 2) Open Room SMARTview. Friend chips: the host's own Don chip is disabled with That's you — tap toasts the same copy. 3) Invite a different Mingl friend; their chip becomes Already in the room (disabled). 4) Chat: invite Don — if a distinct friend is named Don, Inbox gets a Room SMARTview invite; if only the host matches, BOT DEE says That's you. 5) Setup row still shows Join Now and Set a schedule (s3.3.071) — chips stay independent of schedule. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Host can invite a distinct Mingl friend named Don. Self and already-member chips are blocked with clear copy. Chat named invite works. Join Now / Set a schedule sit on the same card. Satellite session still FLOQRSessionShell.",
       troubleshoot:"Still Mingl friends only on self → cached botdee-smartview.js / botdee.html before s3.3.070, or Functions not this SHA (listBotDeeRoomFriends / createBotDeeRoomInvite / executeBotSession). Chip tappable and invites self → decorateFriendInviteState missing. Chat invite Don no-ops → inviteNamedGuests not in executeBotSession. Functions deploy required for callables; Pages for chips."
     },
     {
