@@ -177,11 +177,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beenden",
-          "blurb": "Nur der Gastgeber kann eine Room beenden. Beenden belastet niemanden und löscht fremde private Chats nicht. Ein unbezahlter Tab muss zuerst bezahlt oder storniert werden."
+          "blurb": "Nur der Gastgeber kann eine Room beenden. Beenden belastet niemanden und löscht fremde private Chats nicht. Ein unbezahlter Tab muss zuerst bezahlt oder storniert werden. Ein Gast, der geht oder BOT DEE schließt, beendet den Raum nicht. Es gibt keine geplante Startzeit, und der R"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beenden",
-          "blurb": "Nur der Gastgeber kann eine Room beenden. Beenden belastet niemanden und löscht fremde private Chats nicht. Ein unbezahlter Tab muss zuerst bezahlt oder storniert werden."
+          "blurb": "Nur der Gastgeber kann eine Room beenden. Beenden belastet niemanden und löscht fremde private Chats nicht. Ein unbezahlter Tab muss zuerst bezahlt oder storniert werden. Ein Gast, der geht oder BOT DEE schließt, beendet den Raum nicht. Es gibt keine geplante Startzeit, und der R"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Gemeinsamer Tab Room SMARTview",
@@ -1296,11 +1296,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Terminer Room SMARTview",
-          "blurb": "Seul l’hôte peut terminer une room. Terminer ne débite personne et n’efface pas les chats privés des autres. Une addition impayée doit d’abord être payée ou annulée."
+          "blurb": "Seul l’hôte peut terminer une room. Terminer ne débite personne et n’efface pas les chats privés des autres. Une addition impayée doit d’abord être payée ou annulée. Quitter en invité ou fermer BOT DEE ne termine pas la room. Pas d’heure de début planifiée, et la room ne se ferme"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Terminer Room SMARTview",
-          "blurb": "Seul l’hôte peut terminer une room. Terminer ne débite personne et n’efface pas les chats privés des autres. Une addition impayée doit d’abord être payée ou annulée."
+          "blurb": "Seul l’hôte peut terminer une room. Terminer ne débite personne et n’efface pas les chats privés des autres. Une addition impayée doit d’abord être payée ou annulée. Quitter en invité ou fermer BOT DEE ne termine pas la room. Pas d’heure de début planifiée, et la room ne se ferme"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Addition partagée Room SMARTview",
@@ -2415,11 +2415,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
-          "blurb": "Solo el anfitrión puede terminar una room. Terminar no cobra a nadie ni borra chats privados de otros. Una cuenta impagada debe pagarse o anularse primero."
+          "blurb": "Solo el anfitrión puede terminar una room. Terminar no cobra a nadie ni borra chats privados de otros. Una cuenta impagada debe pagarse o anularse primero. Que un invitado salga o cierre BOT DEE no termina la room. No hay inicio programado, y la room no se cierra cuando el último"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
-          "blurb": "Solo el anfitrión puede terminar una room. Terminar no cobra a nadie ni borra chats privados de otros. Una cuenta impagada debe pagarse o anularse primero."
+          "blurb": "Solo el anfitrión puede terminar una room. Terminar no cobra a nadie ni borra chats privados de otros. Una cuenta impagada debe pagarse o anularse primero. Que un invitado salga o cierre BOT DEE no termina la room. No hay inicio programado, y la room no se cierra cuando el último"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Cuenta compartida Room SMARTview",
@@ -3534,11 +3534,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Termina Room SMARTview",
-          "blurb": "Solo l’host può terminare una room. Terminare non addebita nessuno e non cancella le chat private altrui. Un conto non pagato va prima pagato o annullato."
+          "blurb": "Solo l’host può terminare una room. Terminare non addebita nessuno e non cancella le chat private altrui. Un conto non pagato va prima pagato o annullato. Un ospite che esce o chiude BOT DEE non termina la room. Non c’è un orario di inizio, e la room non si chiude quando l’ultimo"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Termina Room SMARTview",
-          "blurb": "Solo l’host può terminare una room. Terminare non addebita nessuno e non cancella le chat private altrui. Un conto non pagato va prima pagato o annullato."
+          "blurb": "Solo l’host può terminare una room. Terminare non addebita nessuno e non cancella le chat private altrui. Un conto non pagato va prima pagato o annullato. Un ospite che esce o chiude BOT DEE non termina la room. Non c’è un orario di inizio, e la room non si chiude quando l’ultimo"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Conto condiviso Room SMARTview",
@@ -4653,11 +4653,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
-          "blurb": "Só o anfitrião pode terminar uma room. Terminar não cobra ninguém nem apaga chats privados de outros. Uma conta por pagar deve ser paga ou anulada primeiro."
+          "blurb": "Só o anfitrião pode terminar uma room. Terminar não cobra ninguém nem apaga chats privados de outros. Uma conta por pagar deve ser paga ou anulada primeiro. Um convidado sair ou fechar BOT DEE não termina a room. Não há início agendado, e a room não fecha quando o último convidad"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
-          "blurb": "Só o anfitrião pode terminar uma room. Terminar não cobra ninguém nem apaga chats privados de outros. Uma conta por pagar deve ser paga ou anulada primeiro."
+          "blurb": "Só o anfitrião pode terminar uma room. Terminar não cobra ninguém nem apaga chats privados de outros. Uma conta por pagar deve ser paga ou anulada primeiro. Um convidado sair ou fechar BOT DEE não termina a room. Não há início agendado, e a room não fecha quando o último convidad"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Conta partilhada Room SMARTview",
@@ -5756,11 +5756,11 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Пригласить друзей Mingl",
-          "blurb": "После Confirm кнопка Invite показывает только друзей Mingl. Каждое приглашение привязано к другу и приходит в Inbox как Review BOT DEE invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги."
+          "blurb": "После Confirm кнопка Invite показывает только друзей Mingl. Каждое приглашение привязано к другу и приходит в Inbox как Review BOT DEE invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги. Если фишка — эт"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Пригласить друзей Mingl",
-          "blurb": "После Confirm кнопка Invite показывает только друзей Mingl. Каждое приглашение привязано к другу и приходит в Inbox как Review BOT DEE invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги."
+          "blurb": "После Confirm кнопка Invite показывает только друзей Mingl. Каждое приглашение привязано к другу и приходит в Inbox как Review BOT DEE invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги. Если фишка — эт"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Войти в сессию BOT DEE",
@@ -5772,11 +5772,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Завершить Room SMARTview",
-          "blurb": "Только хост может завершить room. Завершение никого не списывает и не стирает чужие личные чаты. Неоплаченный общий счёт нужно оплатить или аннулировать сначала."
+          "blurb": "Только хост может завершить room. Завершение никого не списывает и не стирает чужие личные чаты. Неоплаченный общий счёт нужно оплатить или аннулировать сначала. Выход гостя или закрытие BOT DEE не завершает room. Нет запланированного старта, и room не закрывается, когда последни"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Завершить Room SMARTview",
-          "blurb": "Только хост может завершить room. Завершение никого не списывает и не стирает чужие личные чаты. Неоплаченный общий счёт нужно оплатить или аннулировать сначала."
+          "blurb": "Только хост может завершить room. Завершение никого не списывает и не стирает чужие личные чаты. Неоплаченный общий счёт нужно оплатить или аннулировать сначала. Выход гостя или закрытие BOT DEE не завершает room. Нет запланированного старта, и room не закрывается, когда последни"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Общий счёт Room SMARTview",
@@ -6891,11 +6891,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Τέλος Room SMARTview",
-          "blurb": "Μόνο ο οικοδεσπότης μπορεί να τερματίσει μια room. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Ένας απλήρωτος κοινός λογαριασμός πρέπει πρώτα να πληρωθεί ή να ακυρωθεί."
+          "blurb": "Μόνο ο οικοδεσπότης μπορεί να τερματίσει μια room. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Ένας απλήρωτος κοινός λογαριασμός πρέπει πρώτα να πληρωθεί ή να ακυρωθεί. Ένας επισκέπτης που φεύγει ή κλείνει το BOT DEE δεν τερματίζει τη room. Δεν υπάρχει"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Τέλος Room SMARTview",
-          "blurb": "Μόνο ο οικοδεσπότης μπορεί να τερματίσει μια room. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Ένας απλήρωτος κοινός λογαριασμός πρέπει πρώτα να πληρωθεί ή να ακυρωθεί."
+          "blurb": "Μόνο ο οικοδεσπότης μπορεί να τερματίσει μια room. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Ένας απλήρωτος κοινός λογαριασμός πρέπει πρώτα να πληρωθεί ή να ακυρωθεί. Ένας επισκέπτης που φεύγει ή κλείνει το BOT DEE δεν τερματίζει τη room. Δεν υπάρχει"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Κοινός λογαριασμός Room SMARTview",
@@ -8010,11 +8010,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Zakończ Room SMARTview",
-          "blurb": "Tylko gospodarz może zakończyć room. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nieopłacony wspólny rachunek trzeba najpierw zapłacić lub unieważnić."
+          "blurb": "Tylko gospodarz może zakończyć room. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nieopłacony wspólny rachunek trzeba najpierw zapłacić lub unieważnić. Gość, który wychodzi albo zamyka BOT DEE, nie kończy room. Nie ma zaplanowanego startu, a room nie zamy"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Zakończ Room SMARTview",
-          "blurb": "Tylko gospodarz może zakończyć room. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nieopłacony wspólny rachunek trzeba najpierw zapłacić lub unieważnić."
+          "blurb": "Tylko gospodarz może zakończyć room. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nieopłacony wspólny rachunek trzeba najpierw zapłacić lub unieważnić. Gość, który wychodzi albo zamyka BOT DEE, nie kończy room. Nie ma zaplanowanego startu, a room nie zamy"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Wspólny rachunek Room SMARTview",
@@ -9129,11 +9129,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beëindigen",
-          "blurb": "Alleen de host kan een room beëindigen. Beëindigen belast niemand en wist andermans privéchats niet. Een onbetaalde gedeelde tab moet eerst betaald of geannuleerd."
+          "blurb": "Alleen de host kan een room beëindigen. Beëindigen belast niemand en wist andermans privéchats niet. Een onbetaalde gedeelde tab moet eerst betaald of geannuleerd. Een gast die weggaat of BOT DEE sluit beëindigt de room niet. Er is geen geplande start, en de room sluit niet als d"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beëindigen",
-          "blurb": "Alleen de host kan een room beëindigen. Beëindigen belast niemand en wist andermans privéchats niet. Een onbetaalde gedeelde tab moet eerst betaald of geannuleerd."
+          "blurb": "Alleen de host kan een room beëindigen. Beëindigen belast niemand en wist andermans privéchats niet. Een onbetaalde gedeelde tab moet eerst betaald of geannuleerd. Een gast die weggaat of BOT DEE sluit beëindigt de room niet. Er is geen geplande start, en de room sluit niet als d"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "Gedeelde tab Room SMARTview",
@@ -10232,11 +10232,11 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "دعوة أصدقاء Mingl",
-          "blurb": "بعد Confirm يعرض Invite أصدقاء Mingl فقط. كل دعوة مربوطة بذلك الصديق وتصل Inbox كـ Review BOT DEE invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً."
+          "blurb": "بعد Confirm يعرض Invite أصدقاء Mingl فقط. كل دعوة مربوطة بذلك الصديق وتصل Inbox كـ Review BOT DEE invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً. إذا كانت الشريحة أنت أو شخصاً موجوداً في الجلسة تُع"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "دعوة أصدقاء Mingl",
-          "blurb": "بعد Confirm يعرض Invite أصدقاء Mingl فقط. كل دعوة مربوطة بذلك الصديق وتصل Inbox كـ Review BOT DEE invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً."
+          "blurb": "بعد Confirm يعرض Invite أصدقاء Mingl فقط. كل دعوة مربوطة بذلك الصديق وتصل Inbox كـ Review BOT DEE invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً. إذا كانت الشريحة أنت أو شخصاً موجوداً في الجلسة تُع"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "الانضمام إلى جلسة BOT DEE",
@@ -10248,11 +10248,11 @@
         },
         "help:help-botdee-room-smartview-end": {
           "label": "إنهاء Room SMARTview",
-          "blurb": "المضيف فقط يمكنه إنهاء room. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة. يجب دفع الحساب المشترك غير المدفوع أو إلغاؤه أولاً."
+          "blurb": "المضيف فقط يمكنه إنهاء room. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة. يجب دفع الحساب المشترك غير المدفوع أو إلغاؤه أولاً. خروج الضيف أو إغلاق BOT DEE لا يُنهي الـ room. لا يوجد بدء مجدول، ولا تُغلق عندما يسجّل آخر ضيف خروجه — المضيف يضغط End Room أو تنتهي بعد نحو أ"
         },
         "intent:help-botdee-room-smartview-end": {
           "label": "إنهاء Room SMARTview",
-          "blurb": "المضيف فقط يمكنه إنهاء room. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة. يجب دفع الحساب المشترك غير المدفوع أو إلغاؤه أولاً."
+          "blurb": "المضيف فقط يمكنه إنهاء room. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة. يجب دفع الحساب المشترك غير المدفوع أو إلغاؤه أولاً. خروج الضيف أو إغلاق BOT DEE لا يُنهي الـ room. لا يوجد بدء مجدول، ولا تُغلق عندما يسجّل آخر ضيف خروجه — المضيف يضغط End Room أو تنتهي بعد نحو أ"
         },
         "help:help-botdee-room-smartview-tab": {
           "label": "الحساب المشترك Room SMARTview",

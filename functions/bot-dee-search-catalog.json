@@ -611,6 +611,10 @@
         "let s plan a trip to cancun",
         "plan a cancun trip",
         "cancun trip with friends",
+        "schedule a time",
+        "when does the room expire",
+        "last person logs out",
+        "one-time live session",
         "open bot dee",
         "help-botdee-room-smartview"
       ]
@@ -620,11 +624,11 @@
       "id": "help-botdee-room-smartview-end",
       "kind": "help",
       "label": "End Room SMARTview",
-      "blurb": "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first.",
+      "blurb": "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first. A guest leaving or closing BOT DEE does not end the room. There is no scheduled start, and the room does not close when the last g",
       "href": "./botdee.html",
       "phrases": [
         "end room smartview",
-        "only the host can end a room. ending does not charge anyone or erase other people s private chats. an unpaid shared tab must be paid or voided first.",
+        "only the host can end a room. ending does not charge anyone or erase other people s private chats. an unpaid shared tab must be paid or voided first. a guest le",
         "end this room",
         "close room smartview",
         "end group chat bot dee",
@@ -637,15 +641,18 @@
       "id": "help-botdee-room-smartview-invite",
       "kind": "help",
       "label": "Invite Mingl friends",
-      "blurb": "After you confirm Room SMARTview, Invite shows your Mingl friends only. Each invite is bound to that friend and lands in Inbox as Review BOT DEE invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not",
+      "blurb": "After you confirm Room SMARTview, Invite shows your Mingl friends only. Tap a friend to send an Inbox invite (Review BOT DEE invite). If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a ",
       "href": "./botdee.html",
       "phrases": [
         "invite mingl friends",
-        "after you confirm room smartview invite shows your mingl friends only. each invite is bound to that friend and lands in inbox as review bot dee invite. not a pu",
+        "after you confirm room smartview invite shows your mingl friends only. tap a friend to send an inbox invite review bot dee invite . if a chip is you or someone ",
         "invite others to this chat",
         "invite friends bot dee",
         "bring my friends into this conversation",
         "review bot dee invite",
+        "that s you",
+        "already in this session",
+        "cannot invite myself",
         "open bot dee",
         "help-botdee-room-smartview-invite"
       ]
