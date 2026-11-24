@@ -171,7 +171,7 @@
     ["shoutouts", "ownClubStaff", 1, "ShoutOut requests (board text shows on the venue display); Functions-write for paid Stripe fulfill and headless pending submit"],
     ["smartVisualAdPolicy", "master", 0, "SMARTvisuals labeled-ad slot policy (AdSense off; mock fill from authorized tags)"],
     ["smartVisualAuditLogs", "master", 1, "SMARTvisual Studio publish/override/sanitizer denials (actor email; Functions-write)"],
-    ["smartVisualDrafts", "master", 1, "Unpublished SMARTstencil/SMARTbackground drafts; patrons never read"],
+    ["smartVisualDrafts", "master", 1, "SMARTstencil/SMARTbackground drafts; review until SOS2FA approve; patrons never read"],
     ["featuresSmartviewApprovals", "master", 0, "Editorial approval stamps for Features SMARTview public copy; Functions-write; no IP"],
     ["featuresSmartviewDrafts", "master", 0, "Unpublished Features SMARTview ingest drafts; patrons never read; Functions-write"],
     ["featuresSmartviewAuditLogs", "master", 1, "Features SMARTview approve/rollback audit (actor email; Functions-write; no IP)"],
@@ -302,6 +302,9 @@
     ["smartVisualDrafts", "imageChecksumSha256", "master", 0, "SHA-256 of the unpublished raster draft"],
     ["smartVisualDrafts", "contentType", "master", 0, "Draft media type image/svg+xml | image/jpeg | image/png | image/webp"],
     ["smartVisualDrafts", "license", "master", 0, "Optional leftover provenance on older drafts; not required on submit; not patron PII"],
+    ["smartVisualDrafts", "publishedAtMs", "master", 0, "When a Master Admin published a queued draft from Review / Publish"],
+    ["smartVisualDrafts", "publishedByEmail", "master", 1, "Master Admin email that published the queued draft"],
+    ["smartVisualDrafts", "catalogAssetId", "master", 0, "Packaged registry id this draft overlays after approve (e.g. bg-milan)"],
     ["featuresSmartviewApprovals", "publicCopy", "master", 0, "Reviewer-approved patron-facing feature copy; no PR bodies or secrets"],
     ["featuresSmartviewApprovals", "publicCopyReviewer", "master", 1, "Master Admin email that approved Features SMARTview copy"]
   ];

@@ -157,6 +157,7 @@ module.exports = {
   rollbackFeaturesSmartViewCopy: require("./features-smartview-functions").rollbackFeaturesSmartViewCopy,
   classifySmartVisual: require("./smartvisuals-functions").classifySmartVisual,
   publishSmartVisualDraft: require("./smartvisuals-functions").publishSmartVisualDraft,
+  approveSmartVisualDraft: require("./smartvisuals-functions").approveSmartVisualDraft,
   setSmartVisualOverride: require("./smartvisuals-functions").setSmartVisualOverride,
   getSmartVisualAdPolicy: require("./smartvisuals-functions").getSmartVisualAdPolicy
 };

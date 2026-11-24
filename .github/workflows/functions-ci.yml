@@ -223,6 +223,7 @@ jobs:
             add_fns \
               classifySmartVisual \
               publishSmartVisualDraft \
+              approveSmartVisualDraft \
               setSmartVisualOverride \
               getSmartVisualAdPolicy
             echo "SMARTvisuals Studio deploy tagged"
@@ -310,6 +311,7 @@ jobs:
               rollbackFeaturesSmartViewCopy \
               classifySmartVisual \
               publishSmartVisualDraft \
+              approveSmartVisualDraft \
               setSmartVisualOverride \
               getSmartVisualAdPolicy \
               executeBotSession \

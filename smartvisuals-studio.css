@@ -8,8 +8,15 @@
 .sv-studio-card b{display:block;margin-top:6px;font-size:13px}
 .sv-studio-card small{color:inherit;opacity:.75}
 .sv-studio-preview{width:min(100%,420px);max-height:180px;object-fit:contain;background:#0b1520;border-radius:10px}
-.sv-studio-draft{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px solid var(--line,#2b505a)}
+.sv-studio-draft{display:flex;flex-direction:column;gap:6px;padding:12px;margin:0 -12px;border-bottom:1px solid var(--line,#2b505a);cursor:pointer;border-radius:12px}
 .sv-studio-draft img{max-width:220px}
+.sv-studio-draft.is-selected{
+  outline:2px solid var(--accent,#00d4fe);
+  background:color-mix(in srgb, var(--accent,#00d4fe) 12%, transparent)
+}
+.sv-studio-review-toolbar{display:flex;flex-direction:column;gap:8px;margin:0 0 12px}
+.sv-studio-publish{min-height:44px;min-width:120px}
+.sv-studio-publish:disabled{opacity:.55;cursor:not-allowed}
 .sv-studio-example{display:flex;flex-direction:column;gap:4px;padding:10px 0;border-bottom:1px solid var(--line,#2b505a)}
 .sv-studio-ad-example{margin:12px 0;padding:10px 0;border-bottom:1px solid var(--line,#2b505a)}
 .sv-studio-ad-example h4{margin:0 0 8px;font-size:13px}
