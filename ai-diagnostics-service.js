@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.065";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.065";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.066";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.066";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.066",
+      title: "s3.3.066 — Place SMARTview stencil, background, and tags",
+      checks: [
+        {label:"Place card stencil + tags", file:"botdee-smartview.js", includes:["botdee-sv-place-stencil", "placeTagHtml", "smartStencilId"]},
+        {label:"Studio Place assign", file:"smartvisuals-studio.js", includes:["function assignPlaceVisual", "svStudioPlaceStencil", "svStudioPlaceTags", "getSessionId?.(SOS_SCOPE)"], notIncludes:["SPAAVS_SAMPLE"]},
+        {label:"Resolver explicit stencil/tags", file:"smartvisuals-resolver.js", includes:["normalizeSmartViewTags", "explicitPlaceStencilId", "smartTags"]},
+        {label:"Headless still has no SPAAVS sample", file:"botdee-smartview-headless.js", includes:["tagFromSearch", "stampPlaceVisual"], notIncludes:["SPAAVS_SAMPLE", "ENTITY_RULES"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-066-place-smartview-stencil-tags"]}
+      ]
+    },
     {
       version: "s3.3.065",
       title: "s3.3.065 — SMARTvisual Studio SOS2FA session on Save",
@@ -3863,11 +3874,20 @@
       troubleshoot:"Empty ? → cached master-admin.html / botdee-help-repository.js / floqr-i18n-help.js. JPEG still not-svg → client still file.text()+SVG sniff, or Functions still sanitizeSvg only (needs [firebase-deploy] [firebase-deploy-smartvisuals]). WebP works locally but callable denies → Functions not this SHA. Stencil JPEG accepted → stop; stencil-requires-svg must fire. Rights / source still on the form → this SHA not served. 'Entity Management requires a valid SOS2FA session' after Save → live Studio still calls FLOQRSOS2FA.sessionId() (needs s3.3.065). Unlock SOS2FA on Studio, then Save."
     },
     {
+      id:"s3-3-066-place-smartview-stencil-tags",
+      area:"BOT DEE",
+      feature:"Place SMARTview stencil, background, and tags",
+      changed:"Operators can change the SMARTstencil and SMARTbackground on compact Place SMARTview cards and assign tags (persist on smartVisualOverrides, filter in Studio / Features catalog / headless ?tag=). Compact density stays: 28px chrome, 28px stencil, tag chips. SPAAVS sample cards stay removed. SOS2FA still uses getSessionId('entityManagement').",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js / botdee-smartview.js / botdee-smartview.css ?v=s3.3.066. 2) Library: filter by a tag chip. Open a published SMARTbackground or SMARTstencil. Place card type, SMARTbackground, SMARTstencil, and Tags are on the detail. Preview in Place SMARTview — compact Aurelia-style card with illustration, 28px stencil, tag chips, no photo well. 3) Save Place SMARTview assignment needs SOS2FA + reason (Functions deploy pending until Don asks). 4) Open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive — one compact card, no Load SPAAVS sample. 5) Features SMARTview catalog shows category tags and a tag filter. 6) Phone ~390 and desktop ~1280. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Studio can change stencil and background on the compact Place card and attach tags. Headless still mints one generic card, not four SPAAVS cards. Features catalog is the eight-product SMARTview, not Room SMARTvisuals.",
+      troubleshoot:"No stencil/tag on the card → cached botdee-smartview.js/css before this SHA, or catalog.json not loaded (ensureCatalog). Save still background-only → cached smartvisuals-studio.js. Four SPAAVS cards → cached headless JS. Features page missing tag chips → cached floqr-features-smartview.js. Studio save SOS2FA sentence → unlock Entity Management first. Live venue chat unchanged after Save → Functions deploy of setSmartVisualOverride / executeBotSession pending."
+    },
+    {
       id:"s3-3-065-smartvisuals-studio-sos2fa",
       area:"Master Admin",
       feature:"SMARTvisual Studio SOS2FA session on Save",
       changed:"Milan.webp was not rejected. Live Studio called FLOQRSOS2FA.sessionId() which does not exist, so publishSmartVisualDraft sent an empty sos2faSessionId and Functions returned permission-denied 'Entity Management requires a valid SOS2FA session.' Studio now uses getSessionId('entityManagement'), refreshes the ID token, and passes sos2faSessionId on publishSmartVisualDraft / classifySmartVisual. A valid session is reused — no new code request.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js, sos2fa.js, and master-admin-app.js ?v=s3.3.065. 2) Sign in as Master Admin. If SOS2FA is already unlocked from Entity Management, do not Request SOS2FA Code again — Studio must reuse that session. 3) Create / Edit: Name Milan, type SMARTbackground, Art upload Milan.webp. Submit. Reason prompt. Save. Status should be Draft queued for review, not 'Entity Management requires a valid SOS2FA session.' 4) Mark Succeed/Failed.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js, sos2fa.js, and master-admin-app.js ?v=s3.3.066. 2) Sign in as Master Admin. If SOS2FA is already unlocked from Entity Management, do not Request SOS2FA Code again — Studio must reuse that session. 3) Create / Edit: Name Milan, type SMARTbackground, Art upload Milan.webp. Submit. Reason prompt. Save. Status should be Draft queued for review, not 'Entity Management requires a valid SOS2FA session.' 4) Mark Succeed/Failed.",
       expected:"WebP SMARTbackground saves to smartVisualDrafts after SOS2FA unlock + reason. Empty session never reaches the reason prompt. Display URLs have no ?v=.",
       troubleshoot:"Same SOS2FA sentence after Save → cached smartvisuals-studio.js still has sessionId()?. Unlock first. Session expired (different sentence: 'SOS2FA session expired') → Request a new SOS2FA code. File rejected → not this bug; check type SMARTbackground and RIFF/WEBP magic. No Functions redeploy needed for this client fix."
     },
@@ -3885,7 +3905,7 @@
       area:"BOT DEE",
       feature:"SPAAVS sample cards removed from headless SMARTview",
       changed:"botdee-smartview-headless.html no longer mints Product SPAAVS / Travel Mobility Hub / Product Autonomous docking equipment / Vehicle Robotaxi fleet from the SPAAVS Mobility Hub sentence. Load SPAAVS sample is gone. The public host still paints one compact fallback card from pasted authorized text.",
-      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive until botdee-smartview-headless.js?v=s3.3.065 and the page has no Load SPAAVS sample button. No sign-in. 2) Open the old SPAAVS q= URL if you still have it — do not expect four cards titled SPAAVS, Mobility Hub, Autonomous docking equipment, Robotaxi fleet. 3) Interactive: paste a short authorized sentence (not that SPAAVS sample), tap Render SMARTview — one compact card, 28px chrome, no photo well, no invented ratings or dates. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html.",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive until botdee-smartview-headless.js?v=s3.3.066 and the page has no Load SPAAVS sample button. No sign-in. 2) Open the old SPAAVS q= URL if you still have it — do not expect four cards titled SPAAVS, Mobility Hub, Autonomous docking equipment, Robotaxi fleet. 3) Interactive: paste a short authorized sentence (not that SPAAVS sample), tap Render SMARTview — one compact card, 28px chrome, no photo well, no invented ratings or dates. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html.",
       expected:"The four SPAAVS sample cards are gone. Host stays public. Generic authorized text still renders one compact SMARTview. Display URLs unchanged.",
       troubleshoot:"Still four SPAAVS cards → cached botdee-smartview-headless.js from before this SHA. Hard-refresh. 404 → wrong URL. Load SPAAVS sample still visible → cached HTML. Empty host on generic paste → q= missing or prompt-injection filter hit (URLs are ignored)."
     },
@@ -3894,7 +3914,7 @@
       area:"BOT DEE",
       feature:"Headless SMARTview from authorized text",
       changed:"Public botdee-smartview-headless.html turns authorized text into compact Place/info SMARTview cards (fixed template, SMARTbackground, no photo well). Query ?mode=headless&q=… needs no Search sign-in. Not Features catalog. Gemini off. The SPAAVS four-card sample is retired; see s3-3-064-headless-smartview-no-spaavs.",
-      howToTest:"1) After Pages publish, open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive. Hard-refresh until botdee-smartview-headless.js?v=s3.3.065 and there is no Load SPAAVS sample button. No sign-in. 2) Paste a short authorized sentence and tap Render SMARTview. Expect one compact card (kind + name, two-line blurb, scenic SMARTbackground, 28px chrome). No photo well. No invented ratings. 3) Confirm there is no four-card SPAAVS mint. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html.",
+      howToTest:"1) After Pages publish, open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive. Hard-refresh until botdee-smartview-headless.js?v=s3.3.066 and there is no Load SPAAVS sample button. No sign-in. 2) Paste a short authorized sentence and tap Render SMARTview. Expect one compact card (kind + name, two-line blurb, scenic SMARTbackground, 28px chrome). No photo well. No invented ratings. 3) Confirm there is no four-card SPAAVS mint. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html.",
       expected:"Public headless host still renders compact SMARTview from authorized text. SPAAVS sample cards are not present. Sign-in not required. Display URLs unchanged (this host is not an LED board).",
       troubleshoot:"404 → Pages still on a SHA before botdee-smartview-headless.html. Empty host → cached page without the module, or q= missing. Tall photo well → cached botdee-smartview.css before compact Place template. Four SPAAVS cards → cached JS from before this SHA. Cards on Search / Features catalog → wrong URL."
     },

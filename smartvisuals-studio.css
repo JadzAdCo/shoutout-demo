@@ -15,8 +15,19 @@
 .sv-studio-ad-example h4{margin:0 0 8px;font-size:13px}
 .sv-studio-dl{margin:0;padding-left:18px}
 .sv-studio-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:16px}
-.sv-studio-place-kind{display:flex;flex-direction:column;gap:4px;font-size:13px}
-.sv-studio-place-kind select{min-height:40px}
+.sv-studio-place-kind{display:flex;flex-direction:column;gap:4px;font-size:13px;flex:1 1 140px}
+.sv-studio-place-kind select,.sv-studio-place-kind input{min-height:40px}
+.sv-studio-place-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
 .sv-studio-place-preview{max-width:420px}
 .sv-studio-place-preview .botdee-sv-place{margin:0}
+.sv-studio-assign-head{margin:12px 0 4px;font-size:15px}
+.sv-studio-tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.sv-studio-tag{
+  min-height:32px;padding:4px 10px;border-radius:999px;border:1px solid var(--line,#2b505a);
+  background:transparent;color:inherit;cursor:pointer;font-size:12px
+}
+.sv-studio-tag.is-active{
+  border-color:var(--accent,#00d4fe);
+  background:color-mix(in srgb, var(--accent,#00d4fe) 22%, transparent)
+}
 @media (max-width:800px){.sv-studio-layout{grid-template-columns:1fr}}

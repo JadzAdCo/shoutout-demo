@@ -66,8 +66,32 @@
     return finishClip(hay, start, end, limit);
   }
 
+  function resolverApi() {
+    if (typeof globalThis !== "undefined" && globalThis.FLOQRSmartVisualsResolver) {
+      return globalThis.FLOQRSmartVisualsResolver;
+    }
+    try {
+      if (typeof require === "function") return require("./smartvisuals-resolver");
+    } catch (_) { /* optional in this host */ }
+    return null;
+  }
+
+  function stampPlaceVisual(payload) {
+    const api = resolverApi();
+    if (!payload || !api?.resolvePlaceCard) return payload;
+    try {
+      const visual = api.resolvePlaceCard(payload);
+      payload.floqrPublicData = Object.assign({}, payload.floqrPublicData || {}, {
+        smartBackgroundId: visual.backgroundId || "",
+        smartStencilId: visual.stencilId || "",
+        smartTags: Array.isArray(visual.tags) ? visual.tags : []
+      });
+    } catch (_) { /* catalog optional */ }
+    return payload;
+  }
+
   function cardPayload({kind, title, summary}) {
-    return {
+    return stampPlaceVisual({
       schemaVersion: SCHEMA_VERSION,
       kind,
       title: text(title, 160),
@@ -89,7 +113,7 @@
       },
       recommendationExplanation: {},
       actions: []
-    };
+    });
   }
 
   function fallbackCard(source) {
@@ -101,7 +125,7 @@
     });
   }
 
-  function cardsFromAuthorizedText(raw) {
+  function cardsFromAuthorizedText(raw, opts) {
     const source = text(raw, MAX_INPUT);
     if (!source) {
       return {ok: false, reason: "empty-text", geminiUsed: false, views: []};
@@ -109,12 +133,23 @@
     if (injectionHit(source)) {
       return {ok: false, reason: "prompt-injection-ignored", geminiUsed: false, views: []};
     }
+    const views = [fallbackCard(source)];
+    const tag = text(opts && opts.tag, 40);
+    const api = resolverApi();
+    const filtered = tag && api?.cardMatchesSmartViewTag
+      ? views.filter(row => api.cardMatchesSmartViewTag(row, tag))
+      : (tag
+        ? views.filter(row => {
+          const tags = (row.floqrPublicData && row.floqrPublicData.smartTags) || [];
+          return tags.map(String).includes(tag.toLowerCase());
+        })
+        : views);
     return {
       ok: true,
       reason: "authorized-text",
       sourceKind: "authorized-text",
       geminiUsed: false,
-      views: [fallbackCard(source)]
+      views: filtered
     };
   }
 
@@ -134,11 +169,19 @@
     return text(params.get("q") || params.get("text") || "", MAX_INPUT);
   }
 
+  function tagFromSearch(search) {
+    const params = search instanceof URLSearchParams
+      ? search
+      : new URLSearchParams(String(search || ""));
+    return text(params.get("tag") || "", 40);
+  }
+
   return {
     SCHEMA_VERSION,
     cardsFromAuthorizedText,
     clipAround,
     modeFromSearch,
-    queryFromSearch
+    queryFromSearch,
+    tagFromSearch
   };
 });

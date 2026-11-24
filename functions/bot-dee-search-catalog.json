@@ -2859,6 +2859,26 @@
       ]
     },
     {
+      "sourceId": "help:help-smartvisuals-place-assign",
+      "id": "help-smartvisuals-place-assign",
+      "kind": "help",
+      "label": "Place SMARTview stencil, background, and tags",
+      "blurb": "Assign a published SMARTstencil and SMARTbackground to Place SMARTview cards of one type (venue, restaurant, hotel, event, travel). Tags stay with that assignment so operators can filter cards. SOS2FA and a reason are required to save. Patrons still only see published registry ar",
+      "href": "./master-admin.html",
+      "phrases": [
+        "place smartview stencil background and tags",
+        "assign a published smartstencil and smartbackground to place smartview cards of one type venue restaurant hotel event travel . tags stay with that assignment so",
+        "place smartview stencil",
+        "smartbackground assignment",
+        "smartview tags",
+        "change stencil",
+        "change card background",
+        "filter by tag",
+        "smartvisual studio",
+        "help-smartvisuals-place-assign"
+      ]
+    },
+    {
       "sourceId": "help:help-smartvisuals-room",
       "id": "help-smartvisuals-room",
       "kind": "help",
@@ -2894,6 +2914,8 @@
         "smartvisuals library",
         "publish stencil",
         "place smartview background",
+        "place smartview stencil",
+        "smartview tags",
         "venue card background",
         "jpeg png webp",
         "help-smartvisuals-studio"
@@ -4693,6 +4715,22 @@
         "smartstencils",
         "smartbackgrounds",
         "help-smartvisuals-notification"
+      ]
+    },
+    {
+      "sourceId": "intent:help-smartvisuals-place-assign",
+      "id": "help-smartvisuals-place-assign",
+      "kind": "help",
+      "label": "Place SMARTview stencil, background, and tags",
+      "blurb": "Master Admin assigns a published SMARTstencil, SMARTbackground, and tags to Place SMARTview cards.",
+      "href": "./botdee.html",
+      "phrases": [
+        "place smartview stencil background and tags",
+        "master admin assigns a published smartstencil smartbackground and tags to place smartview cards.",
+        "place smartview stencil",
+        "smartview tags",
+        "change card background",
+        "help-smartvisuals-place-assign"
       ]
     },
     {

@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.066",
+    "text": "s3.3.066: Place SMARTview stencil + background assignment and tags (Studio, compact cards, Features catalog filter)",
+    "audiences": [
+      "other"
+    ]
+  },
+  {
     "id": "s3.3.065",
     "text": "s3.3.065: SMARTvisual Studio Save uses Entity Management SOS2FA session (getSessionId), not an empty sessionId()",
     "audiences": [

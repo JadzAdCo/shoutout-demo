@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.065";
+  const VERSION = "s3.3.066";
   const packs = {
     "ru": {
       "help-smartvisuals-create": {

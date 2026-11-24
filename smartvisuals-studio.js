@@ -29,6 +29,7 @@
   let page = "library";
   let filter = "";
   let typeFilter = "all";
+  let tagFilter = "";
   let selectedId = "";
   let reviewSeq = 0;
 
@@ -80,6 +81,31 @@
     return (catalog && catalog.assets) || [];
   }
 
+  function publishedOf(type) {
+    return assets().filter(a => a.type === type && a.approvalStatus === "published");
+  }
+
+  function uniqueAssetTags() {
+    const set = new Set();
+    assets().forEach(a => (a.tags || []).forEach(tag => {
+      const v = String(tag || "").trim();
+      if (v) set.add(v);
+    }));
+    return [...set].sort();
+  }
+
+  function normalizeTags(raw) {
+    const api = root.FLOQRSmartVisualsResolver;
+    if (api?.normalizeSmartViewTags) return api.normalizeSmartViewTags(raw);
+    return String(raw || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean).slice(0, 12);
+  }
+
+  function optionList(rows, selected) {
+    return rows.map(a =>
+      `<option value="${esc(a.id)}"${a.id === selected ? " selected" : ""}>${esc(a.name)} (${esc(a.id)})</option>`
+    ).join("");
+  }
+
   function setPage(name) {
     page = name;
     document.querySelectorAll("[data-sv-studio-page]").forEach(btn => {
@@ -102,12 +128,28 @@
     const host = byId("svStudioLibrary");
     if (!host) return;
     const q = filter.trim().toLowerCase();
+    const tagWant = tagFilter.trim().toLowerCase();
     const rows = assets().filter(a => {
       if (typeFilter !== "all" && a.type !== typeFilter) return false;
+      const tags = (a.tags || []).map(x => String(x).toLowerCase());
+      if (tagWant && !tags.includes(tagWant) && a.category !== tagWant) return false;
       if (!q) return true;
       const hay = [a.id, a.name, a.category, ...(a.tags || []), ...(a.aliases || [])].join(" ").toLowerCase();
       return hay.includes(q);
     });
+    const chipHost = byId("svStudioTagRow");
+    if (chipHost) {
+      const chips = uniqueAssetTags().map(tag =>
+        `<button type="button" class="sv-studio-tag${tag === tagFilter ? " is-active" : ""}" data-sv-tag="${esc(tag)}">${esc(tag)}</button>`
+      ).join("");
+      chipHost.innerHTML = `<button type="button" class="sv-studio-tag${tagFilter ? "" : " is-active"}" data-sv-tag="">${esc(t("sv.placeTagFilterAll", "All tags"))}</button>${chips}`;
+      chipHost.querySelectorAll("[data-sv-tag]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          tagFilter = btn.getAttribute("data-sv-tag") || "";
+          renderLibrary();
+        });
+      });
+    }
     host.innerHTML = rows.map(a => `
       <button type="button" class="sv-studio-card" data-sv-asset="${esc(a.id)}">
         <img src="./${esc(a.path)}" alt="${esc(a.name)}"/>
@@ -124,10 +166,28 @@
     if (count) count.textContent = t("sv.studioCount", "{n} packaged published assets").replace("{n}", String(rows.length));
   }
 
+  function defaultPlacePick(asset) {
+    const bgs = publishedOf("background");
+    const sts = publishedOf("stencil");
+    const backgroundId = asset?.type === "background"
+      ? asset.id
+      : (bgs[0] && bgs[0].id) || "bg-vip-nightlife";
+    let stencilId = asset?.type === "stencil" ? asset.id : "";
+    if (!stencilId && asset?.pairedStencilId) {
+      stencilId = String(asset.pairedStencilId).startsWith("st-")
+        ? asset.pairedStencilId
+        : `st-${asset.pairedStencilId}`;
+    }
+    if (!stencilId) stencilId = (sts.find(s => s.id === "st-location") || sts[0] || {}).id || "st-people";
+    const tags = (asset?.tags || []).join(", ");
+    return {backgroundId, stencilId, tags};
+  }
+
   function showDetail(id) {
     const asset = assets().find(a => a.id === id);
     const box = byId("svStudioDetail");
     if (!box || !asset) return;
+    const pick = defaultPlacePick(asset);
     box.innerHTML = `
       <h3 data-floqr-help-id="help-smartvisuals-create"
         data-floqr-help-title="Create / Edit SMARTvisuals"
@@ -137,7 +197,12 @@
       <img src="./${esc(asset.path)}" alt="${esc(asset.name)}" class="sv-studio-preview"/>
       <p>${esc((asset.tags || []).join(", "))}</p>
       <p class="sub small" data-keep-visible="true">${esc(t("sv.licenseNote", "Original FLOQR illustration. Not a photograph or official mark."))}</p>
-      <p class="sub small">${esc(t("sv.studioPlaceHint", "Place SMARTview cards use a published SMARTbackground, not an empty photo well. SOS2FA and a reason are required to save."))}</p>
+      <h4 class="sv-studio-assign-head"
+        data-floqr-help-id="help-smartvisuals-place-assign"
+        data-floqr-help-title="Place SMARTview stencil, background, and tags"
+        data-floqr-help-search="place smartview stencil|smartbackground assignment|smartview tags"
+        data-floqr-help-body="Assign a published SMARTstencil and SMARTbackground to Place SMARTview cards of one type (venue, restaurant, hotel, event, travel). Tags stay with that assignment so operators can filter cards. SOS2FA and a reason are required to save. Patrons still only see published registry art. This is not Features SMARTview.">${esc(t("sv.assignPlaceCard", "Save Place SMARTview assignment"))}</h4>
+      <p class="sub small">${esc(t("sv.placeAssignHint", "Choose a published SMARTstencil and SMARTbackground for this place type. Tags stay with the assignment. SOS2FA and a reason are required to save."))}</p>
       <p class="button-row sv-studio-place-row">
         <label class="sv-studio-place-kind">${esc(t("sv.placeBgKind", "Place card type"))}
           <select id="svStudioPlaceKind">
@@ -148,19 +213,65 @@
             <option value="travel">${esc(t("botdee.sv.kindTravel", "Travel"))}</option>
           </select>
         </label>
+        <label class="sv-studio-place-kind">${esc(t("sv.placeBackground", "SMARTbackground"))}
+          <select id="svStudioPlaceBackground">${optionList(publishedOf("background"), pick.backgroundId)}</select>
+        </label>
+        <label class="sv-studio-place-kind">${esc(t("sv.placeStencil", "SMARTstencil"))}
+          <select id="svStudioPlaceStencil">${optionList(publishedOf("stencil"), pick.stencilId)}</select>
+        </label>
       </p>
+      <p class="sv-studio-place-row">
+        <label class="sv-studio-place-kind">${esc(t("sv.placeTags", "Tags"))}
+          <input id="svStudioPlaceTags" value="${esc(pick.tags)}" maxlength="200" placeholder="nightlife, dc, venue"/>
+        </label>
+      </p>
+      <p class="sub small">${esc(t("sv.placeTagsHint", "Comma-separated tags on this Place SMARTview (assign, filter, persist)."))}</p>
       <p class="button-row">
         <button type="button" class="buttonlike" data-sv-preview="notify">${esc(t("sv.previewNotify", "Preview in Search SMARTnotification"))}</button>
         <button type="button" class="buttonlike" data-sv-preview="room">${esc(t("sv.previewRoom", "Preview in Room SMARTview"))}</button>
         <button type="button" class="buttonlike" data-sv-preview="place">${esc(t("sv.previewPlace", "Preview in Place SMARTview"))}</button>
-        ${asset.type === "background" ? `<button type="button" class="buttonlike primary" data-sv-assign-place="1">${esc(t("sv.assignPlaceBg", "Use as Place SMARTview background"))}</button>` : ""}
+        <button type="button" class="buttonlike primary" data-sv-assign-place="1">${esc(t("sv.assignPlaceCard", "Save Place SMARTview assignment"))}</button>
       </p>
       <p id="svStudioPlaceStatus" class="status" aria-live="polite"></p>`;
     box.querySelectorAll("[data-sv-preview]").forEach(btn => {
       btn.addEventListener("click", () => previewSurface(btn.getAttribute("data-sv-preview"), asset));
     });
-    box.querySelector("[data-sv-assign-place]")?.addEventListener("click", () => assignPlaceBackground(asset));
+    box.querySelector("[data-sv-assign-place]")?.addEventListener("click", () => assignPlaceVisual(asset));
+    byId("svStudioPlaceKind")?.addEventListener("change", () => fillPlaceOverride(asset));
     try { root.FLOQRHelpAttach?.mountAll?.(box); } catch (_) { /* optional */ }
+    fillPlaceOverride(asset);
+  }
+
+  function placeAssignFields() {
+    return {
+      kind: byId("svStudioPlaceKind")?.value || "venue",
+      backgroundId: byId("svStudioPlaceBackground")?.value || "",
+      stencilId: byId("svStudioPlaceStencil")?.value || "",
+      tags: normalizeTags(byId("svStudioPlaceTags")?.value || "")
+    };
+  }
+
+  async function fillPlaceOverride(asset) {
+    const kind = byId("svStudioPlaceKind")?.value || "venue";
+    const db = root.firebase?.firestore?.();
+    if (!db) return;
+    try {
+      const snap = await db.collection("smartVisualOverrides").doc(`placeSmartView:${kind}`).get();
+      if (!snap.exists) return;
+      const row = snap.data() || {};
+      if (row.backgroundId && byId("svStudioPlaceBackground")) {
+        byId("svStudioPlaceBackground").value = row.backgroundId;
+      }
+      if (row.stencilId && byId("svStudioPlaceStencil")) {
+        byId("svStudioPlaceStencil").value = row.stencilId;
+      }
+      if (Array.isArray(row.tags) && byId("svStudioPlaceTags")) {
+        byId("svStudioPlaceTags").value = row.tags.join(", ");
+      }
+    } catch (_) {
+      /* Master Admin read of overrides is optional until signed in */
+      if (asset) return;
+    }
   }
 
   function previewSurface(kind, asset) {
@@ -171,8 +282,13 @@
       previewPlaceCard(asset, host);
       return;
     }
+    const pick = placeAssignFields();
     const payload = Object.assign(root.FLOQRSmartVisuals?.syntheticCancun?.() || {title: "Cancun Trip", demo: true}, {
-      override: {backgroundId: asset.type === "background" ? asset.id : "bg-bali", stencilId: asset.type === "stencil" ? asset.id : "st-flight", authorized: true}
+      override: {
+        backgroundId: pick.backgroundId || (asset.type === "background" ? asset.id : "bg-bali"),
+        stencilId: pick.stencilId || (asset.type === "stencil" ? asset.id : "st-flight"),
+        authorized: true
+      }
     });
     if (!root.FLOQRSmartVisuals) return;
     if (kind === "notify") root.FLOQRSmartVisuals.mountNotification(host, payload, {onView() { root.FLOQRSmartVisuals.mountRoom(host, payload, {}); }});
@@ -186,8 +302,8 @@
       return;
     }
     if (catalog) root.FLOQRSmartVisualsCatalog = catalog;
-    const kind = byId("svStudioPlaceKind")?.value || "venue";
-    const backgroundId = asset.type === "background" ? asset.id : "";
+    const pick = placeAssignFields();
+    const kind = pick.kind || "venue";
     const html = api.renderCard({
       kind,
       title: kind === "venue" ? "Aurelia" : t("sv.untitled", "Mingl Room"),
@@ -198,15 +314,23 @@
       actions: [{id: "open-public-page", href: "./club-profile.html?location=temp-democlub-1", label: "Open FLOQR Public Page"}],
       sources: [{provider: "FLOQR", reuseRights: "approved"}],
       canonicalFloqrPageId: "temp-democlub-1",
-      floqrPublicData: {city: "Washington, DC", smartBackgroundId: backgroundId}
+      tags: pick.tags,
+      floqrPublicData: {
+        city: "Washington, DC",
+        smartBackgroundId: pick.backgroundId,
+        smartStencilId: pick.stencilId,
+        smartTags: pick.tags
+      }
     });
+    host.hidden = false;
     host.innerHTML = `<div class="sv-studio-place-preview">${html}</div>`;
     try { root.FLOQRChromeScheme?.applyDocument?.(); } catch (_) { /* ignore */ }
   }
 
-  async function assignPlaceBackground(asset) {
+  async function assignPlaceVisual(asset) {
     const status = byId("svStudioPlaceStatus");
-    if (!asset || asset.type !== "background") {
+    const pick = placeAssignFields();
+    if (!pick.backgroundId || !pick.stencilId) {
       if (status) status.textContent = t("sv.studioDenied", "Publish denied.");
       return;
     }
@@ -216,9 +340,8 @@
       return;
     }
     if (needSos2fa(status)) return;
-    const kind = byId("svStudioPlaceKind")?.value || "venue";
     const reason = await reasonPrompt.ask({
-      summary: t("sv.studioPlaceSummary", "SMARTvisuals: set Place SMARTview background"),
+      summary: t("sv.studioPlaceSummary", "SMARTvisuals: set Place SMARTview stencil, background, and tags"),
       minLength: 8
     });
     if (reason == null) {
@@ -226,18 +349,22 @@
       return;
     }
     try {
-      const stencilId = asset.pairedStencilId
-        ? (String(asset.pairedStencilId).startsWith("st-") ? asset.pairedStencilId : `st-${asset.pairedStencilId}`)
-        : "st-location";
       const result = await studioCallable("setSmartVisualOverride", {
-        roomKey: `placeSmartView:${kind}`,
-        backgroundId: asset.id,
-        stencilId,
+        roomKey: `placeSmartView:${pick.kind}`,
+        backgroundId: pick.backgroundId,
+        stencilId: pick.stencilId,
+        tags: pick.tags,
         reason
       });
-      if (status) status.textContent = t("sv.placeBgSaved", "Place SMARTview background saved.")
-        + ` (${result.data?.backgroundId || asset.id})`;
-      previewPlaceCard(asset, byId("svStudioLivePreview") || document.createElement("div"));
+      if (status) {
+        const saved = [result.data?.backgroundId || pick.backgroundId, result.data?.stencilId || pick.stencilId]
+          .concat(result.data?.tags || pick.tags)
+          .join(" · ");
+        status.textContent = t("sv.placeAssignSaved", "Place SMARTview stencil, background, and tags saved.")
+          + ` (${saved})`;
+      }
+      const previewHost = byId("svStudioLivePreview");
+      if (previewHost) previewPlaceCard(asset, previewHost);
     } catch (err) {
       if (status) status.textContent = err?.message || t("sv.studioDenied", "Publish denied.");
     }
@@ -247,15 +374,26 @@
     const host = byId("svStudioExamples");
     if (!host || !root.FLOQRSmartVisualsResolver) return;
     const policy = root.FLOQRSmartVisualsResolver.adPolicy();
-    host.innerHTML = EXAMPLES.map(ex => {
+    const filterEl = byId("svStudioTaggingFilter");
+    const want = normalizeTags(filterEl?.value || "")[0] || "";
+    const rows = EXAMPLES.map(ex => {
       const out = root.FLOQRSmartVisualsResolver.resolve(ex, catalog);
       const ad = root.FLOQRSmartVisualsResolver.selectAd(out, policy);
+      return {ex, out, ad};
+    }).filter(row => {
+      if (!want) return true;
+      const tags = root.FLOQRSmartVisualsResolver.normalizeSmartViewTags(row.out.tags || []);
+      return tags.includes(want);
+    });
+    host.innerHTML = rows.map(({ex, out, ad}) => {
+      const tags = (out.tags || []).join(", ");
       return `<div class="sv-studio-example">
         <strong>${esc(ex.title)}</strong>
         <span>${esc(out.reasonCode)} · ${esc(out.backgroundId)} · ${esc(out.stencilId)} · ${esc(String(Math.round((out.confidence || 0) * 100)))}%</span>
+        <span>${esc(tags)}</span>
         <span>${esc(ad.fill ? ad.reasonCode : ad.reasonCode)} · ${esc(ad.headlineKey || "empty")}${ad.placeLabel ? " · " + esc(ad.placeLabel) : ""}</span>
       </div>`;
-    }).join("");
+    }).join("") || `<p class="sub small">${esc(t("sv.studioEmpty", "No assets match."))}</p>`;
   }
 
   function renderAds() {
@@ -451,6 +589,9 @@
     byId("svStudioTypeFilter")?.addEventListener("change", event => {
       typeFilter = event.target.value;
       renderLibrary();
+    });
+    byId("svStudioTaggingFilter")?.addEventListener("input", () => {
+      if (page === "tagging") renderTagging();
     });
     document.querySelectorAll("[data-sv-studio-page]").forEach(btn => {
       btn.addEventListener("click", () => setPage(btn.getAttribute("data-sv-studio-page")));

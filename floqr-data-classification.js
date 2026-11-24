@@ -175,7 +175,7 @@
     ["featuresSmartviewApprovals", "master", 0, "Editorial approval stamps for Features SMARTview public copy; Functions-write; no IP"],
     ["featuresSmartviewDrafts", "master", 0, "Unpublished Features SMARTview ingest drafts; patrons never read; Functions-write"],
     ["featuresSmartviewAuditLogs", "master", 1, "Features SMARTview approve/rollback audit (actor email; Functions-write; no IP)"],
-    ["smartVisualOverrides", "master", 0, "Authorized host/admin SMARTvisual asset overrides (Functions-write)"],
+    ["smartVisualOverrides", "master", 0, "Authorized host/admin SMARTvisual asset overrides (backgroundId, stencilId, tags; Functions-write; no IP)"],
     ["smartVisualSelections", "secret", 0, "Cached classification hash → approved asset IDs (Functions-write; no titles stored)"],
     ["sos2faChallenges", "secret", 1, "SOS2FA sign-in challenges"],
     ["sos2faRecoveryAttempts", "secret", 0, "SOS2FA recovery code attempts"],

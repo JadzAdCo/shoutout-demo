@@ -146,6 +146,7 @@ exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
   const stencilId = text(request.data?.stencilId, 80);
   const roomKey = text(request.data?.roomKey, 80);
   if (!roomKey) deny("invalid-argument", "Room key is required.");
+  const tags = resolver.normalizeSmartViewTags(request.data?.tags);
   const probe = resolver.resolve({
     title: "override",
     override: {backgroundId, stencilId, authorized: true}
@@ -154,12 +155,13 @@ exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
   await db.collection(COLLECTIONS.overrides).doc(roomKey).set({
     backgroundId: probe.backgroundId,
     stencilId: probe.stencilId,
+    tags,
     reason,
     updatedByEmail: email,
     updatedAt: FieldValue.serverTimestamp(),
     updatedAtMs: Date.now()
   });
-  return {ok: true, backgroundId: probe.backgroundId, stencilId: probe.stencilId};
+  return {ok: true, backgroundId: probe.backgroundId, stencilId: probe.stencilId, tags};
 });
 
 exports.getSmartVisualAdPolicy = onCall(CALL_OPTS, async request => {
