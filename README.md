@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.071 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.072 (stable)
 
+- s3.3.072: Search SMARTnotification compact glass card matches the original Cancun phone layout; Damon stays demo-only
 - s3.3.071: Room SMARTview Join Now or Set a schedule. A schedule is when the BOT DEE room starts and can appear on Search for invited Mingl friends. Join Now does not.
 - s3.3.070: BOT DEE Room SMARTview: invite chips say That's you or Already in this session; no scheduled start
 - s3.3.069: Demo Worker Mgmt: Find demo worker + Generate code and same-mobile Find patron / Preview / Merge

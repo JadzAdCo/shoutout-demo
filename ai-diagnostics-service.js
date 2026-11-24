@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.071";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.071";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.072";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.072";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.072",
+      title: "s3.3.072 — Search SMARTnotification matches original compact Cancun card",
+      checks: [
+        {label:"Compact Search notify markup", file:"smartvisuals-view.js", includes:["sv-notify-body", "sv-notify-copy", "sv-people-mark", "listBotDeeRoomNotifications"]},
+        {label:"Compact glass CSS", file:"smartvisuals-view.css", includes:["sv-notify-body", ".sv-notify .sv-btn-primary"]},
+        {label:"Tropical travel art", file:"smartvisuals/backgrounds/bali.svg", includes:["baliWater", "baliPlane"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-072-search-smartnotification-match"]}
+      ]
+    },
     {
       version: "s3.3.071",
       title: "s3.3.071 — BOT DEE Room SMARTview schedule + Search Join Now",
@@ -3932,10 +3942,19 @@
       id:"s3-3-038-smartvisuals-search-notification",
       area:"Mingl",
       feature:"Search SMARTnotification + Room SMARTview (Cancun Trip demo)",
-      changed:"SMARTvisuals kit: Search can show a compact Mingl Room Invitation with SMARTbackground + SMARTstencils. Demo only via ?smartvisualInvite=cancun (group rooms are not live). Art is illustration (Cancun → tropical bali + flight stencil), not a photo. Labeled Ad is a mock from tags (Travel partner / Fly to Cancun). Gemini is not called on view.",
-      howToTest:"1) After Pages publish. Open https://jadzadco.github.io/shoutout-demo/?start=search&smartvisualInvite=cancun and hard-refresh. Sign in if Search is gated. 2) Expect a compact Mingl Room Invitation over Search — View Invitation + Not Now, plus a labeled Ad sample. Scenic art is illustration; tags include Travel / Planning. 3) Tap View Invitation — Room SMARTview with RSVP/live chips, BOT-DEE capability row, Join Now, and Travel partner / Fly to Cancun Ad. Join Now must NOT create a live room or charge. 4) Tap Not Now — card dismisses for this tab (sessionStorage). 5) Open without the query — no fabricated Damon invite. 6) Phone ~390 and desktop ~1280. 7) Mark Succeed/Failed.",
-      expected:"Query-gated invitation card matching the two-phone mock hierarchy. Illustration not photo. Labeled Ad shows Travel partner / Fly to Cancun as a sample, not a live advertiser. Join Now does not create a room. No AdSense. Xibo Display URLs have no ?v=.",
-      troubleshoot:"No card → missing query, dismissed sessionStorage floqr.smartvisual.notifyDismissed, or cached index.html without #smartvisualNotificationHost. Wrong city art → resolver missed Cancun alias (should be bg-bali + st-flight). Empty Ad chrome → selectAd/mockFill missing. Card for every patron → overlay must stay query/hash/session gated. Join created a room → stop; this build must only open mingl-chat.html?from=smartvisual."
+      changed:"Compact Search SMARTnotification matches the original phone card: Mingl Room Invitation, host invited you, Cancun Trip tropical art + TRAVEL/PLANNING chips, Let’s plan… BOT-DEE, time, participants, View Invitation / Not Now. Demo query still uses Damon; live Search uses listBotDeeRoomNotifications only (no fabricated Damon for every patron). Art is illustration (bg-bali tropical lagoon + plane), not a photo. Labeled Ad stays on Room SMARTview, not the compact Search card.",
+      howToTest:"1) After Pages publish. Open https://jadzadco.github.io/shoutout-demo/?start=search&smartvisualInvite=cancun and hard-refresh. Sign in if Search is gated. 2) Expect a compact glass Mingl Room Invitation over Search: Damon invited you, tropical Cancun Trip thumbnail with TRAVEL + PLANNING, Let’s plan… BOT-DEE, Today 7:00 PM ET, 5 Participants, cyan View Invitation + Not Now. Demo flag may show. No Ad on this compact card. 3) Tap View Invitation — Room SMARTview with RSVP/live chips, BOT-DEE capability row, Join Now, and Travel partner / Fly to Cancun Ad. Join Now opens botdee.html, not mingl-chat.html. 4) Tap Not Now — card dismisses for this tab (sessionStorage). 5) Open Search without the query while signed out — no fabricated Damon invite. 6) Phone ~390 and desktop ~1280. 7) Mark Succeed/Failed.",
+      expected:"Query-gated compact invitation matching the original phone SMARTnotification. Illustration not photo. No Damon card for every patron. Room overlay still has the labeled mock Ad. Join Now goes to BOT DEE. No AdSense. Xibo Display URLs have no ?v=.",
+      troubleshoot:"No card → missing query, dismissed sessionStorage floqr.smartvisual.notifyDismissed, or cached index.html without #smartvisualNotificationHost. Temple/house art → stale bali.svg (should be tropical lagoon + plane). Full-bleed title-on-art → stale smartvisuals-view.css (needs sv-notify-body). Card for every patron → overlay must stay query/hash/session gated except real listBotDeeRoomNotifications. Join opened mingl-chat.html → stop."
+    },
+    {
+      id:"s3-3-072-search-smartnotification-match",
+      area:"Mingl",
+      feature:"Search SMARTnotification compact Cancun card match",
+      changed:"s3.3.072 restyles the Search compact glass card to Don’s original phone layout and tropical travel illustration. Damon remains demo-only.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/?start=search&smartvisualInvite=cancun until smartvisuals-view.css?v=s3.3.072. 2) Compare to the original phone photo: compact card, Mingl Room Invitation, Damon invited you, Cancun Trip art + TRAVEL PLANNING, Let’s plan… BOT-DEE, Today 7:00 PM ET, 5 Participants, View Invitation / Not Now. 3) Open Search without the query — no Damon card. 4) Phone ~390 and desktop ~1280. 5) Mark Succeed/Failed.",
+      expected:"Compact glass card matches the original hierarchy. Tropical lagoon + plane illustration, not a house/temple silhouette. Unsigned Search without the demo query has no Damon invite.",
+      troubleshoot:"Old house art → cache. Layout still full-bleed → smartvisuals-view.js missing sv-notify-body. Damon on every Search → requestedDemo/listBotDeeRoomNotifications gate broken."
     },
     {
       id:"s3-3-038-smartvisuals-studio",

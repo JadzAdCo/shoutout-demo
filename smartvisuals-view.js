@@ -101,6 +101,12 @@
       override: payload.override
     }, catalog());
     const urls = r.urlsFor(selection, catalog());
+    const bust = url => {
+      if (!url || /[?&]v=/.test(url)) return url;
+      return `${url}${url.includes("?") ? "&" : "?"}v=s3.3.072`;
+    };
+    urls.backgroundUrl = bust(urls.backgroundUrl);
+    urls.stencilUrl = bust(urls.stencilUrl);
     return {...selection, ...urls};
   }
 
@@ -210,10 +216,15 @@
   function renderNotification(payload) {
     const visual = resolveVisual(payload);
     const count = Number(payload.participantCount) || (payload.participants || []).length || 0;
+    /* Compact Search card matches the original phone SMARTnotification:
+       header, thumbnail + title/blurb, time/participants, View Invitation / Not Now.
+       No labeled Ad on this compact card (Room overlay keeps it). Damon is demo-only. */
     return `<article class="sv-notify" data-sv="notification" data-reason="${esc(visual.reasonCode || "")}" data-bg="${esc(visual.backgroundId || "")}">
       <div class="sv-notify-head">
         <div class="sv-kicker">
-          <img class="sv-icon" src="./smartvisuals/stencils/people.svg" alt=""/>
+          <span class="sv-people-mark" aria-hidden="true">
+            <img class="sv-icon" src="./smartvisuals/stencils/people.svg" alt=""/>
+          </span>
           <div>
             <div class="sv-kicker-title">${esc(t("sv.notifyTitle", "Mingl Room Invitation"))}</div>
             <span class="sv-kicker-sub">${esc(payload.inviteeLine || t("sv.youAreInvited", "You are invited to join a Mingl Room."))}</span>
@@ -221,26 +232,28 @@
         </div>
         <button type="button" class="sv-close" data-sv-dismiss aria-label="${esc(t("sv.dismiss", "Close"))}">×</button>
       </div>
-      ${payload.demo ? `<p class="sv-demo-flag">${esc(t("sv.demoFlag", "Demo / synthetic — not a live invitation"))}</p>` : ""}
-      <div class="sv-hero">
-        <img class="sv-bg" src="${esc(visual.backgroundUrl)}" alt="${esc(t("sv.scenicAlt", "Scenic illustration for this room. Not a photograph."))}"/>
-        <img class="sv-stencil" src="${esc(visual.stencilUrl)}" alt=""/>
-        <div class="sv-hero-scrim" aria-hidden="true"></div>
-        <div class="sv-hero-copy">
-          <div class="sv-pills">${pillHtml(visual)}</div>
-          <h2 class="sv-title">${esc(payload.title || t("sv.untitled", "Mingl Room"))}</h2>
+      ${payload.demo ? `<p class="sv-demo-flag sv-demo-flag-compact">${esc(t("sv.demoFlag", "Demo / synthetic — not a live invitation"))}</p>` : ""}
+      <div class="sv-notify-body">
+        <div class="sv-hero">
+          <img class="sv-bg" src="${esc(visual.backgroundUrl)}" alt="${esc(t("sv.scenicAlt", "Scenic illustration for this room. Not a photograph."))}"/>
+          <div class="sv-hero-scrim" aria-hidden="true"></div>
+          <div class="sv-hero-copy">
+            <div class="sv-pills">${pillHtml(visual)}</div>
+            <h2 class="sv-title">${esc(payload.title || t("sv.untitled", "Mingl Room"))}</h2>
+          </div>
+        </div>
+        <div class="sv-notify-copy">
           <p class="sv-blurb">${esc(payload.description || "")}</p>
         </div>
       </div>
       <div class="sv-meta">
-        <span>📅 <b>${esc(payload.scheduledLabel || t("sv.unscheduled", "Time to be confirmed"))}</b></span>
-        <span>👥 <b>${esc(String(count))} ${esc(t("sv.participants", "Participants"))}</b></span>
+        <span class="sv-meta-item"><img src="./smartvisuals/stencils/calendar.svg" alt=""/><b>${esc(payload.scheduledLabel || t("sv.unscheduled", "Time to be confirmed"))}</b></span>
+        <span class="sv-meta-item"><img src="./smartvisuals/stencils/people.svg" alt=""/><b>${esc(String(count))} ${esc(t("sv.participants", "Participants"))}</b></span>
       </div>
       <div class="sv-actions">
         <button type="button" class="sv-btn sv-btn-primary" data-sv-view>${esc(t("sv.viewInvitation", "View Invitation"))} →</button>
         <button type="button" class="sv-btn sv-btn-ghost" data-sv-later>${esc(t("sv.notNow", "Not Now"))}</button>
       </div>
-      ${adSlotHtml(payload, visual, {compact: true})}
     </article>`;
   }
 
