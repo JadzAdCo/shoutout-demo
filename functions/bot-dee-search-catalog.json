@@ -2422,7 +2422,7 @@
       "kind": "help",
       "label": "Patron account merge",
       "blurb": "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted unti",
-      "href": "./master-admin.html?from=botdee",
+      "href": "./master-admin.html?from=botdee#duplicateRecords",
       "phrases": [
         "patron account merge",
         "mslorna and another lorna gmail can be the same person with two auth uids. master admin looks up both accounts previews then merges firestore into one surviving",

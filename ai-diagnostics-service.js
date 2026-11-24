@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.067";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.067";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.068";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.068";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.068",
+      title: "s3.3.068 — Patron merge card on Duplicate Records only; one Find patron per column",
+      checks: [
+        {label:"Merge card inside Duplicate Records", file:"master-admin.html", includes:["id=\"duplicateRecords\"", "id=\"patronAccountMerge\"", "patron-merge-col", "patronMergeLookupSurvivorBtn"]},
+        {label:"Hash alias to Duplicate Records", file:"master-admin-app.js", includes:["patronAccountMerge", "duplicateRecords"]},
+        {label:"Operator-neutral chrome", file:"floqr-i18n.js", includes:["until a Master Admin confirms"], notIncludes:["until Don confirms"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-064-patron-merge-chrome"]}
+      ]
+    },
     {
       version: "s3.3.067",
       title: "s3.3.067 — SMARTvisual Studio Review / Publish",
@@ -3695,6 +3705,15 @@
 
   const MANUAL_FEATURE_TESTS = [
     {
+      id:"s3-3-064-patron-merge-chrome",
+      area:"Master Admin",
+      feature:"Patron accounts (same mobile) only on Duplicate Records; one Find patron per column",
+      changed:"s3.3.064 — Merge card is inside Reports → Duplicate Records. One Find patron under Keep this uid and one under Merge this uid away. Chrome and help say Master Admin, not a named person. Merge still never deletes Firebase Auth.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / admin.css / floqr-i18n.js ?v=s3.3.068. Unlock SOS2FA. 2) Reports → Duplicate Records (#duplicateRecords). Patron accounts (same mobile) is the second card; each column has exactly one Find patron; Preview merge and Merge patron accounts sit below. 3) Open Network Dashboard, Diagnostics, and Features Mgmt → Beta & Testing — the merge card is not there (Beta still has its own Find patron search). 4) Open #patronAccountMerge — lands on Duplicate Records with the card. 5) Confirm sub copy says Master Admin, not Don. Display URLs have no ?v=.",
+      expected:"Card only on Duplicate Records. One Find patron per column. Operator-neutral copy. Auth still not deleted.",
+      troubleshoot:"Card still on every tab → #patronAccountMerge is outside #duplicateRecords (cached master-admin.html). Two Find patron in one row → cached HTML before s3.3.064. Still says Don → cached floqr-i18n.js / botdee-help-repository.js. #patronAccountMerge blanks the page → master-admin-app.js must map that hash to duplicateRecords."
+    },
+    {
       id:"s3-3-035-botdee-place-search",
       area:"BOT DEE",
       feature:"Contextual FLOQR venue search (dining / clubs in a city)",
@@ -3752,10 +3771,10 @@
       id:"s3-3-052-patron-phone-unifier",
       area:"Accounts",
       feature:"Required mobile unifies patrons; Master Admin merge does not delete Auth",
-      changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Live Lorna merge waits for a separate Don confirmation after deploy.",
-      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.053. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until Don separately confirms after deploy. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
+      changed:"s3.3.052 — Create profile and My Profile require E.164 mobile. claimPatronPhone refuses a second account when that mobile is already claimed and returns the patron to existing sign-in. Master Admin Duplicate Records can preview/merge two uids (Mingl, beta, Inbox, BOT DEE) with SOS2FA + reason. Firebase Auth is not deleted. No client IP stored. Live Lorna merge waits for a separate Master Admin confirmation after deploy.",
+      howToTest:"1) After Pages + Functions + rules (`[firebase-deploy-accounts]`). Hard-refresh Search until floqr-account-unifier.js ?v=s3.3.053. 2) New Google/email sign-in: profile complete without mobile must not save. 3) Complete with a mobile already on another FLOQR account — status says same phone / same person and you land on existing sign-in (phone number is not in the URL). 4) Master Admin → SOS2FA → Duplicate Records → Patron accounts: Find patron for both Lorna identities, Preview merge, confirm recommended survivor and authDeleted false. Do not press Merge until a Master Admin separately confirms after deploy. 5) Mark Succeed/Failed. Display URLs have no ?v=.",
       expected:"Mobile required. Duplicate phone cannot create a second live profile. Preview shows both uids and does not delete Auth. Merge is Master Admin + SOS2FA + reason only.",
-      troubleshoot:"Save still optional phone → cached patron-app.js / patron-portal-app.js. Second account created → Functions claimPatronPhone / phoneIndex rules not this SHA. Merge button works without SOS2FA → stop; lookupPatronAccounts must assertSos2faSession. Auth user vanished → mergePatronAccounts must not call deleteUser; revert and wait for Don."
+      troubleshoot:"Save still optional phone → cached patron-app.js / patron-portal-app.js. Second account created → Functions claimPatronPhone / phoneIndex rules not this SHA. Merge button works without SOS2FA → stop; lookupPatronAccounts must assertSos2faSession. Auth user vanished → mergePatronAccounts must not call deleteUser; revert and wait for a Master Admin."
     },
     {
       id:"s3-3-052-mingl-search-tile",
