@@ -1,7 +1,7 @@
 [
   {
     "id": "s3.3.075",
-    "text": "s3.3.075: Room SMARTview shared picks + 60% host election, VIP session popouts (rebased onto s3.3.074)",
+    "text": "s3.3.075: Room SMARTview shared picks + 60% host election, VIP session popouts",
     "audiences": [
       "botDee"
     ]
@@ -11,7 +11,8 @@
     "text": "s3.3.074: Headless ShoutOut collects from template collectableInput1..N",
     "audiences": [
       "botDee"
-    ]
+    ],
+    "whatsNewText": "s3.3.074: BOT DEE can throw a ShoutOut from chat using each template's listed inputs"
   },
   {
     "id": "s3.3.073",
