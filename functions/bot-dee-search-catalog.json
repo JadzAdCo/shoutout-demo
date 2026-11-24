@@ -565,14 +565,16 @@
       "id": "help-botdee-room-smartview-join",
       "kind": "help",
       "label": "Join a BOT DEE session",
-      "blurb": "Open the Inbox invite while signed in as the Mingl friend it was sent to. Wrong account, expired, or revoked invites refuse. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
+      "blurb": "Open the Inbox invite or Search Join Now while signed in as the Mingl friend it was sent to. Join Now opens BOT DEE (not Mingl chat). You and invited Mingl friends share the Room SMARTview group chat; names show for members. Wrong account, expired, or revoked invites refuse. Join",
       "href": "./botdee.html",
       "phrases": [
         "join a bot dee session",
-        "open the inbox invite while signed in as the mingl friend it was sent to. wrong account expired or revoked invites refuse. joining the room is not joining a sha",
+        "open the inbox invite or search join now while signed in as the mingl friend it was sent to. join now opens bot dee not mingl chat . you and invited mingl frien",
         "join room smartview",
         "join this bot dee chat",
         "can my friends join us",
+        "group chat with lorna",
+        "join now search",
         "open bot dee",
         "help-botdee-room-smartview-join"
       ]

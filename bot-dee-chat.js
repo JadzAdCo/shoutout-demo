@@ -32,6 +32,8 @@
   let chatsUiBound = false;
   let pendingJoinToken = "";
   let pendingJoinRoomId = "";
+  let groupPollTimer = 0;
+  let groupRoomId = "";
   let chatTitles = {};
   let liveConversationId = "";
   let storedConversationId = "";
@@ -500,7 +502,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.078";
+    return "s3.3.079";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -1436,6 +1438,7 @@
         try { await global.FLOQRHelpLoader.ensure(); } catch (error) {}
       }
       appendBubble("bot", reply, localizeResults(peopleCard ? [] : data.results), media, views, peopleSearch);
+      if (roomView && roomView.roomId) startGroupSessionPoll(roomView.roomId);
       pushHistory("model", reply);
       if (reply) visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
       if (data.conversationId && /^cv_[0-9a-f]{32}$/.test(String(data.conversationId))) {
@@ -2139,6 +2142,61 @@
     appendBubble("bot", `${t("botdee.recapLead", "Last time:")} ${recap}`);
   }
 
+  function waitWhile(pred, tries = 50, ms = 120) {
+    return new Promise(resolve => {
+      const tick = () => {
+        if (!pred() || tries-- <= 0) return resolve();
+        setTimeout(tick, ms);
+      };
+      tick();
+    });
+  }
+
+  function groupTurnHtml(turns) {
+    return (Array.isArray(turns) ? turns : []).map(row => {
+      const who = row && (row.role === "model" || row.system)
+        ? "BOT DEE"
+        : (row && (row.displayName || row.handle)) || "Member";
+      return `<div class="botdee-sv-room-turn" data-role="${esc(row && row.role || "")}"><b>${esc(who)}</b><span>${esc(row && row.text || "")}</span></div>`;
+    }).join("");
+  }
+
+  function paintGroupSession(data) {
+    const roomId = String((data && data.room && data.room.roomId) || groupRoomId || "").trim();
+    if (!roomId) return;
+    const card = document.querySelector(`[data-rs-room="${CSS.escape(roomId)}"]`);
+    if (!card) return;
+    const members = Array.isArray(data.members) ? data.members : [];
+    const turns = Array.isArray(data.turns) ? data.turns : [];
+    const roster = card.querySelector("[data-rs-roster]");
+    const log = card.querySelector("[data-rs-transcript]");
+    if (roster) {
+      roster.innerHTML = members.map(row => `<span class="botdee-sv-room-chip">${esc(row.displayName || row.handle || "Member")}</span>`).join("");
+    }
+    if (log) log.innerHTML = groupTurnHtml(turns);
+    const countEl = card.querySelector(".botdee-sv-room-stat b");
+    if (countEl && members.length) countEl.textContent = String(members.length);
+  }
+
+  async function refreshGroupSession() {
+    if (!groupRoomId) return;
+    const getFn = callable("getBotDeeRoom");
+    if (!getFn) return;
+    try {
+      const data = (await getFn({roomId: groupRoomId}))?.data || {};
+      if (data.room || Array.isArray(data.members)) paintGroupSession(data);
+    } catch (_) {}
+  }
+
+  function startGroupSessionPoll(roomId) {
+    const id = String(roomId || "").trim();
+    if (!id) return;
+    groupRoomId = id;
+    refreshGroupSession();
+    if (groupPollTimer) clearInterval(groupPollTimer);
+    groupPollTimer = setInterval(refreshGroupSession, 4000);
+  }
+
   function captureJoinToken() {
     try {
       const url = new URL(location.href);
@@ -2154,50 +2212,15 @@
     } catch (_) {}
   }
 
-  async function attachExistingRoom(roomId) {
-    const getFn = callable("getBotDeeRoom");
-    if (!getFn || !roomId) return null;
-    try {
-      const data = (await getFn({roomId}))?.data || {};
-      if (data.ok === false) return null;
-      if (data.room || data.viewerIsHost === true || Array.isArray(data.members)) return data;
-    } catch (_) {}
-    return null;
-  }
-
-  async function acceptPendingInvite() {
-    if (!pendingJoinToken && !pendingJoinRoomId) return {ok: false, message: ""};
-    const token = pendingJoinToken;
-    const roomId = pendingJoinRoomId;
-    const fail = t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.");
-    const finish = ok => {
+  async function completeSearchJoin() {
+    await waitWhile(() => restoreInFlight || byId("botDeeChatForm")?.getAttribute("aria-busy") === "true");
+    if (!pendingJoinToken && !pendingJoinRoomId) return;
+    await sendMessage("I joined this Room SMARTview");
+    if (pendingJoinToken || pendingJoinRoomId) {
+      appendBubble("bot", t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."));
       pendingJoinToken = "";
       pendingJoinRoomId = "";
-      return ok;
-    };
-    if (token) {
-      const fn = callable("acceptBotDeeRoomInvite");
-      if (fn) {
-        try {
-          const data = (await fn({token, roomId: roomId || undefined}))?.data || {};
-          if (data.ok || data.alreadyMember || data.room) return finish({ok: true, message: ""});
-        } catch (error) {
-          if (!roomId) return finish({ok: false, message: error?.message || fail});
-        }
-      } else if (!roomId) {
-        return finish({ok: false, message: fail});
-      }
-    } else if (roomId) {
-      const fn = callable("acceptBotDeeRoomInvite");
-      if (fn) {
-        try {
-          const data = (await fn({token: "", roomId}))?.data || {};
-          if (data.ok || data.alreadyMember || data.room) return finish({ok: true, message: ""});
-        } catch (_) {}
-      }
     }
-    if (roomId && await attachExistingRoom(roomId)) return finish({ok: true, message: ""});
-    return finish({ok: false, message: fail});
   }
 
   function bind(opts = {}) {
@@ -2214,14 +2237,7 @@
     loadFeaturesCatalog();
     restoreOrWelcome();
     if (pendingJoinToken || pendingJoinRoomId) {
-      setTimeout(async () => {
-        const joined = await acceptPendingInvite();
-        if (joined && joined.ok) {
-          sendMessage("I joined this Room SMARTview");
-          return;
-        }
-        appendBubble("bot", (joined && joined.message) || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."));
-      }, 400);
+      completeSearchJoin();
     }
     return {sendMessage, endConversation, getPhase: () => phase, getIdleSeconds: () => idleSeconds};
   }

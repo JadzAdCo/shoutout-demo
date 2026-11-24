@@ -1246,9 +1246,14 @@
         </div>
       </div>
       <div class="botdee-sv-room-stats">
-        <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.participants", "Participants"))}</span><b>${esc(String(count))} / ${esc(String(cap))}</b><small>${esc(t("botdee.rs.includingHost", "including host"))}</small></div>
+        <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.participants", "Participants"))}</span><b>${esc(String((Array.isArray(view.members) && view.members.length) || count))} / ${esc(String(cap))}</b><small>${esc(t("botdee.rs.includingHost", "including host"))}</small></div>
         <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.roomStatus", "Room status"))}</span><b data-rs-status-b>${esc(status)}</b><small>${esc(scheduled ? (scheduleLabel || t("sv.scheduled", "Scheduled")) : (liveOpen || view.roomId ? t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests") : t("botdee.rs.notLiveNote", "Group rooms are not live yet")))}</small></div>
       </div>
+      ${Array.isArray(view.members) && view.members.length ? `<div class="botdee-sv-room-roster" data-rs-roster>${view.members.map(row => `<span class="botdee-sv-room-chip">${esc(row.displayName || row.handle || "Member")}</span>`).join("")}</div>` : (view.roomId ? `<div class="botdee-sv-room-roster" data-rs-roster></div>` : "")}
+      ${view.roomId ? `<div class="botdee-sv-room-transcript" data-rs-transcript>${(Array.isArray(view.turns) ? view.turns : []).map(row => {
+        const who = row && (row.role === "model" || row.system) ? "BOT DEE" : (row && (row.displayName || row.handle)) || "Member";
+        return `<div class="botdee-sv-room-turn" data-role="${esc(row && row.role || "")}"><b>${esc(who)}</b><span>${esc(row && row.text || "")}</span></div>`;
+      }).join("")}</div>` : ""}
       ${activeRoom ? renderCollabStrip(view) : ""}
       ${denied ? `<p class="botdee-sv-room-note">${esc(t("botdee.rs.injectionDenied", "I can’t use private BOT DEE history or host memory for that. Room SMARTview only uses what this group later confirms."))}</p>` : ""}
       ${renderRoomNeedles(view)}

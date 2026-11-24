@@ -936,6 +936,39 @@ body.botdee-sv-overlay-open { overflow: hidden; }
   font-size: 0.7rem;
 }
 .botdee-sv-room-stat b { display: block; font-size: 1.25rem; margin: 0.2rem 0; }
+.botdee-sv-room-roster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.75rem;
+}
+.botdee-sv-room-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 35%, transparent);
+  background: color-mix(in srgb, var(--accent, #00d4fe) 10%, transparent);
+}
+.botdee-sv-room-transcript {
+  max-height: 220px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.7rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 28%, transparent);
+}
+.botdee-sv-room-turn {
+  display: grid;
+  gap: 0.15rem;
+  font-size: 0.85rem;
+}
+.botdee-sv-room-turn b { font-size: 0.72rem; color: var(--accent, #00d4fe); }
 .botdee-sv-room-rows {
   border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 28%, transparent);
   border-radius: 12px;

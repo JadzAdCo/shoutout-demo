@@ -36,6 +36,7 @@ test("intent matrix: explicit / strong / contextual / none / commands / injectio
     ["Invite lorna", "setup"],
     ["invite @lornaawuro", "setup"],
     ["open a room smart card", "setup"],
+    ["I joined this Room SMARTview", "command"],
     ["Who is in this room?", "command"],
     ["What have we decided?", "command"],
     ["Who's paying?", "command"],
@@ -98,6 +99,13 @@ test("share preview is selected facts only — no private thread or SMARTsummary
   assert.equal(view.actions.create, false);
   assert.ok(view.sharePreview.facts.some(row => /Mykonos/i.test(row.label) && row.tentative));
   assert.doesNotMatch(JSON.stringify(view), /usercharacter_analysis|botDeeThreads/);
+});
+
+test("I joined this Room SMARTview is join, not a new setup card", () => {
+  const classified = room.classifyRoomIntent("I joined this Room SMARTview");
+  assert.equal(classified.command, "join");
+  assert.equal(classified.route, "command");
+  assert.notEqual(classified.route, "setup");
 });
 
 test("Invite lorna is a named Room SMARTview invite, not VIP", () => {

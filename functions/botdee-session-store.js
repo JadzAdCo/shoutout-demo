@@ -262,7 +262,7 @@ async function appendTurn(roomId, uid, role, body, extra = {}) {
   return {ok: true};
 }
 
-async function loadTurns(roomId, limit = 12) {
+async function loadTurnRows(roomId, limit = 12) {
   const id = core.text(roomId, 80);
   if (!id) return [];
   const roomSnap = await roomRef(id).get();
@@ -273,7 +273,35 @@ async function loadTurns(roomId, limit = 12) {
   if (snap.empty) {
     snap = await roomRef(id).collection("turns").orderBy("createdAtMs", "desc").limit(Math.max(1, Math.min(24, Number(limit) || 12))).get();
   }
-  return core.sanitizeRoomTurns(snap.docs.map(doc => doc.data()).reverse());
+  return snap.docs.map(doc => doc.data()).reverse();
+}
+
+async function loadTurns(roomId, limit = 12) {
+  return core.sanitizeRoomTurns(await loadTurnRows(roomId, limit));
+}
+
+async function loadMemberTurns(roomId, members, limit = 24) {
+  const rows = await loadTurnRows(roomId, limit);
+  const names = {};
+  (Array.isArray(members) ? members : []).forEach(person => {
+    const id = core.text(person && person.uid, 80);
+    if (id) names[id] = core.text(person.displayName || person.handle, 80);
+  });
+  return rows.map(row => {
+    const uid = core.text(row && row.uid, 80);
+    const role = row && row.role === "user" ? "user" : "model";
+    const system = !!(row && row.system);
+    const textBody = core.stripPrivateSignals(row && (row.text || row.body || ""));
+    if (!textBody) return null;
+    return {
+      uid,
+      role,
+      system,
+      text: textBody,
+      displayName: role === "model" || system ? "BOT DEE" : (names[uid] || "Member"),
+      createdAtMs: Number(row && row.createdAtMs || 0) || 0
+    };
+  }).filter(Boolean);
 }
 
 async function listPendingInviteeUids(roomId) {
@@ -397,7 +425,19 @@ async function acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs}) 
   } else if (roomId) {
     inviteSnap = await findPendingInvite({uid, roomId});
   }
-  if (!inviteSnap || !inviteSnap.exists) return {ok: false, error: "not_found"};
+  if (!inviteSnap || !inviteSnap.exists) {
+    if (roomId) {
+      const liveHost = await loadRoom(roomId);
+      if (
+        liveHost
+        && core.roomIsInviteable(liveHost.data, now)
+        && (core.isCurrentMember(liveHost.data, uid) || core.text(liveHost.data.hostUid, 80) === uid)
+      ) {
+        return {ok: true, alreadyMember: true, room: core.publicRoom(liveHost.id, liveHost.data)};
+      }
+    }
+    return {ok: false, error: "not_found"};
+  }
   const inviteId = inviteSnap.id;
   const invite = inviteSnap.exists ? inviteSnap.data() : null;
   const verdict = core.evaluateInvite(invite, {uid, nowMs: now, roomId});
@@ -881,6 +921,65 @@ async function persistActorRoom(uid, roomId, conversationId) {
   } catch (_) {}
 }
 
+async function sessionSnapshot(live, uid) {
+  const members = await publicMemberList(live.data);
+  const turns = await loadMemberTurns(live.id, members);
+  const waiting = core.roomIsScheduled(live.data) && !core.roomIsOpen(live.data);
+  return {
+    ok: true,
+    alreadyMember: true,
+    waiting,
+    room: core.publicRoom(live.id, live.data),
+    members,
+    turns
+  };
+}
+
+async function attachSession({uid, token, roomId, conversationId, actorEmail, actorRole, nowMs}) {
+  const now = Number(nowMs || Date.now());
+  const actor = core.text(uid, 80);
+  if (!actor) return {ok: false, error: "not_member"};
+  let accepted = null;
+  if (core.isValidInviteToken(token) || roomId) {
+    accepted = await acceptInvite({
+      uid: actor,
+      token: token || "",
+      roomId: roomId || "",
+      actorEmail,
+      actorRole,
+      nowMs: now
+    });
+    if (accepted && accepted.ok && accepted.room && accepted.room.roomId) {
+      roomId = accepted.room.roomId;
+    } else if (accepted && !accepted.ok && accepted.error !== "not_found") {
+      return accepted;
+    }
+  }
+  const id = core.text(roomId, 80);
+  if (!id) return {ok: false, error: "not_found"};
+  let live = await loadRoom(id);
+  if (!live) return {ok: false, error: "not_found"};
+  if (!core.roomIsInviteable(live.data, now)) return {ok: false, error: "closed"};
+  if (!core.isCurrentMember(live.data, actor) && core.text(live.data.hostUid, 80) !== actor) {
+    return {ok: false, error: "not_member"};
+  }
+  if (core.scheduleStartDue(live.data, now) && !core.roomIsOpen(live.data, now)) {
+    const started = await startRoom({
+      uid: actor,
+      roomId: live.id,
+      conversationId: conversationId || live.data.conversationId,
+      actorEmail,
+      actorRole,
+      nowMs: now
+    });
+    if (started && started.ok) {
+      live = await loadRoom(live.id);
+    }
+  }
+  await persistActorRoom(actor, live.id, conversationId || live.data.conversationId);
+  return sessionSnapshot(live, actor);
+}
+
 async function latestInviteableHostRoom({uid, nowMs}) {
   const viewer = core.text(uid, 80);
   const now = Number(nowMs || Date.now());
@@ -970,7 +1069,11 @@ async function startRoom({uid, roomId, conversationId, title, authorizedTitle, a
   }
   const live = await loadRoom(roomId);
   if (!live) return {ok: false, error: "not_found"};
-  if (core.text(live.data.hostUid, 80) !== actor) return {ok: false, error: "not_host"};
+  const isHost = core.text(live.data.hostUid, 80) === actor;
+  const due = core.scheduleStartDue(live.data, now);
+  if (!isHost && !(due && core.isCurrentMember(live.data, actor))) {
+    return {ok: false, error: "not_host"};
+  }
   if (core.roomIsOpen(live.data, now)) {
     return {ok: true, room: core.publicRoom(live.id, live.data), alreadyOpen: true};
   }
@@ -1108,6 +1211,8 @@ async function listNotifications({uid, nowMs}) {
     if (core.roomStatus(row) === "open" && Number(row.expiresAtMs || 0) && Number(row.expiresAtMs) <= now) continue;
     const hostName = await hostDisplayName(row.hostUid);
     const viewerRole = core.text(row.hostUid, 80) === viewer ? "host" : "invitee";
+    const liveOpen = core.roomStatus(row) === "open";
+    const memberPeople = await publicMemberList(row);
     notes.push(core.publicNotification(roomId, row, {
       hostName,
       viewerRole,
@@ -1116,9 +1221,10 @@ async function listNotifications({uid, nowMs}) {
         ? `${hostName} scheduled a Mingl Room.`
         : `${hostName} invited you to join a Mingl Room.`,
       rsvp: viewerRole === "host" ? "accepted" : core.text(meta.invite?.rsvp || meta.invite?.status, 20),
-      scheduledLabel: Number(row.scheduledStartMs || 0)
+      scheduledLabel: !liveOpen && Number(row.scheduledStartMs || 0)
         ? new Date(Number(row.scheduledStartMs)).toLocaleString("en-US", {timeZone: row.scheduledTimeZone || "UTC"})
         : "",
+      participants: core.publicSearchParticipants(memberPeople, {live: liveOpen}),
       placeVisualOverride
     }));
   }
@@ -1439,6 +1545,8 @@ module.exports = {
   appendTurn,
   appendSystemEvent,
   loadTurns,
+  loadMemberTurns,
+  attachSession,
   createInvite,
   findPendingInvite,
   listPendingInviteeUids,

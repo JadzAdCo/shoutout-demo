@@ -134,6 +134,23 @@ function scheduleStartValid(ms, nowMs = Date.now()) {
   return Number(ms || 0) > Number(nowMs || 0) + SCHEDULE_MIN_LEAD_MS;
 }
 
+function scheduleStartDue(row, nowMs = Date.now()) {
+  const start = Number(row?.scheduledStartMs || 0);
+  return start > 0 && start <= Number(nowMs || 0);
+}
+
+function publicSearchParticipants(people, {live} = {}) {
+  return (Array.isArray(people) ? people : []).slice(0, MEMBER_CAP).map(person => {
+    const name = text(person && (person.displayName || person.handle || person.name), 80) || "Member";
+    const initials = name.split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase() || "?";
+    return {
+      name,
+      initials,
+      status: live ? "live" : "accepted"
+    };
+  });
+}
+
 function ttlExpiresAtMs(row, nowMs = Date.now()) {
   const live = Number(row?.liveOpenedAtMs || 0);
   if (live) return live + ROOM_TTL_MS;
@@ -840,6 +857,7 @@ function publicNotification(id, row, extra = {}) {
     joinHref: extra.joinHref || roomHref(id, extra.token || ""),
     viewerRole: text(extra.viewerRole, 20) || "invitee",
     rsvp: text(extra.rsvp, 20) || "",
+    participants: Array.isArray(extra.participants) ? extra.participants.slice(0, MEMBER_CAP) : [],
     backgroundId: text(row?.smartBackgroundId || (visual && visual.backgroundId), 80),
     stencilId: text(row?.smartStencilId || (visual && visual.stencilId), 80),
     tags,
@@ -1047,6 +1065,8 @@ module.exports = {
   roomIsInviteable,
   roomNotifiesSearch,
   scheduleStartValid,
+  scheduleStartDue,
+  publicSearchParticipants,
   ttlExpiresAtMs,
   inviteExpiresAtMs,
   lastLogoutShouldClose,
