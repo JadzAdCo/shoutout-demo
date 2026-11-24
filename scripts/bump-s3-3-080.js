@@ -5,7 +5,7 @@ const path = require("path");
 const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
 const NEXT = "s3.3.080";
 const NEXT_NUM = "3.3.080";
-const NOTE = "BOT DEE VIP reserV still attaches Miami Place SMARTview from mixed input";
+const NOTE = "BOT DEE VIP reserV map at Aurelia plus Miami Place SMARTview on mixed VIP input";
 const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
 function transformHtml(src) {
@@ -33,6 +33,7 @@ function run(root) {
   for (const file of servedJs) edit(file, stripPageLinkVersions);
   edit("floqr-i18n.js", src => src.replace(/const VERSION\s*=\s*"[^"]+"/, `const VERSION = "${NEXT}"`));
   edit("floqr-i18n-help.js", src => src.replace(/const VERSION\s*=\s*"[^"]+"/, `const VERSION = "${NEXT}"`));
+  edit("floqr-i18n-help-runtime.js", src => src.replace(/const VERSION\s*=\s*"[^"]+"/, `const VERSION = "${NEXT}"`));
   edit("ai-diagnostics-service.js", src => src
     .replace(/PREVIEW_LINKS_PACKAGE = "s3\.\d+\.\d+"/, `PREVIEW_LINKS_PACKAGE = "${NEXT}"`)
     .replace(/CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3\.\d+\.\d+"/, `CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "${NEXT}"`));

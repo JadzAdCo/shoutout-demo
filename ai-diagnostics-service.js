@@ -224,12 +224,16 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.080",
-      title: "s3.3.080 — BOT DEE VIP reserV still attaches Miami Place SMARTview",
+      title: "s3.3.080 — BOT DEE VIP reserV map at Aurelia plus Miami Place SMARTview",
       checks: [
         {label:"Conversation place tokens", file:"functions/bot-dee-tools.js", includes:["classifyPlaceSearchFromConversation", "placeAttachQuery"]},
         {label:"VIP does not skip Place attach", file:"functions/bot-dee-functions.js", includes:["!vipExecute || attachPlaceWithRoom", "mergePlaceSmartViews"]},
         {label:"Local VIP keeps Place", file:"functions/bot-dee-functions.js", includes:["destinationPlaceViews", "smartViews: placeViews"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-080-botdee-vip-miami-place", "s3.3.080"]}
+        {label:"Popout loads floor viewer", file:"botdee-vip-popout.html", includes:["vip-floor-viewer.js", "FLOQR_VIP_SKIP_BOOT", "aurelia.json"], notIncludes:["Open VIP reserV from BOT DEE chat to see the floor"]},
+        {label:"Dock hydrates Pages plan", file:"botdee-smartview.js", includes:["hydrateVipMap", "searchParams.set(\"plan\"", "searchParams.set(\"location\"", "VIP_PLAN_BY_CLUB"], notIncludes:["noopener=no"]},
+        {label:"Viewer skip-boot + onSelect", file:"vip-floor-viewer.js", includes:["FLOQR_VIP_SKIP_BOOT", "onSelect"]},
+        {label:"Functions packaged plans", file:"functions/headless-vip-core.js", includes:["path.join(__dirname, \"vip-plans\"", "path.join(__dirname, \"..\", \"vip-plans\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-080-botdee-vip-miami-place", "s3-3-080-botdee-vip-aurelia-map", "s3.3.080"]}
       ]
     },
     {
@@ -3882,10 +3886,19 @@
       id:"s3-3-080-botdee-vip-miami-place",
       area:"BOT DEE",
       feature:"VIP reserV + Miami still attach Place SMARTview",
-      changed:"s3.3.080 — BOT DEE processes mixed VIP reserV + Miami input. VIP execute / follow-up (reservations in Miami, then at Aurelia, then a night) still attaches Place SMARTview (bg-miami, miami tag) beside the VIP card. Place is not swallowed. Floor-map sheet is out of scope.",
+      changed:"s3.3.080 — BOT DEE processes mixed VIP reserV + Miami input. VIP execute / follow-up (reservations in Miami, then at Aurelia, then a night) still attaches Place SMARTview (bg-miami, miami tag) beside the VIP card. Place is not swallowed. Aurelia floor map ships in the same package (see s3-3-080-botdee-vip-aurelia-map).",
       howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee.html / bot-dee-chat.js / botdee-smartview.js ?v=s3.3.080. Sign in with BOT DEE + VIP reserV. 2) Type VIP reservations in Miami — expect VIP reserV card AND Miami Place SMARTview (bg-miami). 3) Reply at Aurelia, then 2026-11-26 — VIP nights/party stay, Miami Place SMARTview remains. 4) Open a room smart card for reservations in Miami still mounts Room SMARTview + Place (regression). 5) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
       expected:"VIP reserV at Aurelia still shows a Miami Place SMARTview card. BOT DEE does not drop the city after a VIP follow-up.",
       troubleshoot:"VIP only, no Place → cached executeBotSession still skips attachVenueSearch when vipExecute; deploy Functions from origin/main with [firebase-deploy-botdee]. Place missing on follow-up → classifyPlaceSearchFromConversation not deployed, or history not loaded. Room-card Miami still works but VIP mix fails → this SHA missing mergePlaceSmartViews. Wrong art → catalog.json not loaded (ensureCatalog) so bg-miami never resolves."
+    },
+      {
+      id:"s3-3-080-botdee-vip-aurelia-map",
+      area:"BOT DEE",
+      feature:"VIP reserV floor map at Aurelia from BOT DEE",
+      changed:"s3.3.080 — Open VIP reserV map from BOT DEE at Aurelia loads vip-plans/aurelia.json in vip-floor-viewer (phone first-area). Dock hydrates the 2D plan from Pages when the callable map is missing. No blank stub sheet. Tracker SMA-34.",
+      howToTest:"1) After Pages publish (Functions optional for this map). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-vip-popout.html / vip-floor-viewer.js ?v=s3.3.080. Sign in with BOT DEE + VIP reserV. New chat. 2) Send at Aurelia (or book a table at Aurelia). VIP reserV dock names Aurelia. 3) Tap a later open night (not Tonight Closed). Area chips and a floor thumbnail must appear — not nights then an empty Table only. 4) Tap Open VIP reserV map. Expect the Aurelia 2D plan (West Booths first on phone), green tables, area chips, pinch-zoom. Not a blank page titled Open VIP reserV map that says open from chat. 5) Tap Mezzanine then V1 — dock Table becomes V1. Hold it still waits for Hold it. 6) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Aurelia BOT DEE VIP shows the floor map on the dock and in the map pop-out. Phone opens an area. Table taps select in chat. No stub overlay.",
+      troubleshoot:"Blank stub sheet → cached botdee-vip-popout.html still has the open-from-chat paragraph, or popout URL missing plan=aurelia.json. Dock still has no area chips → cached botdee-smartview.js (hydrateVipMap) or vip-plans/aurelia.json 404 on Pages. Viewer is decades → plan= query not set (need location=temp-democlub-1). Functions still omit map.imageUrl until deploy; Pages hydrate covers the dock. Functions deny vipReservations → Features & Services VIP still off."
     },
       {
       id:"s3-3-079-botdee-joined-group-chat",

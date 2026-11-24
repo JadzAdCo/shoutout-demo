@@ -63,15 +63,24 @@ function resolveClubQuery(raw) {
   return byName || "";
 }
 
+function planPathCandidates(planFile) {
+  const name = text(planFile, 80);
+  if (!name) return [];
+  return [
+    path.join(__dirname, "vip-plans", name),
+    path.join(__dirname, "..", "vip-plans", name)
+  ];
+}
+
 function loadPlan(clubLocationId) {
   const catalog = betaCatalog[clubLocationId];
   if (!catalog?.planFile) return null;
-  const file = path.join(__dirname, "..", "vip-plans", catalog.planFile);
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch (_) {
-    return null;
+  for (const file of planPathCandidates(catalog.planFile)) {
+    try {
+      if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, "utf8"));
+    } catch (_) { /* try the next packaged path */ }
   }
+  return null;
 }
 
 function sectionsForClub(clubLocationId) {

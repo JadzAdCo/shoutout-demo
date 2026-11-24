@@ -173,6 +173,38 @@ test("VIP follow-up does not swallow people lookup or hello", () => {
   assert.equal(vip.isConfirmHoldPrompt("confirm"), true);
 });
 
+test("Aurelia plan loads from packaged functions/vip-plans", () => {
+  const packaged = path.join(root, "functions/vip-plans/aurelia.json");
+  assert.ok(fs.existsSync(packaged));
+  const plan = vip.loadPlan("temp-democlub-1");
+  assert.ok(plan);
+  assert.match(String(plan.image?.file || ""), /aurelia-floor-map/);
+  assert.ok((plan.areas || []).some(row => /mezzanine/i.test(`${row.name || ""} ${row.defaultName || ""}`)));
+  const core = read("functions/headless-vip-core.js");
+  assert.match(core, /path\.join\(__dirname, "vip-plans"/);
+  assert.match(core, /path\.join\(__dirname, "\.\.", "vip-plans"/);
+});
+
+test("BOT DEE VIP map popout loads the Aurelia floor plan, not a stub sheet", () => {
+  const popout = read("botdee-vip-popout.html");
+  assert.doesNotMatch(popout, /Open VIP reserV from BOT DEE chat to see the floor/);
+  assert.match(popout, /vip-floor-viewer\.js/);
+  assert.match(popout, /vip-map-section/);
+  assert.match(popout, /FLOQR_VIP_SKIP_BOOT/);
+  assert.match(popout, /aurelia\.json/);
+  assert.match(popout, /FLOQRVipFloorViewer/);
+  const smart = read("botdee-smartview.js");
+  assert.match(smart, /function hydrateVipMap/);
+  assert.match(smart, /searchParams\.set\("plan"/);
+  assert.match(smart, /searchParams\.set\("location"/);
+  assert.match(smart, /VIP_PLAN_BY_CLUB/);
+  assert.match(smart, /aurelia\.json/);
+  assert.doesNotMatch(smart, /noopener=no/);
+  const viewer = read("vip-floor-viewer.js");
+  assert.match(viewer, /FLOQR_VIP_SKIP_BOOT/);
+  assert.match(viewer, /onSelect/);
+});
+
 test("VIP dock has a Hold it CTA and strips the demo slug", () => {
   const smart = read("botdee-smartview.js");
   assert.match(smart, /botdee\.vip\.holdIt/);

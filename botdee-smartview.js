@@ -1873,6 +1873,123 @@
     return "";
   }
 
+  const VIP_PLAN_BY_CLUB = Object.freeze({
+    "temp-democlub-1": "aurelia.json",
+    "decades-washington-dc": "decades.json",
+    "lima-twist-washington-dc": "lima-twist.json",
+    "shoko-barcelona-spain": "shoko-barcelona.json"
+  });
+
+  function vipPlanFileForClub(id) {
+    const key = String(id || "").trim();
+    if (VIP_PLAN_BY_CLUB[key]) return VIP_PLAN_BY_CLUB[key];
+    if (/aurelia/i.test(key)) return "aurelia.json";
+    return "";
+  }
+
+  function vipShortAreaName(name) {
+    return String(name || "").replace(/^Area\s+[A-Z]\s*[·•-]\s*/i, "").trim();
+  }
+
+  function vipSectionRect(row) {
+    if (!row) return null;
+    if (row.rect && Number.isFinite(Number(row.rect.w))) {
+      return {
+        x: Number(row.rect.x) || 0,
+        y: Number(row.rect.y) || 0,
+        w: Number(row.rect.w) || 0,
+        h: Number(row.rect.h) || 0
+      };
+    }
+    const box = Array.isArray(row.pixelBox) ? row.pixelBox : null;
+    if (box && box.length === 4) {
+      const w = Number(box[2]) - Number(box[0]) + 1;
+      const h = Number(box[3]) - Number(box[1]) + 1;
+      const imgW = Number(row._w) || 1;
+      const imgH = Number(row._h) || 1;
+      return {x: Number(box[0]) / imgW, y: Number(box[1]) / imgH, w: w / imgW, h: h / imgH};
+    }
+    const c = row.circle;
+    if (c && Number.isFinite(Number(c.cx))) {
+      const rx = Number(c.rx || c.r) || 0;
+      const ry = Number(c.ry || c.r) || rx;
+      return {x: Number(c.cx) - rx, y: Number(c.cy) - ry, w: rx * 2, h: ry * 2};
+    }
+    return null;
+  }
+
+  function mapLiteFromPlan(plan, view, opts = {}) {
+    if (!plan || typeof plan !== "object") return null;
+    const full = !!(opts && opts.full);
+    const file = String(plan.image?.file || "").replace(/^\.\//, "");
+    const areas = (Array.isArray(plan.areas) ? plan.areas : []).map(area => ({
+      id: String(area.id || "").trim(),
+      name: vipShortAreaName(area.name || area.defaultName || area.label),
+      prompt: vipShortAreaName(area.name || area.defaultName || area.label),
+      bounds: area.viewBox || area.bounds || area.rect || null
+    })).filter(area => area.id && area.name);
+    const sectionId = String(view?.sectionId || "").trim();
+    const sectionQuery = String(view?.sectionQuery || "").trim().toLowerCase();
+    let selected = null;
+    if (!full) {
+      if (sectionId) {
+        selected = (plan.areas || []).find(area => (area.sectionIds || []).includes(sectionId)) || null;
+      }
+      if (!selected && sectionQuery) {
+        selected = (plan.areas || []).find(area => {
+          const hay = `${area.id} ${area.name} ${area.defaultName || ""} ${vipShortAreaName(area.name)}`.toLowerCase();
+          return hay.includes(sectionQuery) || sectionQuery.includes(vipShortAreaName(area.name).toLowerCase());
+        }) || null;
+      }
+    }
+    const viewBox = selected
+      ? (selected.viewBox || selected.bounds || selected.rect || {x: 0, y: 0, w: 1, h: 1})
+      : {x: 0, y: 0, w: 1, h: 1};
+    const ids = new Set(selected?.sectionIds || []);
+    const tables = (Array.isArray(plan.sections) ? plan.sections : [])
+      .filter(row => row && row.bookable !== false && (full || !selected || ids.has(row.id)))
+      .map(row => {
+        const rect = vipSectionRect(row);
+        if (!rect || rect.w <= 0 || rect.h <= 0) return null;
+        return {
+          id: String(row.id || "").trim(),
+          label: String(row.label || row.id || "").trim(),
+          prompt: String(row.label || row.id || "").trim(),
+          selected: row.id === sectionId,
+          maxCapacity: Math.max(0, Math.floor(Number(row.maxCapacity) || 0)),
+          status: "available",
+          rect
+        };
+      })
+      .filter(Boolean);
+    return {
+      planFile: String(opts.planFile || "").trim(),
+      imageUrl: file ? `./${file}` : "",
+      selectedAreaId: String(selected?.id || "").trim(),
+      selectedAreaName: selected ? vipShortAreaName(selected.name || selected.defaultName) : "",
+      viewBox,
+      areas,
+      tables: (full || selected) ? tables : []
+    };
+  }
+
+  function hydrateVipMap(view) {
+    const live = view && typeof view === "object" ? view : {};
+    if (live.map && live.map.imageUrl) return Promise.resolve(live);
+    const planFile = vipPlanFileForClub(live.clubLocationId || live.venueName);
+    if (!planFile) return Promise.resolve(live);
+    return fetch(`./vip-plans/${planFile}`, {cache: "no-store"})
+      .then(res => res.ok ? res.json() : null)
+      .then(plan => {
+        if (!plan) return live;
+        const map = mapLiteFromPlan(plan, live, {planFile});
+        const mapFull = mapLiteFromPlan(plan, live, {full: true, planFile});
+        if (!map || !map.imageUrl) return live;
+        return {...live, map, mapFull: mapFull || map, planFile};
+      })
+      .catch(() => live);
+  }
+
   function vipMapHtml(map, {interactive} = {interactive: true}) {
     if (!map || typeof map !== "object" || !map.imageUrl) return "";
     const vb = map.viewBox && typeof map.viewBox === "object" ? map.viewBox : {x: 0, y: 0, w: 1, h: 1};
@@ -1909,12 +2026,14 @@
     const h = Math.min(860, Math.max(480, Math.round(availH * 0.82)));
     const left = Math.max(0, Math.round((availW - w) / 2));
     const top = Math.max(0, Math.round((availH - h) / 2));
-    return `popup=yes,width=${w},height=${h},left=${left},top=${top},noopener=no`;
+    return `popup=yes,width=${w},height=${h},left=${left},top=${top}`;
   }
 
   function storeVipPopoutPayload(payload) {
     try { global.__floqrBotDeeVipPopout = payload; } catch (_) {}
-    try { sessionStorage.setItem("floqr.botdeeVipPopout", JSON.stringify(payload)); } catch (_) {}
+    const raw = JSON.stringify(payload);
+    try { sessionStorage.setItem("floqr.botdeeVipPopout", raw); } catch (_) {}
+    try { localStorage.setItem("floqr.botdeeVipPopout", raw); } catch (_) {}
   }
 
   function openVipPopout(kind, view, sourceEl) {
@@ -1949,6 +2068,14 @@
     try {
       const url = new URL("botdee-vip-popout.html", location.href);
       if (kind) url.searchParams.set("kind", String(kind));
+      const clubId = String(view?.clubLocationId || "").trim();
+      const planFile = vipPlanFileForClub(clubId) || String(view?.planFile || view?.map?.planFile || "").trim();
+      if (clubId) url.searchParams.set("location", clubId);
+      if (planFile) url.searchParams.set("plan", planFile.replace(/^.*\//, ""));
+      if (view?.night) url.searchParams.set("night", String(view.night));
+      if (view?.map?.selectedAreaId) url.searchParams.set("area", String(view.map.selectedAreaId));
+      if (view?.sectionId) url.searchParams.set("sel", String(view.sectionId));
+      if (view?.guestMode) url.searchParams.set("guest", "1");
       href = url.href;
     } catch (_) {}
     let win = null;
@@ -2224,6 +2351,12 @@
     global.document?.body?.classList.remove("botdee-vip-dock-open");
   }
 
+  function paintVipDock(el, view) {
+    lastVipView = view;
+    el.innerHTML = renderVipCard({...view, surface: "dock"});
+    bindVipCard(el.querySelector(".botdee-sv-vip"), view);
+  }
+
   function dockVipPreview(view) {
     const el = vipPreviewHost();
     if (!el || !isLiveVipPreview(view)) {
@@ -2234,9 +2367,17 @@
     el.hidden = false;
     el.classList.add("is-open");
     global.document?.body?.classList.add("botdee-vip-dock-open");
-    lastVipView = view;
-    el.innerHTML = renderVipCard({...view, surface: "dock"});
-    bindVipCard(el.querySelector(".botdee-sv-vip"), view);
+    paintVipDock(el, view);
+    if (!view.map?.imageUrl) {
+      const stamp = `${view.clubLocationId || ""}|${view.night || ""}|${view.sectionId || ""}`;
+      hydrateVipMap(view).then(live => {
+        if (!el.isConnected || el.hidden) return;
+        const now = lastVipView;
+        const same = now && `${now.clubLocationId || ""}|${now.night || ""}|${now.sectionId || ""}` === stamp;
+        if (!same || !live.map?.imageUrl) return;
+        paintVipDock(el, live);
+      });
+    }
     return true;
   }
 
