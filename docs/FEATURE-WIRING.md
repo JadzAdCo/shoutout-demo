@@ -70,7 +70,7 @@ Resume: `@gdpr$` / `$residency$`. Rule: `.cursor/rules/gdpr-data-residency.mdc`.
 | Master Admin | Duplicate Records (`master-admin.html#duplicateRecords`, alias `#patronAccountMerge`) → **Patron accounts (same mobile)** card `#patronAccountMerge` **inside** that panel only. One **Find patron** per column (keep uid / merge-away uid). SOS2FA + `FLOQRReasonPrompt`. Callables `lookupPatronAccounts`, `previewPatronAccountMerge`, `mergePatronAccounts`. Moves Mingl connections, beta `features` union (incl. `mingl`), Inbox `recipientUid`, BOT DEE rooms/threads, blocks. **Never deletes Firebase Auth** (`authDeleted: false`). Chrome copy is operator-neutral (Master Admin, not a named person). |
 | Audit | Chained `account.merged` on `featureServiceAuditLogs`. Unchained `account.phone_claimed` / `account.phone_denied`. Agent clients stamp `actorEmail: "agent"`. No client IP on `users` or `phoneIndex`. |
 | Rules | `phoneIndex` Functions-only. `mergedInto`, `mergedFromUids`, `accountStatus`, `linkedAuthUids`, `phoneE164`, `phoneNormalized` in `hasBackendOnlyIdentityFields`. |
-| Deploy | Functions subset tag `[firebase-deploy-accounts]` (claim/lookup/preview/merge). Pages cache-bust s3.3.064. |
+| Deploy | Functions subset tag `[firebase-deploy-accounts]` (claim/lookup/preview/merge). Pages cache-bust s3.3.068. |
 | Help | `help-profile-mobile` (patron, required mobile) · `help-patron-account-merge` (masterAdmin, English). |
 | Classification | `phoneIndex` secret PII; `users` merge/E.164 fields; system job `patronAccountUnifier`. Movable in-region; no stored IP. |
 | Tests | `functions/account-unifier.test.js`, rules `phoneIndex` block, i18n chrome +12 keys × 11 langs. |

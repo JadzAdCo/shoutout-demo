@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.067";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.067";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.068";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.068";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -3709,7 +3709,7 @@
       area:"Master Admin",
       feature:"Patron accounts (same mobile) only on Duplicate Records; one Find patron per column",
       changed:"s3.3.064 — Merge card is inside Reports → Duplicate Records. One Find patron under Keep this uid and one under Merge this uid away. Chrome and help say Master Admin, not a named person. Merge still never deletes Firebase Auth.",
-      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / admin.css / floqr-i18n.js ?v=s3.3.064. Unlock SOS2FA. 2) Reports → Duplicate Records (#duplicateRecords). Patron accounts (same mobile) is the second card; each column has exactly one Find patron; Preview merge and Merge patron accounts sit below. 3) Open Network Dashboard, Diagnostics, and Features Mgmt → Beta & Testing — the merge card is not there (Beta still has its own Find patron search). 4) Open #patronAccountMerge — lands on Duplicate Records with the card. 5) Confirm sub copy says Master Admin, not Don. Display URLs have no ?v=.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html until master-admin.html / admin.css / floqr-i18n.js ?v=s3.3.068. Unlock SOS2FA. 2) Reports → Duplicate Records (#duplicateRecords). Patron accounts (same mobile) is the second card; each column has exactly one Find patron; Preview merge and Merge patron accounts sit below. 3) Open Network Dashboard, Diagnostics, and Features Mgmt → Beta & Testing — the merge card is not there (Beta still has its own Find patron search). 4) Open #patronAccountMerge — lands on Duplicate Records with the card. 5) Confirm sub copy says Master Admin, not Don. Display URLs have no ?v=.",
       expected:"Card only on Duplicate Records. One Find patron per column. Operator-neutral copy. Auth still not deleted.",
       troubleshoot:"Card still on every tab → #patronAccountMerge is outside #duplicateRecords (cached master-admin.html). Two Find patron in one row → cached HTML before s3.3.064. Still says Don → cached floqr-i18n.js / botdee-help-repository.js. #patronAccountMerge blanks the page → master-admin-app.js must map that hash to duplicateRecords."
     },
