@@ -242,7 +242,12 @@ async function createInvite({roomId, actorUid, targetUid, actorEmail, actorRole,
   const member = await loadMember(roomSnap.id, actorUid);
   const inviteOk = core.canInviteMore(row, actorUid, member);
   if (!inviteOk.ok) return {ok: false, error: inviteOk.reason};
-  if (core.isCurrentMember(row, targetUid)) return {ok: false, error: "used"};
+  const targetState = core.classifyInviteTarget({
+    actorUid,
+    targetUid,
+    memberUids: core.currentMembers(row)
+  });
+  if (!targetState.ok) return {ok: false, error: targetState.reason};
   const friends = await friendGate(actorUid, targetUid);
   const hostUid = core.text(row.hostUid, 80);
   const blockedHost = hostUid && hostUid !== core.text(targetUid, 80)

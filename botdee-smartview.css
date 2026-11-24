@@ -987,9 +987,20 @@ body.botdee-sv-overlay-open { overflow: hidden; }
   cursor: pointer;
   padding: 0.45rem 0.3rem;
 }
-.botdee-sv-room-btn:disabled {
-  opacity: 0.45;
+.botdee-sv-room-btn:disabled,
+.botdee-sv-room-btn.is-blocked,
+.botdee-sv-room-btn[aria-disabled="true"] {
+  opacity: 0.55;
   cursor: not-allowed;
+}
+.botdee-sv-room [data-rs-friend-list] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.botdee-sv-room [data-rs-friend-list] .botdee-sv-room-btn {
+  flex: 1 1 8.5rem;
 }
 .botdee-sv-room-main {
   background: var(--accent, #00d4fe);

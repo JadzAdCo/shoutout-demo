@@ -1092,7 +1092,7 @@
 
   function roomPanelCopy(name) {
     if (name === "itinerary") {
-      return `<p>${esc(t("botdee.rs.itineraryEmpty", "No shared plans yet"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.privacyNote", "Private BOT DEE messages, other members’ profiles, and SMARTsummary are not included."))}</p>`;
+      return `<p>${esc(t("botdee.rs.itineraryEmpty", "No shared plans yet"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.itineraryNotCalendar", "Shared Itinerary is night-out notes, not a calendar. There is no scheduled start time."))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.privacyNote", "Private BOT DEE messages, other members’ profiles, and SMARTsummary are not included."))}</p>`;
     }
     if (name === "tab") {
       return `<p>${esc(t("botdee.rs.tabConsent", "Consent required before any charge"))}</p>
@@ -1105,7 +1105,7 @@
         <button type="button" class="botdee-sv-room-btn" data-rs-tab-close-split>${esc(t("botdee.room.payMyLines", "Pay my lines"))}</button>`;
     }
     if (name === "permissions") {
-      return `<p>${esc(t("botdee.rs.hostManaged", "Host managed"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests"))}</p>`;
+      return `<p>${esc(t("botdee.rs.hostManaged", "Host managed"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.permissionsNotSchedule", "Room Permissions is host invite rules. The room stays open until the host taps End Room, or about four hours after it opened. It does not close when the last guest logs out."))}</p>`;
     }
     if (name === "members") {
       return `<p>${esc(t("botdee.room.membersLive", "Members of this BOT DEE session. Display names only — no emails."))}</p><div data-rs-members-list></div>`;
@@ -1114,6 +1114,36 @@
       return `<p>${esc(t("botdee.room.commandInvite", "Invite Mingl friends into this BOT DEE session. Not a public link. Cap is host plus 7 guests."))}</p><div data-rs-friend-list>${esc(t("botdee.room.loadingFriends", "Loading Mingl friends…"))}</div>`;
     }
     return "";
+  }
+
+  function inviteErrorCopy(error) {
+    const reason = error?.details?.reason || error?.details?.error || "";
+    if (reason === "self") return t("botdee.room.self", "That's you — you're already in this BOT DEE session.");
+    if (reason === "already_member") return t("botdee.room.alreadyMember", "That Mingl friend is already in this BOT DEE session.");
+    if (reason === "full") return t("botdee.room.joinFull", "This BOT DEE session is full (host plus 7 guests).");
+    if (reason === "not_friend") return t("botdee.room.notFriend", "BOT DEE session invites are Mingl friends only.");
+    const msg = String(error?.message || "").trim();
+    if (!msg || /^(INTERNAL|FAILED_PRECONDITION|PERMISSION_DENIED|NOT_FOUND|RESOURCE_EXHAUSTED)\b/i.test(msg)) {
+      return t("botdee.room.inviteFailed", "Could not send that invite.");
+    }
+    return msg.replace(/^(INTERNAL|FAILED_PRECONDITION|PERMISSION_DENIED|NOT_FOUND|RESOURCE_EXHAUSTED):\s*/i, "").trim()
+      || t("botdee.room.inviteFailed", "Could not send that invite.");
+  }
+
+  function friendChipHtml(row, roomFull) {
+    const label = row.displayName || row.handle || t("botdee.room.friend", "Mingl friend");
+    const state = row.inviteState || "invite";
+    const uid = row.uid || "";
+    if (state === "self") {
+      return `<button type="button" class="botdee-sv-room-btn is-blocked" data-rs-invite-state="self" aria-disabled="true">${esc(label)} · ${esc(t("botdee.room.chipSelf", "That's you"))}</button>`;
+    }
+    if (state === "already_member") {
+      return `<button type="button" class="botdee-sv-room-btn is-blocked" data-rs-invite-state="already_member" aria-disabled="true">${esc(label)} · ${esc(t("botdee.room.chipMember", "Already in this session"))}</button>`;
+    }
+    if (roomFull) {
+      return `<button type="button" class="botdee-sv-room-btn is-blocked" data-rs-invite-state="full" aria-disabled="true">${esc(label)}</button>`;
+    }
+    return `<button type="button" class="botdee-sv-room-btn" data-rs-invite-uid="${esc(uid)}" data-rs-invite-state="invite">${esc(label)}</button>`;
   }
 
   function bindRoomCard(card) {
@@ -1136,31 +1166,55 @@
       const host = panel?.querySelector("[data-rs-friend-list]");
       if (!host) return;
       try {
-        const data = await call("listBotDeeRoomFriends", {});
+        const data = await call("listBotDeeRoomFriends", {roomId: roomIdOf()});
         const friends = Array.isArray(data.friends) ? data.friends : [];
         if (!friends.length) {
           host.textContent = t("botdee.room.noFriends", "No Mingl friends to invite yet.");
           return;
         }
-        host.innerHTML = friends.map(row => `<button type="button" class="botdee-sv-room-btn" data-rs-invite-uid="${esc(row.uid)}">${esc(row.displayName || row.handle || t("botdee.room.friend", "Mingl friend"))}</button>`).join("");
-        host.querySelectorAll("[data-rs-invite-uid]").forEach(btn => {
+        if (data.roomFull) {
+          showToast(t("botdee.room.joinFull", "This BOT DEE session is full (host plus 7 guests)."));
+        }
+        host.innerHTML = friends.map(row => friendChipHtml(row, !!data.roomFull)).join("");
+        host.querySelectorAll("[data-rs-invite-state], [data-rs-invite-uid]").forEach(btn => {
           btn.addEventListener("click", async event => {
             event.preventDefault();
+            event.stopPropagation();
             const roomId = roomIdOf();
+            const uid = btn.getAttribute("data-rs-invite-uid") || "";
+            const state = btn.getAttribute("data-rs-invite-state") || "invite";
+            if (state === "self") {
+              showToast(t("botdee.room.self", "That's you — you're already in this BOT DEE session."));
+              return;
+            }
+            if (state === "already_member") {
+              showToast(t("botdee.room.alreadyMember", "That Mingl friend is already in this BOT DEE session."));
+              return;
+            }
+            if (state === "full") {
+              showToast(t("botdee.room.joinFull", "This BOT DEE session is full (host plus 7 guests)."));
+              return;
+            }
             if (!roomId) {
               showToast(t("botdee.room.confirmFirst", "Confirm the session first, then invite Mingl friends."));
               return;
             }
+            if (!uid) {
+              showToast(t("botdee.room.inviteFailed", "Could not send that invite."));
+              return;
+            }
+            btn.disabled = true;
             try {
-              await call("createBotDeeRoomInvite", {roomId, targetUid: btn.getAttribute("data-rs-invite-uid")});
+              await call("createBotDeeRoomInvite", {roomId, targetUid: uid});
               showToast(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
             } catch (error) {
-              showToast(error?.message || t("botdee.room.inviteFailed", "Could not send that invite."));
+              btn.disabled = false;
+              showToast(inviteErrorCopy(error));
             }
           });
         });
       } catch (error) {
-        host.textContent = error?.message || t("botdee.room.inviteFailed", "Could not send that invite.");
+        host.textContent = inviteErrorCopy(error);
       }
     };
     const fillMembers = async () => {

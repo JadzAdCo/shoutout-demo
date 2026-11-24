@@ -61,6 +61,38 @@ test("wrong-account / expired / revoked / used invites refuse", () => {
   assert.equal(core.evaluateInvite(invite(), {uid: "friend-1", nowMs: now, roomId: "br_room"}).ok, true);
 });
 
+test("self-invite and already-member are distinct from used/not_friend", () => {
+  const members = ["host-1", "guest-1"];
+  assert.equal(core.classifyInviteTarget({actorUid: "host-1", targetUid: "host-1", memberUids: members}).reason, "self");
+  assert.equal(core.classifyInviteTarget({actorUid: "host-1", targetUid: "guest-1", memberUids: members}).reason, "already_member");
+  assert.equal(core.classifyInviteTarget({actorUid: "host-1", targetUid: "friend-2", memberUids: members}).ok, true);
+  assert.equal(core.denialMessage("self"), "That's you — you're already in this BOT DEE session.");
+  assert.equal(core.denialMessage("already_member"), "That Mingl friend is already in this BOT DEE session.");
+  const decorated = core.decorateFriendInviteState(
+    [
+      {uid: "host-1", displayName: "Don Bans"},
+      {uid: "guest-1", displayName: "JuJu"},
+      {uid: "friend-don", displayName: "Don"},
+      {uid: "friend-don", displayName: "Don duplicate"}
+    ],
+    {actorUid: "host-1", memberUids: members}
+  );
+  assert.deepEqual(decorated.map(row => `${row.uid}:${row.inviteState}`), [
+    "guest-1:already_member",
+    "friend-don:invite"
+  ]);
+  const hits = core.matchNamedInvitees(decorated, [{displayName: "Don"}]);
+  assert.equal(hits.length, 1);
+  assert.equal(hits[0].uid, "friend-don");
+  assert.equal(hits[0].inviteState, "invite");
+  assert.equal(core.matchNamedInvitees(decorated, [{displayName: "Don Bans"}]).length, 0);
+  assert.equal(core.ROOM_TTL_MS, 4 * 60 * 60 * 1000);
+  assert.match(read("botdee-smartview.js"), /itineraryNotCalendar/);
+  assert.match(read("botdee-smartview.js"), /permissionsNotSchedule/);
+  assert.match(read("botdee-help-repository.js"), /There is no scheduled start time/);
+  assert.doesNotMatch(read("functions/botdee-session-store.js"), /lastLogout|scheduleStart|scheduledStart/);
+});
+
 test("Mingl friends only; blocked pairs cannot invite", () => {
   const mutual = {status: "mutual", participants: ["host-1", "friend-1"]};
   const pending = {status: "pending", participants: ["host-1", "stranger"]};
@@ -192,6 +224,11 @@ test("client join captures room=&t= and Inbox is not a ShoutOut CTA", () => {
   assert.doesNotMatch(read("botdee-smartview.js"), /createBotDeeRoom\b/);
   assert.match(read("botdee-smartview.js"), /createBotDeeRoomInvite/);
   assert.match(read("botdee-smartview.js"), /listBotDeeRoomFriends/);
+  assert.match(read("botdee-smartview.js"), /botdee\.room\.self/);
+  assert.match(read("botdee-smartview.js"), /botdee\.room\.alreadyMember/);
+  assert.match(read("botdee-smartview.js"), /botdee\.rs\.itineraryNotCalendar/);
+  assert.match(read("botdee-smartview.js"), /botdee\.rs\.permissionsNotSchedule/);
+  assert.match(read("botdee-smartview.js"), /data-rs-invite-state/);
   assert.match(read("botdee-smartview.js"), /data-rs-kick-uid/);
   assert.match(read("botdee-smartview.js"), /kickBotDeeRoomMember/);
   assert.match(read("functions/index.js"), /acceptBotDeeRoomInvite/);
@@ -204,6 +241,8 @@ test("callables re-check botDee + mingl; guests cannot end", () => {
   assert.match(fns, /assertFeatureAccess\(request\.auth, "botDee"/);
   assert.match(fns, /assertFeatureAccess\(request\.auth, "mingl"/);
   assert.match(fns, /inviteBotDeeRoomGuest/);
+  assert.match(fns, /already_member/);
+  assert.match(fns, /decorateFriendInviteState/);
   assert.match(fns, /kickBotDeeRoomMember/);
   assert.match(fns, /endBotDeeRoom/);
   assert.match(fns, /viewerIsHost/);
@@ -217,6 +256,9 @@ test("callables re-check botDee + mingl; guests cannot end", () => {
   assert.match(store, /canSetTabLineStatus/);
   assert.match(read("functions/bot-dee-functions.js"), /roomId: stored\.joinedRoomId/);
   assert.match(read("functions/bot-dee-functions.js"), /kickRoom && stored\.joinedRoomId/);
+  assert.match(read("functions/bot-dee-functions.js"), /inviteRoom && stored\.joinedRoomId/);
+  assert.match(read("functions/botdee-room-live.js"), /function inviteNamedGuests/);
+  assert.match(read("functions/botdee-session-store.js"), /classifyInviteTarget/);
   assert.match(read("functions/botdee-room-live.js"), /function kickMember/);
   assert.match(read("functions/botdee-room-live.js"), /resolveKickTarget/);
 });

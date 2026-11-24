@@ -130,6 +130,59 @@ function inviteeAllowed({friendsWithInviter, blockedWithHost} = {}) {
   return {ok: true, reason: ""};
 }
 
+function classifyInviteTarget({actorUid = "", targetUid = "", memberUids = []} = {}) {
+  const actor = text(actorUid, 80);
+  const target = text(targetUid, 80);
+  if (!target) return {ok: false, reason: "not_found"};
+  if (actor && target === actor) return {ok: false, reason: "self"};
+  const members = (Array.isArray(memberUids) ? memberUids : []).map(id => text(id, 80)).filter(Boolean);
+  if (members.includes(target)) return {ok: false, reason: "already_member"};
+  return {ok: true, reason: "invite"};
+}
+
+function decorateFriendInviteState(friends, {actorUid = "", memberUids = []} = {}) {
+  const actor = text(actorUid, 80);
+  const seen = new Set();
+  const out = [];
+  for (const row of Array.isArray(friends) ? friends : []) {
+    const uid = text(row && row.uid, 80);
+    if (!uid || uid === actor || seen.has(uid)) continue;
+    seen.add(uid);
+    const state = classifyInviteTarget({actorUid: actor, targetUid: uid, memberUids});
+    out.push({
+      uid,
+      displayName: text(row.displayName, 80),
+      handle: text(row.handle, 40),
+      inviteState: state.ok ? "invite" : state.reason
+    });
+  }
+  return out;
+}
+
+function matchNamedInvitees(friends, needles) {
+  const names = (Array.isArray(needles) ? needles : [])
+    .map(row => text(row && (row.displayName || row), 40).toLowerCase())
+    .filter(Boolean);
+  if (!names.length) return [];
+  const scored = [];
+  for (const row of Array.isArray(friends) ? friends : []) {
+    if (!row || !text(row.uid, 80)) continue;
+    const display = text(row.displayName, 80).toLowerCase();
+    const handle = text(row.handle, 40).toLowerCase();
+    let best = 0;
+    for (const name of names) {
+      if (display === name || handle === name) best = Math.max(best, 3);
+      else if (display.startsWith(`${name} `) || display.endsWith(` ${name}`)) best = Math.max(best, 2);
+      else if (display.includes(name) || handle.includes(name)) best = Math.max(best, 1);
+    }
+    if (best) scored.push({row, best});
+  }
+  scored.sort((a, b) => b.best - a.best);
+  if (!scored.length) return [];
+  const top = scored[0].best;
+  return scored.filter(item => item.best === top).map(item => item.row);
+}
+
 function admitMember(row, uid) {
   const members = currentMembers(row);
   const id = text(uid, 80);
@@ -349,6 +402,8 @@ function denialMessage(reason) {
     wrong_account: "Sign in as the Mingl friend this invite was sent to.",
     not_friend: "Invites are Mingl friends only.",
     blocked: "Invites are Mingl friends only.",
+    self: "That's you — you're already in this BOT DEE session.",
+    already_member: "That Mingl friend is already in this BOT DEE session.",
     full: "This BOT DEE session is full (host plus 7 guests).",
     closed: "This BOT DEE session has ended.",
     not_member: "You are not in this BOT DEE session.",
@@ -392,6 +447,9 @@ module.exports = {
   isCurrentMember,
   canInviteMore,
   inviteeAllowed,
+  classifyInviteTarget,
+  decorateFriendInviteState,
+  matchNamedInvitees,
   admitMember,
   matchGuests,
   canSetTabLineStatus,

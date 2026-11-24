@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.067";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.067";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.068";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.068";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.068",
+      title: "s3.3.068 — BOT DEE invite self vs already member",
+      checks: [
+        {label:"Invite target states", file:"functions/botdee-session-core.js", includes:["classifyInviteTarget", "decorateFriendInviteState", "already_member", "That's you"]},
+        {label:"Create invite uses classifyInviteTarget", file:"functions/botdee-session-store.js", includes:["classifyInviteTarget"]},
+        {label:"Named invite from chat", file:"functions/botdee-room-live.js", includes:["function inviteNamedGuests"]},
+        {label:"Chip states on Room SMARTview", file:"botdee-smartview.js", includes:["botdee.room.self", "botdee.room.alreadyMember", "data-rs-invite-state"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-068-botdee-invite-self-member"]}
+      ]
+    },
     {
       version: "s3.3.067",
       title: "s3.3.067 — SMARTvisual Studio Review / Publish",
@@ -3891,6 +3902,15 @@
       howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js / botdee-smartview.js / botdee-smartview.css ?v=s3.3.066. 2) Library: filter by a tag chip. Open a published SMARTbackground or SMARTstencil. Place card type, SMARTbackground, SMARTstencil, and Tags are on the detail. Preview in Place SMARTview — compact Aurelia-style card with illustration, 28px stencil, tag chips, no photo well. 3) Save Place SMARTview assignment needs SOS2FA + reason (Functions deploy pending until Don asks). 4) Open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive — one compact card, no Load SPAAVS sample. 5) Features SMARTview catalog shows category tags and a tag filter. 6) Phone ~390 and desktop ~1280. Display URLs have no ?v=. Mark Succeed/Failed.",
       expected:"Studio can change stencil and background on the compact Place card and attach tags. Headless still mints one generic card, not four SPAAVS cards. Features catalog is the eight-product SMARTview, not Room SMARTvisuals.",
       troubleshoot:"No stencil/tag on the card → cached botdee-smartview.js/css before this SHA, or catalog.json not loaded (ensureCatalog). Save still background-only → cached smartvisuals-studio.js. Four SPAAVS cards → cached headless JS. Features page missing tag chips → cached floqr-features-smartview.js. Studio save SOS2FA sentence → unlock Entity Management first. Live venue chat unchanged after Save → Functions deploy of setSmartVisualOverride / executeBotSession pending."
+    },
+    {
+      id:"s3-3-068-botdee-invite-self-member",
+      area:"BOT DEE",
+      feature:"Room SMARTview invite — self vs already member",
+      changed:"Tapping a Mingl friend named Don (or any friend chip) on Room SMARTview failed with generic Mingl friends only / invite already used when that chip was the host or already in the room. Chips now show That's you / Already in the room, listBotDeeRoomFriends returns inviteState, createBotDeeRoomInvite returns failed-precondition with reason, and chat invite Don can mint a real invite for a distinct Mingl friend (exact name match beats host first name).",
+      howToTest:"1) After Pages publish (Don merge), hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js / botdee.html ?v=s3.3.068. Sign in as Don Bans. 2) Open Room SMARTview. Friend chips: the host's own Don chip is disabled with That's you — tap toasts the same copy. 3) Invite a different Mingl friend; their chip becomes Already in the room (disabled). 4) Chat: invite Don — if a distinct friend is named Don, Inbox gets a Room SMARTview invite; if only the host matches, BOT DEE says That's you. 5) Confirm there is no Schedule a time or last-logout expiry control — room lasts up to 4 hours or until the host taps End Room. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Host can invite a distinct Mingl friend named Don. Self and already-member chips are blocked with clear copy. Chat named invite works. No scheduled-start or last-logout expiry (not built). Satellite session still FLOQRSessionShell.",
+      troubleshoot:"Still Mingl friends only on self → cached botdee-smartview.js / botdee.html before s3.3.068, or Functions not this SHA (listBotDeeRoomFriends / createBotDeeRoomInvite / executeBotSession). Chip tappable and invites self → decorateFriendInviteState missing. Chat invite Don no-ops → inviteNamedGuests not in executeBotSession. Functions deploy required for callables; Pages for chips."
     },
     {
       id:"s3-3-067-smartvisuals-studio-review-publish",

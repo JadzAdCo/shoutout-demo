@@ -1103,6 +1103,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       const leaveRoom = classified.command === "leave" || classified.command === "make_private";
       const endRoom = classified.command === "end";
       const kickRoom = classified.command === "kick";
+      const inviteRoom = classified.command === "invite";
       if (leaveRoom && stored.joinedRoomId) {
         try {
           const left = await roomLive.leaveRoom({uid, roomId: stored.joinedRoomId});
@@ -1225,6 +1226,52 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
           }
         } catch (error) {
           console.warn("BOT DEE room kick failed", error?.message || error);
+        }
+      } else if (inviteRoom && stored.joinedRoomId && Array.isArray(classified.namedNeedles) && classified.namedNeedles.length) {
+        try {
+          await audit.assertFeatureAccess(request.auth, "mingl", request);
+          const sessionCore = require("./botdee-session-core");
+          const invited = await roomLive.inviteNamedGuests({
+            uid,
+            roomId: stored.joinedRoomId,
+            needles: classified.namedNeedles,
+            actorEmail: request.auth?.token?.email || "",
+            actorRole: "patron"
+          });
+          const reason = invited && invited.error;
+          if (invited && invited.ok) {
+            outcome = {
+              reply: "Invite sent to Inbox. Mingl friends only.",
+              results: [],
+              provider: "local-room-smartview",
+              model: "roomInvite",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: roomAttached.smartViews || [],
+              replyKey: "botdee.room.invited",
+              geminiOnView: false
+            };
+          } else if (reason === "self" || reason === "already_member" || reason === "full" || reason === "not_friend") {
+            const replyKeys = {
+              self: "botdee.room.self",
+              already_member: "botdee.room.alreadyMember",
+              full: "botdee.room.joinFull",
+              not_friend: "botdee.room.notFriend"
+            };
+            outcome = {
+              reply: sessionCore.denialMessage(reason),
+              results: [],
+              provider: "local-room-smartview",
+              model: "roomInviteDenied",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: roomAttached.smartViews || [],
+              replyKey: replyKeys[reason],
+              geminiOnView: false
+            };
+          }
+        } catch (error) {
+          console.warn("BOT DEE room invite failed", error?.message || error);
         }
       } else if (confirmRoom) {
         try {

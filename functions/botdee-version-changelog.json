@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.068",
+    "text": "s3.3.068: Invite Mingl friends chips say That’s you or Already in this session instead of failing with no explanation.",
+    "audiences": [
+      "botDee"
+    ]
+  },
+  {
     "id": "s3.3.067",
     "text": "s3.3.067: SMARTvisual Studio Review / Publish: select a queued SMARTbackground, visible Publish, SOS2FA + reason",
     "audiences": [
