@@ -105,7 +105,9 @@ test("venue cards open the club public page without cache-bust v=", () => {
   });
   assert.equal(tagged.floqrPublicData.smartBackgroundId, "bg-paris");
   assert.equal(tagged.floqrPublicData.smartStencilId, "st-flight");
-  assert.deepEqual(tagged.floqrPublicData.smartTags, ["nightlife", "dc"]);
+  assert.ok(tagged.floqrPublicData.smartTags.includes("nightlife"));
+  assert.ok(tagged.floqrPublicData.smartTags.includes("dc"));
+  assert.ok(tagged.floqrPublicData.smartTags.includes("paris"));
   const result = tools.clubToResult(card);
   assert.equal(result.href, card.profileHref);
   assert.doesNotMatch(result.href, /[?&]v=/);
@@ -114,7 +116,8 @@ test("venue cards open the club public page without cache-bust v=", () => {
 test("unknown city or cuisine does not fall back to DC restaurants", () => {
   const miami = tools.classifyPlaceSearchIntent("Sushi restaurants in Miami");
   assert.equal(miami.intent, "dining");
-  assert.ok(miami.leftoverTokens.includes("miami"));
+  assert.ok(miami.placeTokens.includes("miami"));
+  assert.ok(!miami.leftoverTokens.includes("miami"));
   assert.equal(tools.scoreClubForPlace(KATA.id, KATA.data, miami), 0);
   assert.equal(tools.rankPublicClubs([KATA, DECADES, NYC_CLUB], miami, 5).length, 0);
 
@@ -151,7 +154,50 @@ test("venue search returns SMARTviews only, not duplicate result links", () => {
   const session = fs.readFileSync(path.join(__dirname, "bot-dee-functions.js"), "utf8");
   assert.match(session, /else if \(venueAttached && venueAttached\.handled\)[\s\S]*?results: \[\]/);
   const attach = fs.readFileSync(path.join(__dirname, "bot-dee-tools.js"), "utf8");
-  assert.match(attach, /handled: true[\s\S]*?results: \[\][\s\S]*?smartViews: cards\.map\(card => applyPlaceVisualOverride\(clubSmartView\(card\), overrideVisual\)\)/);
+  assert.match(attach, /const smartViews = cards\.map\(card => applyPlaceVisualOverride\(clubSmartView\(card\), overrideVisual\)\)/);
+  assert.match(session, /attachPlaceWithRoom/);
+  assert.match(session, /placeViews/);
+});
+
+test("room smart card for reservations in Miami keeps Miami place tokens and Place SMARTview", () => {
+  const q = "Open a room smart card for reservations in Miami";
+  const classified = tools.classifyPlaceSearchIntent(q);
+  assert.equal(classified.intent, "venue");
+  assert.ok(classified.placeTokens.includes("miami"));
+  assert.ok(!classified.leftoverTokens.includes("miami"));
+  assert.ok(!classified.leftoverTokens.includes("smart"));
+  assert.ok(!classified.leftoverTokens.includes("card"));
+  assert.ok(!classified.leftoverTokens.includes("room"));
+  assert.equal(tools.placeSearchAlongsideRoom(classified), true);
+  assert.equal(tools.scoreClubForPlace(KATA.id, KATA.data, classified), 0);
+
+  const liv = {
+    id: "liv-miami-fl",
+    data: {
+      locationName: "LIV Miami",
+      city: "Miami",
+      fullAddress: "Miami, Florida",
+      categories: ["Clubs", "Nightlife"],
+      type: "club",
+      visibility: "public",
+      active: true
+    }
+  };
+  const ranked = tools.rankPublicClubs([KATA, DECADES, NYC_CLUB, liv], classified, 5);
+  assert.equal(ranked.length, 1);
+  assert.equal(ranked[0].id, "liv-miami-fl");
+
+  const dest = tools.destinationSmartView(classified);
+  assert.equal(dest.kind, "venue");
+  assert.match(dest.title, /Miami/i);
+  assert.equal(dest.floqrPublicData.smartBackgroundId, "bg-miami");
+  assert.ok(dest.floqrPublicData.smartTags.includes("miami"));
+
+  const local = require("./bot-dee-functions").__botDeeHelpers.localSession("patron", q);
+  assert.equal(local.provider, "local-room-smartview");
+  assert.ok(local.smartViews.some(row => row && row.kind === "botDeeRoom"));
+  assert.ok(local.smartViews.some(row => row && row.kind === "venue" && /miami/i.test(row.title || "")));
+  assert.ok(local.smartViews.some(row => row && Array.isArray(row.floqrPublicData?.smartTags) && row.floqrPublicData.smartTags.includes("miami")));
 });
 
 test("Gemini dining path is kind=club and does not pitch products", () => {

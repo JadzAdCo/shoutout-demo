@@ -153,9 +153,18 @@
   }
 
   function placeTagHtml(tags) {
-    const list = Array.isArray(tags) ? tags.filter(Boolean).slice(0, 8) : [];
-    if (!list.length) return "";
-    return `<div class="botdee-sv-tags" data-sv-place-tags="1">${list.map(tag =>
+    const seen = new Set();
+    const list = [];
+    (Array.isArray(tags) ? tags : []).forEach(tag => {
+      const raw = String(tag || "");
+      const next = raw.indexOf("destination:") === 0 ? raw.slice("destination:".length) : raw;
+      if (!next || seen.has(next)) return;
+      seen.add(next);
+      list.push(next);
+    });
+    const shown = list.slice(0, 8);
+    if (!shown.length) return "";
+    return `<div class="botdee-sv-tags" data-sv-place-tags="1">${shown.map(tag =>
       `<span class="botdee-sv-tag">${esc(tag)}</span>`
     ).join("")}</div>`;
   }
@@ -460,7 +469,7 @@
       </section>
       <div class="botdee-sv-people-actions">
         <a class="botdee-sv-action" href="${esc(profileHref)}">${esc(t("botdee.sv.viewProfile", "View Full Profile"))}</a>
-        <a class="botdee-sv-action botdee-sv-action-main" href="${esc(minglHref)}">${esc(t("botdee.sv.mingl", "Mingl"))}</a>
+        ${uid ? `<button type="button" class="botdee-sv-action botdee-sv-action-main" data-sv-invite-uid="${esc(uid)}">${esc(t("botdee.rs.invite", "Invite"))}</button>` : `<a class="botdee-sv-action botdee-sv-action-main" href="${esc(minglHref)}">${esc(t("botdee.sv.mingl", "Mingl"))}</a>`}
       </div>
     </article>`;
   }
@@ -1224,6 +1233,7 @@
     const visual = roomVisual(view);
     const visualHero = visual ? `<div class="sv-hero botdee-sv-visual" data-sv-reason="${esc(visual.reasonCode || "neutral-fallback")}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}">
         <img class="sv-bg" src="${esc(visual.backgroundUrl)}" alt="${esc(t("sv.scenicAlt", "Scenic illustration for this room. Not a photograph."))}"/>
+        ${placeTagHtml(visual.tags)}
       </div>` : "";
     return `<article class="botdee-sv-room" data-kind="botDeeRoom" data-rs-mode="${esc(view.mode || "")}" data-rs-decline="${esc(view.declineKey || "")}" data-rs-active="${activeRoom ? "1" : "0"}" data-rs-room="${esc(view.roomId || "")}" data-rs-status="${esc(view.status || "")}" data-rs-host="${viewerHost ? "1" : "0"}" data-rs-title="${esc(view.authorizedTitle || "")}" data-rs-desc="${esc(view.authorizedDescription || "")}">
       <h2 class="botdee-sv-room-title">${esc(t("botdee.rs.title", "Room SMARTview"))}</h2>
@@ -1587,6 +1597,7 @@
       card.setAttribute("data-rs-room", room.roomId);
       card.setAttribute("data-rs-status", room.status || "");
       card.setAttribute("data-rs-active", "1");
+      try { global.__floqrActiveBotDeeRoomId = room.roomId; } catch (_) {}
       const inviteBtn = card.querySelector("[data-rs-panel='invite']");
       const endBtn = card.querySelector("[data-rs-end]");
       if (inviteBtn) inviteBtn.disabled = false;
@@ -1698,6 +1709,9 @@
         showToast(error?.message || t("botdee.rs.endNeedsHost", "Only the host can end this Room SMARTview. Say leave the room to leave without closing it."));
       }
     });
+    if (roomIdOf()) {
+      try { global.__floqrActiveBotDeeRoomId = roomIdOf(); } catch (_) {}
+    }
     if (card.getAttribute("data-rs-status") === "open" && roomIdOf()) startRoomPresence(roomIdOf());
     bindCollabActions(card, {call, showToast, roomIdOf});
     const hydrateCollab = async () => {
@@ -2480,7 +2494,49 @@
     const people = peopleOf(payload);
     if (!card || !people) return;
     bindOverlayDocument(global.document);
+    const noteInvite = message => {
+      let note = card.querySelector("[data-sv-invite-note]");
+      if (!note) {
+        note = document.createElement("p");
+        note.className = "botdee-sv-room-toast";
+        note.setAttribute("data-sv-invite-note", "");
+        card.appendChild(note);
+      }
+      note.hidden = false;
+      note.textContent = message;
+    };
     card.addEventListener("click", event => {
+      const inviteBtn = event.target.closest("[data-sv-invite-uid]");
+      if (inviteBtn && card.contains(inviteBtn)) {
+        event.preventDefault();
+        event.stopPropagation();
+        const targetUid = inviteBtn.getAttribute("data-sv-invite-uid") || "";
+        const roomId = String(global.__floqrActiveBotDeeRoomId
+          || document.querySelector(".botdee-sv-room[data-rs-room]")?.getAttribute("data-rs-room")
+          || "").trim();
+        if (!roomId) {
+          noteInvite(t("botdee.room.confirmFirst", "Confirm the session first, then invite Mingl friends."));
+          return;
+        }
+        if (!targetUid) {
+          noteInvite(t("botdee.room.inviteFailed", "Could not send that invite."));
+          return;
+        }
+        inviteBtn.disabled = true;
+        const fn = functionsCallable("createBotDeeRoomInvite");
+        if (!fn) {
+          inviteBtn.disabled = false;
+          noteInvite(t("botdee.room.inviteFailed", "Could not send that invite."));
+          return;
+        }
+        fn({roomId, targetUid}).then(() => {
+          noteInvite(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
+        }).catch(error => {
+          inviteBtn.disabled = false;
+          noteInvite(inviteErrorCopy(error));
+        });
+        return;
+      }
       const primaryBtn = event.target.closest("[data-sv-primary]");
       if (primaryBtn && card.contains(primaryBtn)) {
         const next = primaryBtn.getAttribute("data-sv-primary");

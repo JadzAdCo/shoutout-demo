@@ -863,10 +863,10 @@
     {
       id: "help-smartvisuals-notification",
       title: "Mingl Room SMARTnotification",
-      body: "A compact Mingl Room Invitation can appear on Search when a Mingl friend scheduled a BOT DEE room you were invited to. View Invitation opens Room SMARTview. Join Now goes to BOT DEE, not Mingl chat. Not Now hides the card this tab; Inbox still has Review BOT DEE invite. The Cancun demo query is Studio-only. Art is illustration, not a photo. Join Now rooms without a schedule do not paint Search.",
+      body: "A compact Mingl Room Invitation can appear on Search when you Set a schedule for a BOT DEE room, or when a Mingl friend invited you to one. The host sees their own scheduled room on Search without the Cancun demo query. View Invitation opens Room SMARTview. Join Now goes to BOT DEE, not Mingl chat. Not Now hides the card this tab; Inbox still has Review BOT DEE invite. The Cancun demo query is Studio-only. Art is illustration, not a photo. Join Now rooms without a schedule do not paint Search.",
       searchPhrases: [
         "smartnotification", "smart notification", "mingl room invitation", "view invitation",
-        "join at scheduled time", "cancun trip", "smartvisuals", "smartstencils", "smartbackgrounds",
+        "join at scheduled time", "scheduled room search", "cancun trip", "smartvisuals", "smartstencils", "smartbackgrounds",
         "travel partner", "fly to cancun", "labeled ad"
       ],
       links: [{label: "Open Search", href: pageUrl("./", {start: "search"})}],
@@ -903,8 +903,8 @@
     {
       id: "help-botdee-room-smartview-invite",
       title: "Invite Mingl friends",
-      body: "After you confirm Room SMARTview, Invite shows your Mingl friends only. Tap a friend to send an Inbox invite (Review BOT DEE invite). If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
-      searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation", "invite mingl friends", "review bot dee invite", "that's you", "already in this session", "cannot invite myself"],
+      body: "After you confirm Room SMARTview (Join Now or Set a schedule), Invite shows your Mingl friends only. Tap a friend, or type Invite lorna, to send an Inbox invite (Review BOT DEE invite). That is a Room SMARTview command — it does not open VIP reserV or a People SMARTview Invite. If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
+      searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation", "invite mingl friends", "invite lorna", "review bot dee invite", "that's you", "already in this session", "cannot invite myself"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
       source: "help-repository-seed",

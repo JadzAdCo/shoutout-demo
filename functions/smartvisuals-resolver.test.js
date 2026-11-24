@@ -371,8 +371,11 @@ test("Search SMARTnotification is compact glass matching original Cancun card hi
   assert.match(view, /requestedDemo\(\)/);
   assert.match(view, /hostName: "Damon"/);
   const boot = view.slice(view.indexOf("function bootSearch"));
+  assert.match(boot, /refreshSearchNotifications/);
   assert.match(boot, /syntheticCancun\(\)/);
   assert.match(boot, /mountLiveNotifications/);
+  assert.match(view, /us-central1/);
+  assert.doesNotMatch(view, /canAccess\("botDee"\)/);
 });
 
 test("Place SMARTview uses published SMARTbackground, not a photo well", () => {
@@ -412,6 +415,19 @@ test("Place SMARTview uses published SMARTbackground, not a photo well", () => {
   assert.deepEqual(resolver.normalizeSmartViewTags("Travel, beach, Travel"), ["travel", "beach"]);
   assert.equal(resolver.cardMatchesSmartViewTag(assigned, "nightlife"), true);
   assert.equal(resolver.cardMatchesSmartViewTag(assigned, "spaavs"), false);
+  const miamiCard = resolver.resolvePlaceCard({
+    kind: "venue",
+    title: "LIV Miami",
+    summary: "Miami nightclub",
+    floqrPublicData: {city: "Miami"}
+  }, catalog);
+  assert.equal(miamiCard.backgroundId, "bg-miami");
+  assert.ok(miamiCard.tags.includes("miami"));
+  assert.equal(resolver.cardMatchesSmartViewTag({
+    kind: "venue",
+    title: "LIV Miami",
+    floqrPublicData: {city: "Miami"}
+  }, "miami"), true);
 
   const dining = resolver.resolvePlaceCard({kind: "restaurant", title: "District Kitchen"}, catalog);
   assert.equal(dining.backgroundId, "bg-dining");

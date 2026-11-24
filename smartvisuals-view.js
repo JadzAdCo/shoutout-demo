@@ -407,40 +407,66 @@
     };
   }
 
+  function functionsForNotify() {
+    try {
+      const app = root.firebase?.app?.();
+      return app?.functions?.("us-central1")
+        || root.firebase?.functions?.("us-central1")
+        || root.firebase?.functions?.()
+        || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   function mountLiveNotifications(host) {
     if (!host || requestedDemo() || dismissKey()) return;
-    const auth = root.firebase?.auth?.();
-    if (!auth) return;
     const run = user => {
       if (!user) return;
-      const gated = root.FLOQRFeatureServices;
-      const show = !gated || gated.canAccess?.("botDee") || gated.canAccess?.("mingl");
-      if (gated && gated.canAccess && !gated.canAccess("botDee")) return;
-      if (!show) return;
-      let fns;
-      try { fns = root.firebase.functions(); } catch (_) { return; }
+      /* Server assertFeatureAccess is the control. Do not fail-closed on
+         FLOQRFeatureServices before load() — that hid real scheduled rooms. */
+      const fns = functionsForNotify();
       const call = fns?.httpsCallable?.("listBotDeeRoomNotifications");
       if (!call) return;
       call({}).then(res => {
         const rows = Array.isArray(res?.data?.notifications) ? res.data.notifications : [];
-        const payload = rows[0];
+        const payload = rows.find(row => row && row.demo !== true && Number(row.smartNotification) === 1);
         if (!payload || payload.demo === true) return;
         if (dismissKey()) return;
         ensureCatalog().then(() => {
           mountNotification(host, payload, notificationHandlers(host, payload));
         });
-      }).catch(() => {});
-    };
-    if (auth.currentUser) run(auth.currentUser);
-    else {
-      const unsub = auth.onAuthStateChanged(user => {
-        if (typeof unsub === "function") unsub();
-        run(user);
+      }).catch(err => {
+        console.warn("BOT DEE Search SMARTnotification failed", err?.message || err);
       });
-    }
+    };
+    let tries = 0;
+    const boot = () => {
+      let auth;
+      try { auth = root.firebase?.auth?.(); } catch (_) { auth = null; }
+      if (!auth) {
+        if (tries < 20) {
+          tries += 1;
+          setTimeout(boot, 250);
+        }
+        return;
+      }
+      if (auth.currentUser) run(auth.currentUser);
+      else {
+        const unsub = auth.onAuthStateChanged(user => {
+          if (typeof unsub === "function") unsub();
+          run(user);
+        });
+      }
+    };
+    boot();
   }
 
   function bootSearch() {
+    refreshSearchNotifications();
+  }
+
+  function refreshSearchNotifications() {
     const host = document.getElementById("smartvisualNotificationHost");
     if (!host) return;
     const demo = requestedDemo();
@@ -469,7 +495,8 @@
     mountNotification,
     mountRoom,
     openRoomOverlay,
-    bootSearch
+    bootSearch,
+    refreshSearchNotifications
   };
 
   /* Catalog is required on BOT DEE Room SMARTview as well as Search.

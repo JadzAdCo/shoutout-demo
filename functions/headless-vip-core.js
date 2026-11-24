@@ -223,6 +223,8 @@ function isVipExecutePrompt(raw) {
   const q = fold(raw);
   if (!q || q.length > 2000) return false;
   if (/\b(?:how|help|what is|where do i|instructions?|explain)\b/.test(q)) return false;
+  if (/\broom smart(?:view| ?card)\b/.test(q)) return false;
+  if (/^(?:invite|bring)\s+\S+/.test(q) && !/\b(?:table|vip|reservation)\b/.test(q)) return false;
   if (/\b(?:throw|send|post)\b.{0,24}\bshout\s*out/.test(q)) return false;
   if (/\bvip\s*reserv/.test(q) || /\breserv\s*v\b/.test(q)) return true;
   if (/\bheadless\s+vip\b/.test(q)) return true;

@@ -2283,6 +2283,7 @@
       window.FLOQRFeatureServices?.applySearchUi?.();
       window.FLOQRFeatureServices?.applyFeatureLinks?.(document);
       window.FLOQRChromeScheme?.syncAccessGate?.();
+      window.FLOQRSmartVisuals?.refreshSearchNotifications?.();
     } catch (e) {
       console.warn("Search feature visibility failed", e?.message || e);
     }

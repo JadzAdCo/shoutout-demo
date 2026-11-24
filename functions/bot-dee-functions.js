@@ -1039,7 +1039,19 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, fe
       uiLanguage: lang
     };
   }
-  if (bot.isVipExecutePrompt(userPrompt)) {
+  const room = require("./botdee-room-smartview").buildRoomSession(userPrompt, {
+    hasActiveRoom: false,
+    declinedKeys: Array.isArray(roomSmartViewDeclined) ? roomSmartViewDeclined : []
+  });
+  const roomClassified = room.classified || {};
+  const roomTakesPriority = !!(room.handled && (
+    roomClassified.level === "explicit"
+    || roomClassified.route === "setup"
+    || roomClassified.route === "confirm"
+    || roomClassified.route === "command"
+    || roomClassified.command === "invite"
+  ));
+  if (!roomTakesPriority && bot.isVipExecutePrompt(userPrompt)) {
     const pack = bot.vipExecuteFallback(lang, allowed);
     return {
       reply: pack.reply,
@@ -1050,11 +1062,8 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, fe
       uiLanguage: lang
     };
   }
-  const room = require("./botdee-room-smartview").buildRoomSession(userPrompt, {
-    hasActiveRoom: false,
-    declinedKeys: Array.isArray(roomSmartViewDeclined) ? roomSmartViewDeclined : []
-  });
   if (room.handled) {
+    const extra = require("./bot-dee-tools").destinationPlaceViews(userPrompt);
     return {
       reply: room.reply,
       results: [],
@@ -1062,7 +1071,7 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, fe
       model: room.model,
       toolRounds: 0,
       uiLanguage: lang,
-      smartViews: room.smartViews,
+      smartViews: [...(room.smartViews || []), ...extra],
       replyKey: room.replyKey
     };
   }
@@ -1252,7 +1261,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     if (stored.joinedRoomId) {
       try {
         const liveRoom = await roomLive.loadRoom(stored.joinedRoomId);
-        if (!liveRoom || liveRoom.status !== "open" || !roomLive.memberOf(liveRoom, uid)) {
+        const sessionCore = require("./botdee-session-core");
+        if (!liveRoom || !sessionCore.roomIsInviteable(liveRoom) || !roomLive.memberOf(liveRoom, uid)) {
           await threads.persistJoinedRoomId(uid, null);
           stored.joinedRoomId = "";
           stored.joinedRoomConversationId = "";
@@ -1357,7 +1367,15 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     const previousVipDraft = stored.headlessVipDraft || null;
     const vipFollowUp = !!(previousVipDraft
       && require("./headless-vip-core").isInteractiveFollowUp(userPrompt, previousVipDraft));
-    const vipExecute = bot.isVipExecutePrompt(userPrompt) || vipFollowUp;
+    const roomClassified = roomAttached.classified || {};
+    const roomTakesPriority = !!(roomAttached.handled && (
+      roomClassified.level === "explicit"
+      || roomClassified.route === "setup"
+      || roomClassified.route === "confirm"
+      || roomClassified.route === "command"
+      || roomClassified.command === "invite"
+    ));
+    const vipExecute = !roomTakesPriority && (bot.isVipExecutePrompt(userPrompt) || vipFollowUp);
     let venueAttached = null;
     const collabUtterance = stored.joinedRoomId ? parseCollabUtterance(userPrompt) : null;
     if (!outcome && collabUtterance) {
@@ -1369,9 +1387,12 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     }
     let peopleAttached = null;
     const peopleIntent = peopleCards.classifyPeopleSearchIntent(userPrompt);
-    if (!outcome && !shoutExecute && !vipExecute && !roomAttached.handled) {
+    const placeTools = require("./bot-dee-tools");
+    const placeClassified = placeTools.classifyPlaceSearchIntent(userPrompt);
+    const attachPlaceWithRoom = placeTools.placeSearchAlongsideRoom(placeClassified);
+    if (!outcome && !shoutExecute && !vipExecute && (!roomAttached.handled || attachPlaceWithRoom)) {
       try {
-        venueAttached = await require("./bot-dee-tools").attachVenueSearch({
+        venueAttached = await placeTools.attachVenueSearch({
           query: userPrompt,
           request
         });
@@ -1554,10 +1575,32 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         } catch (error) {
           console.warn("BOT DEE room kick failed", error?.message || error);
         }
-      } else if (inviteRoom && stored.joinedRoomId && Array.isArray(classified.namedNeedles) && classified.namedNeedles.length) {
+      } else if (inviteRoom && Array.isArray(classified.namedNeedles) && classified.namedNeedles.length) {
         try {
           await audit.assertFeatureAccess(request.auth, "mingl", request);
           const sessionCore = require("./botdee-session-core");
+          const sessionStore = require("./botdee-session-store");
+          if (!stored.joinedRoomId) {
+            const latest = await sessionStore.latestInviteableHostRoom({uid});
+            if (latest && latest.id) {
+              await threads.persistJoinedRoomId(uid, latest.id, roomConversationId);
+              stored.joinedRoomId = latest.id;
+              stored.joinedRoomConversationId = roomConversationId;
+            }
+          }
+          if (!stored.joinedRoomId) {
+            outcome = {
+              reply: "Join Now or Set a schedule on Room SMARTview first, then I can invite that Mingl friend.",
+              results: [],
+              provider: "local-room-smartview",
+              model: "roomInviteNeedsRoom",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: roomAttached.smartViews || [],
+              replyKey: "botdee.room.confirmFirst",
+              geminiOnView: false
+            };
+          } else {
           const invited = await roomLive.inviteNamedGuests({
             uid,
             roomId: stored.joinedRoomId,
@@ -1596,6 +1639,26 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
               replyKey: replyKeys[reason],
               geminiOnView: false
             };
+          } else {
+            outcome = {
+              reply: reason === "ambiguous"
+                ? "More than one Mingl friend matches that name. Invite from Room SMARTview."
+                : (sessionCore.denialMessage(reason) || "Could not send that invite."),
+              results: [],
+              provider: "local-room-smartview",
+              model: "roomInviteDenied",
+              toolRounds: 0,
+              uiLanguage,
+              smartViews: roomAttached.smartViews || [],
+              replyKey: "botdee.room.inviteFailed",
+              geminiOnView: false
+            };
+          }
+          if (outcome && stored.joinedRoomId && Array.isArray(outcome.smartViews)) {
+            outcome.smartViews.forEach(view => {
+              if (view && view.kind === "botDeeRoom") view.roomId = stored.joinedRoomId;
+            });
+          }
           }
         } catch (error) {
           console.warn("BOT DEE room invite failed", error?.message || error);
@@ -1679,6 +1742,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         }
       }
       if (!outcome) {
+        const placeViews = (attachPlaceWithRoom && venueAttached && venueAttached.handled)
+          ? (venueAttached.smartViews || []).slice(0, 4)
+          : [];
         outcome = {
           reply: roomAttached.reply,
           results: [],
@@ -1686,8 +1752,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
           model: roomAttached.model,
           toolRounds: 0,
           uiLanguage,
-          smartViews: roomAttached.smartViews || [],
+          smartViews: [...(roomAttached.smartViews || []), ...placeViews],
           replyKey: roomAttached.replyKey,
+          venueSearch: placeViews.length ? venueAttached.venueSearch : undefined,
           geminiOnView: false
         };
       }

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.075";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.075";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.076";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.076";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.076",
+      title: "s3.3.076 — BOT DEE named invite + Search SMARTnotification + Miami Place SMARTview",
+      checks: [
+        {label:"Named invite needles", file:"functions/botdee-room-smartview.js", includes:["@?[\\w.'-]+", "invite|bring)\\s+\\S+"]},
+        {label:"Keep scheduled joinedRoomId", file:"functions/bot-dee-functions.js", includes:["roomIsInviteable(liveRoom)", "latestInviteableHostRoom", "roomTakesPriority"]},
+        {label:"Persist actor room on schedule", file:"functions/botdee-session-store.js", includes:["persistActorRoom", "latestInviteableHostRoom", "smartNotification\", \"==\", 1"]},
+        {label:"Search notify us-central1", file:"smartvisuals-view.js", includes:["refreshSearchNotifications", "us-central1", "listBotDeeRoomNotifications"]},
+        {label:"People Invite + room-only Join", file:"botdee-smartview.js", includes:["data-sv-invite-uid", "__floqrActiveBotDeeRoomId"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-076-botdee-invite-search-notify", "s3.3.076"]}
+      ]
+    },
     {
       version: "s3.3.075",
       title: "s3.3.075 — Room SMARTview collab + VIP popouts rebased onto collectableInput",
@@ -3823,7 +3835,16 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
-    {
+      {
+      id:"s3-3-076-botdee-invite-search-notify",
+      area:"BOT DEE",
+      feature:"Room SMARTview Invite lorna + Search SMARTnotification for scheduled rooms",
+      changed:"s3.3.076 — Invite lorna (lowercase) sends a Mingl Inbox invite for an open or scheduled BOT DEE room. It does not open VIP reserV or a People SMARTview Invite. Set a schedule paints Search SMARTnotification for the host without ?smartvisualInvite=cancun. Join Now from Search opens botdee.html?room= (t= optional for the host), never mingl-chat.html. Self / already-in-room chips stay That's you / Already in this session. Open a room smart card for reservations in Miami mounts Room SMARTview plus a Miami-tagged Place SMARTview (bg-miami), not VIP reserV only.",
+      howToTest:"1) After Don says merge: Pages + Functions + Firestore indexes (`hostUid`+`smartNotification`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / bot-dee-chat.js / smartvisuals-view.js / floqr-i18n.js ?v=s3.3.076. Sign in with BOT DEE + Mingl. 2) Open Room SMARTview, Set a schedule (future time). 3) Type Invite lorna for a distinct Mingl friend — expect Inbox Review BOT DEE invite, not a VIP reserV card. Chip That's you / Already in this session must not send. 4) People SMARTview Invite on a friend with a uid uses the same createBotDeeRoomInvite. 5) Open Search without the Cancun demo query — compact SMARTnotification for that scheduled room (host sees it). Join Now → botdee.html?room= not mingl-chat.html. 6) Type Open a room smart card for reservations in Miami — Room SMARTview with a miami tag chip / bg-miami, plus Place SMARTview; not VIP reserV only. 7) Phone ~390 and desktop ~1280. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Named Invite lorna invites the Mingl friend. Search shows the host's scheduled SMARTnotification without the Cancun demo query. Join Now stays on BOT DEE. A Miami-tagged Place / Room SMARTview appears for the Miami room-card ask.",
+      troubleshoot:"Invite still opens VIP reserV → cached botdee-room-smartview.js / headless-vip-core.js, or Functions not this SHA. Invite lorna looks up People only → extractNamedNeedles still requires [A-Z], or joinedRoomId cleared because status!==open (needs roomIsInviteable + persistActorRoom). Search empty without demo query → bootSearch still fail-closed on canAccess before load, or listBotDeeRoomNotifications missing hostUid+smartNotification index (fallback hostUid limit 80 should still work). Join Now no-op → captureJoinToken still required t=. Miami tag missing → cached bot-dee-tools.js still leftover-filters miami/room/smart/card, or executeBotSession still skips attachVenueSearch when Room SMARTview handled, or catalog.json not loaded (ensureCatalog) so bg-miami never resolves."
+    },
+      {
       id:"s3-3-075-botdee-room-collab-rebase",
       area:"BOT DEE",
       feature:"Room SMARTview shared picks + 60% host election on s3.3.074",

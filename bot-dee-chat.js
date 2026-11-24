@@ -500,7 +500,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.075";
+    return "s3.3.076";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -2144,7 +2144,7 @@
       const url = new URL(location.href);
       const token = String(url.searchParams.get("t") || url.searchParams.get("join") || "").trim();
       const roomId = String(url.searchParams.get("room") || "").trim();
-      if (!token) return;
+      if (!token && !roomId) return;
       pendingJoinToken = token;
       if (roomId) pendingJoinRoomId = roomId;
       url.searchParams.delete("join");
@@ -2154,34 +2154,50 @@
     } catch (_) {}
   }
 
-  async function acceptPendingInvite() {
-    if (!pendingJoinToken) return {ok: false, message: ""};
-    const fn = callable("acceptBotDeeRoomInvite");
-    if (!fn) {
-      pendingJoinToken = "";
-      pendingJoinRoomId = "";
-      return {ok: false, message: t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")};
-    }
+  async function attachExistingRoom(roomId) {
+    const getFn = callable("getBotDeeRoom");
+    if (!getFn || !roomId) return null;
     try {
-      const data = (await fn({
-        token: pendingJoinToken,
-        roomId: pendingJoinRoomId || undefined
-      }))?.data || {};
+      const data = (await getFn({roomId}))?.data || {};
+      if (data.ok === false) return null;
+      if (data.room || data.viewerIsHost === true || Array.isArray(data.members)) return data;
+    } catch (_) {}
+    return null;
+  }
+
+  async function acceptPendingInvite() {
+    if (!pendingJoinToken && !pendingJoinRoomId) return {ok: false, message: ""};
+    const token = pendingJoinToken;
+    const roomId = pendingJoinRoomId;
+    const fail = t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.");
+    const finish = ok => {
       pendingJoinToken = "";
       pendingJoinRoomId = "";
-      if (data.ok) return {ok: true, message: ""};
-      return {
-        ok: false,
-        message: data.error || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")
-      };
-    } catch (error) {
-      pendingJoinToken = "";
-      pendingJoinRoomId = "";
-      return {
-        ok: false,
-        message: error?.message || t("botdee.room.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one.")
-      };
+      return ok;
+    };
+    if (token) {
+      const fn = callable("acceptBotDeeRoomInvite");
+      if (fn) {
+        try {
+          const data = (await fn({token, roomId: roomId || undefined}))?.data || {};
+          if (data.ok || data.alreadyMember || data.room) return finish({ok: true, message: ""});
+        } catch (error) {
+          if (!roomId) return finish({ok: false, message: error?.message || fail});
+        }
+      } else if (!roomId) {
+        return finish({ok: false, message: fail});
+      }
+    } else if (roomId) {
+      const fn = callable("acceptBotDeeRoomInvite");
+      if (fn) {
+        try {
+          const data = (await fn({token: "", roomId}))?.data || {};
+          if (data.ok || data.alreadyMember || data.room) return finish({ok: true, message: ""});
+        } catch (_) {}
+      }
     }
+    if (roomId && await attachExistingRoom(roomId)) return finish({ok: true, message: ""});
+    return finish({ok: false, message: fail});
   }
 
   function bind(opts = {}) {
@@ -2197,7 +2213,7 @@
     }
     loadFeaturesCatalog();
     restoreOrWelcome();
-    if (pendingJoinToken) {
+    if (pendingJoinToken || pendingJoinRoomId) {
       setTimeout(async () => {
         const joined = await acceptPendingInvite();
         if (joined && joined.ok) {

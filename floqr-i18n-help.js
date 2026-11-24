@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.075";
+  const VERSION = "s3.3.076";
   const packs = {
     "ru": {
       "help-smartvisuals-create": {
@@ -11,7 +11,7 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Компактное приглашение Mingl Room может появиться в Search, когда друг Mingl запланировал room BOT DEE, куда вас пригласили. Смотреть приглашение открывает Room SMARTview. Join Now ведёт в BOT DEE, не в Mingl chat. Не сейчас скрывает карточку в этой вкладке; Inbox сохраняет Review BOT DEE invite. Демо-запрос Cancun — только Studio. Картинка — иллюстрация, не фото. Rooms Join Now без расписания не появляются в Search."
+        body: "Компактное приглашение Mingl Room может появиться в Search, когда вы задали расписание room BOT DEE или друг Mingl пригласил вас. Хост видит свою запланированную room на Search без демо-запроса Cancun. Смотреть приглашение открывает Room SMARTview. Join Now ведёт в BOT DEE, не в Mingl chat. Не сейчас скрывает карточку в этой вкладке; Inbox сохраняет Review BOT DEE invite. Демо-запрос Cancun — только Studio. Картинка — иллюстрация, не фото. Rooms Join Now без расписания не появляются в Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview и SMARTvisuals",
@@ -71,7 +71,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Пригласить друзей Mingl",
-        body: "После Confirm кнопка Invite показывает только друзей Mingl. Каждое приглашение привязано к другу и приходит в Inbox как Review BOT DEE invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги. Если фишка — это вы или человек уже в сессии, она помечена «Это вы» или «Уже в этой сессии» и не шлёт второе приглашение."
+        body: "После Confirm (Join Now или Set a schedule) кнопка Invite показывает только друзей Mingl. Нажмите друга или напишите Invite lorna — Inbox получит Review BOT DEE invite. Это команда Room SMARTview, не VIP reserV и не People SMARTview Invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги. Если фишка — это вы или человек уже в сессии, она помечена «Это вы» или «Уже в этой сессии» и не шлёт второе приглашение."
       },
       "help-botdee-room-smartview-join": {
         title: "Войти в сессию BOT DEE",
@@ -549,7 +549,7 @@
       },
       "help-smartvisuals-notification": {
         title: "Mingl Room SMARTnotification",
-        body: "Een compacte Mingl Room-uitnodiging kan op Search verschijnen als een Mingl-vriend een BOT DEE-room plande waar jij voor bent uitgenodigd. Uitnodiging bekijken opent Room SMARTview. Join Now gaat naar BOT DEE, niet Mingl-chat. Niet nu verbergt de kaart in dit tabblad; Inbox houdt Review BOT DEE invite. De Cancun-demovraag is alleen Studio. Kunst is illustratie, geen foto. Join Now-rooms zonder plan verschijnen niet op Search."
+        body: "Een compacte Mingl Room-uitnodiging kan op Search verschijnen als jij een schema zet voor een BOT DEE-room, of als een Mingl-vriend je uitnodigde. De host ziet de eigen geplande room op Search zonder de Cancun-demovraag. Uitnodiging bekijken opent Room SMARTview. Join Now gaat naar BOT DEE, niet Mingl-chat. Niet nu verbergt de kaart in dit tabblad; Inbox houdt Review BOT DEE invite. De Cancun-demovraag is alleen Studio. Kunst is illustratie, geen foto. Join Now-rooms zonder plan verschijnen niet op Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview met SMARTvisuals",
@@ -609,7 +609,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Mingl-vrienden uitnodigen",
-        body: "Na Confirm toont Invite alleen je Mingl-vrienden. Elke uitnodiging is gebonden aan die vriend en landt in Inbox als Review BOT DEE invite. Geen openbare join-link. Cap is host plus 7. Gasten kunnen meer Mingl-vrienden uitnodigen tot de host dat uitzet. Deelnemen is geen betaling. Als een chip jij bent of iemand die al in de sessie zit, staat That’s you of Already in this session en wordt er geen tweede uitnodiging gestuurd."
+        body: "Na Confirm (Join Now of Set a schedule) toont Invite alleen je Mingl-vrienden. Tik een vriend of typ Invite lorna — Inbox krijgt Review BOT DEE invite. Dat is een Room SMARTview-commando, geen VIP reserV en geen People SMARTview Invite. Geen openbare join-link. Cap is host plus 7. Gasten kunnen meer Mingl-vrienden uitnodigen tot de host dat uitzet. Deelnemen is geen betaling. Als een chip jij bent of iemand die al in de sessie zit, staat That’s you of Already in this session en wordt er geen tweede uitnodiging gestuurd."
       },
       "help-botdee-room-smartview-join": {
         title: "Deelnemen aan een BOT DEE-sessie",
@@ -1087,7 +1087,7 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Une invitation Mingl Room compacte peut apparaître sur Search quand un ami Mingl a planifié une room BOT DEE à laquelle vous êtes invité. Voir l’invitation ouvre Room SMARTview. Join Now va vers BOT DEE, pas Mingl chat. Pas maintenant masque la carte dans cet onglet ; Inbox garde Review BOT DEE invite. La requête démo Cancun est réservée au Studio. L’art est une illustration, pas une photo. Les rooms Join Now sans horaire n’apparaissent pas sur Search."
+        body: "Une invitation Mingl Room compacte peut apparaître sur Search quand vous définissez un horaire pour une room BOT DEE, ou qu’un ami Mingl vous y a invité. L’hôte voit sa room planifiée sur Search sans la requête démo Cancun. Voir l’invitation ouvre Room SMARTview. Join Now va vers BOT DEE, pas Mingl chat. Pas maintenant masque la carte dans cet onglet ; Inbox garde Review BOT DEE invite. La requête démo Cancun est réservée au Studio. L’art est une illustration, pas une photo. Les rooms Join Now sans horaire n’apparaissent pas sur Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview et SMARTvisuals",
@@ -1147,7 +1147,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Inviter des amis Mingl",
-        body: "Après Confirm, Invite n’affiche que vos amis Mingl. Chaque invitation est liée à cet ami et arrive dans Inbox comme Review BOT DEE invite. Ce n’est pas un lien public. Capacité : hôte plus 7. Les invités peuvent inviter d’autres amis Mingl sauf si l’hôte désactive cela. Rejoindre n’est pas un paiement. Si une puce est vous ou quelqu’un déjà dans la session, elle reste marquée C’est vous ou Déjà dans cette session et n’envoie pas une deuxième invitation."
+        body: "Après Confirm (Join Now ou Set a schedule), Invite n’affiche que vos amis Mingl. Touchez un ami ou tapez Invite lorna — Inbox reçoit Review BOT DEE invite. C’est une commande Room SMARTview, pas VIP reserV ni People SMARTview Invite. Ce n’est pas un lien public. Capacité : hôte plus 7. Les invités peuvent inviter d’autres amis Mingl sauf si l’hôte désactive cela. Rejoindre n’est pas un paiement. Si une puce est vous ou quelqu’un déjà dans la session, elle reste marquée C’est vous ou Déjà dans cette session et n’envoie pas une deuxième invitation."
       },
       "help-botdee-room-smartview-join": {
         title: "Rejoindre une session BOT DEE",
@@ -1625,7 +1625,7 @@
       },
       "help-smartvisuals-notification": {
         title: "Mingl Room SMARTnotification",
-        body: "Eine kompakte Mingl-Room-Einladung kann auf Search erscheinen, wenn ein Mingl-Freund eine BOT DEE-Room geplant hat, zu der Sie eingeladen sind. Einladung ansehen öffnet Room SMARTview. Join Now geht zu BOT DEE, nicht Mingl-Chat. Nicht jetzt blendet die Karte in diesem Tab aus; Inbox behält Review BOT DEE invite. Die Cancun-Demo-Abfrage ist nur Studio. Kunst ist Illustration, kein Foto. Join-Now-Rooms ohne Zeitplan erscheinen nicht auf Search."
+        body: "Eine kompakte Mingl-Room-Einladung kann auf Search erscheinen, wenn Sie einen Zeitplan für eine BOT DEE-Room setzen oder ein Mingl-Freund Sie eingeladen hat. Der Host sieht die eigene geplante Room auf Search ohne die Cancun-Demo-Abfrage. Einladung ansehen öffnet Room SMARTview. Join Now geht zu BOT DEE, nicht Mingl-Chat. Nicht jetzt blendet die Karte in diesem Tab aus; Inbox behält Review BOT DEE invite. Die Cancun-Demo-Abfrage ist nur Studio. Kunst ist Illustration, kein Foto. Join-Now-Rooms ohne Zeitplan erscheinen nicht auf Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview mit SMARTvisuals",
@@ -1685,7 +1685,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Mingl-Freunde einladen",
-        body: "Nach Confirm zeigt Invite nur deine Mingl-Freunde. Jede Einladung ist an diesen Freund gebunden und landet in Inbox als Review BOT DEE invite. Kein öffentlicher Join-Link. Maximum Gastgeber plus 7. Gäste können weitere Mingl-Freunde einladen, bis der Gastgeber das abschaltet. Beitreten ist keine Zahlung. Ist ein Chip du selbst oder schon in der Sitzung, bleibt er mit Das sind Sie oder Schon in dieser Sitzung markiert und sendet keine zweite Einladung."
+        body: "Nach Confirm (Join Now oder Set a schedule) zeigt Invite nur deine Mingl-Freunde. Tippe einen Freund oder schreibe Invite lorna — Inbox erhält Review BOT DEE invite. Das ist ein Room SMARTview-Befehl, kein VIP reserV und kein People SMARTview Invite. Kein öffentlicher Join-Link. Maximum Gastgeber plus 7. Gäste können weitere Mingl-Freunde einladen, bis der Gastgeber das abschaltet. Beitreten ist keine Zahlung. Ist ein Chip du selbst oder schon in der Sitzung, bleibt er mit Das sind Sie oder Schon in dieser Sitzung markiert und sendet keine zweite Einladung."
       },
       "help-botdee-room-smartview-join": {
         title: "Einer BOT DEE-Sitzung beitreten",
@@ -2163,7 +2163,7 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification de Mingl Room",
-        body: "Una invitación compacta Mingl Room puede aparecer en Search cuando un amigo Mingl programó una room BOT DEE a la que usted está invitado. Ver invitación abre Room SMARTview. Join Now va a BOT DEE, no a Mingl chat. Ahora no oculta la tarjeta en esta pestaña; Inbox sigue con Review BOT DEE invite. La consulta demo Cancun es solo Studio. El arte es ilustración, no foto. Las rooms Join Now sin horario no aparecen en Search."
+        body: "Una invitación compacta Mingl Room puede aparecer en Search cuando usted fija un horario para una room BOT DEE, o un amigo Mingl lo invitó. El anfitrión ve su room programada en Search sin la consulta demo Cancun. Ver invitación abre Room SMARTview. Join Now va a BOT DEE, no a Mingl chat. Ahora no oculta la tarjeta en esta pestaña; Inbox sigue con Review BOT DEE invite. La consulta demo Cancun es solo Studio. El arte es ilustración, no foto. Las rooms Join Now sin horario no aparecen en Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview con SMARTvisuals",
@@ -2223,7 +2223,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Invitar amigos Mingl",
-        body: "Tras Confirm, Invite muestra solo tus amigos Mingl. Cada invitación está ligada a ese amigo y llega a Inbox como Review BOT DEE invite. No es un enlace público. Cupo: anfitrión más 7. Los invitados pueden invitar más amigos Mingl salvo que el anfitrión lo desactive. Unirse no es un pago. Si un chip eres tú o alguien ya en la sesión, queda marcado Eres tú o Ya en esta sesión y no envía otra invitación."
+        body: "Tras Confirm (Join Now o Set a schedule), Invite muestra solo tus amigos Mingl. Toque un amigo o escriba Invite lorna — Inbox recibe Review BOT DEE invite. Es un comando de Room SMARTview, no VIP reserV ni People SMARTview Invite. No es un enlace público. Cupo: anfitrión más 7. Los invitados pueden invitar más amigos Mingl salvo que el anfitrión lo desactive. Unirse no es un pago. Si un chip eres tú o alguien ya en la sesión, queda marcado Eres tú o Ya en esta sesión y no envía otra invitación."
       },
       "help-botdee-room-smartview-join": {
         title: "Unirse a una sesión BOT DEE",
@@ -2701,7 +2701,7 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Un invito compatto Mingl Room può comparire su Search quando un amico Mingl ha programmato una room BOT DEE a cui sei invitato. Vedi invito apre Room SMARTview. Join Now va a BOT DEE, non Mingl chat. Non ora nasconde la scheda in questa scheda; Inbox tiene Review BOT DEE invite. La query demo Cancun è solo Studio. L’arte è illustrazione, non foto. Le room Join Now senza orario non appaiono su Search."
+        body: "Un invito compatto Mingl Room può comparire su Search quando imposti un orario per una room BOT DEE, o un amico Mingl ti invita. L’host vede la propria room programmata su Search senza la query demo Cancun. Vedi invito apre Room SMARTview. Join Now va a BOT DEE, non Mingl chat. Non ora nasconde la scheda in questa scheda; Inbox tiene Review BOT DEE invite. La query demo Cancun è solo Studio. L’arte è illustrazione, non foto. Le room Join Now senza orario non appaiono su Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview con SMARTvisuals",
@@ -2761,7 +2761,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Invita amici Mingl",
-        body: "Dopo Confirm, Invite mostra solo i tuoi amici Mingl. Ogni invito è legato a quell’amico e arriva in Inbox come Review BOT DEE invite. Non è un link pubblico. Capienza: host più 7. Gli ospiti possono invitare altri amici Mingl finché l’host non lo disattiva. Entrare non è un pagamento. Se un chip sei tu o qualcuno già in sessione, resta Sei tu o Già in questa sessione e non invia un secondo invito."
+        body: "Dopo Confirm (Join Now o Set a schedule), Invite mostra solo i tuoi amici Mingl. Tocca un amico o scrivi Invite lorna — Inbox riceve Review BOT DEE invite. È un comando Room SMARTview, non VIP reserV né People SMARTview Invite. Non è un link pubblico. Capienza: host più 7. Gli ospiti possono invitare altri amici Mingl finché l’host non lo disattiva. Entrare non è un pagamento. Se un chip sei tu o qualcuno già in sessione, resta Sei tu o Già in questa sessione e non invia un secondo invito."
       },
       "help-botdee-room-smartview-join": {
         title: "Unisciti a una sessione BOT DEE",
@@ -3239,7 +3239,7 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Um convite compacto Mingl Room pode aparecer na Search quando um amigo Mingl agendou uma room BOT DEE para a qual foi convidado. Ver convite abre Room SMARTview. Join Now vai para BOT DEE, não Mingl chat. Agora não esconde o cartão neste separador; Inbox mantém Review BOT DEE invite. A consulta demo Cancun é só Studio. A arte é ilustração, não foto. Rooms Join Now sem horário não aparecem na Search."
+        body: "Um convite compacto Mingl Room pode aparecer na Search quando você define um horário para uma room BOT DEE, ou um amigo Mingl o convidou. O anfitrião vê a própria room agendada na Search sem a consulta demo Cancun. Ver convite abre Room SMARTview. Join Now vai para BOT DEE, não Mingl chat. Agora não esconde o cartão neste separador; Inbox mantém Review BOT DEE invite. A consulta demo Cancun é só Studio. A arte é ilustração, não foto. Rooms Join Now sem horário não aparecem na Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview com SMARTvisuals",
@@ -3299,7 +3299,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Convidar amigos Mingl",
-        body: "Depois de Confirm, Invite mostra só os seus amigos Mingl. Cada convite fica ligado a esse amigo e chega ao Inbox como Review BOT DEE invite. Não é um link público. Limite: anfitrião mais 7. Convidados podem convidar mais amigos Mingl até o anfitrião desligar isso. Entrar não é pagamento. Se um chip é você ou alguém já na sessão, fica É você ou Já nesta sessão e não envia outro convite."
+        body: "Depois de Confirm (Join Now ou Set a schedule), Invite mostra só os seus amigos Mingl. Toque um amigo ou escreva Invite lorna — Inbox recebe Review BOT DEE invite. É um comando Room SMARTview, não VIP reserV nem People SMARTview Invite. Não é um link público. Limite: anfitrião mais 7. Convidados podem convidar mais amigos Mingl até o anfitrião desligar isso. Entrar não é pagamento. Se um chip é você ou alguém já na sessão, fica É você ou Já nesta sessão e não envia outro convite."
       },
       "help-botdee-room-smartview-join": {
         title: "Entrar numa sessão BOT DEE",
@@ -3777,7 +3777,7 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Μια συμπαγής πρόσκληση Mingl Room μπορεί να εμφανιστεί στο Search όταν ένας φίλος Mingl προγραμμάτισε BOT DEE room στο οποίο προσκληθήκατε. Προβολή πρόσκλησης ανοίγει Room SMARTview. Το Join Now πηγαίνει στο BOT DEE, όχι Mingl chat. Όχι τώρα κρύβει την κάρτα σε αυτή την καρτέλα· το Inbox κρατά Review BOT DEE invite. Το demo Cancun είναι μόνο Studio. Η τέχνη είναι εικονογράφηση, όχι φωτογραφία. Rooms Join Now χωρίς πρόγραμμα δεν εμφανίζονται στο Search."
+        body: "Μια συμπαγής πρόσκληση Mingl Room μπορεί να εμφανιστεί στο Search όταν ορίζετε πρόγραμμα για BOT DEE room, ή σας προσκάλεσε φίλος Mingl. Ο οικοδεσπότης βλέπει τη δική του προγραμματισμένη room στο Search χωρίς το demo Cancun. Προβολή πρόσκλησης ανοίγει Room SMARTview. Το Join Now πηγαίνει στο BOT DEE, όχι Mingl chat. Όχι τώρα κρύβει την κάρτα σε αυτή την καρτέλα· το Inbox κρατά Review BOT DEE invite. Το demo Cancun είναι μόνο Studio. Η τέχνη είναι εικονογράφηση, όχι φωτογραφία. Rooms Join Now χωρίς πρόγραμμα δεν εμφανίζονται στο Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview με SMARTvisuals",
@@ -3837,7 +3837,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Πρόσκληση φίλων Mingl",
-        body: "Μετά το Confirm, το Invite δείχνει μόνο τους φίλους Mingl. Κάθε πρόσκληση δεσμεύεται σε αυτόν τον φίλο και φτάνει στο Inbox ως Review BOT DEE invite. Όχι δημόσιος σύνδεσμος. Όριο: οικοδεσπότης συν 7. Οι επισκέπτες μπορούν να προσκαλούν περισσότερους φίλους Mingl μέχρι ο οικοδεσπότης να το κλείσει. Η συμμετοχή δεν είναι πληρωμή. Αν ένα chip είστε εσείς ή κάποιος ήδη στη συνεδρία, μένει Είστε εσείς ή Ήδη στη συνεδρία και δεν στέλνει δεύτερη πρόσκληση."
+        body: "Μετά το Confirm (Join Now ή Set a schedule), το Invite δείχνει μόνο τους φίλους Mingl. Πατήστε έναν φίλο ή γράψτε Invite lorna — το Inbox λαμβάνει Review BOT DEE invite. Είναι εντολή Room SMARTview, όχι VIP reserV ούτε People SMARTview Invite. Όχι δημόσιος σύνδεσμος. Όριο: οικοδεσπότης συν 7. Οι επισκέπτες μπορούν να προσκαλούν περισσότερους φίλους Mingl μέχρι ο οικοδεσπότης να το κλείσει. Η συμμετοχή δεν είναι πληρωμή. Αν ένα chip είστε εσείς ή κάποιος ήδη στη συνεδρία, μένει Είστε εσείς ή Ήδη στη συνεδρία και δεν στέλνει δεύτερη πρόσκληση."
       },
       "help-botdee-room-smartview-join": {
         title: "Συμμετοχή σε συνεδρία BOT DEE",
@@ -4315,7 +4315,7 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Kompaktowe zaproszenie Mingl Room może pojawić się na Search, gdy znajomy Mingl zaplanował room BOT DEE, na które Cię zaproszono. Zobacz zaproszenie otwiera Room SMARTview. Join Now idzie do BOT DEE, nie Mingl chat. Nie teraz chowa kartę w tej karcie; Inbox zostawia Review BOT DEE invite. Demo Cancun jest tylko Studio. Grafika to ilustracja, nie zdjęcie. Roomy Join Now bez harmonogramu nie pojawiają się na Search."
+        body: "Kompaktowe zaproszenie Mingl Room może pojawić się na Search, gdy ustawisz harmonogram room BOT DEE albo znajomy Mingl Cię zaprosi. Gospodarz widzi własną zaplanowaną room na Search bez zapytania demo Cancun. Zobacz zaproszenie otwiera Room SMARTview. Join Now idzie do BOT DEE, nie Mingl chat. Nie teraz chowa kartę w tej karcie; Inbox zostawia Review BOT DEE invite. Demo Cancun jest tylko Studio. Grafika to ilustracja, nie zdjęcie. Roomy Join Now bez harmonogramu nie pojawiają się na Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview ze SMARTvisuals",
@@ -4375,7 +4375,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Zaproś znajomych Mingl",
-        body: "Po Confirm Invite pokazuje tylko Twoich znajomych Mingl. Każde zaproszenie jest powiązane z tym znajomym i trafia do Inbox jako Review BOT DEE invite. To nie jest publiczny link. Limit: gospodarz plus 7. Goście mogą zapraszać więcej znajomych Mingl, dopóki gospodarz tego nie wyłączy. Dołączenie nie jest płatnością. Jeśli chip to ty albo ktoś już w sesji, zostaje To ty albo Już w tej sesji i nie wysyła drugiego zaproszenia."
+        body: "Po Confirm (Join Now lub Set a schedule) Invite pokazuje tylko Twoich znajomych Mingl. Dotknij znajomego albo wpisz Invite lorna — Inbox dostaje Review BOT DEE invite. To polecenie Room SMARTview, nie VIP reserV i nie People SMARTview Invite. To nie jest publiczny link. Limit: gospodarz plus 7. Goście mogą zapraszać więcej znajomych Mingl, dopóki gospodarz tego nie wyłączy. Dołączenie nie jest płatnością. Jeśli chip to ty albo ktoś już w sesji, zostaje To ty albo Już w tej sesji i nie wysyła drugiego zaproszenia."
       },
       "help-botdee-room-smartview-join": {
         title: "Dołącz do sesji BOT DEE",
@@ -4853,7 +4853,7 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification لـ Mingl Room",
-        body: "يمكن أن تظهر دعوة Mingl Room مختصرة على Search عندما يجدول صديق Mingl room BOT DEE دُعيت إليها. عرض الدعوة يفتح Room SMARTview. Join Now يذهب إلى BOT DEE وليس Mingl chat. ليس الآن يخفي البطاقة في هذا التبويب؛ يبقى Inbox فيه Review BOT DEE invite. استعلام Cancun التجريبي لـ Studio فقط. الرسم توضيح وليس صورة. غرف Join Now بلا جدول لا تظهر على Search."
+        body: "يمكن أن تظهر دعوة Mingl Room مختصرة على Search عندما تضبط جدولاً لـ room BOT DEE أو يدعوك صديق Mingl. يرى المضيف room المجدولة على Search دون استعلام Cancun التجريبي. عرض الدعوة يفتح Room SMARTview. Join Now يذهب إلى BOT DEE وليس Mingl chat. ليس الآن يخفي البطاقة في هذا التبويب؛ يبقى Inbox فيه Review BOT DEE invite. استعلام Cancun التجريبي لـ Studio فقط. الرسم توضيح وليس صورة. غرف Join Now بلا جدول لا تظهر على Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview مع SMARTvisuals",
@@ -4913,7 +4913,7 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "دعوة أصدقاء Mingl",
-        body: "بعد Confirm يعرض Invite أصدقاء Mingl فقط. كل دعوة مربوطة بذلك الصديق وتصل Inbox كـ Review BOT DEE invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً. إذا كانت الشريحة أنت أو شخصاً موجوداً في الجلسة تُعلَّم هذا أنت أو موجود في هذه الجلسة ولا تُرسل دعوة ثانية."
+        body: "بعد Confirm (Join Now أو Set a schedule) يعرض Invite أصدقاء Mingl فقط. اضغط صديقاً أو اكتب Invite lorna — يصل Inbox كـ Review BOT DEE invite. هذا أمر Room SMARTview وليس VIP reserV ولا People SMARTview Invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً. إذا كانت الشريحة أنت أو شخصاً موجوداً في الجلسة تُعلَّم هذا أنت أو موجود في هذه الجلسة ولا تُرسل دعوة ثانية."
       },
       "help-botdee-room-smartview-join": {
         title: "الانضمام إلى جلسة BOT DEE",
