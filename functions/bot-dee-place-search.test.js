@@ -157,6 +157,10 @@ test("venue search returns SMARTviews only, not duplicate result links", () => {
   assert.match(attach, /const smartViews = cards\.map\(card => applyPlaceVisualOverride\(clubSmartView\(card\), overrideVisual\)\)/);
   assert.match(session, /attachPlaceWithRoom/);
   assert.match(session, /placeViews/);
+  assert.match(session, /!vipExecute \|\| attachPlaceWithRoom/);
+  assert.match(session, /classifyPlaceSearchFromConversation/);
+  assert.match(session, /mergePlaceSmartViews/);
+  assert.doesNotMatch(session, /!outcome && !shoutExecute && !vipExecute && \(!roomAttached\.handled \|\| attachPlaceWithRoom\)/);
 });
 
 test("room smart card for reservations in Miami keeps Miami place tokens and Place SMARTview", () => {
@@ -198,6 +202,63 @@ test("room smart card for reservations in Miami keeps Miami place tokens and Pla
   assert.ok(local.smartViews.some(row => row && row.kind === "botDeeRoom"));
   assert.ok(local.smartViews.some(row => row && row.kind === "venue" && /miami/i.test(row.title || "")));
   assert.ok(local.smartViews.some(row => row && Array.isArray(row.floqrPublicData?.smartTags) && row.floqrPublicData.smartTags.includes("miami")));
+});
+
+test("VIP reservations in Miami still attach Place SMARTview", () => {
+  const vip = require("./headless-vip-core");
+  const q = "VIP reservations in Miami";
+  assert.equal(vip.isVipExecutePrompt(q), true);
+  const classified = tools.classifyPlaceSearchIntent(q);
+  assert.equal(classified.intent, "venue");
+  assert.ok(classified.placeTokens.includes("miami"));
+  assert.equal(tools.placeSearchAlongsideRoom(classified), true);
+  const dest = tools.destinationSmartView(classified);
+  assert.equal(dest.floqrPublicData.smartBackgroundId, "bg-miami");
+  assert.ok(dest.floqrPublicData.smartTags.includes("miami"));
+
+  const local = require("./bot-dee-functions").__botDeeHelpers.localSession("patron", q);
+  assert.equal(local.provider, "local-vip");
+  assert.ok(local.smartViews.some(row => row && row.kind === "venue" && /miami/i.test(row.title || "")));
+  assert.ok(local.smartViews.some(row => row && row.floqrPublicData?.smartBackgroundId === "bg-miami"));
+});
+
+test("VIP follow-up keeps Miami Place SMARTview from earlier turns", () => {
+  const history = [
+    {role: "user", text: "VIP reservations in Miami"},
+    {role: "model", text: "Which club?"},
+    {role: "user", text: "at Aurelia"}
+  ];
+  const follow = tools.classifyPlaceSearchFromConversation("at Aurelia", history);
+  assert.equal(tools.placeSearchAlongsideRoom(follow), true);
+  assert.ok(follow.placeTokens.includes("miami"));
+  assert.match(tools.placeAttachQuery(follow, "at Aurelia"), /miami/i);
+
+  const dateFollow = tools.classifyPlaceSearchFromConversation("2026-11-26", history.concat([
+    {role: "model", text: "Pick a night"}
+  ]));
+  assert.ok(dateFollow.placeTokens.includes("miami"));
+
+  const local = require("./bot-dee-functions").__botDeeHelpers.localSession("patron", "at Aurelia", {history});
+  assert.ok(local.smartViews.some(row => row && row.kind === "venue" && /miami/i.test(row.title || "")));
+
+  const helpers = require("./bot-dee-functions").__botDeeHelpers;
+  const vipOnly = {
+    reply: "Tap a night.",
+    smartViews: [{kind: "botDeeVip", venueName: "Aurelia"}]
+  };
+  const merged = helpers.mergePlaceSmartViews(vipOnly, {
+    handled: true,
+    smartViews: [tools.destinationSmartView(follow)],
+    venueSearch: {intent: "venue", count: 1}
+  });
+  assert.equal(merged.smartViews[0].kind, "botDeeVip");
+  assert.equal(merged.smartViews[1].kind, "venue");
+  assert.equal(merged.smartViews[1].floqrPublicData.smartBackgroundId, "bg-miami");
+  const again = helpers.mergePlaceSmartViews(merged, {
+    handled: true,
+    smartViews: [tools.destinationSmartView(follow)]
+  });
+  assert.equal(again.smartViews.filter(row => row.kind === "venue").length, 1);
 });
 
 test("Gemini dining path is kind=club and does not pitch products", () => {

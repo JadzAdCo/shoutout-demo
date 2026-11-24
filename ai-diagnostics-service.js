@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.079";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.079";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.080";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.080";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.080",
+      title: "s3.3.080 — BOT DEE VIP reserV still attaches Miami Place SMARTview",
+      checks: [
+        {label:"Conversation place tokens", file:"functions/bot-dee-tools.js", includes:["classifyPlaceSearchFromConversation", "placeAttachQuery"]},
+        {label:"VIP does not skip Place attach", file:"functions/bot-dee-functions.js", includes:["!vipExecute || attachPlaceWithRoom", "mergePlaceSmartViews"]},
+        {label:"Local VIP keeps Place", file:"functions/bot-dee-functions.js", includes:["destinationPlaceViews", "smartViews: placeViews"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-080-botdee-vip-miami-place", "s3.3.080"]}
+      ]
+    },
     {
       version: "s3.3.079",
       title: "s3.3.079 — Search Join Now attaches Room SMARTview group chat",
@@ -3868,6 +3878,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-080-botdee-vip-miami-place",
+      area:"BOT DEE",
+      feature:"VIP reserV + Miami still attach Place SMARTview",
+      changed:"s3.3.080 — BOT DEE processes mixed VIP reserV + Miami input. VIP execute / follow-up (reservations in Miami, then at Aurelia, then a night) still attaches Place SMARTview (bg-miami, miami tag) beside the VIP card. Place is not swallowed. Floor-map sheet is out of scope.",
+      howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee.html / bot-dee-chat.js / botdee-smartview.js ?v=s3.3.080. Sign in with BOT DEE + VIP reserV. 2) Type VIP reservations in Miami — expect VIP reserV card AND Miami Place SMARTview (bg-miami). 3) Reply at Aurelia, then 2026-11-26 — VIP nights/party stay, Miami Place SMARTview remains. 4) Open a room smart card for reservations in Miami still mounts Room SMARTview + Place (regression). 5) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"VIP reserV at Aurelia still shows a Miami Place SMARTview card. BOT DEE does not drop the city after a VIP follow-up.",
+      troubleshoot:"VIP only, no Place → cached executeBotSession still skips attachVenueSearch when vipExecute; deploy Functions from origin/main with [firebase-deploy-botdee]. Place missing on follow-up → classifyPlaceSearchFromConversation not deployed, or history not loaded. Room-card Miami still works but VIP mix fails → this SHA missing mergePlaceSmartViews. Wrong art → catalog.json not loaded (ensureCatalog) so bg-miami never resolves."
+    },
       {
       id:"s3-3-079-botdee-joined-group-chat",
       area:"BOT DEE",

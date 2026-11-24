@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.079";
+  const VERSION = "s3.3.080";
   const packs = {
     "ru": {
       "help-smartvisuals-create": {
@@ -31,7 +31,7 @@
       },
     "help-botdee-place-search": {
         title: "Спросить BOT DEE про площадки FLOQR",
-        body: "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают компактный Place SMARTview (название, краткий текст, рейтинги, ссылка на публичную страницу) с SMARTbackground — не фото-лунку. Фото посетителей и питчи ShoutOut / VIP не показываются, если вы об этом не просили. Если площадки ещё нет — BOT DEE так и скажет."
+        body: "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают компактный Place SMARTview (название, краткий текст, рейтинги, ссылка на публичную страницу) с SMARTbackground — не фото-лунку. Название города вместе с VIP reserV (reservations in Miami) всё равно прикрепляет Place SMARTview рядом с картой VIP. Фото посетителей и питчи ShoutOut не показываются, если вы об этом не просили. Если площадки ещё нет — BOT DEE так и скажет."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -569,7 +569,7 @@
       },
     "help-botdee-place-search": {
         title: "Vraag BOT DEE naar FLOQR-venues",
-        body: "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen een compacte Place SMARTview (naam, korte blurb, ratings, publiekspagina) met een SMARTbackground — geen fotobak. Patronfoto’s en ShoutOut- / VIP-pitches blijven weg tenzij u daarnaar vroeg. Als er nog niets onboarded is, zegt BOT DEE dat."
+        body: "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen een compacte Place SMARTview (naam, korte blurb, ratings, publiekspagina) met een SMARTbackground — geen fotobak. Een stad noemen bij VIP reserV (reservations in Miami) koppelt nog steeds Place SMARTview naast de VIP-kaart. Patronfoto’s en ShoutOut-pitches blijven weg tenzij u daarnaar vroeg. Als er nog niets onboarded is, zegt BOT DEE dat."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -1107,7 +1107,7 @@
       },
     "help-botdee-place-search": {
         title: "Demander à BOT DEE des lieux FLOQR",
-        body: "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent une Place SMARTview compacte (nom, court texte, notes, lien page publique) avec un SMARTbackground — pas un puits photo. Photos de patrons et pitches ShoutOut / VIP restent hors sujet sauf si vous les avez demandés. S’il n’y a encore rien, BOT DEE le dit."
+        body: "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent une Place SMARTview compacte (nom, court texte, notes, lien page publique) avec un SMARTbackground — pas un puits photo. Nommer une ville avec VIP reserV (reservations in Miami) attache toujours Place SMARTview à côté de la carte VIP. Photos de patrons et pitches ShoutOut restent hors sujet sauf si vous les avez demandés. S’il n’y a encore rien, BOT DEE le dit."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -1645,7 +1645,7 @@
       },
     "help-botdee-place-search": {
         title: "BOT DEE nach FLOQR-Locations fragen",
-        body: "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen eine kompakte Place SMARTview (Name, Kurztext, Bewertungen, Public-Page-Link) mit SMARTbackground — keinen Fotoschacht. Patron-Fotos und ShoutOut-/VIP-Pitches bleiben weg, außer Sie haben danach gefragt. Ist noch nichts onboardet, sagt BOT DEE das."
+        body: "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen eine kompakte Place SMARTview (Name, Kurztext, Bewertungen, Public-Page-Link) mit SMARTbackground — keinen Fotoschacht. Eine Stadt mit VIP reserV (reservations in Miami) hängt Place SMARTview weiter neben der VIP-Karte an. Patron-Fotos und ShoutOut-Pitches bleiben weg, außer Sie haben danach gefragt. Ist noch nichts onboardet, sagt BOT DEE das."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -2183,7 +2183,7 @@
       },
     "help-botdee-place-search": {
         title: "Preguntar a BOT DEE por locales FLOQR",
-        body: "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren un Place SMARTview compacto (nombre, texto corto, valoraciones, enlace a la página pública) con un SMARTbackground — no un pozo de foto. Las fotos de patrons y los pitches de ShoutOut / VIP no aparecen salvo que los pida. Si aún no hay nada, BOT DEE lo dice."
+        body: "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren un Place SMARTview compacto (nombre, texto corto, valoraciones, enlace a la página pública) con un SMARTbackground — no un pozo de foto. Nombrar una ciudad con VIP reserV (reservations in Miami) sigue adjuntando Place SMARTview junto a la tarjeta VIP. Las fotos de patrons y los pitches de ShoutOut no aparecen salvo que los pida. Si aún no hay nada, BOT DEE lo dice."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -2721,7 +2721,7 @@
       },
     "help-botdee-place-search": {
         title: "Chiedere a BOT DEE i locali FLOQR",
-        body: "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono una Place SMARTview compatta (nome, breve testo, valutazioni, link alla pagina pubblica) con SMARTbackground — non un pozzo foto. Foto dei patron e pitch ShoutOut / VIP restano fuori se non li hai chiesti. Se non c’è ancora nulla, BOT DEE lo dice."
+        body: "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono una Place SMARTview compatta (nome, breve testo, valutazioni, link alla pagina pubblica) con SMARTbackground — non un pozzo foto. Nominare una città con VIP reserV (reservations in Miami) allega ancora Place SMARTview accanto alla card VIP. Foto dei patron e pitch ShoutOut restano fuori se non li hai chiesti. Se non c’è ancora nulla, BOT DEE lo dice."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -3259,7 +3259,7 @@
       },
     "help-botdee-place-search": {
         title: "Perguntar ao BOT DEE por locais FLOQR",
-        body: "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem um Place SMARTview compacto (nome, texto curto, classificações, ligação à página pública) com SMARTbackground — não um poço de foto. Fotos de patrons e pitches de ShoutOut / VIP ficam de fora salvo se pedir. Se ainda não houver listing, o BOT DEE diz."
+        body: "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem um Place SMARTview compacto (nome, texto curto, classificações, ligação à página pública) com SMARTbackground — não um poço de foto. Nomear uma cidade com VIP reserV (reservations in Miami) continua a anexar Place SMARTview ao lado do cartão VIP. Fotos de patrons e pitches de ShoutOut ficam de fora salvo se pedir. Se ainda não houver listing, o BOT DEE diz."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -3797,7 +3797,7 @@
       },
     "help-botdee-place-search": {
         title: "Ρωτήστε τον BOT DEE για χώρους FLOQR",
-        body: "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν μια συμπαγή Place SMARTview (όνομα, σύντομο κείμενο, βαθμολογίες, σύνδεσμος δημόσιας σελίδας) με SMARTbackground — όχι πηγάδι φωτογραφίας. Φωτογραφίες patrons και pitches ShoutOut / VIP μένουν εκτός εκτός αν τα ζητήσατε. Αν δεν υπάρχει ακόμα, ο BOT DEE το λέει."
+        body: "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν μια συμπαγή Place SMARTview (όνομα, σύντομο κείμενο, βαθμολογίες, σύνδεσμος δημόσιας σελίδας) με SMARTbackground — όχι πηγάδι φωτογραφίας. Αν ονομάσετε μια πόλη με VIP reserV (reservations in Miami), το Place SMARTview επισυνάπτεται ακόμα δίπλα στην κάρτα VIP. Φωτογραφίες patrons και pitches ShoutOut μένουν εκτός εκτός αν τα ζητήσατε. Αν δεν υπάρχει ακόμα, ο BOT DEE το λέει."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -4335,7 +4335,7 @@
       },
     "help-botdee-place-search": {
         title: "Zapytaj BOT DEE o lokale FLOQR",
-        body: "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają zwartą kartę Place SMARTview (nazwa, krótki opis, oceny, link do strony publicznej) ze SMARTbackground — nie studnią zdjęcia. Zdjęcia patronów i pitch ShoutOut / VIP zostają pominięte, chyba że o nie poprosisz. Jeśli nic jeszcze nie jest onboardowane, BOT DEE to powie."
+        body: "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają zwartą kartę Place SMARTview (nazwa, krótki opis, oceny, link do strony publicznej) ze SMARTbackground — nie studnią zdjęcia. Podanie miasta z VIP reserV (reservations in Miami) nadal dołącza Place SMARTview obok karty VIP. Zdjęcia patronów i pitch ShoutOut zostają pominięte, chyba że o nie poprosisz. Jeśli nic jeszcze nie jest onboardowane, BOT DEE to powie."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -4873,7 +4873,7 @@
       },
     "help-botdee-place-search": {
         title: "اسأل BOT DEE عن أماكن FLOQR",
-        body: "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. صور الرواد وعروض ShoutOut / VIP لا تظهر إلا إذا طلبتها. إذا لم يُدرج المكان بعد، يقول BOT DEE ذلك."
+        body: "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. ذكر مدينة مع VIP reserV (reservations in Miami) ما زال يُرفق Place SMARTview بجانب بطاقة VIP. صور الرواد وعروض ShoutOut لا تظهر إلا إذا طلبتها. إذا لم يُدرج المكان بعد، يقول BOT DEE ذلك."
       },
       "help-botdee-page": {
         title: "BOT DEE",

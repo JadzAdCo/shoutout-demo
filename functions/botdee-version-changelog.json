@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.080",
+    "text": "s3.3.080: BOT DEE VIP reserV still attaches Miami Place SMARTview from mixed input",
+    "audiences": [
+      "botDee"
+    ]
+  },
+  {
     "id": "s3.3.079",
     "text": "s3.3.079: Search Join Now attaches the existing BOT DEE Room SMARTview group chat (Don + Lorna names + shared turns)",
     "audiences": [
