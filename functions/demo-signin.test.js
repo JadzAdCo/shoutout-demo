@@ -258,7 +258,11 @@ test("BOT DEE help entry is Master Admin only and classified", () => {
   const win = {FLOQRNav: {appVersion: "t"}, location: {href: "https://x/", pathname: "/"}, localStorage: {getItem() { return null; }, setItem() {}}, navigator: {language: "en"}, addEventListener() {}, document: null, URLSearchParams, URL, console, setTimeout};
   win.window = win;
   vm.runInContext(read("botdee-help-repository.js"), vm.createContext(win));
-  const entry = win.FLOQRHelpRepository.entries().find(row => row.id === "help-master-demo-signin");
+  const publicEntry = win.FLOQRHelpRepository.entries().find(row => row.id === "help-master-demo-signin");
+  assert.equal(publicEntry, undefined, "master-only help stays off the public Pages script");
+  assert.doesNotMatch(read("help-verbiage-snapshot.js"), /help-master-demo-signin/);
+  const master = JSON.parse(read("functions/help-verbiage-master-source.json"));
+  const entry = master.find(row => row.id === "help-master-demo-signin");
   assert.ok(entry);
   assert.deepEqual([...entry.audiences], ["masterAdmin"]);
   for (const phrase of ["demo employee code", "temp code", "demo sign in", "sign in as demo", "demo worker mgmt"]) assert.ok(entry.searchPhrases.includes(phrase), phrase);

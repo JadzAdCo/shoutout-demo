@@ -26,52 +26,6 @@
       ]
     },
     {
-      "sourceId": "help:help-ad-campaign-mgmt",
-      "id": "help-ad-campaign-mgmt",
-      "kind": "help",
-      "label": "Ad Management",
-      "blurb": "Master Admin → Ad Management. Approval queue: approve, waive payment with a reason, mark an invoice paid, or reject with an optional refund. Live & scheduled: pause, resume, end, edit audience and dates. Ad stats: measured impressions, clicks and click rate, with Clear for one ad",
-      "href": "./master-admin.html?from=botdee#adApprovalQueue",
-      "phrases": [
-        "ad management",
-        "master admin ad management. approval queue approve waive payment with a reason mark an invoice paid or reject with an optional refund. live scheduled pause resu",
-        "ad campaign mgmt",
-        "approve ad",
-        "preview creative",
-        "match tags",
-        "schedule ad flight",
-        "inline package",
-        "mingl gist package",
-        "demo not live",
-        "packaged demos",
-        "house ads",
-        "campaign status badge",
-        "ad approval queue",
-        "help-ad-campaign-mgmt"
-      ]
-    },
-    {
-      "sourceId": "help:help-ad-campaign-status-badge",
-      "id": "help-ad-campaign-status-badge",
-      "kind": "help",
-      "label": "Ad campaign Status and Shows on",
-      "blurb": "On each Ad Campaign Mgmt card, Status tells whether the creative is Live, Demo (not live), Awaiting approval, Needs verification, or Rejected. Shows on names the paid package (Inline or Mingl Gist) or the first feature path for packaged demos (for example ShoutOut path). Demo (no",
-      "href": "./master-admin.html?from=botdee#adCampaignManagement",
-      "phrases": [
-        "ad campaign status and shows on",
-        "on each ad campaign mgmt card status tells whether the creative is live demo not live awaiting approval needs verification or rejected. shows on names the paid ",
-        "preview shoutout",
-        "demo not live",
-        "shows on shoutout",
-        "campaign badge",
-        "status live",
-        "shoutout path",
-        "what does preview mean on ad",
-        "packaged demos",
-        "help-ad-campaign-status-badge"
-      ]
-    },
-    {
       "sourceId": "help:help-ad-campaigns",
       "id": "help-ad-campaigns",
       "kind": "help",
@@ -95,27 +49,6 @@
       ]
     },
     {
-      "sourceId": "help:help-ai-crawl-gemini",
-      "id": "help-ai-crawl-gemini",
-      "kind": "help",
-      "label": "Gemini on AI Crawling",
-      "blurb": "Gemini should improve crawling by reading official event and venue pages FLOQR already found — for DJ(s), “presented by” / promoter, and contact — not by inventing names. Use Fill missing with Gemini on a Review card (needs a source URL), or paste one detail page on Import → Extr",
-      "href": "./master-admin.html?from=botdee#aiCrawling",
-      "phrases": [
-        "gemini on ai crawling",
-        "gemini should improve crawling by reading official event and venue pages floqr already found for dj s presented by / promoter and contact not by inventing names",
-        "gemini crawl",
-        "fill missing with gemini",
-        "extract dj promoter",
-        "gemini source extractor",
-        "ai crawling gemini",
-        "invent tba",
-        "lineup page",
-        "ai crawling",
-        "help-ai-crawl-gemini"
-      ]
-    },
-    {
       "sourceId": "help:help-ai-recommendations",
       "id": "help-ai-recommendations",
       "kind": "help",
@@ -131,36 +64,6 @@
         "personalized shoutout",
         "search",
         "help-ai-recommendations"
-      ]
-    },
-    {
-      "sourceId": "help:help-app-language",
-      "id": "help-app-language",
-      "kind": "help",
-      "label": "App language / FloqR webapp language",
-      "blurb": "A new visitor with a Spanish internet location starts FloqR in Spanish, and Preferred Language is set to Spanish. Other mapped countries follow the same rule (a French IP starts in French). After the first visit, this setting and your saved profile language win. Change it anytime",
-      "href": "./patron-portal.html?from=botdee&tab=language",
-      "phrases": [
-        "app language / floqr webapp language",
-        "a new visitor with a spanish internet location starts floqr in spanish and preferred language is set to spanish. other mapped countries follow the same rule a f",
-        "app language",
-        "webapp language",
-        "dutch",
-        "nederlands",
-        "browser language",
-        "first use language",
-        "change language",
-        "switch language",
-        "ui language",
-        "detect language",
-        "language settings",
-        "how language works",
-        "ip language",
-        "country language",
-        "floqr language",
-        "language settings my profile",
-        "translation overrides master admin",
-        "help-app-language"
       ]
     },
     {
@@ -332,52 +235,6 @@
         "baller s alert",
         "throw a shoutout",
         "help-black-card"
-      ]
-    },
-    {
-      "sourceId": "help:help-bot-dee-mgmt",
-      "id": "help-bot-dee-mgmt",
-      "kind": "help",
-      "label": "BOT DEE conversation pause",
-      "blurb": "Features Mgmt → BOT DEE sets how many seconds BOT DEE waits after the last message before pausing the live session (default 300 / 5 minutes). After the pause, the next message continues the same chat with stored history. Pause does not delete conversations, memories, or workflows",
-      "href": "./master-admin.html?from=botdee#featuresBotDee",
-      "phrases": [
-        "bot dee conversation pause",
-        "features mgmt bot dee sets how many seconds bot dee waits after the last message before pausing the live session default 300 / 5 minutes . after the pause the n",
-        "bot dee idle",
-        "bot dee pause",
-        "conversation timeout",
-        "bot dee settings",
-        "botdee mgmt",
-        "idle pause",
-        "provider slot",
-        "api key slot",
-        "ticketmaster discovery",
-        "bot dee master admin",
-        "help-bot-dee-mgmt"
-      ]
-    },
-    {
-      "sourceId": "help:help-botdee-audience-sections",
-      "id": "help-botdee-audience-sections",
-      "kind": "help",
-      "label": "BOT DEE help audiences",
-      "blurb": "BOT DEE shows help that matches your role — patron, service member, venue admin, or master admin. Master Admins can search across those audiences. If nothing appears for a topic, your signed-in role may not include that help.",
-      "href": "./botdee.html",
-      "phrases": [
-        "bot dee help audiences",
-        "bot dee shows help that matches your role patron service member venue admin or master admin. master admins can search across those audiences. if nothing appears",
-        "bot dee audience",
-        "floqai audience",
-        "help sections",
-        "master admin help",
-        "venue admin help",
-        "service member help",
-        "patron help",
-        "help security",
-        "blank bot dee answer",
-        "blank floqai answer",
-        "help-botdee-audience-sections"
       ]
     },
     {
@@ -1058,26 +915,6 @@
       ]
     },
     {
-      "sourceId": "help:help-chrome-audit",
-      "id": "help-chrome-audit",
-      "kind": "help",
-      "label": "Site chrome audit",
-      "blurb": "Master Admin only. After you switch Site chrome under My Profile → Appearance, FLOQR records each page you open and checks whether html[data-floqr-chrome] matches your choice (pass/fail). Open Master Admin → Diagnostics → Manual Feature Tests → Site chrome audit → Read Site chrom",
-      "href": "./master-admin.html?from=botdee",
-      "phrases": [
-        "site chrome audit",
-        "master admin only. after you switch site chrome under my profile appearance floqr records each page you open and checks whether html data-floqr-chrome matches y",
-        "chrome follow through",
-        "receipt chrome",
-        "payment-return chrome",
-        "chrome pass fail",
-        "appearance audit",
-        "site chrome audit diagnostics",
-        "appearance",
-        "help-chrome-audit"
-      ]
-    },
-    {
       "sourceId": "help:help-chrome-scheme",
       "id": "help-chrome-scheme",
       "kind": "help",
@@ -1237,28 +1074,6 @@
         "twilio credits",
         "466 sms",
         "help-club-messaging-credit"
-      ]
-    },
-    {
-      "sourceId": "help:help-club-messaging-logs",
-      "id": "help-club-messaging-logs",
-      "kind": "help",
-      "label": "SMS & WhatsApp delivery logs",
-      "blurb": "Club Admin → Marketing → SMS & WhatsApp Logs shows Twilio SMS and WhatsApp for this venue (marketing Send test, club alerts). The same rows appear under Master Admin → Twilio. Dry-run means secrets or From were missing — nothing was delivered and credits were not debited. Phones ",
-      "href": "./admin.html?tab=marketing&from=botdee",
-      "phrases": [
-        "sms whatsapp delivery logs",
-        "club admin marketing sms whatsapp logs shows twilio sms and whatsapp for this venue marketing send test club alerts . the same rows appear under master admin tw",
-        "messaging logs",
-        "club sms log",
-        "club whatsapp log",
-        "twiliosmslogs",
-        "twiliowhatsapplogs",
-        "marketing sms log",
-        "send test debit",
-        "why no sms",
-        "club marketing",
-        "help-club-messaging-logs"
       ]
     },
     {
@@ -1431,36 +1246,6 @@
       ]
     },
     {
-      "sourceId": "help:help-data-classification",
-      "id": "help-data-classification",
-      "kind": "help",
-      "label": "Data classification",
-      "blurb": "Each row is one type of FLOQR data. The ticks say who may read it: Public, Patron, Regular employee, Privileged employee, Club Admin, Master Admin, and whether a person may read their own record. Higher tiers include lower ones. Turn every switch off to make it Secret. Start with",
-      "href": "./master-admin.html#dataClassification",
-      "phrases": [
-        "data classification",
-        "each row is one type of floqr data. the ticks say who may read it public patron regular employee privileged employee club admin master admin and whether a perso",
-        "classify data",
-        "who can read",
-        "data access",
-        "personal data",
-        "pii",
-        "retention",
-        "exposure report",
-        "system access",
-        "security tab",
-        "bot dee access",
-        "floqai access",
-        "save all classifications",
-        "needs review",
-        "what needs fixing",
-        "delete after",
-        "seed classification",
-        "open data classification",
-        "help-data-classification"
-      ]
-    },
-    {
       "sourceId": "help:help-default-template",
       "id": "help-default-template",
       "kind": "help",
@@ -1575,25 +1360,6 @@
       ]
     },
     {
-      "sourceId": "help:help-feature-promote-live",
-      "id": "help-feature-promote-live",
-      "kind": "help",
-      "label": "Test → live",
-      "blurb": "Promote test code to live. Records who promoted what and why, then opens the GitHub workflow that merges the test branch into main after tests pass. Turn the feature Live in the Release Control table once the promotion is published.",
-      "href": "./master-admin.html?from=botdee#featuresReleaseControl",
-      "phrases": [
-        "test live",
-        "promote test code to live. records who promoted what and why then opens the github workflow that merges the test branch into main after tests pass. turn the fea",
-        "test to live",
-        "promote test code to live",
-        "promote to main",
-        "github promote workflow",
-        "feature promotion",
-        "release control master admin",
-        "help-feature-promote-live"
-      ]
-    },
-    {
       "sourceId": "help:help-featured-staff",
       "id": "help-featured-staff",
       "kind": "help",
@@ -1611,40 +1377,6 @@
         "bottle service on club page",
         "club admin",
         "help-featured-staff"
-      ]
-    },
-    {
-      "sourceId": "help:help-features-services",
-      "id": "help-features-services",
-      "kind": "help",
-      "label": "Release Control",
-      "blurb": "Release Control lists every Features & Services row with Enable Feature (IsFeatureEnabled) and Enable Beta Feature (IsTestFeature) switches. Only ShoutOut is live by default. Enable Feature = 0 turns a feature off for everyone. Enable Feature = 1 and Enable Beta Feature = 0 makes",
-      "href": "./master-admin.html?from=botdee#featuresReleaseControl",
-      "phrases": [
-        "release control",
-        "release control lists every features services row with enable feature isfeatureenabled and enable beta feature istestfeature switches. only shoutout is live by ",
-        "features mgmt",
-        "features and services",
-        "beta and testing",
-        "feature audit trail",
-        "feature flags",
-        "enable feature",
-        "enable beta feature",
-        "disable feature",
-        "test feature",
-        "beta testers",
-        "invite beta tester",
-        "isfeatureenabled",
-        "istestfeature",
-        "feature links",
-        "beta pill",
-        "revision",
-        "reason for change",
-        "promote test to live",
-        "site chrome",
-        "issitechrome",
-        "nightlife",
-        "traditional theme"
       ]
     },
     {
@@ -1920,27 +1652,6 @@
       ]
     },
     {
-      "sourceId": "help:help-heist-enable-64x48",
-      "id": "help-heist-enable-64x48",
-      "kind": "help",
-      "label": "Enable 64×48 display choice at Heist",
-      "blurb": "To offer 64×48 cm as a ShoutOut screen size at Heist Washington DC: open Club Public Profile (or Master Admin for that club) → FLOQR display screens → tick 64 x 48 cm (keep 64×32 if that board stays live) → Save. Only set primary display to 64×48 if that board is the main Display",
-      "href": "./admin.html?from=botdee&tab=public-profile&location=heist-washington-dc",
-      "phrases": [
-        "enable 64 48 display choice at heist",
-        "to offer 64 48 cm as a shoutout screen size at heist washington dc open club public profile or master admin for that club floqr display screens tick 64 x 48 cm ",
-        "heist 64x48",
-        "64x48 at heist",
-        "set 64x48 heist",
-        "enable 64x48 heist",
-        "heist display choice",
-        "heist washington 64x48",
-        "club public profile display screens",
-        "master admin",
-        "help-heist-enable-64x48"
-      ]
-    },
-    {
       "sourceId": "help:help-location-search",
       "id": "help-location-search",
       "kind": "help",
@@ -1966,334 +1677,6 @@
         "search",
         "privacy policy",
         "help-location-search"
-      ]
-    },
-    {
-      "sourceId": "help:help-mail-logging",
-      "id": "help-mail-logging",
-      "kind": "help",
-      "label": "SendGrid Mail Logs",
-      "blurb": "Master Admin → Twilio / SendGrid Mgmt → SendGrid Mail Logs. Every FLOQR system-generated SendGrid email is logged here: queued, accepted, failed, and later delivery (delivered, bounce, drop). Covers preview links, OTP, SOS2FA, receipts, schedule invites, and club ops. Search by s",
-      "href": "./master-admin.html?from=botdee#twilio_sendgridMailLogs",
-      "phrases": [
-        "sendgrid mail logs",
-        "master admin twilio / sendgrid mgmt sendgrid mail logs. every floqr system-generated sendgrid email is logged here queued accepted failed and later delivery del",
-        "twilio_sendgridmaillogs",
-        "mail logging",
-        "email log",
-        "sendgrid",
-        "system mail",
-        "preview links email",
-        "tls 1.3",
-        "mail delivery",
-        "who sent that email",
-        "system generated mail",
-        "help-mail-logging"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-ad-approval",
-      "id": "help-master-ad-approval",
-      "kind": "help",
-      "label": "Ad approval queue",
-      "blurb": "Every paid ad lands here before it can show to patrons. Check the flyer or video, the audience, and who posted it, then Approve and schedule. Ads still awaiting payment can only go live if you approve without payment and give a reason. Invoice ads: mark the invoice paid with the ",
-      "href": "./master-admin.html?from=botdee#adApprovalQueue",
-      "phrases": [
-        "ad approval queue",
-        "every paid ad lands here before it can show to patrons. check the flyer or video the audience and who posted it then approve and schedule. ads still awaiting pa",
-        "ad approval",
-        "approve ad",
-        "pending ads",
-        "reject ad",
-        "refund ad",
-        "waive payment",
-        "mark invoice paid",
-        "ad queue",
-        "help-master-ad-approval"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-ad-intake",
-      "id": "help-master-ad-intake",
-      "kind": "help",
-      "label": "SMS and WhatsApp ad intake",
-      "blurb": "Anyone can text or WhatsApp a flyer or a video of 30 seconds or less to the FLOQR advertising number. They get a private link to choose dates and audience and pay. Paid ads move to the approval queue and the sender receives an invoice. Delete expired or unpaid submissions here.",
-      "href": "./master-admin.html?from=botdee#adIntakePanel",
-      "phrases": [
-        "sms and whatsapp ad intake",
-        "anyone can text or whatsapp a flyer or a video of 30 seconds or less to the floqr advertising number. they get a private link to choose dates and audience and p",
-        "text an ad",
-        "sms ad",
-        "whatsapp ad",
-        "ad intake",
-        "send flyer",
-        "ad payment link",
-        "delete ad submissions",
-        "sms / whatsapp intake",
-        "help-master-ad-intake"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-ad-live",
-      "id": "help-master-ad-live",
-      "kind": "help",
-      "label": "Live and scheduled ads",
-      "blurb": "Ads that are approved and in rotation (or paused). Each card shows measured impressions, clicks and click rate. Pause, resume or end an ad early, edit its audience or dates, or clear its stats. Every change asks for a reason and is kept in the ad audit log.",
-      "href": "./master-admin.html?from=botdee#adLiveCampaigns",
-      "phrases": [
-        "live and scheduled ads",
-        "ads that are approved and in rotation or paused . each card shows measured impressions clicks and click rate. pause resume or end an ad early edit its audience ",
-        "live ads",
-        "pause ad",
-        "end ad",
-        "resume ad",
-        "edit ad audience",
-        "ad dates",
-        "ad targeting",
-        "live scheduled",
-        "help-master-ad-live"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-ad-settings",
-      "id": "help-master-ad-settings",
-      "kind": "help",
-      "label": "Ad settings and billing",
-      "blurb": "Turn splash ads on or off, set how long the search splash shows, choose whether house and demo ads fill in when no paid ad matches, and pause SMS / WhatsApp intake. Invoice accounts decide which clubs, promoters or groups may pay later on net terms. The audit log lists every ad d",
-      "href": "./master-admin.html?from=botdee#adSettingsPanel",
-      "phrases": [
-        "ad settings and billing",
-        "turn splash ads on or off set how long the search splash shows choose whether house and demo ads fill in when no paid ad matches and pause sms / whatsapp intake",
-        "ad settings",
-        "splash ads",
-        "splash seconds",
-        "house ads",
-        "demo ads",
-        "invoice account",
-        "net terms",
-        "ad audit log",
-        "settings billing",
-        "help-master-ad-settings"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-ad-stats",
-      "id": "help-master-ad-stats",
-      "kind": "help",
-      "label": "Ad stats",
-      "blurb": "Real impressions and clicks recorded when patrons see or tap an ad on the search splash, Mingl, Mingl Gist and RydR. Repeat views from the same person within 30 minutes count once. Clear one ad or all stats when you need a clean record; clearing asks for a reason and is logged.",
-      "href": "./master-admin.html?from=botdee#adStatsPanel",
-      "phrases": [
-        "ad stats",
-        "real impressions and clicks recorded when patrons see or tap an ad on the search splash mingl mingl gist and rydr. repeat views from the same person within 30 m",
-        "impressions",
-        "clicks",
-        "ctr",
-        "click rate",
-        "clear ad stats",
-        "reset ad stats",
-        "ad measurement",
-        "help-master-ad-stats"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-aicrawl-diagnostics",
-      "id": "help-master-aicrawl-diagnostics",
-      "kind": "help",
-      "label": "AI Crawling diagnostics",
-      "blurb": "Master Admin → Diagnostics → AI Crawling. Categorized appLogs with category aiCrawl: Runs, Discoveries, Duplicates, Auto-publish, CSV, Past events, and Publish. Instant Crawl, CSV import, Save, and Publish write rows here. Auto-publish also emails the Master Admin list. Functions",
-      "href": "./master-admin.html?from=botdee#diagnosticsAiCrawl",
-      "phrases": [
-        "ai crawling diagnostics",
-        "master admin diagnostics ai crawling. categorized applogs with category aicrawl runs discoveries duplicates auto-publish csv past events and publish. instant cr",
-        "ai crawling logs",
-        "ai crawl diagnostics",
-        "discovery logs",
-        "auto publish email",
-        "csv import crawl",
-        "past event cleanup",
-        "duplicate crawl log",
-        "ai crawling",
-        "help-master-aicrawl-diagnostics"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-completed-log",
-      "id": "help-master-completed-log",
-      "kind": "help",
-      "label": "Completed Log",
-      "blurb": "Master Admin → ShoutOut Mgmt → Completed Log. Network log of submitted, rejected, paid, and completed ShoutOuts. SOC 2 / ISO 27001 / NIST-aligned audit metadata is retained here. Pick a venue from clubLocations or type to filter. Rebuild fills empty logs from ShoutOuts, shoutoutA",
-      "href": "./master-admin.html?from=botdee#shoutoutCompletedLog",
-      "phrases": [
-        "completed log",
-        "master admin shoutout mgmt completed log. network log of submitted rejected paid and completed shoutouts. soc 2 / iso 27001 / nist-aligned audit metadata is ret",
-        "completed shoutout log",
-        "shoutout compliance",
-        "compliance logs",
-        "master shoutouts",
-        "audit retention",
-        "soc 2",
-        "iso 27001",
-        "nist",
-        "rebuild compliance",
-        "export csv shoutout",
-        "retention",
-        "help-master-completed-log"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-demo-signin",
-      "id": "help-master-demo-signin",
-      "kind": "help",
-      "label": "Demo sign-in code",
-      "blurb": "Master Admin → Entity Management → Demo Worker Mgmt. Use this when email codes are not arriving and you need to sign in as a demo worker (temp_role_number@floqr-demo.com). Unlock SOS2FA, find or pick the demo worker, press Generate code and give a reason. The code is shown once, ",
-      "href": "./master-admin.html?from=botdee#demoEmployees",
-      "phrases": [
-        "demo sign-in code",
-        "master admin entity management demo worker mgmt. use this when email codes are not arriving and you need to sign in as a demo worker temp_role_number@floqr-demo",
-        "demo employee code",
-        "temp code",
-        "demo sign in",
-        "sign in as demo",
-        "demo sign in code",
-        "demo signin",
-        "sign in as demo account",
-        "log in as demo account",
-        "demo svc emp mgmt",
-        "demo employees",
-        "demo worker mgmt",
-        "demo worker management",
-        "demo workers",
-        "find patron",
-        "merge patron accounts",
-        "demo service member",
-        "temp waitress",
-        "floqr-demo",
-        "demo account login",
-        "test account code",
-        "email code not arriving",
-        "sendgrid not working"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-floqcast-diagnostics",
-      "id": "help-master-floqcast-diagnostics",
-      "kind": "help",
-      "label": "FloqCAST diagnostics",
-      "blurb": "Master Admin → Diagnostics → FloqCAST. Shows connectivity rows from appLogs for categories floqCast and legacy suprstar: WebRTC status, ICE/TURN source, live heartbeats, and board wait timeouts. Phone Go live must be signed in for rows to save. Display boards are anonymous so the",
-      "href": "./master-admin.html?from=botdee#diagnosticsFloqCast",
-      "phrases": [
-        "floqcast diagnostics",
-        "master admin diagnostics floqcast. shows connectivity rows from applogs for categories floqcast and legacy suprstar webrtc status ice/turn source live heartbeat",
-        "floqcast logs",
-        "floq cast diagnostics",
-        "webrtc logs",
-        "ice servers log",
-        "turn stun floqcast",
-        "suprstar logs",
-        "floqcast connectivity",
-        "why floqcast disconnects",
-        "diagnostics floqcast tab",
-        "application logging",
-        "help-master-floqcast-diagnostics"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-network-intelligence",
-      "id": "help-master-network-intelligence",
-      "kind": "help",
-      "label": "All Locations",
-      "blurb": "This card means you are looking at the whole FLOQR network, not one venue. The Network Dashboard numbers below cover every location: Total Locations counts live venues plus venues still in onboarding or found by AI Crawling; Total Users counts FLOQR accounts; All Pending ShoutOut",
-      "href": "./master-admin.html?from=botdee#networkDashboard",
-      "phrases": [
-        "all locations",
-        "this card means you are looking at the whole floqr network not one venue. the network dashboard numbers below cover every location total locations counts live v",
-        "network intelligence center",
-        "network intelligence",
-        "location picker",
-        "pick a location",
-        "choose a venue",
-        "network dashboard locations",
-        "which venue am i looking at",
-        "total locations",
-        "all pending shoutouts",
-        "estimated network revenue",
-        "top locations",
-        "all venues",
-        "network view",
-        "floqr master admin",
-        "master admin portal",
-        "network dashboard",
-        "manage entities",
-        "venue links",
-        "help-master-network-intelligence"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-ops-status",
-      "id": "help-master-ops-status",
-      "kind": "help",
-      "label": "Master Admin security and action status",
-      "blurb": "Privileged Master Admin panels (Entity Management and similar) stay locked until Privilege Admin Access (SOS2FA) succeeds. After unlock, security status shows whether SOS2FA cleared the gate. Feature actions report progress on each panel’s own status line. The old Ops Status bann",
-      "href": "./master-admin.html?from=botdee",
-      "phrases": [
-        "master admin security and action status",
-        "privileged master admin panels entity management and similar stay locked until privilege admin access sos2fa succeeds. after unlock security status shows whethe",
-        "ops status",
-        "master ops",
-        "ops status banner",
-        "security status pending",
-        "no admin action clicked yet",
-        "master admin status",
-        "master security status",
-        "admin action feedback",
-        "master admin unlock status",
-        "privilege admin access",
-        "master admin",
-        "help-master-ops-status"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-shoutout-diagnostics",
-      "id": "help-master-shoutout-diagnostics",
-      "kind": "help",
-      "label": "ShoutOut diagnostics",
-      "blurb": "Master Admin → Diagnostics → ShoutOut. Consolidates ShoutOut appLogs (category shoutout): submit and save starts, media and Baller portrait steps, and page_call rows for the live patron path — ShoutOut button, Choose a venue, Throw ShoutOut Here, splash, template, editor, Continu",
-      "href": "./master-admin.html?from=botdee#diagnosticsShoutOut",
-      "phrases": [
-        "shoutout diagnostics",
-        "master admin diagnostics shoutout. consolidates shoutout applogs category shoutout submit and save starts media and baller portrait steps and page_call rows for",
-        "shoutout logs",
-        "shout out diagnostics",
-        "page_call shoutout",
-        "shoutout page trail",
-        "composer pages log",
-        "diagnostics shoutout tab",
-        "baller portrait log",
-        "application logging",
-        "help-master-shoutout-diagnostics"
-      ]
-    },
-    {
-      "sourceId": "help:help-master-shoutout-retention",
-      "id": "help-master-shoutout-retention",
-      "kind": "help",
-      "label": "Retention",
-      "blurb": "Master Admin → ShoutOut Mgmt → Retention. Audit metadata: keep 7 years then anonymize — do not delete at 60 days. Media: delete 90 days after completion. Completed Log default search window is 60 days (expand dates for older retained rows). No forever media archive for compliance",
-      "href": "./master-admin.html?from=botdee#shoutoutRetention",
-      "phrases": [
-        "retention",
-        "master admin shoutout mgmt retention. audit metadata keep 7 years then anonymize do not delete at 60 days. media delete 90 days after completion. completed log ",
-        "shoutout retention",
-        "audit retention",
-        "7 years",
-        "90 days",
-        "media purge",
-        "anonymize",
-        "completed log retention",
-        "master shoutout retention",
-        "completed log",
-        "help-master-shoutout-retention"
       ]
     },
     {
@@ -2375,68 +1758,6 @@
         "guest lists",
         "public media",
         "help-my-profile"
-      ]
-    },
-    {
-      "sourceId": "help:help-network-promoters",
-      "id": "help-network-promoters",
-      "kind": "help",
-      "label": "Network Promoter Data",
-      "blurb": "Master Admin → Promoters shows guest-list referral volume by promoter, Club Public Profile promotion groups (including QA temp-democlub Temp Promoter N Collective cards), and promoter onboarding records. Empty referrals does not mean there are no club promoters.",
-      "href": "./master-admin.html?from=botdee",
-      "phrases": [
-        "network promoter data",
-        "master admin promoters shows guest-list referral volume by promoter club public profile promotion groups including qa temp-democlub temp promoter n collective c",
-        "promoters",
-        "promoter network",
-        "guest list referrals",
-        "temp promoter",
-        "promotion groups",
-        "master admin promoters",
-        "help-network-promoters"
-      ]
-    },
-    {
-      "sourceId": "help:help-onboarding",
-      "id": "help-onboarding",
-      "kind": "help",
-      "label": "Onboarding",
-      "blurb": "Patron / service-member onboarding — request Club Admin, DJ, Promoter, or hospitality access. Master Admins can also onboard venues.",
-      "href": "./role-request.html?from=botdee",
-      "phrases": [
-        "onboarding",
-        "patron / service-member onboarding request club admin dj promoter or hospitality access. master admins can also onboard venues.",
-        "link to onboarding",
-        "onboard",
-        "patron onboarding",
-        "role onboarding",
-        "service member onboarding",
-        "request access",
-        "get started",
-        "role / service onboarding",
-        "venue onboarding master admin",
-        "help-onboarding"
-      ]
-    },
-    {
-      "sourceId": "help:help-patron-account-merge",
-      "id": "help-patron-account-merge",
-      "kind": "help",
-      "label": "Patron account merge",
-      "blurb": "MsLorna and another Lorna Gmail can be the same person with two Auth uids. Master Admin looks up both accounts, previews, then merges Firestore into one surviving uid (Mingl friends, beta grants, Inbox, BOT DEE). SOS2FA and a reason are required. Firebase Auth is not deleted unti",
-      "href": "./master-admin.html?from=botdee#demoEmployees",
-      "phrases": [
-        "patron account merge",
-        "mslorna and another lorna gmail can be the same person with two auth uids. master admin looks up both accounts previews then merges firestore into one surviving",
-        "merge accounts",
-        "duplicate patron",
-        "same phone",
-        "mslorna",
-        "lorna",
-        "phone unifier",
-        "demo worker mgmt",
-        "duplicate records",
-        "help-patron-account-merge"
       ]
     },
     {
@@ -2816,27 +2137,6 @@
       ]
     },
     {
-      "sourceId": "help:help-smartvisuals-create",
-      "id": "help-smartvisuals-create",
-      "kind": "help",
-      "label": "Create / Edit SMARTvisuals",
-      "blurb": "Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photogr",
-      "href": "./master-admin.html",
-      "phrases": [
-        "create / edit smartvisuals",
-        "create or edit a smartstencil or smartbackground draft. name is required. smartstencils must be svg. smartbackgrounds accept svg jpeg png or webp. files are san",
-        "create smartbackground",
-        "edit smartvisual",
-        "svg jpeg png webp",
-        "milan background",
-        "submit for review",
-        "art upload",
-        "create / edit",
-        "smartvisual studio",
-        "help-smartvisuals-create"
-      ]
-    },
-    {
       "sourceId": "help:help-smartvisuals-notification",
       "id": "help-smartvisuals-notification",
       "kind": "help",
@@ -2862,26 +2162,6 @@
       ]
     },
     {
-      "sourceId": "help:help-smartvisuals-place-assign",
-      "id": "help-smartvisuals-place-assign",
-      "kind": "help",
-      "label": "Place SMARTview stencil, background, and tags",
-      "blurb": "Assign a published SMARTstencil and SMARTbackground to Place SMARTview cards of one type (venue, restaurant, hotel, event, travel). Tags stay with that assignment so operators can filter cards. SOS2FA and a reason are required to save. Patrons still only see published registry ar",
-      "href": "./master-admin.html",
-      "phrases": [
-        "place smartview stencil background and tags",
-        "assign a published smartstencil and smartbackground to place smartview cards of one type venue restaurant hotel event travel . tags stay with that assignment so",
-        "place smartview stencil",
-        "smartbackground assignment",
-        "smartview tags",
-        "change stencil",
-        "change card background",
-        "filter by tag",
-        "smartvisual studio",
-        "help-smartvisuals-place-assign"
-      ]
-    },
-    {
       "sourceId": "help:help-smartvisuals-room",
       "id": "help-smartvisuals-room",
       "kind": "help",
@@ -2904,30 +2184,6 @@
       ]
     },
     {
-      "sourceId": "help:help-smartvisuals-studio",
-      "id": "help-smartvisuals-studio",
-      "kind": "help",
-      "label": "SMARTvisual Studio",
-      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Save uses the same Entity Management SOS2FA session as other Master Admin saves — do not request a new code if already unlocked. Search and preview packaged art as images. Preview in Place SMAR",
-      "href": "./master-admin.html",
-      "phrases": [
-        "smartvisual studio",
-        "smartvisual studio is the master admin library for smartstencils and smartbackgrounds. save uses the same entity management sos2fa session as other master admin",
-        "asset registry",
-        "smartvisuals library",
-        "publish stencil",
-        "review publish",
-        "publish smartbackground",
-        "milan webp",
-        "place smartview background",
-        "place smartview stencil",
-        "smartview tags",
-        "venue card background",
-        "jpeg png webp",
-        "help-smartvisuals-studio"
-      ]
-    },
-    {
       "sourceId": "help:help-soccer-jersey",
       "id": "help-soccer-jersey",
       "kind": "help",
@@ -2946,51 +2202,6 @@
         "chelsea jersey",
         "start shoutout",
         "help-soccer-jersey"
-      ]
-    },
-    {
-      "sourceId": "help:help-sos2fa-entity-mgmt",
-      "id": "help-sos2fa-entity-mgmt",
-      "kind": "help",
-      "label": "Privilege Admin Access",
-      "blurb": "Entity Management is protected by Social OS - 2FA (SOS2FA). Request SOS2FA Code sends a one-time code using your FloqR notification channels — Email and/or SMS. Enter the six-digit code, then Verify & unlock. Activity is logged for 90 days.",
-      "href": "./patron-portal.html?from=botdee&tab=privacy",
-      "phrases": [
-        "privilege admin access",
-        "entity management is protected by social os - 2fa sos2fa . request sos2fa code sends a one-time code using your floqr notification channels email and/or sms. en",
-        "sos2fa",
-        "social os 2fa",
-        "social os - 2fa",
-        "entity management unlock",
-        "request sos2fa code",
-        "two factor",
-        "sos2fa sms",
-        "entity management 2fa",
-        "general notifications my privacy",
-        "manage entities",
-        "help-sos2fa-entity-mgmt"
-      ]
-    },
-    {
-      "sourceId": "help:help-sos2fa-request-channels",
-      "id": "help-sos2fa-request-channels",
-      "kind": "help",
-      "label": "Request SOS2FA Code",
-      "blurb": "Request is sent using your general Notifications settings",
-      "href": "./patron-portal.html?from=botdee&tab=privacy",
-      "phrases": [
-        "request sos2fa code",
-        "request is sent using your general notifications settings",
-        "sos2fa",
-        "notifications settings",
-        "general notifications",
-        "entity management unlock",
-        "sos2fa email sms",
-        "notifyemail",
-        "notifysms",
-        "general notifications my privacy",
-        "venue links",
-        "help-sos2fa-request-channels"
       ]
     },
     {
@@ -3248,29 +2459,6 @@
       ]
     },
     {
-      "sourceId": "help:help-translation-overrides",
-      "id": "help-translation-overrides",
-      "kind": "help",
-      "label": "Translation Overrides",
-      "blurb": "Master Admin → Translation Overrides. Choose German or Arabic, search a UI string key, edit the wording, then Save language. Patrons see the fix on the next page load — overrides win over the packaged translation. German and Arabic ship first. FLOQR does not pick language from IP",
-      "href": "./master-admin.html?from=botdee#translationOverrides",
-      "phrases": [
-        "translation overrides",
-        "master admin translation overrides. choose german or arabic search a ui string key edit the wording then save language. patrons see the fix on the next page loa",
-        "edit translation",
-        "fix german translation",
-        "fix arabic translation",
-        "ai sounding translation",
-        "native speaker edit",
-        "override language",
-        "german arabic chrome",
-        "how to edit language",
-        "i18n override",
-        "bersetzungs-anpassungen",
-        "help-translation-overrides"
-      ]
-    },
-    {
       "sourceId": "help:help-trending-shoutouts",
       "id": "help-trending-shoutouts",
       "kind": "help",
@@ -3285,45 +2473,6 @@
         "approved shoutouts",
         "search",
         "help-trending-shoutouts"
-      ]
-    },
-    {
-      "sourceId": "help:help-twilio-compliance-logs",
-      "id": "help-twilio-compliance-logs",
-      "kind": "help",
-      "label": "Compliance Logs",
-      "blurb": "Master Admin → Twilio / SendGrid Mgmt → Compliance Logs lists security-relevant Twilio outcomes (dry-run, auth failure, blocked or filtered) for GRC review. Same SOC 2 / ISO 27001 / NIST AU standard as ShoutOut Completed Log. Day-to-day SMS, WhatsApp, and SendGrid mail live in th",
-      "href": "./master-admin.html?from=botdee#twilioComplianceLogs",
-      "phrases": [
-        "compliance logs",
-        "master admin twilio / sendgrid mgmt compliance logs lists security-relevant twilio outcomes dry-run auth failure blocked or filtered for grc review. same soc 2 ",
-        "twilio compliance",
-        "twiliocompliancelogs",
-        "grc sms",
-        "dry-run compliance",
-        "help-twilio-compliance-logs"
-      ]
-    },
-    {
-      "sourceId": "help:help-twilio-logging",
-      "id": "help-twilio-logging",
-      "kind": "help",
-      "label": "SMS Logs",
-      "blurb": "Master Admin → Twilio / SendGrid Mgmt → SMS Logs shows outbound SMS for the network. Club Admin → Advertising → Messaging logs shows the same rows for that venue only. Dry-run means secrets or From were missing. GRC security rows are under Twilio → Compliance Logs. SendGrid email",
-      "href": "./master-admin.html?from=botdee#twilioSmsLogs",
-      "phrases": [
-        "sms logs",
-        "master admin twilio / sendgrid mgmt sms logs shows outbound sms for the network. club admin advertising messaging logs shows the same rows for that venue only. ",
-        "twilio logging",
-        "sms log",
-        "whatsapp log",
-        "twilio dry-run",
-        "twiliosmslogs",
-        "marketing sms",
-        "why no sms",
-        "send test debit",
-        "twilio debugger",
-        "help-twilio-logging"
       ]
     },
     {
@@ -3346,40 +2495,6 @@
       ]
     },
     {
-      "sourceId": "help:help-venue-crawl-datapoints",
-      "id": "help-venue-crawl-datapoints",
-      "kind": "help",
-      "label": "AI crawl venue datapoints",
-      "blurb": "Master Admin → AI Crawling is split into Overview, Review queue, Run & schedule, Rules, Import, and Insights. Set a Publishing rule per crawl type on Rules. Nightclubs and beach clubs need Name, Genre, DJ(s), Address, City, Country, and a Phone or Email. Daytime markets skip DJ(s",
-      "href": "./master-admin.html?from=botdee",
-      "phrases": [
-        "ai crawl venue datapoints",
-        "master admin ai crawling is split into overview review queue run schedule rules import and insights. set a publishing rule per crawl type on rules. nightclubs a",
-        "ai crawl",
-        "discovery crawl",
-        "venue datapoints",
-        "impactful datapoints",
-        "import datapoints",
-        "publishing rule",
-        "csv import",
-        "csv export",
-        "duplicate venue",
-        "monaco monte carlo",
-        "crawl ingest",
-        "parse venue",
-        "hoursstructured crawl",
-        "needs research",
-        "club admin imports",
-        "publish discovery",
-        "save discovery card",
-        "ai crawling tabs",
-        "review queue",
-        "run and schedule",
-        "master admin ai crawling",
-        "help-venue-crawl-datapoints"
-      ]
-    },
-    {
       "sourceId": "help:help-venue-hours-calendar",
       "id": "help-venue-hours-calendar",
       "kind": "help",
@@ -3399,44 +2514,6 @@
         "venue calendar",
         "club public profile",
         "help-venue-hours-calendar"
-      ]
-    },
-    {
-      "sourceId": "help:help-venue-links",
-      "id": "help-venue-links",
-      "kind": "help",
-      "label": "Venue Links",
-      "blurb": "Venue Admin Portal URLs are generated when you search. Page links never carry a version number, so a saved or shared link always opens the current FLOQR release, and an old bookmark that still has ?v= in it just ignores it. Display board URLs stay location-only.",
-      "href": "./master-admin.html?from=botdee",
-      "phrases": [
-        "venue links",
-        "venue admin portal urls are generated when you search. page links never carry a version number so a saved or shared link always opens the current floqr release ",
-        "venue admin portal url",
-        "club admin url",
-        "admin.html version",
-        "hardcoded version",
-        "club admin link",
-        "master admin venue links",
-        "help-venue-links"
-      ]
-    },
-    {
-      "sourceId": "help:help-venue-onboarding",
-      "id": "help-venue-onboarding",
-      "kind": "help",
-      "label": "Venue onboarding (Master Admin)",
-      "blurb": "Master Admin venue onboarding — push crawled club profiles into Firestore.",
-      "href": "./onboard-dc-venues.html?from=botdee",
-      "phrases": [
-        "venue onboarding master admin",
-        "master admin venue onboarding push crawled club profiles into firestore.",
-        "venue onboarding",
-        "onboard clubs",
-        "onboard venues",
-        "dc venues",
-        "link to onboarding venues",
-        "master admin onboarding",
-        "help-venue-onboarding"
       ]
     },
     {
@@ -3681,24 +2758,6 @@
         "master admin vip payments",
         "set floqmedia stripe for aurelia",
         "help-vip-payment-collector"
-      ]
-    },
-    {
-      "sourceId": "help:help-vip-receipt-sms-redaction-fixes",
-      "id": "help-vip-receipt-sms-redaction-fixes",
-      "kind": "help",
-      "label": "VIP receipt SMS & invoice redaction",
-      "blurb": "Paid receipts send SMS only through the logged Twilio Messages API path. FLOQR-YYYYMMDD-… and VR-… invoice numbers stay readable in mail/SMS logs (they are not treated as OTP codes).",
-      "href": "./botdee.html",
-      "phrases": [
-        "vip receipt sms invoice redaction",
-        "paid receipts send sms only through the logged twilio messages api path. floqr-yyyymmdd- and vr- invoice numbers stay readable in mail/sms logs they are not tre",
-        "vip receipt sms",
-        "invoice redaction",
-        "floqr invoice",
-        "vr receipt",
-        "twilio receipt",
-        "help-vip-receipt-sms-redaction-fixes"
       ]
     },
     {

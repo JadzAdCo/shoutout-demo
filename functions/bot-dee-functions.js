@@ -893,7 +893,15 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       allowedFeatures,
       lastUserPrompt: userPrompt,
       personalization,
-      request
+      request,
+      loadHelpVerbiage: async ids => {
+        try {
+          return await require("./help-verbiage-functions").loadPublishedMap(ids, require("firebase-admin/firestore").getFirestore());
+        } catch (err) {
+          console.warn("BOT DEE help verbiage load failed", err?.message || err);
+          return {};
+        }
+      }
     });
 
     const apiKey = geminiKey();

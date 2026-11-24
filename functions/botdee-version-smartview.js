@@ -74,7 +74,22 @@ function changelogFromReadme(rootDir) {
 function changelogItems(rootDir) {
   const bundled = changelogFromBundle();
   const source = bundled.length ? bundled : changelogFromReadme(rootDir);
-  return whatsNewCatalog.forVersionWhatsNew(source);
+  const shown = whatsNewCatalog.forVersionWhatsNew(source);
+  let byVersion = new Map();
+  try {
+    const help = require("./help-verbiage-core");
+    byVersion = new Map(help.whatsNewSeedRecords(source, whatsNewCatalog).map(row => [
+      String(row.id || "").replace(/^whatsnew-/, ""),
+      row
+    ]));
+  } catch (_) {
+    byVersion = new Map();
+  }
+  return shown.map(row => {
+    const seed = byVersion.get(row.id);
+    const body = seed && seed.lasttextenhun && seed.lasttextenhun.body;
+    return body ? {...row, text: body} : row;
+  });
 }
 
 /** Probe this Version request. Never a static Not checked label.

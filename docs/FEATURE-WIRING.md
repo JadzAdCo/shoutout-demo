@@ -740,6 +740,22 @@ Xibo’s *Trigger on page load error* is usually a **trigger code**; put the URL
 
 ---
 
+## Help verbiage enhancement
+
+**Purpose:** One scheduled job rewrites a single help entry when its raw title or body changes. Patrons, service members, and venue admins read the published `lasttextenhun`. Master Admin help is enhanced too, and stays off the public Pages script.
+
+| Layer | Wiring |
+|---|---|
+| Store | `helpVerbiage/{id}`: `beenModsincelasttextenhun` 0\|1, `lasttextenhun` `{title, body}`, `lasttextenhunSourceHash` SHA-256 of raw title + newline + body, `audiences`, `audienceLabel`, `locales` for de fr es it pt ru el pl nl ar. Functions set the flag. |
+| Job | `scheduledHelpVerbiageEnhance` every 15 minutes UTC. One Gemini call per run (`FLOQR_GEMINI_TEXT_MODEL`, default `gemini-3.6-flash`). Steps on that entry: drop repeated sentences, grammar pass, contextual rewrite. Auto-publishes when checks pass. Legal help is never sent. Gemini failure leaves the previous `lasttextenhun` and the flag at 1. |
+| Flag 0 | English `lasttextenhun` plus all 10 translations, together, for any patron / service member / venue admin audience. Master-only may stay English. |
+| Seed | Patron What's New lines and Version SMARTview help are the first `lasttextenhun` (`seeded: 1`, flag 1) until that entry's scheduled pass publishes. |
+| Pages | `help-verbiage-snapshot.js` and the copy inside `botdee-help-repository.js`. No master-only text. No Gemini on the version card, a `?` popout, or any paint path. |
+| Read | Callable `getHelpVerbiage` (signed in, `filterContent`). `contextualSearch` replaces a result label/blurb from a published non-master `lasttextenhun` when the session loads it. |
+| Rules | `helpVerbiage` client read/write off. `helpVerbiageAudit` Master Admin read, client write off. Not `translationOverrides`. |
+| Audit | Help id, flag before/after, `lasttextenhun` before/after, source hash, model id, outcome. No client IP. Agent probes: `actorRole` / `actorEmail` `agent`. Gemini rows also go to `geminiApiAccessLogs`. |
+| Source split | Public entries: `functions/help-verbiage-public-source.json`. Master-only entries: `functions/help-verbiage-master-source.json` (not a Pages script). Rebuild: `node scripts/build-help-verbiage-sources.js`. |
+
 ## BOT DEE intent search (plain-language router)
 
 **Purpose:** Map short / partial patron wording to products and help cards (e.g. `throw` / `shou` → Throw a ShoutOut; `sho` → Shows/events + ShoutOut; `hai` / `hail` → RydR). Stays the **feature-optimized fast path / fallback** under BOT DEE chat (and inside feature searches).
