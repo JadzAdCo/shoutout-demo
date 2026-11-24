@@ -1258,6 +1258,37 @@ function placeSearchAlongsideRoom(classified) {
   return !!(classified && classified.intent && classified.intent !== "none" && (classified.placeTokens || []).length);
 }
 
+function userTextsFromHistory(history) {
+  const rows = Array.isArray(history) ? history : [];
+  const texts = [];
+  for (const row of rows) {
+    if (!row || typeof row !== "object") continue;
+    const role = String(row.role || "").toLowerCase();
+    if (role && role !== "user") continue;
+    const value = String(row.text || "").trim();
+    if (value) texts.push(value);
+  }
+  return texts.slice(-12);
+}
+
+function classifyPlaceSearchFromConversation(currentPrompt, history) {
+  const current = classifyPlaceSearchIntent(currentPrompt);
+  if (placeSearchAlongsideRoom(current)) return current;
+  const needle = String(currentPrompt || "").trim();
+  const texts = userTextsFromHistory(history);
+  for (let i = texts.length - 1; i >= 0; i -= 1) {
+    if (texts[i] === needle) continue;
+    const classified = classifyPlaceSearchIntent(texts[i]);
+    if (placeSearchAlongsideRoom(classified)) return classified;
+  }
+  return current;
+}
+
+function placeAttachQuery(classified, fallbackPrompt) {
+  if (placeSearchAlongsideRoom(classified) && classified.needle) return classified.needle;
+  return fallbackPrompt;
+}
+
 function destinationSmartView(classified) {
   const token = (classified && classified.placeTokens || []).find(Boolean);
   if (!token) return null;
@@ -2009,7 +2040,9 @@ module.exports = {
   createFloqCastCheckout,
   lookupPublicProfiles,
   classifyPlaceSearchIntent,
+  classifyPlaceSearchFromConversation,
   placeSearchAlongsideRoom,
+  placeAttachQuery,
   destinationSmartView,
   destinationPlaceViews,
   clubHaystack,

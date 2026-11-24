@@ -418,6 +418,21 @@ function vipSmartOutcome(reply, lang, extra = {}) {
   };
 }
 
+function mergePlaceSmartViews(outcome, venueAttached) {
+  if (!outcome || !venueAttached || !venueAttached.handled) return outcome;
+  const placeViews = (venueAttached.smartViews || [])
+    .filter(row => row && row.kind === "venue")
+    .slice(0, 4);
+  if (!placeViews.length) return outcome;
+  const existing = Array.isArray(outcome.smartViews) ? outcome.smartViews.slice() : [];
+  if (existing.some(row => row && row.kind === "venue")) return outcome;
+  return {
+    ...outcome,
+    smartViews: [...existing, ...placeViews],
+    venueSearch: outcome.venueSearch || venueAttached.venueSearch
+  };
+}
+
 function snapshotFromVipView(view) {
   const row = view && typeof view === "object" ? view : {};
   return {
@@ -931,7 +946,7 @@ async function tryHeadlessVip(userPrompt, session, uiLanguage, allowedFeatures, 
   );
 }
 
-function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined, functionsReachable, geminiConfigured} = {}) {
+function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined, functionsReachable, geminiConfigured, history} = {}) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const isActive = !!active;
@@ -1062,6 +1077,9 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, fe
     || roomClassified.route === "command"
     || roomClassified.command === "invite"
   ));
+  const placeTools = require("./bot-dee-tools");
+  const placeClassified = placeTools.classifyPlaceSearchFromConversation(userPrompt, history);
+  const placeViews = placeTools.destinationPlaceViews(placeTools.placeAttachQuery(placeClassified, userPrompt));
   if (!roomTakesPriority && bot.isVipExecutePrompt(userPrompt)) {
     const pack = bot.vipExecuteFallback(lang, allowed);
     return {
@@ -1070,11 +1088,11 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, fe
       provider: pack.provider,
       model: pack.model,
       toolRounds: 0,
-      uiLanguage: lang
+      uiLanguage: lang,
+      smartViews: placeViews
     };
   }
   if (room.handled) {
-    const extra = require("./bot-dee-tools").destinationPlaceViews(userPrompt);
     return {
       reply: room.reply,
       results: [],
@@ -1082,7 +1100,7 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, fe
       model: room.model,
       toolRounds: 0,
       uiLanguage: lang,
-      smartViews: [...(room.smartViews || []), ...extra],
+      smartViews: [...(room.smartViews || []), ...placeViews],
       replyKey: room.replyKey
     };
   }
@@ -1097,7 +1115,8 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, fe
     provider: "local-fallback",
     model: "contextualSearch",
     toolRounds: 1,
-    uiLanguage: lang
+    uiLanguage: lang,
+    smartViews: placeViews
   };
 }
 
@@ -1385,12 +1404,13 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     let peopleAttached = null;
     const peopleIntent = peopleCards.classifyPeopleSearchIntent(userPrompt);
     const placeTools = require("./bot-dee-tools");
-    const placeClassified = placeTools.classifyPlaceSearchIntent(userPrompt);
+    const placeClassified = placeTools.classifyPlaceSearchFromConversation(userPrompt, history);
     const attachPlaceWithRoom = placeTools.placeSearchAlongsideRoom(placeClassified);
-    if (!outcome && !shoutExecute && !vipExecute && (!roomAttached.handled || attachPlaceWithRoom)) {
+    const placeQuery = placeTools.placeAttachQuery(placeClassified, userPrompt);
+    if (!outcome && !shoutExecute && (!vipExecute || attachPlaceWithRoom) && (!roomAttached.handled || attachPlaceWithRoom)) {
       try {
         venueAttached = await placeTools.attachVenueSearch({
-          query: userPrompt,
+          query: placeQuery,
           request
         });
       } catch (error) {
@@ -1426,7 +1446,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         outcome = localSession(role, userPrompt, {
           active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined: roomDeclined,
           functionsReachable: true,
-          geminiConfigured: !!apiKey
+          geminiConfigured: !!apiKey,
+          history
         });
       }
     } else if (vipExecute) {
@@ -1814,7 +1835,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       outcome = localSession(role, userPrompt, {
         active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined: roomDeclined,
         functionsReachable: true,
-        geminiConfigured: !!apiKey
+        geminiConfigured: !!apiKey,
+        history
       });
     } else if (apiKey) {
       if (stored.joinedRoomId) {
@@ -1842,7 +1864,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         outcome = localSession(role, userPrompt, {
           active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined: roomDeclined,
           functionsReachable: true,
-          geminiConfigured: !!apiKey
+          geminiConfigured: !!apiKey,
+          history
         });
         outcome.geminiError = String(error?.message || error).slice(0, 180);
       }
@@ -1850,9 +1873,11 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       outcome = localSession(role, userPrompt, {
         active, uiLanguage, allowedFeatures, featureFlags, personalization, roomSmartViewDeclined: roomDeclined,
         functionsReachable: true,
-        geminiConfigured: false
+        geminiConfigured: false,
+        history
       });
     }
+    outcome = mergePlaceSmartViews(outcome, venueAttached);
     const versionCardOnly = Array.isArray(outcome.smartViews)
       && outcome.smartViews.some(row => row && row.kind === "botDeeVersion")
       && !String(outcome.reply || "").trim();
@@ -2194,6 +2219,7 @@ exports.__botDeeHelpers = {
   localSession,
   tryHeadlessShoutOut,
   tryHeadlessVip,
+  mergePlaceSmartViews,
   geminiKey,
   BOT_DEE_SETTINGS_DOC
 };

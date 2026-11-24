@@ -10368,11 +10368,11 @@
         },
         "help:help-botdee-place-search": {
           "label": "اسأل BOT DEE عن أماكن FLOQR",
-          "blurb": "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. صور الرواد "
+          "blurb": "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. ذكر مدينة م"
         },
         "intent:help-botdee-place-search": {
           "label": "اسأل BOT DEE عن أماكن FLOQR",
-          "blurb": "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. صور الرواد "
+          "blurb": "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. ذكر مدينة م"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",

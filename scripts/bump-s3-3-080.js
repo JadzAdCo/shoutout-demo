@@ -5,7 +5,7 @@ const path = require("path");
 const {stripPageLinkVersions} = require("./strip-page-link-versions.js");
 const NEXT = "s3.3.080";
 const NEXT_NUM = "3.3.080";
-const NOTE = "BOT DEE VIP reserV map at Aurelia loads vip-plans/aurelia.json (phone area view); no stub sheet";
+const NOTE = "BOT DEE VIP reserV map at Aurelia plus Miami Place SMARTview on mixed VIP input";
 const EXEMPT = ["admin-scheduling.js", "functions/ai-discovery-functions.js"];
 const ASSET_REF = /((?:src|href)\s*=\s*["']\.?\/?[^"'?#\s]+\.(?:js|mjs|css|png|jpe?g|gif|svg|webp|avif|ico|json|webmanifest|woff2?)\?v=)[^"'&#\s]*/gi;
 function transformHtml(src) {
@@ -40,7 +40,7 @@ function run(root) {
   edit("functions/package.json", src => src.replace(/"version": "[^"]+"/, `"version": "${NEXT_NUM}"`));
   edit("functions/i18n-coverage.test.js", src => src
     .replace(/test\("floqr-i18n VERSION is s3\.\d+\.\d+; help packs remain s3\.\d+\.\d+"/, `test("floqr-i18n and help VERSION are ${NEXT}"`)
-    .replace(/floqr-i18n and help VERSION are s3\.\d+\.\d+/, `floqr-i18n and help VERSION are ${NEXT}`)
+    .replace(/floqr-i18n and help VERSION are s3\.\d+\.\d+/g, `floqr-i18n and help VERSION are ${NEXT}`)
     .replace(/assert\.match\(i18n, \/const VERSION\\s\*=\\s\*"s3\.\d+\.\d+"\/\)/g, `assert.match(i18n, /const VERSION\\s*=\\s*"${NEXT}"/)`)
     .replace(/assert\.match\(help, \/const VERSION\\s\*=\\s\*"s3\.\d+\.\d+"\/\)/g, `assert.match(help, /const VERSION\\s*=\\s*"${NEXT}"/)`));
   edit("bot-dee-chat.js", src => src.replace(/return "s3\.\d+\.\d+";/, `return "${NEXT}";`));

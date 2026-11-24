@@ -1159,11 +1159,12 @@
     {
       id: "help-botdee-place-search",
       title: "Ask BOT DEE for FLOQR venues",
-      body: "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a photo well. Patron photos and ShoutOut / VIP pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so.",
+      body: "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a photo well. Naming a city with VIP reserV (reservations in Miami) still attaches Place SMARTview next to the VIP card. Patron photos and ShoutOut pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so.",
       searchPhrases: [
         "sushi restaurants", "sushi in washington dc", "restaurants in dc",
         "clubs in washington dc", "dining search", "find a club", "japanese restaurant",
-        "bot dee venues", "bot dee restaurants"
+        "bot dee venues", "bot dee restaurants", "reservations in miami",
+        "place smartview miami", "vip reserv miami"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
