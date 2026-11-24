@@ -344,11 +344,35 @@ test("mockFill false empties the slot without loading AdSense", () => {
 
 test("renderer wires Search notification and Room SMARTview through selectAd", () => {
   const view = read("smartvisuals-view.js");
+  const notify = view.slice(view.indexOf("function renderNotification"), view.indexOf("function renderRoom"));
+  const room = view.slice(view.indexOf("function renderRoom"), view.indexOf("function bindCard"));
   assert.match(view, /selectAdFor/);
-  assert.match(view, /adSlotHtml\(payload, visual/);
-  assert.match(view, /compact: true/);
+  assert.match(room, /adSlotHtml\(payload, visual\)/);
+  assert.doesNotMatch(notify, /adSlotHtml/);
   assert.match(read("botdee-smartview.js"), /renderAdSlot/);
   assert.match(read("smartvisuals-preview.html"), /Paris Fashion Week/);
+});
+
+test("Search SMARTnotification is compact glass matching original Cancun card hierarchy", () => {
+  const view = read("smartvisuals-view.js");
+  const css = read("smartvisuals-view.css");
+  const notify = view.slice(view.indexOf("function renderNotification"), view.indexOf("function renderRoom"));
+  assert.match(notify, /sv-notify-body/);
+  assert.match(notify, /sv-notify-copy/);
+  assert.match(notify, /sv-people-mark/);
+  assert.match(notify, /sv-hero-copy[\s\S]*sv-title[\s\S]*sv-notify-copy/);
+  assert.doesNotMatch(notify, /sv-notify-copy[\s\S]*sv-title/);
+  assert.match(notify, /sv\.viewInvitation/);
+  assert.match(notify, /sv\.notNow/);
+  assert.doesNotMatch(notify, /sv-stencil/);
+  assert.match(css, /\.sv-notify-body/);
+  assert.match(css, /\.sv-notify \.sv-btn-primary/);
+  assert.match(view, /listBotDeeRoomNotifications/);
+  assert.match(view, /requestedDemo\(\)/);
+  assert.match(view, /hostName: "Damon"/);
+  const boot = view.slice(view.indexOf("function bootSearch"));
+  assert.match(boot, /syntheticCancun\(\)/);
+  assert.match(boot, /mountLiveNotifications/);
 });
 
 test("Place SMARTview uses published SMARTbackground, not a photo well", () => {

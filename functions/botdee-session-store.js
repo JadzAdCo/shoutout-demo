@@ -72,6 +72,14 @@ async function loadRoom(roomId) {
   return {id: snap.id, data: snap.data() || {}};
 }
 
+async function viewerMayReadRoom(live, uid) {
+  if (!live) return false;
+  if (core.isCurrentMember(live.data, uid)) return true;
+  if (core.text(live.data.hostUid, 80) === core.text(uid, 80)) return true;
+  const pending = await findPendingInvite({uid, roomId: live.id});
+  return !!(pending && pending.exists);
+}
+
 async function loadMember(roomId, uid) {
   const snap = await memberRef(roomId, uid).get();
   if (!snap.exists) return null;
@@ -151,25 +159,52 @@ async function listMinglFriends(uid) {
   return users.map((snap, index) => core.publicPerson(allowed[index], snap.exists ? snap.data() : {}));
 }
 
-async function createRoom({hostUid, conversationId, title, nowMs}) {
+function roomSeed({hostUid, conversationId, title, authorizedTitle, authorizedDescription, now, status, scheduledStartMs, scheduledTimeZone, smartNotification}) {
+  const uid = core.text(hostUid, 80);
+  const live = status === "open";
+  const start = Number(scheduledStartMs || 0) || 0;
+  const row = {
+    hostUid: uid,
+    memberUids: [uid],
+    status,
+    conversationId: core.text(conversationId, 80),
+    title: core.text(title || authorizedTitle, 80) || "BOT DEE group session",
+    authorizedTitle: core.text(authorizedTitle || title, 80) || "BOT DEE group session",
+    authorizedDescription: core.text(authorizedDescription, 240),
+    minglFriendsOnly: true,
+    guestsCanInvite: true,
+    sharedIntent: core.publicIntent({}),
+    scheduledStartMs: status === "scheduled" ? start : 0,
+    scheduledTimeZone: status === "scheduled" ? core.text(scheduledTimeZone, 80) : "",
+    liveOpenedAtMs: live ? now : 0,
+    smartNotification: smartNotification === 1 ? 1 : 0,
+    lastPresenceAtMs: live ? now : 0,
+    closeReason: "",
+    createdAtMs: now,
+    updatedAtMs: now,
+    expiresAtMs: core.ttlExpiresAtMs({
+      liveOpenedAtMs: live ? now : 0,
+      scheduledStartMs: status === "scheduled" ? start : 0
+    }, now)
+  };
+  return row;
+}
+
+async function createRoom({hostUid, conversationId, title, authorizedTitle, authorizedDescription, nowMs}) {
   const uid = core.text(hostUid, 80);
   if (!uid) return {ok: false, error: "missing_host"};
   const roomId = `br_${cryptoRandom(8)}`;
   const now = Number(nowMs || Date.now());
-  const expiresAtMs = now + core.ROOM_TTL_MS;
-  const row = {
+  const row = roomSeed({
     hostUid: uid,
-    memberUids: [uid],
+    conversationId,
+    title,
+    authorizedTitle,
+    authorizedDescription,
+    now,
     status: "open",
-    conversationId: core.text(conversationId, 80),
-    title: core.text(title, 80) || "BOT DEE group session",
-    minglFriendsOnly: true,
-    guestsCanInvite: true,
-    sharedIntent: core.publicIntent({}),
-    createdAtMs: now,
-    updatedAtMs: now,
-    expiresAtMs
-  };
+    smartNotification: 0
+  });
   const batch = db().batch();
   batch.set(roomRef(roomId), row);
   batch.set(memberRef(roomId, uid), {
@@ -177,8 +212,10 @@ async function createRoom({hostUid, conversationId, title, nowMs}) {
     uid,
     role: "host",
     canInvite: true,
+    rsvp: "accepted",
     joinedAtMs: now,
     leftAtMs: null,
+    lastPresenceAtMs: now,
     displayName: "",
     handle: ""
   });
@@ -277,14 +314,18 @@ async function createInvite({roomId, actorUid, targetUid, actorEmail, actorRole,
     status: "pending",
     usesRemaining: 1,
     createdAtMs: now,
-    expiresAtMs: now + core.INVITE_TTL_MS,
+    expiresAtMs: core.inviteExpiresAtMs(row, now),
     createdAt: FieldValue().serverTimestamp()
   });
+  const scheduled = core.roomIsScheduled(row, now);
+  const when = scheduled && Number(row.scheduledStartMs || 0)
+    ? ` Scheduled for ${new Date(Number(row.scheduledStartMs)).toISOString()}.`
+    : "";
   await systemCollection("inboxNotifications").add({
     recipientUid: core.text(targetUid, 80),
     type: "botDeeRoomInvite",
-    title: "You're invited to a BOT DEE session",
-    body: "A Mingl friend invited you to join their BOT DEE session. Review the invite while signed in as this account. Joining does not charge anyone.",
+    title: scheduled ? "You're invited to a scheduled BOT DEE session" : "You're invited to a BOT DEE session",
+    body: `A Mingl friend invited you to join their BOT DEE session.${when} Review the invite while signed in as this account. Joining does not charge anyone.`,
     link: href,
     read: false,
     createdAt: FieldValue().serverTimestamp()
@@ -302,22 +343,41 @@ async function createInvite({roomId, actorUid, targetUid, actorEmail, actorRole,
   return {
     ok: true,
     invitePath: href,
-    expiresAtMs: now + core.INVITE_TTL_MS,
+    expiresAtMs: core.inviteExpiresAtMs(row, now),
     target: person,
     room: core.publicRoom(roomSnap.id, row)
   };
 }
 
+async function findPendingInvite({uid, roomId}) {
+  const target = core.text(uid, 80);
+  const id = core.text(roomId, 80);
+  if (!target || !id) return null;
+  const snap = await systemCollection("botDeeRoomInvites")
+    .where("roomId", "==", id)
+    .where("targetUid", "==", target)
+    .where("status", "==", "pending")
+    .limit(1)
+    .get();
+  if (snap.empty) return null;
+  return snap.docs[0];
+}
+
 async function acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs}) {
   const now = Number(nowMs || Date.now());
-  if (!core.isValidInviteToken(token)) return {ok: false, error: "not_found"};
-  const inviteId = core.inviteIdFor(token);
-  const inviteSnap = await inviteRef(inviteId).get();
+  let inviteSnap = null;
+  if (core.isValidInviteToken(token)) {
+    inviteSnap = await inviteRef(core.inviteIdFor(token)).get();
+  } else if (roomId) {
+    inviteSnap = await findPendingInvite({uid, roomId});
+  }
+  if (!inviteSnap || !inviteSnap.exists) return {ok: false, error: "not_found"};
+  const inviteId = inviteSnap.id;
   const invite = inviteSnap.exists ? inviteSnap.data() : null;
   const verdict = core.evaluateInvite(invite, {uid, nowMs: now, roomId});
   if (!verdict.ok) {
     const liveMaybe = invite ? await loadRoom(invite.roomId) : null;
-    if (verdict.reason === "used" && liveMaybe && core.roomIsOpen(liveMaybe.data, now) && core.isCurrentMember(liveMaybe.data, uid)) {
+    if (verdict.reason === "used" && liveMaybe && core.roomIsInviteable(liveMaybe.data, now) && core.isCurrentMember(liveMaybe.data, uid)) {
       return {ok: true, alreadyMember: true, room: core.publicRoom(liveMaybe.id, liveMaybe.data)};
     }
     await writeAudit({
@@ -334,7 +394,8 @@ async function acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs}) 
     return {ok: false, error: verdict.reason};
   }
   const live = await loadRoom(invite.roomId);
-  if (!live || !core.roomIsOpen(live.data, now)) return {ok: false, error: "closed"};
+  if (!live || !core.roomIsInviteable(live.data, now)) return {ok: false, error: "closed"};
+  const scheduled = core.roomIsScheduled(live.data, now);
   const friends = await friendGate(invite.invitedByUid, uid);
   const hostUid = core.text(live.data.hostUid, 80);
   const blockedHost = hostUid && hostUid !== core.text(uid, 80)
@@ -366,7 +427,7 @@ async function acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs}) 
         throw err;
       }
       const roomData = roomDoc.data() || {};
-      if (!core.roomIsOpen(roomData, now)) {
+      if (!core.roomIsInviteable(roomData, now)) {
         const err = new Error("closed");
         err.code = "closed";
         throw err;
@@ -382,7 +443,8 @@ async function acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs}) 
         status: "accepted",
         usesRemaining: 0,
         acceptedAtMs: now,
-        acceptedUid: uid
+        acceptedUid: uid,
+        rsvp: "accepted"
       });
       if (!admitted.alreadyMember) {
         tx.set(roomDoc.ref, {
@@ -395,7 +457,8 @@ async function acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs}) 
         uid,
         role: core.text(roomData.hostUid, 80) === uid ? "host" : "guest",
         canInvite: true,
-        joinedAtMs: now,
+        rsvp: "accepted",
+        joinedAtMs: core.roomIsOpen(roomData, now) ? now : null,
         leftAtMs: null
       }, {merge: true});
     });
@@ -412,9 +475,11 @@ async function acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs}) 
     }
     throw error;
   }
-  await appendSystemEvent(live.id, uid, `${uid} joined this BOT DEE session.`);
+  if (core.roomIsOpen({...live.data, memberUids: members}, now)) {
+    await appendSystemEvent(live.id, uid, `${uid} joined this BOT DEE session.`);
+  }
   await writeAudit({
-    eventType: "botdee.room_joined",
+    eventType: scheduled ? "botdee.room_rsvp" : "botdee.room_joined",
     actorUid: uid,
     actorEmail,
     actorRole,
@@ -432,7 +497,7 @@ async function leaveRoom({uid, roomId, actorEmail, actorRole}) {
   const live = await loadRoom(roomId);
   if (!live) return {ok: false, error: "not_found"};
   if (core.text(live.data.hostUid, 80) === core.text(uid, 80)) {
-    return endRoom({uid, roomId, actorEmail, actorRole});
+    return endRoom({uid, roomId, actorEmail, actorRole, closeReason: "host_leave"});
   }
   if (!core.isCurrentMember(live.data, uid)) return {ok: false, error: "not_member"};
   const next = core.currentMembers(live.data).filter(id => id !== core.text(uid, 80));
@@ -476,7 +541,41 @@ async function kickMember({hostUid, roomId, targetUid, actorEmail, actorRole}) {
   return {ok: true, kicked: true, targetUid: target, room: core.publicRoom(live.id, {...live.data, memberUids: next})};
 }
 
-async function endRoom({uid, roomId, actorEmail, actorRole, force}) {
+async function revokePendingInvites(roomId) {
+  const pending = await systemCollection("botDeeRoomInvites").where("roomId", "==", roomId).where("status", "==", "pending").limit(40).get();
+  if (pending.empty) return;
+  const batch = db().batch();
+  pending.docs.forEach(doc => batch.update(doc.ref, {status: "revoked", revokedAtMs: Date.now()}));
+  await batch.commit();
+}
+
+async function closeRoomRow(live, {status, closeReason, actorUid, actorEmail, actorRole, eventType}) {
+  const now = Date.now();
+  const next = {...live.data, status, closeReason, smartNotification: 0, updatedAtMs: now};
+  await roomRef(live.id).set({
+    status,
+    closeReason,
+    smartNotification: 0,
+    updatedAtMs: now
+  }, {merge: true});
+  await revokePendingInvites(live.id);
+  await writeAudit({
+    eventType,
+    actorUid: actorUid || "system",
+    actorEmail: actorEmail || "",
+    actorRole: actorRole || "system",
+    targetId: live.id,
+    reason: closeReason
+  });
+  return {
+    ok: true,
+    closed: true,
+    memberUids: core.currentMembers(live.data),
+    room: core.publicRoom(live.id, next)
+  };
+}
+
+async function endRoom({uid, roomId, actorEmail, actorRole, force, closeReason}) {
   const live = await loadRoom(roomId);
   if (!live) return {ok: false, error: "not_found"};
   if (core.text(live.data.hostUid, 80) !== core.text(uid, 80)) return {ok: false, error: "not_host"};
@@ -488,33 +587,24 @@ async function endRoom({uid, roomId, actorEmail, actorRole, force}) {
       return {ok: false, error: "unpaid_tab"};
     }
   }
-  const members = core.currentMembers(live.data);
-  await roomRef(live.id).set({status: "ended", updatedAtMs: Date.now()}, {merge: true});
-  const pending = await systemCollection("botDeeRoomInvites").where("roomId", "==", live.id).where("status", "==", "pending").limit(40).get();
-  const batch = db().batch();
-  pending.docs.forEach(doc => batch.update(doc.ref, {status: "revoked", revokedAtMs: Date.now()}));
-  await batch.commit();
-  await writeAudit({
-    eventType: "botdee.room_ended",
+  const scheduled = core.roomIsScheduled(live.data);
+  const reason = core.text(closeReason, 40) || (scheduled ? "cancelled" : "end");
+  const status = scheduled && reason === "cancelled" ? "cancelled" : "ended";
+  return closeRoomRow(live, {
+    status,
+    closeReason: reason,
     actorUid: uid,
     actorEmail,
     actorRole,
-    targetId: live.id,
-    reason: "end"
+    eventType: scheduled ? "botdee.room_cancelled" : "botdee.room_ended"
   });
-  return {
-    ok: true,
-    closed: true,
-    memberUids: members,
-    room: core.publicRoom(live.id, {...live.data, status: "ended"})
-  };
 }
 
 async function setItinerary({uid, roomId, intent}) {
   const live = await loadRoom(roomId);
   if (!live) return {ok: false, error: "not_found"};
-  if (!core.roomIsOpen(live.data) || !core.isCurrentMember(live.data, uid)) {
-    return {ok: false, error: core.roomIsOpen(live.data) ? "not_member" : "closed"};
+  if (!core.roomIsInviteable(live.data) || !core.isCurrentMember(live.data, uid)) {
+    return {ok: false, error: core.roomIsInviteable(live.data) ? "not_member" : "closed"};
   }
   const sharedIntent = core.publicIntent(intent);
   await roomRef(live.id).set({sharedIntent, updatedAtMs: Date.now()}, {merge: true});
@@ -696,6 +786,325 @@ async function revokeInvite({hostUid, inviteId}) {
   return {ok: true};
 }
 
+function ianaZone(value) {
+  const zone = core.text(value, 80) || "UTC";
+  try {
+    Intl.DateTimeFormat("en-US", {timeZone: zone});
+    return zone;
+  } catch (_) {
+    return "UTC";
+  }
+}
+
+async function refreshInviteExpiry(roomId, expiresAtMs) {
+  const pending = await systemCollection("botDeeRoomInvites").where("roomId", "==", roomId).where("status", "==", "pending").limit(40).get();
+  if (pending.empty) return;
+  const batch = db().batch();
+  pending.docs.forEach(doc => batch.update(doc.ref, {expiresAtMs: Number(expiresAtMs || 0)}));
+  await batch.commit();
+}
+
+async function hostDisplayName(uid) {
+  const snap = await systemCollection("users").doc(core.text(uid, 80)).get();
+  return core.publicPerson(uid, snap.exists ? snap.data() : {}).displayName || "Host";
+}
+
+async function scheduleRoom({hostUid, conversationId, title, authorizedTitle, authorizedDescription, scheduledStartMs, scheduledTimeZone, actorEmail, actorRole, nowMs}) {
+  const uid = core.text(hostUid, 80);
+  const now = Number(nowMs || Date.now());
+  if (!uid) return {ok: false, error: "not_host"};
+  if (!core.scheduleStartValid(scheduledStartMs, now)) return {ok: false, error: "past"};
+  const zone = ianaZone(scheduledTimeZone);
+  const roomId = `br_${cryptoRandom(8)}`;
+  const row = roomSeed({
+    hostUid: uid,
+    conversationId,
+    title,
+    authorizedTitle,
+    authorizedDescription,
+    now,
+    status: "scheduled",
+    scheduledStartMs,
+    scheduledTimeZone: zone,
+    smartNotification: 1
+  });
+  const batch = db().batch();
+  batch.set(roomRef(roomId), row);
+  batch.set(memberRef(roomId, uid), {
+    roomId,
+    uid,
+    role: "host",
+    canInvite: true,
+    rsvp: "accepted",
+    joinedAtMs: now,
+    leftAtMs: null,
+    lastPresenceAtMs: 0,
+    displayName: "",
+    handle: ""
+  });
+  await batch.commit();
+  await writeAudit({
+    eventType: "botdee.room_scheduled",
+    actorUid: uid,
+    actorEmail,
+    actorRole,
+    targetId: roomId,
+    reason: "schedule",
+    detail: {scheduledStartMs: Number(scheduledStartMs), scheduledTimeZone: zone},
+    nowMs: now
+  });
+  return {ok: true, room: core.publicRoom(roomId, row)};
+}
+
+async function startRoom({uid, roomId, conversationId, title, authorizedTitle, authorizedDescription, actorEmail, actorRole, nowMs}) {
+  const now = Number(nowMs || Date.now());
+  const actor = core.text(uid, 80);
+  if (!actor) return {ok: false, error: "not_host"};
+  if (!roomId) {
+    const created = await createRoom({
+      hostUid: actor,
+      conversationId,
+      title,
+      authorizedTitle,
+      authorizedDescription,
+      nowMs: now
+    });
+    if (created.ok) {
+      await writeAudit({
+        eventType: "botdee.room_started",
+        actorUid: actor,
+        actorEmail,
+        actorRole,
+        targetId: created.room.roomId,
+        reason: "join_now",
+        nowMs: now
+      });
+    }
+    return created;
+  }
+  const live = await loadRoom(roomId);
+  if (!live) return {ok: false, error: "not_found"};
+  if (core.text(live.data.hostUid, 80) !== actor) return {ok: false, error: "not_host"};
+  if (core.roomIsOpen(live.data, now)) {
+    return {ok: true, room: core.publicRoom(live.id, live.data), alreadyOpen: true};
+  }
+  if (!core.roomIsScheduled(live.data, now) && core.roomStatus(live.data) !== "scheduled") {
+    return {ok: false, error: "closed"};
+  }
+  const next = {
+    ...live.data,
+    status: "open",
+    liveOpenedAtMs: now,
+    lastPresenceAtMs: now,
+    expiresAtMs: now + core.ROOM_TTL_MS,
+    updatedAtMs: now
+  };
+  await roomRef(live.id).set({
+    status: "open",
+    liveOpenedAtMs: now,
+    lastPresenceAtMs: now,
+    expiresAtMs: now + core.ROOM_TTL_MS,
+    updatedAtMs: now
+  }, {merge: true});
+  await memberRef(live.id, actor).set({lastPresenceAtMs: now, joinedAtMs: now, leftAtMs: null}, {merge: true});
+  await appendSystemEvent(live.id, actor, `${actor} opened this BOT DEE session.`);
+  await writeAudit({
+    eventType: "botdee.room_started",
+    actorUid: actor,
+    actorEmail,
+    actorRole,
+    targetId: live.id,
+    reason: "start",
+    nowMs: now
+  });
+  return {ok: true, room: core.publicRoom(live.id, next)};
+}
+
+async function rescheduleRoom({uid, roomId, scheduledStartMs, scheduledTimeZone, actorEmail, actorRole, nowMs}) {
+  const now = Number(nowMs || Date.now());
+  if (!core.scheduleStartValid(scheduledStartMs, now)) return {ok: false, error: "past"};
+  const live = await loadRoom(roomId);
+  if (!live) return {ok: false, error: "not_found"};
+  if (core.text(live.data.hostUid, 80) !== core.text(uid, 80)) return {ok: false, error: "not_host"};
+  if (!core.roomIsScheduled(live.data, now)) return {ok: false, error: "not_scheduled"};
+  const zone = ianaZone(scheduledTimeZone || live.data.scheduledTimeZone);
+  const expiresAtMs = Number(scheduledStartMs) + core.ROOM_TTL_MS;
+  const next = {
+    ...live.data,
+    scheduledStartMs: Number(scheduledStartMs),
+    scheduledTimeZone: zone,
+    expiresAtMs,
+    smartNotification: 1,
+    updatedAtMs: now
+  };
+  await roomRef(live.id).set({
+    scheduledStartMs: Number(scheduledStartMs),
+    scheduledTimeZone: zone,
+    expiresAtMs,
+    smartNotification: 1,
+    updatedAtMs: now
+  }, {merge: true});
+  await refreshInviteExpiry(live.id, expiresAtMs);
+  await writeAudit({
+    eventType: "botdee.room_scheduled",
+    actorUid: uid,
+    actorEmail,
+    actorRole,
+    targetId: live.id,
+    reason: "reschedule",
+    detail: {scheduledStartMs: Number(scheduledStartMs)},
+    nowMs: now
+  });
+  return {ok: true, room: core.publicRoom(live.id, next)};
+}
+
+async function touchPresence({uid, roomId, nowMs}) {
+  const now = Number(nowMs || Date.now());
+  const live = await loadRoom(roomId);
+  if (!live) return {ok: false, error: "not_found"};
+  if (!core.roomIsOpen(live.data, now)) return {ok: false, error: "not_live"};
+  if (!core.isCurrentMember(live.data, uid)) return {ok: false, error: "not_member"};
+  const last = Number(live.data.lastPresenceAtMs || 0);
+  if (last && now - last < core.PRESENCE_TOUCH_MS / 2) {
+    return {ok: true, room: core.publicRoom(live.id, live.data), throttled: true};
+  }
+  await memberRef(live.id, uid).set({lastPresenceAtMs: now, leftAtMs: null}, {merge: true});
+  await roomRef(live.id).set({lastPresenceAtMs: now, updatedAtMs: now}, {merge: true});
+  return {ok: true, room: core.publicRoom(live.id, {...live.data, lastPresenceAtMs: now})};
+}
+
+async function memberRowsFor(roomId, room) {
+  const uids = core.currentMembers(room);
+  if (!uids.length) return [];
+  const snaps = await db().getAll(...uids.map(uid => memberRef(roomId, uid)));
+  return snaps.map((snap, index) => ({uid: uids[index], ...(snap.exists ? snap.data() : {})}));
+}
+
+async function listNotifications({uid, nowMs}) {
+  const viewer = core.text(uid, 80);
+  const now = Number(nowMs || Date.now());
+  if (!viewer) return {ok: true, notifications: []};
+  const hosted = await systemCollection("botDeeRooms").where("hostUid", "==", viewer).limit(20).get();
+  const invites = await systemCollection("botDeeRoomInvites").where("targetUid", "==", viewer).limit(40).get();
+  const roomIds = new Map();
+  hosted.docs.forEach(doc => roomIds.set(doc.id, {doc, via: "host"}));
+  for (const inv of invites.docs) {
+    const row = inv.data() || {};
+    const st = core.text(row.status, 20);
+    if (st !== "pending" && st !== "accepted") continue;
+    const id = core.text(row.roomId, 80);
+    if (id && !roomIds.has(id)) roomIds.set(id, {invite: row, via: "invitee"});
+  }
+  const notes = [];
+  for (const [id, meta] of roomIds) {
+    const live = meta.doc ? {id, data: meta.doc.data() || {}} : await loadRoom(id);
+    if (!live) continue;
+    const row = live.data || live;
+    const roomId = live.id || id;
+    if (!core.roomNotifiesSearch(row)) continue;
+    if (core.roomStatus(row) === "open" && Number(row.expiresAtMs || 0) && Number(row.expiresAtMs) <= now) continue;
+    const hostName = await hostDisplayName(row.hostUid);
+    const viewerRole = core.text(row.hostUid, 80) === viewer ? "host" : "invitee";
+    notes.push(core.publicNotification(roomId, row, {
+      hostName,
+      viewerRole,
+      joinHref: core.roomHref(roomId, ""),
+      rsvp: viewerRole === "host" ? "accepted" : core.text(meta.invite?.rsvp || meta.invite?.status, 20),
+      scheduledLabel: Number(row.scheduledStartMs || 0)
+        ? new Date(Number(row.scheduledStartMs)).toLocaleString("en-US", {timeZone: row.scheduledTimeZone || "UTC"})
+        : ""
+    }));
+  }
+  notes.sort((a, b) => Number(a.scheduledStartMs || 0) - Number(b.scheduledStartMs || 0));
+  return {ok: true, notifications: notes.slice(0, 8)};
+}
+
+async function expireRooms({nowMs, actorRole} = {}) {
+  const now = Number(nowMs || Date.now());
+  const expiredSnap = await systemCollection("botDeeRooms").where("expiresAtMs", "<=", now).limit(80).get();
+  const staleSnap = await systemCollection("botDeeRooms")
+    .where("status", "==", "open")
+    .where("lastPresenceAtMs", "<=", now - core.PRESENCE_STALE_MS)
+    .limit(80)
+    .get();
+  const seen = new Set();
+  let expired = 0;
+  let lastLogout = 0;
+  for (const doc of expiredSnap.docs) {
+    if (seen.has(doc.id)) continue;
+    seen.add(doc.id);
+    const row = doc.data() || {};
+    const st = core.roomStatus(row);
+    if (st !== "open" && st !== "scheduled") continue;
+    await closeRoomRow({id: doc.id, data: row}, {
+      status: "expired",
+      closeReason: "ttl",
+      actorUid: "system",
+      actorRole: actorRole || "system",
+      eventType: "botdee.room_expired"
+    });
+    expired += 1;
+  }
+  for (const doc of staleSnap.docs) {
+    if (seen.has(doc.id)) continue;
+    const row = doc.data() || {};
+    if (core.roomStatus(row) !== "open") continue;
+    const members = await memberRowsFor(doc.id, row);
+    if (!core.lastLogoutShouldClose(row, members, now)) continue;
+    seen.add(doc.id);
+    await closeRoomRow({id: doc.id, data: row}, {
+      status: "ended",
+      closeReason: "last_logout",
+      actorUid: "system",
+      actorRole: actorRole || "system",
+      eventType: "botdee.room_last_logout"
+    });
+    lastLogout += 1;
+  }
+  return {ok: true, expired, lastLogout, scanned: seen.size};
+}
+
+async function rsvpRoom({uid, roomId, token, rsvp, actorEmail, actorRole, nowMs}) {
+  const choice = core.text(rsvp, 20) === "declined" ? "declined" : "accepted";
+  if (choice === "accepted") {
+    return acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs});
+  }
+  const now = Number(nowMs || Date.now());
+  const live = await loadRoom(roomId);
+  if (!live || !core.roomIsScheduled(live.data, now)) return {ok: false, error: "not_scheduled"};
+  const pending = await systemCollection("botDeeRoomInvites")
+    .where("roomId", "==", live.id)
+    .where("targetUid", "==", core.text(uid, 80))
+    .where("status", "==", "pending")
+    .limit(4)
+    .get();
+  if (pending.empty && token) {
+    return acceptInvite({uid, token, roomId, actorEmail, actorRole, nowMs});
+  }
+  if (pending.empty) return {ok: false, error: "not_found"};
+  const batch = db().batch();
+  pending.docs.forEach(doc => batch.update(doc.ref, {rsvp: "declined", rsvpAtMs: now}));
+  batch.set(memberRef(live.id, uid), {
+    roomId: live.id,
+    uid,
+    role: "guest",
+    rsvp: "declined",
+    canInvite: false,
+    leftAtMs: now
+  }, {merge: true});
+  await batch.commit();
+  await writeAudit({
+    eventType: "botdee.room_rsvp",
+    actorUid: uid,
+    actorEmail,
+    actorRole,
+    targetId: live.id,
+    reason: "declined",
+    nowMs: now
+  });
+  return {ok: true, rsvp: "declined", room: core.publicRoom(live.id, live.data)};
+}
+
 async function setGuestCanInvite({hostUid, roomId, targetUid, canInvite}) {
   const live = await loadRoom(roomId);
   if (!live || core.text(live.data.hostUid, 80) !== core.text(hostUid, 80)) {
@@ -715,6 +1124,7 @@ module.exports = {
   tabRef,
   writeAudit,
   loadRoom,
+  viewerMayReadRoom,
   loadMember,
   isMutualMinglFriend,
   isBlockedPair,
@@ -739,5 +1149,12 @@ module.exports = {
   planTabCheckout,
   fulfillTabPayment,
   revokeInvite,
+  scheduleRoom,
+  startRoom,
+  rescheduleRoom,
+  touchPresence,
+  listNotifications,
+  expireRooms,
+  rsvpRoom,
   setGuestCanInvite
 };

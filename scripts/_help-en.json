@@ -457,7 +457,7 @@
   },
   "help-botdee-room-smartview": {
     "title": "Room SMARTview",
-    "body": "In BOT DEE chat, say Open Room SMARTview or Start a group chat. Confirm mints a join link friends can open while signed in. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme."
+    "body": "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words. Confirm shows Join Now or Set a schedule. Join Now opens a Mingl-friends session now and does not paint Search. Set a schedule is when the BOT DEE room starts — not Shared Itinerary — and turns on Search SMARTnotification for you and invited Mingl friends. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme. A live room stays open until the host taps End Room, about four hours after it opens, or everyone has been gone about 15 minutes. Pausing private BOT DEE chat is separate."
   },
   "help-botdee-room-smartview-invite": {
     "title": "Room SMARTview invite",
@@ -469,7 +469,7 @@
   },
   "help-botdee-room-smartview-end": {
     "title": "End Room SMARTview",
-    "body": "Only the host can end a room, and only after confirm. Ending does not charge anyone or erase other people’s private chats."
+    "body": "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first. A live room stays open until End Room, about four hours after it opens, or everyone has been gone about 15 minutes. Pausing private BOT DEE chat is not room logout. A guest leaving does not end the room while the host is still present."
   },
   "help-botdee-room-smartview-tab": {
     "title": "Room SMARTview shared tab",
@@ -489,11 +489,11 @@
   },
   "help-smartvisuals-notification": {
     "title": "Mingl Room SMARTnotification",
-    "body": "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come only from the room record. A labeled Ad sample under the card follows the room tags (Travel partner / Fly to Cancun for a Cancun Trip). It is not a live advertiser. Private chat and prompt injection keep the slot empty."
+    "body": "A compact Mingl Room Invitation can appear on Search when a Mingl friend scheduled a BOT DEE room you were invited to. View Invitation opens Room SMARTview. Join Now goes to BOT DEE, not Mingl chat. Not Now hides the card this tab; Inbox still has Review BOT DEE invite. The Cancun demo query is Studio-only. Art is illustration, not a photo. Join Now rooms without a schedule do not paint Search."
   },
   "help-smartvisuals-room": {
     "title": "Room SMARTview with SMARTvisuals",
-    "body": "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used to pick art. Group rooms are not live yet, so Join Now does not create a room or charge. A labeled Ad below is a sample from those tags (Travel partner / Fly to Cancun). It stays empty for private chat or injection and is not a live advertiser."
+    "body": "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. Join Now on Search opens BOT DEE (not Mingl chat) with room= and t=. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo. Private BOT DEE chat is never used to pick art. A labeled Ad below is a sample from those tags. It stays empty for private chat or injection and is not a live advertiser."
   },
   "help-shoutout-headless-smartview": {
     "title": "ShoutOut SMARTpreview",
@@ -522,5 +522,9 @@
   "help-smartvisuals-create": {
     "title": "Create / Edit SMARTvisuals",
     "body": "Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark."
+  },
+  "help-botdee-room-smartview-schedule": {
+    "title": "Join Now or set a schedule",
+    "body": "After Room SMARTview setup, choose Join Now or Set a schedule. Join Now opens the BOT DEE session now and does not put a card on Search. Set a schedule is when the BOT DEE room starts — not Shared Itinerary. Saving a future time turns on Search SMARTnotification for you and invited Mingl friends only. Guests RSVP until the room is live, then Join Now opens BOT DEE (not Mingl chat)."
   }
 }

@@ -2,6 +2,7 @@
 "use strict";
 
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {onSchedule} = require("firebase-functions/v2/scheduler");
 const core = require("./botdee-session-core");
 const store = require("./botdee-session-store");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
@@ -37,7 +38,7 @@ async function requireSessionAuth(request) {
 function fail(reason) {
   const code = reason === "rate_limited" ? "resource-exhausted"
     : reason === "wrong_account" || reason === "not_host" || reason === "not_member" || reason === "not_assignee" ? "permission-denied"
-      : reason === "full" || reason === "closed" || reason === "unpaid_tab" || reason === "no_opt_in" || reason === "not_friend" || reason === "invite_disabled" || reason === "expired" || reason === "revoked" || reason === "used" || reason === "self" || reason === "already_member" ? "failed-precondition"
+      : reason === "full" || reason === "closed" || reason === "unpaid_tab" || reason === "no_opt_in" || reason === "not_friend" || reason === "invite_disabled" || reason === "expired" || reason === "revoked" || reason === "used" || reason === "self" || reason === "already_member" || reason === "past" || reason === "already_open" || reason === "not_scheduled" || reason === "not_live" ? "failed-precondition"
         : "not-found";
   throw new HttpsError(code, core.denialMessage(reason), {reason});
 }
@@ -184,7 +185,7 @@ exports.getBotDeeRoom = onCall(CALL_OPTS, async request => {
   try {
     const uid = await requireSessionAuth(request);
     const live = await store.loadRoom(core.text(request.data?.roomId, 80));
-    if (!live || !core.isCurrentMember(live.data, uid)) fail("not_member");
+    if (!live || !(await store.viewerMayReadRoom(live, uid))) fail("not_member");
     const members = await store.publicMemberList(live.data);
     const loadedTab = await store.loadTab(live.id);
     return {
@@ -310,6 +311,111 @@ exports.postBotDeeRoomTurn = onCall(CALL_OPTS, async request => {
   } catch (error) {
     throw asHttps(error);
   }
+});
+
+exports.scheduleBotDeeRoom = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    const actor = actorFrom(request);
+    return unwrap(await store.scheduleRoom({
+      hostUid: uid,
+      conversationId: core.text(request.data?.conversationId, 80),
+      title: core.text(request.data?.title, 80),
+      authorizedTitle: core.text(request.data?.authorizedTitle || request.data?.title, 80),
+      authorizedDescription: core.text(request.data?.authorizedDescription, 240),
+      scheduledStartMs: request.data?.scheduledStartMs,
+      scheduledTimeZone: core.text(request.data?.scheduledTimeZone, 80),
+      actorEmail: actor.email,
+      actorRole: actor.role
+    }));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.startBotDeeRoom = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    const actor = actorFrom(request);
+    return unwrap(await store.startRoom({
+      uid,
+      roomId: core.text(request.data?.roomId, 80),
+      conversationId: core.text(request.data?.conversationId, 80),
+      title: core.text(request.data?.title, 80),
+      authorizedTitle: core.text(request.data?.authorizedTitle || request.data?.title, 80),
+      authorizedDescription: core.text(request.data?.authorizedDescription, 240),
+      actorEmail: actor.email,
+      actorRole: actor.role
+    }));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.rescheduleBotDeeRoom = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    const actor = actorFrom(request);
+    return unwrap(await store.rescheduleRoom({
+      uid,
+      roomId: core.text(request.data?.roomId, 80),
+      scheduledStartMs: request.data?.scheduledStartMs,
+      scheduledTimeZone: core.text(request.data?.scheduledTimeZone, 80),
+      actorEmail: actor.email,
+      actorRole: actor.role
+    }));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.touchBotDeeRoomPresence = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    return unwrap(await store.touchPresence({
+      uid,
+      roomId: core.text(request.data?.roomId, 80)
+    }));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.listBotDeeRoomNotifications = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    return unwrap(await store.listNotifications({uid}));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.rsvpBotDeeRoomInvite = onCall(CALL_OPTS, async request => {
+  try {
+    const uid = await requireSessionAuth(request);
+    const actor = actorFrom(request);
+    return unwrap(await store.rsvpRoom({
+      uid,
+      roomId: core.text(request.data?.roomId, 80),
+      token: String(request.data?.token || ""),
+      rsvp: core.text(request.data?.rsvp, 20),
+      actorEmail: actor.email,
+      actorRole: actor.role
+    }));
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.expireBotDeeRooms = onSchedule({
+  region: "us-central1",
+  schedule: "every 15 minutes",
+  timeZone: "UTC",
+  timeoutSeconds: 120,
+  memory: "256MiB"
+}, async () => {
+  const actor = {role: "system"};
+  return store.expireRooms({actorRole: actor.role});
 });
 
 exports.revokeBotDeeRoomInvite = onCall(CALL_OPTS, async request => {

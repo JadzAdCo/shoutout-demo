@@ -989,12 +989,89 @@
   }
 
   function roomStatusCopy(payload) {
-    const life = String(payload?.lifecycle || "created");
-    if (life === "active") return t("botdee.rs.statusActive", "Active");
-    if (life === "closing") return t("botdee.rs.statusClosing", "Closing");
-    if (life === "closed") return t("botdee.rs.statusClosed", "Closed");
+    const st = String(payload?.status || payload?.lifecycle || "created");
+    if (st === "scheduled") return t("botdee.rs.statusScheduled", "Scheduled");
+    if (st === "open" || st === "active") return payload?.status === "open"
+      ? t("sv.liveInRoom", "Live in Room")
+      : t("botdee.rs.statusActive", "Active");
+    if (st === "closing") return t("botdee.rs.statusClosing", "Closing");
+    if (st === "closed" || st === "ended" || st === "expired" || st === "cancelled") {
+      return t("botdee.rs.statusClosed", "Closed");
+    }
     if (payload?.mode === "setup" || payload?.mode === "offer") return t("botdee.rs.statusSetup", "Setup");
     return t("botdee.rs.statusCreated", "Created");
+  }
+
+  function formatScheduleLabel(ms, zone) {
+    const start = Number(ms || 0);
+    if (!start) return "";
+    try {
+      return new Date(start).toLocaleString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        timeZone: zone || undefined
+      });
+    } catch (_) {
+      return new Date(start).toLocaleString();
+    }
+  }
+
+  function roomIsScheduledView(view) {
+    return String(view?.status || "") === "scheduled" || (Number(view?.scheduledStartMs || 0) > 0 && String(view?.status || "") !== "open");
+  }
+
+  function datetimeLocalValue(ms) {
+    const start = Number(ms || 0) || Date.now() + 60 * 60 * 1000;
+    const d = new Date(start);
+    const pad = n => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function askScheduleTime(currentMs) {
+    return new Promise(resolve => {
+      const overlay = document.createElement("div");
+      overlay.className = "botdee-sv-schedule-overlay";
+      overlay.innerHTML = `<div class="botdee-sv-schedule-sheet" role="dialog" aria-modal="true">
+        <h2>${esc(t("botdee.rs.setSchedule", "Set a schedule"))}</h2>
+        <p>${esc(t("botdee.rs.scheduleHint", "This is when the BOT DEE room starts — not Shared Itinerary."))}</p>
+        <label>${esc(t("botdee.rs.scheduleWhen", "Start time"))}
+          <input type="datetime-local" data-rs-schedule-input value="${esc(datetimeLocalValue(currentMs))}"/>
+        </label>
+        <div class="botdee-sv-schedule-actions">
+          <button type="button" class="botdee-sv-room-btn" data-rs-schedule-cancel>${esc(t("botdee.rs.notNow", "Not now"))}</button>
+          <button type="button" class="botdee-sv-room-btn botdee-sv-room-main" data-rs-schedule-save disabled>${esc(t("botdee.rs.scheduleSave", "Save schedule"))}</button>
+        </div>
+      </div>`;
+      const input = overlay.querySelector("[data-rs-schedule-input]");
+      const save = overlay.querySelector("[data-rs-schedule-save]");
+      const close = value => {
+        overlay.remove();
+        resolve(value);
+      };
+      const sync = () => {
+        const ms = input.value ? new Date(input.value).getTime() : 0;
+        save.disabled = !(ms > Date.now() + 30 * 1000);
+      };
+      input.addEventListener("input", sync);
+      sync();
+      overlay.querySelector("[data-rs-schedule-cancel]").addEventListener("click", () => close(null));
+      overlay.addEventListener("click", event => {
+        if (event.target === overlay) close(null);
+      });
+      save.addEventListener("click", () => {
+        const ms = new Date(input.value).getTime();
+        if (!(ms > Date.now() + 30 * 1000)) return;
+        close({
+          scheduledStartMs: ms,
+          scheduledTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+        });
+      });
+      document.body.appendChild(overlay);
+      input.focus();
+    });
   }
 
   function renderRoomFacts(payload) {
@@ -1037,12 +1114,17 @@
     const share = view.mode === "share_preview";
     const denied = view.injectionDenied === true || view.mode === "deny";
     const joinHref = resolveSameOriginHref(view.joinHref || "");
-    const activeRoom = view.hasActiveRoom === true || view.lifecycle === "active" || !!joinHref;
+    const scheduled = roomIsScheduledView(view);
+    const liveOpen = String(view.status || "") === "open" || (view.hasActiveRoom === true && !scheduled);
+    const activeRoom = liveOpen || scheduled || view.hasActiveRoom === true || view.lifecycle === "active" || !!view.roomId;
+    const viewerHost = view.viewerIsHost !== false;
+    const guestPending = scheduled && view.viewerIsHost === false;
+    const scheduleLabel = view.scheduledLabel || formatScheduleLabel(view.scheduledStartMs, view.scheduledTimeZone);
     const visual = roomVisual(view);
     const visualHero = visual ? `<div class="sv-hero botdee-sv-visual" data-sv-reason="${esc(visual.reasonCode || "neutral-fallback")}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}">
         <img class="sv-bg" src="${esc(visual.backgroundUrl)}" alt="${esc(t("sv.scenicAlt", "Scenic illustration for this room. Not a photograph."))}"/>
       </div>` : "";
-    return `<article class="botdee-sv-room" data-kind="botDeeRoom" data-rs-mode="${esc(view.mode || "")}" data-rs-decline="${esc(view.declineKey || "")}" data-rs-active="${activeRoom ? "1" : "0"}" data-rs-room="${esc(view.roomId || "")}">
+    return `<article class="botdee-sv-room" data-kind="botDeeRoom" data-rs-mode="${esc(view.mode || "")}" data-rs-decline="${esc(view.declineKey || "")}" data-rs-active="${activeRoom ? "1" : "0"}" data-rs-room="${esc(view.roomId || "")}" data-rs-status="${esc(view.status || "")}" data-rs-host="${viewerHost ? "1" : "0"}" data-rs-title="${esc(view.authorizedTitle || "")}" data-rs-desc="${esc(view.authorizedDescription || "")}">
       <h2 class="botdee-sv-room-title">${esc(t("botdee.rs.title", "Room SMARTview"))}</h2>
       ${visualHero}
       <div class="botdee-sv-room-head">
@@ -1054,7 +1136,7 @@
       </div>
       <div class="botdee-sv-room-stats">
         <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.participants", "Participants"))}</span><b>${esc(String(count))} / ${esc(String(cap))}</b><small>${esc(t("botdee.rs.includingHost", "including host"))}</small></div>
-        <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.roomStatus", "Room status"))}</span><b data-rs-status-b>${esc(status)}</b><small>${esc(activeRoom ? t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests") : t("botdee.rs.notLiveNote", "Group rooms are not live yet"))}</small></div>
+        <div class="botdee-sv-room-stat"><span>${esc(t("botdee.rs.roomStatus", "Room status"))}</span><b data-rs-status-b>${esc(status)}</b><small>${esc(scheduled ? (scheduleLabel || t("sv.scheduled", "Scheduled")) : (liveOpen || view.roomId ? t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests") : t("botdee.rs.notLiveNote", "Group rooms are not live yet")))}</small></div>
       </div>
       ${denied ? `<p class="botdee-sv-room-note">${esc(t("botdee.rs.injectionDenied", "I can’t use private BOT DEE history or host memory for that. Room SMARTview only uses what this group later confirms."))}</p>` : ""}
       ${renderRoomNeedles(view)}
@@ -1066,13 +1148,28 @@
       </div>
       <div class="botdee-sv-room-panel" data-rs-panel-body hidden></div>
       <div class="botdee-sv-room-controls">
-        <button type="button" class="botdee-sv-room-btn" data-rs-panel="invite"${activeRoom ? "" : " disabled"}>${esc(t("botdee.rs.invite", "Invite"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-panel="invite"${view.roomId ? "" : " disabled"}>${esc(t("botdee.rs.invite", "Invite"))}</button>
         <button type="button" class="botdee-sv-room-btn" data-rs-panel="members">${esc(t("botdee.rs.members", "Members"))}</button>
-        <button type="button" class="botdee-sv-room-btn botdee-sv-room-danger" data-rs-end${activeRoom ? "" : " disabled"}>${esc(t("botdee.rs.endRoom", "End Room"))}</button>
+        <button type="button" class="botdee-sv-room-btn botdee-sv-room-danger" data-rs-end${view.roomId ? "" : " disabled"}>${esc(t("botdee.rs.endRoom", "End Room"))}</button>
       </div>
-      ${joinHref ? `<p class="botdee-sv-room-note"><a class="botdee-sv-action" href="${esc(joinHref)}">${esc(t("botdee.rs.joinLink", "Join this Room SMARTview"))}</a></p>` : ""}
-      ${confirmable ? `<div class="botdee-sv-room-confirm" data-rs-confirm-row>
-        <button type="button" class="botdee-sv-room-btn botdee-sv-room-main" data-rs-confirm>${esc(share ? t("botdee.rs.shareApprove", "Approve selected facts") : t("botdee.rs.confirm", "Confirm"))}</button>
+      ${joinHref && liveOpen ? `<p class="botdee-sv-room-note"><a class="botdee-sv-action" href="${esc(joinHref)}">${esc(t("botdee.rs.joinLink", "Join this Room SMARTview"))}</a></p>` : ""}
+      ${scheduled && scheduleLabel ? `<p class="botdee-sv-room-note" data-rs-schedule-label>📅 ${esc(scheduleLabel)}</p>` : ""}
+      ${share && confirmable ? `<div class="botdee-sv-room-confirm" data-rs-confirm-row>
+        <button type="button" class="botdee-sv-room-btn botdee-sv-room-main" data-rs-confirm>${esc(t("botdee.rs.shareApprove", "Approve selected facts"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-decline>${esc(t("botdee.rs.notNow", "Not now"))}</button>
+      </div>` : ""}
+      ${!share && confirmable && !view.roomId ? `<div class="botdee-sv-room-confirm botdee-sv-room-joinrow" data-rs-confirm-row>
+        <button type="button" class="botdee-sv-room-btn botdee-sv-room-main" data-rs-join-now data-rs-confirm>${esc(t("botdee.rs.joinNow", "Join Now"))}</button>
+        <span class="botdee-sv-room-or">${esc(t("sv.or", "or"))}</span>
+        <button type="button" class="botdee-sv-room-btn" data-rs-set-schedule>${esc(t("botdee.rs.setSchedule", "Set a schedule"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-decline>${esc(t("botdee.rs.notNow", "Not now"))}</button>
+      </div>` : ""}
+      ${scheduled && viewerHost && view.roomId ? `<div class="botdee-sv-room-confirm botdee-sv-room-joinrow" data-rs-confirm-row>
+        <button type="button" class="botdee-sv-room-btn botdee-sv-room-main" data-rs-join-now>${esc(t("botdee.rs.joinNow", "Join Now"))}</button>
+        <button type="button" class="botdee-sv-room-btn" data-rs-change-schedule>${esc(t("botdee.rs.changeSchedule", "Change schedule"))}</button>
+      </div>` : ""}
+      ${guestPending ? `<div class="botdee-sv-room-confirm" data-rs-confirm-row>
+        <button type="button" class="botdee-sv-room-btn botdee-sv-room-main" data-rs-rsvp-accept>${esc(t("botdee.rs.rsvpAccept", "Accepted"))}</button>
         <button type="button" class="botdee-sv-room-btn" data-rs-decline>${esc(t("botdee.rs.notNow", "Not now"))}</button>
       </div>` : ""}
       ${denied ? "" : (window.FLOQRSmartVisuals?.renderAdSlot
@@ -1092,7 +1189,7 @@
 
   function roomPanelCopy(name) {
     if (name === "itinerary") {
-      return `<p>${esc(t("botdee.rs.itineraryEmpty", "No shared plans yet"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.itineraryNotCalendar", "Shared Itinerary is night-out notes, not a calendar. There is no scheduled start time."))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.privacyNote", "Private BOT DEE messages, other members’ profiles, and SMARTsummary are not included."))}</p>`;
+      return `<p>${esc(t("botdee.rs.itineraryEmpty", "No shared plans yet"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.itineraryNotCalendar", "Shared Itinerary is night-out notes, not a calendar. Set a schedule is when the BOT DEE room starts."))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.privacyNote", "Private BOT DEE messages, other members’ profiles, and SMARTsummary are not included."))}</p>`;
     }
     if (name === "tab") {
       return `<p>${esc(t("botdee.rs.tabConsent", "Consent required before any charge"))}</p>
@@ -1105,7 +1202,7 @@
         <button type="button" class="botdee-sv-room-btn" data-rs-tab-close-split>${esc(t("botdee.room.payMyLines", "Pay my lines"))}</button>`;
     }
     if (name === "permissions") {
-      return `<p>${esc(t("botdee.rs.hostManaged", "Host managed"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.permissionsNotSchedule", "Room Permissions is host invite rules. The room stays open until the host taps End Room, or about four hours after it opened. It does not close when the last guest logs out."))}</p>`;
+      return `<p>${esc(t("botdee.rs.hostManaged", "Host managed"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.room.minglOnly", "Mingl friends only · host plus 7 guests"))}</p><p class="botdee-sv-room-note">${esc(t("botdee.rs.permissionsNotSchedule", "Room Permissions is host invite rules. The room stays open until the host taps End Room, about four hours after it opens, or everyone has been gone about 15 minutes. Pausing private BOT DEE chat is separate."))}</p>`;
     }
     if (name === "members") {
       return `<p>${esc(t("botdee.room.membersLive", "Members of this BOT DEE session. Display names only — no emails."))}</p><div data-rs-members-list></div>`;
@@ -1144,6 +1241,62 @@
       return `<button type="button" class="botdee-sv-room-btn is-blocked" data-rs-invite-state="full" aria-disabled="true">${esc(label)}</button>`;
     }
     return `<button type="button" class="botdee-sv-room-btn" data-rs-invite-uid="${esc(uid)}" data-rs-invite-state="invite">${esc(label)}</button>`;
+  }
+
+  let presenceTimer = 0;
+  let presenceRoomId = "";
+  let presenceBound = false;
+
+  function functionsForPresence() {
+    try {
+      return global.firebase?.functions?.() || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function stopRoomPresence() {
+    if (presenceTimer) {
+      clearInterval(presenceTimer);
+      presenceTimer = 0;
+    }
+    presenceRoomId = "";
+  }
+
+  function touchPresence(roomId, keepalive) {
+    const id = String(roomId || presenceRoomId || "").trim();
+    if (!id) return;
+    try {
+      const fns = functionsForPresence();
+      const call = fns?.httpsCallable?.("touchBotDeeRoomPresence");
+      if (!call) return;
+      const payload = {roomId: id};
+      if (keepalive && typeof navigator !== "undefined" && navigator.sendBeacon && false) {
+        return;
+      }
+      call(payload).catch(() => {});
+    } catch (_) {}
+  }
+
+  function startRoomPresence(roomId) {
+    const id = String(roomId || "").trim();
+    if (!id) return;
+    presenceRoomId = id;
+    if (presenceTimer) clearInterval(presenceTimer);
+    touchPresence(id);
+    presenceTimer = setInterval(() => touchPresence(id), 30 * 1000);
+    if (!presenceBound && global.document) {
+      presenceBound = true;
+      const onHide = () => {
+        if (!presenceRoomId) return;
+        touchPresence(presenceRoomId, true);
+      };
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") onHide();
+        else if (presenceRoomId) touchPresence(presenceRoomId);
+      });
+      window.addEventListener("pagehide", onHide);
+    }
   }
 
   function bindRoomCard(card) {
@@ -1310,6 +1463,62 @@
         if (!open && name === "tab") bindTabActions();
       });
     });
+    const stampRoom = room => {
+      if (!room || !room.roomId) return;
+      card.setAttribute("data-rs-room", room.roomId);
+      card.setAttribute("data-rs-status", room.status || "");
+      card.setAttribute("data-rs-active", "1");
+      const inviteBtn = card.querySelector("[data-rs-panel='invite']");
+      const endBtn = card.querySelector("[data-rs-end]");
+      if (inviteBtn) inviteBtn.disabled = false;
+      if (endBtn) endBtn.disabled = false;
+    };
+    const joinNow = async () => {
+      try {
+        const data = await call("startBotDeeRoom", {
+          roomId: roomIdOf(),
+          title: card.getAttribute("data-rs-title") || "BOT DEE group session",
+          authorizedTitle: card.getAttribute("data-rs-title") || "",
+          authorizedDescription: card.getAttribute("data-rs-desc") || ""
+        });
+        stampRoom(data.room);
+        startRoomPresence(data.room?.roomId);
+        card.querySelector("[data-rs-confirm-row]")?.setAttribute("hidden", "");
+        showToast(t("botdee.room.confirmedLive", "BOT DEE session is open. Invite Mingl friends from the card. Joining does not charge anyone."));
+      } catch (error) {
+        showToast(error?.message || t("botdee.rs.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."));
+      }
+    };
+    const saveSchedule = async currentMs => {
+      const picked = await askScheduleTime(currentMs);
+      if (!picked) return;
+      try {
+        const roomId = roomIdOf();
+        const name = roomId ? "rescheduleBotDeeRoom" : "scheduleBotDeeRoom";
+        const data = await call(name, {
+          roomId,
+          title: card.getAttribute("data-rs-title") || "BOT DEE group session",
+          authorizedTitle: card.getAttribute("data-rs-title") || "",
+          authorizedDescription: card.getAttribute("data-rs-desc") || "",
+          scheduledStartMs: picked.scheduledStartMs,
+          scheduledTimeZone: picked.scheduledTimeZone
+        });
+        stampRoom(data.room);
+        const label = formatScheduleLabel(data.room?.scheduledStartMs, data.room?.scheduledTimeZone);
+        let note = card.querySelector("[data-rs-schedule-label]");
+        if (!note) {
+          note = document.createElement("p");
+          note.className = "botdee-sv-room-note";
+          note.setAttribute("data-rs-schedule-label", "");
+          card.querySelector("[data-rs-confirm-row]")?.before(note);
+        }
+        note.textContent = `📅 ${label}`;
+        showToast(t("botdee.rs.scheduleSaved", "Scheduled. Search SMARTnotification is on for you and invited Mingl friends."));
+        card.querySelector("[data-rs-set-schedule]")?.setAttribute("hidden", "");
+      } catch (error) {
+        showToast(error?.message || t("botdee.rs.schedulePast", "Pick a future time for the BOT DEE room."));
+      }
+    };
     card.querySelector("[data-rs-confirm]")?.addEventListener("click", event => {
       event.preventDefault();
       const share = card.getAttribute("data-rs-mode") === "share_preview";
@@ -1318,16 +1527,42 @@
         card.querySelector("[data-rs-confirm-row]")?.setAttribute("hidden", "");
         return;
       }
-      card.querySelector("[data-rs-confirm-row]")?.setAttribute("hidden", "");
-      if (global.FLOQRBotDeeChat?.sendMessage) {
-        global.FLOQRBotDeeChat.sendMessage("confirm room smartview");
+      if (card.querySelector("[data-rs-join-now]") && event.currentTarget.hasAttribute("data-rs-join-now")) {
+        joinNow();
         return;
       }
-      showToast(t("botdee.room.confirmedLive", "BOT DEE session is open. Invite Mingl friends from the card. Joining does not charge anyone."));
+      if (event.currentTarget.hasAttribute("data-rs-join-now")) joinNow();
+    });
+    const joinBtn = card.querySelector("[data-rs-join-now]");
+    if (joinBtn && !joinBtn.hasAttribute("data-rs-confirm")) {
+      joinBtn.addEventListener("click", event => {
+        event.preventDefault();
+        joinNow();
+      });
+    }
+    card.querySelector("[data-rs-set-schedule]")?.addEventListener("click", event => {
+      event.preventDefault();
+      saveSchedule();
+    });
+    card.querySelector("[data-rs-change-schedule]")?.addEventListener("click", event => {
+      event.preventDefault();
+      saveSchedule();
+    });
+    card.querySelector("[data-rs-rsvp-accept]")?.addEventListener("click", async event => {
+      event.preventDefault();
+      try {
+        await call("rsvpBotDeeRoomInvite", {roomId: roomIdOf(), rsvp: "accepted"});
+        showToast(t("botdee.rs.rsvpPending", "You're in. Join Now is available when the room is live."));
+      } catch (error) {
+        showToast(error?.message || t("botdee.rs.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."));
+      }
     });
     card.querySelector("[data-rs-decline]")?.addEventListener("click", event => {
       event.preventDefault();
       rememberRoomDecline(card.getAttribute("data-rs-decline"));
+      if (roomIdOf() && card.getAttribute("data-rs-host") !== "1") {
+        call("rsvpBotDeeRoomInvite", {roomId: roomIdOf(), rsvp: "declined"}).catch(() => {});
+      }
       showToast(t("botdee.rs.declined", "OK — I won’t keep offering Room SMARTview for this."));
       card.querySelector("[data-rs-confirm-row]")?.setAttribute("hidden", "");
     });
@@ -1337,12 +1572,14 @@
       if (!roomId) return;
       try {
         await call("endBotDeeRoom", {roomId});
+        stopRoomPresence();
         showToast(t("botdee.rs.endedLive", "This Room SMARTview is closed. Private BOT DEE chat continues here."));
         if (global.FLOQRBotDeeChat?.sendMessage) global.FLOQRBotDeeChat.sendMessage("leave the room");
       } catch (error) {
         showToast(error?.message || t("botdee.rs.endNeedsHost", "Only the host can end this Room SMARTview. Say leave the room to leave without closing it."));
       }
     });
+    if (card.getAttribute("data-rs-status") === "open" && roomIdOf()) startRoomPresence(roomIdOf());
   }
 
   function isVipPayload(payload) {

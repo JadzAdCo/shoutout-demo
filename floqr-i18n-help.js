@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.070";
+  const VERSION = "s3.3.072";
   const packs = {
     "ru": {
       "help-smartvisuals-create": {
@@ -11,11 +11,11 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "В Поиске может появиться компактное приглашение Mingl Room. «Смотреть приглашение» открывает Room SMARTview. «Не сейчас» скрывает его в этой сессии. Картинка — иллюстрация SMARTbackground со SMARTstencils, не фото и не официальный знак. Имена и RSVP только из записи room. Подписанный образец Ad под карточкой следует тегам (Партнёр поездки / Летите в Cancun для Cancun Trip). Это не живой рекламодатель. Личный чат и инъекция оставляют слот пустым."
+        body: "Компактное приглашение Mingl Room может появиться в Search, когда друг Mingl запланировал room BOT DEE, куда вас пригласили. Смотреть приглашение открывает Room SMARTview. Join Now ведёт в BOT DEE, не в Mingl chat. Не сейчас скрывает карточку в этой вкладке; Inbox сохраняет Review BOT DEE invite. Демо-запрос Cancun — только Studio. Картинка — иллюстрация, не фото. Rooms Join Now без расписания не появляются в Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview и SMARTvisuals",
-        body: "Room SMARTview показывает приглашение Mingl: время, RSVP или эфир и «Присоединиться». SMARTstencils и SMARTbackgrounds следуют разрешённому названию — Cancun Trip даёт travel-иллюстрацию, не фото и не партнёрство. Личный чат BOT DEE не выбирает картинку. Групповые room ещё не в эфире; кнопка ничего не создаёт и не списывает. Подписанный Ad снизу — образец из этих тегов (Партнёр поездки / Летите в Cancun). Пусто для личного чата или инъекции; это не живой рекламодатель."
+        body: "Room SMARTview показывает приглашение Mingl: расписание, RSVP или эфир и Join Now. Join Now в Search открывает BOT DEE (не Mingl chat) с room= и t=. SMARTstencils и SMARTbackgrounds следуют разрешённому названию — Cancun Trip даёт travel-иллюстрацию, не настоящее фото Cancun. Личный чат BOT DEE не выбирает картинку. Подписанный Ad снизу — образец из этих тегов. Пусто для личного чата или инъекции; это не живой рекламодатель."
       },
       "help-scheduling-schedule-for": {
         title: "Расписание персонала",
@@ -67,7 +67,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "В чате BOT DEE скажите Open Room SMARTview, Start a group chat или простыми словами запланируйте поездку в Cancun (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Это тот же Room SMARTview, что Open Room SMARTview Cancun Trip — travel-иллюстрация и образец Ad Travel partner / Fly to Cancun, не живое бронирование рейсов или отелей. VIP tables tonight остаются nightlife, не карточкой поездки. Confirm открывает сессию. Приглашайте только друзей Mingl — хост плюс 7 гостей. Гости тоже могут приглашать. Вход — не платёж и не общий счёт. BOT DEE никогда не берёт номера карт. Личные сообщения остаются личными. Site Chrome следует Appearance. Сессия начинается после Confirm. Она открыта, пока хост не нажмёт End Room, или около четырёх часов. Нет запланированного старта, и room не закрывается, когда последний гость выходит. Shared Itinerary — заметки вечера, не календарь. Room Permissions — правила приглашений хоста, не расписание."
+        body: "В чате BOT DEE скажите Open Room SMARTview, Start a group chat или простыми словами запланируйте поездку в Cancun. Дальше: Войти сейчас или Задать расписание. Войти сейчас открывает сессию друзей Mingl сразу и не ставит карточку на Search. Задать расписание — старт room BOT DEE, не Shared Itinerary, и включает Search SMARTnotification для вас и приглашённых друзей Mingl. Приглашайте только друзей Mingl — хост плюс 7 гостей. Гости тоже могут приглашать. Вход — не платёж и не общий счёт. BOT DEE никогда не берёт номера карт. Личные сообщения остаются личными. Site Chrome следует Appearance. Живая room открыта, пока хост не нажмёт End Room, около четырёх часов после открытия, или если все отсутствуют около 15 минут. Пауза личного чата BOT DEE отдельно."
       },
       "help-botdee-room-smartview-invite": {
         title: "Пригласить друзей Mingl",
@@ -79,7 +79,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "Завершить Room SMARTview",
-        body: "Только хост может завершить room. Завершение никого не списывает и не стирает чужие личные чаты. Неоплаченный общий счёт нужно оплатить или аннулировать сначала. Выход гостя или закрытие BOT DEE не завершает room. Нет запланированного старта, и room не закрывается, когда последний гость выходит — хост жмёт End Room, или сессия истекает примерно через четыре часа."
+        body: "Только хост может завершить room. Завершение никого не списывает и не стирает чужие личные чаты. Неоплаченный общий счёт нужно оплатить или аннулировать сначала. Живая room открыта до End Room, около четырёх часов после открытия, или если все отсутствуют около 15 минут. Пауза личного чата BOT DEE — не выход из room. Гость, который уходит, не завершает room, пока хост на месте."
       },
       "help-botdee-room-smartview-tab": {
         title: "Общий счёт Room SMARTview",
@@ -96,6 +96,10 @@
       "help-botdee-room-smartview-share": {
         title: "Поделиться в Room SMARTview",
         body: "Share this conversation никогда не копирует ваш личный тред BOT DEE. BOT DEE показывает предпросмотр выбранных фактов из этого сообщения, помеченных как предварительные. Можно править или убрать факты. Профили и SMARTsummary остаются вне room."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "Войти сейчас или задать расписание",
+        body: "После настройки Room SMARTview выберите Войти сейчас или Задать расписание. Войти сейчас открывает сессию BOT DEE сразу и не ставит карточку на Search. Задать расписание — старт room BOT DEE, не Shared Itinerary. Будущее время включает Search SMARTnotification только для вас и приглашённых друзей Mingl. Гости RSVP, пока room не в эфире; затем Join Now открывает BOT DEE (не Mingl chat)."
       },
       "help-botdee-smartview-review": {
         title: "Проверить и исправить SMARTsummary",
@@ -537,11 +541,11 @@
       },
       "help-smartvisuals-notification": {
         title: "Mingl Room SMARTnotification",
-        body: "Op Zoeken kan een compacte Mingl Room-uitnodiging verschijnen. Uitnodiging bekijken opent Room SMARTview. Niet nu verbergt hem deze sessie. De art is SMARTbackground-illustratie met SMARTstencils — geen foto en geen officieel merkteken. Namen en RSVP komen alleen uit het room-record. Een gelabeld Ad-voorbeeld onder de kaart volgt de tags (Reispartner / Vlieg naar Cancun bij Cancun Trip). Geen echte adverteerder. Privéchat en injectie laten het vak leeg."
+        body: "Een compacte Mingl Room-uitnodiging kan op Search verschijnen als een Mingl-vriend een BOT DEE-room plande waar jij voor bent uitgenodigd. Uitnodiging bekijken opent Room SMARTview. Join Now gaat naar BOT DEE, niet Mingl-chat. Niet nu verbergt de kaart in dit tabblad; Inbox houdt Review BOT DEE invite. De Cancun-demovraag is alleen Studio. Kunst is illustratie, geen foto. Join Now-rooms zonder plan verschijnen niet op Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview met SMARTvisuals",
-        body: "Room SMARTview toont de Mingl-uitnodiging: tijd, RSVP of live, en Nu deelnemen. SMARTstencils en SMARTbackgrounds volgen de goedgekeurde titel — Cancun Trip gebruikt reisart, geen echte foto of officieel partnerschap. Privé BOT DEE-chat kiest geen art. Groepsrooms zijn niet live; Deelnemen maakt niets en rekent niets. Een gelabelde Ad eronder is een voorbeeld uit die tags (Reispartner / Vlieg naar Cancun). Leeg bij privéchat of injectie; geen echte adverteerder."
+        body: "Room SMARTview toont de Mingl-uitnodiging: plan, RSVP of live-status, en Join Now. Join Now op Search opent BOT DEE (niet Mingl-chat) met room= en t=. SMARTstencils en SMARTbackgrounds volgen de geautoriseerde roomtitel — Cancun Trip gebruikt reisillustratie, geen echte Cancun-foto. Privé-BOT DEE-chat kiest nooit de kunst. Een gelabelde Ad eronder is een sample van die tags. Leeg bij privéchat of injectie; geen live adverteerder."
       },
       "help-scheduling-schedule-for": {
         title: "Personeelsplanning",
@@ -593,7 +597,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Zeg in BOT DEE-chat Open Room SMARTview, Start a group chat, of plan in gewone woorden een Cancun-trip (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Dat opent dezelfde Room SMARTview als Open Room SMARTview Cancun Trip — travel-illustratie en een sample Ad Travel partner / Fly to Cancun, geen live vlucht- of hotelboeking. VIP tables tonight blijft nightlife, geen tripkaart. Confirm opent een sessie. Nodig alleen Mingl-vrienden uit — host plus 7 gasten. Gasten mogen ook uitnodigen. Deelnemen is geen betaling en opent geen gedeelde tab. BOT DEE neemt nooit kaartnummers. Privéberichten blijven privé. Site Chrome volgt Appearance. Een sessie start na Confirm. Die blijft open tot de host End Room tikt, of tot ongeveer vier uur na opening. Er is geen gepland starttijdstip, en de room sluit niet als de laatste gast uitlogt. Shared Itinerary zijn avondnotities, geen kalender. Room Permissions is host-beheer voor uitnodigingen, geen schema."
+        body: "Zeg in de BOT DEE-chat Open Room SMARTview, Start a group chat, of plan een Cancun-reis in gewone woorden. Daarna: Nu deelnemen of Plan instellen. Nu deelnemen opent nu een Mingl-vrienden-sessie en zet geen kaart op Search. Plan instellen is wanneer de BOT DEE-room start — niet Shared Itinerary — en zet Search SMARTnotification aan voor jou en uitgenodigde Mingl-vrienden. Nodig alleen Mingl-vrienden uit — host plus 7 gasten. Gasten kunnen ook uitnodigen. Deelnemen is geen betaling en opent geen gedeelde rekening. BOT DEE neemt nooit kaartnummers. Privé-BOT DEE-berichten blijven privé. Site Chrome volgt Appearance. Een live room blijft open tot End Room, tot ongeveer vier uur na opening, of tot iedereen zo’n 15 minuten weg is. De pauze van privé-BOT DEE-chat is apart."
       },
       "help-botdee-room-smartview-invite": {
         title: "Mingl-vrienden uitnodigen",
@@ -605,7 +609,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "Room SMARTview beëindigen",
-        body: "Alleen de host kan een room beëindigen. Beëindigen belast niemand en wist andermans privéchats niet. Een onbetaalde gedeelde tab moet eerst betaald of geannuleerd. Een gast die weggaat of BOT DEE sluit beëindigt de room niet. Er is geen geplande start, en de room sluit niet als de laatste gast uitlogt — de host tikt End Room, of hij verloopt na ongeveer vier uur."
+        body: "Alleen de host kan een room beëindigen. Beëindigen belast niemand en wist geen privéchats van anderen. Een onbetaalde gedeelde rekening moet eerst betaald of geannuleerd. Een live room blijft open tot End Room, tot ongeveer vier uur na opening, of tot iedereen zo’n 15 minuten weg is. De pauze van privé-BOT DEE-chat is geen room-logout. Een gast die weggaat beëindigt de room niet zolang de host er is."
       },
       "help-botdee-room-smartview-tab": {
         title: "Gedeelde tab Room SMARTview",
@@ -622,6 +626,10 @@
       "help-botdee-room-smartview-share": {
         title: "Delen in Room SMARTview",
         body: "Share this conversation kopieert nooit je privé BOT DEE-thread. BOT DEE toont een voorbeeld van geselecteerde deelbare feiten uit dit bericht, gemarkeerd als voorlopig. Je kunt feiten bewerken of weglaten. Profielen en SMARTsummary blijven buiten de room."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "Nu deelnemen of plan instellen",
+        body: "Na Room SMARTview-setup kies je Nu deelnemen of Plan instellen. Nu deelnemen opent de BOT DEE-sessie nu en zet geen kaart op Search. Plan instellen is wanneer de BOT DEE-room start — niet Shared Itinerary. Een toekomstig tijdstip zet Search SMARTnotification alleen aan voor jou en uitgenodigde Mingl-vrienden. Gasten RSVP tot de room live is; daarna opent Join Now BOT DEE (niet Mingl-chat)."
       },
       "help-botdee-smartview-review": {
         title: "SMARTsummary controleren en corrigeren",
@@ -1063,11 +1071,11 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Une invitation Mingl Room compacte peut s’afficher dans la Recherche. Voir l’invitation ouvre Room SMARTview. Pas maintenant la masque pour cette session. L’art est une illustration SMARTbackground avec SMARTstencils — pas une photo ni une marque officielle. Les noms et RSVP viennent uniquement du dossier de la room. Un exemple Ad étiqueté sous la carte suit les tags (Partenaire voyage / Envolez-vous vers Cancun pour Cancun Trip). Ce n’est pas un annonceur réel. Chat privé et injection laissent le slot vide."
+        body: "Une invitation Mingl Room compacte peut apparaître sur Search quand un ami Mingl a planifié une room BOT DEE à laquelle vous êtes invité. Voir l’invitation ouvre Room SMARTview. Join Now va vers BOT DEE, pas Mingl chat. Pas maintenant masque la carte dans cet onglet ; Inbox garde Review BOT DEE invite. La requête démo Cancun est réservée au Studio. L’art est une illustration, pas une photo. Les rooms Join Now sans horaire n’apparaissent pas sur Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview et SMARTvisuals",
-        body: "Room SMARTview montre l’invitation Mingl : horaire, RSVP ou statut live, et Rejoindre. SMARTstencils et SMARTbackgrounds suivent le titre autorisé — Cancun Trip utilise un art voyage, pas une photo réelle ni un partenariat officiel. Le chat BOT DEE privé ne choisit jamais l’art. Les rooms de groupe ne sont pas en ligne ; Rejoindre ne crée rien et ne facture pas. Un Ad étiqueté dessous est un exemple issu des tags (Partenaire voyage / Envolez-vous vers Cancun). Vide pour chat privé ou injection ; pas un annonceur réel."
+        body: "Room SMARTview montre l’invitation Mingl : horaire, RSVP ou statut en ligne, et Join Now. Join Now sur Search ouvre BOT DEE (pas Mingl chat) avec room= et t=. SMARTstencils et SMARTbackgrounds suivent le titre autorisé — Cancun Trip utilise une illustration voyage, pas une vraie photo de Cancun. Le chat BOT DEE privé ne choisit jamais l’art. Un Ad étiqueté en dessous est un échantillon de ces tags. Vide pour chat privé ou injection ; ce n’est pas un annonceur en direct."
       },
       "help-scheduling-schedule-for": {
         title: "Planification du personnel",
@@ -1119,7 +1127,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Dans le chat BOT DEE, dites Open Room SMARTview, Start a group chat, ou planifiez un voyage à Cancun en mots simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). C’est le même Room SMARTview que Open Room SMARTview Cancun Trip — illustration travel et un Ad échantillon Travel partner / Fly to Cancun, pas de réservation live de vols ou d’hôtels. VIP tables tonight reste nightlife, pas une carte voyage. Confirm ouvre une session. Invitez uniquement des amis Mingl — hôte plus 7 invités. Les invités peuvent aussi inviter. Rejoindre n’est pas un paiement et n’ouvre pas d’addition partagée. BOT DEE ne prend jamais de numéros de carte. Les messages privés restent privés. Site Chrome suit Appearance. Une session commence après Confirm. Elle reste ouverte jusqu’à End Room par l’hôte, ou environ quatre heures après l’ouverture. Il n’y a pas d’heure de début planifiée, et la room ne se ferme pas quand le dernier invité se déconnecte. Shared Itinerary sont des notes de soirée, pas un calendrier. Room Permissions est la gestion des invitations par l’hôte, pas un planning."
+        body: "Dans le chat BOT DEE, dites Open Room SMARTview, Start a group chat, ou planifiez un voyage à Cancun en mots simples. Ensuite : Rejoindre maintenant ou Définir un horaire. Rejoindre maintenant ouvre une session d’amis Mingl tout de suite et ne met pas de carte sur Search. Définir un horaire, c’est le début de la room BOT DEE — pas Shared Itinerary — et active SMARTnotification Search pour vous et les amis Mingl invités. Invitez seulement des amis Mingl — hôte plus 7 invités. Les invités peuvent aussi inviter. Rejoindre n’est pas un paiement et n’ouvre pas d’addition partagée. BOT DEE ne prend jamais de numéros de carte. Les messages BOT DEE privés restent privés. Site Chrome suit Appearance. Une room en ligne reste ouverte jusqu’à End Room, environ quatre heures après l’ouverture, ou si tout le monde est parti depuis environ 15 minutes. La pause du chat BOT DEE privé est séparée."
       },
       "help-botdee-room-smartview-invite": {
         title: "Inviter des amis Mingl",
@@ -1131,7 +1139,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "Terminer Room SMARTview",
-        body: "Seul l’hôte peut terminer une room. Terminer ne débite personne et n’efface pas les chats privés des autres. Une addition impayée doit d’abord être payée ou annulée. Quitter en invité ou fermer BOT DEE ne termine pas la room. Pas d’heure de début planifiée, et la room ne se ferme pas quand le dernier invité se déconnecte — l’hôte appuie End Room, ou elle expire environ quatre heures après l’ouverture."
+        body: "Seul l’hôte peut terminer une room. Terminer ne facture personne et n’efface pas les chats privés des autres. Une addition partagée impayée doit d’abord être payée ou annulée. Une room en ligne reste ouverte jusqu’à End Room, environ quatre heures après l’ouverture, ou si tout le monde est parti depuis environ 15 minutes. La pause du chat BOT DEE privé n’est pas une déconnexion de room. Un invité qui part ne termine pas la room tant que l’hôte est présent."
       },
       "help-botdee-room-smartview-tab": {
         title: "Addition partagée Room SMARTview",
@@ -1148,6 +1156,10 @@
       "help-botdee-room-smartview-share": {
         title: "Partager dans Room SMARTview",
         body: "Share this conversation ne copie jamais votre fil BOT DEE privé. BOT DEE montre un aperçu de faits partageables de ce message, marqués provisoires. Vous pouvez modifier ou retirer des faits. Profils et SMARTsummary restent hors de la room."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "Rejoindre maintenant ou définir un horaire",
+        body: "Après la configuration Room SMARTview, choisissez Rejoindre maintenant ou Définir un horaire. Rejoindre maintenant ouvre la session BOT DEE tout de suite et ne met pas de carte sur Search. Définir un horaire, c’est le début de la room BOT DEE — pas Shared Itinerary. Une heure future active SMARTnotification Search pour vous et les amis Mingl invités seulement. Les invités RSVP jusqu’à ce que la room soit en ligne ; Join Now ouvre alors BOT DEE (pas Mingl chat)."
       },
       "help-botdee-smartview-review": {
         title: "Relire et corriger un SMARTsummary",
@@ -1589,11 +1601,11 @@
       },
       "help-smartvisuals-notification": {
         title: "Mingl Room SMARTnotification",
-        body: "Auf der Suche kann eine kompakte Mingl-Room-Einladung erscheinen. Einladung ansehen öffnet Room SMARTview. Nicht jetzt blendet sie für diese Sitzung aus. Die Grafik ist SMARTbackground-Illustration mit SMARTstencils — kein Foto, kein offizielles Zeichen. Namen und RSVP kommen nur aus dem Room-Datensatz. Ein gekennzeichnetes Ad-Beispiel unter der Karte folgt den Tags (Reisepartner / Fliegen Sie nach Cancun bei Cancun Trip). Kein echter Werbetreibender. Privater Chat und Injection lassen den Slot leer."
+        body: "Eine kompakte Mingl-Room-Einladung kann auf Search erscheinen, wenn ein Mingl-Freund eine BOT DEE-Room geplant hat, zu der Sie eingeladen sind. Einladung ansehen öffnet Room SMARTview. Join Now geht zu BOT DEE, nicht Mingl-Chat. Nicht jetzt blendet die Karte in diesem Tab aus; Inbox behält Review BOT DEE invite. Die Cancun-Demo-Abfrage ist nur Studio. Kunst ist Illustration, kein Foto. Join-Now-Rooms ohne Zeitplan erscheinen nicht auf Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview mit SMARTvisuals",
-        body: "Room SMARTview zeigt die Mingl-Einladung: Zeit, RSVP oder Live, Jetzt beitreten. SMARTstencils und SMARTbackgrounds folgen dem freigegebenen Titel — Cancun Trip nutzt Reisekunst, kein echtes Foto, keine Partnerschaft. Privater BOT-DEE-Chat wählt keine Grafik. Gruppenräume sind nicht live; Beitreten erzeugt nichts und belastet nicht. Ein gekennzeichnetes Ad darunter ist ein Beispiel aus den Tags (Reisepartner / Fliegen Sie nach Cancun). Leer bei privatem Chat oder Injection; kein echter Werbetreibender."
+        body: "Room SMARTview zeigt die Mingl-Einladung: Zeitplan, RSVP oder Live-Status und Join Now. Join Now auf Search öffnet BOT DEE (nicht Mingl-Chat) mit room= und t=. SMARTstencils und SMARTbackgrounds folgen dem autorisierten Room-Titel — Cancun Trip nutzt Reisekunst, kein echtes Cancun-Foto. Privater BOT DEE-Chat wählt nie die Kunst. Ein beschriftetes Ad darunter ist ein Muster aus diesen Tags. Leer bei privatem Chat oder Injektion; kein Live-Werber."
       },
       "help-scheduling-schedule-for": {
         title: "Mitarbeiterplanung",
@@ -1645,7 +1657,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Sage im BOT DEE-Chat Open Room SMARTview, Start a group chat oder plane eine Cancun-Reise in normalen Worten (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Das ist dieselbe Room SMARTview wie Open Room SMARTview Cancun Trip — Travel-Illustration und ein Muster-Ad Travel partner / Fly to Cancun, keine Live-Flug- oder Hotelbuchung. VIP tables tonight bleibt Nightlife, keine Trip-Karte. Confirm öffnet eine Sitzung. Lade nur Mingl-Freunde ein — Gastgeber plus 7 Gäste. Gäste dürfen auch einladen. Beitreten ist keine Zahlung und öffnet keinen gemeinsamen Tab. BOT DEE nimmt niemals Kartennummern. Private Nachrichten bleiben privat. Site Chrome folgt Appearance. Eine Sitzung startet nach Confirm. Sie bleibt offen, bis der Gastgeber End Room tippt, oder etwa vier Stunden nach dem Öffnen. Es gibt keine geplante Startzeit, und der Raum schließt nicht, wenn der letzte Gast sich abmeldet. Shared Itinerary sind Abendnotizen, kein Kalender. Room Permissions ist die Einladungsregel des Gastgebers, kein Zeitplan."
+        body: "Im BOT DEE-Chat sagen Sie Open Room SMARTview, Start a group chat oder planen Sie eine Cancun-Reise in einfachen Worten. Danach: Jetzt beitreten oder Zeitplan festlegen. Jetzt beitreten öffnet eine Mingl-Freunde-Session sofort und legt keine Karte auf Search. Zeitplan festlegen ist der Start der BOT DEE-Room — nicht Shared Itinerary — und schaltet Search SMARTnotification für Sie und eingeladene Mingl-Freunde ein. Nur Mingl-Freunde einladen — Host plus 7 Gäste. Gäste können auch einladen. Beitreten ist keine Zahlung und öffnet keine geteilte Rechnung. BOT DEE nimmt nie Kartennummern. Private BOT DEE-Nachrichten bleiben privat. Site Chrome folgt Appearance. Eine Live-Room bleibt offen, bis der Host End Room tippt, etwa vier Stunden nach dem Öffnen, oder alle etwa 15 Minuten weg sind. Die Pause des privaten BOT DEE-Chats ist getrennt."
       },
       "help-botdee-room-smartview-invite": {
         title: "Mingl-Freunde einladen",
@@ -1657,7 +1669,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "Room SMARTview beenden",
-        body: "Nur der Gastgeber kann eine Room beenden. Beenden belastet niemanden und löscht fremde private Chats nicht. Ein unbezahlter Tab muss zuerst bezahlt oder storniert werden. Ein Gast, der geht oder BOT DEE schließt, beendet den Raum nicht. Es gibt keine geplante Startzeit, und der Raum schließt nicht, wenn der letzte Gast sich abmeldet — der Gastgeber tippt End Room, oder er endet nach etwa vier Stunden."
+        body: "Nur der Host kann einen Room beenden. Beenden belastet niemanden und löscht keine privaten Chats anderer. Eine unbezahlte geteilte Rechnung muss zuerst bezahlt oder storniert werden. Eine Live-Room bleibt offen bis End Room, etwa vier Stunden nach dem Öffnen, oder bis alle etwa 15 Minuten weg sind. Die Pause des privaten BOT DEE-Chats ist kein Room-Logout. Ein Gast, der geht, beendet die Room nicht, solange der Host da ist."
       },
       "help-botdee-room-smartview-tab": {
         title: "Gemeinsamer Tab Room SMARTview",
@@ -1674,6 +1686,10 @@
       "help-botdee-room-smartview-share": {
         title: "In Room SMARTview teilen",
         body: "Share this conversation kopiert niemals deinen privaten BOT DEE-Thread. BOT DEE zeigt eine Vorschau ausgewählter teilbarer Fakten aus dieser Nachricht, als vorläufig markiert. Du kannst Fakten bearbeiten oder streichen. Profile und SMARTsummary bleiben draußen."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "Jetzt beitreten oder Zeitplan festlegen",
+        body: "Nach dem Room-SMARTview-Setup wählen Sie Jetzt beitreten oder Zeitplan festlegen. Jetzt beitreten öffnet die BOT DEE-Session sofort und legt keine Karte auf Search. Zeitplan festlegen ist der Start der BOT DEE-Room — nicht Shared Itinerary. Ein zukünftiger Zeitpunkt schaltet Search SMARTnotification nur für Sie und eingeladene Mingl-Freunde ein. Gäste sagen zu, bis die Room live ist; dann öffnet Join Now BOT DEE (nicht Mingl-Chat)."
       },
       "help-botdee-smartview-review": {
         title: "SMARTsummary prüfen und korrigieren",
@@ -2115,11 +2131,11 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification de Mingl Room",
-        body: "En Búsqueda puede aparecer una invitación compacta. Ver invitación abre Room SMARTview. Ahora no la oculta en esta sesión. El arte es ilustración SMARTbackground con SMARTstencils — no foto ni marca oficial. Nombres y RSVP salen solo del registro de la room. Un anuncio de muestra etiquetado bajo la tarjeta sigue las etiquetas (Socio de viaje / Vuela a Cancun para Cancun Trip). No es un anunciante real. El chat privado y la inyección dejan el hueco vacío."
+        body: "Una invitación compacta Mingl Room puede aparecer en Search cuando un amigo Mingl programó una room BOT DEE a la que usted está invitado. Ver invitación abre Room SMARTview. Join Now va a BOT DEE, no a Mingl chat. Ahora no oculta la tarjeta en esta pestaña; Inbox sigue con Review BOT DEE invite. La consulta demo Cancun es solo Studio. El arte es ilustración, no foto. Las rooms Join Now sin horario no aparecen en Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview con SMARTvisuals",
-        body: "Room SMARTview muestra la invitación Mingl: horario, RSVP o en vivo, y Unirse. SMARTstencils y SMARTbackgrounds siguen el título autorizado — Cancun Trip usa arte de viaje, no foto real ni alianza oficial. El chat privado de BOT DEE no elige el arte. Las rooms de grupo no están en vivo; Unirse no crea ni cobra. Un anuncio etiquetado debajo es una muestra de esas etiquetas (Socio de viaje / Vuela a Cancun). Vacío en chat privado o inyección; no es un anunciante real."
+        body: "Room SMARTview muestra la invitación Mingl: horario, RSVP o estado en vivo, y Join Now. Join Now en Search abre BOT DEE (no Mingl chat) con room= y t=. SMARTstencils y SMARTbackgrounds siguen el título autorizado — Cancun Trip usa arte de viaje, no una foto real de Cancun. El chat privado de BOT DEE nunca elige el arte. Un Ad etiquetado debajo es una muestra de esas etiquetas. Vacío para chat privado o inyección; no es un anunciante en vivo."
       },
       "help-scheduling-schedule-for": {
         title: "Planificación del personal",
@@ -2171,7 +2187,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "En el chat BOT DEE di Open Room SMARTview, Start a group chat o planea un viaje a Cancun en palabras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Es el mismo Room SMARTview que Open Room SMARTview Cancun Trip — ilustración travel y un Ad de muestra Travel partner / Fly to Cancun, no reserva en vivo de vuelos u hoteles. VIP tables tonight sigue nightlife, no una tarjeta de viaje. Confirm abre una sesión. Invita solo amigos Mingl — anfitrión más 7 invitados. Los invitados también pueden invitar. Unirse no es un pago y no abre una cuenta compartida. BOT DEE nunca toma números de tarjeta. Los mensajes privados siguen privados. Site Chrome sigue Appearance. La sesión empieza al Confirm. Sigue abierta hasta que el anfitrión pulse End Room, o unas cuatro horas después de abrir. No hay hora de inicio programada, y la room no se cierra cuando el último invitado cierra sesión. Shared Itinerary son notas de la noche, no un calendario. Room Permissions es la regla de invitaciones del anfitrión, no un horario."
+        body: "En el chat de BOT DEE, diga Open Room SMARTview, Start a group chat, o planee un viaje a Cancun en palabras simples. Luego: Unirse ahora o Fijar un horario. Unirse ahora abre una sesión de amigos Mingl ya y no pone una tarjeta en Search. Fijar un horario es cuando empieza la room BOT DEE — no Shared Itinerary — y activa SMARTnotification de Search para usted y amigos Mingl invitados. Invite solo amigos Mingl — anfitrión más 7 invitados. Los invitados también pueden invitar. Unirse no es un pago y no abre una cuenta compartida. BOT DEE nunca toma números de tarjeta. Los mensajes privados de BOT DEE siguen privados. Site Chrome sigue Appearance. Una room en vivo sigue abierta hasta End Room, unas cuatro horas después de abrir, o si todos se han ido unos 15 minutos. Pausar el chat privado de BOT DEE es aparte."
       },
       "help-botdee-room-smartview-invite": {
         title: "Invitar amigos Mingl",
@@ -2183,7 +2199,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "Terminar Room SMARTview",
-        body: "Solo el anfitrión puede terminar una room. Terminar no cobra a nadie ni borra chats privados de otros. Una cuenta impagada debe pagarse o anularse primero. Que un invitado salga o cierre BOT DEE no termina la room. No hay inicio programado, y la room no se cierra cuando el último invitado cierra sesión — el anfitrión pulsa End Room, o caduca unas cuatro horas después de abrir."
+        body: "Solo el anfitrión puede terminar una room. Terminar no cobra a nadie ni borra chats privados de otros. Una cuenta compartida impagada debe pagarse o anularse primero. Una room en vivo sigue abierta hasta End Room, unas cuatro horas después de abrir, o si todos se han ido unos 15 minutos. Pausar el chat privado de BOT DEE no es salir de la room. Un invitado que se va no termina la room mientras el anfitrión sigue."
       },
       "help-botdee-room-smartview-tab": {
         title: "Cuenta compartida Room SMARTview",
@@ -2200,6 +2216,10 @@
       "help-botdee-room-smartview-share": {
         title: "Compartir en Room SMARTview",
         body: "Share this conversation nunca copia tu hilo privado de BOT DEE. BOT DEE muestra una vista previa de hechos compartibles de este mensaje, marcados como provisionales. Puedes editar o quitar hechos. Perfiles y SMARTsummary quedan fuera de la room."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "Unirse ahora o fijar un horario",
+        body: "Tras configurar Room SMARTview, elija Unirse ahora o Fijar un horario. Unirse ahora abre la sesión BOT DEE ya y no pone una tarjeta en Search. Fijar un horario es cuando empieza la room BOT DEE — no Shared Itinerary. Una hora futura activa SMARTnotification de Search solo para usted y amigos Mingl invitados. Los invitados confirman RSVP hasta que la room esté en vivo; entonces Join Now abre BOT DEE (no Mingl chat)."
       },
       "help-botdee-smartview-review": {
         title: "Revisar y corregir un SMARTsummary",
@@ -2641,11 +2661,11 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "In Cerca può comparire un invito Mingl Room compatto. Vedi invito apre Room SMARTview. Non ora lo nasconde per questa sessione. L’arte è illustrazione SMARTbackground con SMARTstencils — non una foto né un marchio ufficiale. Nomi e RSVP arrivano solo dal record della room. Un esempio Ad etichettato sotto la carta segue i tag (Partner di viaggio / Vola a Cancun per Cancun Trip). Non è un inserzionista reale. Chat privata e injection lasciano lo slot vuoto."
+        body: "Un invito compatto Mingl Room può comparire su Search quando un amico Mingl ha programmato una room BOT DEE a cui sei invitato. Vedi invito apre Room SMARTview. Join Now va a BOT DEE, non Mingl chat. Non ora nasconde la scheda in questa scheda; Inbox tiene Review BOT DEE invite. La query demo Cancun è solo Studio. L’arte è illustrazione, non foto. Le room Join Now senza orario non appaiono su Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview con SMARTvisuals",
-        body: "Room SMARTview mostra l’invito Mingl: orario, RSVP o live, e Entra ora. SMARTstencils e SMARTbackgrounds seguono il titolo autorizzato — Cancun Trip usa arte di viaggio, non una foto reale né una partnership. La chat privata BOT DEE non sceglie l’arte. Le room di gruppo non sono live; Entra non crea e non addebita. Un Ad etichettato sotto è un esempio da quei tag (Partner di viaggio / Vola a Cancun). Vuoto per chat privata o injection; non è un inserzionista reale."
+        body: "Room SMARTview mostra l’invito Mingl: orario, RSVP o stato live, e Join Now. Join Now su Search apre BOT DEE (non Mingl chat) con room= e t=. SMARTstencils e SMARTbackgrounds seguono il titolo autorizzato — Cancun Trip usa arte di viaggio, non una foto reale di Cancun. La chat BOT DEE privata non sceglie mai l’arte. Un Ad etichettato sotto è un campione da quei tag. Vuoto per chat privata o iniezione; non è un inserzionista live."
       },
       "help-scheduling-schedule-for": {
         title: "Pianificazione del personale",
@@ -2697,7 +2717,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Nella chat BOT DEE di’ Open Room SMARTview, Start a group chat o pianifica un viaggio a Cancun in parole semplici (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). È lo stesso Room SMARTview di Open Room SMARTview Cancun Trip — illustrazione travel e un Ad campione Travel partner / Fly to Cancun, non prenotazione live di voli o hotel. VIP tables tonight resta nightlife, non una scheda viaggio. Confirm apre una sessione. Invita solo amici Mingl — host più 7 ospiti. Anche gli ospiti possono invitare. Entrare non è un pagamento e non apre un conto condiviso. BOT DEE non prende mai numeri di carta. I messaggi privati restano privati. Site Chrome segue Appearance. La sessione inizia con Confirm. Resta aperta finché l’host non tocca End Room, o circa quattro ore dopo l’apertura. Non c’è un orario di inizio, e la room non si chiude quando l’ultimo ospite esce. Shared Itinerary sono note della serata, non un calendario. Room Permissions è la regola inviti dell’host, non una programmazione."
+        body: "Nella chat BOT DEE di’ Open Room SMARTview, Start a group chat, o pianifica un viaggio a Cancun in parole semplici. Poi: Entra ora o Imposta un orario. Entra ora apre una sessione di amici Mingl subito e non mette una scheda su Search. Imposta un orario è quando inizia la room BOT DEE — non Shared Itinerary — e attiva SMARTnotification di Search per te e gli amici Mingl invitati. Invita solo amici Mingl — host più 7 ospiti. Anche gli ospiti possono invitare. Unirsi non è un pagamento e non apre un conto condiviso. BOT DEE non prende mai numeri di carta. I messaggi BOT DEE privati restano privati. Site Chrome segue Appearance. Una room live resta aperta fino a End Room, circa quattro ore dopo l’apertura, o se tutti sono assenti da circa 15 minuti. La pausa della chat BOT DEE privata è distinta."
       },
       "help-botdee-room-smartview-invite": {
         title: "Invita amici Mingl",
@@ -2709,7 +2729,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "Termina Room SMARTview",
-        body: "Solo l’host può terminare una room. Terminare non addebita nessuno e non cancella le chat private altrui. Un conto non pagato va prima pagato o annullato. Un ospite che esce o chiude BOT DEE non termina la room. Non c’è un orario di inizio, e la room non si chiude quando l’ultimo ospite esce — l’host tocca End Room, oppure scade circa quattro ore dopo l’apertura."
+        body: "Solo l’host può terminare una room. Terminare non addebita nessuno e non cancella le chat private altrui. Un conto condiviso non pagato va prima pagato o annullato. Una room live resta aperta fino a End Room, circa quattro ore dopo l’apertura, o se tutti sono assenti da circa 15 minuti. La pausa della chat BOT DEE privata non è un logout della room. Un ospite che esce non termina la room se l’host è presente."
       },
       "help-botdee-room-smartview-tab": {
         title: "Conto condiviso Room SMARTview",
@@ -2726,6 +2746,10 @@
       "help-botdee-room-smartview-share": {
         title: "Condividi in Room SMARTview",
         body: "Share this conversation non copia mai il tuo thread BOT DEE privato. BOT DEE mostra un’anteprima di fatti condivisibili da questo messaggio, contrassegnati come provvisori. Puoi modificare o togliere fatti. Profili e SMARTsummary restano fuori dalla room."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "Entra ora o imposta un orario",
+        body: "Dopo il setup Room SMARTview, scegli Entra ora o Imposta un orario. Entra ora apre la sessione BOT DEE subito e non mette una scheda su Search. Imposta un orario è quando inizia la room BOT DEE — non Shared Itinerary. Un orario futuro attiva SMARTnotification di Search solo per te e gli amici Mingl invitati. Gli ospiti RSVP finché la room è live; poi Join Now apre BOT DEE (non Mingl chat)."
       },
       "help-botdee-smartview-review": {
         title: "Rivedi e correggi lo SMARTsummary",
@@ -3167,11 +3191,11 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Na Pesquisa pode aparecer um convite compacto Mingl Room. Ver convite abre o Room SMARTview. Agora não esconde-o nesta sessão. A arte é ilustração SMARTbackground com SMARTstencils — não é foto nem marca oficial. Nomes e RSVP vêm só do registo da room. Um anúncio de amostra rotulado sob o cartão segue as tags (Parceiro de viagem / Voe para Cancun num Cancun Trip). Não é um anunciante real. Chat privado e injeção deixam o espaço vazio."
+        body: "Um convite compacto Mingl Room pode aparecer na Search quando um amigo Mingl agendou uma room BOT DEE para a qual foi convidado. Ver convite abre Room SMARTview. Join Now vai para BOT DEE, não Mingl chat. Agora não esconde o cartão neste separador; Inbox mantém Review BOT DEE invite. A consulta demo Cancun é só Studio. A arte é ilustração, não foto. Rooms Join Now sem horário não aparecem na Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview com SMARTvisuals",
-        body: "O Room SMARTview mostra o convite Mingl: horário, RSVP ou direto, e Entrar agora. SMARTstencils e SMARTbackgrounds seguem o título autorizado — Cancun Trip usa arte de viagem, não foto real nem parceria oficial. O chat privado BOT DEE não escolhe a arte. Rooms de grupo ainda não estão live; Entrar não cria nem cobra. Um anúncio rotulado abaixo é uma amostra dessas tags (Parceiro de viagem / Voe para Cancun). Vazio para chat privado ou injeção; não é um anunciante real."
+        body: "Room SMARTview mostra o convite Mingl: horário, RSVP ou estado ao vivo, e Join Now. Join Now na Search abre BOT DEE (não Mingl chat) com room= e t=. SMARTstencils e SMARTbackgrounds seguem o título autorizado — Cancun Trip usa arte de viagem, não uma foto real de Cancun. O chat privado BOT DEE nunca escolhe a arte. Um Ad rotulado abaixo é uma amostra dessas etiquetas. Vazio para chat privado ou injeção; não é um anunciante ao vivo."
       },
       "help-scheduling-schedule-for": {
         title: "Agendamento de pessoal",
@@ -3223,7 +3247,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "No chat BOT DEE diga Open Room SMARTview, Start a group chat ou planeie uma viagem a Cancun em palavras simples (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). É o mesmo Room SMARTview que Open Room SMARTview Cancun Trip — ilustração travel e um Ad de amostra Travel partner / Fly to Cancun, sem reserva live de voos ou hotéis. VIP tables tonight continua nightlife, não um cartão de viagem. Confirm abre uma sessão. Convide só amigos Mingl — anfitrião mais 7 convidados. Convidados também podem convidar. Entrar não é pagamento e não abre conta partilhada. BOT DEE nunca pega números de cartão. Mensagens privadas ficam privadas. Site Chrome segue Appearance. A sessão começa no Confirm. Fica aberta até o anfitrião tocar End Room, ou cerca de quatro horas depois de abrir. Não há hora de início agendada, e a room não fecha quando o último convidado sai. Shared Itinerary são notas da noite, não um calendário. Room Permissions é a regra de convites do anfitrião, não um horário."
+        body: "No chat BOT DEE, diga Open Room SMARTview, Start a group chat, ou planeie uma viagem a Cancun em palavras simples. Depois: Entrar agora ou Definir um horário. Entrar agora abre uma sessão de amigos Mingl já e não põe um cartão na Search. Definir um horário é quando a room BOT DEE começa — não Shared Itinerary — e liga SMARTnotification da Search para si e amigos Mingl convidados. Convide só amigos Mingl — anfitrião mais 7 convidados. Convidados também podem convidar. Entrar não é um pagamento e não abre uma conta partilhada. O BOT DEE nunca pede números de cartão. As mensagens privadas do BOT DEE ficam privadas. Site Chrome segue Appearance. Uma room ao vivo fica aberta até End Room, cerca de quatro horas depois de abrir, ou se todos saíram há cerca de 15 minutos. Pausar o chat privado BOT DEE é separado."
       },
       "help-botdee-room-smartview-invite": {
         title: "Convidar amigos Mingl",
@@ -3235,7 +3259,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "Terminar Room SMARTview",
-        body: "Só o anfitrião pode terminar uma room. Terminar não cobra ninguém nem apaga chats privados de outros. Uma conta por pagar deve ser paga ou anulada primeiro. Um convidado sair ou fechar BOT DEE não termina a room. Não há início agendado, e a room não fecha quando o último convidado sai — o anfitrião toca End Room, ou expira cerca de quatro horas depois de abrir."
+        body: "Só o anfitrião pode terminar uma room. Terminar não cobra ninguém nem apaga chats privados de outros. Uma conta partilhada por pagar deve ser paga ou anulada primeiro. Uma room ao vivo fica aberta até End Room, cerca de quatro horas depois de abrir, ou se todos saíram há cerca de 15 minutos. Pausar o chat privado BOT DEE não é logout da room. Um convidado que sai não termina a room enquanto o anfitrião está presente."
       },
       "help-botdee-room-smartview-tab": {
         title: "Conta partilhada Room SMARTview",
@@ -3252,6 +3276,10 @@
       "help-botdee-room-smartview-share": {
         title: "Partilhar em Room SMARTview",
         body: "Share this conversation nunca copia o seu tópico privado BOT DEE. BOT DEE mostra uma pré-visualização de factos partilháveis desta mensagem, marcados como provisórios. Pode editar ou retirar factos. Perfis e SMARTsummary ficam fora da room."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "Entrar agora ou definir um horário",
+        body: "Depois da configuração Room SMARTview, escolha Entrar agora ou Definir um horário. Entrar agora abre a sessão BOT DEE já e não põe um cartão na Search. Definir um horário é quando a room BOT DEE começa — não Shared Itinerary. Uma hora futura liga SMARTnotification da Search só para si e amigos Mingl convidados. Convidados RSVP até a room estar ao vivo; depois Join Now abre BOT DEE (não Mingl chat)."
       },
       "help-botdee-smartview-review": {
         title: "Rever e corrigir o SMARTsummary",
@@ -3693,11 +3721,11 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "Στην Αναζήτηση μπορεί να εμφανιστεί συμπαγής πρόσκληση Mingl Room. Η προβολή ανοίγει το Room SMARTview. Όχι τώρα την κρύβει σε αυτή τη συνεδρία. Η εικόνα είναι εικονογράφηση SMARTbackground με SMARTstencils — όχι φωτογραφία ούτε επίσημο σήμα. Ονόματα και RSVP μόνο από την εγγραφή room. Ένα επισημασμένο δείγμα Ad κάτω από την κάρτα ακολουθεί τις ετικέτες (Ταξιδιωτικός συνεργάτης / Πτήση για Cancun στο Cancun Trip). Όχι πραγματικός διαφημιζόμενος. Ιδιωτική συνομιλία και injection αφήνουν το κενό."
+        body: "Μια συμπαγής πρόσκληση Mingl Room μπορεί να εμφανιστεί στο Search όταν ένας φίλος Mingl προγραμμάτισε BOT DEE room στο οποίο προσκληθήκατε. Προβολή πρόσκλησης ανοίγει Room SMARTview. Το Join Now πηγαίνει στο BOT DEE, όχι Mingl chat. Όχι τώρα κρύβει την κάρτα σε αυτή την καρτέλα· το Inbox κρατά Review BOT DEE invite. Το demo Cancun είναι μόνο Studio. Η τέχνη είναι εικονογράφηση, όχι φωτογραφία. Rooms Join Now χωρίς πρόγραμμα δεν εμφανίζονται στο Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview με SMARTvisuals",
-        body: "Το Room SMARTview δείχνει την πρόσκληση Mingl: ώρα, RSVP ή ζωντανά, και Συμμετοχή τώρα. SMARTstencils και SMARTbackgrounds ακολουθούν τον εγκεκριμένο τίτλο — το Cancun Trip χρησιμοποιεί ταξιδιωτική τέχνη, όχι πραγματική φωτογραφία ούτε επίσημη συνεργασία. Η ιδιωτική συνομιλία BOT DEE δεν διαλέγει τέχνη. Οι ομαδικές room δεν είναι ζωντανές· η Συμμετοχή δεν δημιουργεί ούτε χρεώνει. Ένα επισημασμένο Ad από κάτω είναι δείγμα από αυτές τις ετικέτες (Ταξιδιωτικός συνεργάτης / Πτήση για Cancun). Κενό για ιδιωτική συνομιλία ή injection· όχι πραγματικός διαφημιζόμενος."
+        body: "Το Room SMARTview δείχνει την πρόσκληση Mingl: πρόγραμμα, RSVP ή live κατάσταση, και Join Now. Το Join Now στο Search ανοίγει BOT DEE (όχι Mingl chat) με room= και t=. SMARTstencils και SMARTbackgrounds ακολουθούν τον εγκεκριμένο τίτλο — Cancun Trip χρησιμοποιεί ταξιδιωτική εικονογράφηση, όχι πραγματική φωτογραφία Cancun. Η ιδιωτική συνομιλία BOT DEE δεν επιλέγει ποτέ την τέχνη. Ένα επισημασμένο Ad από κάτω είναι δείγμα από αυτές τις ετικέτες. Κενό για ιδιωτική συνομιλία ή έγχυση· δεν είναι ζωντανός διαφημιστής."
       },
       "help-scheduling-schedule-for": {
         title: "Προγραμματισμός προσωπικού",
@@ -3749,7 +3777,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "Στη συνομιλία BOT DEE πείτε Open Room SMARTview, Start a group chat ή σχεδιάστε ένα ταξίδι Cancun με απλά λόγια (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). Είναι το ίδιο Room SMARTview με Open Room SMARTview Cancun Trip — travel εικονογράφηση και δείγμα Ad Travel partner / Fly to Cancun, όχι ζωντανή κράτηση πτήσεων ή ξενοδοχείων. VIP tables tonight μένει nightlife, όχι κάρτα ταξιδιού. Confirm ανοίγει συνεδρία. Προσκαλέστε μόνο φίλους Mingl — οικοδεσπότης συν 7 επισκέπτες. Οι επισκέπτες μπορούν επίσης να προσκαλούν. Η συμμετοχή δεν είναι πληρωμή και δεν ανοίγει κοινό λογαριασμό. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών. Τα ιδιωτικά μηνύματα μένουν ιδιωτικά. Το Site Chrome ακολουθεί Appearance. Η συνεδρία ξεκινά με Confirm. Μένει ανοιχτή μέχρι ο οικοδεσπότης να πατήσει End Room, ή περίπου τέσσερις ώρες μετά το άνοιγμα. Δεν υπάρχει προγραμματισμένη έναρξη, και η room δεν κλείνει όταν αποσυνδεθεί ο τελευταίος επισκέπτης. Το Shared Itinerary είναι σημειώσεις βραδιάς, όχι ημερολόγιο. Το Room Permissions είναι κανόνες πρόσκλησης του οικοδεσπότη, όχι πρόγραμμα."
+        body: "Στη συνομιλία BOT DEE πείτε Open Room SMARTview, Start a group chat ή σχεδιάστε ταξίδι Cancun με απλά λόγια. Έπειτα: Συμμετοχή τώρα ή Ορισμός προγράμματος. Η συμμετοχή τώρα ανοίγει συνεδρία φίλων Mingl τώρα και δεν βάζει κάρτα στο Search. Ορισμός προγράμματος είναι η έναρξη του BOT DEE room — όχι Shared Itinerary — και ενεργοποιεί Search SMARTnotification για εσάς και προσκεκλημένους φίλους Mingl. Προσκαλέστε μόνο φίλους Mingl — host συν 7 επισκέπτες. Οι επισκέπτες μπορούν επίσης να προσκαλούν. Η είσοδος δεν είναι πληρωμή και δεν ανοίγει κοινό λογαριασμό. Το BOT DEE δεν παίρνει ποτέ αριθμούς κάρτας. Τα ιδιωτικά μηνύματα BOT DEE μένουν ιδιωτικά. Το Site Chrome ακολουθεί Appearance. Ένα live room μένει ανοιχτό μέχρι End Room, περίπου τέσσερις ώρες μετά το άνοιγμα, ή αν όλοι έχουν φύγει περίπου 15 λεπτά. Η παύση ιδιωτικής συνομιλίας BOT DEE είναι ξεχωριστή."
       },
       "help-botdee-room-smartview-invite": {
         title: "Πρόσκληση φίλων Mingl",
@@ -3761,7 +3789,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "Τέλος Room SMARTview",
-        body: "Μόνο ο οικοδεσπότης μπορεί να τερματίσει μια room. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Ένας απλήρωτος κοινός λογαριασμός πρέπει πρώτα να πληρωθεί ή να ακυρωθεί. Ένας επισκέπτης που φεύγει ή κλείνει το BOT DEE δεν τερματίζει τη room. Δεν υπάρχει προγραμματισμένη έναρξη, και η room δεν κλείνει όταν αποσυνδεθεί ο τελευταίος επισκέπτης — ο οικοδεσπότης πατά End Room, ή λήγει περίπου τέσσερις ώρες μετά το άνοιγμα."
+        body: "Μόνο ο host μπορεί να τελειώσει μια room. Το τέλος δεν χρεώνει κανέναν και δεν σβήνει ιδιωτικές συνομιλίες άλλων. Ένας απλήρωτος κοινός λογαριασμός πρέπει πρώτα να πληρωθεί ή να ακυρωθεί. Ένα live room μένει ανοιχτό μέχρι End Room, περίπου τέσσερις ώρες μετά το άνοιγμα, ή αν όλοι έχουν φύγει περίπου 15 λεπτά. Η παύση ιδιωτικής συνομιλίας BOT DEE δεν είναι αποσύνδεση room. Ένας επισκέπτης που φεύγει δεν τελειώνει τη room όσο ο host είναι εκεί."
       },
       "help-botdee-room-smartview-tab": {
         title: "Κοινός λογαριασμός Room SMARTview",
@@ -3778,6 +3806,10 @@
       "help-botdee-room-smartview-share": {
         title: "Κοινοποίηση σε Room SMARTview",
         body: "Το Share this conversation δεν αντιγράφει ποτέ το ιδιωτικό νήμα BOT DEE. Το BOT DEE δείχνει προεπισκόπηση επιλεγμένων κοινοποιήσιμων στοιχείων από αυτό το μήνυμα, ως προσωρινά. Μπορείτε να επεξεργαστείτε ή να αφαιρέσετε στοιχεία. Προφίλ και SMARTsummary μένουν έξω από τη room."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "Συμμετοχή τώρα ή ορισμός προγράμματος",
+        body: "Μετά το setup Room SMARTview επιλέξτε Συμμετοχή τώρα ή Ορισμός προγράμματος. Η συμμετοχή τώρα ανοίγει τη συνεδρία BOT DEE τώρα και δεν βάζει κάρτα στο Search. Ορισμός προγράμματος είναι η έναρξη του BOT DEE room — όχι Shared Itinerary. Μελλοντική ώρα ενεργοποιεί Search SMARTnotification μόνο για εσάς και προσκεκλημένους φίλους Mingl. Οι επισκέπτες RSVP μέχρι το room να είναι live· μετά το Join Now ανοίγει BOT DEE (όχι Mingl chat)."
       },
       "help-botdee-smartview-review": {
         title: "Έλεγχος και διόρθωση SMARTsummary",
@@ -4219,11 +4251,11 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification Mingl Room",
-        body: "W Szukaj może pojawić się zwarte zaproszenie Mingl Room. Zobacz zaproszenie otwiera Room SMARTview. Nie teraz chowa je w tej sesji. Grafika to ilustracja SMARTbackground ze SMARTstencils — nie zdjęcie i nie znak oficjalny. Imiona i RSVP tylko z rekordu room. Oznakowana próbka Ad pod kartą idzie za tagami (Partner podróży / Leć do Cancun przy Cancun Trip). To nie żywy reklamodawca. Prywatny czat i iniekcja zostawiają slot pusty."
+        body: "Kompaktowe zaproszenie Mingl Room może pojawić się na Search, gdy znajomy Mingl zaplanował room BOT DEE, na które Cię zaproszono. Zobacz zaproszenie otwiera Room SMARTview. Join Now idzie do BOT DEE, nie Mingl chat. Nie teraz chowa kartę w tej karcie; Inbox zostawia Review BOT DEE invite. Demo Cancun jest tylko Studio. Grafika to ilustracja, nie zdjęcie. Roomy Join Now bez harmonogramu nie pojawiają się na Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview ze SMARTvisuals",
-        body: "Room SMARTview pokazuje zaproszenie Mingl: czas, RSVP lub na żywo i Dołącz teraz. SMARTstencils i SMARTbackgrounds idą za zatwierdzonym tytułem — Cancun Trip to sztuka podróży, nie zdjęcie i nie partnerstwo. Prywatny czat BOT DEE nie dobiera grafiki. Pokoje grupowe nie są live; Dołącz nic nie tworzy i nie obciąża. Oznakowane Ad poniżej to próbka z tych tagów (Partner podróży / Leć do Cancun). Puste przy prywatnym czacie lub iniekcji; to nie żywy reklamodawca."
+        body: "Room SMARTview pokazuje zaproszenie Mingl: harmonogram, RSVP lub status na żywo oraz Join Now. Join Now na Search otwiera BOT DEE (nie Mingl chat) z room= i t=. SMARTstencils i SMARTbackgrounds idą za autoryzowanym tytułem — Cancun Trip używa grafiki podróży, nie prawdziwego zdjęcia Cancun. Prywatny czat BOT DEE nigdy nie wybiera grafiki. Oznakowane Ad poniżej to próbka z tych tagów. Puste przy czacie prywatnym lub iniekcji; to nie żywy reklamodawca."
       },
       "help-scheduling-schedule-for": {
         title: "Planowanie personelu",
@@ -4275,7 +4307,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "W czacie BOT DEE powiedz Open Room SMARTview, Start a group chat albo zaplanuj wyjazd do Cancun zwykłymi słowami (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). To ten sam Room SMARTview co Open Room SMARTview Cancun Trip — ilustracja travel i przykładowy Ad Travel partner / Fly to Cancun, bez żywego rezerwowania lotów ani hoteli. VIP tables tonight zostaje nightlife, nie kartą wyjazdu. Confirm otwiera sesję. Zaproś tylko znajomych Mingl — gospodarz plus 7 gości. Goście też mogą zapraszać. Dołączenie nie jest płatnością i nie otwiera wspólnego rachunku. BOT DEE nigdy nie bierze numerów kart. Prywatne wiadomości zostają prywatne. Site Chrome idzie za Appearance. Sesja zaczyna się po Confirm. Zostaje otwarta, aż gospodarz naciśnie End Room, albo około czterech godzin od otwarcia. Nie ma zaplanowanej godziny startu, a room nie zamyka się, gdy ostatni gość się wyloguje. Shared Itinerary to notatki wieczoru, nie kalendarz. Room Permissions to zasady zaproszeń gospodarza, nie harmonogram."
+        body: "W czacie BOT DEE powiedz Open Room SMARTview, Start a group chat albo zaplanuj wyjazd do Cancun zwykłymi słowami. Potem: Dołącz teraz lub Ustaw harmonogram. Dołącz teraz otwiera sesję znajomych Mingl od razu i nie kładzie karty na Search. Ustaw harmonogram to start room BOT DEE — nie Shared Itinerary — i włącza Search SMARTnotification dla Ciebie i zaproszonych znajomych Mingl. Zaproś tylko znajomych Mingl — host plus 7 gości. Goście też mogą zapraszać. Dołączenie to nie płatność i nie otwiera wspólnego rachunku. BOT DEE nigdy nie bierze numerów kart. Prywatne wiadomości BOT DEE zostają prywatne. Site Chrome idzie za Appearance. Live room zostaje otwarty do End Room, około czterech godzin po otwarciu, albo gdy wszyscy nieobecni są około 15 minut. Pauza prywatnego czatu BOT DEE jest osobna."
       },
       "help-botdee-room-smartview-invite": {
         title: "Zaproś znajomych Mingl",
@@ -4287,7 +4319,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "Zakończ Room SMARTview",
-        body: "Tylko gospodarz może zakończyć room. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nieopłacony wspólny rachunek trzeba najpierw zapłacić lub unieważnić. Gość, który wychodzi albo zamyka BOT DEE, nie kończy room. Nie ma zaplanowanego startu, a room nie zamyka się, gdy ostatni gość się wyloguje — gospodarz klika End Room, albo wygasa około czterech godzin od otwarcia."
+        body: "Tylko host może zakończyć room. Zakończenie nikogo nie obciąża i nie kasuje prywatnych czatów innych. Nieopłacony wspólny rachunek trzeba najpierw zapłacić lub unieważnić. Live room zostaje otwarty do End Room, około czterech godzin po otwarciu, albo gdy wszyscy nieobecni są około 15 minut. Pauza prywatnego czatu BOT DEE to nie wylogowanie z room. Gość, który wychodzi, nie zamyka room, gdy host jest obecny."
       },
       "help-botdee-room-smartview-tab": {
         title: "Wspólny rachunek Room SMARTview",
@@ -4304,6 +4336,10 @@
       "help-botdee-room-smartview-share": {
         title: "Udostępnij w Room SMARTview",
         body: "Share this conversation nigdy nie kopiuje Twojego prywatnego wątku BOT DEE. BOT DEE pokazuje podgląd wybranych faktów z tej wiadomości, oznaczonych jako wstępne. Możesz edytować lub odrzucić fakty. Profile i SMARTsummary zostają poza room."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "Dołącz teraz lub ustaw harmonogram",
+        body: "Po konfiguracji Room SMARTview wybierz Dołącz teraz lub Ustaw harmonogram. Dołącz teraz otwiera sesję BOT DEE od razu i nie kładzie karty na Search. Ustaw harmonogram to start room BOT DEE — nie Shared Itinerary. Przyszła godzina włącza Search SMARTnotification tylko dla Ciebie i zaproszonych znajomych Mingl. Goście RSVP, aż room będzie na żywo; potem Join Now otwiera BOT DEE (nie Mingl chat)."
       },
       "help-botdee-smartview-review": {
         title: "Przejrzyj i popraw SMARTsummary",
@@ -4745,11 +4781,11 @@
       },
       "help-smartvisuals-notification": {
         title: "SMARTnotification لـ Mingl Room",
-        body: "قد تظهر دعوة Mingl Room مختصرة في البحث. عرض الدعوة يفتح Room SMARTview. ليس الآن يخفيها لهذه الجلسة. الفن رسم SMARTbackground مع SMARTstencils — ليست صورة ولا علامة رسمية. الأسماء وRSVP من سجل الغرفة فقط. عيّنة إعلان موسومة أسفل البطاقة تتبع الوسوم (شريك سفر / حلّق إلى Cancun لرحلة Cancun Trip). ليس معلنًا حيًا. الدردشة الخاصة والحقن يُبقيان الموضع فارغًا."
+        body: "يمكن أن تظهر دعوة Mingl Room مختصرة على Search عندما يجدول صديق Mingl room BOT DEE دُعيت إليها. عرض الدعوة يفتح Room SMARTview. Join Now يذهب إلى BOT DEE وليس Mingl chat. ليس الآن يخفي البطاقة في هذا التبويب؛ يبقى Inbox فيه Review BOT DEE invite. استعلام Cancun التجريبي لـ Studio فقط. الرسم توضيح وليس صورة. غرف Join Now بلا جدول لا تظهر على Search."
       },
       "help-smartvisuals-room": {
         title: "Room SMARTview مع SMARTvisuals",
-        body: "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو البث و«انضم الآن». تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة حقيقية ولا شراكة رسمية. دردشة BOT DEE الخاصة لا تختار الفن. الغرف الجماعية ليست حية بعد؛ الانضمام لا ينشئ غرفة ولا يخصم. إعلان موسوم أسفل البطاقة عيّنة من تلك الوسوم (شريك سفر / حلّق إلى Cancun). يبقى فارغًا للدردشة الخاصة أو الحقن وليس معلنًا حيًا."
+        body: "يعرض Room SMARTview دعوة Mingl: الجدول وRSVP أو الحالة المباشرة وJoin Now. Join Now على Search يفتح BOT DEE (وليس Mingl chat) مع room= وt=. تتبع SMARTstencils وSMARTbackgrounds العنوان المصرّح — Cancun Trip فن سفر وليس صورة Cancun حقيقية. دردشة BOT DEE الخاصة لا تختار الرسم أبداً. إعلان موسوم أسفلها عيّنة من تلك الوسوم. يبقى فارغاً للدردشة الخاصة أو الحقن وليس معلناً مباشراً."
       },
       "help-scheduling-schedule-for": {
         title: "جداول الموظفين",
@@ -4801,7 +4837,7 @@
       },
       "help-botdee-room-smartview": {
         title: "Room SMARTview",
-        body: "في محادثة BOT DEE قل Open Room SMARTview أو Start a group chat أو خطّط رحلة Cancun بكلام عادي (Let’s plan our Cancun trip, Let’s plan a trip to Cancun). هذه نفس Room SMARTview مثل Open Room SMARTview Cancun Trip — رسم travel وعينة Ad Travel partner / Fly to Cancun وليست حجز رحلات أو فنادق حيّاً. VIP tables tonight تبقى nightlife وليست بطاقة رحلة. Confirm يفتح جلسة. ادعُ أصدقاء Mingl فقط — المضيف مع 7 ضيوف. يمكن للضيوف الدعوة أيضاً. الانضمام ليس دفعاً ولا يفتح حساباً مشتركاً. BOT DEE لا يأخذ أرقام البطاقات أبداً. الرسائل الخاصة تبقى خاصة. Site Chrome يتبع Appearance. تبدأ الجلسة بعد Confirm. تبقى مفتوحة حتى يضغط المضيف End Room أو نحو أربع ساعات بعد الفتح. لا يوجد وقت بدء مجدول، ولا تُغلق الـ room عندما يسجّل آخر ضيف خروجه. Shared Itinerary ملاحظات الليلة وليست تقويماً. Room Permissions قواعد دعوة المضيف وليست جدولة."
+        body: "في دردشة BOT DEE قل Open Room SMARTview أو Start a group chat أو خطط لرحلة Cancun بكلام بسيط. بعد ذلك: انضم الآن أو تعيين جدول. انضم الآن يفتح جلسة أصدقاء Mingl فوراً ولا يضع بطاقة على Search. تعيين جدول هو وقت بدء room BOT DEE — وليس Shared Itinerary — ويفعّل SMARTnotification في Search لك ولأصدقاء Mingl المدعوين. ادعُ أصدقاء Mingl فقط — مضيف زائد 7 ضيوف. يمكن للضيوف الدعوة أيضاً. الانضمام ليس دفعاً ولا يفتح فاتورة مشتركة. BOT DEE لا يأخذ أرقام بطاقات أبداً. رسائل BOT DEE الخاصة تبقى خاصة. يتبع Site Chrome مظهر Appearance. تبقى الـ room المباشرة مفتوحة حتى End Room، أو نحو أربع ساعات بعد فتحها، أو إذا غاب الجميع نحو 15 دقيقة. إيقاف دردشة BOT DEE الخاصة أمر منفصل."
       },
       "help-botdee-room-smartview-invite": {
         title: "دعوة أصدقاء Mingl",
@@ -4813,7 +4849,7 @@
       },
       "help-botdee-room-smartview-end": {
         title: "إنهاء Room SMARTview",
-        body: "المضيف فقط يمكنه إنهاء room. الإنهاء لا يحاسب أحداً ولا يمسح محادثات الآخرين الخاصة. يجب دفع الحساب المشترك غير المدفوع أو إلغاؤه أولاً. خروج الضيف أو إغلاق BOT DEE لا يُنهي الـ room. لا يوجد بدء مجدول، ولا تُغلق عندما يسجّل آخر ضيف خروجه — المضيف يضغط End Room أو تنتهي بعد نحو أربع ساعات من الفتح."
+        body: "المضيف وحده يمكنه إنهاء room. الإنهاء لا يحصّل أحداً ولا يمسح دردشات الآخرين الخاصة. يجب دفع الفاتورة المشتركة غير المدفوعة أو إلغاؤها أولاً. تبقى الـ room المباشرة مفتوحة حتى End Room، أو نحو أربع ساعات بعد فتحها، أو إذا غاب الجميع نحو 15 دقيقة. إيقاف دردشة BOT DEE الخاصة ليس خروجاً من الـ room. مغادرة ضيف لا تنهي الـ room ما دام المضيف موجوداً."
       },
       "help-botdee-room-smartview-tab": {
         title: "الحساب المشترك Room SMARTview",
@@ -4830,6 +4866,10 @@
       "help-botdee-room-smartview-share": {
         title: "المشاركة في Room SMARTview",
         body: "Share this conversation لا ينسخ محادثتك الخاصة في BOT DEE أبداً. يعرض BOT DEE معاينة حقائق قابلة للمشاركة من هذه الرسالة، معلَّمة مؤقتة. يمكنك تعديل الحقائق أو حذفها. الملفات الشخصية وSMARTsummary تبقى خارج الـ room."
+      },
+      "help-botdee-room-smartview-schedule": {
+        title: "انضم الآن أو عيّن جدولاً",
+        body: "بعد إعداد Room SMARTview اختر انضم الآن أو تعيين جدول. انضم الآن يفتح جلسة BOT DEE فوراً ولا يضع بطاقة على Search. تعيين جدول هو وقت بدء room BOT DEE — وليس Shared Itinerary. وقت مستقبلي يفعّل SMARTnotification في Search لك ولأصدقاء Mingl المدعوين فقط. الضيوف يؤكدون RSVP حتى تصبح الـ room مباشرة؛ ثم Join Now يفتح BOT DEE (وليس Mingl chat)."
       },
       "help-botdee-smartview-review": {
         title: "مراجعة وتصحيح SMARTsummary",
