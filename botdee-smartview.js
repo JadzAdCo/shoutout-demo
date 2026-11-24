@@ -686,10 +686,19 @@
   }
 
   function shoutNeedLabel(id) {
+    if (id === "club") return t("botdee.so.needClub", "Which venue should this ShoutOut play on?");
+    if (id === "message") return t("botdee.so.needMessage", "What should the shoutout text say on the sign?");
     if (id === "template") return t("botdee.so.needTemplate", "Choose a template");
     if (id === "handle") return t("botdee.so.needHandle", "Include your @handle?");
     if (id === "media") return t("botdee.so.needMedia", "Text only, or photo/video via compose");
     if (id === "compose") return t("botdee.so.needCompose", "Open compose for photo/video");
+    if (id === "jerseyTeamId") return t("botdee.so.needJerseyTeam", "Which country or club kit should the jersey use?");
+    if (id === "jerseyName") return t("botdee.so.needJerseyName", "What name goes on the jersey back?");
+    if (id === "jerseyNumber") return t("botdee.so.needJerseyNumber", "What number goes on the jersey?");
+    if (id === "playerName") return t("botdee.so.needPlayerName", "What name should the sign show?");
+    if (id === "facePhoto") return t("botdee.so.needFacePhoto", "Baller's Alert needs a face photo — open compose or send a photo URL.");
+    if (id === "teamPhotos") return t("botdee.so.needTeamPhotos", "Football Intro needs four player photos — open compose to add them.");
+    if (id === "throw") return t("botdee.so.needThrow", "Reply throw it to send this ShoutOut");
     return esc(id);
   }
 

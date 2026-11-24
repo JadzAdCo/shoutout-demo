@@ -2007,6 +2007,117 @@ window.FLOQRTextLayout = {
   }
 };
 
+window.FLOQRTemplatePatronInputs = {
+  // Firestore keys collectableInput1 … collectableInputN (N = collectableInputCount).
+  MAX_SLOTS: 16,
+  FIELD_ASK: {
+    club: "Which venue should this ShoutOut play on?",
+    message: "What should the shoutout text say on the sign?",
+    handle: "Include your @handle on the FloqR card?",
+    media: "Add a photo or video, or keep this a text sign?",
+    jerseyTeamId: "Which country or club kit should the jersey use?",
+    jerseyName: "What name goes on the jersey back?",
+    jerseyNumber: "What number goes on the jersey?",
+    playerName: "What name should the sign show?",
+    facePhoto: "Baller's Alert needs a face photo. Open compose to add it, or send an https photo URL.",
+    teamPhotos: "Football Intro needs four player photos. Open compose to add them.",
+    company: "Optional company line on the card?",
+    compose: "That board needs a photo on compose. Open ShoutOut compose to finish it, or reply with an https photo URL."
+  },
+  familyOf(template = {}) {
+    const t = template || {};
+    const id = String(t.id || t.templateId || "");
+    if (t.nameOnly === true || id === "heistVaultDollars" || id === "heistRedLux") return "nameOnly";
+    if (t.layout === "football-team-intro" || id === "zebbiesFootballTeamIntro") return "footballIntro";
+    if (t.requiresFacePhoto === true || t.ballerAlert === true || /^ballersAlert/i.test(id)) return "ballersAlert";
+    if (t.jerseyNameField === true || t.layout === "soccer-jersey" || t.layout === "nfl-jersey" || /^(soccer|nba|nfl)/i.test(id)) {
+      return "soccerJersey";
+    }
+    if (t.supportsMedia === true || t.supportsImage === true || t.supportsVideo === true || t.layout === "split-media") {
+      return "splitMedia";
+    }
+    return "classicBoard";
+  },
+  lists: {
+    classicBoard: {required: ["club", "message"], optional: ["handle"]},
+    splitMedia: {required: ["club", "message", "media"], optional: ["handle"]},
+    soccerJersey: {required: ["club", "jerseyTeamId", "jerseyName", "jerseyNumber"], optional: ["handle", "message"]},
+    nameOnly: {required: ["club", "playerName"], optional: ["handle"]},
+    ballersAlert: {required: ["club", "facePhoto", "playerName"], optional: ["company", "handle"]},
+    footballIntro: {required: ["club", "teamPhotos"], optional: ["message", "handle"]}
+  },
+  parseSlot(raw, index) {
+    if (raw == null || raw === "") return null;
+    if (typeof raw === "string") {
+      const parts = raw.split("|");
+      const fieldId = String(parts[0] || "").trim();
+      if (!fieldId) return null;
+      const required = parts[1] === "0" || parts[1] === "optional" ? 0 : 1;
+      return {index, fieldId, required, prompt: parts.slice(2).join("|") || this.FIELD_ASK[fieldId] || ""};
+    }
+    if (typeof raw !== "object") return null;
+    const fieldId = String(raw.fieldId || raw.field || raw.id || raw.key || "").trim();
+    if (!fieldId) return null;
+    const required = raw.optional === true || raw.required === 0 || raw.required === "0" ? 0 : 1;
+    return {index, fieldId, required, prompt: String(raw.prompt || raw.label || this.FIELD_ASK[fieldId] || "").trim()};
+  },
+  slotsFrom(template = {}) {
+    const t = template || {};
+    const declared = Number(t.collectableInputCount);
+    const max = declared > 0 ? Math.min(this.MAX_SLOTS, declared) : this.MAX_SLOTS;
+    const slots = [];
+    for (let i = 1; i <= max; i++) {
+      const parsed = this.parseSlot(t["collectableInput" + i], i);
+      if (!parsed) {
+        if (declared > 0) continue;
+        break;
+      }
+      slots.push(parsed);
+    }
+    if (slots.length) return slots;
+    const lists = (t.patronInputs && Array.isArray(t.patronInputs.required))
+      ? t.patronInputs
+      : (this.lists[this.familyOf(t)] || this.lists.classicBoard);
+    const seeded = [];
+    const seen = new Set();
+    (lists.required || []).forEach(id => {
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      seeded.push({fieldId: id, required: 1, prompt: this.FIELD_ASK[id] || ""});
+    });
+    (lists.optional || []).forEach(id => {
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      seeded.push({fieldId: id, required: 0, prompt: this.FIELD_ASK[id] || ""});
+    });
+    return seeded;
+  },
+  stampTemplate(template = {}) {
+    const t = template || {};
+    const slots = this.slotsFrom(t);
+    const clearUntil = Math.max(Number(t.collectableInputCount) || 0, slots.length, this.MAX_SLOTS);
+    for (let i = 1; i <= clearUntil; i++) delete t["collectableInput" + i];
+    t.collectableInputCount = slots.length;
+    slots.forEach((slot, idx) => {
+      t["collectableInput" + (idx + 1)] = {
+        fieldId: slot.fieldId,
+        required: slot.required ? 1 : 0,
+        prompt: slot.prompt || this.FIELD_ASK[slot.fieldId] || ""
+      };
+    });
+    t.patronInputs = {
+      required: slots.filter(slot => slot.required === 1).map(slot => slot.fieldId),
+      optional: slots.filter(slot => slot.required !== 1).map(slot => slot.fieldId)
+    };
+    t.patronInputFamily = this.familyOf(t);
+    return t;
+  },
+  forTemplate(template = {}) {
+    const stamped = this.stampTemplate(Object.assign({}, template));
+    return stamped.patronInputs;
+  }
+};
+
 Object.entries(window.SHOUTOUT_TEMPLATES || {}).forEach(([key, template]) => {
   const normalizeModifiable = (row) => {
     if (row.IsModifiable === 0 || row.IsModifiable === false) {
@@ -2027,6 +2138,7 @@ Object.entries(window.SHOUTOUT_TEMPLATES || {}).forEach(([key, template]) => {
     return;
   }
   window.FLOQRScreenDatapoints.classify(template);
+  window.FLOQRTemplatePatronInputs.stampTemplate(template);
   template.textProfileId = template.templateKind;
   template.textLayoutVersion = window.FLOQRTextLayout.version;
   template.textCompatibleScreenFormatIds = window.FLOQRScreenDatapoints.templateFormatIds(template);

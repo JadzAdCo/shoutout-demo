@@ -284,7 +284,7 @@
     ["botDeeThreads", "chatTitles", "ownMaster", 1, "User-chosen display titles for + Chats rows keyed by minted conversationId (cv_ uuid); Functions-write; owner uid only; never sent to Gemini"],
     ["botDeeThreads", "currentConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the current slice; minted once; Functions-write"],
     ["botDeeThreads", "archiveConversationId", "ownMaster", 0, "Stable BOT DEE conversation id for the previous slice after idle rotate; Functions-write"],
-    ["botDeeThreads", "headlessShoutOutDraft", "ownMaster", 1, "In-progress BOT DEE headless ShoutOut draft (venue, message, template, handle decision, media choice); Functions-write; no IP; cleared on submit/cancel"],
+    ["botDeeThreads", "headlessShoutOutDraft", "ownMaster", 1, "In-progress BOT DEE headless ShoutOut draft (venue, shoutout text, template-required patron inputs, jersey/name/photo fields, optional handle); Functions-write; no IP; cleared on submit/cancel"],
     ["botDeeThreads", "headlessVipDraft", "ownMaster", 1, "In-progress BOT DEE headless VIP reserV draft (club, night, section, party, holdId); Functions-write; no IP; cleared on checkout/cancel"],
     ["botDeeThreads", "joinedRoomId", "ownMaster", 0, "Active Room SMARTview id for this uid; Functions-write"],
     ["botDeeThreads", "joinedRoomConversationId", "ownMaster", 0, "Conversation that owns the Room SMARTview pointer; cleared on new chat / leave / end; Functions-write"],
@@ -319,7 +319,16 @@
     ["smartVisualDrafts", "publishedByEmail", "master", 1, "Master Admin email that published the queued draft"],
     ["smartVisualDrafts", "catalogAssetId", "master", 0, "Packaged registry id this draft overlays after approve (e.g. bg-milan)"],
     ["featuresSmartviewApprovals", "publicCopy", "master", 0, "Reviewer-approved patron-facing feature copy; no PR bodies or secrets"],
-    ["featuresSmartviewApprovals", "publicCopyReviewer", "master", 1, "Master Admin email that approved Features SMARTview copy"]
+    ["featuresSmartviewApprovals", "publicCopyReviewer", "master", 1, "Master Admin email that approved Features SMARTview copy"],
+    ["templates", "collectableInputCount", "public", 0, "N for collectableInput1..N on this ShoutOut template; seed + Master Admin write"],
+    ["templates", "collectableInput1", "public", 0, "Headless slot 1 {fieldId, required 0|1, prompt}; BOT DEE/Gemini collection"],
+    ["templates", "collectableInput2", "public", 0, "Headless slot 2 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput3", "public", 0, "Headless slot 3 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput4", "public", 0, "Headless slot 4 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput5", "public", 0, "Headless slot 5 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput6", "public", 0, "Headless slot 6 {fieldId, required 0|1, prompt}"],
+    ["templates", "collectableInput7", "public", 0, "Headless slot 7 {fieldId, required 0|1, prompt}; omit when N < 7"],
+    ["templates", "collectableInput8", "public", 0, "Headless slot 8 {fieldId, required 0|1, prompt}; omit when N < 8"]
   ];
 
   const CATALOG = ROWS.map(presetRow);

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "floqr.botDeeShoutOutSmartView/export",
-  "updatedAt": "2026-11-19",
+  "generatedAtIso": "2026-11-19T12:00:00.000Z",
+  "source": "functions/botdee-shoutout-smartview.js mockCatalog",
   "views": [
     {
       "schemaVersion": "floqr.botDeeShoutOutSmartView/1",
@@ -10,7 +10,7 @@
       "mode": "draft",
       "venueName": "Decades",
       "clubLocationId": "decades-washington-dc",
-      "mainText": "Happy birthday Maya",
+      "mainText": "",
       "templateId": "",
       "templateName": "",
       "templateSuggestedId": "blackwhite",
@@ -22,16 +22,24 @@
       "handleDecision": "",
       "mediaDecision": "",
       "mediaUrl": "",
-      "previewLines": [
-        "HAPPY BIRTHDAY",
-        "MAYA"
-      ],
+      "jerseyTeamId": "",
+      "jerseyName": "",
+      "jerseyNumber": "",
+      "playerName": "",
+      "patronInputs": {
+        "required": [
+          "club",
+          "message"
+        ],
+        "optional": [
+          "handle"
+        ]
+      },
+      "previewLines": [],
       "boardSkin": "traditional",
-      "currentStep": "template",
+      "currentStep": "message",
       "needs": [
-        "template",
-        "handle",
-        "media"
+        "message"
       ],
       "templates": [
         {
@@ -81,6 +89,54 @@
           "name": "Classic Halloween",
           "priceCents": 1500,
           "className": "classic-bw classic-halloween"
+        },
+        {
+          "id": "birthdayMedia",
+          "name": "Happy Birthday with image/video placeholder",
+          "priceCents": 0,
+          "className": "celebration-media"
+        },
+        {
+          "id": "soccerJersey",
+          "name": "Soccer Jersey",
+          "priceCents": 3000,
+          "className": "soccer-jersey sports-jersey jersey-photo-back"
+        },
+        {
+          "id": "zebbiesFootballTeamIntro",
+          "name": "Football Intro",
+          "priceCents": 3000,
+          "className": "football-team-intro"
+        },
+        {
+          "id": "heistVaultNight",
+          "name": "Locked Up",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistPoliceCar",
+          "name": "Police Car Arrest",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistInterrogation",
+          "name": "I Aint No Snitch",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistVaultDollars",
+          "name": "Tengo muchos dólares",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "ballersAlert",
+          "name": "Baller's Alert",
+          "priceCents": 10000,
+          "className": "baller-card baller-alert"
         }
       ],
       "suggestions": [
@@ -150,13 +206,13 @@
           "group": "throw"
         }
       ],
-      "previewHref": "./display.html?location=decades-washington-dc&template=blackwhite&main=Happy+birthday+Maya&screen=led-96x48&preview=1",
+      "previewHref": "./display.html?location=decades-washington-dc&template=blackwhite&screen=led-96x48&preview=1",
       "composeHref": "./shoutout-search.html?from=botdee&location=decades-washington-dc",
       "checkoutUrl": "",
       "shoutoutId": "",
       "portalHref": "",
       "priceCents": 0,
-      "mockLabel": "Draft — choose template"
+      "mockLabel": "Draft — missing shoutout text"
     },
     {
       "schemaVersion": "floqr.botDeeShoutOutSmartView/1",
@@ -167,8 +223,8 @@
       "venueName": "Decades",
       "clubLocationId": "decades-washington-dc",
       "mainText": "Happy birthday Maya",
-      "templateId": "blackwhite",
-      "templateName": "Traditional Black and White ShoutOut",
+      "templateId": "soccerJersey",
+      "templateName": "Soccer Jersey",
       "templateSuggestedId": "",
       "templateSuggestedName": "Traditional Black and White ShoutOut",
       "screenFormatId": "led-96x48",
@@ -178,15 +234,30 @@
       "handleDecision": "",
       "mediaDecision": "",
       "mediaUrl": "",
+      "jerseyTeamId": "soccerMorocco",
+      "jerseyName": "NYX",
+      "jerseyNumber": "",
+      "playerName": "",
+      "patronInputs": {
+        "required": [
+          "club",
+          "jerseyTeamId",
+          "jerseyName",
+          "jerseyNumber"
+        ],
+        "optional": [
+          "handle",
+          "message"
+        ]
+      },
       "previewLines": [
         "HAPPY BIRTHDAY",
         "MAYA"
       ],
       "boardSkin": "traditional",
-      "currentStep": "handle",
+      "currentStep": "jerseyNumber",
       "needs": [
-        "handle",
-        "media"
+        "jerseyNumber"
       ],
       "templates": [
         {
@@ -236,6 +307,54 @@
           "name": "Classic Halloween",
           "priceCents": 1500,
           "className": "classic-bw classic-halloween"
+        },
+        {
+          "id": "birthdayMedia",
+          "name": "Happy Birthday with image/video placeholder",
+          "priceCents": 0,
+          "className": "celebration-media"
+        },
+        {
+          "id": "soccerJersey",
+          "name": "Soccer Jersey",
+          "priceCents": 3000,
+          "className": "soccer-jersey sports-jersey jersey-photo-back"
+        },
+        {
+          "id": "zebbiesFootballTeamIntro",
+          "name": "Football Intro",
+          "priceCents": 3000,
+          "className": "football-team-intro"
+        },
+        {
+          "id": "heistVaultNight",
+          "name": "Locked Up",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistPoliceCar",
+          "name": "Police Car Arrest",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistInterrogation",
+          "name": "I Aint No Snitch",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistVaultDollars",
+          "name": "Tengo muchos dólares",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "ballersAlert",
+          "name": "Baller's Alert",
+          "priceCents": 10000,
+          "className": "baller-card baller-alert"
         }
       ],
       "suggestions": [
@@ -305,20 +424,20 @@
           "group": "throw"
         }
       ],
-      "previewHref": "./display.html?location=decades-washington-dc&template=blackwhite&main=Happy+birthday+Maya&screen=led-96x48&preview=1",
+      "previewHref": "./display.html?location=decades-washington-dc&template=soccerJersey&main=Happy+birthday+Maya&screen=led-96x48&preview=1",
       "composeHref": "./shoutout-search.html?from=botdee&location=decades-washington-dc",
       "checkoutUrl": "",
       "shoutoutId": "",
       "portalHref": "",
-      "priceCents": 0,
-      "mockLabel": "Handle — FloqR card"
+      "priceCents": 3000,
+      "mockLabel": "Jersey — missing number"
     },
     {
       "schemaVersion": "floqr.botDeeShoutOutSmartView/1",
       "kind": "botDeeShoutOut",
       "generatedAtIso": "2026-11-19T12:00:00.000Z",
       "title": "ShoutOut",
-      "mode": "draft",
+      "mode": "ready",
       "venueName": "Decades",
       "clubLocationId": "decades-washington-dc",
       "mainText": "Happy birthday Maya",
@@ -333,12 +452,25 @@
       "handleDecision": "include",
       "mediaDecision": "none",
       "mediaUrl": "",
+      "jerseyTeamId": "",
+      "jerseyName": "",
+      "jerseyNumber": "",
+      "playerName": "",
+      "patronInputs": {
+        "required": [
+          "club",
+          "message"
+        ],
+        "optional": [
+          "handle"
+        ]
+      },
       "previewLines": [
         "HAPPY BIRTHDAY",
         "MAYA"
       ],
       "boardSkin": "traditional",
-      "currentStep": "throw",
+      "currentStep": "",
       "needs": [],
       "templates": [
         {
@@ -388,6 +520,54 @@
           "name": "Classic Halloween",
           "priceCents": 1500,
           "className": "classic-bw classic-halloween"
+        },
+        {
+          "id": "birthdayMedia",
+          "name": "Happy Birthday with image/video placeholder",
+          "priceCents": 0,
+          "className": "celebration-media"
+        },
+        {
+          "id": "soccerJersey",
+          "name": "Soccer Jersey",
+          "priceCents": 3000,
+          "className": "soccer-jersey sports-jersey jersey-photo-back"
+        },
+        {
+          "id": "zebbiesFootballTeamIntro",
+          "name": "Football Intro",
+          "priceCents": 3000,
+          "className": "football-team-intro"
+        },
+        {
+          "id": "heistVaultNight",
+          "name": "Locked Up",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistPoliceCar",
+          "name": "Police Car Arrest",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistInterrogation",
+          "name": "I Aint No Snitch",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistVaultDollars",
+          "name": "Tengo muchos dólares",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "ballersAlert",
+          "name": "Baller's Alert",
+          "priceCents": 10000,
+          "className": "baller-card baller-alert"
         }
       ],
       "suggestions": [
@@ -485,6 +665,19 @@
       "handleDecision": "include",
       "mediaDecision": "none",
       "mediaUrl": "",
+      "jerseyTeamId": "",
+      "jerseyName": "",
+      "jerseyNumber": "",
+      "playerName": "",
+      "patronInputs": {
+        "required": [
+          "club",
+          "message"
+        ],
+        "optional": [
+          "handle"
+        ]
+      },
       "previewLines": [
         "HAPPY BIRTHDAY",
         "MAYA"
@@ -540,6 +733,54 @@
           "name": "Classic Halloween",
           "priceCents": 1500,
           "className": "classic-bw classic-halloween"
+        },
+        {
+          "id": "birthdayMedia",
+          "name": "Happy Birthday with image/video placeholder",
+          "priceCents": 0,
+          "className": "celebration-media"
+        },
+        {
+          "id": "soccerJersey",
+          "name": "Soccer Jersey",
+          "priceCents": 3000,
+          "className": "soccer-jersey sports-jersey jersey-photo-back"
+        },
+        {
+          "id": "zebbiesFootballTeamIntro",
+          "name": "Football Intro",
+          "priceCents": 3000,
+          "className": "football-team-intro"
+        },
+        {
+          "id": "heistVaultNight",
+          "name": "Locked Up",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistPoliceCar",
+          "name": "Police Car Arrest",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistInterrogation",
+          "name": "I Aint No Snitch",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistVaultDollars",
+          "name": "Tengo muchos dólares",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "ballersAlert",
+          "name": "Baller's Alert",
+          "priceCents": 10000,
+          "className": "baller-card baller-alert"
         }
       ],
       "suggestions": [
@@ -637,6 +878,19 @@
       "handleDecision": "include",
       "mediaDecision": "none",
       "mediaUrl": "",
+      "jerseyTeamId": "",
+      "jerseyName": "",
+      "jerseyNumber": "",
+      "playerName": "",
+      "patronInputs": {
+        "required": [
+          "club",
+          "message"
+        ],
+        "optional": [
+          "handle"
+        ]
+      },
       "previewLines": [
         "HAPPY BIRTHDAY",
         "MAYA"
@@ -692,6 +946,54 @@
           "name": "Classic Halloween",
           "priceCents": 1500,
           "className": "classic-bw classic-halloween"
+        },
+        {
+          "id": "birthdayMedia",
+          "name": "Happy Birthday with image/video placeholder",
+          "priceCents": 0,
+          "className": "celebration-media"
+        },
+        {
+          "id": "soccerJersey",
+          "name": "Soccer Jersey",
+          "priceCents": 3000,
+          "className": "soccer-jersey sports-jersey jersey-photo-back"
+        },
+        {
+          "id": "zebbiesFootballTeamIntro",
+          "name": "Football Intro",
+          "priceCents": 3000,
+          "className": "football-team-intro"
+        },
+        {
+          "id": "heistVaultNight",
+          "name": "Locked Up",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistPoliceCar",
+          "name": "Police Car Arrest",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistInterrogation",
+          "name": "I Aint No Snitch",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "heistVaultDollars",
+          "name": "Tengo muchos dólares",
+          "priceCents": 3000,
+          "className": "classic-bw"
+        },
+        {
+          "id": "ballersAlert",
+          "name": "Baller's Alert",
+          "priceCents": 10000,
+          "className": "baller-card baller-alert"
         }
       ],
       "suggestions": [

@@ -227,7 +227,7 @@ function shoutOutSmartOutcome(reply, lang, extra = {}) {
   };
 }
 
-async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures, previousDraft) {
+async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatures, previousDraft, conversationTurns, previousTemplateRow) {
   const lang = bot.normalizeUiLanguage(uiLanguage);
   const allowed = allowedFeatures || null;
   const headless = require("./headless-shoutout-core");
@@ -236,8 +236,17 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   const tools = require("./bot-dee-tools");
   const uid = session?.userId || session?.request?.auth?.uid || "";
   const parsed = headless.parseShoutOutExecute(userPrompt);
-  headless.applyBareInteractiveReply(previousDraft, parsed, userPrompt);
-  if (parsed.cancel && previousDraft) {
+  const fromThread = headless.fillFromConversation(conversationTurns, userPrompt);
+  const askedTemplateId = previousDraft
+    ? (previousDraft.templateId || headless.DEFAULT_TEMPLATE_ID)
+    : (parsed.templateId || fromThread.templateId);
+  const askedResolved = askedTemplateId || headless.DEFAULT_TEMPLATE_ID;
+  const askedRow = previousTemplateRow
+    && (previousTemplateRow.id === askedResolved || previousTemplateRow.templateId === askedResolved)
+    ? previousTemplateRow
+    : await tools.loadTemplateCollectableRow(askedTemplateId);
+  headless.applyBareInteractiveReply(previousDraft, parsed, userPrompt, askedRow);
+  if ((parsed.cancel || fromThread.cancel) && previousDraft) {
     try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
     return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
       model: "headless-draft",
@@ -246,18 +255,40 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
       shoutOutPreview: "closed"
     });
   }
-  const merged = headless.mergeInteractiveDraft(previousDraft, parsed);
-  if (!merged.clubQuery || !merged.message) {
-    return bot.shoutOutExecuteFallback(lang, allowed);
+  const filled = headless.combineHeadlessFill(parsed, fromThread);
+  const merged = headless.mergeInteractiveDraft(previousDraft, filled, {
+    freshThrow: !!(parsed.clubQuery && parsed.message)
+  });
+  const mergedId = merged.templateId || headless.DEFAULT_TEMPLATE_ID;
+  const templateRow = askedRow && (askedRow.id === mergedId || askedRow.templateId === mergedId)
+    ? askedRow
+    : await tools.loadTemplateCollectableRow(merged.templateId);
+  const earlyNeeds = headless.interactiveNeeds(merged, templateRow);
+  if (!merged.clubQuery) {
+    try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
+    const view = shoutView.buildShoutOutSmartView({
+      draft: merged,
+      needs: earlyNeeds.length ? earlyNeeds : ["club"],
+      venueName: "",
+      mode: "draft",
+      templateRow
+    });
+    return shoutOutSmartOutcome(headless.missingAsk(["club"], templateRow), lang, {
+      model: "headless-draft",
+      toolRounds: 0,
+      smartViews: [view]
+    });
   }
   try {
     merged.clubQuery = await tools.requireClubLocationId(merged.clubQuery);
   } catch (error) {
+    try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
     const fallback = bot.shoutOutExecuteFallback(lang, allowed);
     return shoutOutSmartOutcome(error.message || fallback.reply, lang, {
       results: fallback.results,
       model: "headless-draft",
-      toolRounds: 0
+      toolRounds: 0,
+      smartViews: [shoutView.buildShoutOutSmartView({draft: merged, needs: ["club"], mode: "draft"})]
     });
   }
   const confirm = parsed.confirmSubmit === true || merged.skipExtras === true;
@@ -267,17 +298,18 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
       merged.attribution = await tools.loadPatronShoutOutAttribution(uid);
     } catch (_) {}
   }
-  const needs = headless.interactiveNeeds(merged);
+  const needs = headless.interactiveNeeds(merged, templateRow);
   const viewBase = {
     draft: merged,
     needs,
-    venueName: merged.clubQuery
+    venueName: merged.clubQuery,
+    templateRow
   };
   if (needs.includes("compose") || merged.mediaDecision === "compose") {
     try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
     const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "draft"});
     const fallback = bot.shoutOutExecuteFallback(lang, allowed);
-    return shoutOutSmartOutcome(headless.missingAsk(["compose"]), lang, {
+    return shoutOutSmartOutcome(headless.missingAsk(["compose"], templateRow), lang, {
       results: fallback.results,
       model: "headless-draft",
       toolRounds: 0,
@@ -287,25 +319,25 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   if (needs.length) {
     try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
     const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "draft"});
-    return shoutOutSmartOutcome(headless.missingAsk(needs), lang, {
+    return shoutOutSmartOutcome(headless.missingAsk(needs, templateRow), lang, {
       model: "headless-draft",
       toolRounds: 0,
       smartViews: [view]
     });
   }
-  if (headless.isBareNegative(userPrompt) && parsed.confirmSubmit !== true) {
-    const priorNeeds = previousDraft ? headless.interactiveNeeds(previousDraft) : [];
-    if (!priorNeeds.length) {
-      try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
-      return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
-        model: "headless-draft",
-        toolRounds: 0,
-        smartViews: [],
-        shoutOutPreview: "closed"
-      });
-    }
+  const priorNeeds = previousDraft ? headless.interactiveNeeds(previousDraft, templateRow) : [];
+  if (headless.isBareNegative(userPrompt) && parsed.confirmSubmit !== true && previousDraft && !priorNeeds.length) {
+    try { await threads.persistHeadlessShoutOutDraft(uid, null); } catch (_) {}
+    return shoutOutSmartOutcome("Cancelled — that ShoutOut was not sent.", lang, {
+      model: "headless-draft",
+      toolRounds: 0,
+      smartViews: [],
+      shoutOutPreview: "closed"
+    });
+  }
+  if (!confirm) {
     try { await threads.persistHeadlessShoutOutDraft(uid, merged); } catch (_) {}
-    const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "ready"});
+    const view = shoutView.buildShoutOutSmartView({...viewBase, mode: "ready", needs: []});
     return shoutOutSmartOutcome(
       "ShoutOut SMARTpreview is ready. Reply throw it to send, or cancel the shoutout.",
       lang,
@@ -315,12 +347,17 @@ async function tryHeadlessShoutOut(userPrompt, session, uiLanguage, allowedFeatu
   const result = await tools.startShoutOutCheckout({
     locationName: merged.clubQuery,
     clubLocationId: merged.clubQuery,
-    mainText: merged.message,
+    mainText: merged.message || merged.playerName || merged.jerseyName,
     templateId: merged.templateId || headless.DEFAULT_TEMPLATE_ID,
     screenFormatId: merged.screenFormatId,
     includeAttribution: merged.handleDecision === "include",
     attribution: merged.attribution,
-    mediaUrl: merged.mediaUrl,
+    mediaUrl: merged.mediaUrl || merged.facePhotoUrl,
+    jerseyTeamId: merged.jerseyTeamId,
+    jerseyName: merged.jerseyName,
+    jerseyNumber: merged.jerseyNumber,
+    playerName: merged.playerName,
+    facePhotoUrl: merged.facePhotoUrl,
     userPrompt,
     returnBase: session?.request?.data?.returnBase
   }, session.request);
@@ -1040,8 +1077,16 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       roomId: stored.joinedRoomId || ""
     });
     const previousShoutDraft = stored.headlessShoutOutDraft || null;
+    let previousShoutRow = null;
+    if (previousShoutDraft) {
+      try {
+        previousShoutRow = await require("./bot-dee-tools").loadTemplateCollectableRow(previousShoutDraft.templateId);
+      } catch (_) {
+        previousShoutRow = null;
+      }
+    }
     const shoutFollowUp = !!(previousShoutDraft
-      && require("./headless-shoutout-core").isInteractiveFollowUp(userPrompt, previousShoutDraft));
+      && require("./headless-shoutout-core").isInteractiveFollowUp(userPrompt, previousShoutDraft, previousShoutRow));
     const shoutExecute = bot.isShoutOutExecutePrompt(userPrompt) || shoutFollowUp;
     const previousVipDraft = stored.headlessVipDraft || null;
     const vipFollowUp = !!(previousVipDraft
@@ -1079,7 +1124,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     } else if (shoutExecute) {
       try {
         outcome = await tryHeadlessShoutOut(
-          userPrompt, session, uiLanguage, allowedFeatures, previousShoutDraft
+          userPrompt, session, uiLanguage, allowedFeatures, previousShoutDraft, history, previousShoutRow
         );
       } catch (error) {
         console.warn("BOT DEE headless ShoutOut failed", error?.message || error);

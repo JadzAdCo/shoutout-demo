@@ -22,15 +22,16 @@ test("core does not import SMARTview; SMARTview is optional preview", () => {
   assert.match(smart, /never require this module/);
 });
 
-test("interactive draft asks for template, handle, and media", () => {
+test("interactive draft asks only missing required Traditional inputs", () => {
   const parsed = headless.parseShoutOutExecute(
     "throw a shoutout at Decades that says Happy birthday Maya"
   );
   const draft = headless.mergeInteractiveDraft({}, parsed);
   assert.equal(draft.clubQuery, "decades-washington-dc");
   assert.equal(draft.message, "Happy birthday Maya");
-  assert.equal(draft.templateChosen, false);
-  assert.deepEqual(headless.interactiveNeeds(draft).sort(), ["handle", "media", "template"]);
+  assert.deepEqual(headless.interactiveNeeds(draft), []);
+  assert.deepEqual(headless.inputsForDraft(draft).required, ["club", "message"]);
+  assert.ok(headless.inputsForDraft(draft).optional.includes("handle"));
   assert.equal(headless.isInteractiveFollowUp("Traditional", draft), true);
   assert.equal(headless.isInteractiveFollowUp("include my handle", draft), true);
   assert.equal(headless.isInteractiveFollowUp("text only", draft), true);
@@ -47,7 +48,7 @@ test("one-shot extras complete the interactive draft", () => {
   assert.equal(draft.templateChosen, true);
   assert.equal(draft.handleDecision, "include");
   assert.equal(draft.mediaDecision, "none");
-  assert.ok(headless.interactiveNeeds(draft).includes("handle"));
+  assert.deepEqual(headless.interactiveNeeds(draft), []);
   const withHandle = headless.mergeInteractiveDraft(draft, {attribution: "@Maya"});
   assert.equal(withHandle.attribution, "@Maya");
   assert.deepEqual(headless.interactiveNeeds(withHandle), []);
@@ -64,34 +65,18 @@ test("throw it skips remaining extras; photo asks compose", () => {
   assert.ok(headless.interactiveNeeds(photo).includes("compose"));
 });
 
-test("bare yes answers the current step and does not mint", () => {
+test("bare yes does not mint a ready Traditional draft", () => {
   const draft = headless.mergeInteractiveDraft({}, headless.parseShoutOutExecute(
     "throw a shoutout at Decades that says Happy birthday Maya"
   ));
+  assert.deepEqual(headless.interactiveNeeds(draft), []);
   const yes = headless.parseShoutOutExecute("yes");
   headless.applyBareInteractiveReply(draft, yes, "yes");
   assert.equal(yes.confirmSubmit, false);
-  assert.equal(yes.templateId, "blackwhite");
-  const afterTemplate = headless.mergeInteractiveDraft(draft, yes);
-  assert.equal(afterTemplate.templateChosen, true);
-  const handleYes = headless.parseShoutOutExecute("yes");
-  headless.applyBareInteractiveReply(afterTemplate, handleYes, "ok");
-  assert.equal(handleYes.handleDecision, "include");
-  assert.equal(handleYes.confirmSubmit, false);
-  assert.equal(headless.isInteractiveFollowUp("no", afterTemplate), true);
-  const noHandle = headless.parseShoutOutExecute("no");
-  headless.applyBareInteractiveReply(afterTemplate, noHandle, "no");
-  assert.equal(noHandle.handleDecision, "skip");
-  assert.equal(noHandle.confirmSubmit, false);
-  const ready = headless.mergeInteractiveDraft(afterTemplate, {
-    mediaDecision: "none",
-    handleDecision: "include",
-    attribution: "@Maya"
-  });
-  assert.deepEqual(headless.interactiveNeeds(ready), []);
   const noReady = headless.parseShoutOutExecute("no");
-  headless.applyBareInteractiveReply(ready, noReady, "no");
+  headless.applyBareInteractiveReply(draft, noReady, "no");
   assert.equal(noReady.confirmSubmit, false);
+  assert.equal(headless.isInteractiveFollowUp("throw it", draft), true);
 });
 
 test("a new throw does not keep leftover extras", () => {
@@ -108,7 +93,7 @@ test("a new throw does not keep leftover extras", () => {
   assert.equal(second.templateId, "");
   assert.equal(second.templateChosen, false);
   assert.equal(second.handleDecision, "");
-  assert.deepEqual(headless.interactiveNeeds(second).sort(), ["handle", "media", "template"]);
+  assert.deepEqual(headless.interactiveNeeds(second), []);
 });
 
 test("API compose still defaults Traditional without SMARTview", () => {
@@ -144,15 +129,15 @@ test("ShoutOut SMARTpreview paints a draft preview without submitting", () => {
   const view = shout.buildShoutOutSmartView({draft, nowMs: Date.parse("2026-11-19T12:00:00.000Z")});
   assert.equal(view.kind, "botDeeShoutOut");
   assert.equal(view.schemaVersion, shout.SCHEMA_VERSION);
-  assert.equal(view.mode, "draft");
-  assert.ok(view.needs.includes("template"));
+  assert.equal(view.mode, "ready");
+  assert.deepEqual(view.needs, []);
   assert.match(view.previewHref, /^\.\/display\.html\?/);
   assert.match(view.previewHref, /preview=1/);
   assert.doesNotMatch(view.previewHref, /[?&]v=/);
   assert.ok(view.templates.some(row => row.id === "blackwhite"));
   assert.deepEqual(view.previewLines, ["HAPPY BIRTHDAY", "MAYA"]);
   assert.equal(view.boardSkin, "traditional");
-  assert.equal(view.currentStep, "template");
+  assert.equal(view.currentStep, "");
 });
 
 test("ShoutOut SMARTpreview LED is display.html composer preview and updates on chips", () => {
@@ -183,6 +168,7 @@ test("ShoutOut SMARTpreview LED is display.html composer preview and updates on 
   assert.doesNotMatch(session, /parsed\.confirmSubmit = true/);
   assert.match(session, /isBareNegative\(userPrompt\)/);
   const tryFn = session.slice(session.indexOf("async function tryHeadlessShoutOut"), session.indexOf("function localSession"));
+  assert.ok(tryFn.indexOf("isBareNegative") < tryFn.indexOf("if (!confirm)"));
   assert.ok(tryFn.indexOf("isBareNegative") < tryFn.indexOf("startShoutOutCheckout"));
   assert.match(session, /result\?\.ok && \(result\.checkoutUrl \|\| result\.shoutoutId\)/);
   const chatStart = chat.indexOf("function startNewChat");
@@ -215,6 +201,12 @@ test("BOT DEE session collects extras before mint; FloqR callable stays one-shot
   assert.match(session, /buildShoutOutSmartView/);
   assert.match(session, /persistHeadlessShoutOutDraft/);
   assert.match(session, /isInteractiveFollowUp/);
+  assert.match(session, /fillFromConversation/);
+  assert.match(session, /conversationTurns/);
+  assert.match(session, /loadTemplateCollectableRow/);
+  assert.match(session, /applyBareInteractiveReply\(previousDraft, parsed, userPrompt, askedRow\)/);
+  assert.match(session, /isInteractiveFollowUp\(userPrompt, previousShoutDraft, previousShoutRow\)/);
+  assert.match(session, /loadTemplateCollectableRow\(previousShoutDraft\.templateId\)/);
   const commerce = read("functions/commerce-functions.js");
   assert.doesNotMatch(commerce, /interactiveNeeds/);
   assert.match(commerce, /notifyClubPendingHeadlessShoutOut/);

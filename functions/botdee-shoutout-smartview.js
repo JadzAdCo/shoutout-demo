@@ -107,7 +107,15 @@ function buildShoutOutSmartView(opts = {}) {
     handleDecision: draft.handleDecision,
     mediaDecision: draft.mediaDecision,
     mediaUrl: draft.mediaUrl,
-    previewLines: previewLines(draft.message),
+    jerseyTeamId: draft.jerseyTeamId || "",
+    jerseyName: draft.jerseyName || "",
+    jerseyNumber: draft.jerseyNumber || "",
+    playerName: draft.playerName || "",
+    patronInputs: (() => {
+      const inputs = headless.inputsForDraft(draft, options.templateRow);
+      return {required: inputs.required, optional: inputs.optional};
+    })(),
+    previewLines: previewLines(draft.message || draft.playerName || draft.jerseyName),
     boardSkin: boardSkin(draft.templateId || headless.DEFAULT_TEMPLATE_ID),
     currentStep: needs[0] || (mode === "draft" ? "throw" : ""),
     needs,
@@ -145,17 +153,17 @@ function mockCatalog(nowMs) {
   const portalHref = "./patron-portal.html?tab=feature-orders";
   return [
     Object.assign(buildShoutOutSmartView({
-      draft: mockDraft(),
+      draft: mockDraft({message: ""}),
       venueName,
       nowMs: stamp,
       mode: "draft"
-    }), {mockLabel: "Draft — choose template"}),
+    }), {mockLabel: "Draft — missing shoutout text"}),
     Object.assign(buildShoutOutSmartView({
-      draft: mockDraft({templateId: "blackwhite", templateChosen: true}),
+      draft: mockDraft({templateId: "soccerJersey", templateChosen: true, jerseyTeamId: "soccerMorocco", jerseyName: "NYX"}),
       venueName,
       nowMs: stamp,
       mode: "draft"
-    }), {mockLabel: "Handle — FloqR card"}),
+    }), {mockLabel: "Jersey — missing number"}),
     Object.assign(buildShoutOutSmartView({
       draft: mockDraft({
         templateId: "blackwhite",
@@ -166,7 +174,7 @@ function mockCatalog(nowMs) {
       }),
       venueName,
       nowMs: stamp,
-      mode: "draft"
+      mode: "ready"
     }), {mockLabel: "Ready — throw it"}),
     Object.assign(buildShoutOutSmartView({
       draft: mockDraft({

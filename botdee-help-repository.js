@@ -1234,12 +1234,13 @@
     {
       id: "help-shoutout-headless-smartview",
       title: "ShoutOut SMARTpreview",
-      body: "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. The dock shows the live LED template (the same Display 1 composer preview) and updates when you pick a template, @handle, or text vs photo. Reply in chat or tap a chip. Photo and video boards still open compose. A true headless throw from FloqR or a third party does not use this card — pass venue, message, and optional extras in one request.",
+      body: "When you throw a ShoutOut in BOT DEE chat, BOT DEE uses that template's patron input list. Context already in the chat fills venue, shoutout text, names, and numbers. BOT DEE asks only for missing required fields, one at a time — there is no canned phrase you must say. Traditional needs a venue and shoutout text. When the list is complete, ShoutOut SMARTpreview is ready; reply throw it (or skip extras) to send. @handle is optional on Traditional. Photo, jersey, Football Intro, Heist name-only, and Baller's Alert use their own required fields; photo boards still open compose. A FloqR or third-party one-shot still sends venue, sign verbiage, and optional extras in one request.",
       searchPhrases: [
         "headless shoutout smartview", "shoutout smartview", "shoutout smartpreview",
         "choose shoutout template", "include my handle", "floqr card handle",
         "throw shoutout photo", "throw shoutout video", "bot dee shoutout preview",
-        "headless shoutout extras", "smartpreview"
+        "headless shoutout extras", "smartpreview", "throw a shoutout",
+        "happy birthday shoutout", "shoutout text", "patron input list"
       ],
       links: [
         {label: "Open BOT DEE", href: pageUrl("./botdee.html", {from: "botdee"})},

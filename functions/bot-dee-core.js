@@ -61,7 +61,7 @@ const TOOL_DEFS = [
   },
   {
     name: "listShoutOutTemplates",
-    description: "List ShoutOut templates available at a club (or return compose link). Accepts a venue slug OR a display name (e.g. Aurelia → temp-democlub-1). Re-validates shoutOut access.",
+    description: "List ShoutOut templates and their collectableInput1..N slots {fieldId, required 0|1, prompt}. That numbered list is the headless collection list — fill from conversation context; ask only the next missing required slot. Never invent a canned throw phrase. Accepts a venue slug OR a display name (e.g. Aurelia → temp-democlub-1). Re-validates shoutOut access.",
     parameters: obj({
       clubLocationId: str("Venue slug or display name (e.g. Aurelia, temp-democlub-1)."),
       locationId: str("Alias for clubLocationId."),
@@ -71,12 +71,12 @@ const TOOL_DEFS = [
   {
     name: "startShoutOutCheckout",
     description:
-      "Throw a ShoutOut in one shot (API / third-party). Pass clubLocationId or locationName plus message/mainText. Optional templateId (default Traditional blackwhite), screenFormatId, includeAttribution + attribution (@handle), mediaUrl. Does not use SMARTview. Paid templates return checkoutUrl; free boards submit pending (shoutoutId). Never collect card data. Do not invent checkoutUrl. Football Intro, jerseys, Baller's Alert, Heist art, and photo boards return composeHref instead. BOT DEE chat collects extras interactively before calling this.",
+      "Throw a ShoutOut in one shot (API / third-party) after collectableInput1..N required slots are filled. Pass clubLocationId or locationName plus message/mainText (shoutout text / sign verbiage — never say LED copy). Optional templateId (default Traditional blackwhite), screenFormatId, includeAttribution + attribution (@handle), mediaUrl. Does not use SMARTview. Paid templates return checkoutUrl; free boards submit pending (shoutoutId). Never collect card data. Do not invent checkoutUrl. Football Intro, jerseys, Baller's Alert, Heist art, and photo boards return composeHref when a required photo slot is empty. BOT DEE chat collects from collectableInput1..N before calling this.",
     parameters: obj({
       clubLocationId: str("Venue slug or display name (e.g. Aurelia, decades-washington-dc)."),
       locationName: str("Optional venue display name."),
       locationId: str("Alias for clubLocationId."),
-      message: str("Board copy the patron wants on the LED."),
+      message: str("Shoutout text / sign verbiage for the board."),
       mainText: str("Alias for message."),
       text: str("Alias for message."),
       templateId: str("Optional template id. Default blackwhite. classicHalloween is paid."),
@@ -1112,7 +1112,7 @@ function systemInstruction(role, uiLanguage, allowedFeatures, personalization) {
     "Place, restaurant, sushi, dining, or clubs-in-a-city questions: call lookupPublicProfiles with kind=club. Search onboarded FLOQR venues only — never Google, Yelp, Maps, or a general restaurant guide. Never look up patrons for food or restaurant queries. Never pitch ShoutOut, VIP reserV, or floqCast unless they asked. If no club matches, say FLOQR has no onboarded listing yet.",
     "Venue names: patrons say Aurelia / Decades / Lima Twist — tools accept those display names and resolve to slugs (Aurelia → temp-democlub-1). Prefer listShoutOutTemplates / getVipAvailability / createVipHold / createFloqCastRequest with the name they typed; do not invent a wrong slug.",
     "VIP reserV: Mezzanine / West Booths / Dance Floor are AREAS, not sectionId. Call getVipAvailability with sectionQuery Mezzanine first, then createVipHold with a returned table id (aurelia-v1 / V1). Never pass Mezzanine as sectionId. If getVipAvailability returns several matches, list the labels and ask which table. Night is YYYY-MM-DD (tonight is OK to resolve server-side).",
-    "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = getVipAvailability when the table is unclear, then createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = when they name a club and the board message, call startShoutOutCheckout immediately with clubLocationId/locationName + message (templateId optional; default Traditional blackwhite). Do not wait for a full shoutout object. If the tool returns checkoutUrl, tell them to Pay securely. If it returns shoutoutId, the board is pending club approval. If needs club or message, ask only for the missing piece. Never invent a checkout URL. Photo / jersey / Football Intro / Heist / Baller's Alert stay on composeHref.",
+    "Use contextualSearch only for clear how-to / product questions. For booking/pay only when the matching tool is available: VIP = getVipAvailability when the table is unclear, then createVipHold → recordVipConsent → createVipCheckout; floqCast = createFloqCastRequest → createFloqCastCheckout; ShoutOut = call listShoutOutTemplates to read collectableInput1..N {fieldId, required 0|1, prompt} for that template. Fill those slots from conversation context. Ask only the next missing required collectableInput. Never invent a canned throw phrase. Never say LED copy — say shoutout text or sign verbiage. When required slots are filled, call startShoutOutCheckout with clubLocationId/locationName + message (templateId optional; default Traditional blackwhite). If the tool returns checkoutUrl, tell them to Pay securely. If it returns shoutoutId, the board is pending club approval. Photo / jersey / Football Intro / Heist / Baller's Alert stay on composeHref when a required photo slot cannot be filled in chat. Never invent a checkout URL.",
     "Never ask for or accept card numbers. Pay links come only from tools — VIP createVipCheckout follows the venue collector (clubPos Toast/SpotOn confirm, no-deposit confirm, or Stripe checkoutUrl for floqrStripe/clubStripe). Do not invent a Stripe URL when checkoutMode is clubPos or noDeposit; use passHref / message instead.",
     "If a tool returns ok:false, explain the error and suggest the matching FLOQR page.",
     "If they ask where you left off, recap the last two meaningful retrieved turns — skip a post-pause hello/Hey. Distinguish discussed vs booked: never claim a VIP reservation, hold, or payment is confirmed unless a tool result in this turn or a stored execution receipt says so. Talking about a venue or VIP tables is discussion, not a booking.",
