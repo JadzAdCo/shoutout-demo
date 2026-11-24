@@ -224,7 +224,7 @@
   const PACKAGE_INSTALL_CHECKS = [
     {
       version: "s3.3.076",
-      title: "s3.3.076 — BOT DEE named invite + Search SMARTnotification for scheduled rooms",
+      title: "s3.3.076 — BOT DEE named invite + Search SMARTnotification + Miami Place SMARTview",
       checks: [
         {label:"Named invite needles", file:"functions/botdee-room-smartview.js", includes:["@?[\\w.'-]+", "invite|bring)\\s+\\S+"]},
         {label:"Keep scheduled joinedRoomId", file:"functions/bot-dee-functions.js", includes:["roomIsInviteable(liveRoom)", "latestInviteableHostRoom", "roomTakesPriority"]},
