@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.074";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.074";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.075";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.075";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,18 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.075",
+      title: "s3.3.075 — Room SMARTview collab + VIP popouts rebased onto collectableInput",
+      checks: [
+        {label:"Host election ratio", file:"functions/botdee-session-core.js", includes:["HOST_ELECTION_RATIO = 0.6", "holdGateMessage"]},
+        {label:"Collab callables", file:"functions/botdee-session-functions.js", includes:["proposeBotDeeRoomTransaction", "nominateBotDeeRoomHost"]},
+        {label:"Transactional votes", file:"functions/botdee-session-store.js", includes:["function mutateRoom", "scheduleRoom"]},
+        {label:"VIP popouts", file:"botdee-vip-popout.html", includes:["kind === \"paid\" || kind === \"pass\""]},
+        {label:"Collectable inputs still present", file:"shared-data.js", includes:["FLOQRTemplatePatronInputs", "collectableInput1"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-075-botdee-room-collab-rebase", "s3.3.075"]}
+      ]
+    },
     {
       version: "s3.3.062",
       title: "s3.3.062 — BOT DEE VIP pass popout, checkout cancel, hold clock",
@@ -3811,6 +3823,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+    {
+      id:"s3-3-075-botdee-room-collab-rebase",
+      area:"BOT DEE",
+      feature:"Room SMARTview shared picks + 60% host election on s3.3.074",
+      changed:"s3.3.075 — PR 147 rebased onto origin/main after 154 (Aurelia gallery) and 152 (collectableInput). Room SMARTview members vote Yes/No on the host VIP reserV or ShoutOut pick. Anyone can be host at 60% of currently joined members. Host leave keeps the room open. VIP map/Terms/Stripe/pass stay botdee-vip-popout.html. Schedule Join Now vs Set a schedule stays. Headless ShoutOut still uses collectableInput1..N.",
+      howToTest:"1) After Pages + Functions deploy (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js / botdee-vip-popout.html ?v=s3.3.075. Sign in with BOT DEE + Mingl + VIP reserV. 2) Confirm a Room SMARTview, Join Now or Set a schedule, invite a Mingl friend. Joining is not a payment. 3) Host: VIP reserV pick a table — Shared picks Yes/No. Guest votes. Hold it stays host-only until 60% yes. 4) Guest: Make me host. After 60% yes they can Hold it. Stripe is a pop-out, not vip.html. 5) Original host leaves — room stays open. 6) New chat throw a shoutout still uses collectableInput (Aurelia + birthday fills Traditional). 7) Mark Succeed/Failed. Display URLs have no ?v=.",
+      expected:"Shared picks + 60% host election work on the same package as collectableInput and retired Aurelia gallery tiles. No vip.html. Schedule still works. Display URLs never ?v=.",
+      troubleshoot:"No Shared picks → cached botdee-smartview.js or Functions missing proposeBotDeeRoomTransaction. Guest Hold it works → Functions not this SHA. Host leave ends room → leaveRoom still auto-endRoom. Still asking template/@handle after venue+text → executeBotSession not this SHA. Functions deny mingl/botDee → Features & Services."
+    },
     {
       id:"s3-3-062-botdee-vip-popout-hold",
       area:"BOT DEE",

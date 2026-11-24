@@ -1,4 +1,4 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.074 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.075 (stable)
 
 - s3.3.074: Headless ShoutOut collects from template collectableInput1..N
 - s3.3.073: Aurelia Gallery drops four DonPapi/VIP shoutout tiles; Happy Birthday Maya stays first
