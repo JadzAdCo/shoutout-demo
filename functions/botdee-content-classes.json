@@ -133,6 +133,12 @@
       "serviceMember",
       "venueAdmin"
     ],
+    "help-botdee-room-smartview-schedule": [
+      "masterAdmin",
+      "patron",
+      "serviceMember",
+      "venueAdmin"
+    ],
     "help-botdee-room-smartview-share": [
       "masterAdmin",
       "patron",
@@ -667,6 +673,9 @@
       "patron"
     ],
     "help-botdee-room-smartview": [
+      "patron"
+    ],
+    "help-botdee-room-smartview-schedule": [
       "patron"
     ],
     "help-botdee-version-smartview": [

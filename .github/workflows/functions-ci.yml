@@ -271,6 +271,13 @@ jobs:
               setBotDeeProviderSlot \
               createHeadlessShoutOutCheckout \
               createBotDeeRoom \
+              scheduleBotDeeRoom \
+              startBotDeeRoom \
+              rescheduleBotDeeRoom \
+              touchBotDeeRoomPresence \
+              listBotDeeRoomNotifications \
+              rsvpBotDeeRoomInvite \
+              expireBotDeeRooms \
               createBotDeeRoomInvite \
               inviteBotDeeRoomGuest \
               acceptBotDeeRoomInvite \
@@ -342,6 +349,13 @@ jobs:
               listBotDeeProviderSlots \
               setBotDeeProviderSlot \
               createBotDeeRoom \
+              scheduleBotDeeRoom \
+              startBotDeeRoom \
+              rescheduleBotDeeRoom \
+              touchBotDeeRoomPresence \
+              listBotDeeRoomNotifications \
+              rsvpBotDeeRoomInvite \
+              expireBotDeeRooms \
               createBotDeeRoomInvite \
               inviteBotDeeRoomGuest \
               acceptBotDeeRoomInvite \

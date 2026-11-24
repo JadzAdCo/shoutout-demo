@@ -1,1 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Stylized illustration representing Bali"><defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#102c4a"/><stop offset=".55" stop-color="#175e7b"/><stop offset="1" stop-color="#ef9d80"/></linearGradient><linearGradient id="floor" x2="0" y2="1"><stop stop-color="#267b88"/><stop offset="1" stop-color="#122b47"/></linearGradient></defs><rect width="800" height="450" fill="url(#sky)"/><circle cx="635" cy="100" r="53" fill="#f6d4a5" opacity=".85"/><path d="M0 365Q170 340 310 380Q520 345 800 370V450H0Z" fill="url(#floor)"/><g fill="#183b55" stroke="#9adbe0" stroke-width="5" stroke-linejoin="round"><path d="M260 430V330H520V430 M240 330L390 230L540 330 M290 250L390 180L490 250 M355 180L390 135L425 180"/></g><rect width="800" height="450" fill="none" stroke="none"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Stylized tropical lagoon illustration">
+  <defs>
+    <linearGradient id="baliSky" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a2a6c"/>
+      <stop offset=".38" stop-color="#7b4aa8"/>
+      <stop offset=".7" stop-color="#f48c6b"/>
+      <stop offset="1" stop-color="#ffd27a"/>
+    </linearGradient>
+    <linearGradient id="baliWater" x2="0" y2="1">
+      <stop offset="0" stop-color="#7ff5ea"/>
+      <stop offset=".28" stop-color="#2ec8d6"/>
+      <stop offset=".7" stop-color="#1488b8"/>
+      <stop offset="1" stop-color="#0b5478"/>
+    </linearGradient>
+    <linearGradient id="baliSand" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6e2b4"/>
+      <stop offset="1" stop-color="#d7b16a"/>
+    </linearGradient>
+    <linearGradient id="baliPlane" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cfefff"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#baliSky)"/>
+  <circle cx="168" cy="92" r="58" fill="#ffe7b0"/>
+  <circle cx="168" cy="92" r="88" fill="#ffd28a" opacity=".28"/>
+  <path d="M0 210C90 198 170 228 260 214C360 198 430 232 530 216C640 198 720 226 800 214V450H0Z" fill="url(#baliWater)"/>
+  <path d="M0 278C120 262 210 292 320 274C440 254 560 288 800 268V450H0Z" fill="#0e6f8c" opacity=".28"/>
+  <path d="M0 348C150 322 270 362 410 338C560 312 680 350 800 330V450H0Z" fill="url(#baliSand)"/>
+  <path d="M0 392C180 372 320 404 470 386C620 368 720 392 800 378V450H0Z" fill="#c9a15a" opacity=".45"/>
+  <g fill="#163b2f" stroke="#9adbe0" stroke-width="4" stroke-linejoin="round">
+    <path d="M86 450V318"/>
+    <path d="M86 250C28 272 18 330 70 338C30 352 62 400 86 360C108 404 156 362 122 340C164 328 142 268 86 250Z"/>
+    <path d="M210 450V300"/>
+    <path d="M210 232C148 256 142 318 194 326C154 342 188 392 210 350C232 396 282 352 246 330C290 318 268 254 210 232Z"/>
+    <path d="M718 450V308"/>
+    <path d="M718 242C660 264 654 322 704 330C666 346 698 394 718 354C740 398 788 356 754 334C796 322 774 260 718 242Z"/>
+  </g>
+  <g fill="url(#baliPlane)" stroke="#e8fbff" stroke-width="3" stroke-linejoin="round">
+    <path d="M392 168L692 86L572 232L602 302L542 224L392 268L420 198Z"/>
+    <path d="M548 148L628 124L610 168Z"/>
+  </g>
+  <path d="M430 176L700 96" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+</svg>

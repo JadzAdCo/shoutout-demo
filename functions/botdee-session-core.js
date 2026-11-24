@@ -8,6 +8,9 @@ const MEMBER_CAP = 8;
 const TOKEN_BYTES = 32;
 const INVITE_TTL_MS = 24 * 60 * 60 * 1000;
 const ROOM_TTL_MS = 4 * 60 * 60 * 1000;
+const PRESENCE_STALE_MS = 15 * 60 * 1000;
+const PRESENCE_TOUCH_MS = 30 * 1000;
+const SCHEDULE_MIN_LEAD_MS = 30 * 1000;
 const INVITE_RATE_PER_HOUR = 12;
 const TURN_RATE_PER_MIN = 20;
 const INVITE_PREFIX = "floqr-botdee-room-invite:";
@@ -47,10 +50,15 @@ function publicOrigin() {
   return String(process.env.FLOQR_PUBLIC_ORIGIN || "https://jadzadco.github.io/shoutout-demo").replace(/\/$/, "");
 }
 
-function inviteHref(roomId, token) {
+function roomHref(roomId, token) {
   const room = encodeURIComponent(text(roomId, 80));
-  const t = encodeURIComponent(String(token || ""));
-  return `${publicOrigin()}/botdee.html?room=${room}&t=${t}`;
+  const t = String(token || "");
+  if (t) return `${publicOrigin()}/botdee.html?room=${room}&t=${encodeURIComponent(t)}`;
+  return `${publicOrigin()}/botdee.html?room=${room}`;
+}
+
+function inviteHref(roomId, token) {
+  return roomHref(roomId, token);
 }
 
 function isMutualConnection(row, uidA, uidB) {
@@ -91,12 +99,67 @@ function evaluateInvite(invite, {uid = "", nowMs = Date.now(), roomId = ""} = {}
   return {ok: true, reason: ""};
 }
 
+function roomStatus(row) {
+  return text(row?.status, 20);
+}
+
 function roomIsOpen(row, nowMs = Date.now()) {
   if (!row) return false;
-  if (text(row.status, 20) !== "open") return false;
+  if (roomStatus(row) !== "open") return false;
   const expires = Number(row.expiresAtMs || 0);
   if (expires && expires <= nowMs) return false;
   return true;
+}
+
+function roomIsScheduled(row, nowMs = Date.now()) {
+  if (!row) return false;
+  if (roomStatus(row) !== "scheduled") return false;
+  if (["ended", "expired", "cancelled"].includes(roomStatus(row))) return false;
+  return Number(row.scheduledStartMs || 0) > 0;
+}
+
+function roomIsInviteable(row, nowMs = Date.now()) {
+  if (roomIsScheduled(row, nowMs)) return true;
+  return roomIsOpen(row, nowMs);
+}
+
+function roomNotifiesSearch(row) {
+  if (!row) return false;
+  if (Number(row.smartNotification || 0) !== 1) return false;
+  return roomStatus(row) === "scheduled" || roomStatus(row) === "open";
+}
+
+function scheduleStartValid(ms, nowMs = Date.now()) {
+  return Number(ms || 0) > Number(nowMs || 0) + SCHEDULE_MIN_LEAD_MS;
+}
+
+function ttlExpiresAtMs(row, nowMs = Date.now()) {
+  const live = Number(row?.liveOpenedAtMs || 0);
+  if (live) return live + ROOM_TTL_MS;
+  const start = Number(row?.scheduledStartMs || 0);
+  if (start) return start + ROOM_TTL_MS;
+  return Number(nowMs || Date.now()) + ROOM_TTL_MS;
+}
+
+function inviteExpiresAtMs(row, nowMs = Date.now()) {
+  const start = Number(row?.scheduledStartMs || 0);
+  if (roomStatus(row) === "scheduled" && start) return start + ROOM_TTL_MS;
+  const live = Number(row?.liveOpenedAtMs || 0);
+  if (live) return Math.max(nowMs + 60 * 1000, live + ROOM_TTL_MS);
+  return Number(nowMs || Date.now()) + INVITE_TTL_MS;
+}
+
+function lastLogoutShouldClose(row, memberRows, nowMs = Date.now()) {
+  if (roomStatus(row) !== "open") return false;
+  const members = currentMembers(row);
+  if (!members.length) return true;
+  const byUid = new Map((Array.isArray(memberRows) ? memberRows : []).map(item => [text(item?.uid, 80), item || {}]));
+  return members.every(uid => {
+    const member = byUid.get(uid) || {};
+    if (Number(member.leftAtMs || 0) > 0) return true;
+    const last = Number(member.lastPresenceAtMs || row.lastPresenceAtMs || row.liveOpenedAtMs || 0);
+    return last > 0 && last <= nowMs - PRESENCE_STALE_MS;
+  });
 }
 
 function currentMembers(row) {
@@ -112,7 +175,7 @@ function isCurrentMember(row, uid) {
 
 function canInviteMore(row, actorUid, memberRow) {
   const actor = text(actorUid, 80);
-  if (!roomIsOpen(row)) return {ok: false, reason: "closed"};
+  if (!roomIsInviteable(row)) return {ok: false, reason: "closed"};
   if (!isCurrentMember(row, actor)) return {ok: false, reason: "not_member"};
   if (currentMembers(row).length >= MEMBER_CAP) return {ok: false, reason: "full"};
   const isHost = text(row.hostUid, 80) === actor;
@@ -254,24 +317,64 @@ function sanitizeRoomTurns(turns) {
   })).filter(row => row.text);
 }
 
+function publicRoomStatus(row, nowMs = Date.now()) {
+  const st = roomStatus(row);
+  if (st === "scheduled" || st === "expired" || st === "cancelled") return st;
+  return roomIsOpen(row, nowMs) ? "open" : (st || "ended");
+}
+
 function publicRoom(id, row, extra = {}) {
   const members = currentMembers(row);
+  const st = publicRoomStatus(row);
   return {
     roomId: text(id, 80),
     hostUid: text(row.hostUid, 80),
     memberUids: members,
     participantCount: Math.min(MEMBER_CAP, members.length || 1),
     participantCap: MEMBER_CAP,
-    status: roomIsOpen(row) ? "open" : (text(row.status, 20) || "ended"),
+    status: st,
     conversationId: text(row.conversationId, 80),
     expiresAtMs: Number(row.expiresAtMs || 0) || 0,
+    scheduledStartMs: Number(row.scheduledStartMs || 0) || 0,
+    scheduledTimeZone: text(row.scheduledTimeZone, 80),
+    liveOpenedAtMs: Number(row.liveOpenedAtMs || 0) || 0,
+    smartNotification: Number(row.smartNotification || 0) === 1 ? 1 : 0,
+    authorizedTitle: text(row.authorizedTitle || row.title, 80),
+    authorizedDescription: text(row.authorizedDescription, 240),
+    lastPresenceAtMs: Number(row.lastPresenceAtMs || 0) || 0,
+    closeReason: text(row.closeReason, 40),
     sharedIntent: publicIntent(row.sharedIntent),
-    joinHref: extra.joinHref || "",
+    joinHref: extra.joinHref || (extra.token ? inviteHref(id, extra.token) : ""),
     roomsLive: true,
     minglFriendsOnly: true,
     guestsCanInvite: true,
     tabOptIn: extra.tabOptIn === true,
     charge: false
+  };
+}
+
+function publicNotification(id, row, extra = {}) {
+  const hostName = text(extra.hostName, 80) || "Host";
+  const title = text(row?.authorizedTitle || row?.title, 80) || "Mingl Room";
+  const start = Number(row?.scheduledStartMs || 0) || 0;
+  return {
+    demo: false,
+    sourceKind: "authorized-room",
+    roomId: text(id, 80),
+    title,
+    description: text(row?.authorizedDescription, 240),
+    hostName,
+    hostInitials: hostName.slice(0, 1).toUpperCase(),
+    inviteeLine: extra.inviteeLine || `${hostName} invited you to join a Mingl Room.`,
+    scheduledStartMs: start,
+    scheduledTimeZone: text(row?.scheduledTimeZone, 80),
+    scheduledLabel: extra.scheduledLabel || "",
+    participantCount: Math.min(MEMBER_CAP, currentMembers(row).length || 1),
+    liveInRoom: roomStatus(row) === "open",
+    smartNotification: 1,
+    joinHref: extra.joinHref || roomHref(id, extra.token || ""),
+    viewerRole: text(extra.viewerRole, 20) || "invitee",
+    rsvp: text(extra.rsvp, 20) || ""
   };
 }
 
@@ -417,7 +520,11 @@ function denialMessage(reason) {
     missing_payer: "Choose who is paying.",
     amount: "That tab total is too small to check out.",
     rate_limited: "Slow down — try again in a minute.",
-    mingl_required: "Mingl friends and BOT DEE access are required."
+    mingl_required: "Mingl friends and BOT DEE access are required.",
+    past: "Pick a future time for the BOT DEE room.",
+    already_open: "This BOT DEE session is already live.",
+    not_scheduled: "That BOT DEE room is not scheduled.",
+    not_live: "This BOT DEE room is not live yet."
   };
   return map[reason] || map.not_found;
 }
@@ -427,6 +534,9 @@ module.exports = {
   TOKEN_BYTES,
   INVITE_TTL_MS,
   ROOM_TTL_MS,
+  PRESENCE_STALE_MS,
+  PRESENCE_TOUCH_MS,
+  SCHEDULE_MIN_LEAD_MS,
   INVITE_RATE_PER_HOUR,
   TURN_RATE_PER_MIN,
   INVITE_PREFIX,
@@ -438,11 +548,20 @@ module.exports = {
   inviteIdFor,
   hashInviteToken,
   publicOrigin,
+  roomHref,
   inviteHref,
   isMutualConnection,
   isBlockedRow,
   evaluateInvite,
+  roomStatus,
   roomIsOpen,
+  roomIsScheduled,
+  roomIsInviteable,
+  roomNotifiesSearch,
+  scheduleStartValid,
+  ttlExpiresAtMs,
+  inviteExpiresAtMs,
+  lastLogoutShouldClose,
   currentMembers,
   isCurrentMember,
   canInviteMore,
@@ -456,7 +575,9 @@ module.exports = {
   publicPerson,
   stripPrivateSignals,
   sanitizeRoomTurns,
+  publicRoomStatus,
   publicRoom,
+  publicNotification,
   publicIntent,
   publicTab,
   publicTabLine,
