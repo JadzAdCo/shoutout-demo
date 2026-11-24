@@ -33,6 +33,7 @@ function run(root) {
   for (const file of servedJs) edit(file, stripPageLinkVersions);
   edit("floqr-i18n.js", src => src.replace(/const VERSION\s*=\s*"[^"]+"/, `const VERSION = "${NEXT}"`));
   edit("floqr-i18n-help.js", src => src.replace(/const VERSION\s*=\s*"[^"]+"/, `const VERSION = "${NEXT}"`));
+  edit("floqr-i18n-help-runtime.js", src => src.replace(/const VERSION\s*=\s*"[^"]+"/, `const VERSION = "${NEXT}"`));
   edit("ai-diagnostics-service.js", src => src
     .replace(/PREVIEW_LINKS_PACKAGE = "s3\.\d+\.\d+"/, `PREVIEW_LINKS_PACKAGE = "${NEXT}"`)
     .replace(/CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3\.\d+\.\d+"/, `CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "${NEXT}"`));
