@@ -245,6 +245,12 @@ test("Coming Soon, Beta filter, and journey columns follow flag badges", () => {
   const testing = core.filterFeatures(pub.features, {view: "all", lifecycle: "Testing"});
   testing.forEach(row => assert.equal(row.lifecycleLabel, "Testing", row.id));
   assert.ok(testing.some(row => row.productId === "bot-dee"));
+  const tagged = core.filterFeatures(pub.features, {view: "all", tag: "assistant"});
+  assert.ok(tagged.length > 0);
+  tagged.forEach(row => {
+    assert.ok((row.tags || []).includes("assistant") || row.category === "assistant", row.id);
+  });
+  assert.ok(pub.features.some(row => Array.isArray(row.tags) && row.tags.length));
 });
 
 test("Try feature stays off without authorization and availability", () => {

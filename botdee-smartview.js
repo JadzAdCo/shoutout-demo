@@ -132,16 +132,32 @@
   function placeVisual(payload) {
     const resolver = global.FLOQRSmartVisualsResolver;
     if (!resolver?.resolvePlaceCard) {
-      return {backgroundUrl: "", backgroundId: "", stencilUrl: ""};
+      return {backgroundUrl: "", backgroundId: "", stencilUrl: "", stencilId: "", tags: []};
     }
     const catalog = global.FLOQRSmartVisualsCatalog;
     const selection = resolver.resolvePlaceCard(payload, catalog);
     const urls = resolver.urlsFor ? resolver.urlsFor(selection, catalog) : {};
+    const tags = Array.isArray(selection.tags)
+      ? selection.tags
+      : (resolver.normalizeSmartViewTags
+        ? resolver.normalizeSmartViewTags(payload?.floqrPublicData?.smartTags || payload?.tags)
+        : []);
     return {
       backgroundId: selection.backgroundId || "",
       backgroundUrl: urls.backgroundUrl || "",
-      stencilUrl: urls.stencilUrl || ""
+      stencilId: selection.stencilId || "",
+      stencilUrl: urls.stencilUrl || "",
+      stencilName: urls.stencilName || "",
+      tags
     };
+  }
+
+  function placeTagHtml(tags) {
+    const list = Array.isArray(tags) ? tags.filter(Boolean).slice(0, 8) : [];
+    if (!list.length) return "";
+    return `<div class="botdee-sv-tags" data-sv-place-tags="1">${list.map(tag =>
+      `<span class="botdee-sv-tag">${esc(tag)}</span>`
+    ).join("")}</div>`;
   }
 
   function chromeIconSrc() {
@@ -1426,6 +1442,9 @@
     const bgStyle = visual.backgroundUrl
       ? ` style="--sv-place-bg:url('${esc(visual.backgroundUrl)}')"`
       : "";
+    const stencil = visual.stencilUrl
+      ? `<img class="botdee-sv-place-stencil" src="${esc(visual.stencilUrl)}" alt="${esc(t("sv.stencilAlt", "SMARTstencil for this Place SMARTview. Illustration, not a photograph."))}" width="28" height="28" data-sv-st="${esc(visual.stencilId || "")}"/>`
+      : "";
     const actionHtml = actions.map(action => {
       const href = String(action.href || "").trim();
       if (!href || /javascript:/i.test(href)) return "";
@@ -1439,16 +1458,18 @@
       const main = action.id === "open-public-page" ? " botdee-sv-action-main" : "";
       return `<li><a class="buttonlike${main}" href="${esc(fixed)}">${label}</a></li>`;
     }).join("");
-    return `<article class="botdee-sv-card botdee-sv-place" data-kind="${esc(payload.kind)}" data-sv-bg="${esc(visual.backgroundId || "")}"${bgStyle}>
+    return `<article class="botdee-sv-card botdee-sv-place" data-kind="${esc(payload.kind)}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}"${bgStyle}>
       <header class="botdee-sv-place-head">
         <img class="botdee-sv-place-chrome" data-floqr-chrome-icon="botDee" src="${esc(chromeIconSrc())}" alt="${esc(t("botdee.sv.chromeAlt", "BOT DEE"))}" width="28" height="28"/>
         <div class="botdee-sv-place-copy">
           <p class="botdee-sv-kind">${esc(kindLabel(payload.kind))}</p>
           <h3>${esc(payload.title)}</h3>
         </div>
+        ${stencil}
         ${mock ? `<p class="botdee-sv-mock">${esc(t("botdee.smartviewMockBadge", "Mock / not live licensed data"))}</p>` : ""}
       </header>
       ${payload.summary ? `<p class="botdee-sv-summary">${esc(payload.summary)}</p>` : ""}
+      ${placeTagHtml(visual.tags)}
       ${ratings.length ? `<ul class="botdee-sv-ratings">${ratings.map(ratingRow).join("")}</ul>` : ""}
       ${cuisine.length ? `<p class="botdee-sv-cuisine">${esc(Array.isArray(cuisine) ? cuisine.join(" · ") : cuisine)}</p>` : ""}
       ${nhtsa && nhtsa.status === "missing" ? `<p class="botdee-sv-missing">${esc(nhtsa.note || "Safety rating unavailable for this year/trim.")}</p>` : ""}

@@ -457,6 +457,39 @@
     return bg && bg.type === "background" && bg.approvalStatus === "published" ? bg : null;
   }
 
+  function publishedStencil(catalog, id) {
+    const st = byId(catalog, stencilIdOf(id));
+    return st && st.type === "stencil" && st.approvalStatus === "published" ? st : null;
+  }
+
+  /** Small SMARTview tag list for card/stencil assignment. Not template-tags. */
+  function normalizeSmartViewTags(raw) {
+    const list = Array.isArray(raw)
+      ? raw
+      : String(raw == null ? "" : raw).split(/[,;|]/);
+    const out = [];
+    const seen = new Set();
+    for (let i = 0; i < list.length; i++) {
+      const tag = String(list[i] || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9:_-]/g, "")
+        .slice(0, 40);
+      if (!tag || tag.length < 2 || seen.has(tag)) continue;
+      seen.add(tag);
+      out.push(tag);
+      if (out.length >= 12) break;
+    }
+    return out;
+  }
+
+  function payloadPublicData(payload) {
+    return payload && payload.floqrPublicData && typeof payload.floqrPublicData === "object"
+      ? payload.floqrPublicData
+      : {};
+  }
+
   function placeKindDefault(kind, catalog) {
     const tax = (catalog && catalog.taxonomy && catalog.taxonomy.placeCardDefaults) || {};
     const packed = tax[kind] || PLACE_CARD_DEFAULTS[kind] || PLACE_CARD_DEFAULTS.venue;
@@ -468,9 +501,7 @@
 
   function explicitPlaceBackgroundId(payload) {
     if (!payload || typeof payload !== "object") return "";
-    const publicData = payload.floqrPublicData && typeof payload.floqrPublicData === "object"
-      ? payload.floqrPublicData
-      : {};
+    const publicData = payloadPublicData(payload);
     return text(
       payload.backgroundId
         || payload.smartBackgroundId
@@ -478,6 +509,62 @@
         || publicData.backgroundId,
       80
     );
+  }
+
+  function explicitPlaceStencilId(payload) {
+    if (!payload || typeof payload !== "object") return "";
+    const publicData = payloadPublicData(payload);
+    return text(
+      payload.stencilId
+        || payload.smartStencilId
+        || publicData.smartStencilId
+        || publicData.stencilId,
+      80
+    );
+  }
+
+  function explicitPlaceTags(payload) {
+    if (!payload || typeof payload !== "object") return [];
+    const publicData = payloadPublicData(payload);
+    return normalizeSmartViewTags(
+      payload.smartTags || payload.tags || publicData.smartTags || publicData.tags
+    );
+  }
+
+  function pickPlaceStencil(catalog, payload, classified, bg, def) {
+    const explicit = explicitPlaceStencilId(payload);
+    if (explicit) {
+      const st = publishedStencil(catalog, explicit);
+      if (st) return st.id;
+    }
+    if (bg && bg.pairedStencilId) {
+      const st = publishedStencil(catalog, bg.pairedStencilId);
+      if (st) return st.id;
+    }
+    if (classified && classified.stencilId) {
+      const st = publishedStencil(catalog, classified.stencilId);
+      if (st) return st.id;
+    }
+    const fallback = publishedStencil(catalog, def.stencilId);
+    return (fallback && fallback.id) || "st-people";
+  }
+
+  function tagsForPlaceCard(payload, classified, bg) {
+    const explicit = explicitPlaceTags(payload);
+    if (explicit.length) return explicit;
+    if (classified && Array.isArray(classified.tags) && classified.tags.length) {
+      return normalizeSmartViewTags(classified.tags);
+    }
+    if (bg && Array.isArray(bg.tags) && bg.tags.length) return normalizeSmartViewTags(bg.tags);
+    return [];
+  }
+
+  function cardMatchesSmartViewTag(payload, tag) {
+    const want = normalizeSmartViewTags(tag)[0] || "";
+    if (!want) return true;
+    const tags = explicitPlaceTags(payload);
+    if (tags.includes(want)) return true;
+    return tagsForPlaceCard(payload, null, null).includes(want);
   }
 
   function classifyUsefulForPlace(classified) {
@@ -490,51 +577,40 @@
     return classified.backgroundId && classified.backgroundId !== "bg-mingl-room";
   }
 
-  /** Place / venue SMARTview art. Gemini off. Explicit published id wins, then city/title, then kind default. */
+  /** Place / venue SMARTview art. Gemini off. Explicit published ids win, then city/title, then kind default. */
   function resolvePlaceCard(input, catalogOpt) {
     const catalog = loadCatalog(catalogOpt);
     const payload = input && typeof input === "object" ? input : {};
     const kind = String(payload.kind || "venue");
     const def = placeKindDefault(kind, catalog);
-    const explicit = explicitPlaceBackgroundId(payload);
-    if (explicit) {
-      const bg = publishedBackground(catalog, explicit);
-      if (bg) {
-        return {
-          ok: true,
-          kind,
-          backgroundId: bg.id,
-          stencilId: def.stencilId,
-          reasonCode: "place-card-explicit",
-          geminiUsed: false,
-          modelCalls: 0
-        };
-      }
-    }
     const city = payload.floqrPublicData && payload.floqrPublicData.city;
     const classified = resolve({
       title: text(payload.title, 160),
       description: text([payload.summary, city, kind].filter(Boolean).join(" "), 400),
       sourceKind: "place-smartview"
     }, catalog);
-    if (classifyUsefulForPlace(classified) && publishedBackground(catalog, classified.backgroundId)) {
-      return {
-        ok: true,
-        kind,
-        backgroundId: classified.backgroundId,
-        stencilId: classified.stencilId || def.stencilId,
-        reasonCode: "place-card-classified",
-        geminiUsed: false,
-        modelCalls: 0
-      };
+    const explicitBg = explicitPlaceBackgroundId(payload);
+    let backgroundId = def.backgroundId;
+    let reasonCode = "place-card-kind-default";
+    let classifiedForStencil = null;
+    if (explicitBg && publishedBackground(catalog, explicitBg)) {
+      backgroundId = publishedBackground(catalog, explicitBg).id;
+      reasonCode = "place-card-explicit";
+    } else if (classifyUsefulForPlace(classified) && publishedBackground(catalog, classified.backgroundId)) {
+      backgroundId = classified.backgroundId;
+      reasonCode = "place-card-classified";
+      classifiedForStencil = classified;
     }
-    const fallback = publishedBackground(catalog, def.backgroundId);
+    const bg = publishedBackground(catalog, backgroundId);
+    const stencilId = pickPlaceStencil(catalog, payload, classifiedForStencil || classified, bg, def);
+    const tags = tagsForPlaceCard(payload, classifiedForStencil || classified, bg);
     return {
       ok: true,
       kind,
-      backgroundId: (fallback && fallback.id) || "bg-vip-nightlife",
-      stencilId: def.stencilId,
-      reasonCode: "place-card-kind-default",
+      backgroundId: (bg && bg.id) || "bg-vip-nightlife",
+      stencilId,
+      tags,
+      reasonCode,
       geminiUsed: false,
       modelCalls: 0
     };
@@ -787,6 +863,8 @@
     classify,
     resolve,
     resolvePlaceCard,
+    normalizeSmartViewTags,
+    cardMatchesSmartViewTag,
     urlsFor,
     contentHash,
     geminiAllowed,

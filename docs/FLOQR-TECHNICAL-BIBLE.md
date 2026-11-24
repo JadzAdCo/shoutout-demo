@@ -516,7 +516,8 @@ flowchart TD
   Q --> M
   Q --> AUTH[RBAC + SOS2FA + SVG sanitizer]
   AUTH --> DRAFT[smartVisualDrafts review]
-  DRAFT -.->|not patron-visible until git publish| H
+  DRAFT -->|Studio Review Publish approveSmartVisualDraft| STUDIO[Studio overlay catalogAssetId]
+  DRAFT -.->|patrons stay on git registry until Pages| H
 ```
 
 Verified vs kit proposal: no live Gemini path; no AdSense script; Search overlay is opt-in demo (`?smartvisualInvite=cancun`) because group rooms are not live; Cancun maps to tropical `bg-bali` + `st-flight` (no Cancun photograph in the kit). Mock ads: Cancun Trip → Travel partner / Fly to Cancun; Paris Fashion Week → Fashion partner; dining → Dining partner; generic Saturday → Mingl Room (no destination).

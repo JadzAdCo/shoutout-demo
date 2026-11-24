@@ -300,6 +300,24 @@
       patterns: [/join\s+now/, /room\s+smartview\s+invitation/]
     },
     {
+      id: "help-smartvisuals-create",
+      kind: "help",
+      label: "Create / Edit SMARTvisuals",
+      blurb: "Master Admin Create / Edit drafts. Name is required. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP.",
+      links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
+      searchPhrases: ["create smartbackground", "edit smartvisual", "art upload", "svg jpeg png webp"],
+      patterns: [/create\s*\/\s*edit/, /smart\s*background\s+upload/, /art\s+upload/]
+    },
+    {
+      id: "help-smartvisuals-place-assign",
+      kind: "help",
+      label: "Place SMARTview stencil, background, and tags",
+      blurb: "Master Admin assigns a published SMARTstencil, SMARTbackground, and tags to Place SMARTview cards.",
+      links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
+      searchPhrases: ["place smartview stencil", "smartview tags", "change card background"],
+      patterns: [/place\s*smartview\s*(stencil|tag)/, /smart\s*stencil\s+assign/]
+    },
+    {
       id: "help-post-ad",
       kind: "help",
       label: "Post an ad on FLOQR",
@@ -1164,6 +1182,8 @@
     "help-botdee-headless-vip": ["patron"],
     "help-features-smartview": ["patron"], "help-features-smartview-status": ["patron"], "help-features-smartview-botdee": ["patron"],
     "help-smartvisuals-notification": ["patron"], "help-smartvisuals-room": ["patron"],
+    "help-smartvisuals-create": ["masterAdmin"],
+    "help-smartvisuals-place-assign": ["masterAdmin"],
     "help-donpapi-led-wall": ["patron"], "help-role-profiles": ["patron"], "help-app-language": ["patron"],
     "help-my-profile": ["patron"], "help-profile-account-type": ["patron"], "help-profile-height": ["patron"], "help-floqr-handle": ["patron"], "help-profile-country": ["patron"], "help-profile-mobile": ["patron"], "help-prior-travels": ["patron"], "help-future-travel": ["patron"], "help-taxi-pickup-address": ["patron"],
     "help-dj": ["patron"], "help-promoter": ["patron"], "help-hospitality": ["patron"],

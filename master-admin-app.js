@@ -181,7 +181,8 @@
     "adLiveCampaigns",
     "adStatsPanel",
     "adIntakePanel",
-    "adSettingsPanel"
+    "adSettingsPanel",
+    "smartvisualStudio"
   ];
   const AD_MGMT_PANEL_IDS = ["adApprovalQueue", "adLiveCampaigns", "adStatsPanel", "adIntakePanel", "adSettingsPanel"];
   const FEATURES_MGMT_PANEL_IDS = ["featuresReleaseControl", "featuresBetaTesting", "featuresVipPayments", "featuresBotDee", "featuresAuditTrail"];

@@ -7,7 +7,7 @@ const crypto = require("crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {__featureServiceHelpers: audit} = require("./feature-services-functions");
 const resolver = require("./smartvisuals-resolver");
-const {sanitizeSvg} = require("./smartvisuals-svg-sanitize");
+const {sanitizeSmartVisualUpload} = require("./smartvisuals-svg-sanitize");
 const catalog = require("./smartvisuals/catalog.json");
 
 if (!admin.apps.length) admin.initializeApp();
@@ -31,6 +31,25 @@ function text(value, max) {
 function deny(code, message) {
   throw new HttpsError(code, message);
 }
+
+function slugName(name) {
+  return text(name, 80).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function matchCatalogAsset(draft) {
+  const assets = Array.isArray(catalog.assets) ? catalog.assets : [];
+  const type = text(draft?.type, 20) || "background";
+  const name = text(draft?.name, 80);
+  const slug = slugName(name);
+  const wantId = type === "stencil" ? `st-${slug}` : `bg-${slug}`;
+  const lower = name.toLowerCase();
+  return assets.find(a => a && a.id === wantId)
+    || assets.find(a => a && a.type === type && String(a.name || "").toLowerCase() === lower)
+    || assets.find(a => a && (a.aliases || []).map(x => String(x).toLowerCase()).includes(slug))
+    || null;
+}
+
+exports.__smartvisualHelpers = {slugName, matchCatalogAsset};
 
 exports.classifySmartVisual = onCall(CALL_OPTS, async request => {
   if (!request.auth) deny("unauthenticated", "Sign in to classify SMARTvisuals.");
@@ -74,10 +93,9 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
   if (reason.length < REASON_MIN) deny("invalid-argument", "A reason of at least 8 characters is required.");
   const name = text(request.data?.name, 80);
   const license = text(request.data?.license, 240);
-  const svg = String(request.data?.svg || "");
+  const assetType = text(request.data?.type, 20) || "stencil";
   if (!name) deny("invalid-argument", "Name is required.");
-  if (!license) deny("invalid-argument", "License / provenance is required.");
-  const sanit = sanitizeSvg(svg);
+  const sanit = sanitizeSmartVisualUpload(request.data || {}, {assetType});
   if (!sanit.ok) {
     await db.collection(COLLECTIONS.audit).add({
       eventType: "smartvisual.upload_denied",
@@ -87,12 +105,18 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
       createdAtMs: Date.now(),
       createdAt: FieldValue.serverTimestamp()
     });
-    deny("invalid-argument", `SVG rejected (${sanit.reason}).`);
+    deny("invalid-argument", `File rejected (${sanit.reason}).`);
   }
   const id = text(request.data?.id, 80) || `draft_${Date.now()}`;
   const expectedRev = Number(request.data?.revision || 0);
-  const svgXml = String(sanit.svg || "");
-  const svgChecksumSha256 = crypto.createHash("sha256").update(svgXml, "utf8").digest("hex");
+  const isSvg = sanit.kind !== "raster";
+  const svgXml = isSvg ? String(sanit.svg || "") : "";
+  const imageBase64 = isSvg ? "" : String(sanit.imageBase64 || "");
+  const checksumInput = isSvg ? svgXml : imageBase64;
+  const checksumSha256 = crypto.createHash("sha256").update(checksumInput, "utf8").digest("hex");
+  const svgChecksumSha256 = isSvg ? checksumSha256 : "";
+  const imageChecksumSha256 = isSvg ? "" : checksumSha256;
+  const contentType = sanit.contentType || (isSvg ? "image/svg+xml" : "application/octet-stream");
   const ref = db.collection(COLLECTIONS.drafts).doc(id);
   await db.runTransaction(async tx => {
     const snap = await tx.get(ref);
@@ -100,26 +124,77 @@ exports.publishSmartVisualDraft = onCall(CALL_OPTS, async request => {
     if (snap.exists && current !== expectedRev) {
       deny("failed-precondition", "Revision conflict — reload and retry.");
     }
-    tx.set(ref, {
+    const row = {
       id,
       name,
       description: text(request.data?.description, 400),
-      type: text(request.data?.type, 20) || "stencil",
+      type: assetType,
       tags: Array.isArray(request.data?.tags) ? request.data.tags.map(v => text(v, 40)).slice(0, 12) : [],
-      license,
       approvalStatus: "review",
       bytes: sanit.bytes,
       svgXml,
       svgChecksumSha256,
-      contentType: "image/svg+xml",
+      imageBase64,
+      imageChecksumSha256,
+      contentType,
       revision: current + 1,
       updatedByEmail: email,
       sos2faSessionId: sessionId,
       reason,
       updatedAt: FieldValue.serverTimestamp()
-    }, {merge: true});
+    };
+    if (license) row.license = license;
+    tx.set(ref, row, {merge: true});
   });
-  return {ok: true, id, status: "review", bytes: sanit.bytes, svgChecksumSha256};
+  return {
+    ok: true,
+    id,
+    status: "review",
+    bytes: sanit.bytes,
+    contentType,
+    svgChecksumSha256: svgChecksumSha256 || undefined,
+    imageChecksumSha256: imageChecksumSha256 || undefined
+  };
+});
+
+exports.approveSmartVisualDraft = onCall(CALL_OPTS, async request => {
+  const {email, sessionId} = await audit.assertAdmin(request, "smartvisual.approve");
+  const reason = text(request.data?.reason, 500);
+  if (reason.length < REASON_MIN) deny("invalid-argument", "A reason of at least 8 characters is required.");
+  const draftId = text(request.data?.draftId || request.data?.id, 80);
+  if (!draftId) deny("invalid-argument", "Draft id is required.");
+  const ref = db.collection(COLLECTIONS.drafts).doc(draftId);
+  const snap = await ref.get();
+  if (!snap.exists) deny("not-found", "Draft not found.");
+  const row = snap.data() || {};
+  const match = matchCatalogAsset(row);
+  const catalogAssetId = match ? String(match.id) : "";
+  if (String(row.approvalStatus || "") === "published") {
+    return {ok: true, id: draftId, status: "published", catalogAssetId: row.catalogAssetId || catalogAssetId, alreadyPublished: true};
+  }
+  const now = Date.now();
+  await ref.set({
+    approvalStatus: "published",
+    publishedAtMs: now,
+    publishedByEmail: email,
+    catalogAssetId,
+    reason,
+    sos2faSessionId: sessionId,
+    updatedByEmail: email,
+    updatedAt: FieldValue.serverTimestamp(),
+    revision: Number(row.revision || 0) + 1
+  }, {merge: true});
+  await db.collection(COLLECTIONS.audit).add({
+    eventType: "smartvisual.approved",
+    outcome: "success",
+    actorEmail: email,
+    targetId: draftId,
+    catalogAssetId,
+    reason,
+    createdAtMs: now,
+    createdAt: FieldValue.serverTimestamp()
+  });
+  return {ok: true, id: draftId, status: "published", catalogAssetId, alreadyPublished: false};
 });
 
 exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
@@ -130,6 +205,7 @@ exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
   const stencilId = text(request.data?.stencilId, 80);
   const roomKey = text(request.data?.roomKey, 80);
   if (!roomKey) deny("invalid-argument", "Room key is required.");
+  const tags = resolver.normalizeSmartViewTags(request.data?.tags);
   const probe = resolver.resolve({
     title: "override",
     override: {backgroundId, stencilId, authorized: true}
@@ -138,12 +214,13 @@ exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
   await db.collection(COLLECTIONS.overrides).doc(roomKey).set({
     backgroundId: probe.backgroundId,
     stencilId: probe.stencilId,
+    tags,
     reason,
     updatedByEmail: email,
     updatedAt: FieldValue.serverTimestamp(),
     updatedAtMs: Date.now()
   });
-  return {ok: true, backgroundId: probe.backgroundId, stencilId: probe.stencilId};
+  return {ok: true, backgroundId: probe.backgroundId, stencilId: probe.stencilId, tags};
 });
 
 exports.getSmartVisualAdPolicy = onCall(CALL_OPTS, async request => {

@@ -1030,28 +1030,57 @@ function clubSmartView(card) {
   try {
     const visual = require("./smartvisuals-resolver").resolvePlaceCard(payload);
     if (visual && visual.backgroundId) payload.floqrPublicData.smartBackgroundId = visual.backgroundId;
+    if (visual && visual.stencilId) payload.floqrPublicData.smartStencilId = visual.stencilId;
+    if (visual && Array.isArray(visual.tags) && visual.tags.length) {
+      payload.floqrPublicData.smartTags = visual.tags;
+    }
   } catch (_) { /* catalog optional on this path */ }
   return payload;
 }
 
-async function loadPlaceBackgroundOverride(kind) {
+function emptyPlaceVisualOverride() {
+  return {backgroundId: "", stencilId: "", tags: []};
+}
+
+async function loadPlaceVisualOverride(kind) {
   try {
+    const normalize = require("./smartvisuals-resolver").normalizeSmartViewTags;
     for (const key of [`placeSmartView:${kind}`, "placeSmartView"]) {
       const snap = await db.collection("smartVisualOverrides").doc(key).get();
       if (!snap.exists) continue;
-      const id = String(snap.data()?.backgroundId || "").trim();
-      if (id) return id;
+      const data = snap.data() || {};
+      const backgroundId = String(data.backgroundId || "").trim();
+      const stencilId = String(data.stencilId || "").trim();
+      const tags = typeof normalize === "function" ? normalize(data.tags) : [];
+      if (backgroundId || stencilId || (tags && tags.length)) {
+        return {backgroundId, stencilId, tags: tags || []};
+      }
     }
   } catch (_) { /* overrides optional until Functions deploy */ }
-  return "";
+  return emptyPlaceVisualOverride();
+}
+
+async function loadPlaceBackgroundOverride(kind) {
+  const row = await loadPlaceVisualOverride(kind);
+  return row.backgroundId || "";
+}
+
+function applyPlaceVisualOverride(payload, override) {
+  if (!payload || !override) return payload;
+  const next = {};
+  if (override.backgroundId) next.smartBackgroundId = override.backgroundId;
+  if (override.stencilId) next.smartStencilId = override.stencilId;
+  if (Array.isArray(override.tags) && override.tags.length) next.smartTags = override.tags;
+  if (!Object.keys(next).length) return payload;
+  payload.floqrPublicData = Object.assign({}, payload.floqrPublicData || {}, next);
+  return payload;
 }
 
 function applyPlaceBackgroundOverride(payload, backgroundId) {
-  if (!payload || !backgroundId) return payload;
-  payload.floqrPublicData = Object.assign({}, payload.floqrPublicData || {}, {
-    smartBackgroundId: backgroundId
-  });
-  return payload;
+  if (backgroundId && typeof backgroundId === "object") {
+    return applyPlaceVisualOverride(payload, backgroundId);
+  }
+  return applyPlaceVisualOverride(payload, {backgroundId, stencilId: "", tags: []});
 }
 
 async function searchPublicClubs(classified, limit = 5) {
@@ -1077,9 +1106,9 @@ async function attachVenueSearch({query} = {}) {
     ? (names.length ? `Here are FLOQR venues that match: ${names.join(", ")}.` : "Here are FLOQR venues that match.")
     : "FLOQR doesn't list that kind of spot there yet. I only search onboarded venues — not a general restaurant guide.";
   const media = [];
-  let overrideBg = "";
+  let overrideVisual = emptyPlaceVisualOverride();
   try {
-    overrideBg = await loadPlaceBackgroundOverride("venue");
+    overrideVisual = await loadPlaceVisualOverride("venue");
   } catch (_) { /* packaged resolver still stamps a SMARTbackground */ }
   return {
     handled: true,
@@ -1087,7 +1116,7 @@ async function attachVenueSearch({query} = {}) {
     reply,
     replyKey: found ? "botdee.place.found" : "botdee.place.none",
     results: [],
-    smartViews: cards.map(card => applyPlaceBackgroundOverride(clubSmartView(card), overrideBg)),
+    smartViews: cards.map(card => applyPlaceVisualOverride(clubSmartView(card), overrideVisual)),
     media,
     venueSearch: {
       intent: classified.intent,
@@ -1761,7 +1790,9 @@ module.exports = {
   publicClubCard,
   clubSmartView,
   applyPlaceBackgroundOverride,
+  applyPlaceVisualOverride,
   loadPlaceBackgroundOverride,
+  loadPlaceVisualOverride,
   clubToResult,
   isClubPublic,
   isSelfProfileQuery,

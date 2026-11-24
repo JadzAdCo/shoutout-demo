@@ -97,6 +97,15 @@ test("venue cards open the club public page without cache-bust v=", () => {
   assert.equal(view.actions[0].href, card.profileHref);
   assert.equal((view.images || []).length, 0);
   assert.ok(view.floqrPublicData.smartBackgroundId);
+  assert.ok(view.floqrPublicData.smartStencilId);
+  const tagged = tools.applyPlaceVisualOverride(view, {
+    backgroundId: "bg-paris",
+    stencilId: "st-flight",
+    tags: ["nightlife", "dc"]
+  });
+  assert.equal(tagged.floqrPublicData.smartBackgroundId, "bg-paris");
+  assert.equal(tagged.floqrPublicData.smartStencilId, "st-flight");
+  assert.deepEqual(tagged.floqrPublicData.smartTags, ["nightlife", "dc"]);
   const result = tools.clubToResult(card);
   assert.equal(result.href, card.profileHref);
   assert.doesNotMatch(result.href, /[?&]v=/);
@@ -142,7 +151,7 @@ test("venue search returns SMARTviews only, not duplicate result links", () => {
   const session = fs.readFileSync(path.join(__dirname, "bot-dee-functions.js"), "utf8");
   assert.match(session, /else if \(venueAttached && venueAttached\.handled\)[\s\S]*?results: \[\]/);
   const attach = fs.readFileSync(path.join(__dirname, "bot-dee-tools.js"), "utf8");
-  assert.match(attach, /handled: true[\s\S]*?results: \[\][\s\S]*?smartViews: cards\.map\(card => applyPlaceBackgroundOverride\(clubSmartView\(card\), overrideBg\)\)/);
+  assert.match(attach, /handled: true[\s\S]*?results: \[\][\s\S]*?smartViews: cards\.map\(card => applyPlaceVisualOverride\(clubSmartView\(card\), overrideVisual\)\)/);
 });
 
 test("Gemini dining path is kind=club and does not pitch products", () => {

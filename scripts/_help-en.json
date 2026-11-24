@@ -518,5 +518,9 @@
   "help-venue-command-center": {
     "title": "Venue Command Center",
     "body": "Approve ShoutOuts, review venue performance, and reconcile account activity for this location."
+  },
+  "help-smartvisuals-create": {
+    "title": "Create / Edit SMARTvisuals",
+    "body": "Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark."
   }
 }

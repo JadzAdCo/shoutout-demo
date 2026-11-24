@@ -2813,6 +2813,27 @@
       ]
     },
     {
+      "sourceId": "help:help-smartvisuals-create",
+      "id": "help-smartvisuals-create",
+      "kind": "help",
+      "label": "Create / Edit SMARTvisuals",
+      "blurb": "Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photogr",
+      "href": "./master-admin.html",
+      "phrases": [
+        "create / edit smartvisuals",
+        "create or edit a smartstencil or smartbackground draft. name is required. smartstencils must be svg. smartbackgrounds accept svg jpeg png or webp. files are san",
+        "create smartbackground",
+        "edit smartvisual",
+        "svg jpeg png webp",
+        "milan background",
+        "submit for review",
+        "art upload",
+        "create / edit",
+        "smartvisual studio",
+        "help-smartvisuals-create"
+      ]
+    },
+    {
       "sourceId": "help:help-smartvisuals-notification",
       "id": "help-smartvisuals-notification",
       "kind": "help",
@@ -2835,6 +2856,26 @@
         "labeled ad",
         "open search",
         "help-smartvisuals-notification"
+      ]
+    },
+    {
+      "sourceId": "help:help-smartvisuals-place-assign",
+      "id": "help-smartvisuals-place-assign",
+      "kind": "help",
+      "label": "Place SMARTview stencil, background, and tags",
+      "blurb": "Assign a published SMARTstencil and SMARTbackground to Place SMARTview cards of one type (venue, restaurant, hotel, event, travel). Tags stay with that assignment so operators can filter cards. SOS2FA and a reason are required to save. Patrons still only see published registry ar",
+      "href": "./master-admin.html",
+      "phrases": [
+        "place smartview stencil background and tags",
+        "assign a published smartstencil and smartbackground to place smartview cards of one type venue restaurant hotel event travel . tags stay with that assignment so",
+        "place smartview stencil",
+        "smartbackground assignment",
+        "smartview tags",
+        "change stencil",
+        "change card background",
+        "filter by tag",
+        "smartvisual studio",
+        "help-smartvisuals-place-assign"
       ]
     },
     {
@@ -2864,16 +2905,22 @@
       "id": "help-smartvisuals-studio",
       "kind": "help",
       "label": "SMARTvisual Studio",
-      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Preview in Place SMARTview shows the compact club/place card. Use as Place SMARTview background writes a published SMARTbackground (SOS2FA + reason) s",
+      "blurb": "SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Save uses the same Entity Management SOS2FA session as other Master Admin saves — do not request a new code if already unlocked. Search and preview packaged art as images. Preview in Place SMAR",
       "href": "./master-admin.html",
       "phrases": [
         "smartvisual studio",
-        "smartvisual studio is the master admin library for smartstencils and smartbackgrounds. search and preview packaged art as images. preview in place smartview sho",
+        "smartvisual studio is the master admin library for smartstencils and smartbackgrounds. save uses the same entity management sos2fa session as other master admin",
         "asset registry",
         "smartvisuals library",
         "publish stencil",
+        "review publish",
+        "publish smartbackground",
+        "milan webp",
         "place smartview background",
+        "place smartview stencil",
+        "smartview tags",
         "venue card background",
+        "jpeg png webp",
         "help-smartvisuals-studio"
       ]
     },
@@ -4637,6 +4684,23 @@
       ]
     },
     {
+      "sourceId": "intent:help-smartvisuals-create",
+      "id": "help-smartvisuals-create",
+      "kind": "help",
+      "label": "Create / Edit SMARTvisuals",
+      "blurb": "Master Admin Create / Edit drafts. Name is required. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP.",
+      "href": "./botdee.html",
+      "phrases": [
+        "create / edit smartvisuals",
+        "master admin create / edit drafts. name is required. smartbackgrounds accept svg jpeg png or webp.",
+        "create smartbackground",
+        "edit smartvisual",
+        "art upload",
+        "svg jpeg png webp",
+        "help-smartvisuals-create"
+      ]
+    },
+    {
       "sourceId": "intent:help-smartvisuals-notification",
       "id": "help-smartvisuals-notification",
       "kind": "help",
@@ -4654,6 +4718,22 @@
         "smartstencils",
         "smartbackgrounds",
         "help-smartvisuals-notification"
+      ]
+    },
+    {
+      "sourceId": "intent:help-smartvisuals-place-assign",
+      "id": "help-smartvisuals-place-assign",
+      "kind": "help",
+      "label": "Place SMARTview stencil, background, and tags",
+      "blurb": "Master Admin assigns a published SMARTstencil, SMARTbackground, and tags to Place SMARTview cards.",
+      "href": "./botdee.html",
+      "phrases": [
+        "place smartview stencil background and tags",
+        "master admin assigns a published smartstencil smartbackground and tags to place smartview cards.",
+        "place smartview stencil",
+        "smartview tags",
+        "change card background",
+        "help-smartvisuals-place-assign"
       ]
     },
     {

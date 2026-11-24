@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.064";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.064";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.067";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.067";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,13 +223,56 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
-      version: "s3.3.064",
-      title: "s3.3.064 — Patron merge card on Duplicate Records only; one Find patron per column",
+      version: "s3.3.068",
+      title: "s3.3.068 — Patron merge card on Duplicate Records only; one Find patron per column",
       checks: [
         {label:"Merge card inside Duplicate Records", file:"master-admin.html", includes:["id=\"duplicateRecords\"", "id=\"patronAccountMerge\"", "patron-merge-col", "patronMergeLookupSurvivorBtn"]},
         {label:"Hash alias to Duplicate Records", file:"master-admin-app.js", includes:["patronAccountMerge", "duplicateRecords"]},
         {label:"Operator-neutral chrome", file:"floqr-i18n.js", includes:["until a Master Admin confirms"], notIncludes:["until Don confirms"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-064-patron-merge-chrome"]}
+      ]
+    },
+    {
+      version: "s3.3.067",
+      title: "s3.3.067 — SMARTvisual Studio Review / Publish",
+      checks: [
+        {label:"Studio Review Publish CTA", file:"smartvisuals-studio.js", includes:["id=\"svStudioPublishBtn\"", "data-sv-publish-draft", "studioCallable(\"approveSmartVisualDraft\"", "function showDraftDetail"]},
+        {label:"Approve callable", file:"functions/smartvisuals-functions.js", includes:["exports.approveSmartVisualDraft", "smartvisual.approve", "catalogAssetId"]},
+        {label:"Index export", file:"functions/index.js", includes:["approveSmartVisualDraft"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-067-smartvisuals-studio-review-publish"]}
+      ]
+    },
+    {
+      version: "s3.3.066",
+      title: "s3.3.066 — Place SMARTview stencil, background, and tags",
+      checks: [
+        {label:"Place card stencil + tags", file:"botdee-smartview.js", includes:["botdee-sv-place-stencil", "placeTagHtml", "smartStencilId"]},
+        {label:"Studio Place assign", file:"smartvisuals-studio.js", includes:["function assignPlaceVisual", "svStudioPlaceStencil", "svStudioPlaceTags", "getSessionId?.(SOS_SCOPE)"], notIncludes:["SPAAVS_SAMPLE"]},
+        {label:"Resolver explicit stencil/tags", file:"smartvisuals-resolver.js", includes:["normalizeSmartViewTags", "explicitPlaceStencilId", "smartTags"]},
+        {label:"Headless still has no SPAAVS sample", file:"botdee-smartview-headless.js", includes:["tagFromSearch", "stampPlaceVisual"], notIncludes:["SPAAVS_SAMPLE", "ENTITY_RULES"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-066-place-smartview-stencil-tags"]}
+      ]
+    },
+    {
+      version: "s3.3.065",
+      title: "s3.3.065 — SMARTvisual Studio SOS2FA session on Save",
+      checks: [
+        {label:"Studio getSessionId", file:"smartvisuals-studio.js", includes:["getSessionId?.(SOS_SCOPE)", "function studioCallable(", "getIdToken(true)", "publishSmartVisualDraft"]},
+        {label:"Studio SOS2FA gate", file:"sos2fa.js", includes:["\"smartvisualStudio\"", "sessionId: (scope) => getSessionId"]},
+        {label:"Master Admin panel list", file:"master-admin-app.js", includes:["\"smartvisualStudio\""]},
+        {label:"Headless host has no SPAAVS sample", file:"botdee-smartview-headless.html", includes:["data-floqr-public", "FLOQRBotDeeSmartView.mount"], notIncludes:["Load SPAAVS sample", "SPAAVS_SAMPLE"]},
+        {label:"Headless parser has no SPAAVS entity rules", file:"botdee-smartview-headless.js", includes:["cardsFromAuthorizedText", "fallbackCard"], notIncludes:["SPAAVS_SAMPLE", "Robotaxi fleet", "Mobility Hub"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-065-smartvisuals-studio-sos2fa", "s3-3-064-headless-smartview-no-spaavs"]}
+      ]
+    },
+    {
+      version: "s3.3.064",
+      title: "s3.3.064 — SMARTvisual Studio Create/Edit JPEG/PNG/WebP backgrounds",
+      checks: [
+        {label:"Create/Edit help + Art upload", file:"master-admin.html", includes:["help-smartvisuals-create", "sv.studioUploadLabel", "image/jpeg,image/png,image/webp"]},
+        {label:"Studio readUpload raster path", file:"smartvisuals-studio.js", includes:["function readUpload", "imageBase64", "stencil-requires-svg"]},
+        {label:"Server media sanitizer", file:"functions/smartvisuals-svg-sanitize.js", includes:["sanitizeSmartVisualUpload", "image/webp", "stencil-requires-svg"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-064-smartvisuals-studio-upload"]}
       ]
     },
     {
@@ -239,7 +282,9 @@
         {label:"Place card renderer", file:"botdee-smartview.js", includes:["function renderPlaceCard(", "botdee-sv-place", "resolvePlaceCard"]},
         {label:"Place card CSS", file:"botdee-smartview.css", includes:["--sv-place-bg", ".botdee-sv-place-chrome"]},
         {label:"Studio Place preview/assign", file:"smartvisuals-studio.js", includes:["previewPlaceCard", "placeSmartView:", "setSmartVisualOverride"]},
-        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-063-place-smartview-compact"]}
+        {label:"Headless SMARTview host", file:"botdee-smartview-headless.html", includes:["data-floqr-public", "FLOQRBotDeeSmartView.mount"]},
+        {label:"Headless authorized-text cards", file:"botdee-smartview-headless.js", includes:["cardsFromAuthorizedText", "fallbackCard"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-063-place-smartview-compact", "s3-3-063-headless-smartview"]}
       ]
     },
     {
@@ -3843,10 +3888,46 @@
       id:"s3-3-038-smartvisuals-studio",
       area:"Master Admin",
       feature:"SMARTvisual Studio",
-      changed:"Master Admin → SMARTvisual Studio lists 26 stencils + 34 backgrounds, tagging examples (Cancun / Paris Fashion Week / dining / Seattle LA / San Dego / Burningman), SVG sanitizer + SOS2FA + reason on draft submit. Ads tab previews mock fill from authorized tags; AdSense not loaded. Drafts never appear on Search.",
-      howToTest:"1) Sign in as Master Admin. Open https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio. 2) Library shows published kit art as images. Search/filter works. 3) Tagging & Resolver: Cancun Trip → travel/flight + Fly to Cancun ad; Paris Fashion Week → fashion; Dinner reservations → dining; Seattle LA → collision/neutral generic ad; San Dego → San Diego; Burningman → burning-man without official affiliation. 4) Create: upload an SVG with <script> — rejected. Valid SVG + name + license → reason prompt; without SOS2FA, Functions deny and the git registry is unchanged. 5) Ads tab shows mockFill true, AdSense off, and sample banners. 6) Preview in Search SMARTnotification opens ?smartvisualInvite=cancun. 7) Mark Succeed/Failed. Studio draft persist needs Functions deploy.",
+      changed:"Master Admin → SMARTvisual Studio lists 26 stencils + 34 backgrounds, tagging examples (Cancun / Paris Fashion Week / dining / Seattle LA / San Dego / Burningman), media sanitizer + SOS2FA + reason on draft submit. Ads tab previews mock fill from authorized tags; AdSense not loaded. Drafts never appear on Search.",
+      howToTest:"1) Sign in as Master Admin. Open https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio. 2) Library shows published kit art as images. Search/filter works. 3) Tagging & Resolver: Cancun Trip → travel/flight + Fly to Cancun ad; Paris Fashion Week → fashion; Dinner reservations → dining; Seattle LA → collision/neutral generic ad; San Dego → San Diego; Burningman → burning-man without official affiliation. 4) Create: upload an SVG with <script> — rejected. Valid SVG + name → reason prompt; without SOS2FA, Functions deny and the git registry is unchanged. 5) Ads tab shows mockFill true, AdSense off, and sample banners. 6) Preview in Search SMARTnotification opens ?smartvisualInvite=cancun. 7) Mark Succeed/Failed. Studio draft persist needs Functions deploy.",
       expected:"Studio is Master Admin only. Patrons only see published registry assets. Malicious SVG never publishes. Ads are labeled mock samples, not AdSense.",
       troubleshoot:"Empty library → smartvisuals/catalog.json missing on the served origin. Submit succeeded without SOS2FA → stop; publishSmartVisualDraft must assertAdmin. Script SVG accepted → sanitizer not wired. Search overlay missing after Preview → index.html host or smartvisuals-view.js cache. Blank Ad chrome → selectAd not wired."
+    },
+    {
+      id:"s3-3-064-smartvisuals-studio-upload",
+      area:"Master Admin",
+      feature:"SMARTvisual Studio Create/Edit — JPEG/PNG/WebP",
+      changed:"Create/Edit and Milan preview ? now have help for the remaining form (name + upload types). Rights / source is not a submit field. Art upload is not SVG-only: SMARTbackgrounds accept SVG, JPEG, PNG, and WebP; SMARTstencils stay SVG. Server sanitizeSmartVisualUpload matches the client types.",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js and floqr-i18n-help.js ?v=s3.3.064. Sign in as Master Admin. 2) Open Create / Edit. Tap the heading ? — Create / Edit SMARTvisuals help (name required; SMARTbackgrounds SVG/JPEG/PNG/WebP; stencils SVG), not an empty popout. There is no Rights / source field. 3) Control label is Art upload, not SVG upload. File picker accept includes jpeg/png/webp. Pick a .webp or .jpg SMARTbackground — must not show File rejected: not-svg. Pick SVG with <script> — rejected. SMARTstencil + JPEG — stencil-requires-svg. 4) Open Library → Milan. The preview ? has the same Create/Edit help. 5) Functions deploy needed for a real draft persist. Mark Succeed/Failed.",
+      expected:"Create/Edit and Milan ? show help. Rights / source is gone. JPEG, PNG, and WebP SMARTbackgrounds are not rejected as not-svg. Stencils stay SVG. Display URLs have no ?v=.",
+      troubleshoot:"Empty ? → cached master-admin.html / botdee-help-repository.js / floqr-i18n-help.js. JPEG still not-svg → client still file.text()+SVG sniff, or Functions still sanitizeSvg only (needs [firebase-deploy] [firebase-deploy-smartvisuals]). WebP works locally but callable denies → Functions not this SHA. Stencil JPEG accepted → stop; stencil-requires-svg must fire. Rights / source still on the form → this SHA not served. 'Entity Management requires a valid SOS2FA session' after Save → live Studio still calls FLOQRSOS2FA.sessionId() (needs s3.3.065). Unlock SOS2FA on Studio, then Save."
+    },
+    {
+      id:"s3-3-066-place-smartview-stencil-tags",
+      area:"BOT DEE",
+      feature:"Place SMARTview stencil, background, and tags",
+      changed:"Operators can change the SMARTstencil and SMARTbackground on compact Place SMARTview cards and assign tags (persist on smartVisualOverrides, filter in Studio / Features catalog / headless ?tag=). Compact density stays: 28px chrome, 28px stencil, tag chips. SPAAVS sample cards stay removed. SOS2FA still uses getSessionId('entityManagement').",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js / botdee-smartview.js / botdee-smartview.css ?v=s3.3.066. 2) Library: filter by a tag chip. Open a published SMARTbackground or SMARTstencil. Place card type, SMARTbackground, SMARTstencil, and Tags are on the detail. Preview in Place SMARTview — compact Aurelia-style card with illustration, 28px stencil, tag chips, no photo well. 3) Save Place SMARTview assignment needs SOS2FA + reason (Functions deploy pending until Don asks). 4) Open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive — one compact card, no Load SPAAVS sample. 5) Features SMARTview catalog shows category tags and a tag filter. 6) Phone ~390 and desktop ~1280. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Studio can change stencil and background on the compact Place card and attach tags. Headless still mints one generic card, not four SPAAVS cards. Features catalog is the eight-product SMARTview, not Room SMARTvisuals.",
+      troubleshoot:"No stencil/tag on the card → cached botdee-smartview.js/css before this SHA, or catalog.json not loaded (ensureCatalog). Save still background-only → cached smartvisuals-studio.js. Four SPAAVS cards → cached headless JS. Features page missing tag chips → cached floqr-features-smartview.js. Studio save SOS2FA sentence → unlock Entity Management first. Live venue chat unchanged after Save → Functions deploy of setSmartVisualOverride / executeBotSession pending."
+    },
+    {
+      id:"s3-3-067-smartvisuals-studio-review-publish",
+      area:"Master Admin",
+      feature:"SMARTvisual Studio Review / Publish",
+      changed:"Review / Publish listed queued Milan.webp drafts with no Publish button, so Asset detail stayed on the old packaged illustration. Selecting a row now fills Asset detail with that file. Publish is visible after select and on each queued row (not hidden solely because SOS2FA is locked). Publish runs SOS2FA + FLOQRReasonPrompt then approveSmartVisualDraft.",
+      howToTest:"1) After Pages publish (Don merge), hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js / smartvisuals-studio.css / floqr-i18n.js ?v=s3.3.067. Functions deploy of approveSmartVisualDraft is required for the save. 2) Sign in as Master Admin. Unlock Entity Management SOS2FA if needed — do not request a new code if already unlocked. 3) Open Review / Publish. Queued SMARTbackground drafts (Milan.webp) list with a Publish button on each row. 4) Click a row — Asset detail shows the WebP photo, not the old Milan illustration. Toolbar Publish enables. 5) Press Publish. Reason prompt. Save. Status: Published {id}. Asset detail shows this file. 6) Mark Succeed/Failed.",
+      expected:"Master Admin can publish a queued SMARTbackground from Review / Publish. Asset detail shows the selected photo. SOS2FA + reason required. Patrons still use git registry until Pages ships the file. Display URLs have no ?v=.",
+      troubleshoot:"No Publish button → cached smartvisuals-studio.js before s3.3.067. Button present but disabled and Asset detail still illustration → click the draft row first. SOS2FA sentence → unlock Entity Management; Studio uses getSessionId. Callable not-found → Functions deploy of approveSmartVisualDraft pending. Publish succeeded but live Search still old illustration → expected until Pages ships git registry; Studio overlay is Master Admin only."
+    },
+    {
+      id:"s3-3-065-smartvisuals-studio-sos2fa",
+      area:"Master Admin",
+      feature:"SMARTvisual Studio SOS2FA session on Save",
+      changed:"Milan.webp was not rejected. Live Studio called FLOQRSOS2FA.sessionId() which does not exist, so publishSmartVisualDraft sent an empty sos2faSessionId and Functions returned permission-denied 'Entity Management requires a valid SOS2FA session.' Studio now uses getSessionId('entityManagement'), refreshes the ID token, and passes sos2faSessionId on publishSmartVisualDraft / classifySmartVisual. A valid session is reused — no new code request.",
+      howToTest:"1) Hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js, sos2fa.js, and master-admin-app.js ?v=s3.3.066. 2) Sign in as Master Admin. If SOS2FA is already unlocked from Entity Management, do not Request SOS2FA Code again — Studio must reuse that session. 3) Create / Edit: Name Milan, type SMARTbackground, Art upload Milan.webp. Submit. Reason prompt. Save. Status should be Draft queued for review, not 'Entity Management requires a valid SOS2FA session.' 4) Mark Succeed/Failed.",
+      expected:"WebP SMARTbackground saves to smartVisualDrafts after SOS2FA unlock + reason. Empty session never reaches the reason prompt. Display URLs have no ?v=.",
+      troubleshoot:"Same SOS2FA sentence after Save → cached smartvisuals-studio.js still has sessionId()?. Unlock first. Session expired (different sentence: 'SOS2FA session expired') → Request a new SOS2FA code. File rejected → not this bug; check type SMARTbackground and RIFF/WEBP magic. No Functions redeploy needed for this client fix."
     },
     {
       id:"s3-3-063-place-smartview-compact",
@@ -3856,6 +3937,24 @@
       howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / botdee-smartview.css ?v=s3.3.063. Sign in with BOT DEE access. 2) Ask for Aurelia (FLOQR demo club) or clubs in Washington DC. Expect a tight card: kind + Aurelia, two-line blurb, FLOQR 4.8, Open FLOQR Public Page. Chrome icon is 28px, not a full-width empty well. Scenic art is illustration behind the copy, not black empty. 3) Master Admin → SMARTvisual Studio → pick a published SMARTbackground → Preview in Place SMARTview. Optionally Use as Place SMARTview background (SOS2FA + reason). 4) Phone ~390 and desktop ~1280. Display URLs have no ?v=. 5) Mark Succeed/Failed. Live override stamp needs Functions deploy of executeBotSession / attachVenueSearch.",
       expected:"Compact Place card with SMARTbackground. No giant empty media well. Studio can preview and assign the background. Features SMARTview catalog page is unchanged.",
       troubleshoot:"Still a tall empty well → cached botdee-smartview.css / .js before renderPlaceCard, or Master Admin mock catalog still serving chrome JPG images (needs this SHA). Black with no illustration → catalog.json not loaded (ensureCatalog) or Functions not stamping smartBackgroundId and city classify missed. Studio assign saved but chat unchanged → Functions deploy pending; packaged city/kind defaults still apply on Pages. Assigned Features SMARTview by mistake → wrong surface (features-smartview.html)."
+    },
+    {
+      id:"s3-3-064-headless-smartview-no-spaavs",
+      area:"BOT DEE",
+      feature:"SPAAVS sample cards removed from headless SMARTview",
+      changed:"botdee-smartview-headless.html no longer mints Product SPAAVS / Travel Mobility Hub / Product Autonomous docking equipment / Vehicle Robotaxi fleet from the SPAAVS Mobility Hub sentence. Load SPAAVS sample is gone. The public host still paints one compact fallback card from pasted authorized text.",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive until botdee-smartview-headless.js?v=s3.3.066 and the page has no Load SPAAVS sample button. No sign-in. 2) Open the old SPAAVS q= URL if you still have it — do not expect four cards titled SPAAVS, Mobility Hub, Autonomous docking equipment, Robotaxi fleet. 3) Interactive: paste a short authorized sentence (not that SPAAVS sample), tap Render SMARTview — one compact card, 28px chrome, no photo well, no invented ratings or dates. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html.",
+      expected:"The four SPAAVS sample cards are gone. Host stays public. Generic authorized text still renders one compact SMARTview. Display URLs unchanged.",
+      troubleshoot:"Still four SPAAVS cards → cached botdee-smartview-headless.js from before this SHA. Hard-refresh. 404 → wrong URL. Load SPAAVS sample still visible → cached HTML. Empty host on generic paste → q= missing or prompt-injection filter hit (URLs are ignored)."
+    },
+    {
+      id:"s3-3-063-headless-smartview",
+      area:"BOT DEE",
+      feature:"Headless SMARTview from authorized text",
+      changed:"Public botdee-smartview-headless.html turns authorized text into compact Place/info SMARTview cards (fixed template, SMARTbackground, no photo well). Query ?mode=headless&q=… needs no Search sign-in. Not Features catalog. Gemini off. The SPAAVS four-card sample is retired; see s3-3-064-headless-smartview-no-spaavs.",
+      howToTest:"1) After Pages publish, open https://jadzadco.github.io/shoutout-demo/botdee-smartview-headless.html?mode=interactive. Hard-refresh until botdee-smartview-headless.js?v=s3.3.066 and there is no Load SPAAVS sample button. No sign-in. 2) Paste a short authorized sentence and tap Render SMARTview. Expect one compact card (kind + name, two-line blurb, scenic SMARTbackground, 28px chrome). No photo well. No invented ratings. 3) Confirm there is no four-card SPAAVS mint. 4) Phone ~390. 5) Mark Succeed/Failed. Do not use Search or features-smartview.html.",
+      expected:"Public headless host still renders compact SMARTview from authorized text. SPAAVS sample cards are not present. Sign-in not required. Display URLs unchanged (this host is not an LED board).",
+      troubleshoot:"404 → Pages still on a SHA before botdee-smartview-headless.html. Empty host → cached page without the module, or q= missing. Tall photo well → cached botdee-smartview.css before compact Place template. Four SPAAVS cards → cached JS from before this SHA. Cards on Search / Features catalog → wrong URL."
     },
     {
       id:"s3-3-040-people-alias-match",
