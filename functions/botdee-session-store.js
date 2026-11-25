@@ -963,7 +963,7 @@ async function attachSession({uid, token, roomId, conversationId, actorEmail, ac
   if (!core.isCurrentMember(live.data, actor) && core.text(live.data.hostUid, 80) !== actor) {
     return {ok: false, error: "not_member"};
   }
-  if (core.scheduleStartDue(live.data, now) && !core.roomIsOpen(live.data, now)) {
+  if (!core.roomIsOpen(live.data, now)) {
     const started = await startRoom({
       uid: actor,
       roomId: live.id,

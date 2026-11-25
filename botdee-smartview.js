@@ -1228,7 +1228,7 @@
     const liveOpen = String(view.status || "") === "open" || (view.hasActiveRoom === true && !scheduled);
     const activeRoom = liveOpen || scheduled || view.hasActiveRoom === true || view.lifecycle === "active" || !!view.roomId;
     const viewerHost = view.viewerIsHost !== false;
-    const guestPending = scheduled && view.viewerIsHost === false;
+    const guestPending = scheduled && view.viewerIsHost === false && !view.hasActiveRoom && !view.roomId;
     const scheduleLabel = view.scheduledLabel || formatScheduleLabel(view.scheduledStartMs, view.scheduledTimeZone);
     const visual = roomVisual(view);
     const visualHero = visual ? `<div class="sv-hero botdee-sv-visual" data-sv-reason="${esc(visual.reasonCode || "neutral-fallback")}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}">

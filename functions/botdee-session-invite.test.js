@@ -420,10 +420,13 @@ test("Search Join Now attaches the existing BOT DEE session for group chat", () 
   assert.match(store, /function loadMemberTurns/);
   assert.match(store, /alreadyMember: true/);
   assert.match(store, /scheduleStartDue/);
+  assert.match(store, /if \(!core\.roomIsOpen\(live\.data, now\)\) \{\s*const started = await startRoom/);
   assert.match(store, /publicSearchParticipants/);
   assert.match(store, /persistActorRoom\(actor, live\.id, conversationId \|\| live\.data\.conversationId\);\s*return \{ok: true, room: core\.publicRoom\(live\.id, live\.data\), alreadyOpen: true\}/);
   assert.match(session, /attachSession/);
   assert.match(session, /stored\.joinedRoomId !== joinRoomId/);
+  assert.match(session, /replyKey: joined\.waiting \? "botdee\.rs\.joinedWaiting" : "botdee\.rs\.joined"/);
+  assert.doesNotMatch(session, /joined\.waiting \? "botdee\.rs\.notLiveNote"/);
   assert.match(chat, /completeSearchJoin/);
   assert.match(chat, /startGroupSessionPoll/);
   assert.match(chat, /function attachRoomSession/);
@@ -435,6 +438,7 @@ test("Search Join Now attaches the existing BOT DEE session for group chat", () 
   assert.match(card, /attachRoomSession/);
   assert.match(card, /conversationId: roomConversationId\(\)/);
   assert.match(card, /Type in this BOT DEE room/);
+  assert.match(card, /guestPending = scheduled && view\.viewerIsHost === false && !view\.hasActiveRoom && !view\.roomId/);
   assert.match(view, /BOT DEE Room Invitation/);
   assert.match(view, /Use BOT DEE to:/);
   assert.doesNotMatch(view, /Use Mingl chat to work with BOT DEE/);

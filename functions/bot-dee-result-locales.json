@@ -161,19 +161,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Mingl-Freunde einladen",
-          "blurb": "Nach Confirm (Join Now oder Set a schedule) zeigt Invite nur deine Mingl-Freunde. Tippe einen Freund oder schreibe Invite lorna — Inbox erhält Review BOT DEE invite. Der Chip bleibt grau mit Invite sent — ein zweites Tippen sendet keine zweite Einladung. Das ist ein Room SMARTvie"
+          "blurb": "Nach Confirm (Join Now oder Set a schedule) zeigt Invite nur deine Mingl-Freunde. Tippe einen Freund oder schreibe Invite lorna — Inbox erhält Review BOT DEE invite. Nach Invite sent bleiben Sie in diesem BOT DEE-Raum und schreiben dort — das ist der Gruppenchat. Sie tippen Inbox"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Mingl-Freunde einladen",
-          "blurb": "Nach Confirm (Join Now oder Set a schedule) zeigt Invite nur deine Mingl-Freunde. Tippe einen Freund oder schreibe Invite lorna — Inbox erhält Review BOT DEE invite. Der Chip bleibt grau mit Invite sent — ein zweites Tippen sendet keine zweite Einladung. Das ist ein Room SMARTvie"
+          "blurb": "Nach Confirm (Join Now oder Set a schedule) zeigt Invite nur deine Mingl-Freunde. Tippe einen Freund oder schreibe Invite lorna — Inbox erhält Review BOT DEE invite. Nach Invite sent bleiben Sie in diesem BOT DEE-Raum und schreiben dort — das ist der Gruppenchat. Sie tippen Inbox"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Einer BOT DEE-Sitzung beitreten",
-          "blurb": "Öffne die Inbox-Einladung oder Search Join Now, angemeldet als der Mingl-Freund, dem sie gilt. Join Now öffnet BOT DEE, nicht Mingl chat. Du und eingeladene Mingl-Freunde teilt den Room SMARTview-Gruppenchat; Namen sehen Mitglieder. Falsches Konto, Ablauf oder Widerruf lehnt ab. "
+          "blurb": "Öffne die Inbox-Einladung (Review BOT DEE invite) oder Search Join Now, angemeldet als der Mingl-Freund, dem sie gilt. Join Now öffnet BOT DEE (botdee.html?room=, nicht Mingl chat). Schreibe in diesem BOT DEE-Raum — das ist der Room SMARTview-Gruppenchat. Du und eingeladene Mingl"
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "Einer BOT DEE-Sitzung beitreten",
-          "blurb": "Öffne die Inbox-Einladung oder Search Join Now, angemeldet als der Mingl-Freund, dem sie gilt. Join Now öffnet BOT DEE, nicht Mingl chat. Du und eingeladene Mingl-Freunde teilt den Room SMARTview-Gruppenchat; Namen sehen Mitglieder. Falsches Konto, Ablauf oder Widerruf lehnt ab. "
+          "blurb": "Öffne die Inbox-Einladung (Review BOT DEE invite) oder Search Join Now, angemeldet als der Mingl-Freund, dem sie gilt. Join Now öffnet BOT DEE (botdee.html?room=, nicht Mingl chat). Schreibe in diesem BOT DEE-Raum — das ist der Room SMARTview-Gruppenchat. Du und eingeladene Mingl"
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beenden",
@@ -1304,19 +1304,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Inviter des amis Mingl",
-          "blurb": "Après Confirm (Join Now ou Set a schedule), Invite n’affiche que vos amis Mingl. Touchez un ami ou tapez Invite lorna — Inbox reçoit Review BOT DEE invite. La puce reste grisée avec Invite sent — un second tap n’envoie pas une deuxième invitation. C’est une commande Room SMARTvie"
+          "blurb": "Après Confirm (Join Now ou Set a schedule), Invite n’affiche que vos amis Mingl. Touchez un ami ou tapez Invite lorna — Inbox reçoit Review BOT DEE invite. Après Invite sent, restez dans cette salle BOT DEE et tapez — c’est le chat de groupe. Ils ouvrent Inbox Review BOT DEE invi"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Inviter des amis Mingl",
-          "blurb": "Après Confirm (Join Now ou Set a schedule), Invite n’affiche que vos amis Mingl. Touchez un ami ou tapez Invite lorna — Inbox reçoit Review BOT DEE invite. La puce reste grisée avec Invite sent — un second tap n’envoie pas une deuxième invitation. C’est une commande Room SMARTvie"
+          "blurb": "Après Confirm (Join Now ou Set a schedule), Invite n’affiche que vos amis Mingl. Touchez un ami ou tapez Invite lorna — Inbox reçoit Review BOT DEE invite. Après Invite sent, restez dans cette salle BOT DEE et tapez — c’est le chat de groupe. Ils ouvrent Inbox Review BOT DEE invi"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Rejoindre une session BOT DEE",
-          "blurb": "Ouvrez l’invitation Inbox ou Search Join Now connecté comme l’ami Mingl destinataire. Join Now ouvre BOT DEE, pas Mingl chat. Vous et les amis Mingl invités partagez le chat de groupe Room SMARTview ; les noms s’affichent pour les membres. Mauvais compte, expiration ou révocation"
+          "blurb": "Ouvrez l’invitation Inbox (Review BOT DEE invite) ou Search Join Now connecté comme l’ami Mingl destinataire. Join Now ouvre BOT DEE (botdee.html?room=, pas Mingl chat). Tapez dans cette salle BOT DEE — c’est le chat de groupe Room SMARTview. Vous et les amis Mingl invités le par"
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "Rejoindre une session BOT DEE",
-          "blurb": "Ouvrez l’invitation Inbox ou Search Join Now connecté comme l’ami Mingl destinataire. Join Now ouvre BOT DEE, pas Mingl chat. Vous et les amis Mingl invités partagez le chat de groupe Room SMARTview ; les noms s’affichent pour les membres. Mauvais compte, expiration ou révocation"
+          "blurb": "Ouvrez l’invitation Inbox (Review BOT DEE invite) ou Search Join Now connecté comme l’ami Mingl destinataire. Join Now ouvre BOT DEE (botdee.html?room=, pas Mingl chat). Tapez dans cette salle BOT DEE — c’est le chat de groupe Room SMARTview. Vous et les amis Mingl invités le par"
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Terminer Room SMARTview",
@@ -2447,19 +2447,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Invitar amigos Mingl",
-          "blurb": "Tras Confirm (Join Now o Set a schedule), Invite muestra solo tus amigos Mingl. Toque un amigo o escriba Invite lorna — Inbox recibe Review BOT DEE invite. El chip se queda gris con Invite sent — un segundo toque no envía otra invitación. Es un comando de Room SMARTview, no VIP r"
+          "blurb": "Tras Confirm (Join Now o Set a schedule), Invite muestra solo tus amigos Mingl. Toque un amigo o escriba Invite lorna — Inbox recibe Review BOT DEE invite. Tras Invite sent, quédate en esta sala BOT DEE y escribe — ese es el chat grupal. Abren Inbox Review BOT DEE invite o Search"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Invitar amigos Mingl",
-          "blurb": "Tras Confirm (Join Now o Set a schedule), Invite muestra solo tus amigos Mingl. Toque un amigo o escriba Invite lorna — Inbox recibe Review BOT DEE invite. El chip se queda gris con Invite sent — un segundo toque no envía otra invitación. Es un comando de Room SMARTview, no VIP r"
+          "blurb": "Tras Confirm (Join Now o Set a schedule), Invite muestra solo tus amigos Mingl. Toque un amigo o escriba Invite lorna — Inbox recibe Review BOT DEE invite. Tras Invite sent, quédate en esta sala BOT DEE y escribe — ese es el chat grupal. Abren Inbox Review BOT DEE invite o Search"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Unirse a una sesión BOT DEE",
-          "blurb": "Abre la invitación de Inbox o Search Join Now iniciado sesión como el amigo Mingl destinatario. Join Now abre BOT DEE, no Mingl chat. Tú y los amigos Mingl invitados compartís el chat de grupo Room SMARTview; los nombres se ven para miembros. Cuenta incorrecta, caducada o revocad"
+          "blurb": "Abre la invitación de Inbox (Review BOT DEE invite) o Search Join Now iniciado sesión como el amigo Mingl destinatario. Join Now abre BOT DEE (botdee.html?room=, no Mingl chat). Escribe en esa sala BOT DEE — ese es el chat de grupo Room SMARTview. Tú y los amigos Mingl invitados "
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "Unirse a una sesión BOT DEE",
-          "blurb": "Abre la invitación de Inbox o Search Join Now iniciado sesión como el amigo Mingl destinatario. Join Now abre BOT DEE, no Mingl chat. Tú y los amigos Mingl invitados compartís el chat de grupo Room SMARTview; los nombres se ven para miembros. Cuenta incorrecta, caducada o revocad"
+          "blurb": "Abre la invitación de Inbox (Review BOT DEE invite) o Search Join Now iniciado sesión como el amigo Mingl destinatario. Join Now abre BOT DEE (botdee.html?room=, no Mingl chat). Escribe en esa sala BOT DEE — ese es el chat de grupo Room SMARTview. Tú y los amigos Mingl invitados "
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
@@ -3590,19 +3590,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Invita amici Mingl",
-          "blurb": "Dopo Confirm (Join Now o Set a schedule), Invite mostra solo i tuoi amici Mingl. Tocca un amico o scrivi Invite lorna — Inbox riceve Review BOT DEE invite. Il chip resta grigio con Invite sent — un secondo tocco non invia un secondo invito. È un comando Room SMARTview, non VIP re"
+          "blurb": "Dopo Confirm (Join Now o Set a schedule), Invite mostra solo i tuoi amici Mingl. Tocca un amico o scrivi Invite lorna — Inbox riceve Review BOT DEE invite. Dopo Invite sent resta in questa stanza BOT DEE e scrivi — è la chat di gruppo. Aprono Inbox Review BOT DEE invite oppure Se"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Invita amici Mingl",
-          "blurb": "Dopo Confirm (Join Now o Set a schedule), Invite mostra solo i tuoi amici Mingl. Tocca un amico o scrivi Invite lorna — Inbox riceve Review BOT DEE invite. Il chip resta grigio con Invite sent — un secondo tocco non invia un secondo invito. È un comando Room SMARTview, non VIP re"
+          "blurb": "Dopo Confirm (Join Now o Set a schedule), Invite mostra solo i tuoi amici Mingl. Tocca un amico o scrivi Invite lorna — Inbox riceve Review BOT DEE invite. Dopo Invite sent resta in questa stanza BOT DEE e scrivi — è la chat di gruppo. Aprono Inbox Review BOT DEE invite oppure Se"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Unisciti a una sessione BOT DEE",
-          "blurb": "Apri l’invito Inbox o Search Join Now autenticato come l’amico Mingl destinatario. Join Now apre BOT DEE, non Mingl chat. Tu e gli amici Mingl invitati condividete la chat di gruppo Room SMARTview; i nomi sono visibili ai membri. Account sbagliato, scaduto o revocato rifiuta. Ent"
+          "blurb": "Apri l’invito Inbox (Review BOT DEE invite) o Search Join Now autenticato come l’amico Mingl destinatario. Join Now apre BOT DEE (botdee.html?room=, non Mingl chat). Scrivi in quella stanza BOT DEE — è la chat di gruppo Room SMARTview. Tu e gli amici Mingl invitati la condividete"
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "Unisciti a una sessione BOT DEE",
-          "blurb": "Apri l’invito Inbox o Search Join Now autenticato come l’amico Mingl destinatario. Join Now apre BOT DEE, non Mingl chat. Tu e gli amici Mingl invitati condividete la chat di gruppo Room SMARTview; i nomi sono visibili ai membri. Account sbagliato, scaduto o revocato rifiuta. Ent"
+          "blurb": "Apri l’invito Inbox (Review BOT DEE invite) o Search Join Now autenticato come l’amico Mingl destinatario. Join Now apre BOT DEE (botdee.html?room=, non Mingl chat). Scrivi in quella stanza BOT DEE — è la chat di gruppo Room SMARTview. Tu e gli amici Mingl invitati la condividete"
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Termina Room SMARTview",
@@ -4733,19 +4733,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Convidar amigos Mingl",
-          "blurb": "Depois de Confirm (Join Now ou Set a schedule), Invite mostra só os seus amigos Mingl. Toque um amigo ou escreva Invite lorna — Inbox recebe Review BOT DEE invite. O chip fica cinzento com Invite sent — um segundo toque não envia outro convite. É um comando Room SMARTview, não VI"
+          "blurb": "Depois de Confirm (Join Now ou Set a schedule), Invite mostra só os seus amigos Mingl. Toque um amigo ou escreva Invite lorna — Inbox recebe Review BOT DEE invite. Depois de Invite sent, fique nesta sala BOT DEE e escreva — esse é o chat em grupo. Abrem Inbox Review BOT DEE invit"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Convidar amigos Mingl",
-          "blurb": "Depois de Confirm (Join Now ou Set a schedule), Invite mostra só os seus amigos Mingl. Toque um amigo ou escreva Invite lorna — Inbox recebe Review BOT DEE invite. O chip fica cinzento com Invite sent — um segundo toque não envia outro convite. É um comando Room SMARTview, não VI"
+          "blurb": "Depois de Confirm (Join Now ou Set a schedule), Invite mostra só os seus amigos Mingl. Toque um amigo ou escreva Invite lorna — Inbox recebe Review BOT DEE invite. Depois de Invite sent, fique nesta sala BOT DEE e escreva — esse é o chat em grupo. Abrem Inbox Review BOT DEE invit"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Entrar numa sessão BOT DEE",
-          "blurb": "Abra o convite do Inbox ou Search Join Now autenticado como o amigo Mingl destinatário. Join Now abre BOT DEE, não Mingl chat. Tu e os amigos Mingl convidados partilham o chat de grupo Room SMARTview; os nomes aparecem para membros. Conta errada, expirado ou revogado recusa. Entr"
+          "blurb": "Abra o convite do Inbox (Review BOT DEE invite) ou Search Join Now autenticado como o amigo Mingl destinatário. Join Now abre BOT DEE (botdee.html?room=, não Mingl chat). Escreva nessa sala BOT DEE — esse é o chat de grupo Room SMARTview. Tu e os amigos Mingl convidados partilham"
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "Entrar numa sessão BOT DEE",
-          "blurb": "Abra o convite do Inbox ou Search Join Now autenticado como o amigo Mingl destinatário. Join Now abre BOT DEE, não Mingl chat. Tu e os amigos Mingl convidados partilham o chat de grupo Room SMARTview; os nomes aparecem para membros. Conta errada, expirado ou revogado recusa. Entr"
+          "blurb": "Abra o convite do Inbox (Review BOT DEE invite) ou Search Join Now autenticado como o amigo Mingl destinatário. Join Now abre BOT DEE (botdee.html?room=, não Mingl chat). Escreva nessa sala BOT DEE — esse é o chat de grupo Room SMARTview. Tu e os amigos Mingl convidados partilham"
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Terminar Room SMARTview",
@@ -5876,19 +5876,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Пригласить друзей Mingl",
-          "blurb": "После Confirm (Join Now или Set a schedule) кнопка Invite показывает только друзей Mingl. Нажмите друга или напишите Invite lorna — Inbox получит Review BOT DEE invite. Фишка остаётся серой с Invite sent — повторное нажатие не шлёт второе приглашение. Это команда Room SMARTview, "
+          "blurb": "После Confirm (Join Now или Set a schedule) кнопка Invite показывает только друзей Mingl. Нажмите друга или напишите Invite lorna — Inbox получит Review BOT DEE invite. После Invite sent оставайтесь в этой комнате BOT DEE и пишите там — это групповой чат. Они открывают Inbox Revi"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Пригласить друзей Mingl",
-          "blurb": "После Confirm (Join Now или Set a schedule) кнопка Invite показывает только друзей Mingl. Нажмите друга или напишите Invite lorna — Inbox получит Review BOT DEE invite. Фишка остаётся серой с Invite sent — повторное нажатие не шлёт второе приглашение. Это команда Room SMARTview, "
+          "blurb": "После Confirm (Join Now или Set a schedule) кнопка Invite показывает только друзей Mingl. Нажмите друга или напишите Invite lorna — Inbox получит Review BOT DEE invite. После Invite sent оставайтесь в этой комнате BOT DEE и пишите там — это групповой чат. Они открывают Inbox Revi"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Войти в сессию BOT DEE",
-          "blurb": "Откройте приглашение Inbox или Search Join Now, войдя как друг Mingl, которому оно отправлено. Join Now открывает BOT DEE, не Mingl chat. Вы и приглашённые друзья Mingl делите групповой чат Room SMARTview; имена видят участники. Чужой аккаунт, срок и отзыв отказывают. Вход в room"
+          "blurb": "Откройте приглашение Inbox (Review BOT DEE invite) или Search Join Now, войдя как друг Mingl, которому оно отправлено. Join Now открывает BOT DEE (botdee.html?room=, не Mingl chat). Пишите в этой комнате BOT DEE — это групповой чат Room SMARTview. Вы и приглашённые друзья Mingl д"
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "Войти в сессию BOT DEE",
-          "blurb": "Откройте приглашение Inbox или Search Join Now, войдя как друг Mingl, которому оно отправлено. Join Now открывает BOT DEE, не Mingl chat. Вы и приглашённые друзья Mingl делите групповой чат Room SMARTview; имена видят участники. Чужой аккаунт, срок и отзыв отказывают. Вход в room"
+          "blurb": "Откройте приглашение Inbox (Review BOT DEE invite) или Search Join Now, войдя как друг Mingl, которому оно отправлено. Join Now открывает BOT DEE (botdee.html?room=, не Mingl chat). Пишите в этой комнате BOT DEE — это групповой чат Room SMARTview. Вы и приглашённые друзья Mingl д"
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Завершить Room SMARTview",
@@ -7019,19 +7019,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Πρόσκληση φίλων Mingl",
-          "blurb": "Μετά το Confirm (Join Now ή Set a schedule), το Invite δείχνει μόνο τους φίλους Mingl. Πατήστε έναν φίλο ή γράψτε Invite lorna — το Inbox λαμβάνει Review BOT DEE invite. Το chip μένει γκρι με Invite sent — δεύτερο πάτημα δεν στέλνει δεύτερη πρόσκληση. Είναι εντολή Room SMARTview,"
+          "blurb": "Μετά το Confirm (Join Now ή Set a schedule), το Invite δείχνει μόνο τους φίλους Mingl. Πατήστε έναν φίλο ή γράψτε Invite lorna — το Inbox λαμβάνει Review BOT DEE invite. Μετά το Invite sent μείνετε σε αυτό το δωμάτιο BOT DEE και γράψτε — αυτό είναι το group chat. Ανοίγουν Inbox R"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Πρόσκληση φίλων Mingl",
-          "blurb": "Μετά το Confirm (Join Now ή Set a schedule), το Invite δείχνει μόνο τους φίλους Mingl. Πατήστε έναν φίλο ή γράψτε Invite lorna — το Inbox λαμβάνει Review BOT DEE invite. Το chip μένει γκρι με Invite sent — δεύτερο πάτημα δεν στέλνει δεύτερη πρόσκληση. Είναι εντολή Room SMARTview,"
+          "blurb": "Μετά το Confirm (Join Now ή Set a schedule), το Invite δείχνει μόνο τους φίλους Mingl. Πατήστε έναν φίλο ή γράψτε Invite lorna — το Inbox λαμβάνει Review BOT DEE invite. Μετά το Invite sent μείνετε σε αυτό το δωμάτιο BOT DEE και γράψτε — αυτό είναι το group chat. Ανοίγουν Inbox R"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Συμμετοχή σε συνεδρία BOT DEE",
-          "blurb": "Ανοίξτε την πρόσκληση Inbox ή Search Join Now συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Το Join Now ανοίγει BOT DEE, όχι Mingl chat. Εσείς και οι προσκεκλημένοι φίλοι Mingl μοιράζεστε το group chat Room SMARTview· τα ονόματα φαίνονται στα μέλη. Λάθος λογαριασμός, λήξη ή "
+          "blurb": "Ανοίξτε την πρόσκληση Inbox (Review BOT DEE invite) ή Search Join Now συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Το Join Now ανοίγει BOT DEE (botdee.html?room=, όχι Mingl chat). Γράψτε σε αυτό το δωμάτιο BOT DEE — αυτό είναι το group chat Room SMARTview. Εσείς και οι προσ"
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "Συμμετοχή σε συνεδρία BOT DEE",
-          "blurb": "Ανοίξτε την πρόσκληση Inbox ή Search Join Now συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Το Join Now ανοίγει BOT DEE, όχι Mingl chat. Εσείς και οι προσκεκλημένοι φίλοι Mingl μοιράζεστε το group chat Room SMARTview· τα ονόματα φαίνονται στα μέλη. Λάθος λογαριασμός, λήξη ή "
+          "blurb": "Ανοίξτε την πρόσκληση Inbox (Review BOT DEE invite) ή Search Join Now συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Το Join Now ανοίγει BOT DEE (botdee.html?room=, όχι Mingl chat). Γράψτε σε αυτό το δωμάτιο BOT DEE — αυτό είναι το group chat Room SMARTview. Εσείς και οι προσ"
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Τέλος Room SMARTview",
@@ -8162,19 +8162,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Zaproś znajomych Mingl",
-          "blurb": "Po Confirm (Join Now lub Set a schedule) Invite pokazuje tylko Twoich znajomych Mingl. Dotknij znajomego albo wpisz Invite lorna — Inbox dostaje Review BOT DEE invite. Chip zostaje szary z Invite sent — drugie stuknięcie nie wysyła drugiego zaproszenia. To polecenie Room SMARTvie"
+          "blurb": "Po Confirm (Join Now lub Set a schedule) Invite pokazuje tylko Twoich znajomych Mingl. Dotknij znajomego albo wpisz Invite lorna — Inbox dostaje Review BOT DEE invite. Po Invite sent zostań w tym pokoju BOT DEE i pisz — to czat grupowy. Otwierają Inbox Review BOT DEE invite albo "
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Zaproś znajomych Mingl",
-          "blurb": "Po Confirm (Join Now lub Set a schedule) Invite pokazuje tylko Twoich znajomych Mingl. Dotknij znajomego albo wpisz Invite lorna — Inbox dostaje Review BOT DEE invite. Chip zostaje szary z Invite sent — drugie stuknięcie nie wysyła drugiego zaproszenia. To polecenie Room SMARTvie"
+          "blurb": "Po Confirm (Join Now lub Set a schedule) Invite pokazuje tylko Twoich znajomych Mingl. Dotknij znajomego albo wpisz Invite lorna — Inbox dostaje Review BOT DEE invite. Po Invite sent zostań w tym pokoju BOT DEE i pisz — to czat grupowy. Otwierają Inbox Review BOT DEE invite albo "
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Dołącz do sesji BOT DEE",
-          "blurb": "Otwórz zaproszenie Inbox lub Search Join Now zalogowany jako znajomy Mingl, do którego je wysłano. Join Now otwiera BOT DEE, nie Mingl chat. Ty i zaproszeni znajomi Mingl dzielicie czat grupowy Room SMARTview; imiona widzą członkowie. Złe konto, wygaśnięcie lub odwołanie odmawia."
+          "blurb": "Otwórz zaproszenie Inbox (Review BOT DEE invite) lub Search Join Now zalogowany jako znajomy Mingl, do którego je wysłano. Join Now otwiera BOT DEE (botdee.html?room=, nie Mingl chat). Pisz w tym pokoju BOT DEE — to czat grupowy Room SMARTview. Ty i zaproszeni znajomi Mingl dziel"
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "Dołącz do sesji BOT DEE",
-          "blurb": "Otwórz zaproszenie Inbox lub Search Join Now zalogowany jako znajomy Mingl, do którego je wysłano. Join Now otwiera BOT DEE, nie Mingl chat. Ty i zaproszeni znajomi Mingl dzielicie czat grupowy Room SMARTview; imiona widzą członkowie. Złe konto, wygaśnięcie lub odwołanie odmawia."
+          "blurb": "Otwórz zaproszenie Inbox (Review BOT DEE invite) lub Search Join Now zalogowany jako znajomy Mingl, do którego je wysłano. Join Now otwiera BOT DEE (botdee.html?room=, nie Mingl chat). Pisz w tym pokoju BOT DEE — to czat grupowy Room SMARTview. Ty i zaproszeni znajomi Mingl dziel"
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Zakończ Room SMARTview",
@@ -9305,19 +9305,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "Mingl-vrienden uitnodigen",
-          "blurb": "Na Confirm (Join Now of Set a schedule) toont Invite alleen je Mingl-vrienden. Tik een vriend of typ Invite lorna — Inbox krijgt Review BOT DEE invite. De chip blijft grijs met Invite sent — opnieuw tikken stuurt geen tweede uitnodiging. Dat is een Room SMARTview-commando, geen V"
+          "blurb": "Na Confirm (Join Now of Set a schedule) toont Invite alleen je Mingl-vrienden. Tik een vriend of typ Invite lorna — Inbox krijgt Review BOT DEE invite. Na Invite sent blijf je in deze BOT DEE-ruimte typen — dat is de groepschat. Zij tikken Inbox Review BOT DEE invite of Search Jo"
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "Mingl-vrienden uitnodigen",
-          "blurb": "Na Confirm (Join Now of Set a schedule) toont Invite alleen je Mingl-vrienden. Tik een vriend of typ Invite lorna — Inbox krijgt Review BOT DEE invite. De chip blijft grijs met Invite sent — opnieuw tikken stuurt geen tweede uitnodiging. Dat is een Room SMARTview-commando, geen V"
+          "blurb": "Na Confirm (Join Now of Set a schedule) toont Invite alleen je Mingl-vrienden. Tik een vriend of typ Invite lorna — Inbox krijgt Review BOT DEE invite. Na Invite sent blijf je in deze BOT DEE-ruimte typen — dat is de groepschat. Zij tikken Inbox Review BOT DEE invite of Search Jo"
         },
         "help:help-botdee-room-smartview-join": {
           "label": "Deelnemen aan een BOT DEE-sessie",
-          "blurb": "Open de Inbox-uitnodiging of Search Join Now terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Join Now opent BOT DEE, niet Mingl chat. Jij en uitgenodigde Mingl-vrienden delen de Room SMARTview-groepschat; namen zijn zichtbaar voor leden. Verkeerd account, v"
+          "blurb": "Open de Inbox-uitnodiging (Review BOT DEE invite) of Search Join Now terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Join Now opent BOT DEE (botdee.html?room=, niet Mingl chat). Typ in die BOT DEE-ruimte — dat is de Room SMARTview-groepschat. Jij en uitgeno"
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "Deelnemen aan een BOT DEE-sessie",
-          "blurb": "Open de Inbox-uitnodiging of Search Join Now terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Join Now opent BOT DEE, niet Mingl chat. Jij en uitgenodigde Mingl-vrienden delen de Room SMARTview-groepschat; namen zijn zichtbaar voor leden. Verkeerd account, v"
+          "blurb": "Open de Inbox-uitnodiging (Review BOT DEE invite) of Search Join Now terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Join Now opent BOT DEE (botdee.html?room=, niet Mingl chat). Typ in die BOT DEE-ruimte — dat is de Room SMARTview-groepschat. Jij en uitgeno"
         },
         "help:help-botdee-room-smartview-end": {
           "label": "Room SMARTview beëindigen",
@@ -10448,19 +10448,19 @@
         },
         "help:help-botdee-room-smartview-invite": {
           "label": "دعوة أصدقاء Mingl",
-          "blurb": "بعد Confirm (Join Now أو Set a schedule) يعرض Invite أصدقاء Mingl فقط. اضغط صديقاً أو اكتب Invite lorna — يصل Inbox كـ Review BOT DEE invite. تبقى الشريحة رمادية مع Invite sent — الضغط مرة أخرى لا يرسل دعوة ثانية. هذا أمر Room SMARTview وليس VIP reserV ولا People SMARTview Invite"
+          "blurb": "بعد Confirm (Join Now أو Set a schedule) يعرض Invite أصدقاء Mingl فقط. اضغط صديقاً أو اكتب Invite lorna — يصل Inbox كـ Review BOT DEE invite. بعد Invite sent ابقَ في غرفة BOT DEE هذه واكتب هناك — هذه الدردشة الجماعية. يفتحون Inbox Review BOT DEE invite أو Search Join Now (botdee."
         },
         "intent:help-botdee-room-smartview-invite": {
           "label": "دعوة أصدقاء Mingl",
-          "blurb": "بعد Confirm (Join Now أو Set a schedule) يعرض Invite أصدقاء Mingl فقط. اضغط صديقاً أو اكتب Invite lorna — يصل Inbox كـ Review BOT DEE invite. تبقى الشريحة رمادية مع Invite sent — الضغط مرة أخرى لا يرسل دعوة ثانية. هذا أمر Room SMARTview وليس VIP reserV ولا People SMARTview Invite"
+          "blurb": "بعد Confirm (Join Now أو Set a schedule) يعرض Invite أصدقاء Mingl فقط. اضغط صديقاً أو اكتب Invite lorna — يصل Inbox كـ Review BOT DEE invite. بعد Invite sent ابقَ في غرفة BOT DEE هذه واكتب هناك — هذه الدردشة الجماعية. يفتحون Inbox Review BOT DEE invite أو Search Join Now (botdee."
         },
         "help:help-botdee-room-smartview-join": {
           "label": "الانضمام إلى جلسة BOT DEE",
-          "blurb": "افتح دعوة Inbox أو Search Join Now وأنت مسجّل كصديق Mingl المُرسَل إليه. Join Now يفتح BOT DEE وليس Mingl chat. أنت وأصدقاء Mingl المدعوون تتشاركون دردشة مجموعة Room SMARTview؛ تظهر الأسماء للأعضاء. الحساب الخطأ أو المنتهية أو الملغاة تُرفض. الانضمام إلى room ليس انضماماً إلى حسا"
+          "blurb": "افتح دعوة Inbox (Review BOT DEE invite) أو Search Join Now وأنت مسجّل كصديق Mingl المُرسَل إليه. Join Now يفتح BOT DEE (botdee.html?room= وليس Mingl chat). اكتب في غرفة BOT DEE هذه — هذه دردشة مجموعة Room SMARTview. أنت وأصدقاء Mingl المدعوون تتشاركونها؛ تظهر الأسماء للأعضاء. الح"
         },
         "intent:help-botdee-room-smartview-join": {
           "label": "الانضمام إلى جلسة BOT DEE",
-          "blurb": "افتح دعوة Inbox أو Search Join Now وأنت مسجّل كصديق Mingl المُرسَل إليه. Join Now يفتح BOT DEE وليس Mingl chat. أنت وأصدقاء Mingl المدعوون تتشاركون دردشة مجموعة Room SMARTview؛ تظهر الأسماء للأعضاء. الحساب الخطأ أو المنتهية أو الملغاة تُرفض. الانضمام إلى room ليس انضماماً إلى حسا"
+          "blurb": "افتح دعوة Inbox (Review BOT DEE invite) أو Search Join Now وأنت مسجّل كصديق Mingl المُرسَل إليه. Join Now يفتح BOT DEE (botdee.html?room= وليس Mingl chat). اكتب في غرفة BOT DEE هذه — هذه دردشة مجموعة Room SMARTview. أنت وأصدقاء Mingl المدعوون تتشاركونها؛ تظهر الأسماء للأعضاء. الح"
         },
         "help:help-botdee-room-smartview-end": {
           "label": "إنهاء Room SMARTview",
