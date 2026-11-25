@@ -145,7 +145,7 @@ test("storage.rules: clubMedia writes and deletes need Master Admin or a Club Ad
 
 test("catalog seed.html cache-busts seed-app.js; cleanup skips permission-denied without failing catalog", () => {
   const app = read("seed-app.js");
-  assert.match(read("seed.html"), /seed-app\.js\?v=s3\.3\.082-seed-cleanup/);
+  assert.match(read("seed.html"), /seed-app\.js\?v=s3\.3\.081&r=cleanup/);
   assert.match(app, /SHOUTOUT_ADMIN_EMAILS/);
   assert.match(app, /isPermissionDenied/);
   assert.match(app, /obsolete cleanup was skipped/);

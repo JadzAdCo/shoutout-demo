@@ -38,7 +38,7 @@ Agents: update this file in the same iteration as feature work (see `.cursor/rul
 | Surface | `seed.html` — Create / Update Records. Status on `#seedStatus`. |
 | Client | `seed-app.js` — gated to `SHOUTOUT_ADMIN_EMAILS`. Firestore batches ≤450. Progress: templates N/M, clubs, events. Catalog write failures still fail the run (`e.code` + `e.message`; no write backdoor). Obsolete cleanup (`FLOQR_OBSOLETE_LOCATION_IDS` clubLocations/aiIndex + Heist Houston `aiDiscoveryQueue`) is split per collection; `permission-denied` is skipped and seed still reports **Done** with a warning. |
 | Data | Client SDK `set({merge:true})` on `templates/{id}`, `clubLocations/{id}`, `events/{id}`. Rules: templates `canManageCatalogTemplates()` (Master Admin / FloqR Admin); clubs/events `isMasterAdmin()` (claim or verified listed email). |
-| URL | `https://jadzadco.github.io/shoutout-demo/seed.html` — cache-bust `seed-app.js?v=s3.3.082-seed-cleanup`. |
+| URL | `https://jadzadco.github.io/shoutout-demo/seed.html` — cache-bust `seed-app.js?v=s3.3.081&r=cleanup`. |
 
 ---
 
