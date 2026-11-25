@@ -143,6 +143,17 @@ test("storage.rules: clubMedia writes and deletes need Master Admin or a Club Ad
   assert.deepEqual(emails(storage), emails(read("firestore.rules")), "Master Admin list matches firestore.rules");
 });
 
+test("catalog seed.html cache-busts seed-app.js; cleanup skips permission-denied without failing catalog", () => {
+  const app = read("seed-app.js");
+  assert.match(read("seed.html"), /seed-app\.js\?v=s3\.3\.081&r=cleanup/);
+  assert.match(app, /SHOUTOUT_ADMIN_EMAILS/);
+  assert.match(app, /isPermissionDenied/);
+  assert.match(app, /obsolete cleanup was skipped/);
+  assert.match(app, /aiDiscoveryQueue[\s\S]*Heist Houston/);
+  assert.match(app, /Catalog seed succeeded/);
+  assert.doesNotMatch(app, /allow write: if true/);
+});
+
 test("Club Admin uploads use clubMedia/{locationId}/... so the club id is the first path segment", () => {
   const admin = read("admin-app.js");
   const paths = [...admin.matchAll(/`clubMedia\/\$\{(\w+)\}\//g)].map(m => m[1]);
