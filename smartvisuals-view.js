@@ -365,8 +365,8 @@
         <div class="sv-kicker">
           <img class="sv-icon" src="./smartvisuals/stencils/people.svg" alt=""/>
           <div>
-            <div class="sv-kicker-title">${esc(t("sv.roomTitle", "Mingl Room Invitation"))}</div>
-            <span class="sv-kicker-sub">${esc(t("sv.youAreInvited", "You are invited to join a Mingl Room."))}</span>
+            <div class="sv-kicker-title">${esc(t("sv.roomTitle", "BOT DEE Room Invitation"))}</div>
+            <span class="sv-kicker-sub">${esc(t("sv.youAreInvited", "You are invited to join a BOT DEE session."))}</span>
           </div>
         </div>
         <button type="button" class="sv-close" data-sv-dismiss aria-label="${esc(t("sv.dismiss", "Close"))}">×</button>
@@ -388,7 +388,7 @@
       <div class="sv-room-invitee">
         <div class="sv-avatar">${esc(payload.hostInitials || host.slice(0, 1))}</div>
         <div class="sv-invitee-copy">
-          <b>${esc(host)} ${esc(t("sv.isInviting", "is inviting you to a Mingl Room."))}</b>
+          <b>${esc(host)} ${esc(t("sv.isInviting", "is inviting you to a BOT DEE session."))}</b>
           <span>${esc(description)}</span>
         </div>
       </div>
@@ -401,7 +401,7 @@
       <section class="sv-botdee">
         <div class="sv-botdee-head">
           <img src="./smartvisuals/stencils/ai.svg" width="22" height="22" alt=""/>
-          ${esc(t("sv.botdeePrompt", "Use Mingl chat to work with BOT DEE to:"))}
+          ${esc(t("sv.botdeePrompt", "Use BOT DEE to:"))}
         </div>
         ${capabilityHtml()}
       </section>
@@ -468,7 +468,7 @@
       overlay.className = "sv-room-overlay";
       overlay.setAttribute("role", "dialog");
       overlay.setAttribute("aria-modal", "true");
-      overlay.setAttribute("aria-label", t("sv.roomTitle", "Mingl Room Invitation"));
+      overlay.setAttribute("aria-label", t("sv.roomTitle", "BOT DEE Room Invitation"));
       document.body.appendChild(overlay);
     }
     overlay.hidden = false;

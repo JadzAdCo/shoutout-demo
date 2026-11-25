@@ -502,7 +502,7 @@
         if (m && m[1]) return m[1].startsWith("s") ? m[1] : `s${m[1]}`;
       }
     } catch (_) {}
-    return "s3.3.080";
+    return "s3.3.081";
   }
 
   function isVersionSmartViewAlias(raw) {
@@ -2223,6 +2223,20 @@
     }
   }
 
+  function attachRoomSession(roomId, token) {
+    const id = String(roomId || "").trim();
+    const tok = String(token || "").trim();
+    if (!id && !tok) return Promise.resolve();
+    if (id) pendingJoinRoomId = id;
+    if (tok) pendingJoinToken = tok;
+    if (id) startGroupSessionPoll(id);
+    return completeSearchJoin();
+  }
+
+  function getConversationId() {
+    return String(liveConversationId || "").trim();
+  }
+
   function bind(opts = {}) {
     bindForm();
     bindChatsUi();
@@ -2257,6 +2271,9 @@
   global.FLOQRBotDeeChat = {
     bind,
     sendMessage,
+    attachRoomSession,
+    startGroupSessionPoll,
+    getConversationId,
     openPhotoViewer,
     closePhotoViewer,
     scrollTranscriptToLatest,

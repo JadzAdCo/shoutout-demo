@@ -1328,19 +1328,22 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
             joinHref: ""
           });
           view.hasActiveRoom = true;
-          view.roomsLive = !joined.waiting;
+          view.roomsLive = true;
           view.lifecycle = joined.waiting ? "scheduled" : "active";
           view.joinHref = "";
           view.participantCount = names.length || joined.room.participantCount;
           view.roomId = joined.room.roomId;
           view.status = joined.room.status;
+          view.scheduledStartMs = joined.room.scheduledStartMs;
+          view.scheduledTimeZone = joined.room.scheduledTimeZone;
+          view.scheduledLabel = joined.room.scheduledLabel;
           view.viewerIsHost = joined.room.hostUid === uid;
           view.members = joined.members || [];
           view.turns = joined.turns || [];
           view.needsConfirmation = false;
           outcome = {
             reply: joined.waiting
-              ? "You're in this BOT DEE session. It goes live at the scheduled time. Joining does not charge anyone."
+              ? "You're in this BOT DEE session. Tap Join Now on this Room SMARTview to open the group chat. Joining does not charge anyone."
               : (names.length
                 ? `You're in this BOT DEE session with ${names.join(", ")}. Joining does not charge anyone. Shared tab needs a separate opt-in.`
                 : "You're in this BOT DEE session with your Mingl friends. Joining does not charge anyone. Shared tab needs a separate opt-in."),
@@ -1352,7 +1355,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
             smartViews: [view],
             members: joined.members || [],
             turns: joined.turns || [],
-            replyKey: joined.waiting ? "botdee.rs.notLiveNote" : "botdee.rs.joined",
+            replyKey: joined.waiting ? "botdee.rs.joinedWaiting" : "botdee.rs.joined",
             geminiOnView: false
           };
         } else {

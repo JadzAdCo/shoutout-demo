@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.081",
+    "text": "s3.3.081: After Invite sent, type in this BOT DEE room; Search Join Now stays botdee.html?room=",
+    "audiences": [
+      "botDee"
+    ]
+  },
+  {
     "id": "s3.3.080",
     "text": "s3.3.080: BOT DEE VIP reserV map at Aurelia plus Miami Place SMARTview on mixed VIP input",
     "audiences": [

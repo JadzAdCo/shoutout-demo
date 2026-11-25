@@ -963,7 +963,7 @@ async function attachSession({uid, token, roomId, conversationId, actorEmail, ac
   if (!core.isCurrentMember(live.data, actor) && core.text(live.data.hostUid, 80) !== actor) {
     return {ok: false, error: "not_member"};
   }
-  if (core.scheduleStartDue(live.data, now) && !core.roomIsOpen(live.data, now)) {
+  if (!core.roomIsOpen(live.data, now)) {
     const started = await startRoom({
       uid: actor,
       roomId: live.id,
@@ -1075,6 +1075,7 @@ async function startRoom({uid, roomId, conversationId, title, authorizedTitle, a
     return {ok: false, error: "not_host"};
   }
   if (core.roomIsOpen(live.data, now)) {
+    await persistActorRoom(actor, live.id, conversationId || live.data.conversationId);
     return {ok: true, room: core.publicRoom(live.id, live.data), alreadyOpen: true};
   }
   if (!core.roomIsScheduled(live.data, now) && core.roomStatus(live.data) !== "scheduled") {
