@@ -10,6 +10,11 @@
   const adminEmails = () => (window.SHOUTOUT_ADMIN_EMAILS || []).map(e => String(e || "").trim().toLowerCase()).filter(Boolean);
   const isAdminUser = user => !!user && adminEmails().includes(safeUser(user));
   const errText = e => `${(e && e.code) || "error"}: ${(e && e.message) || String(e)}`;
+  const isPermissionDenied = e => {
+    const code = String((e && e.code) || "");
+    const msg = String((e && e.message) || e || "").toLowerCase();
+    return code === "permission-denied" || code === "firestore/permission-denied" || msg.includes("permission-denied") || msg.includes("missing or insufficient permissions");
+  };
   const yieldUi = () => new Promise(r => setTimeout(r, 0));
   let seeding = false;
 
@@ -44,48 +49,70 @@
     }
   }
 
+  async function tryCleanupStep(label, fn, skipped) {
+    try {
+      await fn();
+    } catch (e) {
+      if (!isPermissionDenied(e)) throw e;
+      skipped.push(`${label}: ${errText(e)}`);
+    }
+  }
+
   async function cleanupObsoleteLocations(user, counts) {
+    const skipped = [];
     counts.phase = "cleanup obsolete locations";
     setStatus(progressLine(counts));
     await yieldUi();
     const ids = window.FLOQR_OBSOLETE_LOCATION_IDS || [];
-    const locBatch = db.batch();
-    let locWrites = 0;
-    for (const id of ids) {
-      locBatch.set(db.collection("clubLocations").doc(id), {
-        active: false,
-        status: "deleted",
-        deletedReason: "Fictitious test record removed from FLOQR package.",
-        deletedByUid: user.uid,
-        deletedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-      locWrites += 1;
-      locBatch.set(db.collection("aiIndex").doc(`clubLocation_${id}`), {
-        visibility: "deleted",
-        status: "deleted",
-        aiIndexExcluded: true,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-      locWrites += 1;
-    }
-    if (locWrites) await locBatch.commit();
+    await tryCleanupStep("clubLocations obsolete soft-delete", async () => {
+      const locBatch = db.batch();
+      let locWrites = 0;
+      for (const id of ids) {
+        locBatch.set(db.collection("clubLocations").doc(id), {
+          active: false,
+          status: "deleted",
+          deletedReason: "Fictitious test record removed from FLOQR package.",
+          deletedByUid: user.uid,
+          deletedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        locWrites += 1;
+      }
+      if (locWrites) await locBatch.commit();
+    }, skipped);
+    await tryCleanupStep("aiIndex obsolete soft-delete", async () => {
+      const idxBatch = db.batch();
+      let idxWrites = 0;
+      for (const id of ids) {
+        idxBatch.set(db.collection("aiIndex").doc(`clubLocation_${id}`), {
+          visibility: "deleted",
+          status: "deleted",
+          aiIndexExcluded: true,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        idxWrites += 1;
+      }
+      if (idxWrites) await idxBatch.commit();
+    }, skipped);
     counts.phase = "cleanup Heist Houston queue";
     setStatus(progressLine(counts));
     await yieldUi();
-    const queueSnap = await db.collection("aiDiscoveryQueue").where("proposedTitle", "==", "Heist Houston").limit(25).get();
-    const queueBatch = db.batch();
-    let batchWrites = 0;
-    queueSnap.forEach(doc => {
-      queueBatch.set(doc.ref, {
-        status: "deleted",
-        deletedReason: "Fictitious Heist Houston record removed from FLOQR package.",
-        deletedByUid: user.uid,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-      batchWrites += 1;
-    });
-    if (batchWrites) await queueBatch.commit();
+    await tryCleanupStep("aiDiscoveryQueue Heist Houston", async () => {
+      const queueSnap = await db.collection("aiDiscoveryQueue").where("proposedTitle", "==", "Heist Houston").limit(25).get();
+      const queueBatch = db.batch();
+      let batchWrites = 0;
+      queueSnap.forEach(doc => {
+        queueBatch.set(doc.ref, {
+          status: "deleted",
+          deletedReason: "Fictitious Heist Houston record removed from FLOQR package.",
+          deletedByUid: user.uid,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        batchWrites += 1;
+      });
+      if (batchWrites) await queueBatch.commit();
+    }, skipped);
     counts.phase = "";
+    return skipped;
   }
 
   async function seed(){
@@ -104,8 +131,13 @@
       await commitMerged("templates", window.SHOUTOUT_TEMPLATES, counts, "templates");
       await commitMerged("clubLocations", window.SHOUTOUT_CLUB_LOCATIONS, counts, "clubs");
       await commitMerged("events", window.SHOUTOUT_EVENTS, counts, "events");
-      await cleanupObsoleteLocations(user, counts);
-      setStatus(`Done. Templates ${counts.templates.done}/${counts.templates.total}, clubs ${counts.clubs.done}/${counts.clubs.total}, events ${counts.events.done}/${counts.events.total}. Obsolete fictitious location records were marked deleted.`);
+      const cleanupSkipped = await cleanupObsoleteLocations(user, counts);
+      const totals = `Templates ${counts.templates.done}/${counts.templates.total}, clubs ${counts.clubs.done}/${counts.clubs.total}, events ${counts.events.done}/${counts.events.total}`;
+      if (cleanupSkipped.length) {
+        setStatus(`Done. ${totals}. Warning: obsolete cleanup was skipped (${cleanupSkipped.join("; ")}). Catalog seed succeeded.`);
+      } else {
+        setStatus(`Done. ${totals}. Obsolete fictitious location records were marked deleted.`);
+      }
     } catch (e) {
       setStatus(`Seed failed at ${progressLine(counts)}. ${errText(e)}`);
     } finally {
