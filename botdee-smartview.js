@@ -1334,7 +1334,7 @@
     const reason = error?.details?.reason || error?.details?.error || "";
     if (reason === "self") return t("botdee.room.self", "That's you — you're already in this BOT DEE session.");
     if (reason === "already_member") return t("botdee.room.alreadyMember", "That Mingl friend is already in this BOT DEE session.");
-    if (reason === "invited" || reason === "used") return t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox.");
+    if (reason === "invited" || reason === "used") return t("botdee.room.inviteSentAck", "Invite sent. Type in this BOT DEE room. They tap Inbox → Review BOT DEE invite or Search → Join Now.");
     if (reason === "full") return t("botdee.room.joinFull", "This BOT DEE session is full (host plus 7 guests).");
     if (reason === "not_friend") return t("botdee.room.notFriend", "BOT DEE session invites are Mingl friends only.");
     const msg = String(error?.message || "").trim();
@@ -1474,6 +1474,25 @@
     } catch (_) {}
   }
 
+  function roomConversationId() {
+    return (global.FLOQRBotDeeChat && typeof global.FLOQRBotDeeChat.getConversationId === "function"
+      ? global.FLOQRBotDeeChat.getConversationId()
+      : "") || "";
+  }
+
+  function bindComposerToRoom(roomId, token, attach) {
+    const id = String(roomId || "").trim();
+    if (!id) return Promise.resolve();
+    try { global.__floqrActiveBotDeeRoomId = id; } catch (_) {}
+    if (attach && typeof global.FLOQRBotDeeChat?.attachRoomSession === "function") {
+      return global.FLOQRBotDeeChat.attachRoomSession(id, token || "") || Promise.resolve();
+    }
+    if (typeof global.FLOQRBotDeeChat?.startGroupSessionPoll === "function") {
+      global.FLOQRBotDeeChat.startGroupSessionPoll(id);
+    }
+    return Promise.resolve();
+  }
+
   function startRoomPresence(roomId) {
     const id = String(roomId || "").trim();
     if (!id) return;
@@ -1534,7 +1553,7 @@
           }
         });
         const invitedAck = friends.some(row => row.inviteState === "invited")
-          ? `<p class="botdee-sv-room-ack" data-rs-invite-ack="1">${esc(t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox."))}</p>`
+          ? `<p class="botdee-sv-room-ack" data-rs-invite-ack="1">${esc(t("botdee.room.inviteSentAck", "Invite sent. Type in this BOT DEE room. They tap Inbox → Review BOT DEE invite or Search → Join Now."))}</p>`
           : "";
         host.innerHTML = invitedAck + friends.map(row => friendChipHtml(row, !!data.roomFull)).join("");
         host.querySelectorAll("[data-rs-invite-state], [data-rs-invite-uid]").forEach(btn => {
@@ -1555,8 +1574,9 @@
               return;
             }
             if (state === "invited") {
-              showInviteAck(host, t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox."), "ok");
-              showToast(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
+              const ack = t("botdee.room.inviteSentAck", "Invite sent. Type in this BOT DEE room. They tap Inbox → Review BOT DEE invite or Search → Join Now.");
+              showInviteAck(host, ack, "ok");
+              showToast(ack);
               return;
             }
             if (state === "full") {
@@ -1580,18 +1600,20 @@
             try {
               const sent = await call("createBotDeeRoomInvite", {roomId, targetUid: uid});
               markChipInvited(btn, false);
-              const ack = t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox.");
+              const ack = t("botdee.room.inviteSentAck", "Invite sent. Type in this BOT DEE room. They tap Inbox → Review BOT DEE invite or Search → Join Now.");
               showInviteAck(host, ack, "ok");
-              showToast(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
+              showToast(ack);
+              bindComposerToRoom(roomId);
               if (sent && sent.alreadySent) {
                 showInviteAck(host, ack, "ok");
               }
             } catch (error) {
               if (inviteAlreadyAcked(error)) {
                 markChipInvited(btn, false);
-                const ack = t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox.");
+                const ack = t("botdee.room.inviteSentAck", "Invite sent. Type in this BOT DEE room. They tap Inbox → Review BOT DEE invite or Search → Join Now.");
                 showInviteAck(host, ack, "ok");
-                showToast(t("botdee.room.invited", "Invite sent to Inbox. Mingl friends only."));
+                showToast(ack);
+                bindComposerToRoom(roomId);
                 return;
               }
               forgetLocalInvited(roomId, uid);
@@ -1731,14 +1753,16 @@
       try {
         const data = await call("startBotDeeRoom", {
           roomId: roomIdOf(),
+          conversationId: roomConversationId(),
           title: card.getAttribute("data-rs-title") || "BOT DEE group session",
           authorizedTitle: card.getAttribute("data-rs-title") || "",
           authorizedDescription: card.getAttribute("data-rs-desc") || ""
         });
         stampRoom(data.room);
         startRoomPresence(data.room?.roomId);
+        await bindComposerToRoom(data.room?.roomId, "", true);
         card.querySelector("[data-rs-confirm-row]")?.setAttribute("hidden", "");
-        showToast(t("botdee.room.confirmedLive", "BOT DEE session is open. Invite Mingl friends from the card. Joining does not charge anyone."));
+        showToast(t("botdee.room.confirmedLive", "BOT DEE session is open. Invite Mingl friends, then type in this BOT DEE room. Joining does not charge anyone."));
       } catch (error) {
         showToast(error?.message || t("botdee.rs.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."));
       }
@@ -1751,6 +1775,7 @@
         const name = roomId ? "rescheduleBotDeeRoom" : "scheduleBotDeeRoom";
         const data = await call(name, {
           roomId,
+          conversationId: roomConversationId(),
           title: card.getAttribute("data-rs-title") || "BOT DEE group session",
           authorizedTitle: card.getAttribute("data-rs-title") || "",
           authorizedDescription: card.getAttribute("data-rs-desc") || "",
@@ -1758,6 +1783,7 @@
           scheduledTimeZone: picked.scheduledTimeZone
         });
         stampRoom(data.room);
+        await bindComposerToRoom(data.room?.roomId, "", true);
         const label = formatScheduleLabel(data.room?.scheduledStartMs, data.room?.scheduledTimeZone);
         let note = card.querySelector("[data-rs-schedule-label]");
         if (!note) {
@@ -1806,6 +1832,7 @@
       event.preventDefault();
       try {
         await call("rsvpBotDeeRoomInvite", {roomId: roomIdOf(), rsvp: "accepted"});
+        await bindComposerToRoom(roomIdOf(), "", true);
         showToast(t("botdee.rs.rsvpPending", "You're in. Join Now is available when the room is live."));
       } catch (error) {
         showToast(error?.message || t("botdee.rs.joinFailed", "That BOT DEE invite isn't available. Ask your Mingl friend to send a new one."));
@@ -1836,7 +1863,10 @@
     if (roomIdOf()) {
       try { global.__floqrActiveBotDeeRoomId = roomIdOf(); } catch (_) {}
     }
-    if (card.getAttribute("data-rs-status") === "open" && roomIdOf()) startRoomPresence(roomIdOf());
+    if (card.getAttribute("data-rs-status") === "open" && roomIdOf()) {
+      startRoomPresence(roomIdOf());
+      bindComposerToRoom(roomIdOf());
+    }
     bindCollabActions(card, {call, showToast, roomIdOf});
     const hydrateCollab = async () => {
       const roomId = roomIdOf();
@@ -2798,12 +2828,14 @@
         }
         fn({roomId, targetUid}).then(result => {
           markChipInvited(inviteBtn, false);
-          noteInvite(t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox."));
+          noteInvite(t("botdee.room.inviteSentAck", "Invite sent. Type in this BOT DEE room. They tap Inbox → Review BOT DEE invite or Search → Join Now."));
+          bindComposerToRoom(roomId);
           return result;
         }).catch(error => {
           if (inviteAlreadyAcked(error)) {
             markChipInvited(inviteBtn, false);
-            noteInvite(t("botdee.room.inviteSentAck", "Invite sent. They'll get Review BOT DEE invite in Inbox."));
+            noteInvite(t("botdee.room.inviteSentAck", "Invite sent. Type in this BOT DEE room. They tap Inbox → Review BOT DEE invite or Search → Join Now."));
+            bindComposerToRoom(roomId);
             return;
           }
           forgetLocalInvited(roomId, targetUid);

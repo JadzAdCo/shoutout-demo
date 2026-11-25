@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.080";
+  const VERSION = "s3.3.081";
   const packs = {
     "ru": {
       "help-smartvisuals-create": {
@@ -71,11 +71,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Пригласить друзей Mingl",
-        body: "После Confirm (Join Now или Set a schedule) кнопка Invite показывает только друзей Mingl. Нажмите друга или напишите Invite lorna — Inbox получит Review BOT DEE invite. Фишка остаётся серой с Invite sent — повторное нажатие не шлёт второе приглашение. Это команда Room SMARTview, не VIP reserV и не People SMARTview Invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги. Если фишка — это вы или человек уже в сессии, она помечена «Это вы» или «Уже в этой сессии» и не шлёт второе приглашение."
+        body: "После Confirm (Join Now или Set a schedule) кнопка Invite показывает только друзей Mingl. Нажмите друга или напишите Invite lorna — Inbox получит Review BOT DEE invite. После Invite sent оставайтесь в этой комнате BOT DEE и пишите там — это групповой чат. Они открывают Inbox Review BOT DEE invite или Search Join Now (botdee.html?room=, не Mingl chat). Фишка остаётся серой с Invite sent — повторное нажатие не шлёт второе приглашение. Это команда Room SMARTview, не VIP reserV и не People SMARTview Invite. Это не публичная ссылка. Лимит: хост плюс 7. Гости могут приглашать, пока хост не отключит это. Вход не списывает деньги. Если фишка — это вы или человек уже в сессии, она помечена «Это вы» или «Уже в этой сессии» и не шлёт второе приглашение."
       },
       "help-botdee-room-smartview-join": {
         title: "Войти в сессию BOT DEE",
-        body: "Откройте приглашение Inbox или Search Join Now, войдя как друг Mingl, которому оно отправлено. Join Now открывает BOT DEE, не Mingl chat. Вы и приглашённые друзья Mingl делите групповой чат Room SMARTview; имена видят участники. Чужой аккаунт, срок и отзыв отказывают. Вход в room — не вход в общий счёт и не согласие на оплату. BOT DEE никогда не берёт номера карт."
+        body: "Откройте приглашение Inbox (Review BOT DEE invite) или Search Join Now, войдя как друг Mingl, которому оно отправлено. Join Now открывает BOT DEE (botdee.html?room=, не Mingl chat). Пишите в этой комнате BOT DEE — это групповой чат Room SMARTview. Вы и приглашённые друзья Mingl делите его; имена видят участники. Чужой аккаунт, срок и отзыв отказывают. Вход в room — не вход в общий счёт и не согласие на оплату. BOT DEE никогда не берёт номера карт."
       },
       "help-botdee-room-smartview-end": {
         title: "Завершить Room SMARTview",
@@ -609,11 +609,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Mingl-vrienden uitnodigen",
-        body: "Na Confirm (Join Now of Set a schedule) toont Invite alleen je Mingl-vrienden. Tik een vriend of typ Invite lorna — Inbox krijgt Review BOT DEE invite. De chip blijft grijs met Invite sent — opnieuw tikken stuurt geen tweede uitnodiging. Dat is een Room SMARTview-commando, geen VIP reserV en geen People SMARTview Invite. Geen openbare join-link. Cap is host plus 7. Gasten kunnen meer Mingl-vrienden uitnodigen tot de host dat uitzet. Deelnemen is geen betaling. Als een chip jij bent of iemand die al in de sessie zit, staat That’s you of Already in this session en wordt er geen tweede uitnodiging gestuurd."
+        body: "Na Confirm (Join Now of Set a schedule) toont Invite alleen je Mingl-vrienden. Tik een vriend of typ Invite lorna — Inbox krijgt Review BOT DEE invite. Na Invite sent blijf je in deze BOT DEE-ruimte typen — dat is de groepschat. Zij tikken Inbox Review BOT DEE invite of Search Join Now (botdee.html?room=, nooit Mingl chat). De chip blijft grijs met Invite sent — opnieuw tikken stuurt geen tweede uitnodiging. Dat is een Room SMARTview-commando, geen VIP reserV en geen People SMARTview Invite. Geen openbare join-link. Cap is host plus 7. Gasten kunnen meer Mingl-vrienden uitnodigen tot de host dat uitzet. Deelnemen is geen betaling. Als een chip jij bent of iemand die al in de sessie zit, staat That’s you of Already in this session en wordt er geen tweede uitnodiging gestuurd."
       },
       "help-botdee-room-smartview-join": {
         title: "Deelnemen aan een BOT DEE-sessie",
-        body: "Open de Inbox-uitnodiging of Search Join Now terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Join Now opent BOT DEE, niet Mingl chat. Jij en uitgenodigde Mingl-vrienden delen de Room SMARTview-groepschat; namen zijn zichtbaar voor leden. Verkeerd account, verlopen of ingetrokken weigert. Deelnemen aan de room is niet deelnemen aan een tab en keurt geen betaling goed. BOT DEE neemt nooit kaartnummers."
+        body: "Open de Inbox-uitnodiging (Review BOT DEE invite) of Search Join Now terwijl je bent aangemeld als de Mingl-vriend aan wie die is gestuurd. Join Now opent BOT DEE (botdee.html?room=, niet Mingl chat). Typ in die BOT DEE-ruimte — dat is de Room SMARTview-groepschat. Jij en uitgenodigde Mingl-vrienden delen die; namen zijn zichtbaar voor leden. Verkeerd account, verlopen of ingetrokken weigert. Deelnemen aan de room is niet deelnemen aan een tab en keurt geen betaling goed. BOT DEE neemt nooit kaartnummers."
       },
       "help-botdee-room-smartview-end": {
         title: "Room SMARTview beëindigen",
@@ -1147,11 +1147,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Inviter des amis Mingl",
-        body: "Après Confirm (Join Now ou Set a schedule), Invite n’affiche que vos amis Mingl. Touchez un ami ou tapez Invite lorna — Inbox reçoit Review BOT DEE invite. La puce reste grisée avec Invite sent — un second tap n’envoie pas une deuxième invitation. C’est une commande Room SMARTview, pas VIP reserV ni People SMARTview Invite. Ce n’est pas un lien public. Capacité : hôte plus 7. Les invités peuvent inviter d’autres amis Mingl sauf si l’hôte désactive cela. Rejoindre n’est pas un paiement. Si une puce est vous ou quelqu’un déjà dans la session, elle reste marquée C’est vous ou Déjà dans cette session et n’envoie pas une deuxième invitation."
+        body: "Après Confirm (Join Now ou Set a schedule), Invite n’affiche que vos amis Mingl. Touchez un ami ou tapez Invite lorna — Inbox reçoit Review BOT DEE invite. Après Invite sent, restez dans cette salle BOT DEE et tapez — c’est le chat de groupe. Ils ouvrent Inbox Review BOT DEE invite ou Search Join Now (botdee.html?room=, jamais Mingl chat). La puce reste grisée avec Invite sent — un second tap n’envoie pas une deuxième invitation. C’est une commande Room SMARTview, pas VIP reserV ni People SMARTview Invite. Ce n’est pas un lien public. Capacité : hôte plus 7. Les invités peuvent inviter d’autres amis Mingl sauf si l’hôte désactive cela. Rejoindre n’est pas un paiement. Si une puce est vous ou quelqu’un déjà dans la session, elle reste marquée C’est vous ou Déjà dans cette session et n’envoie pas une deuxième invitation."
       },
       "help-botdee-room-smartview-join": {
         title: "Rejoindre une session BOT DEE",
-        body: "Ouvrez l’invitation Inbox ou Search Join Now connecté comme l’ami Mingl destinataire. Join Now ouvre BOT DEE, pas Mingl chat. Vous et les amis Mingl invités partagez le chat de groupe Room SMARTview ; les noms s’affichent pour les membres. Mauvais compte, expiration ou révocation refuse. Rejoindre la room n’est pas rejoindre une addition et n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte."
+        body: "Ouvrez l’invitation Inbox (Review BOT DEE invite) ou Search Join Now connecté comme l’ami Mingl destinataire. Join Now ouvre BOT DEE (botdee.html?room=, pas Mingl chat). Tapez dans cette salle BOT DEE — c’est le chat de groupe Room SMARTview. Vous et les amis Mingl invités le partagez ; les noms s’affichent pour les membres. Mauvais compte, expiration ou révocation refuse. Rejoindre la room n’est pas rejoindre une addition et n’approuve pas un paiement. BOT DEE ne prend jamais de numéros de carte."
       },
       "help-botdee-room-smartview-end": {
         title: "Terminer Room SMARTview",
@@ -1685,11 +1685,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Mingl-Freunde einladen",
-        body: "Nach Confirm (Join Now oder Set a schedule) zeigt Invite nur deine Mingl-Freunde. Tippe einen Freund oder schreibe Invite lorna — Inbox erhält Review BOT DEE invite. Der Chip bleibt grau mit Invite sent — ein zweites Tippen sendet keine zweite Einladung. Das ist ein Room SMARTview-Befehl, kein VIP reserV und kein People SMARTview Invite. Kein öffentlicher Join-Link. Maximum Gastgeber plus 7. Gäste können weitere Mingl-Freunde einladen, bis der Gastgeber das abschaltet. Beitreten ist keine Zahlung. Ist ein Chip du selbst oder schon in der Sitzung, bleibt er mit Das sind Sie oder Schon in dieser Sitzung markiert und sendet keine zweite Einladung."
+        body: "Nach Confirm (Join Now oder Set a schedule) zeigt Invite nur deine Mingl-Freunde. Tippe einen Freund oder schreibe Invite lorna — Inbox erhält Review BOT DEE invite. Nach Invite sent bleiben Sie in diesem BOT DEE-Raum und schreiben dort — das ist der Gruppenchat. Sie tippen Inbox Review BOT DEE invite oder Search Join Now (botdee.html?room=, nie Mingl chat). Der Chip bleibt grau mit Invite sent — ein zweites Tippen sendet keine zweite Einladung. Das ist ein Room SMARTview-Befehl, kein VIP reserV und kein People SMARTview Invite. Kein öffentlicher Join-Link. Maximum Gastgeber plus 7. Gäste können weitere Mingl-Freunde einladen, bis der Gastgeber das abschaltet. Beitreten ist keine Zahlung. Ist ein Chip du selbst oder schon in der Sitzung, bleibt er mit Das sind Sie oder Schon in dieser Sitzung markiert und sendet keine zweite Einladung."
       },
       "help-botdee-room-smartview-join": {
         title: "Einer BOT DEE-Sitzung beitreten",
-        body: "Öffne die Inbox-Einladung oder Search Join Now, angemeldet als der Mingl-Freund, dem sie gilt. Join Now öffnet BOT DEE, nicht Mingl chat. Du und eingeladene Mingl-Freunde teilt den Room SMARTview-Gruppenchat; Namen sehen Mitglieder. Falsches Konto, Ablauf oder Widerruf lehnt ab. Der Room ist nicht der Tab und genehmigt keine Zahlung. BOT DEE nimmt niemals Kartennummern."
+        body: "Öffne die Inbox-Einladung (Review BOT DEE invite) oder Search Join Now, angemeldet als der Mingl-Freund, dem sie gilt. Join Now öffnet BOT DEE (botdee.html?room=, nicht Mingl chat). Schreibe in diesem BOT DEE-Raum — das ist der Room SMARTview-Gruppenchat. Du und eingeladene Mingl-Freunde teilt ihn; Namen sehen Mitglieder. Falsches Konto, Ablauf oder Widerruf lehnt ab. Der Room ist nicht der Tab und genehmigt keine Zahlung. BOT DEE nimmt niemals Kartennummern."
       },
       "help-botdee-room-smartview-end": {
         title: "Room SMARTview beenden",
@@ -2223,11 +2223,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Invitar amigos Mingl",
-        body: "Tras Confirm (Join Now o Set a schedule), Invite muestra solo tus amigos Mingl. Toque un amigo o escriba Invite lorna — Inbox recibe Review BOT DEE invite. El chip se queda gris con Invite sent — un segundo toque no envía otra invitación. Es un comando de Room SMARTview, no VIP reserV ni People SMARTview Invite. No es un enlace público. Cupo: anfitrión más 7. Los invitados pueden invitar más amigos Mingl salvo que el anfitrión lo desactive. Unirse no es un pago. Si un chip eres tú o alguien ya en la sesión, queda marcado Eres tú o Ya en esta sesión y no envía otra invitación."
+        body: "Tras Confirm (Join Now o Set a schedule), Invite muestra solo tus amigos Mingl. Toque un amigo o escriba Invite lorna — Inbox recibe Review BOT DEE invite. Tras Invite sent, quédate en esta sala BOT DEE y escribe — ese es el chat grupal. Abren Inbox Review BOT DEE invite o Search Join Now (botdee.html?room=, nunca Mingl chat). El chip se queda gris con Invite sent — un segundo toque no envía otra invitación. Es un comando de Room SMARTview, no VIP reserV ni People SMARTview Invite. No es un enlace público. Cupo: anfitrión más 7. Los invitados pueden invitar más amigos Mingl salvo que el anfitrión lo desactive. Unirse no es un pago. Si un chip eres tú o alguien ya en la sesión, queda marcado Eres tú o Ya en esta sesión y no envía otra invitación."
       },
       "help-botdee-room-smartview-join": {
         title: "Unirse a una sesión BOT DEE",
-        body: "Abre la invitación de Inbox o Search Join Now iniciado sesión como el amigo Mingl destinatario. Join Now abre BOT DEE, no Mingl chat. Tú y los amigos Mingl invitados compartís el chat de grupo Room SMARTview; los nombres se ven para miembros. Cuenta incorrecta, caducada o revocada se niega. Unirse a la room no es unirse a una cuenta ni aprobar un pago. BOT DEE nunca toma números de tarjeta."
+        body: "Abre la invitación de Inbox (Review BOT DEE invite) o Search Join Now iniciado sesión como el amigo Mingl destinatario. Join Now abre BOT DEE (botdee.html?room=, no Mingl chat). Escribe en esa sala BOT DEE — ese es el chat de grupo Room SMARTview. Tú y los amigos Mingl invitados lo compartís; los nombres se ven para miembros. Cuenta incorrecta, caducada o revocada se niega. Unirse a la room no es unirse a una cuenta ni aprobar un pago. BOT DEE nunca toma números de tarjeta."
       },
       "help-botdee-room-smartview-end": {
         title: "Terminar Room SMARTview",
@@ -2761,11 +2761,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Invita amici Mingl",
-        body: "Dopo Confirm (Join Now o Set a schedule), Invite mostra solo i tuoi amici Mingl. Tocca un amico o scrivi Invite lorna — Inbox riceve Review BOT DEE invite. Il chip resta grigio con Invite sent — un secondo tocco non invia un secondo invito. È un comando Room SMARTview, non VIP reserV né People SMARTview Invite. Non è un link pubblico. Capienza: host più 7. Gli ospiti possono invitare altri amici Mingl finché l’host non lo disattiva. Entrare non è un pagamento. Se un chip sei tu o qualcuno già in sessione, resta Sei tu o Già in questa sessione e non invia un secondo invito."
+        body: "Dopo Confirm (Join Now o Set a schedule), Invite mostra solo i tuoi amici Mingl. Tocca un amico o scrivi Invite lorna — Inbox riceve Review BOT DEE invite. Dopo Invite sent resta in questa stanza BOT DEE e scrivi — è la chat di gruppo. Aprono Inbox Review BOT DEE invite oppure Search Join Now (botdee.html?room=, mai Mingl chat). Il chip resta grigio con Invite sent — un secondo tocco non invia un secondo invito. È un comando Room SMARTview, non VIP reserV né People SMARTview Invite. Non è un link pubblico. Capienza: host più 7. Gli ospiti possono invitare altri amici Mingl finché l’host non lo disattiva. Entrare non è un pagamento. Se un chip sei tu o qualcuno già in sessione, resta Sei tu o Già in questa sessione e non invia un secondo invito."
       },
       "help-botdee-room-smartview-join": {
         title: "Unisciti a una sessione BOT DEE",
-        body: "Apri l’invito Inbox o Search Join Now autenticato come l’amico Mingl destinatario. Join Now apre BOT DEE, non Mingl chat. Tu e gli amici Mingl invitati condividete la chat di gruppo Room SMARTview; i nomi sono visibili ai membri. Account sbagliato, scaduto o revocato rifiuta. Entrare nella room non è entrare in un conto e non approva un pagamento. BOT DEE non prende mai numeri di carta."
+        body: "Apri l’invito Inbox (Review BOT DEE invite) o Search Join Now autenticato come l’amico Mingl destinatario. Join Now apre BOT DEE (botdee.html?room=, non Mingl chat). Scrivi in quella stanza BOT DEE — è la chat di gruppo Room SMARTview. Tu e gli amici Mingl invitati la condividete; i nomi sono visibili ai membri. Account sbagliato, scaduto o revocato rifiuta. Entrare nella room non è entrare in un conto e non approva un pagamento. BOT DEE non prende mai numeri di carta."
       },
       "help-botdee-room-smartview-end": {
         title: "Termina Room SMARTview",
@@ -3299,11 +3299,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Convidar amigos Mingl",
-        body: "Depois de Confirm (Join Now ou Set a schedule), Invite mostra só os seus amigos Mingl. Toque um amigo ou escreva Invite lorna — Inbox recebe Review BOT DEE invite. O chip fica cinzento com Invite sent — um segundo toque não envia outro convite. É um comando Room SMARTview, não VIP reserV nem People SMARTview Invite. Não é um link público. Limite: anfitrião mais 7. Convidados podem convidar mais amigos Mingl até o anfitrião desligar isso. Entrar não é pagamento. Se um chip é você ou alguém já na sessão, fica É você ou Já nesta sessão e não envia outro convite."
+        body: "Depois de Confirm (Join Now ou Set a schedule), Invite mostra só os seus amigos Mingl. Toque um amigo ou escreva Invite lorna — Inbox recebe Review BOT DEE invite. Depois de Invite sent, fique nesta sala BOT DEE e escreva — esse é o chat em grupo. Abrem Inbox Review BOT DEE invite ou Search Join Now (botdee.html?room=, nunca Mingl chat). O chip fica cinzento com Invite sent — um segundo toque não envia outro convite. É um comando Room SMARTview, não VIP reserV nem People SMARTview Invite. Não é um link público. Limite: anfitrião mais 7. Convidados podem convidar mais amigos Mingl até o anfitrião desligar isso. Entrar não é pagamento. Se um chip é você ou alguém já na sessão, fica É você ou Já nesta sessão e não envia outro convite."
       },
       "help-botdee-room-smartview-join": {
         title: "Entrar numa sessão BOT DEE",
-        body: "Abra o convite do Inbox ou Search Join Now autenticado como o amigo Mingl destinatário. Join Now abre BOT DEE, não Mingl chat. Tu e os amigos Mingl convidados partilham o chat de grupo Room SMARTview; os nomes aparecem para membros. Conta errada, expirado ou revogado recusa. Entrar na room não é entrar numa conta nem aprovar um pagamento. BOT DEE nunca pega números de cartão."
+        body: "Abra o convite do Inbox (Review BOT DEE invite) ou Search Join Now autenticado como o amigo Mingl destinatário. Join Now abre BOT DEE (botdee.html?room=, não Mingl chat). Escreva nessa sala BOT DEE — esse é o chat de grupo Room SMARTview. Tu e os amigos Mingl convidados partilham-no; os nomes aparecem para membros. Conta errada, expirado ou revogado recusa. Entrar na room não é entrar numa conta nem aprovar um pagamento. BOT DEE nunca pega números de cartão."
       },
       "help-botdee-room-smartview-end": {
         title: "Terminar Room SMARTview",
@@ -3837,11 +3837,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Πρόσκληση φίλων Mingl",
-        body: "Μετά το Confirm (Join Now ή Set a schedule), το Invite δείχνει μόνο τους φίλους Mingl. Πατήστε έναν φίλο ή γράψτε Invite lorna — το Inbox λαμβάνει Review BOT DEE invite. Το chip μένει γκρι με Invite sent — δεύτερο πάτημα δεν στέλνει δεύτερη πρόσκληση. Είναι εντολή Room SMARTview, όχι VIP reserV ούτε People SMARTview Invite. Όχι δημόσιος σύνδεσμος. Όριο: οικοδεσπότης συν 7. Οι επισκέπτες μπορούν να προσκαλούν περισσότερους φίλους Mingl μέχρι ο οικοδεσπότης να το κλείσει. Η συμμετοχή δεν είναι πληρωμή. Αν ένα chip είστε εσείς ή κάποιος ήδη στη συνεδρία, μένει Είστε εσείς ή Ήδη στη συνεδρία και δεν στέλνει δεύτερη πρόσκληση."
+        body: "Μετά το Confirm (Join Now ή Set a schedule), το Invite δείχνει μόνο τους φίλους Mingl. Πατήστε έναν φίλο ή γράψτε Invite lorna — το Inbox λαμβάνει Review BOT DEE invite. Μετά το Invite sent μείνετε σε αυτό το δωμάτιο BOT DEE και γράψτε — αυτό είναι το group chat. Ανοίγουν Inbox Review BOT DEE invite ή Search Join Now (botdee.html?room=, ποτέ Mingl chat). Το chip μένει γκρι με Invite sent — δεύτερο πάτημα δεν στέλνει δεύτερη πρόσκληση. Είναι εντολή Room SMARTview, όχι VIP reserV ούτε People SMARTview Invite. Όχι δημόσιος σύνδεσμος. Όριο: οικοδεσπότης συν 7. Οι επισκέπτες μπορούν να προσκαλούν περισσότερους φίλους Mingl μέχρι ο οικοδεσπότης να το κλείσει. Η συμμετοχή δεν είναι πληρωμή. Αν ένα chip είστε εσείς ή κάποιος ήδη στη συνεδρία, μένει Είστε εσείς ή Ήδη στη συνεδρία και δεν στέλνει δεύτερη πρόσκληση."
       },
       "help-botdee-room-smartview-join": {
         title: "Συμμετοχή σε συνεδρία BOT DEE",
-        body: "Ανοίξτε την πρόσκληση Inbox ή Search Join Now συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Το Join Now ανοίγει BOT DEE, όχι Mingl chat. Εσείς και οι προσκεκλημένοι φίλοι Mingl μοιράζεστε το group chat Room SMARTview· τα ονόματα φαίνονται στα μέλη. Λάθος λογαριασμός, λήξη ή ανάκληση αρνείται. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό ούτε έγκριση πληρωμής. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών."
+        body: "Ανοίξτε την πρόσκληση Inbox (Review BOT DEE invite) ή Search Join Now συνδεδεμένοι ως ο φίλος Mingl στον οποίο στάλθηκε. Το Join Now ανοίγει BOT DEE (botdee.html?room=, όχι Mingl chat). Γράψτε σε αυτό το δωμάτιο BOT DEE — αυτό είναι το group chat Room SMARTview. Εσείς και οι προσκεκλημένοι φίλοι Mingl το μοιράζεστε· τα ονόματα φαίνονται στα μέλη. Λάθος λογαριασμός, λήξη ή ανάκληση αρνείται. Η είσοδος στη room δεν είναι είσοδος σε λογαριασμό ούτε έγκριση πληρωμής. Το BOT DEE δεν παίρνει ποτέ αριθμούς καρτών."
       },
       "help-botdee-room-smartview-end": {
         title: "Τέλος Room SMARTview",
@@ -4375,11 +4375,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "Zaproś znajomych Mingl",
-        body: "Po Confirm (Join Now lub Set a schedule) Invite pokazuje tylko Twoich znajomych Mingl. Dotknij znajomego albo wpisz Invite lorna — Inbox dostaje Review BOT DEE invite. Chip zostaje szary z Invite sent — drugie stuknięcie nie wysyła drugiego zaproszenia. To polecenie Room SMARTview, nie VIP reserV i nie People SMARTview Invite. To nie jest publiczny link. Limit: gospodarz plus 7. Goście mogą zapraszać więcej znajomych Mingl, dopóki gospodarz tego nie wyłączy. Dołączenie nie jest płatnością. Jeśli chip to ty albo ktoś już w sesji, zostaje To ty albo Już w tej sesji i nie wysyła drugiego zaproszenia."
+        body: "Po Confirm (Join Now lub Set a schedule) Invite pokazuje tylko Twoich znajomych Mingl. Dotknij znajomego albo wpisz Invite lorna — Inbox dostaje Review BOT DEE invite. Po Invite sent zostań w tym pokoju BOT DEE i pisz — to czat grupowy. Otwierają Inbox Review BOT DEE invite albo Search Join Now (botdee.html?room=, nigdy Mingl chat). Chip zostaje szary z Invite sent — drugie stuknięcie nie wysyła drugiego zaproszenia. To polecenie Room SMARTview, nie VIP reserV i nie People SMARTview Invite. To nie jest publiczny link. Limit: gospodarz plus 7. Goście mogą zapraszać więcej znajomych Mingl, dopóki gospodarz tego nie wyłączy. Dołączenie nie jest płatnością. Jeśli chip to ty albo ktoś już w sesji, zostaje To ty albo Już w tej sesji i nie wysyła drugiego zaproszenia."
       },
       "help-botdee-room-smartview-join": {
         title: "Dołącz do sesji BOT DEE",
-        body: "Otwórz zaproszenie Inbox lub Search Join Now zalogowany jako znajomy Mingl, do którego je wysłano. Join Now otwiera BOT DEE, nie Mingl chat. Ty i zaproszeni znajomi Mingl dzielicie czat grupowy Room SMARTview; imiona widzą członkowie. Złe konto, wygaśnięcie lub odwołanie odmawia. Dołączenie do room to nie dołączenie do rachunku ani zgoda na płatność. BOT DEE nigdy nie bierze numerów kart."
+        body: "Otwórz zaproszenie Inbox (Review BOT DEE invite) lub Search Join Now zalogowany jako znajomy Mingl, do którego je wysłano. Join Now otwiera BOT DEE (botdee.html?room=, nie Mingl chat). Pisz w tym pokoju BOT DEE — to czat grupowy Room SMARTview. Ty i zaproszeni znajomi Mingl dzielicie go; imiona widzą członkowie. Złe konto, wygaśnięcie lub odwołanie odmawia. Dołączenie do room to nie dołączenie do rachunku ani zgoda na płatność. BOT DEE nigdy nie bierze numerów kart."
       },
       "help-botdee-room-smartview-end": {
         title: "Zakończ Room SMARTview",
@@ -4913,11 +4913,11 @@
       },
       "help-botdee-room-smartview-invite": {
         title: "دعوة أصدقاء Mingl",
-        body: "بعد Confirm (Join Now أو Set a schedule) يعرض Invite أصدقاء Mingl فقط. اضغط صديقاً أو اكتب Invite lorna — يصل Inbox كـ Review BOT DEE invite. تبقى الشريحة رمادية مع Invite sent — الضغط مرة أخرى لا يرسل دعوة ثانية. هذا أمر Room SMARTview وليس VIP reserV ولا People SMARTview Invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً. إذا كانت الشريحة أنت أو شخصاً موجوداً في الجلسة تُعلَّم هذا أنت أو موجود في هذه الجلسة ولا تُرسل دعوة ثانية."
+        body: "بعد Confirm (Join Now أو Set a schedule) يعرض Invite أصدقاء Mingl فقط. اضغط صديقاً أو اكتب Invite lorna — يصل Inbox كـ Review BOT DEE invite. بعد Invite sent ابقَ في غرفة BOT DEE هذه واكتب هناك — هذه الدردشة الجماعية. يفتحون Inbox Review BOT DEE invite أو Search Join Now (botdee.html?room= وليس Mingl chat). تبقى الشريحة رمادية مع Invite sent — الضغط مرة أخرى لا يرسل دعوة ثانية. هذا أمر Room SMARTview وليس VIP reserV ولا People SMARTview Invite. ليست رابط انضمام عاماً. الحد المضيف مع 7. يمكن للضيوف دعوة مزيد من أصدقاء Mingl ما لم يوقف المضيف ذلك. الانضمام ليس دفعاً. إذا كانت الشريحة أنت أو شخصاً موجوداً في الجلسة تُعلَّم هذا أنت أو موجود في هذه الجلسة ولا تُرسل دعوة ثانية."
       },
       "help-botdee-room-smartview-join": {
         title: "الانضمام إلى جلسة BOT DEE",
-        body: "افتح دعوة Inbox أو Search Join Now وأنت مسجّل كصديق Mingl المُرسَل إليه. Join Now يفتح BOT DEE وليس Mingl chat. أنت وأصدقاء Mingl المدعوون تتشاركون دردشة مجموعة Room SMARTview؛ تظهر الأسماء للأعضاء. الحساب الخطأ أو المنتهية أو الملغاة تُرفض. الانضمام إلى room ليس انضماماً إلى حساب مشترك ولا موافقة على دفع. BOT DEE لا يأخذ أرقام البطاقات أبداً."
+        body: "افتح دعوة Inbox (Review BOT DEE invite) أو Search Join Now وأنت مسجّل كصديق Mingl المُرسَل إليه. Join Now يفتح BOT DEE (botdee.html?room= وليس Mingl chat). اكتب في غرفة BOT DEE هذه — هذه دردشة مجموعة Room SMARTview. أنت وأصدقاء Mingl المدعوون تتشاركونها؛ تظهر الأسماء للأعضاء. الحساب الخطأ أو المنتهية أو الملغاة تُرفض. الانضمام إلى room ليس انضماماً إلى حساب مشترك ولا موافقة على دفع. BOT DEE لا يأخذ أرقام البطاقات أبداً."
       },
       "help-botdee-room-smartview-end": {
         title: "إنهاء Room SMARTview",

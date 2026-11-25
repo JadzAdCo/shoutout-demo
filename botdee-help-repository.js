@@ -877,7 +877,7 @@
     {
       id: "help-smartvisuals-room",
       title: "Room SMARTview with SMARTvisuals",
-      body: "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. Join Now on Search opens BOT DEE (not Mingl chat) with room= and t=. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo. Private BOT DEE chat is never used to pick art. A labeled Ad below is a sample from those tags. It stays empty for private chat or injection and is not a live advertiser.",
+      body: "Room SMARTview shows the invitation: schedule, RSVP or live status, and Join Now. Join Now on Search opens BOT DEE (not Mingl chat) with room= and t=. Type in that BOT DEE room — that is the group chat. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo. Private BOT DEE chat is never used to pick art. A labeled Ad below is a sample from those tags. It stays empty for private chat or injection and is not a live advertiser.",
       searchPhrases: [
         "room smartview invitation", "join now mingl", "join at scheduled time", "smartstencils", "smartbackgrounds",
         "cancun trip room", "bot-dee itinerary", "travel partner", "exclusive mingl room deals"
@@ -903,7 +903,7 @@
     {
       id: "help-botdee-room-smartview-invite",
       title: "Invite Mingl friends",
-      body: "After you confirm Room SMARTview (Join Now or Set a schedule), Invite shows your Mingl friends only. Tap a friend, or type Invite lorna, to send an Inbox invite (Review BOT DEE invite). The chip stays greyed with Invite sent so you know it went — tapping again does not send a second invite. That is a Room SMARTview command — it does not open VIP reserV or a People SMARTview Invite. If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
+      body: "After you confirm Room SMARTview (Join Now or Set a schedule), Invite shows your Mingl friends only. Tap a friend, or type Invite lorna, to send an Inbox invite (Review BOT DEE invite). After Invite sent, stay on this BOT DEE room and type there — that is the group chat. They tap Inbox Review BOT DEE invite or Search Join Now; both open botdee.html?room= (never Mingl chat). The chip stays greyed with Invite sent so you know it went — tapping again does not send a second invite. That is a Room SMARTview command — it does not open VIP reserV or a People SMARTview Invite. If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
       searchPhrases: ["invite others to this chat", "invite friends bot dee", "bring my friends into this conversation", "invite mingl friends", "invite lorna", "review bot dee invite", "that's you", "already in this session", "cannot invite myself", "invite sent", "greyed chip", "mslorna"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],
@@ -913,7 +913,7 @@
     {
       id: "help-botdee-room-smartview-join",
       title: "Join a BOT DEE session",
-      body: "Open the Inbox invite or Search Join Now while signed in as the Mingl friend it was sent to. Join Now opens BOT DEE (not Mingl chat). You and invited Mingl friends share the Room SMARTview group chat; names show for members. Wrong account, expired, or revoked invites refuse. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
+      body: "Open the Inbox invite (Review BOT DEE invite) or Search Join Now while signed in as the Mingl friend it was sent to. Join Now opens BOT DEE (botdee.html?room=, never Mingl chat). Type in that BOT DEE room — the Room SMARTview transcript is the group chat. You and invited Mingl friends share it; names show for members. Wrong account, expired, or revoked invites refuse. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
       searchPhrases: ["join room smartview", "join this bot dee chat", "can my friends join us", "group chat with lorna", "join now search"],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],

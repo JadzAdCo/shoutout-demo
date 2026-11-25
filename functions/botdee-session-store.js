@@ -1075,6 +1075,7 @@ async function startRoom({uid, roomId, conversationId, title, authorizedTitle, a
     return {ok: false, error: "not_host"};
   }
   if (core.roomIsOpen(live.data, now)) {
+    await persistActorRoom(actor, live.id, conversationId || live.data.conversationId);
     return {ok: true, room: core.publicRoom(live.id, live.data), alreadyOpen: true};
   }
   if (!core.roomIsScheduled(live.data, now) && core.roomStatus(live.data) !== "scheduled") {

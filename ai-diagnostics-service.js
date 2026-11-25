@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.080";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.080";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.081";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.081";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.081",
+      title: "s3.3.081 — After invite, type in this BOT DEE room",
+      checks: [
+        {label:"In-card join attaches composer", file:"botdee-smartview.js", includes:["bindComposerToRoom", "attachRoomSession", "conversationId: roomConversationId()"]},
+        {label:"Chat attachRoomSession", file:"bot-dee-chat.js", includes:["function attachRoomSession", "startGroupSessionPoll", "completeSearchJoin"]},
+        {label:"Already-open persist", file:"functions/botdee-session-store.js", includes:["alreadyOpen: true"]},
+        {label:"Overlay is BOT DEE not Mingl chat", file:"smartvisuals-view.js", includes:["BOT DEE Room Invitation", "Use BOT DEE to:", "botdee.html"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-081-botdee-after-invite-join", "s3.3.081"]}
+      ]
+    },
     {
       version: "s3.3.080",
       title: "s3.3.080 — BOT DEE VIP reserV map at Aurelia plus Miami Place SMARTview",
@@ -3882,6 +3893,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-081-botdee-after-invite-join",
+      area:"BOT DEE",
+      feature:"After Invite sent, host and Lorna share one BOT DEE room",
+      changed:"s3.3.081 — Invitation already worked. Remaining bug: in-card Join Now did not attach the BOT DEE composer or start the Room SMARTview transcript poll, so Don and Lorna looked like separate sessions. Overlay copy said Mingl Room / Use Mingl chat. Fix: Join Now / Set a schedule / RSVP call attachRoomSession (botdee.html?room=, never mingl-chat). Invite ack: Type in this BOT DEE room. They tap Inbox → Review BOT DEE invite or Search → Join Now.",
+      howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh Search and https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js / smartvisuals-view.js / floqr-i18n.js ?v=s3.3.081. Sign in with BOT DEE + Mingl. 2) Host: Open Room SMARTview → Join Now → Invite → tap Lorna. Expect Invite sent plus 'Type in this BOT DEE room'. Type a message on that BOT DEE page (Room SMARTview transcript). 3) Lorna: Inbox Review BOT DEE invite or Search View Invitation → Join Now. Expect botdee.html?room= (not mingl-chat). Same roster and shared transcript. 4) Overlay kicker is BOT DEE Room Invitation, prompt Use BOT DEE to: — not Use Mingl chat. 5) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"After invite, host types in the BOT DEE room. Lorna Join Now lands in the same BOT DEE room. Shared transcript, not Mingl chat, not two private BOT DEE threads.",
+      troubleshoot:"Still separate threads → cached botdee-smartview.js (bindComposerToRoom / attachRoomSession) or Functions not this SHA (already-open persistActorRoom). Join Now opens mingl-chat → smartvisuals-view.js rewrite. Overlay still says Mingl chat → cached floqr-i18n.js sv.botdeePrompt. Invite ack missing next step → cached inviteSentAck. Lorna Inbox not botdee.html → Functions inviteHref."
+    },
       {
       id:"s3-3-080-botdee-vip-miami-place",
       area:"BOT DEE",
