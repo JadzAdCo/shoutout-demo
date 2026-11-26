@@ -10,7 +10,7 @@ const { analyze, CHROME_LANGS, HELP_LANGS } = require(reportPath);
 
 test("chrome packs match en key count for every supported language", () => {
   const { chrome } = analyze();
-  assert.equal(chrome.enKeys, 2047); // s3.3.085 city tokens chrome already 2047
+  assert.equal(chrome.enKeys, 2051); // s3.3.086 Place SMARTview studio assign keys
   for (const row of chrome.rows) {
     assert.equal(row.keys, chrome.enKeys, `chrome ${row.lang} keys`);
     assert.equal(row.missing, 0, `chrome ${row.lang} missing`);

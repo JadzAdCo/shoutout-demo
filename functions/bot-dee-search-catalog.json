@@ -3933,14 +3933,16 @@
       "id": "help-smartvisuals-place-assign",
       "kind": "help",
       "label": "Place SMARTview stencil, background, and tags",
-      "blurb": "Master Admin assigns a published SMARTstencil, SMARTbackground, and tags to Place SMARTview cards.",
+      "blurb": "Master Admin edits saved Place SMARTview cards. Published photos appear in the SMARTbackground list.",
       "href": "./botdee.html",
       "phrases": [
         "place smartview stencil background and tags",
-        "master admin assigns a published smartstencil smartbackground and tags to place smartview cards.",
+        "master admin edits saved place smartview cards. published photos appear in the smartbackground list.",
         "place smartview stencil",
         "smartview tags",
         "change card background",
+        "edit place smartview",
+        "published photo",
         "help-smartvisuals-place-assign"
       ]
     },
