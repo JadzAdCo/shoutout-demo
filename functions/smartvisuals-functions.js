@@ -16,8 +16,9 @@ const {FieldValue} = admin.firestore;
 
 const CALL_OPTS = {region: "us-central1", timeoutSeconds: 30, memory: "256MiB"};
 const REASON_MIN = 8;
-const COLLECTIONS = {
+  const COLLECTIONS = {
   drafts: "smartVisualDrafts",
+  published: "smartVisualPublished",
   overrides: "smartVisualOverrides",
   selections: "smartVisualSelections",
   adPolicy: "smartVisualAdPolicy",
@@ -184,6 +185,20 @@ exports.approveSmartVisualDraft = onCall(CALL_OPTS, async request => {
     updatedAt: FieldValue.serverTimestamp(),
     revision: Number(row.revision || 0) + 1
   }, {merge: true});
+  if (catalogAssetId) {
+    const overlay = {
+      catalogAssetId,
+      draftId,
+      approvalStatus: "published",
+      contentType: text(row.contentType, 80) || (row.svgXml ? "image/svg+xml" : ""),
+      svgXml: String(row.svgXml || ""),
+      imageBase64: String(row.imageBase64 || ""),
+      publishedAtMs: now,
+      publishedByEmail: email,
+      updatedAt: FieldValue.serverTimestamp()
+    };
+    await db.collection(COLLECTIONS.published).doc(catalogAssetId).set(overlay, {merge: true});
+  }
   await db.collection(COLLECTIONS.audit).add({
     eventType: "smartvisual.approved",
     outcome: "success",
@@ -211,7 +226,7 @@ exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
     override: {backgroundId, stencilId, authorized: true}
   }, catalog);
   if (probe.overrideRejected) deny("failed-precondition", "Override asset is not an approved published SMARTvisual.");
-  await db.collection(COLLECTIONS.overrides).doc(roomKey).set({
+  const row = {
     backgroundId: probe.backgroundId,
     stencilId: probe.stencilId,
     tags,
@@ -219,8 +234,13 @@ exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
     updatedByEmail: email,
     updatedAt: FieldValue.serverTimestamp(),
     updatedAtMs: Date.now()
-  });
-  return {ok: true, backgroundId: probe.backgroundId, stencilId: probe.stencilId, tags};
+  };
+  await db.collection(COLLECTIONS.overrides).doc(roomKey).set(row);
+  const placeId = resolver.backgroundPlaceId(probe.backgroundId);
+  if (placeId && roomKey !== `placeSmartView:${placeId}`) {
+    await db.collection(COLLECTIONS.overrides).doc(`placeSmartView:${placeId}`).set(row);
+  }
+  return {ok: true, backgroundId: probe.backgroundId, stencilId: probe.stencilId, tags, placeId: placeId || ""};
 });
 
 exports.getSmartVisualAdPolicy = onCall(CALL_OPTS, async request => {

@@ -136,7 +136,10 @@
     }
     const catalog = global.FLOQRSmartVisualsCatalog;
     const selection = resolver.resolvePlaceCard(payload, catalog);
-    const urls = resolver.urlsFor ? resolver.urlsFor(selection, catalog) : {};
+    const publishedUrl = String(payload?.floqrPublicData?.smartBackgroundUrl || payload?.smartBackgroundUrl || "").trim();
+    const urls = resolver.urlsFor
+      ? resolver.urlsFor(Object.assign({}, selection, publishedUrl ? {backgroundUrl: publishedUrl} : {}), catalog)
+      : {};
     const tags = Array.isArray(selection.tags)
       ? selection.tags
       : (resolver.normalizeSmartViewTags

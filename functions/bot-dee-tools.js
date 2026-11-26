@@ -1151,13 +1151,35 @@ function clubSmartView(card) {
 }
 
 function emptyPlaceVisualOverride() {
-  return {backgroundId: "", stencilId: "", tags: []};
+  return {backgroundId: "", stencilId: "", tags: [], generic: true, roomKey: ""};
 }
 
-async function loadPlaceVisualOverride(kind) {
+function catalogPlaceIdFromTokens(placeTokens) {
+  const tokens = Array.isArray(placeTokens) ? placeTokens.map(v => String(v || "").trim().toLowerCase()).filter(Boolean) : [];
+  if (!tokens.length) return "";
+  if (tokens.includes("miami") || tokens.includes("miami beach")) return "miami";
   try {
-    const normalize = require("./smartvisuals-resolver").normalizeSmartViewTags;
-    for (const key of [`placeSmartView:${kind}`, "placeSmartView"]) {
+    const resolver = require("./smartvisuals-resolver");
+    const out = resolver.resolve({
+      title: tokens.join(" "),
+      description: tokens.join(" "),
+      sourceKind: "place-smartview"
+    });
+    if (out && Array.isArray(out.placeIds) && out.placeIds[0]) return String(out.placeIds[0]);
+  } catch (_) { /* catalog optional */ }
+  return tokens[0].replace(/\s+/g, "-");
+}
+
+async function loadPlaceVisualOverride(kind, placeId) {
+  try {
+    const resolver = require("./smartvisuals-resolver");
+    const normalize = resolver.normalizeSmartViewTags;
+    const keys = [];
+    const place = String(placeId || "").trim();
+    if (place) keys.push(`placeSmartView:${place}`);
+    if (kind) keys.push(`placeSmartView:${kind}`);
+    keys.push("placeSmartView");
+    for (const key of keys) {
       const snap = await db.collection("smartVisualOverrides").doc(key).get();
       if (!snap.exists) continue;
       const data = snap.data() || {};
@@ -1165,7 +1187,8 @@ async function loadPlaceVisualOverride(kind) {
       const stencilId = String(data.stencilId || "").trim();
       const tags = typeof normalize === "function" ? normalize(data.tags) : [];
       if (backgroundId || stencilId || (tags && tags.length)) {
-        return {backgroundId, stencilId, tags: tags || []};
+        const placeSpecific = !!(place && key === `placeSmartView:${place}`);
+        return {backgroundId, stencilId, tags: tags || [], generic: !placeSpecific, roomKey: key};
       }
     }
   } catch (_) { /* overrides optional until Functions deploy */ }
@@ -1209,16 +1232,58 @@ function catalogTagsForBackground(backgroundId) {
 
 function applyPlaceVisualOverride(payload, override) {
   if (!payload || !override) return payload;
+  const publicData = payload.floqrPublicData || {};
+  const classifiedId = String(publicData.smartBackgroundId || "").trim();
+  let classifiedPlace = "";
+  let overridePlace = "";
+  try {
+    const resolver = require("./smartvisuals-resolver");
+    classifiedPlace = resolver.backgroundPlaceId(classifiedId) || "";
+    overridePlace = resolver.backgroundPlaceId(override.backgroundId) || "";
+  } catch (_) { /* catalog optional */ }
+  const otherPlace = !!(classifiedPlace && override.backgroundId && overridePlace && overridePlace !== classifiedPlace);
+  const keepClassified = !!(classifiedPlace && (override.generic || otherPlace || !override.backgroundId));
   const next = {};
-  if (override.backgroundId) next.smartBackgroundId = override.backgroundId;
-  if (override.stencilId) next.smartStencilId = override.stencilId;
-  const prior = (payload.floqrPublicData && payload.floqrPublicData.smartTags) || [];
-  const assigned = Array.isArray(override.tags) ? override.tags : [];
-  const fromBg = catalogTagsForBackground(override.backgroundId || next.smartBackgroundId);
-  const merged = mergeSmartViewTags(prior, assigned, fromBg);
-  if (merged.length) next.smartTags = merged;
+  if (override.backgroundId && !keepClassified) next.smartBackgroundId = override.backgroundId;
+  if (override.stencilId && !keepClassified) next.smartStencilId = override.stencilId;
+  const winId = next.smartBackgroundId || classifiedId;
+  const winPlace = keepClassified ? classifiedPlace : (overridePlace || classifiedPlace);
+  const tags = mergeSmartViewTags(
+    catalogTagsForBackground(winId),
+    winPlace ? [`destination:${winPlace}`] : [],
+    keepClassified ? [] : (Array.isArray(override.tags) ? override.tags : [])
+  );
+  if (tags.length) next.smartTags = tags;
   if (!Object.keys(next).length) return payload;
-  payload.floqrPublicData = Object.assign({}, payload.floqrPublicData || {}, next);
+  payload.floqrPublicData = Object.assign({}, publicData, next);
+  return payload;
+}
+
+function publishedBackgroundDataUrl(row) {
+  if (!row || String(row.approvalStatus || "") !== "published") return "";
+  const type = String(row.contentType || "").trim();
+  const raster = String(row.imageBase64 || "").replace(/\s+/g, "");
+  if (raster && /^image\/(jpeg|png|webp)$/.test(type) && raster.length <= 400000) {
+    return `data:${type};base64,${raster}`;
+  }
+  const svg = String(row.svgXml || "").trim();
+  if (svg && svg.length <= 400000) {
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  }
+  return "";
+}
+
+async function attachPublishedBackgroundUrl(payload) {
+  if (!payload) return payload;
+  const id = String(payload.floqrPublicData && payload.floqrPublicData.smartBackgroundId || "").trim();
+  if (!id) return payload;
+  try {
+    const snap = await db.collection("smartVisualPublished").doc(id).get();
+    if (!snap.exists) return payload;
+    const url = publishedBackgroundDataUrl(snap.data() || {});
+    if (!url) return payload;
+    payload.floqrPublicData = Object.assign({}, payload.floqrPublicData || {}, {smartBackgroundUrl: url});
+  } catch (_) { /* published overlay optional until Functions deploy */ }
   return payload;
 }
 
@@ -1357,12 +1422,15 @@ async function attachVenueSearch({query} = {}) {
   const media = [];
   let overrideVisual = emptyPlaceVisualOverride();
   try {
-    overrideVisual = await loadPlaceVisualOverride("venue");
+    overrideVisual = await loadPlaceVisualOverride("venue", catalogPlaceIdFromTokens(classified.placeTokens));
   } catch (_) { /* packaged resolver still stamps a SMARTbackground */ }
-  const smartViews = cards.map(card => applyPlaceVisualOverride(clubSmartView(card), overrideVisual));
+  const smartViews = [];
+  for (const card of cards) {
+    smartViews.push(await attachPublishedBackgroundUrl(applyPlaceVisualOverride(clubSmartView(card), overrideVisual)));
+  }
   if (!smartViews.length && placeSearchAlongsideRoom(classified)) {
     const dest = destinationSmartView(classified);
-    if (dest) smartViews.push(applyPlaceVisualOverride(dest, overrideVisual));
+    if (dest) smartViews.push(await attachPublishedBackgroundUrl(applyPlaceVisualOverride(dest, overrideVisual)));
   }
   return {
     handled: true,
@@ -2053,6 +2121,8 @@ module.exports = {
   clubSmartView,
   applyPlaceBackgroundOverride,
   applyPlaceVisualOverride,
+  attachPublishedBackgroundUrl,
+  catalogPlaceIdFromTokens,
   loadPlaceBackgroundOverride,
   loadPlaceVisualOverride,
   clubToResult,

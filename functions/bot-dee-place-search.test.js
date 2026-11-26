@@ -101,13 +101,29 @@ test("venue cards open the club public page without cache-bust v=", () => {
   const tagged = tools.applyPlaceVisualOverride(view, {
     backgroundId: "bg-paris",
     stencilId: "st-flight",
-    tags: ["nightlife", "dc"]
+    tags: ["nightlife", "dc"],
+    generic: true
   });
-  assert.equal(tagged.floqrPublicData.smartBackgroundId, "bg-paris");
-  assert.equal(tagged.floqrPublicData.smartStencilId, "st-flight");
-  assert.ok(tagged.floqrPublicData.smartTags.includes("nightlife"));
-  assert.ok(tagged.floqrPublicData.smartTags.includes("dc"));
-  assert.ok(tagged.floqrPublicData.smartTags.includes("paris"));
+  assert.equal(tagged.floqrPublicData.smartBackgroundId, view.floqrPublicData.smartBackgroundId);
+  assert.ok(tagged.floqrPublicData.smartTags.includes("destination:washington-dc") || tagged.floqrPublicData.smartBackgroundId);
+  const miamiDest = tools.destinationSmartView(tools.classifyPlaceSearchIntent("clubs in Miami"));
+  const mixed = tools.applyPlaceVisualOverride(miamiDest, {
+    backgroundId: "bg-bali",
+    stencilId: "st-flight",
+    tags: ["milan", "fashion", "travel", "bali", "tropical"],
+    generic: true
+  });
+  assert.equal(mixed.floqrPublicData.smartBackgroundId, "bg-miami");
+  assert.ok(mixed.floqrPublicData.smartTags.includes("miami"));
+  assert.ok(!mixed.floqrPublicData.smartTags.includes("milan"));
+  assert.ok(!mixed.floqrPublicData.smartTags.includes("bali"));
+  const samePlace = tools.applyPlaceVisualOverride(miamiDest, {
+    backgroundId: "bg-miami",
+    stencilId: "st-beach",
+    tags: ["miami", "beach"],
+    generic: false
+  });
+  assert.equal(samePlace.floqrPublicData.smartBackgroundId, "bg-miami");
   const result = tools.clubToResult(card);
   assert.equal(result.href, card.profileHref);
   assert.doesNotMatch(result.href, /[?&]v=/);
@@ -154,7 +170,9 @@ test("venue search returns SMARTviews only, not duplicate result links", () => {
   const session = fs.readFileSync(path.join(__dirname, "bot-dee-functions.js"), "utf8");
   assert.match(session, /else if \(venueAttached && venueAttached\.handled\)[\s\S]*?results: \[\]/);
   const attach = fs.readFileSync(path.join(__dirname, "bot-dee-tools.js"), "utf8");
-  assert.match(attach, /const smartViews = cards\.map\(card => applyPlaceVisualOverride\(clubSmartView\(card\), overrideVisual\)\)/);
+  assert.match(attach, /applyPlaceVisualOverride\(clubSmartView\(card\), overrideVisual\)/);
+  assert.match(attach, /catalogPlaceIdFromTokens\(classified\.placeTokens\)/);
+  assert.match(attach, /attachPublishedBackgroundUrl/);
   assert.match(session, /attachPlaceWithRoom/);
   assert.match(session, /placeViews/);
   assert.match(session, /!vipExecute \|\| attachPlaceWithRoom/);
@@ -196,6 +214,7 @@ test("room smart card for reservations in Miami keeps Miami place tokens and Pla
   assert.match(dest.title, /Miami/i);
   assert.equal(dest.floqrPublicData.smartBackgroundId, "bg-miami");
   assert.ok(dest.floqrPublicData.smartTags.includes("miami"));
+  assert.equal(tools.catalogPlaceIdFromTokens(["miami"]), "miami");
 
   const local = require("./bot-dee-functions").__botDeeHelpers.localSession("patron", q);
   assert.equal(local.provider, "local-room-smartview");

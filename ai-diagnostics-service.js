@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.081";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.081";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.082";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.082";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,17 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.082",
+      title: "s3.3.082 — Miami Place SMARTview uses published SMARTbackground",
+      checks: [
+        {label:"City art beats generic venue override", file:"functions/bot-dee-tools.js", includes:["keepClassified", "catalogPlaceIdFromTokens", "smartVisualPublished"]},
+        {label:"Studio publish overlay", file:"functions/smartvisuals-functions.js", includes:["smartVisualPublished", "placeSmartView:${placeId}"]},
+        {label:"Checksum URLs + published data URL", file:"smartvisuals-resolver.js", includes:["cacheBustedAssetUrl", "backgroundPlaceId"]},
+        {label:"Place card prefers stamped URL", file:"botdee-smartview.js", includes:["smartBackgroundUrl"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-082-miami-place-smartbackground", "s3.3.082"]}
+      ]
+    },
     {
       version: "s3.3.081",
       title: "s3.3.081 — After invite, type in this BOT DEE room",
@@ -3894,6 +3905,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-082-miami-place-smartbackground",
+      area:"BOT DEE",
+      feature:"Place SMARTview Miami uses the published SMARTbackground",
+      changed:"s3.3.082 — After joining a Room SMARTview and typing Miami, Place SMARTview was showing leftover tropical night/plane art (bg-bali) plus mixed tags (miami, beach, city, milan, fashion, travel, bali, tropical) and copy FLOQR doesn't list that kind of spot. Cause: generic Studio venue override clobbered catalog bg-miami; tags were a union; Studio Publish never reached the card (git miami.svg). Fix: city-matched SMARTbackground wins; tags from that catalog row; approve writes smartVisualPublished; Functions stamp smartBackgroundUrl; git SVG cache-bust ?c=checksum.",
+      howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee] [firebase-deploy-smartvisuals]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / smartvisuals-resolver.js ?v=s3.3.082. 2) Join a Room SMARTview, then type Miami. Expect Place SMARTview titled Miami with bg-miami (or the Studio-published JPEG if Review Publish already ran for Miami) — not Bali lagoon/plane, not milan/fashion/travel/bali chips. Copy may still say FLOQR doesn't list that kind of spot if no onboarded Miami club. 3) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Miami Place SMARTview shows the published Miami SMARTbackground and Miami tags only.",
+      troubleshoot:"Still Bali/plane → Functions executeBotSession not this SHA (keepClassified / loadPlaceVisualOverride place id) or cached botdee-smartview.js. Still leftover SVG after Studio JPEG publish → smartVisualPublished missing (approveSmartVisualDraft deploy) or stamp skipped (payload too large). Mixed tags → old applyPlaceVisualOverride merge still live."
+    },
       {
       id:"s3-3-081-botdee-after-invite-join",
       area:"BOT DEE",

@@ -864,6 +864,7 @@
         "smartNotification",
         "roomSmartView",
         "peopleSmartView",
+        "placeSmartView",
         "studioPreview"
       ],
       "pairedStencilId": "beach",

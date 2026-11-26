@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.081 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.082 (stable)
 
+- s3.3.082: Miami Place SMARTview uses the published SMARTbackground, not leftover Bali art
 - s3.3.081: After Invite sent, type in this BOT DEE room; Search Join Now stays botdee.html?room=
 - s3.3.080: BOT DEE VIP reserV map at Aurelia plus Miami Place SMARTview on mixed VIP input
 - s3.3.079: Search Join Now attaches the existing BOT DEE Room SMARTview group chat (Don + Lorna names + shared turns)

@@ -774,6 +774,10 @@ service cloud.firestore {
  allow read: if isMasterAdmin();
  allow write: if false;
  }
+ match /smartVisualPublished/{id} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
  match /smartVisualSelections/{id} {
  allow read, write: if false;
  }
