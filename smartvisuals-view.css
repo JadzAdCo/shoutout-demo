@@ -110,7 +110,7 @@
 }
 .sv-place-card h3{font-size:14px;line-height:1.15;margin:2px 0 0}
 .sv-place-blurb{font-size:11px;color:var(--sv-muted);margin-top:2px}
-.sv-place-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.sv-place-tags{display:none}
 .sv-place-tag{
   display:inline-flex;padding:1px 6px;border-radius:999px;
   border:1px solid color-mix(in srgb, var(--accent, #34d9df) 40%, transparent);

@@ -116,14 +116,37 @@
   border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 45%, transparent);
   filter: brightness(0) invert(1);
 }
-.botdee-sv-place .botdee-sv-tags {
-  gap: 0.18rem;
+.botdee-sv-place .botdee-sv-tags { display: none; }
+.botdee-sv-place-tabs { margin: 0.05rem 0 0; }
+.botdee-sv-place-tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
 }
-.botdee-sv-place .botdee-sv-tag {
-  padding: 0.08rem 0.38rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.02em;
+.botdee-sv-place-tab {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--accent, #00d4fe) 40%, transparent);
+  background: color-mix(in srgb, var(--floqr-ink, #05080a) 45%, transparent);
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
 }
+.botdee-sv-place-tab[aria-selected="true"] {
+  background: linear-gradient(110deg, var(--accent, #00d4fe), var(--hot, var(--accent, #00d4fe)));
+  color: var(--floqr-ink, #001819);
+  border-color: transparent;
+}
+.botdee-sv-place-panel {
+  margin: 0.28rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: var(--muted, #d8e8e8);
+}
+.botdee-sv-place-panel[hidden] { display: none; }
 .botdee-sv-place .botdee-sv-mock {
   flex: 0 0 auto;
   max-width: 9.5rem;

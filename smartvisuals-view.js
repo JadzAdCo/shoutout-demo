@@ -204,18 +204,18 @@
     const tags = Array.isArray(visual.tags) && visual.tags.length
       ? visual.tags
       : (card.floqrPublicData && Array.isArray(card.floqrPublicData.smartTags) ? card.floqrPublicData.smartTags : []);
-    const tagHtml = tags.slice(0, 4).map(tag => `<span class="sv-place-tag">${esc(tag)}</span>`).join("");
+    const tagList = tags.slice(0, 4);
+    const tagAttr = tagList.length ? ` data-sv-place-tag-list="${esc(JSON.stringify(tagList))}"` : "";
     const bg = urls.backgroundUrl
       ? ` style="--sv-place-bg:url('${esc(urls.backgroundUrl)}')"`
       : "";
     const stencil = urls.stencilUrl
       ? `<img class="sv-place-stencil" src="${esc(urls.stencilUrl)}" alt="" width="22" height="22"/>`
       : "";
-    return `<article class="sv-place-card" data-kind="${esc(card.kind || "venue")}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}"${bg}>
+    return `<article class="sv-place-card" data-kind="${esc(card.kind || "venue")}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}"${tagAttr}${bg}>
       <p class="sv-place-kind">Place SMARTview</p>
       <h3>${esc(card.title || "")}</h3>
       ${card.summary ? `<p class="sv-place-blurb">${esc(card.summary)}</p>` : ""}
-      ${tagHtml ? `<div class="sv-place-tags">${tagHtml}</div>` : ""}
       ${stencil}
     </article>`;
   }

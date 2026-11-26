@@ -155,7 +155,7 @@
     };
   }
 
-  function placeTagHtml(tags) {
+  function placeTagList(tags) {
     const seen = new Set();
     const list = [];
     (Array.isArray(tags) ? tags : []).forEach(tag => {
@@ -165,11 +165,55 @@
       seen.add(next);
       list.push(next);
     });
-    const shown = list.slice(0, 8);
+    return list.slice(0, 8);
+  }
+
+  function placeTagHtml(tags) {
+    const shown = placeTagList(tags);
     if (!shown.length) return "";
     return `<div class="botdee-sv-tags" data-sv-place-tags="1">${shown.map(tag =>
       `<span class="botdee-sv-tag">${esc(tag)}</span>`
     ).join("")}</div>`;
+  }
+
+  function hiddenPlaceTagsAttr(tags) {
+    const shown = placeTagList(tags);
+    if (!shown.length) return "";
+    return ` data-sv-place-tag-list="${esc(JSON.stringify(shown))}"`;
+  }
+
+  function placeTabsHtml() {
+    const tabs = [
+      {id: "things", key: "botdee.place.tabThings", fallback: "Things to do"},
+      {id: "security", key: "botdee.place.tabSecurity", fallback: "Security"},
+      {id: "commute", key: "botdee.place.tabCommute", fallback: "Commute"}
+    ];
+    const stub = t("botdee.place.tabStub", "Nothing here yet.");
+    const buttons = tabs.map((tab, i) =>
+      `<button type="button" class="botdee-sv-place-tab" role="tab" data-place-tab="${tab.id}" aria-selected="${i === 0 ? "true" : "false"}">${esc(t(tab.key, tab.fallback))}</button>`
+    ).join("");
+    const panels = tabs.map((tab, i) =>
+      `<div class="botdee-sv-place-panel is-stub" role="tabpanel" data-place-panel="${tab.id}"${i ? " hidden" : ""}>${esc(stub)}</div>`
+    ).join("");
+    return `<div class="botdee-sv-place-tabs" data-place-tabs="1"><div class="botdee-sv-place-tablist" role="tablist">${buttons}</div>${panels}</div>`;
+  }
+
+  function bindPlaceTabs(root) {
+    (root.querySelectorAll("[data-place-tabs]") || []).forEach(host => {
+      if (host.dataset.placeTabsBound === "1") return;
+      host.dataset.placeTabsBound = "1";
+      host.querySelectorAll("[data-place-tab]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-place-tab");
+          host.querySelectorAll("[data-place-tab]").forEach(other => {
+            other.setAttribute("aria-selected", other === btn ? "true" : "false");
+          });
+          host.querySelectorAll("[data-place-panel]").forEach(panel => {
+            panel.hidden = panel.getAttribute("data-place-panel") !== id;
+          });
+        });
+      });
+    });
   }
 
   function chromeIconSrc() {
@@ -2486,7 +2530,7 @@
       const main = action.id === "open-public-page" ? " botdee-sv-action-main" : "";
       return `<li><a class="buttonlike${main}" href="${esc(fixed)}">${label}</a></li>`;
     }).join("");
-    return `<article class="botdee-sv-card botdee-sv-place" data-kind="${esc(payload.kind)}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}"${bgStyle}>
+    return `<article class="botdee-sv-card botdee-sv-place" data-kind="${esc(payload.kind)}" data-sv-bg="${esc(visual.backgroundId || "")}" data-sv-st="${esc(visual.stencilId || "")}"${hiddenPlaceTagsAttr(visual.tags)}${bgStyle}>
       <header class="botdee-sv-place-head">
         <img class="botdee-sv-place-chrome" data-floqr-chrome-icon="botDee" src="${esc(chromeIconSrc())}" alt="${esc(t("botdee.sv.chromeAlt", "BOT DEE"))}" width="28" height="28"/>
         <div class="botdee-sv-place-copy">
@@ -2497,7 +2541,7 @@
         ${mock ? `<p class="botdee-sv-mock">${esc(t("botdee.smartviewMockBadge", "Mock / not live licensed data"))}</p>` : ""}
       </header>
       ${payload.summary ? `<p class="botdee-sv-summary">${esc(payload.summary)}</p>` : ""}
-      ${placeTagHtml(visual.tags)}
+      ${placeTabsHtml()}
       ${ratings.length ? `<ul class="botdee-sv-ratings">${ratings.map(ratingRow).join("")}</ul>` : ""}
       ${cuisine.length ? `<p class="botdee-sv-cuisine">${esc(Array.isArray(cuisine) ? cuisine.join(" · ") : cuisine)}</p>` : ""}
       ${nhtsa && nhtsa.status === "missing" ? `<p class="botdee-sv-missing">${esc(nhtsa.note || "Safety rating unavailable for this year/trim.")}</p>` : ""}
@@ -3155,6 +3199,7 @@
       : "";
     el.innerHTML = list.map(renderCard).join("") + more || `<p class="sub small">${esc(t("botdee.libraryEmpty", "No saved SMARTviews yet."))}</p>`;
     wireActionLinks(el);
+    bindPlaceTabs(el);
     el.querySelectorAll(".botdee-sv-version").forEach(card => bindVersionCard(card));
     const featureHosts = el.querySelectorAll(".floqr-fsv-inline-host");
     let featureIndex = 0;

@@ -587,7 +587,9 @@ test("Search SMARTnotification for a Miami room prompt uses Place SMARTview card
   assert.match(compact, /sv-place-card/);
   assert.match(compact, /Place SMARTview/);
   assert.match(compact, /data-sv-bg="bg-miami"/);
-  assert.match(compact, /sv-place-tag">miami/);
+  assert.match(compact, /data-sv-place-tag-list=/);
+  assert.match(compact, /miami/);
+  assert.doesNotMatch(compact, /sv-place-tag">miami/);
   assert.match(compact, /View Invitation/);
   assert.doesNotMatch(compact, /Mingl Room<\/span>/);
   assert.doesNotMatch(compact, /mingl-chat\.html/);

@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.087 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.088 (stable)
 
+- s3.3.088: Place SMARTview hides patron tags; Things to do / Security / Commute stubs
 - s3.3.087: Place SMARTview card then natural ask; pasted Place copy is not a ShoutOut
 - s3.3.085: BOT DEE city and place tokens in all 11 languages
 - s3.3.083: Let's plan for Bali opens Bali Place SMARTview with the published SMARTbackground
