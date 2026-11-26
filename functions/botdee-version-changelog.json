@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.087",
+    "text": "s3.3.087: BOT DEE Place SMARTview session intent + published SMARTbackgrounds",
+    "audiences": [
+      "botDee"
+    ]
+  },
+  {
     "id": "s3.3.085",
     "text": "s3.3.085: BOT DEE city and place tokens in all 11 languages",
     "audiences": [

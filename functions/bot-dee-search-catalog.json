@@ -366,11 +366,11 @@
       "id": "help-botdee-place-search",
       "kind": "help",
       "label": "Ask BOT DEE for FLOQR venues",
-      "blurb": "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a pho",
+      "blurb": "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Place SMARTview is three layers: workflow verbiage, a published SMARTbackground, and tags for the place and topic. Matching clu",
       "href": "./botdee.html",
       "phrases": [
         "ask bot dee for floqr venues",
-        "ask in plain words sushi restaurants in washington dc clubs in dc or a named club. bot dee searches onboarded floqr venues only not google or yelp. matching clu",
+        "ask in plain words sushi restaurants in washington dc clubs in dc or a named club. bot dee searches onboarded floqr venues only not google or yelp. place smartv",
         "sushi restaurants",
         "sushi in washington dc",
         "restaurants in dc",
@@ -385,6 +385,10 @@
         "vip reserv miami",
         "lets talk miami",
         "talk miami",
+        "milan fashion week",
+        "reserve a table milan",
+        "don papi talking to bots",
+        "place smartview intent",
         "open bot dee",
         "help-botdee-place-search"
       ]
