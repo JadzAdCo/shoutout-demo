@@ -1,5 +1,6 @@
-# CURRENT PACKAGE: FLOQR ShoutOut s3.3.082 (stable)
+# CURRENT PACKAGE: FLOQR ShoutOut s3.3.083 (stable)
 
+- s3.3.083: Let's plan for Bali opens Bali Place SMARTview with the published SMARTbackground
 - s3.3.082: Miami Place SMARTview uses the published SMARTbackground, not leftover Bali art
 - s3.3.081: After Invite sent, type in this BOT DEE room; Search Join Now stays botdee.html?room=
 - s3.3.080: BOT DEE VIP reserV map at Aurelia plus Miami Place SMARTview on mixed VIP input
