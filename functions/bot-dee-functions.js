@@ -1079,7 +1079,7 @@ function localSession(role, userPrompt, {active, uiLanguage, allowedFeatures, fe
   ));
   const placeTools = require("./bot-dee-tools");
   const placeClassified = placeTools.classifyPlaceSearchFromConversation(userPrompt, history);
-  const placeViews = placeTools.destinationPlaceViews(placeTools.placeAttachQuery(placeClassified, userPrompt));
+  const placeViews = placeTools.destinationPlaceViews(placeTools.placeAttachQuery(placeClassified, userPrompt), null, null);
   if (!roomTakesPriority && bot.isVipExecutePrompt(userPrompt)) {
     const pack = bot.vipExecuteFallback(lang, allowed);
     return {
@@ -1272,6 +1272,15 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         console.warn("BOT DEE mark used failed", err?.message || err);
       }
     }
+    const intentCore = require("./botdee-session-intent");
+    const turnWorkflow = intentCore.classifySessionWorkflow(userPrompt);
+    const sessionWorkflow = intentCore.mergeWorkflow(stored.sessionWorkflow, turnWorkflow);
+    try {
+      await threads.persistSessionWorkflow(uid, sessionWorkflow, receivedAtMs);
+    } catch (err) {
+      console.warn("BOT DEE persist session workflow failed", err?.message || err);
+    }
+    stored.sessionWorkflow = sessionWorkflow;
     let outcome;
     const roomDeclined = Array.isArray(request.data?.roomSmartViewDeclined)
       ? request.data.roomSmartViewDeclined.map(value => String(value || "").slice(0, 80)).filter(Boolean).slice(0, 24)
@@ -1397,7 +1406,15 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       || roomClassified.route === "command"
       || roomClassified.command === "invite"
     ));
-    const vipExecute = !roomTakesPriority && (bot.isVipExecutePrompt(userPrompt) || vipFollowUp);
+    const askIntentNow = !!(turnWorkflow.placeWithoutProduct && !turnWorkflow.productClear
+      && !(sessionWorkflow.intents || []).includes("reserve")
+      && !(sessionWorkflow.intents || []).includes("shoutout"));
+    const talkNow = !!turnWorkflow.talkOnly;
+    const vipExecute = !roomTakesPriority && !talkNow && !askIntentNow && (
+      bot.isVipExecutePrompt(userPrompt)
+      || vipFollowUp
+      || (sessionWorkflow.intents || []).includes("reserve")
+    );
     let venueAttached = null;
     const collabUtterance = stored.joinedRoomId ? parseCollabUtterance(userPrompt) : null;
     if (!outcome && collabUtterance) {
@@ -1416,12 +1433,42 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       : placeTools.classifyPlaceSearchFromConversation(userPrompt, history);
     const attachPlaceWithRoom = placeTools.placeSearchAlongsideRoom(placeClassified);
     const placeQuery = placeTools.placeAttachQuery(placeClassified, userPrompt);
+    if (!outcome && talkNow) {
+      outcome = {
+        reply: intentCore.talkJoke(),
+        results: [],
+        provider: "local-session-intent",
+        model: "session-talk",
+        toolRounds: 0,
+        uiLanguage,
+        smartViews: [],
+        sessionWorkflow,
+        geminiOnView: false
+      };
+    }
+    if (!outcome && askIntentNow) {
+      const views = placeTools.destinationPlaceViews(placeQuery, null, sessionWorkflow);
+      outcome = {
+        reply: intentCore.askIntentReply(sessionWorkflow),
+        results: [],
+        provider: "local-session-intent",
+        model: "session-place-intent",
+        toolRounds: 0,
+        uiLanguage,
+        smartViews: views,
+        sessionWorkflow,
+        geminiOnView: false
+      };
+    }
     if (!skipPlaceSearch && !outcome && !shoutExecute && (!vipExecute || attachPlaceWithRoom) && (!roomAttached.handled || attachPlaceWithRoom)) {
       try {
         venueAttached = await placeTools.attachVenueSearch({
           query: placeQuery,
           request
         });
+        if (venueAttached && Array.isArray(venueAttached.smartViews)) {
+          venueAttached.smartViews = venueAttached.smartViews.map(view => intentCore.stampPlacePayload(view, sessionWorkflow));
+        }
       } catch (error) {
         console.warn("BOT DEE venue search attach failed", error?.message || error);
       }
@@ -1887,6 +1934,13 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       });
     }
     outcome = mergePlaceSmartViews(outcome, venueAttached);
+    if (outcome && Array.isArray(outcome.smartViews)) {
+      outcome.smartViews = outcome.smartViews.map(view => {
+        if (!view || view.kind !== "venue") return view;
+        return intentCore.stampPlacePayload(view, sessionWorkflow);
+      });
+    }
+    outcome.sessionWorkflow = sessionWorkflow;
     const versionCardOnly = Array.isArray(outcome.smartViews)
       && outcome.smartViews.some(row => row && row.kind === "botDeeVersion")
       && !String(outcome.reply || "").trim();

@@ -411,6 +411,9 @@ function snapshotToState(snap, uid, settings, nowMs) {
     headlessVipDraft: staleGeneration ? null : (data.headlessVipDraft && typeof data.headlessVipDraft === "object"
       ? data.headlessVipDraft
       : null),
+    sessionWorkflow: staleGeneration ? null : (data.sessionWorkflow && typeof data.sessionWorkflow === "object"
+      ? data.sessionWorkflow
+      : null),
     joinedRoomConversationId: staleGeneration ? "" : clipConversationId(data.joinedRoomConversationId),
     joinedRoomId: staleGeneration ? "" : String(data.joinedRoomId || "").trim().slice(0, 80)
   };
@@ -933,6 +936,20 @@ async function persistUserTurn(uid, settings, userText, opts) {
   return {ok: true, ...written};
 }
 
+async function persistSessionWorkflow(uid, workflow, nowMs) {
+  const ref = threadRef(uid);
+  if (!ref) return {ok: false, error: "missing_uid"};
+  const intent = require("./botdee-session-intent");
+  const row = intent.clipWorkflow(workflow);
+  const now = Number(nowMs) || Date.now();
+  await ref.set({
+    sessionWorkflow: row,
+    sessionWorkflowAtMs: now,
+    updatedAtMs: now
+  }, {merge: true});
+  return {ok: true, sessionWorkflow: row};
+}
+
 async function persistModelTurn(uid, settings, modelText, opts) {
   if (!settings?.durableThreads) return {ok: true, skipped: true};
   const ref = threadRef(uid);
@@ -1029,6 +1046,7 @@ module.exports = {
   loadThreadState,
   persistExchange,
   persistUserTurn,
+  persistSessionWorkflow,
   persistHeadlessShoutOutDraft,
   persistHeadlessVipDraft,
   persistJoinedRoomId,

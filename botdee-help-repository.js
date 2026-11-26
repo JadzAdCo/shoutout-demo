@@ -1341,13 +1341,15 @@
     {
       id: "help-botdee-place-search",
       title: "Ask BOT DEE for FLOQR venues",
-      body: "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a photo well. Short greetings do not search venues. Miami or let’s talk Miami still attaches Miami Place SMARTview even when clubs are listed. Naming a city with VIP reserV (reservations in Miami) still attaches Place SMARTview next to the VIP card. Patron photos and ShoutOut pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so.",
+      body: "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Place SMARTview is three layers: workflow verbiage, a published SMARTbackground, and tags for the place and topic. Matching clubs open that compact card (not a photo well). Reserve a table at a club in Milan during Milan Fashion Week starts headless VIP reserV and uses the Milan Fashion Week SMARTbackground. If you only like Fashion Week in Milan, BOT DEE shows Place SMARTview with a NEUTRAL SMARTstencil and asks what you want to do. If you just want to talk, BOT DEE jokes that Don Papi the founder said humans like talking to bots. Short greetings do not search venues. Intent is remembered for this BOT DEE session. Patron photos stay off unless you asked.",
       searchPhrases: [
         "sushi restaurants", "sushi in washington dc", "restaurants in dc",
         "clubs in washington dc", "dining search", "find a club", "japanese restaurant",
         "bot dee venues", "bot dee restaurants", "reservations in miami",
         "place smartview miami", "vip reserv miami",
-        "lets talk miami", "talk miami"
+        "lets talk miami", "talk miami",
+        "milan fashion week", "reserve a table milan", "don papi talking to bots",
+        "place smartview intent"
       ],
       links: [{label: "Open BOT DEE", href: pageUrl("./botdee.html")}],
       audiences: ["patron", "serviceMember", "venueAdmin", "masterAdmin"],

@@ -1384,10 +1384,11 @@ function placeAttachQuery(classified, fallbackPrompt) {
   return fallbackPrompt;
 }
 
-function destinationSmartView(classified) {
-  const token = (classified && classified.placeTokens || []).find(Boolean);
-  if (!token) return null;
-  const city = titleCasePlace(token);
+function destinationSmartView(classified, workflow) {
+  const token = (classified && classified.placeTokens || []).find(Boolean)
+    || (workflow && workflow.places && workflow.places[0]);
+  if (!token && !(workflow && workflow.topics && workflow.topics.length)) return null;
+  const city = titleCasePlace(token || (workflow.topics || [])[0] || "Place");
   const payload = {
     kind: "venue",
     title: city,
@@ -1406,14 +1407,25 @@ function destinationSmartView(classified) {
       payload.floqrPublicData.smartTags = visual.tags;
     }
   } catch (_) { /* catalog optional on this path */ }
+  try {
+    require("./botdee-session-intent").stampPlacePayload(payload, workflow);
+  } catch (_) { /* workflow stamp optional */ }
   return payload;
 }
 
-function destinationPlaceViews(query, overrideVisual) {
+function destinationPlaceViews(query, overrideVisual, workflow) {
   const classified = classifyPlaceSearchIntent(query);
-  if (!placeSearchAlongsideRoom(classified)) return [];
-  const dest = destinationSmartView(classified);
-  if (!dest) return [];
+  const dest = destinationSmartView(classified, workflow);
+  if (!dest) {
+    if (workflow && (workflow.placeWithoutProduct || (workflow.places || []).length || (workflow.topics || []).length)) {
+      const stamped = destinationSmartView({placeTokens: workflow.places || []}, workflow);
+      return stamped ? [applyPlaceVisualOverride(stamped, overrideVisual || emptyPlaceVisualOverride())] : [];
+    }
+    return [];
+  }
+  if (!placeSearchAlongsideRoom(classified) && !(workflow && (workflow.placeWithoutProduct || workflow.productClear))) {
+    return [];
+  }
   return [applyPlaceVisualOverride(dest, overrideVisual || emptyPlaceVisualOverride())];
 }
 

@@ -223,6 +223,17 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.087",
+      title: "s3.3.087 — BOT DEE Place SMARTview intent + published photo assignment",
+      checks: [
+        {label:"Session intent classifier", file:"functions/botdee-session-intent.js", includes:["classifySessionWorkflow", "NEUTRAL_STENCIL_ID", "Don Papi"]},
+        {label:"Persist session workflow", file:"functions/bot-dee-thread.js", includes:["persistSessionWorkflow", "sessionWorkflow"]},
+        {label:"Publish injects assignment photo", file:"functions/smartvisuals-functions.js", includes:["bg-published-${draftId}"]},
+        {label:"Studio injects unmatched photo", file:"smartvisuals-studio.js", includes:["publishedPhoto: true"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-087-botdee-place-intent", "s3.3.087"]}
+      ]
+    },
+    {
       version: "s3.3.086",
       title: "s3.3.086 — Studio Place SMARTview edit + published photos",
       checks: [
@@ -3945,6 +3956,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-087-botdee-place-intent",
+      area:"BOT DEE",
+      feature:"Place SMARTview intent + SMARTbackground",
+      changed:"s3.3.087 — Place SMARTview is workflow verbiage + published SMARTbackground + place/topic tags. Publishing a picture adds it to the Studio assignment list. Patron chat extracts datapoints and intent, remembers intent for the session, and starts headless VIP reserV when they reserve a club table. Fashion Week in Milan without a product intent shows Place SMARTview + NEUTRAL stencil and asks. Talk-only uses the Don Papi joke.",
+      howToTest:"1) Hard-refresh BOT DEE until floqr-i18n.js ?v=s3.3.087. Sign in. 2) Send: reserve a table at a club in Milan during Milan Fashion Week — VIP reserV headless + Milan Fashion Week SMARTbackground + tags reserve/club/milan/fashion-week. 3) New chat: I like fashion week in Milan — Place SMARTview Milan, NEUTRAL stencil, BOT DEE asks for intent (no VIP). 4) I just want to talk — Don Papi the founder said humans like talking to bots. 5) Master Admin Studio: Publish a picture; it appears in the Place SMARTview SMARTbackground list (published photo). Do not merge until Don says merge. Display URLs have no ?v=.",
+      expected:"Intent remembered on the BOT DEE session. Fashion Week + reserve uses the published Milan Fashion Week SMARTbackground. No-intent place asks before starting a workflow. Talk-only is the Don Papi joke. Published photos list in Studio assignment.",
+      troubleshoot:"VIP missing → Functions executeBotSession not deployed. Neutral stencil missing → cached botdee-smartview / session-intent. Photo missing from list → approveSmartVisualDraft not deployed or studio.js cache before publishedPhoto inject. Intent forgotten after refresh → persistSessionWorkflow / botDeeThreads.sessionWorkflow."
+    },
       {
       id:"s3-3-086-studio-place-assign-edit",
       area:"Master Admin",

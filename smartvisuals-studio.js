@@ -139,13 +139,30 @@
   function applyDraftToCatalog(draft) {
     if (!draft || String(draft.approvalStatus || "") !== "published") return null;
     const match = assets().find(a => a.id === draft.catalogAssetId) || matchCatalogAsset(draft);
-    if (!match) return null;
     const src = draftPreviewSrc(draft);
-    if (src) match.studioPreviewSrc = src;
-    match.studioDraftId = draft.id;
     const draftName = String(draft.name || "").trim();
-    if (draftName) match.name = draftName;
-    return match;
+    if (match) {
+      if (src) match.studioPreviewSrc = src;
+      match.studioDraftId = draft.id;
+      if (draftName) match.name = draftName;
+      return match;
+    }
+    if (String(draft.type || "background") === "stencil") return null;
+    if (!catalog || !Array.isArray(catalog.assets)) return null;
+    const id = String(draft.catalogAssetId || `bg-published-${draft.id || "draft"}`).trim();
+    const row = {
+      id,
+      type: "background",
+      name: draftName || id,
+      approvalStatus: "published",
+      category: "published",
+      tags: normalizeTags(draft.tags || ["published"]),
+      studioPreviewSrc: src,
+      studioDraftId: draft.id,
+      publishedPhoto: true
+    };
+    catalog.assets = catalog.assets.filter(a => a && a.id !== id).concat(row);
+    return row;
   }
 
   function uniqueAssetTags() {

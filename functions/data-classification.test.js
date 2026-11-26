@@ -183,6 +183,7 @@ test("getBotDeeAccess resolves the tier server-side, keeps the botDee feature gu
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "chatTitles"));
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "headlessShoutOutDraft"));
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "headlessVipDraft"));
+  assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "sessionWorkflow"));
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "joinedRoomId"));
   assert.ok(dc.FIELD_CATALOG.some(row => row.parent === "botDeeThreads" && row.field === "joinedRoomConversationId"));
   assert.ok(dc.COLLECTIONS.includes("botDeeRooms"));
