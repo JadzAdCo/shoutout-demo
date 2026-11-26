@@ -1,0 +1,55 @@
+---
+description: Every new/changed function must work in all 11 supported languages — matchers and token lists, not only chrome i18n keys
+alwaysApply: true
+---
+
+# Language coverage on every function (always)
+
+Resume: `@lang-coverage$` / `$language-coverage$`. Same standing as `floqr-translation.mdc`: **do not wait for the owner to ask.** Chrome/help key counts stay in that rule; **this rule is behavior** (matching, filters, Place SMARTview).
+
+Owner (26 Nov 2026): city detection was Latin-only while **BOT DEE** UI is 11 languages. That is **poor design**. Always consider the other languages so the function does not fail.
+
+## Supported languages (all required)
+
+`en`, `de`, `fr`, `es`, `it`, `pt`, `ru`, `el`, `pl`, `nl`, `ar`
+
+Incomplete language coverage is a **product bug**, not a follow-up. Shipping English/Latin tokens only (Miami vs ميامي / Μαϊάμι / Майами) while BOT DEE chrome is localized **fails this rule**.
+
+## When this applies
+
+Any **new or changed** function, matcher, token list, leftover-word filter, or “if the user said X” gate — especially:
+
+- BOT DEE city / destination detection (`matchPlaces` / `CITY_HITS` in `functions/bot-dee-tools.js`)
+- Place SMARTview attach, Search SMARTnotification place tags
+- Venue / club haystack search, discovery city aliases (`CITY_ALIAS_GROUPS`)
+- Intent search aliases, cuisine/stop-word lists, greeting skip lists used as gates
+
+Not a Master Admin city dashboard. Do not invent one. Tokens stay in code until the owner asks for a live list.
+
+## Required before calling the work done
+
+1. **Ask how it behaves in every supported language**, including native scripts (Arabic, Greek, Cyrillic), not only Latin spellings (Milano, Lisboa, Cancún).
+2. **Keep native-script aliases on the same token** as the Latin id (`miami`, `bali`, …). `\b` is ASCII-word only — do not rely on it around Arabic/Greek/Cyrillic.
+3. **Do not Latin-strip the needle before matching** unless you also match the original string. `normalizeNeedle` today drops non `[a-z0-9]` (`functions/bot-dee-tools.js`) — that is why ميامي / Μαϊάμι / Майами never hit `CITY_HITS`. Changing a city list without fixing fold/strip is still Latin-only.
+4. **Tests** must include at least one native-script prompt per new city/place token (ar + el + ru for Miami/Bali-class destinations). Chrome i18n key-count green is **not** enough.
+5. Protected brands stay untranslated (**BOT DEE**, ShoutOut, FloqR, SMARTview, …). Place names may have native aliases; brands never do.
+
+## Known gap (do not pretend it is shipped)
+
+Live `CITY_HITS` is Latin regex. There is **no** committed native-script city token file. Arabic/Greek/Russian Miami/Bali aliases are **not** on `origin/main` until a matcher change keeps Unicode letters. Do not add a dashboard to close this.
+
+## Checklist (mental, every function iteration)
+
+- [ ] Matcher/token/stop lists considered for all 11 langs (not only `CHROME.*` keys)
+- [ ] Native-script aliases where patrons will type them; ASCII `\b` not the only boundary
+- [ ] Needle fold does not delete the scripts you claim to match
+- [ ] Tests for ar / el / ru (and Latin aliases already in the list)
+- [ ] No city-token admin UI unless the owner asked
+
+## FIX PROMPT
+
+```
+Language coverage (always): every new/changed function must work in en de fr es it pt ru el pl nl ar. Token lists, city/place detection, venue search, Place SMARTview — native-script aliases, not Latin-only. Chrome i18n keys are not enough. Incomplete coverage is a product bug. No city dashboard unless asked. Resume: @lang-coverage$
+```
+
+Related: `.cursor/rules/floqr-translation.mdc` (chrome/help packs). Wiring: `docs/FEATURE-WIRING.md` → Language coverage.
