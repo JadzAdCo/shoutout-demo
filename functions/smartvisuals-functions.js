@@ -169,7 +169,8 @@ exports.approveSmartVisualDraft = onCall(CALL_OPTS, async request => {
   if (!snap.exists) deny("not-found", "Draft not found.");
   const row = snap.data() || {};
   const match = matchCatalogAsset(row);
-  const catalogAssetId = match ? String(match.id) : "";
+  let catalogAssetId = match ? String(match.id) : text(row.catalogAssetId, 80);
+  if (!catalogAssetId) catalogAssetId = `bg-published-${draftId}`;
   if (String(row.approvalStatus || "") === "published") {
     return {ok: true, id: draftId, status: "published", catalogAssetId: row.catalogAssetId || catalogAssetId, alreadyPublished: true};
   }
@@ -190,6 +191,9 @@ exports.approveSmartVisualDraft = onCall(CALL_OPTS, async request => {
       catalogAssetId,
       draftId,
       approvalStatus: "published",
+      type: text(row.type, 40) || "background",
+      name: text(row.name, 120),
+      tags: resolver.normalizeSmartViewTags(row.tags),
       contentType: text(row.contentType, 80) || (row.svgXml ? "image/svg+xml" : ""),
       svgXml: String(row.svgXml || ""),
       imageBase64: String(row.imageBase64 || ""),
@@ -225,10 +229,20 @@ exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
     title: "override",
     override: {backgroundId, stencilId, authorized: true}
   }, catalog);
-  if (probe.overrideRejected) deny("failed-precondition", "Override asset is not an approved published SMARTvisual.");
+  let resolvedBackgroundId = probe.backgroundId;
+  let resolvedStencilId = probe.stencilId;
+  if (probe.overrideRejected) {
+    const pub = await db.collection(COLLECTIONS.published).doc(backgroundId).get();
+    const publishedRow = pub.exists ? pub.data() || {} : {};
+    if (String(publishedRow.approvalStatus || "") !== "published") {
+      deny("failed-precondition", "Override asset is not an approved published SMARTvisual.");
+    }
+    resolvedBackgroundId = backgroundId;
+    resolvedStencilId = stencilId || probe.stencilId;
+  }
   const row = {
-    backgroundId: probe.backgroundId,
-    stencilId: probe.stencilId,
+    backgroundId: resolvedBackgroundId,
+    stencilId: resolvedStencilId,
     tags,
     reason,
     updatedByEmail: email,
@@ -236,11 +250,11 @@ exports.setSmartVisualOverride = onCall(CALL_OPTS, async request => {
     updatedAtMs: Date.now()
   };
   await db.collection(COLLECTIONS.overrides).doc(roomKey).set(row);
-  const placeId = resolver.backgroundPlaceId(probe.backgroundId);
+  const placeId = resolver.backgroundPlaceId(resolvedBackgroundId);
   if (placeId && roomKey !== `placeSmartView:${placeId}`) {
     await db.collection(COLLECTIONS.overrides).doc(`placeSmartView:${placeId}`).set(row);
   }
-  return {ok: true, backgroundId: probe.backgroundId, stencilId: probe.stencilId, tags, placeId: placeId || ""};
+  return {ok: true, backgroundId: resolvedBackgroundId, stencilId: resolvedStencilId, tags, placeId: placeId || ""};
 });
 
 exports.getSmartVisualAdPolicy = onCall(CALL_OPTS, async request => {

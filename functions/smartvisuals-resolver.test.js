@@ -462,6 +462,12 @@ test("Place SMARTview uses published SMARTbackground, not a photo well", () => {
   assert.match(read("smartvisuals-studio.js"), /function assignPlaceVisual/);
   assert.match(read("smartvisuals-studio.js"), /svStudioPlaceStencil/);
   assert.match(read("smartvisuals-studio.js"), /svStudioPlaceTags/);
+  assert.match(read("smartvisuals-studio.js"), /svStudioPlaceAssign/);
+  assert.match(read("smartvisuals-studio.js"), /function collapsePlaceKitDuplicates/);
+  assert.match(read("smartvisuals-studio.js"), /function applyAssetToPlaceForm/);
+  assert.match(read("smartvisuals-studio.js"), /smartVisualPublished/);
+  assert.doesNotMatch(read("smartvisuals-studio.js"), /fillPlaceOverride/);
+  assert.match(read("master-admin.html"), /id="svStudioPlaceAssign"/);
   assert.doesNotMatch(read("smartvisuals-studio.js"), /SPAAVS_SAMPLE/);
   assert.match(js, /botdee-sv-place-stencil/);
   assert.match(js, /placeTagHtml/);
@@ -492,6 +498,25 @@ test("Studio send SOS2FA via getSessionId, not a missing sessionId() helper", ()
   assert.match(sos, /sessionId: \(scope\) => getSessionId\(scope \|\| "entityManagement"\)/);
   assert.match(app, /"smartvisualStudio"/);
   assert.match(read("functions/sos2fa-functions.js"), /Entity Management requires a valid SOS2FA session/);
+});
+
+test("Studio collapses duplicate Milan kit rows when a published photo overlays the place", () => {
+  const sandbox = {
+    document: {
+      addEventListener() {},
+      getElementById() { return null; }
+    }
+  };
+  sandbox.window = sandbox;
+  const ctx = createContext(sandbox);
+  runInContext(read("smartvisuals-studio.js"), ctx, {filename: "smartvisuals-studio.js"});
+  const collapse = ctx.FLOQRSmartVisualStudio.collapsePlaceKitDuplicates;
+  const out = collapse([
+    {id: "bg-milan", type: "background", placeId: "milan", name: "Milan"},
+    {id: "bg-milan-fashion-week", type: "background", placeId: "milan", name: "Milan Fashion Week", studioPreviewSrc: "data:image/jpeg;base64,xx"},
+    {id: "bg-bali", type: "background", placeId: "bali", name: "Bali"}
+  ]);
+  assert.deepEqual(out.map(a => a.id), ["bg-milan-fashion-week", "bg-bali"]);
 });
 
 test("Review / Publish has a visible Publish CTA after selecting a queued draft", () => {

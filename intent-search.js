@@ -352,9 +352,9 @@
       id: "help-smartvisuals-place-assign",
       kind: "help",
       label: "Place SMARTview stencil, background, and tags",
-      blurb: "Master Admin assigns a published SMARTstencil, SMARTbackground, and tags to Place SMARTview cards.",
+      blurb: "Master Admin edits saved Place SMARTview cards. Published photos appear in the SMARTbackground list.",
       links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
-      searchPhrases: ["place smartview stencil", "smartview tags", "change card background"],
+      searchPhrases: ["place smartview stencil", "smartview tags", "change card background", "edit place smartview", "published photo"],
       patterns: [/place\s*smartview\s*(stencil|tag)/, /smart\s*stencil\s+assign/]
     },
     {

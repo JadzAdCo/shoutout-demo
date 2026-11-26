@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.085";
+  const VERSION = "s3.3.087";
   const packs = {
     "ru": {
       "help-smartvisuals-create": {
@@ -31,7 +31,7 @@
       },
     "help-botdee-place-search": {
         title: "Спросить BOT DEE про площадки FLOQR",
-        body: "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают компактный Place SMARTview (название, краткий текст, рейтинги, ссылка на публичную страницу) с SMARTbackground — не фото-лунку. Hey и Hi — приветствия, без поиска площадок. Miami или let’s talk Miami всё равно прикрепляют Miami Place SMARTview, даже если клубы уже в списке. Название города вместе с VIP reserV (reservations in Miami) всё равно прикрепляет Place SMARTview рядом с картой VIP. Фото посетителей и питчи ShoutOut не показываются, если вы об этом не просили. Если площадки ещё нет — BOT DEE так и скажет."
+        body: "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают компактный Place SMARTview (название, краткий текст, рейтинги, ссылка на публичную страницу) с SMARTbackground — не фото-лунку. Hey и Hi — приветствия, без поиска площадок. Miami или let’s talk Miami всё равно прикрепляют Miami Place SMARTview, даже если клубы уже в списке. Название города вместе с VIP reserV (reservations in Miami) всё равно прикрепляет Place SMARTview рядом с картой VIP. Фото посетителей и питчи ShoutOut не показываются, если вы об этом не просили. Если площадки ещё нет — BOT DEE так и скажет. Place SMARTview — текст сценария, опубликованный SMARTbackground и теги места/темы. Резерв стола в клубе в Milan на Milan Fashion Week запускает VIP reserV. Если намерения нет — NEUTRAL SMARTstencil и вопрос. Если просто поговорить — Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -569,7 +569,7 @@
       },
     "help-botdee-place-search": {
         title: "Vraag BOT DEE naar FLOQR-venues",
-        body: "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen een compacte Place SMARTview (naam, korte blurb, ratings, publiekspagina) met een SMARTbackground — geen fotobak. Hey en Hi zijn begroetingen — geen venuesearch. Miami of let’s talk Miami koppelt Miami Place SMARTview, ook als clubs in de lijst staan. Een stad noemen bij VIP reserV (reservations in Miami) koppelt nog steeds Place SMARTview naast de VIP-kaart. Patronfoto’s en ShoutOut-pitches blijven weg tenzij u daarnaar vroeg. Als er nog niets onboarded is, zegt BOT DEE dat."
+        body: "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen een compacte Place SMARTview (naam, korte blurb, ratings, publiekspagina) met een SMARTbackground — geen fotobak. Hey en Hi zijn begroetingen — geen venuesearch. Miami of let’s talk Miami koppelt Miami Place SMARTview, ook als clubs in de lijst staan. Een stad noemen bij VIP reserV (reservations in Miami) koppelt nog steeds Place SMARTview naast de VIP-kaart. Patronfoto’s en ShoutOut-pitches blijven weg tenzij u daarnaar vroeg. Als er nog niets onboarded is, zegt BOT DEE dat. Place SMARTview = workflowtekst, gepubliceerde SMARTbackground en tags. Een tafel reserveren in een club in Milan tijdens Milan Fashion Week start VIP reserV. Zonder intent: NEUTRAL SMARTstencil en een vraag. Alleen praten: Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -1107,7 +1107,7 @@
       },
     "help-botdee-place-search": {
         title: "Demander à BOT DEE des lieux FLOQR",
-        body: "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent une Place SMARTview compacte (nom, court texte, notes, lien page publique) avec un SMARTbackground — pas un puits photo. Hey et Hi sont des salutations — pas une recherche de lieux. Miami ou let’s talk Miami attache Miami Place SMARTview même si des clubs sont listés. Nommer une ville avec VIP reserV (reservations in Miami) attache toujours Place SMARTview à côté de la carte VIP. Photos de patrons et pitches ShoutOut restent hors sujet sauf si vous les avez demandés. S’il n’y a encore rien, BOT DEE le dit."
+        body: "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent une Place SMARTview compacte (nom, court texte, notes, lien page publique) avec un SMARTbackground — pas un puits photo. Hey et Hi sont des salutations — pas une recherche de lieux. Miami ou let’s talk Miami attache Miami Place SMARTview même si des clubs sont listés. Nommer une ville avec VIP reserV (reservations in Miami) attache toujours Place SMARTview à côté de la carte VIP. Photos de patrons et pitches ShoutOut restent hors sujet sauf si vous les avez demandés. S’il n’y a encore rien, BOT DEE le dit. Place SMARTview = texte du flux, SMARTbackground publié et tags. Réserver une table dans un club à Milan pendant Milan Fashion Week lance VIP reserV. Sans intention : SMARTstencil NEUTRAL puis une question. Juste parler : Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -1645,7 +1645,7 @@
       },
     "help-botdee-place-search": {
         title: "BOT DEE nach FLOQR-Locations fragen",
-        body: "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen eine kompakte Place SMARTview (Name, Kurztext, Bewertungen, Public-Page-Link) mit SMARTbackground — keinen Fotoschacht. Hey und Hi sind Begrüßungen — keine Venue-Suche. Miami oder let’s talk Miami hängt Miami Place SMARTview an, auch wenn Clubs gelistet sind. Eine Stadt mit VIP reserV (reservations in Miami) hängt Place SMARTview weiter neben der VIP-Karte an. Patron-Fotos und ShoutOut-Pitches bleiben weg, außer Sie haben danach gefragt. Ist noch nichts onboardet, sagt BOT DEE das."
+        body: "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen eine kompakte Place SMARTview (Name, Kurztext, Bewertungen, Public-Page-Link) mit SMARTbackground — keinen Fotoschacht. Hey und Hi sind Begrüßungen — keine Venue-Suche. Miami oder let’s talk Miami hängt Miami Place SMARTview an, auch wenn Clubs gelistet sind. Eine Stadt mit VIP reserV (reservations in Miami) hängt Place SMARTview weiter neben der VIP-Karte an. Patron-Fotos und ShoutOut-Pitches bleiben weg, außer Sie haben danach gefragt. Ist noch nichts onboardet, sagt BOT DEE das. Place SMARTview = Workflow-Text, veröffentlichtes SMARTbackground und Tags. Tisch in einem Club in Milan während Milan Fashion Week startet VIP reserV. Ohne Absicht: NEUTRAL-SMARTstencil und Frage. Nur reden: Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -2183,7 +2183,7 @@
       },
     "help-botdee-place-search": {
         title: "Preguntar a BOT DEE por locales FLOQR",
-        body: "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren un Place SMARTview compacto (nombre, texto corto, valoraciones, enlace a la página pública) con un SMARTbackground — no un pozo de foto. Hey y Hi son saludos — no buscan venues. Miami o let’s talk Miami adjunta Miami Place SMARTview aunque haya clubs en la lista. Nombrar una ciudad con VIP reserV (reservations in Miami) sigue adjuntando Place SMARTview junto a la tarjeta VIP. Las fotos de patrons y los pitches de ShoutOut no aparecen salvo que los pida. Si aún no hay nada, BOT DEE lo dice."
+        body: "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren un Place SMARTview compacto (nombre, texto corto, valoraciones, enlace a la página pública) con un SMARTbackground — no un pozo de foto. Hey y Hi son saludos — no buscan venues. Miami o let’s talk Miami adjunta Miami Place SMARTview aunque haya clubs en la lista. Nombrar una ciudad con VIP reserV (reservations in Miami) sigue adjuntando Place SMARTview junto a la tarjeta VIP. Las fotos de patrons y los pitches de ShoutOut no aparecen salvo que los pida. Si aún no hay nada, BOT DEE lo dice. Place SMARTview = texto del flujo, SMARTbackground publicado y etiquetas. Reservar mesa en un club en Milan en Milan Fashion Week inicia VIP reserV. Sin intención: SMARTstencil NEUTRAL y pregunta. Solo hablar: Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -2721,7 +2721,7 @@
       },
     "help-botdee-place-search": {
         title: "Chiedere a BOT DEE i locali FLOQR",
-        body: "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono una Place SMARTview compatta (nome, breve testo, valutazioni, link alla pagina pubblica) con SMARTbackground — non un pozzo foto. Hey e Hi sono saluti — non cercano venue. Miami o let’s talk Miami allega Miami Place SMARTview anche se i club sono già elencati. Nominare una città con VIP reserV (reservations in Miami) allega ancora Place SMARTview accanto alla card VIP. Foto dei patron e pitch ShoutOut restano fuori se non li hai chiesti. Se non c’è ancora nulla, BOT DEE lo dice."
+        body: "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono una Place SMARTview compatta (nome, breve testo, valutazioni, link alla pagina pubblica) con SMARTbackground — non un pozzo foto. Hey e Hi sono saluti — non cercano venue. Miami o let’s talk Miami allega Miami Place SMARTview anche se i club sono già elencati. Nominare una città con VIP reserV (reservations in Miami) allega ancora Place SMARTview accanto alla card VIP. Foto dei patron e pitch ShoutOut restano fuori se non li hai chiesti. Se non c’è ancora nulla, BOT DEE lo dice. Place SMARTview = testo del flusso, SMARTbackground pubblicato e tag. Prenotare un tavolo in un club a Milano in Milan Fashion Week avvia VIP reserV. Senza intento: SMARTstencil NEUTRAL e domanda. Solo parlare: Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -3259,7 +3259,7 @@
       },
     "help-botdee-place-search": {
         title: "Perguntar ao BOT DEE por locais FLOQR",
-        body: "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem um Place SMARTview compacto (nome, texto curto, classificações, ligação à página pública) com SMARTbackground — não um poço de foto. Hey e Hi são cumprimentos — não pesquisam venues. Miami ou let’s talk Miami anexa Miami Place SMARTview mesmo com clubs na lista. Nomear uma cidade com VIP reserV (reservations in Miami) continua a anexar Place SMARTview ao lado do cartão VIP. Fotos de patrons e pitches de ShoutOut ficam de fora salvo se pedir. Se ainda não houver listing, o BOT DEE diz."
+        body: "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem um Place SMARTview compacto (nome, texto curto, classificações, ligação à página pública) com SMARTbackground — não um poço de foto. Hey e Hi são cumprimentos — não pesquisam venues. Miami ou let’s talk Miami anexa Miami Place SMARTview mesmo com clubs na lista. Nomear uma cidade com VIP reserV (reservations in Miami) continua a anexar Place SMARTview ao lado do cartão VIP. Fotos de patrons e pitches de ShoutOut ficam de fora salvo se pedir. Se ainda não houver listing, o BOT DEE diz. Place SMARTview = texto do fluxo, SMARTbackground publicado e tags. Reservar mesa num clube em Milan na Milan Fashion Week inicia VIP reserV. Sem intenção: SMARTstencil NEUTRAL e pergunta. Só conversar: Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -3797,7 +3797,7 @@
       },
     "help-botdee-place-search": {
         title: "Ρωτήστε τον BOT DEE για χώρους FLOQR",
-        body: "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν μια συμπαγή Place SMARTview (όνομα, σύντομο κείμενο, βαθμολογίες, σύνδεσμος δημόσιας σελίδας) με SMARTbackground — όχι πηγάδι φωτογραφίας. Hey και Hi είναι χαιρετισμοί — όχι αναζήτηση χώρων. Miami ή let’s talk Miami επισυνάπτει Miami Place SMARTview ακόμα κι αν υπάρχουν clubs στη λίστα. Αν ονομάσετε μια πόλη με VIP reserV (reservations in Miami), το Place SMARTview επισυνάπτεται ακόμα δίπλα στην κάρτα VIP. Φωτογραφίες patrons και pitches ShoutOut μένουν εκτός εκτός αν τα ζητήσατε. Αν δεν υπάρχει ακόμα, ο BOT DEE το λέει."
+        body: "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν μια συμπαγή Place SMARTview (όνομα, σύντομο κείμενο, βαθμολογίες, σύνδεσμος δημόσιας σελίδας) με SMARTbackground — όχι πηγάδι φωτογραφίας. Hey και Hi είναι χαιρετισμοί — όχι αναζήτηση χώρων. Miami ή let’s talk Miami επισυνάπτει Miami Place SMARTview ακόμα κι αν υπάρχουν clubs στη λίστα. Αν ονομάσετε μια πόλη με VIP reserV (reservations in Miami), το Place SMARTview επισυνάπτεται ακόμα δίπλα στην κάρτα VIP. Φωτογραφίες patrons και pitches ShoutOut μένουν εκτός εκτός αν τα ζητήσατε. Αν δεν υπάρχει ακόμα, ο BOT DEE το λέει. Place SMARTview = κείμενο ροής, δημοσιευμένο SMARTbackground και ετικέτες. Κράτηση τραπεζιού σε club στο Milan στο Milan Fashion Week ξεκινά VIP reserV. Χωρίς πρόθεση: NEUTRAL SMARTstencil και ερώτηση. Μόνο κουβέντα: Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -4335,7 +4335,7 @@
       },
     "help-botdee-place-search": {
         title: "Zapytaj BOT DEE o lokale FLOQR",
-        body: "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają zwartą kartę Place SMARTview (nazwa, krótki opis, oceny, link do strony publicznej) ze SMARTbackground — nie studnią zdjęcia. Hey i Hi to powitania — bez wyszukiwania lokali. Miami lub let’s talk Miami dołącza Miami Place SMARTview nawet gdy kluby są na liście. Podanie miasta z VIP reserV (reservations in Miami) nadal dołącza Place SMARTview obok karty VIP. Zdjęcia patronów i pitch ShoutOut zostają pominięte, chyba że o nie poprosisz. Jeśli nic jeszcze nie jest onboardowane, BOT DEE to powie."
+        body: "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają zwartą kartę Place SMARTview (nazwa, krótki opis, oceny, link do strony publicznej) ze SMARTbackground — nie studnią zdjęcia. Hey i Hi to powitania — bez wyszukiwania lokali. Miami lub let’s talk Miami dołącza Miami Place SMARTview nawet gdy kluby są na liście. Podanie miasta z VIP reserV (reservations in Miami) nadal dołącza Place SMARTview obok karty VIP. Zdjęcia patronów i pitch ShoutOut zostają pominięte, chyba że o nie poprosisz. Jeśli nic jeszcze nie jest onboardowane, BOT DEE to powie. Place SMARTview = tekst przepływu, opublikowane SMARTbackground i tagi. Rezerwacja stolika w klubie w Milan podczas Milan Fashion Week startuje VIP reserV. Bez zamiaru: NEUTRAL SMARTstencil i pytanie. Tylko rozmowa: Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -4873,7 +4873,7 @@
       },
     "help-botdee-place-search": {
         title: "اسأل BOT DEE عن أماكن FLOQR",
-        body: "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. Hey و Hi تحيات — ليست بحث أماكن. Miami أو let’s talk Miami يُرفق Miami Place SMARTview حتى عند ظهور النوادي. ذكر مدينة مع VIP reserV (reservations in Miami) ما زال يُرفق Place SMARTview بجانب بطاقة VIP. صور الرواد وعروض ShoutOut لا تظهر إلا إذا طلبتها. إذا لم يُدرج المكان بعد، يقول BOT DEE ذلك."
+        body: "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. Hey و Hi تحيات — ليست بحث أماكن. Miami أو let’s talk Miami يُرفق Miami Place SMARTview حتى عند ظهور النوادي. ذكر مدينة مع VIP reserV (reservations in Miami) ما زال يُرفق Place SMARTview بجانب بطاقة VIP. صور الرواد وعروض ShoutOut لا تظهر إلا إذا طلبتها. إذا لم يُدرج المكان بعد، يقول BOT DEE ذلك. Place SMARTview = نص سير العمل وSMARTbackground منشور ووسوم المكان/الموضوع. حجز طاولة في نادٍ في Milan خلال Milan Fashion Week يبدأ VIP reserV. بلا نية: SMARTstencil NEUTRAL ثم سؤال. للحديث فقط: Don Papi the founder said humans like talking to bots."
       },
       "help-botdee-page": {
         title: "BOT DEE",
