@@ -1,5 +1,6 @@
 /* BOT DEE session workflow intents + datapoints.
-   Deterministic. Gemini off. Native-script aliases (11 langs). No IP. */
+   Deterministic. Gemini off. Native-script aliases (11 langs). No IP.
+   s3.3.087 Functions CI retrigger (first push run cancelled by concurrency). */
 "use strict";
 
 const city = require("./botdee-city-tokens");
