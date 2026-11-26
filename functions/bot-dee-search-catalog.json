@@ -238,27 +238,6 @@
       ]
     },
     {
-      "sourceId": "help:help-botdee-city-tokens",
-      "id": "help-botdee-city-tokens",
-      "kind": "help",
-      "label": "BOT DEE city / place tokens",
-      "blurb": "In Features Mgmt → BOT DEE → City / place tokens, add a city in any of the 11 languages. You must pick the language. Save fills the other languages from the alias table (or copies your token). BOT DEE chat uses this list, including Arabic, Greek, and Cyrillic. Gemini does not inv",
-      "href": "./master-admin.html#featuresBotDee-cities",
-      "phrases": [
-        "bot dee city / place tokens",
-        "in features mgmt bot dee city / place tokens add a city in any of the 11 languages. you must pick the language. save fills the other languages from the alias ta",
-        "city tokens",
-        "place tokens",
-        "bot dee cities",
-        "miami arabic",
-        "city list",
-        "language city",
-        "master admin city tokens",
-        "features mgmt bot dee",
-        "help-botdee-city-tokens"
-      ]
-    },
-    {
       "sourceId": "help:help-botdee-explain",
       "id": "help-botdee-explain",
       "kind": "help",

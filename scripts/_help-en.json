@@ -283,10 +283,6 @@
     "title": "Club website feed",
     "body": "Show your published FLOQR club page on your own website. Press Generate feed key and links, then paste the iframe code into your website, or give your web admin the JSON or RSS link. The feed shows upcoming events, featured DJs, featured staff, gallery, and contact details, following your Public page controls. Staff photos appear only when photo consent is confirmed. Generating a new key turns off the old links, including the staff schedule links."
   },
-  "help-botdee-city-tokens": {
-    "title": "BOT DEE city / place tokens",
-    "body": "In Features Mgmt → BOT DEE → City / place tokens, add a city in any of the 11 languages. You must pick the language. Save fills the other languages from the alias table (or copies your token). BOT DEE chat uses this list, including Arabic, Greek, and Cyrillic. Gemini does not invent cities. Protected brands (BOT DEE, ShoutOut) stay untranslated."
-  },
   "help-botdee-place-search": {
     "title": "Ask BOT DEE for FLOQR venues",
     "body": "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a photo well. Naming a city with VIP reserV (reservations in Miami) still attaches Place SMARTview next to the VIP card. Patron photos and ShoutOut pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so."

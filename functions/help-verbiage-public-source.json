@@ -366,7 +366,7 @@
   {
     "id": "help-botdee-headless-vip",
     "title": "VIP reserV from BOT DEE chat",
-    "body": "Say book a table at Aurelia, hold a table, or I want a reservation in BOT DEE. The VIP reserV card shows nights, the 2D floor areas (Mezzanine, West Booths, Dance Floor, Bar Lounge), and tables. Tap a night, tap an area, tap a table (V1–V4 or AURELIA SUITE on the mezzanine), then Hold it, I agree to Terms, and pay if a deposit is required. Open VIP reserV map is the full pinch-zoom plan. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment.",
+    "body": "Say book a table at Aurelia in BOT DEE and stay in this chat. The VIP reserV dock shows nights (closed nights stay listed), live table colors (green available, amber held, red booked), and party size clamped to that table. Tap a table to select it — only Hold it starts a 30-minute hold. I agree records Terms (legal text stays English) and Stripe opens in a pop-out; this chat stays. After pay, the pass returns to this chat. Map, Terms, pay, and pass are pop-outs, not vip.html. BOT DEE never takes card numbers. Joining a Room SMARTview is not a payment.",
     "audiences": [
       "patron",
       "masterAdmin"
@@ -383,18 +383,15 @@
       "v1 aurelia",
       "hold it vip",
       "floor plan bot dee",
+      "vip popout",
+      "cancel hold",
       "VIP reserV from BOT DEE chat",
-      "Open BOT DEE",
-      "Open VIP reserV"
+      "Open BOT DEE"
     ],
     "links": [
       {
         "label": "Open BOT DEE",
         "href": "./botdee.html?from=botdee"
-      },
-      {
-        "label": "Open VIP reserV",
-        "href": "./vip.html?from=botdee"
       }
     ],
     "page": "",
@@ -535,7 +532,7 @@
   {
     "id": "help-botdee-place-search",
     "title": "Ask BOT DEE for FLOQR venues",
-    "body": "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a photo well. Patron photos and ShoutOut / VIP pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so.",
+    "body": "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a photo well. Short greetings do not search venues. Miami or let’s talk Miami still attaches Miami Place SMARTview even when clubs are listed. Naming a city with VIP reserV (reservations in Miami) still attaches Place SMARTview next to the VIP card. Patron photos and ShoutOut pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so.",
     "audiences": [
       "patron",
       "serviceMember",
@@ -552,6 +549,11 @@
       "japanese restaurant",
       "bot dee venues",
       "bot dee restaurants",
+      "reservations in miami",
+      "place smartview miami",
+      "vip reserv miami",
+      "lets talk miami",
+      "talk miami",
       "Ask BOT DEE for FLOQR venues",
       "Open BOT DEE"
     ],
@@ -666,9 +668,65 @@
     "source": "help-repository-seed"
   },
   {
+    "id": "help-botdee-room-collab",
+    "title": "Share a headless booking in Room SMARTview",
+    "body": "When you are in a Room SMARTview, the host's VIP reserV or ShoutOut picks appear for everyone in the session. Members vote Yes or No. Hold it and pay stay with the host — joining and voting are not a payment. BOT DEE never takes card numbers. Stripe still opens in a pop-out.",
+    "audiences": [
+      "patron",
+      "serviceMember",
+      "venueAdmin",
+      "masterAdmin"
+    ],
+    "searchPhrases": [
+      "vote the table",
+      "share vip reserv",
+      "vote host pick",
+      "headless booking vote",
+      "shared picks room smartview",
+      "Share a headless booking in Room SMARTview",
+      "Open BOT DEE"
+    ],
+    "links": [
+      {
+        "label": "Open BOT DEE",
+        "href": "./botdee.html"
+      }
+    ],
+    "page": "botdee.html#botDeeChatPage",
+    "source": "help-repository-seed"
+  },
+  {
+    "id": "help-botdee-room-elect-host",
+    "title": "Elect a Room SMARTview host",
+    "body": "Anyone in the session can be host. Nominate yourself or another joined member. A candidate becomes host at 60 percent of currently joined members (rounded up). If the host leaves, remaining members elect a new host — the room stays open. Kick and End stay with the elected host.",
+    "audiences": [
+      "patron",
+      "serviceMember",
+      "venueAdmin",
+      "masterAdmin"
+    ],
+    "searchPhrases": [
+      "make me host",
+      "elect host",
+      "vote for host",
+      "60 percent host",
+      "change room host",
+      "Elect a Room SMARTview host",
+      "Open BOT DEE"
+    ],
+    "links": [
+      {
+        "label": "Open BOT DEE",
+        "href": "./botdee.html"
+      }
+    ],
+    "page": "botdee.html#botDeeChatPage",
+    "source": "help-repository-seed"
+  },
+  {
     "id": "help-botdee-room-smartview",
     "title": "Room SMARTview",
-    "body": "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words (Let’s plan our Cancun trip, Let’s plan a trip to Cancun, plan a Cancun trip, Cancun trip with friends). That opens the same Room SMARTview as Open Room SMARTview Cancun Trip — travel art and a sample Travel partner / Fly to Cancun Ad, not live flight or hotel booking. VIP tables tonight stay nightlife, not a trip card. Confirm opens a session. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme.",
+    "body": "In BOT DEE chat, say Open Room SMARTview, Start a group chat, or plan a Cancun trip in plain words. Confirm shows Join Now or Set a schedule. Join Now opens a Mingl-friends session now and does not paint Search. Set a schedule is when the BOT DEE room starts — not Shared Itinerary — and turns on Search SMARTnotification for you and invited Mingl friends. Invite Mingl friends only — host plus 7 guests. Guests can invite too. Joining is not a payment and does not open a shared tab. BOT DEE never takes card numbers. Private BOT DEE messages stay private. Site Chrome follows your Appearance theme. A live room stays open until the host taps End Room, about four hours after it opens, or everyone has been gone about 15 minutes. Pausing private BOT DEE chat is separate.",
     "audiences": [
       "patron",
       "serviceMember",
@@ -687,6 +745,11 @@
       "let's plan a trip to cancun",
       "plan a cancun trip",
       "cancun trip with friends",
+      "schedule a room",
+      "join now or set a schedule",
+      "when does the room expire",
+      "last person logs out",
+      "one-time live session",
       "Room SMARTview",
       "Open BOT DEE"
     ],
@@ -702,7 +765,7 @@
   {
     "id": "help-botdee-room-smartview-end",
     "title": "End Room SMARTview",
-    "body": "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first.",
+    "body": "Only the host can end a room. Ending does not charge anyone or erase other people’s private chats. An unpaid shared tab must be paid or voided first. A live room stays open until End Room, about four hours after it opens, or everyone has been gone about 15 minutes. Pausing private BOT DEE chat is not room logout. A guest leaving does not end the room while the host is still present.",
     "audiences": [
       "patron",
       "serviceMember",
@@ -713,6 +776,8 @@
       "end this room",
       "close room smartview",
       "end group chat bot dee",
+      "when does the room expire",
+      "last person logs out",
       "End Room SMARTview",
       "Open BOT DEE"
     ],
@@ -728,7 +793,7 @@
   {
     "id": "help-botdee-room-smartview-invite",
     "title": "Invite Mingl friends",
-    "body": "After you confirm Room SMARTview, Invite shows your Mingl friends only. Each invite is bound to that friend and lands in Inbox as Review BOT DEE invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
+    "body": "After you confirm Room SMARTview (Join Now or Set a schedule), Invite shows your Mingl friends only. Tap a friend, or type Invite lorna, to send an Inbox invite (Review BOT DEE invite). After Invite sent, stay on this BOT DEE room and type there — that is the group chat. They tap Inbox Review BOT DEE invite or Search Join Now; both open botdee.html?room= (never Mingl chat). The chip stays greyed with Invite sent so you know it went — tapping again does not send a second invite. That is a Room SMARTview command — it does not open VIP reserV or a People SMARTview Invite. If a chip is you or someone already in the session, it stays marked That's you or Already in this session and does not send another invite. Not a public join link. Cap is host plus 7. Guests can invite more Mingl friends unless the host turns that off. Joining is not a payment.",
     "audiences": [
       "patron",
       "serviceMember",
@@ -740,7 +805,14 @@
       "invite friends bot dee",
       "bring my friends into this conversation",
       "invite mingl friends",
+      "invite lorna",
       "review bot dee invite",
+      "that's you",
+      "already in this session",
+      "cannot invite myself",
+      "invite sent",
+      "greyed chip",
+      "mslorna",
       "Invite Mingl friends",
       "Open BOT DEE"
     ],
@@ -756,7 +828,7 @@
   {
     "id": "help-botdee-room-smartview-join",
     "title": "Join a BOT DEE session",
-    "body": "Open the Inbox invite while signed in as the Mingl friend it was sent to. Wrong account, expired, or revoked invites refuse. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
+    "body": "Open the Inbox invite (Review BOT DEE invite) or Search Join Now while signed in as the Mingl friend it was sent to. Join Now opens BOT DEE (botdee.html?room=, never Mingl chat). Type in that BOT DEE room — the Room SMARTview transcript is the group chat. You and invited Mingl friends share it; names show for members. Wrong account, expired, or revoked invites refuse. Joining the room is not joining a shared tab and does not approve a payment. BOT DEE never takes card numbers.",
     "audiences": [
       "patron",
       "serviceMember",
@@ -767,6 +839,8 @@
       "join room smartview",
       "join this bot dee chat",
       "can my friends join us",
+      "group chat with lorna",
+      "join now search",
       "Join a BOT DEE session",
       "Open BOT DEE"
     ],
@@ -794,6 +868,35 @@
       "kick from room smartview",
       "remove jalen",
       "Remove someone from Room SMARTview",
+      "Open BOT DEE"
+    ],
+    "links": [
+      {
+        "label": "Open BOT DEE",
+        "href": "./botdee.html"
+      }
+    ],
+    "page": "botdee.html#botDeeChatPage",
+    "source": "help-repository-seed"
+  },
+  {
+    "id": "help-botdee-room-smartview-schedule",
+    "title": "Join Now or set a schedule",
+    "body": "After Room SMARTview setup, choose Join Now or Set a schedule. Join Now opens the BOT DEE session now and does not put a card on Search. Set a schedule is when the BOT DEE room starts — not Shared Itinerary. Saving a future time turns on Search SMARTnotification for you and invited Mingl friends only. Guests RSVP until the room is live, then Join Now opens BOT DEE (not Mingl chat).",
+    "audiences": [
+      "patron",
+      "serviceMember",
+      "venueAdmin",
+      "masterAdmin"
+    ],
+    "searchPhrases": [
+      "join now or set a schedule",
+      "set a schedule",
+      "schedule a room",
+      "join at scheduled time",
+      "smartnotification search",
+      "when does the room start",
+      "Join Now or set a schedule",
       "Open BOT DEE"
     ],
     "links": [
@@ -2929,7 +3032,7 @@
   {
     "id": "help-shoutout-headless-smartview",
     "title": "ShoutOut SMARTpreview",
-    "body": "When you throw a ShoutOut in BOT DEE chat, BOT DEE asks for the template, whether to print your @handle on the FloqR card, and whether the board is text-only or needs a photo/video. ShoutOut SMARTpreview docks above the composer and follows this chat while you fill those in. The dock shows the live LED template (the same Display 1 composer preview) and updates when you pick a template, @handle, or text vs photo. Reply in chat or tap a chip. Photo and video boards still open compose. A true headless throw from FloqR or a third party does not use this card — pass venue, message, and optional extras in one request.",
+    "body": "When you throw a ShoutOut in BOT DEE chat, BOT DEE uses that template's patron input list. Context already in the chat fills venue, shoutout text, names, and numbers. BOT DEE asks only for missing required fields, one at a time — there is no canned phrase you must say. Traditional needs a venue and shoutout text. When the list is complete, ShoutOut SMARTpreview is ready; reply throw it (or skip extras) to send. @handle is optional on Traditional. Photo, jersey, Football Intro, Heist name-only, and Baller's Alert use their own required fields; photo boards still open compose. A FloqR or third-party one-shot still sends venue, sign verbiage, and optional extras in one request.",
     "audiences": [
       "patron",
       "masterAdmin"
@@ -2946,6 +3049,10 @@
       "bot dee shoutout preview",
       "headless shoutout extras",
       "smartpreview",
+      "throw a shoutout",
+      "happy birthday shoutout",
+      "shoutout text",
+      "patron input list",
       "ShoutOut SMARTpreview",
       "Open BOT DEE",
       "Open ShoutOut",
@@ -3027,7 +3134,7 @@
   {
     "id": "help-smartvisuals-notification",
     "title": "Mingl Room SMARTnotification",
-    "body": "A compact Mingl Room Invitation can appear on Search. View Invitation opens the Room SMARTview. Not Now dismisses it for this session. Art is a SMARTbackground illustration with SMARTstencils — not a real photo and not an official destination mark. Participant names and RSVP come only from the room record. A labeled Ad sample under the card follows the room tags (Travel partner / Fly to Cancun for a Cancun Trip). It is not a live advertiser. Private chat and prompt injection keep the slot empty.",
+    "body": "A compact Mingl Room Invitation can appear on Search when you Set a schedule for a BOT DEE room, or when a Mingl friend invited you to one. The host sees their own scheduled room on Search without the Cancun demo query. View Invitation opens Room SMARTview. Join Now goes to BOT DEE, not Mingl chat. Not Now hides the card this tab; Inbox still has Review BOT DEE invite. The Cancun demo query is Studio-only. Art is illustration, not a photo. Join Now rooms without a schedule do not paint Search.",
     "audiences": [
       "patron",
       "serviceMember",
@@ -3038,6 +3145,8 @@
       "smart notification",
       "mingl room invitation",
       "view invitation",
+      "join at scheduled time",
+      "scheduled room search",
       "cancun trip",
       "smartvisuals",
       "smartstencils",
@@ -3060,7 +3169,7 @@
   {
     "id": "help-smartvisuals-room",
     "title": "Room SMARTview with SMARTvisuals",
-    "body": "Room SMARTview shows the Mingl invitation: schedule, RSVP or live status, and Join Now. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo and not an official partnership. Private BOT DEE chat is never used to pick art. Group rooms are not live yet, so Join Now does not create a room or charge. A labeled Ad below is a sample from those tags (Travel partner / Fly to Cancun). It stays empty for private chat or injection and is not a live advertiser.",
+    "body": "Room SMARTview shows the invitation: schedule, RSVP or live status, and Join Now. Join Now on Search opens BOT DEE (not Mingl chat) with room= and t=. Type in that BOT DEE room — that is the group chat. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo. Private BOT DEE chat is never used to pick art. A labeled Ad below is a sample from those tags. It stays empty for private chat or injection and is not a live advertiser.",
     "audiences": [
       "patron",
       "serviceMember",
@@ -3069,6 +3178,7 @@
     "searchPhrases": [
       "room smartview invitation",
       "join now mingl",
+      "join at scheduled time",
       "smartstencils",
       "smartbackgrounds",
       "cancun trip room",

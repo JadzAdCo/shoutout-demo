@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.085",
+    "text": "s3.3.085: BOT DEE city and place tokens in all 11 languages",
+    "audiences": [
+      "botDee"
+    ]
+  },
+  {
     "id": "s3.3.083",
     "text": "s3.3.083: Let's plan for Bali opens Bali Place SMARTview with the published SMARTbackground",
     "audiences": [

@@ -87,14 +87,6 @@
           "label": "BOT DEE nach FLOQR-Locations fragen",
           "blurb": "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen eine kompakte Place SMARTview (Name, Kurztext, Bewertungen, Public-Page-Link) mit SMARTbackgrou"
         },
-        "help:help-botdee-city-tokens": {
-          "label": "BOT DEE Stadt-Token",
-          "blurb": "Unter Features Mgmt → BOT DEE → City / place tokens fügen Sie eine Stadt in einer der 11 Sprachen hinzu. Die Sprache ist Pflicht. Speichern füllt die anderen Sprachen aus der Alias-Tabelle (oder kopiert Ihr Token). BOT DEE-Chat nutzt diese Liste inkl. Arabisch, Griechisch und Kyr"
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "BOT DEE Stadt-Token",
-          "blurb": "Unter Features Mgmt → BOT DEE → City / place tokens fügen Sie eine Stadt in einer der 11 Sprachen hinzu. Die Sprache ist Pflicht. Speichern füllt die anderen Sprachen aus der Alias-Tabelle (oder kopiert Ihr Token). BOT DEE-Chat nutzt diese Liste inkl. Arabisch, Griechisch und Kyr"
-        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chatte mit BOT DEE auf der BOT DEE-Seite in einfachen Worten: Events und Clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, dein Profil, Mitarbeiterpläne oder Club-Admin-Werkzeuge. Enter sendet die Nachricht; Umschalt+Enter beginnt eine neue Zeile. BOT DEE chattet wie ein Mensch (ver"
@@ -1237,14 +1229,6 @@
         "intent:help-botdee-place-search": {
           "label": "Demander à BOT DEE des lieux FLOQR",
           "blurb": "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent une Place SMARTview compacte (nom, court texte, notes, lien page publique) avec un SM"
-        },
-        "help:help-botdee-city-tokens": {
-          "label": "Jetons ville BOT DEE",
-          "blurb": "Dans Features Mgmt → BOT DEE → City / place tokens, ajoutez une ville dans l’une des 11 langues. La langue est obligatoire. Enregistrer complète les autres langues depuis la table d’alias (ou copie votre jeton). Le chat BOT DEE utilise cette liste, y compris arabe, grec et cyrill"
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "Jetons ville BOT DEE",
-          "blurb": "Dans Features Mgmt → BOT DEE → City / place tokens, ajoutez une ville dans l’une des 11 langues. La langue est obligatoire. Enregistrer complète les autres langues depuis la table d’alias (ou copie votre jeton). Le chat BOT DEE utilise cette liste, y compris arabe, grec et cyrill"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -2389,14 +2373,6 @@
           "label": "Preguntar a BOT DEE por locales FLOQR",
           "blurb": "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren un Place SMARTview compacto (nombre, texto corto, valoraciones, enlace a la página públ"
         },
-        "help:help-botdee-city-tokens": {
-          "label": "Tokens de ciudad BOT DEE",
-          "blurb": "En Features Mgmt → BOT DEE → City / place tokens añada una ciudad en uno de los 11 idiomas. El idioma es obligatorio. Guardar rellena los demás idiomas desde la tabla de alias (o copia su token). El chat BOT DEE usa esta lista, incluido árabe, griego y cirílico. Gemini no inventa"
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "Tokens de ciudad BOT DEE",
-          "blurb": "En Features Mgmt → BOT DEE → City / place tokens añada una ciudad en uno de los 11 idiomas. El idioma es obligatorio. Guardar rellena los demás idiomas desde la tabla de alias (o copia su token). El chat BOT DEE usa esta lista, incluido árabe, griego y cirílico. Gemini no inventa"
-        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (pr"
@@ -3539,14 +3515,6 @@
         "intent:help-botdee-place-search": {
           "label": "Chiedere a BOT DEE i locali FLOQR",
           "blurb": "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono una Place SMARTview compatta (nome, breve testo, valutazioni, link alla pagina pubblica) con SMARTbackgr"
-        },
-        "help:help-botdee-city-tokens": {
-          "label": "Token città BOT DEE",
-          "blurb": "In Features Mgmt → BOT DEE → City / place tokens aggiungi una città in una delle 11 lingue. La lingua è obbligatoria. Salva completa le altre lingue dalla tabella alias (o copia il tuo token). La chat BOT DEE usa questo elenco, incluso arabo, greco e cirillico. Gemini non inventa"
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "Token città BOT DEE",
-          "blurb": "In Features Mgmt → BOT DEE → City / place tokens aggiungi una città in una delle 11 lingue. La lingua è obbligatoria. Salva completa le altre lingue dalla tabella alias (o copia il tuo token). La chat BOT DEE usa questo elenco, incluso arabo, greco e cirillico. Gemini non inventa"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -4691,14 +4659,6 @@
           "label": "Perguntar ao BOT DEE por locais FLOQR",
           "blurb": "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem um Place SMARTview compacto (nome, texto curto, classificações, ligação à págin"
         },
-        "help:help-botdee-city-tokens": {
-          "label": "Tokens de cidade BOT DEE",
-          "blurb": "Em Features Mgmt → BOT DEE → City / place tokens adicione uma cidade num dos 11 idiomas. O idioma é obrigatório. Guardar preenche os outros idiomas da tabela de alias (ou copia o seu token). O chat BOT DEE usa esta lista, incluindo árabe, grego e cirílico. O Gemini não inventa ci"
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "Tokens de cidade BOT DEE",
-          "blurb": "Em Features Mgmt → BOT DEE → City / place tokens adicione uma cidade num dos 11 idiomas. O idioma é obrigatório. Guardar preenche os outros idiomas da tabela de alias (ou copia o seu token). O chat BOT DEE usa esta lista, incluindo árabe, grego e cirílico. O Gemini não inventa ci"
-        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa ("
@@ -5841,14 +5801,6 @@
         "intent:help-botdee-place-search": {
           "label": "Спросить BOT DEE про площадки FLOQR",
           "blurb": "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают компактный Place SMARTview (название, краткий текст, рейтинги, ссылка на публичную страницу) с SMART"
-        },
-        "help:help-botdee-city-tokens": {
-          "label": "Токены города BOT DEE",
-          "blurb": "В Features Mgmt → BOT DEE → City / place tokens добавьте город на любом из 11 языков. Язык обязателен. Сохранение заполняет остальные языки из таблицы псевдонимов (или копирует ваш токен). Чат BOT DEE использует этот список, включая арабский, греческий и кириллицу. Gemini города "
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "Токены города BOT DEE",
-          "blurb": "В Features Mgmt → BOT DEE → City / place tokens добавьте город на любом из 11 языков. Язык обязателен. Сохранение заполняет остальные языки из таблицы псевдонимов (или копирует ваш токен). Чат BOT DEE использует этот список, включая арабский, греческий и кириллицу. Gemini города "
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -6993,14 +6945,6 @@
           "label": "Ρωτήστε τον BOT DEE για χώρους FLOQR",
           "blurb": "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν μια συμπαγή Place SMARTview (όνομα, σύντομο κείμενο, βαθμολογίες, σύνδεσμος δημόσιας σελίδας) με SMARTb"
         },
-        "help:help-botdee-city-tokens": {
-          "label": "Διακριτικά πόλης BOT DEE",
-          "blurb": "Στο Features Mgmt → BOT DEE → City / place tokens προσθέστε μια πόλη σε μία από τις 11 γλώσσες. Η γλώσσα είναι υποχρεωτική. Η αποθήκευση συμπληρώνει τις άλλες γλώσσες από τον πίνακα ψευδωνύμων (ή αντιγράφει το διακριτικό σας). Η συνομιλία BOT DEE χρησιμοποιεί αυτή τη λίστα, συμπε"
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "Διακριτικά πόλης BOT DEE",
-          "blurb": "Στο Features Mgmt → BOT DEE → City / place tokens προσθέστε μια πόλη σε μία από τις 11 γλώσσες. Η γλώσσα είναι υποχρεωτική. Η αποθήκευση συμπληρώνει τις άλλες γλώσσες από τον πίνακα ψευδωνύμων (ή αντιγράφει το διακριτικό σας). Η συνομιλία BOT DEE χρησιμοποιεί αυτή τη λίστα, συμπε"
-        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Συνομιλήστε με τον BOT DEE στη σελίδα BOT DEE με απλά λόγια: εκδηλώσεις και κλαμπ, ShoutOut, Mingl, RydR, BartR, FloqCAST, το προφίλ σας, προγράμματα προσωπικού ή εργαλεία Club Admin. Πατήστε Enter για αποστολή· Shift+Enter ξεκινά νέα γραμμή. Ο BOT DEE συνομιλεί σαν άνθρωπος (δοκ"
@@ -8143,14 +8087,6 @@
         "intent:help-botdee-place-search": {
           "label": "Zapytaj BOT DEE o lokale FLOQR",
           "blurb": "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają zwartą kartę Place SMARTview (nazwa, krótki opis, oceny, link do strony publicznej) ze SMARTbackgro"
-        },
-        "help:help-botdee-city-tokens": {
-          "label": "Tokeny miast BOT DEE",
-          "blurb": "W Features Mgmt → BOT DEE → City / place tokens dodaj miasto w jednym z 11 języków. Język jest wymagany. Zapis uzupełnia pozostałe języki z tabeli aliasów (albo kopiuje Twój token). Czat BOT DEE używa tej listy, w tym arabskiego, greki i cyrylicy. Gemini nie wymyśla miast. Chroni"
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "Tokeny miast BOT DEE",
-          "blurb": "W Features Mgmt → BOT DEE → City / place tokens dodaj miasto w jednym z 11 języków. Język jest wymagany. Zapis uzupełnia pozostałe języki z tabeli aliasów (albo kopiuje Twój token). Czat BOT DEE używa tej listy, w tym arabskiego, greki i cyrylicy. Gemini nie wymyśla miast. Chroni"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",
@@ -9295,14 +9231,6 @@
           "label": "Vraag BOT DEE naar FLOQR-venues",
           "blurb": "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen een compacte Place SMARTview (naam, korte blurb, ratings, publiekspagina) met een SMARTbackground — geen fotob"
         },
-        "help:help-botdee-city-tokens": {
-          "label": "BOT DEE stadstokens",
-          "blurb": "In Features Mgmt → BOT DEE → City / place tokens voegt u een stad toe in een van de 11 talen. Taal is verplicht. Opslaan vult de andere talen uit de aliastabel (of kopieert uw token). BOT DEE-chat gebruikt deze lijst, inclusief Arabisch, Grieks en Cyrillisch. Gemini verzint geen "
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "BOT DEE stadstokens",
-          "blurb": "In Features Mgmt → BOT DEE → City / place tokens voegt u een stad toe in een van de 11 talen. Taal is verplicht. Opslaan vult de andere talen uit de aliastabel (of kopieert uw token). BOT DEE-chat gebruikt deze lijst, inclusief Arabisch, Grieks en Cyrillisch. Gemini verzint geen "
-        },
         "help:help-botdee-page": {
           "label": "BOT DEE",
           "blurb": "Chat met BOT DEE op de BOT DEE-pagina in gewone taal: evenementen en clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, je profiel, personeelsroosters of Club Admin-tools. Druk op Enter om te versturen; Shift+Enter start een nieuwe regel. BOT DEE praat als een persoon (probeer How ar"
@@ -10445,14 +10373,6 @@
         "intent:help-botdee-place-search": {
           "label": "اسأل BOT DEE عن أماكن FLOQR",
           "blurb": "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. Hey و Hi تح"
-        },
-        "help:help-botdee-city-tokens": {
-          "label": "رموز مدن BOT DEE",
-          "blurb": "في Features Mgmt → BOT DEE → City / place tokens أضف مدينة بأي من اللغات الإحدى عشرة. اختيار اللغة إلزامي. الحفظ يملأ اللغات الأخرى من جدول الأسماء البديلة (أو ينسخ رمزك). محادثة BOT DEE تستخدم هذه القائمة بما فيها العربية واليونانية والسيريالية. لا يخترع Gemini مدنًا. العلامات ا"
-        },
-        "intent:help-botdee-city-tokens": {
-          "label": "رموز مدن BOT DEE",
-          "blurb": "في Features Mgmt → BOT DEE → City / place tokens أضف مدينة بأي من اللغات الإحدى عشرة. اختيار اللغة إلزامي. الحفظ يملأ اللغات الأخرى من جدول الأسماء البديلة (أو ينسخ رمزك). محادثة BOT DEE تستخدم هذه القائمة بما فيها العربية واليونانية والسيريالية. لا يخترع Gemini مدنًا. العلامات ا"
         },
         "help:help-botdee-page": {
           "label": "BOT DEE",

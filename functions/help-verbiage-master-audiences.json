@@ -36,6 +36,12 @@
     ]
   },
   {
+    "id": "help-botdee-city-tokens",
+    "audiences": [
+      "masterAdmin"
+    ]
+  },
+  {
     "id": "help-chrome-audit",
     "audiences": [
       "masterAdmin"

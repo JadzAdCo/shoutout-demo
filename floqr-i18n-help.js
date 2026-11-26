@@ -33,10 +33,6 @@
         title: "Спросить BOT DEE про площадки FLOQR",
         body: "Спросите простыми словами — суши-рестораны в Washington DC, клубы в DC или конкретный клуб. BOT DEE ищет только onboarded площадки FLOQR, не Google и не Yelp. Совпадения открывают компактный Place SMARTview (название, краткий текст, рейтинги, ссылка на публичную страницу) с SMARTbackground — не фото-лунку. Hey и Hi — приветствия, без поиска площадок. Miami или let’s talk Miami всё равно прикрепляют Miami Place SMARTview, даже если клубы уже в списке. Название города вместе с VIP reserV (reservations in Miami) всё равно прикрепляет Place SMARTview рядом с картой VIP. Фото посетителей и питчи ShoutOut не показываются, если вы об этом не просили. Если площадки ещё нет — BOT DEE так и скажет."
       },
-          "help-botdee-city-tokens": {
-        title: "Токены города BOT DEE",
-        body: "В Features Mgmt → BOT DEE → City / place tokens добавьте город на любом из 11 языков. Язык обязателен. Сохранение заполняет остальные языки из таблицы псевдонимов (или копирует ваш токен). Чат BOT DEE использует этот список, включая арабский, греческий и кириллицу. Gemini города не выдумывает. Защищённые бренды (BOT DEE, ShoutOut) не переводятся."
-      },
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Общайтесь с BOT DEE на странице BOT DEE простыми словами: события и клубы, ShoutOut, Mingl, RydR, BartR, FloqCAST, ваш профиль, расписания персонала или инструменты Club Admin. Нажмите Enter, чтобы отправить сообщение; Shift+Enter начинает новую строку. BOT DEE общается как человек (попробуйте How are you?) и ищет только когда вы спрашиваете, как сделать что-то в FLOQR. Если вы вошли в аккаунт, BOT DEE сохраняет этот чат при обновлении страницы или на другом телефоне, а после паузы может продолжить сохранённую историю. Пауза не удаляет чат. Ответы учитывают классификацию вашего аккаунта. После входа BOT DEE видит те же публичные добровольные данные профиля, что и вы (музыка, еда, путешествия, хобби и остальные пункты Privacy datapoint sharing) — никогда email, телефон, данные карты или GPS. Нажмите «Настройки» под полем чата для сохранённых чатов и воспоминаний. Нажмите фото в чате, чтобы открыть его в отдельном окне. Закройте крестиком или «Закрыть», чтобы снова увидеть чат. Знак + справа вверху открывает сохранённые чаты и не удаляет их."
@@ -574,10 +570,6 @@
     "help-botdee-place-search": {
         title: "Vraag BOT DEE naar FLOQR-venues",
         body: "Vraag in gewone taal — sushi restaurants in Washington DC, clubs in DC of een clubnaam. BOT DEE zoekt alleen onboarded FLOQR-venues, niet Google of Yelp. Treffers openen een compacte Place SMARTview (naam, korte blurb, ratings, publiekspagina) met een SMARTbackground — geen fotobak. Hey en Hi zijn begroetingen — geen venuesearch. Miami of let’s talk Miami koppelt Miami Place SMARTview, ook als clubs in de lijst staan. Een stad noemen bij VIP reserV (reservations in Miami) koppelt nog steeds Place SMARTview naast de VIP-kaart. Patronfoto’s en ShoutOut-pitches blijven weg tenzij u daarnaar vroeg. Als er nog niets onboarded is, zegt BOT DEE dat."
-      },
-          "help-botdee-city-tokens": {
-        title: "BOT DEE stadstokens",
-        body: "In Features Mgmt → BOT DEE → City / place tokens voegt u een stad toe in een van de 11 talen. Taal is verplicht. Opslaan vult de andere talen uit de aliastabel (of kopieert uw token). BOT DEE-chat gebruikt deze lijst, inclusief Arabisch, Grieks en Cyrillisch. Gemini verzint geen steden. Beschermde merken (BOT DEE, ShoutOut) blijven onvertaald."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -1117,10 +1109,6 @@
         title: "Demander à BOT DEE des lieux FLOQR",
         body: "Demandez en mots simples — restaurants de sushi à Washington DC, clubs à DC, ou un club nommé. BOT DEE ne cherche que les venues FLOQR embarquées, pas Google ni Yelp. Les correspondances ouvrent une Place SMARTview compacte (nom, court texte, notes, lien page publique) avec un SMARTbackground — pas un puits photo. Hey et Hi sont des salutations — pas une recherche de lieux. Miami ou let’s talk Miami attache Miami Place SMARTview même si des clubs sont listés. Nommer une ville avec VIP reserV (reservations in Miami) attache toujours Place SMARTview à côté de la carte VIP. Photos de patrons et pitches ShoutOut restent hors sujet sauf si vous les avez demandés. S’il n’y a encore rien, BOT DEE le dit."
       },
-          "help-botdee-city-tokens": {
-        title: "Jetons ville BOT DEE",
-        body: "Dans Features Mgmt → BOT DEE → City / place tokens, ajoutez une ville dans l’une des 11 langues. La langue est obligatoire. Enregistrer complète les autres langues depuis la table d’alias (ou copie votre jeton). Le chat BOT DEE utilise cette liste, y compris arabe, grec et cyrillique. Gemini n’invente pas de villes. Les marques protégées (BOT DEE, ShoutOut) ne se traduisent pas."
-      },
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Discutez avec BOT DEE sur la page BOT DEE en mots simples : événements et clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, votre profil, les plannings du personnel ou les outils Club Admin. Appuyez sur Entrée pour envoyer ; Maj+Entrée commence une nouvelle ligne. BOT DEE discute comme une personne (essayez How are you?) et ne cherche que lorsque vous demandez comment faire quelque chose dans FLOQR. Si vous êtes connecté, BOT DEE conserve cette discussion si vous actualisez ou ouvrez un autre téléphone, et après la pause il peut reprendre l’historique enregistré. La pause ne supprime pas le chat. Les réponses respectent la classification de votre compte. Connecté, BOT DEE voit les mêmes datapoints publics volontaires que vous (musique, nourriture, voyage, hobbies et le reste de Privacy datapoint sharing) — jamais e-mail, téléphone, données de carte ou GPS. Touchez Réglages sous la zone de chat pour les discussions et souvenirs enregistrés. Touchez une photo du chat pour l’ouvrir dans une fenêtre. Fermez avec X ou Fermer pour revoir le chat. Le + en haut à droite ouvre les chats enregistrés sans les supprimer."
@@ -1658,10 +1646,6 @@
     "help-botdee-place-search": {
         title: "BOT DEE nach FLOQR-Locations fragen",
         body: "Fragen Sie in einfachen Worten — Sushi-Restaurants in Washington DC, Clubs in DC oder einen Clubnamen. BOT DEE sucht nur onboardete FLOQR-Venues, nicht Google oder Yelp. Treffer öffnen eine kompakte Place SMARTview (Name, Kurztext, Bewertungen, Public-Page-Link) mit SMARTbackground — keinen Fotoschacht. Hey und Hi sind Begrüßungen — keine Venue-Suche. Miami oder let’s talk Miami hängt Miami Place SMARTview an, auch wenn Clubs gelistet sind. Eine Stadt mit VIP reserV (reservations in Miami) hängt Place SMARTview weiter neben der VIP-Karte an. Patron-Fotos und ShoutOut-Pitches bleiben weg, außer Sie haben danach gefragt. Ist noch nichts onboardet, sagt BOT DEE das."
-      },
-          "help-botdee-city-tokens": {
-        title: "BOT DEE Stadt-Token",
-        body: "Unter Features Mgmt → BOT DEE → City / place tokens fügen Sie eine Stadt in einer der 11 Sprachen hinzu. Die Sprache ist Pflicht. Speichern füllt die anderen Sprachen aus der Alias-Tabelle (oder kopiert Ihr Token). BOT DEE-Chat nutzt diese Liste inkl. Arabisch, Griechisch und Kyrillisch. Gemini erfindet keine Städte. Geschützte Marken (BOT DEE, ShoutOut) bleiben unübersetzt."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -2201,10 +2185,6 @@
         title: "Preguntar a BOT DEE por locales FLOQR",
         body: "Pregunte en palabras simples — restaurantes de sushi en Washington DC, clubs en DC o un club concreto. BOT DEE busca solo venues FLOQR dadas de alta, no Google ni Yelp. Las coincidencias abren un Place SMARTview compacto (nombre, texto corto, valoraciones, enlace a la página pública) con un SMARTbackground — no un pozo de foto. Hey y Hi son saludos — no buscan venues. Miami o let’s talk Miami adjunta Miami Place SMARTview aunque haya clubs en la lista. Nombrar una ciudad con VIP reserV (reservations in Miami) sigue adjuntando Place SMARTview junto a la tarjeta VIP. Las fotos de patrons y los pitches de ShoutOut no aparecen salvo que los pida. Si aún no hay nada, BOT DEE lo dice."
       },
-          "help-botdee-city-tokens": {
-        title: "Tokens de ciudad BOT DEE",
-        body: "En Features Mgmt → BOT DEE → City / place tokens añada una ciudad en uno de los 11 idiomas. El idioma es obligatorio. Guardar rellena los demás idiomas desde la tabla de alias (o copia su token). El chat BOT DEE usa esta lista, incluido árabe, griego y cirílico. Gemini no inventa ciudades. Las marcas protegidas (BOT DEE, ShoutOut) no se traducen."
-      },
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Chatea con BOT DEE en la página BOT DEE con palabras sencillas: eventos y clubs, ShoutOut, Mingl, RydR, BartR, FloqCAST, tu perfil, horarios del personal o herramientas de Club Admin. Pulsa Intro para enviar; Mayús+Intro empieza una línea nueva. BOT DEE habla como una persona (prueba How are you?) y solo busca cuando preguntas cómo hacer algo en FLOQR. Si has iniciado sesión, BOT DEE guarda este chat si actualizas o abres otro teléfono, y después de la pausa puede continuar el historial guardado. La pausa no borra el chat. Las respuestas usan la clasificación de tu cuenta. Si has iniciado sesión, BOT DEE ve los mismos datapoints públicos voluntarios que tú (música, comida, viajes, hobbies y el resto de Privacy datapoint sharing) — nunca email, teléfono, datos de tarjeta ni GPS. Toca Ajustes bajo el cuadro de chat para chats y recuerdos guardados. Toca una foto del chat para abrirla en una ventana. Cierra con X o Cerrar para volver al chat. El + de arriba a la derecha abre chats guardados y no los borra."
@@ -2742,10 +2722,6 @@
     "help-botdee-place-search": {
         title: "Chiedere a BOT DEE i locali FLOQR",
         body: "Chiedi in parole semplici — ristoranti di sushi a Washington DC, club a DC o un club per nome. BOT DEE cerca solo venue FLOQR onboardate, non Google o Yelp. I risultati aprono una Place SMARTview compatta (nome, breve testo, valutazioni, link alla pagina pubblica) con SMARTbackground — non un pozzo foto. Hey e Hi sono saluti — non cercano venue. Miami o let’s talk Miami allega Miami Place SMARTview anche se i club sono già elencati. Nominare una città con VIP reserV (reservations in Miami) allega ancora Place SMARTview accanto alla card VIP. Foto dei patron e pitch ShoutOut restano fuori se non li hai chiesti. Se non c’è ancora nulla, BOT DEE lo dice."
-      },
-          "help-botdee-city-tokens": {
-        title: "Token città BOT DEE",
-        body: "In Features Mgmt → BOT DEE → City / place tokens aggiungi una città in una delle 11 lingue. La lingua è obbligatoria. Salva completa le altre lingue dalla tabella alias (o copia il tuo token). La chat BOT DEE usa questo elenco, incluso arabo, greco e cirillico. Gemini non inventa città. I brand protetti (BOT DEE, ShoutOut) restano intradotti."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -3285,10 +3261,6 @@
         title: "Perguntar ao BOT DEE por locais FLOQR",
         body: "Pergunte em palavras simples — restaurantes de sushi em Washington DC, clubs em DC ou um clube pelo nome. O BOT DEE pesquisa só venues FLOQR onboardadas, não Google nem Yelp. As correspondências abrem um Place SMARTview compacto (nome, texto curto, classificações, ligação à página pública) com SMARTbackground — não um poço de foto. Hey e Hi são cumprimentos — não pesquisam venues. Miami ou let’s talk Miami anexa Miami Place SMARTview mesmo com clubs na lista. Nomear uma cidade com VIP reserV (reservations in Miami) continua a anexar Place SMARTview ao lado do cartão VIP. Fotos de patrons e pitches de ShoutOut ficam de fora salvo se pedir. Se ainda não houver listing, o BOT DEE diz."
       },
-          "help-botdee-city-tokens": {
-        title: "Tokens de cidade BOT DEE",
-        body: "Em Features Mgmt → BOT DEE → City / place tokens adicione uma cidade num dos 11 idiomas. O idioma é obrigatório. Guardar preenche os outros idiomas da tabela de alias (ou copia o seu token). O chat BOT DEE usa esta lista, incluindo árabe, grego e cirílico. O Gemini não inventa cidades. Marcas protegidas (BOT DEE, ShoutOut) não se traduzem."
-      },
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Converse com o BOT DEE na página BOT DEE em palavras simples: eventos e clubes, ShoutOut, Mingl, RydR, BartR, FloqCAST, seu perfil, escalas da equipe ou ferramentas de Club Admin. Pressione Enter para enviar; Shift+Enter começa uma nova linha. O BOT DEE conversa como uma pessoa (experimente How are you?) e só pesquisa quando você pergunta como fazer algo no FLOQR. Se você estiver conectado, o BOT DEE guarda este chat se você atualizar ou abrir outro telefone, e depois da pausa pode continuar o histórico guardado. A pausa não apaga o chat. As respostas usam a classificação da sua conta. Se estiver conectado, o BOT DEE vê os mesmos datapoints públicos voluntários que você (música, comida, viagem, hobbies e o restante de Privacy datapoint sharing) — nunca e-mail, telefone, dados de cartão ou GPS. Toque em Definições abaixo da caixa de chat para chats e memórias guardados. Toque numa foto do chat para abri-la numa janela. Feche com X ou Fechar para voltar ao chat. O + no canto superior direito abre chats guardados e não os apaga."
@@ -3826,10 +3798,6 @@
     "help-botdee-place-search": {
         title: "Ρωτήστε τον BOT DEE για χώρους FLOQR",
         body: "Ρωτήστε απλά — εστιατόρια σούσι στην Washington DC, clubs στην DC ή ένα club με όνομα. Ο BOT DEE ψάχνει μόνο onboarded χώρους FLOQR, όχι Google ή Yelp. Τα αποτελέσματα ανοίγουν μια συμπαγή Place SMARTview (όνομα, σύντομο κείμενο, βαθμολογίες, σύνδεσμος δημόσιας σελίδας) με SMARTbackground — όχι πηγάδι φωτογραφίας. Hey και Hi είναι χαιρετισμοί — όχι αναζήτηση χώρων. Miami ή let’s talk Miami επισυνάπτει Miami Place SMARTview ακόμα κι αν υπάρχουν clubs στη λίστα. Αν ονομάσετε μια πόλη με VIP reserV (reservations in Miami), το Place SMARTview επισυνάπτεται ακόμα δίπλα στην κάρτα VIP. Φωτογραφίες patrons και pitches ShoutOut μένουν εκτός εκτός αν τα ζητήσατε. Αν δεν υπάρχει ακόμα, ο BOT DEE το λέει."
-      },
-          "help-botdee-city-tokens": {
-        title: "Διακριτικά πόλης BOT DEE",
-        body: "Στο Features Mgmt → BOT DEE → City / place tokens προσθέστε μια πόλη σε μία από τις 11 γλώσσες. Η γλώσσα είναι υποχρεωτική. Η αποθήκευση συμπληρώνει τις άλλες γλώσσες από τον πίνακα ψευδωνύμων (ή αντιγράφει το διακριτικό σας). Η συνομιλία BOT DEE χρησιμοποιεί αυτή τη λίστα, συμπεριλαμβανομένων αραβικών, ελληνικών και κυριλλικών. Το Gemini δεν εφευρίσκει πόλεις. Προστατευμένα σήματα (BOT DEE, ShoutOut) μένουν αμετάφραστα."
       },
       "help-botdee-page": {
         title: "BOT DEE",
@@ -4369,10 +4337,6 @@
         title: "Zapytaj BOT DEE o lokale FLOQR",
         body: "Pytaj zwykłym językiem — restauracje sushi w Washington DC, kluby w DC albo konkretny klub. BOT DEE szuka tylko onboardowanych venue FLOQR, nie Google ani Yelp. Trafienia otwierają zwartą kartę Place SMARTview (nazwa, krótki opis, oceny, link do strony publicznej) ze SMARTbackground — nie studnią zdjęcia. Hey i Hi to powitania — bez wyszukiwania lokali. Miami lub let’s talk Miami dołącza Miami Place SMARTview nawet gdy kluby są na liście. Podanie miasta z VIP reserV (reservations in Miami) nadal dołącza Place SMARTview obok karty VIP. Zdjęcia patronów i pitch ShoutOut zostają pominięte, chyba że o nie poprosisz. Jeśli nic jeszcze nie jest onboardowane, BOT DEE to powie."
       },
-          "help-botdee-city-tokens": {
-        title: "Tokeny miast BOT DEE",
-        body: "W Features Mgmt → BOT DEE → City / place tokens dodaj miasto w jednym z 11 języków. Język jest wymagany. Zapis uzupełnia pozostałe języki z tabeli aliasów (albo kopiuje Twój token). Czat BOT DEE używa tej listy, w tym arabskiego, greki i cyrylicy. Gemini nie wymyśla miast. Chronione marki (BOT DEE, ShoutOut) pozostają nieprzetłumaczone."
-      },
       "help-botdee-page": {
         title: "BOT DEE",
         body: "Czatuj z BOT DEE na stronie BOT DEE prostymi słowami: wydarzenia i kluby, ShoutOut, Mingl, RydR, BartR, FloqCAST, Twój profil, grafiki personelu lub narzędzia Club Admin. Naciśnij Enter, aby wysłać; Shift+Enter zaczyna nową linię. BOT DEE rozmawia jak człowiek (spróbuj How are you?) i szuka tylko gdy pytasz, jak coś zrobić w FLOQR. Po zalogowaniu BOT DEE zachowuje ten czat przy odświeżeniu lub na drugim telefonie, a po pauzie może wrócić do zapisanej historii. Pauza nie usuwa czatu. Odpowiedzi używają klasyfikacji Twojego konta. Po zalogowaniu BOT DEE widzi te same dobrowolnie publiczne datapointy profilu co Ty (muzyka, jedzenie, podróże, hobby i reszta Privacy datapoint sharing) — nigdy e-mail, telefon, dane karty ani GPS. Dotknij Ustawienia pod polem czatu, aby otworzyć zapisane czaty i wspomnienia. Dotknij zdjęcia na czacie, aby otworzyć je w osobnym oknie. Zamknij X lub Zamknij, aby wrócić do czatu. Znak + w prawym górnym rogu otwiera zapisane czaty i ich nie usuwa."
@@ -4910,10 +4874,6 @@
     "help-botdee-place-search": {
         title: "اسأل BOT DEE عن أماكن FLOQR",
         body: "اسأل بكلمات بسيطة — مطاعم السوشي في Washington DC أو النوادي في DC أو نادٍ باسمه. يبحث BOT DEE فقط في أماكن FLOQR المسجّلة، وليس Google أو Yelp. النتائج تفتح Place SMARTview مضغوطًا (الاسم، نبذة قصيرة، التقييمات، رابط الصفحة العامة) مع SMARTbackground — وليس بئر صورة. Hey و Hi تحيات — ليست بحث أماكن. Miami أو let’s talk Miami يُرفق Miami Place SMARTview حتى عند ظهور النوادي. ذكر مدينة مع VIP reserV (reservations in Miami) ما زال يُرفق Place SMARTview بجانب بطاقة VIP. صور الرواد وعروض ShoutOut لا تظهر إلا إذا طلبتها. إذا لم يُدرج المكان بعد، يقول BOT DEE ذلك."
-      },
-          "help-botdee-city-tokens": {
-        title: "رموز مدن BOT DEE",
-        body: "في Features Mgmt → BOT DEE → City / place tokens أضف مدينة بأي من اللغات الإحدى عشرة. اختيار اللغة إلزامي. الحفظ يملأ اللغات الأخرى من جدول الأسماء البديلة (أو ينسخ رمزك). محادثة BOT DEE تستخدم هذه القائمة بما فيها العربية واليونانية والسيريالية. لا يخترع Gemini مدنًا. العلامات المحمية (BOT DEE وShoutOut) لا تُترجم."
       },
       "help-botdee-page": {
         title: "BOT DEE",
