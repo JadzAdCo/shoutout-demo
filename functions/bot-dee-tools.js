@@ -952,7 +952,14 @@ function matchPlaces(needle) {
     {re: /\batlanta\b/, tokens: ["atlanta"], consumed: ["atlanta"]},
     {re: /\blas vegas\b|\bvegas\b/, tokens: ["vegas", "las vegas"], consumed: ["las", "vegas"]},
     {re: /\bcancun\b/, tokens: ["cancun"], consumed: ["cancun"]},
-    {re: /\bmykonos\b/, tokens: ["mykonos"], consumed: ["mykonos"]}
+    {re: /\bmykonos\b/, tokens: ["mykonos"], consumed: ["mykonos"]},
+    {re: /\bbali\b/, tokens: ["bali"], consumed: ["bali"]},
+    {re: /\bmilan\b|\bmilano\b/, tokens: ["milan"], consumed: ["milan", "milano"]},
+    {re: /\bbarcelona\b/, tokens: ["barcelona"], consumed: ["barcelona"]},
+    {re: /\bmadrid\b/, tokens: ["madrid"], consumed: ["madrid"]},
+    {re: /\blisbon\b|\blisboa\b/, tokens: ["lisbon"], consumed: ["lisbon", "lisboa"]},
+    {re: /\bseattle\b/, tokens: ["seattle"], consumed: ["seattle"]},
+    {re: /\bthailand\b/, tokens: ["thailand"], consumed: ["thailand"]}
   ];
   CITY_HITS.forEach(hit => {
     if (!hit.re.test(needle)) return;
@@ -1028,9 +1035,10 @@ function classifyPlaceSearchIntent(raw) {
   const diningHit = rawTokens.some(token => DINING_CUES.has(token))
     || (rawTokens.some(token => FOOD_GENERIC.has(token)) && extractPlaceTokens(needle).length);
   const venueHit = rawTokens.some(token => VENUE_CUES.has(token));
-  if (!diningHit && !venueHit) return emptyPlaceIntent();
-  const tokens = expandSearchTokens(rawTokens);
   const placeTokens = extractPlaceTokens(needle);
+  const destinationHit = placeTokens.length > 0;
+  if (!diningHit && !venueHit && !destinationHit) return emptyPlaceIntent();
+  const tokens = expandSearchTokens(rawTokens);
   const cuisineTokens = cuisineTokensFrom(rawTokens);
   const leftoverTokens = leftoverQueryTokens(rawTokens, needle, placeTokens, cuisineTokens);
   return {
@@ -1339,6 +1347,17 @@ function userTextsFromHistory(history) {
 function classifyPlaceSearchFromConversation(currentPrompt, history) {
   const current = classifyPlaceSearchIntent(currentPrompt);
   if (placeSearchAlongsideRoom(current)) return current;
+  const namedNow = extractPlaceTokens(normalizeNeedle(currentPrompt));
+  if (namedNow.length) {
+    return {
+      intent: "venue",
+      needle: normalizeNeedle(currentPrompt) || namedNow.join(" "),
+      tokens: namedNow,
+      placeTokens: namedNow,
+      cuisineTokens: [],
+      leftoverTokens: []
+    };
+  }
   const needle = String(currentPrompt || "").trim();
   const texts = userTextsFromHistory(history);
   for (let i = texts.length - 1; i >= 0; i -= 1) {

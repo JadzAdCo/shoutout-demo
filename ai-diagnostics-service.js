@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.082";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.082";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.083";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.083";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,16 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.083",
+      title: "s3.3.083 — Bali Place SMARTview uses published SMARTbackground",
+      checks: [
+        {label:"Bali is a city token", file:"functions/bot-dee-tools.js", includes:["\\\\bbali\\\\b", "destinationHit"]},
+        {label:"This turn city wins over Miami history", file:"functions/bot-dee-tools.js", includes:["namedNow"]},
+        {label:"Place card prefers stamped URL", file:"botdee-smartview.js", includes:["smartBackgroundUrl"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-083-bali-place-smartbackground", "s3.3.083"]}
+      ]
+    },
     {
       version: "s3.3.082",
       title: "s3.3.082 — Miami Place SMARTview uses published SMARTbackground",
@@ -3905,6 +3915,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-083-bali-place-smartbackground",
+      area:"BOT DEE",
+      feature:"Place SMARTview Bali uses the published SMARTbackground",
+      changed:"s3.3.083 — After a Miami Place SMARTview, Let's plan for Bali still showed Miami · Place SMARTview with leftover night SVG (palm/moon) and miami/beach/city tags. Studio already had Bali published (temple/lake JPEG) and Milan in review. Cause: bali was not a city token, so Let's plan for Bali was intent none and classifyPlaceSearchFromConversation reused Miami; attachVenueSearch then stamped bg-miami leftover SVG. Fix: Bali (and other catalog cities) are place tokens; a named city on this turn is a Place SMARTview; catalogPlaceIdFromTokens(bali) → smartVisualPublished/bg-bali JPEG via smartBackgroundUrl.",
+      howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee] [firebase-deploy-smartvisuals]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until bot-dee-chat.js / botdee-smartview.js ?v=s3.3.083. Sign in with BOT DEE. 2) If a Miami Place card is already in the thread, type Let's plan for Bali. Expect Place SMARTview titled Bali, tags bali (not miami/beach/city), art is the Studio-published Bali SMARTbackground photo (temple/lake JPEG) not leftover night palm/moon SVG. Copy may still say FLOQR doesn't list that kind of spot if no onboarded Bali club. 3) Milan in review must not appear on the Bali card. 4) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Let's plan for Bali replaces Miami Place SMARTview with Bali and the published Bali SMARTbackground.",
+      troubleshoot:"Still Miami card → Functions executeBotSession not this SHA (bali CITY_HITS / destinationHit) or cached bot-dee-chat.js. Still leftover night SVG after Studio JPEG publish → smartVisualPublished/bg-bali missing (approveSmartVisualDraft) or stamp skipped. Mixed miami tags → attachVenueSearch still used history Miami needle."
+    },
       {
       id:"s3-3-082-miami-place-smartbackground",
       area:"BOT DEE",

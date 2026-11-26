@@ -280,6 +280,46 @@ test("VIP follow-up keeps Miami Place SMARTview from earlier turns", () => {
   assert.equal(again.smartViews.filter(row => row.kind === "venue").length, 1);
 });
 
+test("Let's plan for Bali is a Bali Place SMARTview, not leftover Miami", () => {
+  const q = "Let's plan for Bali";
+  const classified = tools.classifyPlaceSearchIntent(q);
+  assert.equal(classified.intent, "venue");
+  assert.ok(classified.placeTokens.includes("bali"));
+  assert.ok(!classified.placeTokens.includes("miami"));
+  assert.equal(tools.placeSearchAlongsideRoom(classified), true);
+  assert.equal(tools.catalogPlaceIdFromTokens(classified.placeTokens), "bali");
+
+  const dest = tools.destinationSmartView(classified);
+  assert.match(dest.title, /Bali/i);
+  assert.equal(dest.floqrPublicData.smartBackgroundId, "bg-bali");
+  assert.ok(dest.floqrPublicData.smartTags.includes("bali"));
+  assert.ok(!dest.floqrPublicData.smartTags.includes("miami"));
+
+  const leftoverMiami = tools.applyPlaceVisualOverride(dest, {
+    backgroundId: "bg-miami",
+    stencilId: "st-beach",
+    tags: ["miami", "beach", "city"],
+    generic: true
+  });
+  assert.equal(leftoverMiami.floqrPublicData.smartBackgroundId, "bg-bali");
+  assert.ok(leftoverMiami.floqrPublicData.smartTags.includes("bali"));
+  assert.ok(!leftoverMiami.floqrPublicData.smartTags.includes("miami"));
+
+  const history = [
+    {role: "user", text: "Miami"},
+    {role: "model", text: "FLOQR doesn't list that kind of spot there yet."}
+  ];
+  const follow = tools.classifyPlaceSearchFromConversation(q, history);
+  assert.ok(follow.placeTokens.includes("bali"));
+  assert.ok(!follow.placeTokens.includes("miami"));
+  assert.match(tools.placeAttachQuery(follow, q), /bali/i);
+
+  const local = require("./bot-dee-functions").__botDeeHelpers.localSession("patron", q, {history});
+  assert.ok(local.smartViews.some(row => row && row.kind === "venue" && /bali/i.test(row.title || "")));
+  assert.ok(!local.smartViews.some(row => row && row.kind === "venue" && /miami/i.test(row.title || "")));
+  assert.ok(local.smartViews.some(row => row && row.floqrPublicData?.smartBackgroundId === "bg-bali"));
+});
+
 test("Gemini dining path is kind=club and does not pitch products", () => {
   const instruction = bot.systemInstruction("patron");
   assert.match(instruction, /kind=club/);
