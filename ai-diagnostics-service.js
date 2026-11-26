@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.087";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.087";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.088";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.088";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.088",
+      title: "s3.3.088 — Place SMARTview hide tags + stub tabs",
+      checks: [
+        {label:"Place card stub tabs", file:"botdee-smartview.js", includes:["placeTabsHtml", "data-sv-place-tag-list", "botdee.place.tabThings"]},
+        {label:"Search compact hides tags", file:"smartvisuals-view.js", includes:["data-sv-place-tag-list"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-088-place-card-tabs", "s3.3.088"]}
+      ]
+    },
     {
       version: "s3.3.087",
       title: "s3.3.087 — BOT DEE Place SMARTview intent + published photo assignment",
@@ -3958,6 +3967,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-088-place-card-tabs",
+      area:"BOT DEE",
+      feature:"Place SMARTview tabs (stubs)",
+      changed:"s3.3.088 — Patron Place SMARTview cards hide tag chips (tags stay in data). Sub-tabs Things to do / Security / Commute are empty stubs. Room SMARTview destination chips stay visible.",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html until botdee-smartview.js / floqr-i18n.js ?v=s3.3.088. Sign in. 2) Send: I like fashion week in Milan. Place card has Things to do / Security / Commute. No visible milan/fashion chips on the Place card. Click each tab — stub copy only. 3) Search compact Place cards also hide chips. 4) Room SMARTview still shows destination chips. Display URLs have no ?v=.",
+      expected:"Place card: no patron tags, three stub tabs. Room chips unchanged. Tags remain in data-sv-place-tag-list.",
+      troubleshoot:"Tags still on Place card → cached botdee-smartview.js / smartvisuals-view.js. Tabs missing → ?v= not 088."
+    },
       {
       id:"s3-3-087-botdee-place-intent",
       area:"BOT DEE",

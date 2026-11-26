@@ -102,8 +102,14 @@ test("place cards are compact templates without chrome photo wells", () => {
   const js = read("botdee-smartview.js");
   assert.match(js, /function renderPlaceCard\(/);
   assert.match(js, /botdee-sv-place-chrome/);
+  assert.match(js, /function placeTabsHtml\(/);
+  assert.match(js, /function bindPlaceTabs\(/);
+  assert.match(js, /data-sv-place-tag-list/);
+  assert.match(js, /botdee\.place\.tabThings/);
+  assert.match(js, /hiddenPlaceTagsAttr\(visual\.tags\)/);
+  assert.match(js, /\$\{placeTabsHtml\(\)\}/);
   assert.doesNotMatch(js, /class="botdee-sv-images"/);
-  assert.match(read("botdee-smartview.css"), /\.botdee-sv-place/);
+  assert.match(read("botdee-smartview.css"), /\.botdee-sv-place-tabs/);
 });
 
 test("smartViewLoadCopy uses sign-in copy only for unauthenticated", () => {
