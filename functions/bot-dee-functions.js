@@ -3,7 +3,8 @@
    Durable threads: getBotDeeThread + persist under botDeeThreads/{uid}.
    Master Admin: setBotDeeSettings (idle pause) under SOS2FA.
    s3.3.047: Mingl session invites + shared tab.
-   s3.3.063: Place SMARTview attachVenueSearch SMARTbackground stamp. */
+   s3.3.063: Place SMARTview attachVenueSearch SMARTbackground stamp.
+   s3.3.087: stampPublishedPlaceViews after workflow (Milan Fashion Week published photo). */
 "use strict";
 
 const admin = require("firebase-admin");
