@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.087";
+  const VERSION = "s3.3.088";
   const packs = {};
 
   function mergePacks(extra) {

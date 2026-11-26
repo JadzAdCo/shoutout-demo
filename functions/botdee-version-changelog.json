@@ -1,5 +1,12 @@
 [
   {
+    "id": "s3.3.088",
+    "text": "s3.3.088: Place SMARTview hides patron tags; Things to do / Security / Commute stubs",
+    "audiences": [
+      "botDee"
+    ]
+  },
+  {
     "id": "s3.3.087",
     "text": "s3.3.087: Place SMARTview card then natural ask; pasted Place copy is not a ShoutOut",
     "audiences": [
