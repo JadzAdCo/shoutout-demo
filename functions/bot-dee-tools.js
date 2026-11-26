@@ -867,7 +867,9 @@ const PLACE_STOP = new Set([
   "where", "can", "i", "get", "find", "search", "please", "any", "are", "there",
   "is", "what", "whats", "which", "who", "want", "wanna", "need", "recommend",
   "recommendation", "recommendations", "spot", "spots", "place", "places",
-  "city", "cities", "open", "now", "tonight", "today", "this", "that", "you", "got", "have"
+  "city", "cities", "open", "now", "tonight", "today", "this", "that", "you", "got", "have",
+  "lets", "let", "talk", "talks", "talking", "chat", "chatting", "plan", "planning",
+  "discuss", "discussing", "about", "hey", "hi", "hello", "howdy"
 ]);
 
 const DINING_CUES = new Set([
@@ -891,7 +893,9 @@ const PLACE_LEFTOVER_STOP = new Set([
   ...PLACE_STOP,
   "room", "rooms", "smart", "card", "cards", "smartview", "smartcard",
   "group", "reservation", "reservations", "reserve", "booking", "book",
-  "together", "session"
+  "together", "session",
+  "lets", "let", "talk", "talks", "talking", "chat", "chatting", "plan", "planning",
+  "discuss", "discussing", "about", "hey", "hi", "hello", "howdy"
 ]);
 
 const CUISINE_ALIASES = Object.freeze({
@@ -1023,7 +1027,22 @@ function emptyPlaceIntent() {
   return {intent: "none", needle: "", tokens: [], placeTokens: [], cuisineTokens: [], leftoverTokens: []};
 }
 
+function skipPlaceSearchPrompt(raw) {
+  try {
+    const bot = require("./bot-dee-core");
+    return !!(bot.isChitchatPrompt(raw)
+      || bot.isIdentityPrompt(raw)
+      || bot.isHelpPrompt(raw)
+      || bot.isPrivacyPrompt(raw)
+      || bot.isVersionPrompt(raw)
+      || bot.isPrivilegeAskPrompt(raw));
+  } catch (_) {
+    return false;
+  }
+}
+
 function classifyPlaceSearchIntent(raw) {
+  if (skipPlaceSearchPrompt(raw)) return emptyPlaceIntent();
   const people = require("./botdee-smartcard-core").classifyPeopleSearchIntent(raw);
   if (people.intent === "self" || people.intent === "person" || people.intent === "empty") {
     return emptyPlaceIntent();
@@ -1345,6 +1364,7 @@ function userTextsFromHistory(history) {
 }
 
 function classifyPlaceSearchFromConversation(currentPrompt, history) {
+  if (skipPlaceSearchPrompt(currentPrompt)) return emptyPlaceIntent();
   const current = classifyPlaceSearchIntent(currentPrompt);
   if (placeSearchAlongsideRoom(current)) return current;
   const namedNow = extractPlaceTokens(normalizeNeedle(currentPrompt));
@@ -1362,6 +1382,7 @@ function classifyPlaceSearchFromConversation(currentPrompt, history) {
   const texts = userTextsFromHistory(history);
   for (let i = texts.length - 1; i >= 0; i -= 1) {
     if (texts[i] === needle) continue;
+    if (skipPlaceSearchPrompt(texts[i])) continue;
     const classified = classifyPlaceSearchIntent(texts[i]);
     if (placeSearchAlongsideRoom(classified)) return classified;
   }
@@ -1435,21 +1456,24 @@ async function attachVenueSearch({query} = {}) {
   const cards = ranked.map(row => publicClubCard(row.id, row.data, row.score));
   const names = cards.map(card => card.displayName).filter(Boolean);
   const found = cards.length > 0;
+  const destCity = titleCasePlace((classified.placeTokens || []).find(Boolean));
   const reply = found
     ? (names.length ? `Here are FLOQR venues that match: ${names.join(", ")}.` : "Here are FLOQR venues that match.")
-    : "FLOQR doesn't list that kind of spot there yet. I only search onboarded venues — not a general restaurant guide.";
+    : (placeSearchAlongsideRoom(classified) && destCity
+      ? `${destCity} · Place SMARTview. I can look at onboarded FLOQR clubs there — say clubs or a venue name.`
+      : "FLOQR doesn't list that kind of spot there yet. I only search onboarded venues — not a general restaurant guide.");
   const media = [];
   let overrideVisual = emptyPlaceVisualOverride();
   try {
     overrideVisual = await loadPlaceVisualOverride("venue", catalogPlaceIdFromTokens(classified.placeTokens));
   } catch (_) { /* packaged resolver still stamps a SMARTbackground */ }
   const smartViews = [];
-  for (const card of cards) {
-    smartViews.push(await attachPublishedBackgroundUrl(applyPlaceVisualOverride(clubSmartView(card), overrideVisual)));
-  }
-  if (!smartViews.length && placeSearchAlongsideRoom(classified)) {
+  if (placeSearchAlongsideRoom(classified)) {
     const dest = destinationSmartView(classified);
     if (dest) smartViews.push(await attachPublishedBackgroundUrl(applyPlaceVisualOverride(dest, overrideVisual)));
+  }
+  for (const card of cards) {
+    smartViews.push(await attachPublishedBackgroundUrl(applyPlaceVisualOverride(clubSmartView(card), overrideVisual)));
   }
   return {
     handled: true,
@@ -2128,6 +2152,7 @@ module.exports = {
   lookupPublicProfiles,
   classifyPlaceSearchIntent,
   classifyPlaceSearchFromConversation,
+  skipPlaceSearchPrompt,
   placeSearchAlongsideRoom,
   placeAttachQuery,
   destinationSmartView,

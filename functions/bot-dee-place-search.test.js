@@ -320,6 +320,48 @@ test("Let's plan for Bali is a Bali Place SMARTview, not leftover Miami", () => 
   assert.ok(local.smartViews.some(row => row && row.floqrPublicData?.smartBackgroundId === "bg-bali"));
 });
 
+test("Hey is not a venue search even after Miami in history", () => {
+  assert.equal(tools.skipPlaceSearchPrompt("Hey"), true);
+  assert.equal(tools.skipPlaceSearchPrompt("hey!"), true);
+  assert.equal(tools.classifyPlaceSearchIntent("Hey").intent, "none");
+  const history = [
+    {role: "user", text: "Miami"},
+    {role: "model", text: "FLOQR doesn't list that kind of spot there yet."},
+    {role: "user", text: "Let's talk Miami"}
+  ];
+  const hey = tools.classifyPlaceSearchFromConversation("Hey", history);
+  assert.equal(hey.intent, "none");
+  assert.deepEqual(hey.placeTokens, []);
+  const local = require("./bot-dee-functions").__botDeeHelpers.localSession("patron", "Hey", {history});
+  assert.equal(local.provider, "local-chitchat");
+  assert.ok(!Array.isArray(local.smartViews) || !local.smartViews.length);
+  const session = fs.readFileSync(path.join(__dirname, "bot-dee-functions.js"), "utf8");
+  assert.match(session, /skipPlaceSearchPrompt\(userPrompt\)/);
+  assert.match(session, /!skipPlaceSearch && !outcome && !shoutExecute/);
+});
+
+test("Miami and let's talk Miami attach Place SMARTview", () => {
+  for (const q of ["Miami", "Let's talk Miami", "lets talk Miami"]) {
+    const classified = tools.classifyPlaceSearchIntent(q);
+    assert.equal(classified.intent, "venue", q);
+    assert.ok(classified.placeTokens.includes("miami"), q);
+    assert.ok(!classified.leftoverTokens.includes("talk"), q);
+    assert.ok(!classified.leftoverTokens.includes("lets"), q);
+    assert.equal(tools.placeSearchAlongsideRoom(classified), true, q);
+    const dest = tools.destinationSmartView(classified);
+    assert.match(dest.title, /Miami/i);
+    assert.equal(dest.floqrPublicData.smartBackgroundId, "bg-miami");
+    assert.match(dest.summary, /Place SMARTview/);
+    const local = require("./bot-dee-functions").__botDeeHelpers.localSession("patron", q);
+    assert.ok(local.smartViews.some(row => row && row.kind === "venue" && /miami/i.test(row.title || "")), q);
+    assert.ok(local.smartViews.some(row => row && row.floqrPublicData?.smartBackgroundId === "bg-miami"), q);
+  }
+  const attach = fs.readFileSync(path.join(__dirname, "bot-dee-tools.js"), "utf8");
+  assert.match(attach, /if \(placeSearchAlongsideRoom\(classified\)\) \{[\s\S]*destinationSmartView/);
+  assert.match(attach, /const destCity = titleCasePlace/);
+  assert.match(attach, /Place SMARTview\. I can look at onboarded FLOQR clubs there/);
+});
+
 test("Gemini dining path is kind=club and does not pitch products", () => {
   const instruction = bot.systemInstruction("patron");
   assert.match(instruction, /kind=club/);
