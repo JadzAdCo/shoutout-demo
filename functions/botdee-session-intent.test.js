@@ -78,5 +78,6 @@ test("executeBotSession persists sessionWorkflow and talk/place branches", () =>
   assert.match(src, /persistSessionWorkflow/);
   assert.match(src, /session-talk/);
   assert.match(src, /session-place-intent/);
+  assert.match(src, /stampPublishedPlaceViews/);
   assert.match(src, /intents \|\| \[\]\)\.includes\("reserve"\)/);
 });

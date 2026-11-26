@@ -1447,7 +1447,10 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       };
     }
     if (!outcome && askIntentNow) {
-      const views = placeTools.destinationPlaceViews(placeQuery, null, sessionWorkflow);
+      const views = await placeTools.stampPublishedPlaceViews(
+        placeTools.destinationPlaceViews(placeQuery, null, sessionWorkflow),
+        sessionWorkflow
+      );
       outcome = {
         reply: intentCore.askIntentReply(sessionWorkflow),
         results: [],
@@ -1467,7 +1470,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
           request
         });
         if (venueAttached && Array.isArray(venueAttached.smartViews)) {
-          venueAttached.smartViews = venueAttached.smartViews.map(view => intentCore.stampPlacePayload(view, sessionWorkflow));
+          venueAttached.smartViews = await placeTools.stampPublishedPlaceViews(venueAttached.smartViews, sessionWorkflow);
         }
       } catch (error) {
         console.warn("BOT DEE venue search attach failed", error?.message || error);
@@ -1935,10 +1938,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     }
     outcome = mergePlaceSmartViews(outcome, venueAttached);
     if (outcome && Array.isArray(outcome.smartViews)) {
-      outcome.smartViews = outcome.smartViews.map(view => {
-        if (!view || view.kind !== "venue") return view;
-        return intentCore.stampPlacePayload(view, sessionWorkflow);
-      });
+      outcome.smartViews = await placeTools.stampPublishedPlaceViews(outcome.smartViews, sessionWorkflow);
     }
     outcome.sessionWorkflow = sessionWorkflow;
     const versionCardOnly = Array.isArray(outcome.smartViews)
