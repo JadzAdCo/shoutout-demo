@@ -1276,32 +1276,121 @@ function applyPlaceVisualOverride(payload, override) {
   return payload;
 }
 
+const PUBLISHED_DATA_URL_MAX = 900000;
+
 function publishedBackgroundDataUrl(row) {
   if (!row || String(row.approvalStatus || "") !== "published") return "";
   const type = String(row.contentType || "").trim();
   const raster = String(row.imageBase64 || "").replace(/\s+/g, "");
-  if (raster && /^image\/(jpeg|png|webp)$/.test(type) && raster.length <= 400000) {
+  if (raster && /^image\/(jpeg|png|webp)$/.test(type) && raster.length <= PUBLISHED_DATA_URL_MAX) {
     return `data:${type};base64,${raster}`;
   }
   const svg = String(row.svgXml || "").trim();
-  if (svg && svg.length <= 400000) {
+  if (svg && svg.length <= PUBLISHED_DATA_URL_MAX) {
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   }
   return "";
 }
 
+function catalogBackgroundIdForTags(tags) {
+  const set = new Set(mergeSmartViewTags(tags));
+  const fashion = set.has("fashion-week") || set.has("runway")
+    || (set.has("fashion") && (set.has("event") || set.has("milan") || set.has("paris") || set.has("london")));
+  if (fashion) {
+    if (set.has("paris")) return "bg-paris-fashion-week";
+    if (set.has("london")) return "bg-london-fashion-week";
+    if (set.has("new-york") || set.has("nyc") || set.has("new york")) return "bg-new-york-fashion-week";
+    if (set.has("milan")) return "bg-milan-fashion-week";
+  }
+  return "";
+}
+
+function placeTagsOf(payload) {
+  const publicData = payload && payload.floqrPublicData ? payload.floqrPublicData : {};
+  return mergeSmartViewTags(publicData.smartTags, payload && payload.tags);
+}
+
+function applyTaggedCatalogBackground(payload) {
+  if (!payload) return payload;
+  const tagged = catalogBackgroundIdForTags(placeTagsOf(payload));
+  if (!tagged) return payload;
+  payload.floqrPublicData = Object.assign({}, payload.floqrPublicData || {}, {smartBackgroundId: tagged});
+  return payload;
+}
+
+async function loadPublishedOverlay(id, tags) {
+  const keys = [];
+  const primary = String(id || "").trim();
+  if (primary) keys.push(primary);
+  const tagged = catalogBackgroundIdForTags(tags);
+  if (tagged && !keys.includes(tagged)) keys.push(tagged);
+  for (const key of keys) {
+    try {
+      const snap = await db.collection("smartVisualPublished").doc(key).get();
+      if (!snap.exists) continue;
+      const url = publishedBackgroundDataUrl(snap.data() || {});
+      if (url) return {id: key, url};
+    } catch (_) { /* overlay optional */ }
+  }
+  const wanted = mergeSmartViewTags(tags);
+  const place = wanted.find(tag => ["milan", "paris", "london", "new-york", "miami", "bali"].includes(tag));
+  const topic = wanted.find(tag => ["fashion-week", "runway", "fashion"].includes(tag));
+  if (!place && !topic) return null;
+  try {
+    const field = place || topic;
+    const snap = await db.collection("smartVisualPublished").where("tags", "array-contains", field).limit(24).get();
+    let best = null;
+    let bestScore = 0;
+    snap.docs.forEach(doc => {
+      const data = doc.data() || {};
+      const have = mergeSmartViewTags(data.tags);
+      const score = wanted.filter(tag => have.includes(tag)).length;
+      const url = publishedBackgroundDataUrl(data);
+      if (url && score > bestScore) {
+        best = {id: doc.id, url};
+        bestScore = score;
+      }
+    });
+    if (bestScore >= 2) return best;
+  } catch (_) { /* tag query optional if index missing */ }
+  return null;
+}
+
 async function attachPublishedBackgroundUrl(payload) {
   if (!payload) return payload;
-  const id = String(payload.floqrPublicData && payload.floqrPublicData.smartBackgroundId || "").trim();
-  if (!id) return payload;
+  applyTaggedCatalogBackground(payload);
+  const publicData = payload.floqrPublicData || {};
+  const id = String(publicData.smartBackgroundId || "").trim();
+  const tags = placeTagsOf(payload);
+  if (!id && !tags.length) return payload;
   try {
-    const snap = await db.collection("smartVisualPublished").doc(id).get();
-    if (!snap.exists) return payload;
-    const url = publishedBackgroundDataUrl(snap.data() || {});
-    if (!url) return payload;
-    payload.floqrPublicData = Object.assign({}, payload.floqrPublicData || {}, {smartBackgroundUrl: url});
+    const overlay = await loadPublishedOverlay(id, tags);
+    if (!overlay || !overlay.url) return payload;
+    payload.floqrPublicData = Object.assign({}, publicData, {
+      smartBackgroundId: overlay.id || id,
+      smartBackgroundUrl: overlay.url
+    });
   } catch (_) { /* published overlay optional until Functions deploy */ }
   return payload;
+}
+
+async function stampPublishedPlaceViews(views, workflow) {
+  const list = Array.isArray(views) ? views : [];
+  const intent = (() => {
+    try { return require("./botdee-session-intent"); } catch (_) { return null; }
+  })();
+  const out = [];
+  for (const view of list) {
+    if (!view || view.kind !== "venue") {
+      out.push(view);
+      continue;
+    }
+    let next = view;
+    if (intent && workflow) next = intent.stampPlacePayload(next, workflow);
+    applyTaggedCatalogBackground(next);
+    out.push(await attachPublishedBackgroundUrl(next));
+  }
+  return out;
 }
 
 function applyPlaceBackgroundOverride(payload, backgroundId) {
@@ -1410,6 +1499,7 @@ function destinationSmartView(classified, workflow) {
   try {
     require("./botdee-session-intent").stampPlacePayload(payload, workflow);
   } catch (_) { /* workflow stamp optional */ }
+  applyTaggedCatalogBackground(payload);
   return payload;
 }
 
@@ -2172,7 +2262,11 @@ module.exports = {
   applyPlaceBackgroundOverride,
   applyPlaceVisualOverride,
   attachPublishedBackgroundUrl,
+  stampPublishedPlaceViews,
   catalogPlaceIdFromTokens,
+  catalogBackgroundIdForTags,
+  applyTaggedCatalogBackground,
+  publishedBackgroundDataUrl,
   loadPlaceBackgroundOverride,
   loadPlaceVisualOverride,
   clubToResult,

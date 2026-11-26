@@ -280,6 +280,55 @@ test("VIP follow-up keeps Miami Place SMARTview from earlier turns", () => {
   assert.equal(again.smartViews.filter(row => row.kind === "venue").length, 1);
 });
 
+test("Milan Fashion Week tags pick published bg-milan-fashion-week, not leftover night SVG", () => {
+  const tags = ["milan", "fashion", "event", "runway", "fashion-week"];
+  assert.equal(tools.catalogBackgroundIdForTags(tags), "bg-milan-fashion-week");
+  const jpeg = "a".repeat(500001);
+  assert.match(tools.publishedBackgroundDataUrl({
+    approvalStatus: "published",
+    contentType: "image/jpeg",
+    imageBase64: jpeg
+  }), /^data:image\/jpeg;base64,/);
+  assert.equal(tools.publishedBackgroundDataUrl({
+    approvalStatus: "published",
+    contentType: "image/jpeg",
+    imageBase64: jpeg.slice(0, 10)
+  }).startsWith("data:image/jpeg"), true);
+
+  const q = "Let's plan a trip to Milan";
+  const classified = tools.classifyPlaceSearchIntent(q);
+  assert.equal(classified.intent, "venue");
+  assert.ok(classified.placeTokens.includes("milan"));
+  const dest = tools.destinationSmartView(classified);
+  assert.match(dest.title, /Milan/i);
+  const fashion = tools.applyTaggedCatalogBackground({
+    kind: "venue",
+    title: "milan Fashion Week",
+    floqrPublicData: {
+      smartBackgroundId: "bg-bali",
+      smartTags: tags
+    }
+  });
+  assert.equal(fashion.floqrPublicData.smartBackgroundId, "bg-milan-fashion-week");
+
+  const workflow = require("./botdee-session-intent").classifySessionWorkflow("I like fashion week in Milan");
+  const stamped = tools.destinationSmartView(classified, workflow);
+  assert.equal(stamped.floqrPublicData.smartBackgroundId, "bg-milan-fashion-week");
+  assert.equal(stamped.floqrPublicData.smartStencilId, "st-people");
+  assert.ok(stamped.floqrPublicData.smartTags.includes("fashion-week"));
+  assert.ok(stamped.floqrPublicData.smartTags.includes("milan"));
+
+  const local = require("./bot-dee-functions").__botDeeHelpers.localSession("patron", q);
+  assert.ok(!Array.isArray(local.smartViews) || !local.smartViews.some(row => row && row.kind === "botDeeVip"));
+  const attach = fs.readFileSync(path.join(__dirname, "bot-dee-tools.js"), "utf8");
+  assert.match(attach, /stampPublishedPlaceViews/);
+  assert.match(attach, /catalogBackgroundIdForTags/);
+  assert.match(attach, /PUBLISHED_DATA_URL_MAX = 900000/);
+  const session = fs.readFileSync(path.join(__dirname, "bot-dee-functions.js"), "utf8");
+  assert.match(session, /stampPublishedPlaceViews/);
+  assert.doesNotMatch(session, /venueAttached\.smartViews = venueAttached\.smartViews\.map\(view => intentCore\.stampPlacePayload/);
+});
+
 test("Let's plan for Bali is a Bali Place SMARTview, not leftover Miami", () => {
   const q = "Let's plan for Bali";
   const classified = tools.classifyPlaceSearchIntent(q);

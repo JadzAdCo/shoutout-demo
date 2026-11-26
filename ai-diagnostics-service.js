@@ -230,6 +230,8 @@
         {label:"Persist session workflow", file:"functions/bot-dee-thread.js", includes:["persistSessionWorkflow", "sessionWorkflow"]},
         {label:"Publish injects assignment photo", file:"functions/smartvisuals-functions.js", includes:["bg-published-${draftId}"]},
         {label:"Studio injects unmatched photo", file:"smartvisuals-studio.js", includes:["publishedPhoto: true"]},
+        {label:"Milan Fashion Week uses published overlay", file:"functions/bot-dee-tools.js", includes:["catalogBackgroundIdForTags", "stampPublishedPlaceViews", "PUBLISHED_DATA_URL_MAX"]},
+        {label:"Session re-stamps published URL after workflow", file:"functions/bot-dee-functions.js", includes:["stampPublishedPlaceViews"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-087-botdee-place-intent", "s3.3.087"]}
       ]
     },
@@ -3960,10 +3962,10 @@
       id:"s3-3-087-botdee-place-intent",
       area:"BOT DEE",
       feature:"Place SMARTview intent + SMARTbackground",
-      changed:"s3.3.087 — Place SMARTview is workflow verbiage + published SMARTbackground + place/topic tags. Publishing a picture adds it to the Studio assignment list. Patron chat extracts datapoints and intent, remembers intent for the session, and starts headless VIP reserV when they reserve a club table. Fashion Week in Milan without a product intent shows Place SMARTview + NEUTRAL stencil and asks. Talk-only uses the Don Papi joke.",
-      howToTest:"1) Hard-refresh BOT DEE until floqr-i18n.js ?v=s3.3.087. Sign in. 2) Send: reserve a table at a club in Milan during Milan Fashion Week — VIP reserV headless + Milan Fashion Week SMARTbackground + tags reserve/club/milan/fashion-week. 3) New chat: I like fashion week in Milan — Place SMARTview Milan, NEUTRAL stencil, BOT DEE asks for intent (no VIP). 4) I just want to talk — Don Papi the founder said humans like talking to bots. 5) Master Admin Studio: Publish a picture; it appears in the Place SMARTview SMARTbackground list (published photo). Do not merge until Don says merge. Display URLs have no ?v=.",
-      expected:"Intent remembered on the BOT DEE session. Fashion Week + reserve uses the published Milan Fashion Week SMARTbackground. No-intent place asks before starting a workflow. Talk-only is the Don Papi joke. Published photos list in Studio assignment.",
-      troubleshoot:"VIP missing → Functions executeBotSession not deployed. Neutral stencil missing → cached botdee-smartview / session-intent. Photo missing from list → approveSmartVisualDraft not deployed or studio.js cache before publishedPhoto inject. Intent forgotten after refresh → persistSessionWorkflow / botDeeThreads.sessionWorkflow."
+      changed:"s3.3.087 — Place SMARTview is workflow verbiage + published SMARTbackground + place/topic tags. Let's plan a trip to Milan with milan/fashion/event/runway/fashion-week tags must show the Studio-published Milan Fashion Week photo (Duomo/runway), not leftover night triangle/moon SVG. stampPublishedPlaceViews re-stamps smartBackgroundUrl after workflow; catalogBackgroundIdForTags maps Milan + Fashion Week to bg-milan-fashion-week. Neutral stencil when there is no product intent. Do not invent VIP. Talk-only uses the Don Papi joke.",
+      howToTest:"1) Hard-refresh BOT DEE until floqr-i18n.js ?v=s3.3.087. Sign in. 2) Send: Let's plan a trip to Milan — Place SMARTview; if tags include Fashion Week + Milan, art is the published Milan Fashion Week JPEG (not leftover night SVG), stencil NEUTRAL, no VIP map. 3) Send: I like fashion week in Milan — same published photo + tags milan/fashion-week, BOT DEE asks for intent (no VIP). 4) Send: reserve a table at a club in Milan during Milan Fashion Week — VIP reserV headless + published Milan Fashion Week SMARTbackground. 5) I just want to talk — Don Papi joke. Do not merge until Don says merge. Display URLs have no ?v=.",
+      expected:"Milan + Fashion Week tags use the published SMARTbackground photo. Place-only trip does not invent VIP. Neutral stencil when asking intent. Talk-only is the Don Papi joke.",
+      troubleshoot:"Still leftover night SVG → executeBotSession not this SHA (stampPublishedPlaceViews / 900000 stamp cap) or smartVisualPublished/bg-milan-fashion-week missing JPEG. Wrong leftover SVG after stamp → workflow stamp ran after URL attach (must re-stamp). VIP on trip-only → askIntentNow skipped. Studio list has photo but chat does not → Functions smartvisuals overlay not deployed."
     },
       {
       id:"s3-3-086-studio-place-assign-edit",
