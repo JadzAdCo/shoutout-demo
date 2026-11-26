@@ -2247,26 +2247,6 @@
       ]
     },
     {
-      "sourceId": "help:help-smartvisuals-place-assign",
-      "id": "help-smartvisuals-place-assign",
-      "kind": "help",
-      "label": "Place SMARTview stencil, background, and tags",
-      "blurb": "Saved Place SMARTview cards are listed in SMARTvisual Studio. Click a card to edit its SMARTstencil, SMARTbackground, and tags. The SMARTbackground list includes published photos. Opening a library asset keeps that SMARTbackground selected. SOS2FA and a reason are required to sav",
-      "href": "./master-admin.html",
-      "phrases": [
-        "place smartview stencil background and tags",
-        "saved place smartview cards are listed in smartvisual studio. click a card to edit its smartstencil smartbackground and tags. the smartbackground list includes ",
-        "place smartview stencil",
-        "smartbackground assignment",
-        "edit place smartview",
-        "published photo",
-        "milan fashion week",
-        "saved place smartview",
-        "smartvisual studio",
-        "help-smartvisuals-place-assign"
-      ]
-    },
-    {
       "sourceId": "help:help-smartvisuals-room",
       "id": "help-smartvisuals-room",
       "kind": "help",
