@@ -223,6 +223,16 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.084",
+      title: "s3.3.084 — BOT DEE Hey greets; Miami attaches Place SMARTview",
+      checks: [
+        {label:"Greetings skip venue search", file:"functions/bot-dee-tools.js", includes:["skipPlaceSearchPrompt", "isChitchatPrompt"]},
+        {label:"Session skips Hey venue attach", file:"functions/bot-dee-functions.js", includes:["skipPlaceSearchPrompt(userPrompt)", "!skipPlaceSearch && !outcome"]},
+        {label:"Destination Place prepended", file:"functions/bot-dee-tools.js", includes:["destCity", "destinationSmartView"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-084-botdee-hey-miami-place", "s3.3.084"]}
+      ]
+    },
+    {
       version: "s3.3.083",
       title: "s3.3.083 — Bali Place SMARTview uses published SMARTbackground",
       checks: [
@@ -3915,6 +3925,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-084-botdee-hey-miami-place",
+      area:"BOT DEE",
+      feature:"Hey greets; Miami attaches Place SMARTview",
+      changed:"s3.3.084 — Hey ran venue search (FLOQR doesn't list that kind of spot yet) because attachVenueSearch ran before chitchat and reused a prior city from the durable thread. Miami / let’s talk Miami listed clubs without Miami Place SMARTview because destination card was only added when no clubs matched. Fix: skipPlaceSearchPrompt on greetings; destination Place SMARTview is prepended whenever the turn names a city.",
+      howToTest:"1) After Don says merge: Pages + Functions (`[firebase-deploy] [firebase-deploy-botdee]`). Hard-refresh https://jadzadco.github.io/shoutout-demo/botdee.html. Sign in with BOT DEE. 2) New chat. Type Hey — expect a greeting (Wassup / time-of-day hello), not venue-miss copy. Type Hey again — still a greeting. 3) Type Miami — expect Miami · Place SMARTview (bg-miami) plus any onboarded clubs. 4) Type let’s talk Miami — same Place SMARTview, not a club list without the city card. 5) Phone ~390. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Hey never searches venues. Miami and let’s talk Miami attach Miami Place SMARTview.",
+      troubleshoot:"Hey still venue-miss → executeBotSession not this SHA (skipPlaceSearchPrompt). Miami clubs without Place card → attachVenueSearch still only stamps destination when smartViews is empty. Cached Pages help only — Functions deploy required."
+    },
       {
       id:"s3-3-083-bali-place-smartbackground",
       area:"BOT DEE",

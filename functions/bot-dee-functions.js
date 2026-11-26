@@ -1407,10 +1407,13 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     let peopleAttached = null;
     const peopleIntent = peopleCards.classifyPeopleSearchIntent(userPrompt);
     const placeTools = require("./bot-dee-tools");
-    const placeClassified = placeTools.classifyPlaceSearchFromConversation(userPrompt, history);
+    const skipPlaceSearch = placeTools.skipPlaceSearchPrompt(userPrompt);
+    const placeClassified = skipPlaceSearch
+      ? {intent: "none", needle: "", tokens: [], placeTokens: [], cuisineTokens: [], leftoverTokens: []}
+      : placeTools.classifyPlaceSearchFromConversation(userPrompt, history);
     const attachPlaceWithRoom = placeTools.placeSearchAlongsideRoom(placeClassified);
     const placeQuery = placeTools.placeAttachQuery(placeClassified, userPrompt);
-    if (!outcome && !shoutExecute && (!vipExecute || attachPlaceWithRoom) && (!roomAttached.handled || attachPlaceWithRoom)) {
+    if (!skipPlaceSearch && !outcome && !shoutExecute && (!vipExecute || attachPlaceWithRoom) && (!roomAttached.handled || attachPlaceWithRoom)) {
       try {
         venueAttached = await placeTools.attachVenueSearch({
           query: placeQuery,
@@ -1420,7 +1423,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         console.warn("BOT DEE venue search attach failed", error?.message || error);
       }
     }
-    if (!outcome && !shoutExecute && !vipExecute && !roomAttached.handled && !(venueAttached && venueAttached.handled)) {
+    if (!skipPlaceSearch && !outcome && !shoutExecute && !vipExecute && !roomAttached.handled && !(venueAttached && venueAttached.handled)) {
       try {
         peopleAttached = await peopleCards.attachPeopleSearch({
           query: userPrompt,
