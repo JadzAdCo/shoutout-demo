@@ -1057,19 +1057,6 @@
       page: "index.html#categoryPage"
     },
     {
-      id: "help-smartvisuals-place-assign",
-      title: "Place SMARTview stencil, background, and tags",
-      body: "Saved Place SMARTview cards are listed in SMARTvisual Studio. Click a card to edit its SMARTstencil, SMARTbackground, and tags. The SMARTbackground list includes published photos. Opening a library asset keeps that SMARTbackground selected. SOS2FA and a reason are required to save. This is not Features SMARTview.",
-      searchPhrases: [
-        "place smartview stencil", "smartbackground assignment", "edit place smartview",
-        "published photo", "milan fashion week", "saved place smartview"
-      ],
-      links: [{label: "SMARTvisual Studio", href: pageUrl("./master-admin.html")}],
-      audiences: ["masterAdmin"],
-      source: "help-repository-seed",
-      page: "master-admin.html#smartvisualStudio"
-    },
-    {
       id: "help-smartvisuals-room",
       title: "Room SMARTview with SMARTvisuals",
       body: "Room SMARTview shows the invitation: schedule, RSVP or live status, and Join Now. Join Now on Search opens BOT DEE (not Mingl chat) with room= and t=. Type in that BOT DEE room — that is the group chat. SMARTstencils and SMARTbackgrounds follow the authorized room title — Cancun Trip uses travel art, not a real Cancun photo. Private BOT DEE chat is never used to pick art. A labeled Ad below is a sample from those tags. It stays empty for private chat or injection and is not a live advertiser.",
