@@ -18,6 +18,8 @@ English-only help for a French (or any supported) speaker is a **product bug**. 
 
 `en`, `de`, `fr`, `es`, `it`, `pt`, `ru`, `el`, `pl`, `nl`, `ar`
 
+**Matchers / city / Place SMARTview** are not covered by chrome key counts. Same 11 languages apply to token lists — see `.cursor/rules/design-notes-language-coverage.mdc` (`@lang-coverage$`).
+
 ## Who must be fully localized
 
 | Audience | Datapoint | Must translate |

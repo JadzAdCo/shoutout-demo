@@ -947,6 +947,7 @@ function matchPlaces(needle) {
     tokens.push("new york", "nyc", "manhattan");
     consumed.push("new", "york", "nyc", "manhattan", "city");
   }
+  // Latin regex only. Native-script city aliases (ar/el/ru) need Unicode keep in normalizeNeedle — see design-notes-language-coverage.mdc. No city dashboard.
   const CITY_HITS = [
     {re: /\bmiami\s+beach\b|\bsouth beach\b|\bsobe\b/, tokens: ["miami", "miami beach"], consumed: ["miami", "beach", "south", "sobe"]},
     {re: /\bmiami\b/, tokens: ["miami"], consumed: ["miami"]},
