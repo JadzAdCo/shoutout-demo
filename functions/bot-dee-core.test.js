@@ -53,6 +53,9 @@ test("Hey / greetings are chitchat — not a dump of search hits", () => {
   assert.equal(bot.isShoutOutExecutePrompt("throw a shoutout"), true);
   assert.equal(bot.isShoutOutExecutePrompt("send a shoutout at Decades"), true);
   assert.equal(bot.isShoutOutExecutePrompt("how do I throw a shoutout"), false);
+  assert.equal(bot.isShoutOutExecutePrompt(
+    "Place SMARTview for milan Fashion Week. What would you like to do — reserve a VIP reserV table, throw a ShoutOut, or just talk?"
+  ), false);
   assert.equal(bot.isShoutOutExecutePrompt("help throwing a shoutout"), false);
   const longBoard = "Happy birthday from the whole table — love you ".repeat(4).trim();
   const longThrow = `throw a shoutout at Decades Nightclub, Washington, DC that says ${longBoard}`;

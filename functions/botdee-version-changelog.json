@@ -1,7 +1,7 @@
 [
   {
     "id": "s3.3.087",
-    "text": "s3.3.087: BOT DEE Place SMARTview session intent + published SMARTbackgrounds",
+    "text": "s3.3.087: Place SMARTview card then natural ask; pasted Place copy is not a ShoutOut",
     "audiences": [
       "botDee"
     ]

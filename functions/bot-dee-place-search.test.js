@@ -400,7 +400,8 @@ test("Miami and let's talk Miami attach Place SMARTview", () => {
     const dest = tools.destinationSmartView(classified);
     assert.match(dest.title, /Miami/i);
     assert.equal(dest.floqrPublicData.smartBackgroundId, "bg-miami");
-    assert.match(dest.summary, /Place SMARTview/);
+    assert.equal(dest.kind, "venue");
+    assert.doesNotMatch(String(dest.summary || ""), /Place SMARTview for/i);
     const local = require("./bot-dee-functions").__botDeeHelpers.localSession("patron", q);
     assert.ok(local.smartViews.some(row => row && row.kind === "venue" && /miami/i.test(row.title || "")), q);
     assert.ok(local.smartViews.some(row => row && row.floqrPublicData?.smartBackgroundId === "bg-miami"), q);

@@ -1,6 +1,6 @@
 # CURRENT PACKAGE: FLOQR ShoutOut s3.3.087 (stable)
 
-- s3.3.087: BOT DEE Place SMARTview session intent + published SMARTbackgrounds
+- s3.3.087: Place SMARTview card then natural ask; pasted Place copy is not a ShoutOut
 - s3.3.085: BOT DEE city and place tokens in all 11 languages
 - s3.3.083: Let's plan for Bali opens Bali Place SMARTview with the published SMARTbackground
 - s3.3.082: Miami Place SMARTview uses the published SMARTbackground, not leftover Bali art

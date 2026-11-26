@@ -1395,7 +1395,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
     }
     const shoutFollowUp = !!(previousShoutDraft
       && require("./headless-shoutout-core").isInteractiveFollowUp(userPrompt, previousShoutDraft, previousShoutRow));
-    const shoutExecute = bot.isShoutOutExecutePrompt(userPrompt) || shoutFollowUp;
+    const placeQuoted = intentCore.isBotPlaceSelfQuote(userPrompt);
+    const shoutExecute = !placeQuoted && (bot.isShoutOutExecutePrompt(userPrompt) || shoutFollowUp);
     const previousVipDraft = stored.headlessVipDraft || null;
     const vipFollowUp = !!(previousVipDraft
       && require("./headless-vip-core").isInteractiveFollowUp(userPrompt, previousVipDraft));
@@ -1411,7 +1412,7 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       && !(sessionWorkflow.intents || []).includes("reserve")
       && !(sessionWorkflow.intents || []).includes("shoutout"));
     const talkNow = !!turnWorkflow.talkOnly;
-    const vipExecute = !roomTakesPriority && !talkNow && !askIntentNow && (
+    const vipExecute = !placeQuoted && !roomTakesPriority && !talkNow && !askIntentNow && (
       bot.isVipExecutePrompt(userPrompt)
       || vipFollowUp
       || (sessionWorkflow.intents || []).includes("reserve")
@@ -1452,8 +1453,15 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
         placeTools.destinationPlaceViews(placeQuery, null, sessionWorkflow),
         sessionWorkflow
       );
+      const addressName = String(
+        personalization && (personalization.preferredAddressName || personalization.profileFirstName) || ""
+      ).trim();
+      const ask = intentCore.askIntentMeta(sessionWorkflow, {name: addressName, lang: uiLanguage});
       outcome = {
-        reply: intentCore.askIntentReply(sessionWorkflow),
+        reply: ask.reply,
+        replyKey: ask.replyKey,
+        replyVars: ask.replyVars,
+        replyAfterCards: true,
         results: [],
         provider: "local-session-intent",
         model: "session-place-intent",
@@ -2055,6 +2063,8 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       peopleSearch: outcome.peopleSearch || null,
       venueSearch: outcome.venueSearch || null,
       replyKey: outcome.replyKey || outcome.peopleSearch?.replyKey || "",
+      replyVars: outcome.replyVars && typeof outcome.replyVars === "object" ? outcome.replyVars : null,
+      replyAfterCards: outcome.replyAfterCards === true,
       geminiOnView: outcome.geminiOnView === true
     };
   } catch (error) {

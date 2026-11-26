@@ -1118,10 +1118,11 @@
     article.appendChild(gallery);
   }
 
-  function appendBubble(role, text, results, media, smartViews, peopleSearch) {
+  function appendBubble(role, text, results, media, smartViews, peopleSearch, extra) {
     const log = byId("botDeeTranscript");
     if (!log) return;
     const isUser = role === "user";
+    const opts = extra && typeof extra === "object" ? extra : {};
     const row = document.createElement("div");
     row.className = `botdee-msg botdee-msg-${isUser ? "user" : "bot"}`;
 
@@ -1145,12 +1146,34 @@
       tail.setAttribute("aria-hidden", "true");
       article.appendChild(tail);
     }
-    if (text) {
+    const appendText = () => {
+      if (!text) return;
       const body = document.createElement("div");
       body.className = "botdee-bubble-text";
       body.textContent = text;
       article.appendChild(body);
+    };
+    let inlineViews = Array.isArray(smartViews) ? smartViews : [];
+    if (!isUser && global.FLOQRBotDeeSmartView?.applyShoutOutPreviewFromViews) {
+      const split = global.FLOQRBotDeeSmartView.applyShoutOutPreviewFromViews(inlineViews);
+      inlineViews = Array.isArray(split?.inline) ? split.inline : inlineViews;
     }
+    if (!isUser && global.FLOQRBotDeeSmartView?.applyVipPreviewFromViews) {
+      const split = global.FLOQRBotDeeSmartView.applyVipPreviewFromViews(inlineViews);
+      inlineViews = Array.isArray(split?.inline) ? split.inline : inlineViews;
+    }
+    const placeOnly = !isUser && inlineViews.length
+      && inlineViews.every(view => view && view.kind === "venue");
+    const cardsFirst = opts.replyAfterCards === true || placeOnly;
+    const mountCards = () => {
+      if (isUser || !inlineViews.length || !global.FLOQRBotDeeSmartView?.mount) return;
+      const host = document.createElement("div");
+      host.className = "botdee-sv-host";
+      article.appendChild(host);
+      global.FLOQRBotDeeSmartView.mount(host, inlineViews, peopleSearch);
+    };
+    if (cardsFirst) mountCards();
+    else appendText();
     if (!isUser) appendPhotoGallery(article, media);
     if (Array.isArray(results) && results.length) {
       const list = document.createElement("ul");
@@ -1172,21 +1195,8 @@
       });
       article.appendChild(list);
     }
-    let inlineViews = Array.isArray(smartViews) ? smartViews : [];
-    if (!isUser && global.FLOQRBotDeeSmartView?.applyShoutOutPreviewFromViews) {
-      const split = global.FLOQRBotDeeSmartView.applyShoutOutPreviewFromViews(inlineViews);
-      inlineViews = Array.isArray(split?.inline) ? split.inline : inlineViews;
-    }
-    if (!isUser && global.FLOQRBotDeeSmartView?.applyVipPreviewFromViews) {
-      const split = global.FLOQRBotDeeSmartView.applyVipPreviewFromViews(inlineViews);
-      inlineViews = Array.isArray(split?.inline) ? split.inline : inlineViews;
-    }
-    if (!isUser && inlineViews.length && global.FLOQRBotDeeSmartView?.mount) {
-      const host = document.createElement("div");
-      host.className = "botdee-sv-host";
-      article.appendChild(host);
-      global.FLOQRBotDeeSmartView.mount(host, inlineViews, peopleSearch);
-    }
+    if (cardsFirst) appendText();
+    else mountCards();
     row.appendChild(article);
     log.appendChild(row);
     scrollTranscriptToLatest();
@@ -1426,6 +1436,8 @@
         ? ""
         : peopleSearch?.replyKey
           ? t(peopleSearch.replyKey, displayReply(data.reply))
+          : (data.replyKey && data.replyVars && typeof data.replyVars === "object")
+            ? t(data.replyKey, data.replyVars)
           : (data.replyKey || roomView?.replyKey)
             ? t(data.replyKey || roomView.replyKey, displayReply(data.reply))
             : (peopleCard && looksLikeProfileFieldDump(data.reply)
@@ -1437,7 +1449,9 @@
       if (global.FLOQRHelpLoader && typeof global.FLOQRHelpLoader.ensure === "function" && currentUiLanguage() !== "en") {
         try { await global.FLOQRHelpLoader.ensure(); } catch (error) {}
       }
-      appendBubble("bot", reply, localizeResults(peopleCard ? [] : data.results), media, views, peopleSearch);
+      appendBubble("bot", reply, localizeResults(peopleCard ? [] : data.results), media, views, peopleSearch, {
+        replyAfterCards: data.replyAfterCards === true
+      });
       if (roomView && roomView.roomId) startGroupSessionPoll(roomView.roomId);
       pushHistory("model", reply);
       if (reply) visitLiveTurns.push({role: "model", text: reply, conversationId: liveConversationId});
