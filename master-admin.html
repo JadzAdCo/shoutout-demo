@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="./botdee-smartview.css?v=s3.3.085"/>
   <link rel="stylesheet" href="./floqr-features-smartview.css?v=s3.3.085"/>
   <link rel="stylesheet" href="./smartvisuals-view.css?v=s3.3.085"/>
-  <link rel="stylesheet" href="./smartvisuals-studio.css?v=s3.3.085"/>
+  <link rel="stylesheet" href="./smartvisuals-studio.css?v=s3.3.086"/>
   <link rel="stylesheet" href="./floqr-reason-prompt.css?v=s3.3.085"/>
   <link rel="stylesheet" href="./master-demo-employees.css?v=s3.3.085"/>  <script>    try{
       var __floqrChromeMap={0:"nightlife",1:"traditional",2:"blackTiffany",3:"whiteBlack",4:"purpleWhite",5:"blackDarkGreen"};
@@ -1809,7 +1809,7 @@
             data-floqr-help-id="help-smartvisuals-studio"
             data-floqr-help-title="SMARTvisual Studio"
             data-floqr-help-search="smartvisuals|smartstencils|smartbackgrounds|smartview invitation|asset registry"
-            data-floqr-help-body="SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Save Place SMARTview assignment writes a published SMARTstencil, SMARTbackground, and tags. Drafts need a name, sanitizer, SOS2FA, and a reason before review. Review / Publish: select a queued draft so Asset detail shows that file, then Publish (SOS2FA + reason; the button stays visible). SMARTbackgrounds accept SVG, JPEG, PNG, or WebP; SMARTstencils stay SVG. Patrons only see published registry assets until Pages ships the file. Ads stay a separate labeled slot and are off."
+            data-floqr-help-body="SMARTvisual Studio is the Master Admin library for SMARTstencils and SMARTbackgrounds. Search and preview packaged art as images. Saved Place SMARTview cards are listed on the right — click one to edit. Published photos appear in the SMARTbackground list. Opening a library asset keeps that SMARTbackground selected. Drafts need a name, sanitizer, SOS2FA, and a reason before review. Review / Publish: select a queued draft so Asset detail shows that file, then Publish (SOS2FA + reason; the button stays visible). SMARTbackgrounds accept SVG, JPEG, PNG, or WebP; SMARTstencils stay SVG. Patrons only see published registry assets until Pages ships the file. Ads stay a separate labeled slot and are off."
             data-i18n="master.smartvisualStudio">SMARTvisual Studio</h2>
           <p class="sub small" data-i18n="master.smartvisualStudioIntro">Approved SMARTstencils and SMARTbackgrounds. Drafts never reach patrons until an audited publish. Scenic art is illustration, not photography.</p>
           <div class="sv-studio-tabs" role="tablist" aria-label="SMARTvisual Studio">
@@ -1899,6 +1899,7 @@
               data-floqr-help-title="Create / Edit SMARTvisuals"
               data-floqr-help-search="milan preview|smartbackground preview|art upload|create edit"
               data-floqr-help-body="Create or edit a SMARTstencil or SMARTbackground draft. Name is required. SMARTstencils must be SVG. SMARTbackgrounds accept SVG, JPEG, PNG, or WebP. Files are sanitized on the server. Drafts stay off patrons until an audited publish. Scenic art is FLOQR illustration, not photography and not an official destination or Fashion Week mark.">Asset detail / live preview</h3>
+            <div id="svStudioPlaceAssign"></div>
             <div id="svStudioDetail"></div>
             <div id="svStudioLivePreview" hidden></div>
           </div>
@@ -2505,7 +2506,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-functions-compat.js"></script>
-<script src="./floqr-i18n.js?v=s3.3.085"></script>
+<script src="./floqr-i18n.js?v=s3.3.086"></script>
 <script src="./firebase-config.js?v=s3.3.085"></script>
 <script src="./floqr-chrome-scheme.js?v=s3.3.085"></script>
 <script src="./floqr-chrome-audit.js?v=s3.3.085"></script>
@@ -2532,7 +2533,7 @@
 <script src="./dc-spot-ad-campaigns.js?v=s3.3.085"></script>
 <script src="./floqr-privacy-prefs.js?v=s3.3.085"></script>
 <script src="./ad-campaigns.js?v=s3.3.085"></script>
-<script src="./ai-diagnostics-service.js?v=s3.3.085"></script>
+<script src="./ai-diagnostics-service.js?v=s3.3.086"></script>
 <script src="./master-admin-rollup.js?v=s3.3.085"></script>
 <script src="./duplicate-record-service.js?v=s3.3.085"></script>
 <script src="./patron-account-merge.js?v=s3.3.085"></script>
@@ -2549,7 +2550,7 @@
 <script src="./floqr-features-smartview.js?v=s3.3.085"></script>
 <script src="./smartvisuals-resolver.js?v=s3.3.085"></script>
 <script src="./smartvisuals-view.js?v=s3.3.085"></script>
-<script src="./smartvisuals-studio.js?v=s3.3.085"></script>
+<script src="./smartvisuals-studio.js?v=s3.3.086"></script>
 <script src="./botdee-upgrade-ui.js?v=s3.3.085"></script>
 <script src="./master-feature-services.js?v=s3.3.085"></script>
 <script src="./master-demo-employees.js?v=s3.3.085"></script>

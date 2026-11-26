@@ -32,8 +32,11 @@
   let tagFilter = "";
   let selectedId = "";
   let selectedDraftId = "";
+  let selectedRoomKey = "placeSmartView:venue";
   let reviewDrafts = [];
+  let placeOverrides = [];
   let reviewSeq = 0;
+  const PLACE_KINDS = ["venue", "restaurant", "hotel", "event", "travel"];
 
   function byId(id) {
     return document.getElementById(id);
@@ -87,6 +90,22 @@
     return assets().filter(a => a.type === type && a.approvalStatus === "published");
   }
 
+  function collapsePlaceKitDuplicates(rows) {
+    const overlayPlaces = new Set();
+    (rows || []).forEach(a => {
+      if (a && a.type === "background" && a.studioPreviewSrc && a.placeId) overlayPlaces.add(String(a.placeId));
+    });
+    return (rows || []).filter(a => {
+      if (!a || a.type !== "background" || !a.placeId) return true;
+      if (!overlayPlaces.has(String(a.placeId))) return true;
+      return !!a.studioPreviewSrc;
+    });
+  }
+
+  function assignmentBackgrounds() {
+    return collapsePlaceKitDuplicates(publishedOf("background"));
+  }
+
   function slugName(name) {
     return String(name || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   }
@@ -124,6 +143,8 @@
     const src = draftPreviewSrc(draft);
     if (src) match.studioPreviewSrc = src;
     match.studioDraftId = draft.id;
+    const draftName = String(draft.name || "").trim();
+    if (draftName) match.name = draftName;
     return match;
   }
 
@@ -143,9 +164,11 @@
   }
 
   function optionList(rows, selected) {
-    return rows.map(a =>
-      `<option value="${esc(a.id)}"${a.id === selected ? " selected" : ""}>${esc(a.name)} (${esc(a.id)})</option>`
-    ).join("");
+    const photo = t("sv.placePhotoMark", "published photo");
+    return rows.map(a => {
+      const mark = a.studioPreviewSrc ? ` · ${photo}` : "";
+      return `<option value="${esc(a.id)}"${a.id === selected ? " selected" : ""}>${esc(a.name)} (${esc(a.id)})${esc(mark)}</option>`;
+    }).join("");
   }
 
   function setPage(name) {
@@ -171,7 +194,7 @@
     if (!host) return;
     const q = filter.trim().toLowerCase();
     const tagWant = tagFilter.trim().toLowerCase();
-    const rows = assets().filter(a => {
+    const rows = collapsePlaceKitDuplicates(assets()).filter(a => {
       if (typeFilter !== "all" && a.type !== typeFilter) return false;
       const tags = (a.tags || []).map(x => String(x).toLowerCase());
       if (tagWant && !tags.includes(tagWant) && a.category !== tagWant) return false;
@@ -209,7 +232,7 @@
   }
 
   function defaultPlacePick(asset) {
-    const bgs = publishedOf("background");
+    const bgs = assignmentBackgrounds();
     const sts = publishedOf("stencil");
     const backgroundId = asset?.type === "background"
       ? asset.id
@@ -229,7 +252,6 @@
     const asset = assets().find(a => a.id === id);
     const box = byId("svStudioDetail");
     if (!box || !asset) return;
-    const pick = defaultPlacePick(asset);
     box.innerHTML = `
       <h3 data-floqr-help-id="help-smartvisuals-create"
         data-floqr-help-title="Create / Edit SMARTvisuals"
@@ -239,32 +261,144 @@
       <img src="${esc(assetImageSrc(asset))}" alt="${esc(asset.name)}" class="sv-studio-preview"/>
       <p>${esc((asset.tags || []).join(", "))}</p>
       <p class="sub small" data-keep-visible="true">${esc(t("sv.licenseNote", "Original FLOQR illustration. Not a photograph or official mark."))}</p>
+      <p class="button-row">
+        <button type="button" class="buttonlike primary" data-sv-use-bg="1">${esc(t("sv.assignPlaceBg", "Use as Place SMARTview background"))}</button>
+      </p>`;
+    box.querySelector("[data-sv-use-bg]")?.addEventListener("click", () => applyAssetToPlaceForm(asset));
+    try { root.FLOQRHelpAttach?.mountAll?.(box); } catch (_) { /* optional */ }
+    applyAssetToPlaceForm(asset);
+  }
+
+  function roomKeyFromFields() {
+    const raw = byId("svStudioPlaceKey")?.value || selectedRoomKey || "placeSmartView:venue";
+    return String(raw).startsWith("placeSmartView:") ? raw : `placeSmartView:${raw}`;
+  }
+
+  function placeAssignFields() {
+    const roomKey = roomKeyFromFields();
+    const suffix = roomKey.replace(/^placeSmartView:/, "");
+    return {
+      roomKey,
+      kind: PLACE_KINDS.includes(suffix) ? suffix : "venue",
+      backgroundId: byId("svStudioPlaceBackground")?.value || "",
+      stencilId: byId("svStudioPlaceStencil")?.value || "",
+      tags: normalizeTags(byId("svStudioPlaceTags")?.value || "")
+    };
+  }
+
+  function kindLabel(kind) {
+    const map = {
+      venue: t("botdee.sv.kindVenue", "Venue"),
+      restaurant: t("botdee.sv.kindRestaurant", "Restaurant"),
+      hotel: t("botdee.sv.kindHotel", "Hotel"),
+      event: t("botdee.sv.kindEvent", "Event"),
+      travel: t("botdee.sv.kindTravel", "Travel")
+    };
+    return map[kind] || kind;
+  }
+
+  function assignmentOptions(selected) {
+    const keys = new Set(PLACE_KINDS.map(k => `placeSmartView:${k}`));
+    placeOverrides.forEach(row => { if (row.id) keys.add(row.id); });
+    assets().forEach(a => {
+      if (a.placeId) keys.add(`placeSmartView:${a.placeId}`);
+    });
+    return [...keys].sort().map(id => {
+      const suffix = id.replace(/^placeSmartView:/, "");
+      const label = PLACE_KINDS.includes(suffix) ? kindLabel(suffix) : suffix;
+      return `<option value="${esc(id)}"${id === selected ? " selected" : ""}>${esc(label)} (${esc(id)})</option>`;
+    }).join("");
+  }
+
+  function applyFieldsToForm(pick) {
+    const bg = byId("svStudioPlaceBackground");
+    const st = byId("svStudioPlaceStencil");
+    const tags = byId("svStudioPlaceTags");
+    const key = byId("svStudioPlaceKey");
+    if (key && pick.roomKey) key.value = pick.roomKey;
+    if (bg && pick.backgroundId) {
+      if (![...bg.options].some(o => o.value === pick.backgroundId)) {
+        const extra = document.createElement("option");
+        extra.value = pick.backgroundId;
+        extra.textContent = pick.backgroundId;
+        bg.appendChild(extra);
+      }
+      bg.value = pick.backgroundId;
+    }
+    if (st && pick.stencilId) st.value = pick.stencilId;
+    if (tags && pick.tags != null) tags.value = Array.isArray(pick.tags) ? pick.tags.join(", ") : String(pick.tags || "");
+  }
+
+  function applyAssetToPlaceForm(asset) {
+    if (!byId("svStudioPlaceBackground")) renderPlaceAssign();
+    const pick = defaultPlacePick(asset);
+    applyFieldsToForm({
+      roomKey: selectedRoomKey,
+      backgroundId: pick.backgroundId,
+      stencilId: byId("svStudioPlaceStencil")?.value || pick.stencilId,
+      tags: byId("svStudioPlaceTags")?.value || pick.tags
+    });
+  }
+
+  function loadSavedAssignment(roomKey) {
+    selectedRoomKey = roomKey || selectedRoomKey;
+    const row = placeOverrides.find(r => r.id === selectedRoomKey) || {};
+    if (!byId("svStudioPlaceBackground")) renderPlaceAssign();
+    applyFieldsToForm({
+      roomKey: selectedRoomKey,
+      backgroundId: row.backgroundId || "",
+      stencilId: row.stencilId || "",
+      tags: row.tags || []
+    });
+    document.querySelectorAll("[data-sv-saved-place]").forEach(node => {
+      node.classList.toggle("is-selected", node.getAttribute("data-sv-saved-place") === selectedRoomKey);
+    });
+  }
+
+  function renderPlaceAssign() {
+    const host = byId("svStudioPlaceAssign");
+    if (!host) return;
+    const bgs = assignmentBackgrounds();
+    const sts = publishedOf("stencil");
+    const current = placeOverrides.find(r => r.id === selectedRoomKey) || {};
+    const selectedBg = byId("svStudioPlaceBackground")?.value || current.backgroundId || (bgs[0] && bgs[0].id) || "";
+    const selectedSt = byId("svStudioPlaceStencil")?.value || current.stencilId || "st-location";
+    const selectedTags = byId("svStudioPlaceTags")?.value || (current.tags || []).join(", ");
+    const saved = placeOverrides.length
+      ? placeOverrides.map(row => {
+        const suffix = String(row.id || "").replace(/^placeSmartView:/, "");
+        const label = PLACE_KINDS.includes(suffix) ? kindLabel(suffix) : suffix;
+        const bg = assets().find(a => a.id === row.backgroundId);
+        const bgName = bg?.name || row.backgroundId || "";
+        const selectedClass = row.id === selectedRoomKey ? " is-selected" : "";
+        return `<button type="button" class="sv-studio-saved${selectedClass}" data-sv-saved-place="${esc(row.id)}">
+          <b>${esc(label)}</b>
+          <small>${esc(bgName)} · ${esc(row.backgroundId || "")} · ${esc(row.stencilId || "")}</small>
+        </button>`;
+      }).join("")
+      : `<p class="sub small">${esc(t("sv.placeNoSaved", "No saved Place SMARTview cards yet. Pick a SMARTbackground and save."))}</p>`;
+    host.innerHTML = `
       <h4 class="sv-studio-assign-head"
         data-floqr-help-id="help-smartvisuals-place-assign"
         data-floqr-help-title="Place SMARTview stencil, background, and tags"
-        data-floqr-help-search="place smartview stencil|smartbackground assignment|smartview tags"
-        data-floqr-help-body="Assign a published SMARTstencil and SMARTbackground to Place SMARTview cards of one type (venue, restaurant, hotel, event, travel). Tags stay with that assignment so operators can filter cards. SOS2FA and a reason are required to save. Patrons still only see published registry art. This is not Features SMARTview.">${esc(t("sv.assignPlaceCard", "Save Place SMARTview assignment"))}</h4>
-      <p class="sub small">${esc(t("sv.placeAssignHint", "Choose a published SMARTstencil and SMARTbackground for this place type. Tags stay with the assignment. SOS2FA and a reason are required to save."))}</p>
+        data-floqr-help-search="place smartview stencil|smartbackground assignment|edit place smartview|published photo"
+        data-floqr-help-body="Saved Place SMARTview cards are listed here. Click a card to edit its SMARTstencil, SMARTbackground, and tags. The SMARTbackground list includes published photos from Review / Publish. Opening a library asset keeps that SMARTbackground selected — it does not snap to another saved card. SOS2FA and a reason are required to save. This is not Features SMARTview.">${esc(t("sv.placeSavedCards", "Saved Place SMARTview cards"))}</h4>
+      <p class="sub small">${esc(t("sv.placeAssignHint", "Click a saved Place SMARTview card to edit it. Published photos appear in the SMARTbackground list. Viewing an asset keeps that SMARTbackground selected."))}</p>
+      <div class="sv-studio-saved-list">${saved}</div>
       <p class="button-row sv-studio-place-row">
-        <label class="sv-studio-place-kind">${esc(t("sv.placeBgKind", "Place card type"))}
-          <select id="svStudioPlaceKind">
-            <option value="venue">${esc(t("botdee.sv.kindVenue", "Venue"))}</option>
-            <option value="restaurant">${esc(t("botdee.sv.kindRestaurant", "Restaurant"))}</option>
-            <option value="hotel">${esc(t("botdee.sv.kindHotel", "Hotel"))}</option>
-            <option value="event">${esc(t("botdee.sv.kindEvent", "Event"))}</option>
-            <option value="travel">${esc(t("botdee.sv.kindTravel", "Travel"))}</option>
-          </select>
+        <label class="sv-studio-place-kind">${esc(t("sv.placeAssignment", "Place SMARTview"))}
+          <select id="svStudioPlaceKey">${assignmentOptions(selectedRoomKey)}</select>
         </label>
         <label class="sv-studio-place-kind">${esc(t("sv.placeBackground", "SMARTbackground"))}
-          <select id="svStudioPlaceBackground">${optionList(publishedOf("background"), pick.backgroundId)}</select>
+          <select id="svStudioPlaceBackground">${optionList(bgs, selectedBg)}</select>
         </label>
         <label class="sv-studio-place-kind">${esc(t("sv.placeStencil", "SMARTstencil"))}
-          <select id="svStudioPlaceStencil">${optionList(publishedOf("stencil"), pick.stencilId)}</select>
+          <select id="svStudioPlaceStencil">${optionList(sts, selectedSt)}</select>
         </label>
       </p>
       <p class="sv-studio-place-row">
         <label class="sv-studio-place-kind">${esc(t("sv.placeTags", "Tags"))}
-          <input id="svStudioPlaceTags" value="${esc(pick.tags)}" maxlength="200" placeholder="nightlife, dc, venue"/>
+          <input id="svStudioPlaceTags" value="${esc(selectedTags)}" maxlength="200" placeholder="nightlife, dc, venue"/>
         </label>
       </p>
       <p class="sub small">${esc(t("sv.placeTagsHint", "Comma-separated tags on this Place SMARTview (assign, filter, persist)."))}</p>
@@ -275,45 +409,19 @@
         <button type="button" class="buttonlike primary" data-sv-assign-place="1">${esc(t("sv.assignPlaceCard", "Save Place SMARTview assignment"))}</button>
       </p>
       <p id="svStudioPlaceStatus" class="status" aria-live="polite"></p>`;
-    box.querySelectorAll("[data-sv-preview]").forEach(btn => {
-      btn.addEventListener("click", () => previewSurface(btn.getAttribute("data-sv-preview"), asset));
+    host.querySelectorAll("[data-sv-preview]").forEach(btn => {
+      btn.addEventListener("click", () => previewSurface(btn.getAttribute("data-sv-preview"), assets().find(a => a.id === selectedId)));
     });
-    box.querySelector("[data-sv-assign-place]")?.addEventListener("click", () => assignPlaceVisual(asset));
-    byId("svStudioPlaceKind")?.addEventListener("change", () => fillPlaceOverride(asset));
-    try { root.FLOQRHelpAttach?.mountAll?.(box); } catch (_) { /* optional */ }
-    fillPlaceOverride(asset);
-  }
-
-  function placeAssignFields() {
-    return {
-      kind: byId("svStudioPlaceKind")?.value || "venue",
-      backgroundId: byId("svStudioPlaceBackground")?.value || "",
-      stencilId: byId("svStudioPlaceStencil")?.value || "",
-      tags: normalizeTags(byId("svStudioPlaceTags")?.value || "")
-    };
-  }
-
-  async function fillPlaceOverride(asset) {
-    const kind = byId("svStudioPlaceKind")?.value || "venue";
-    const db = root.firebase?.firestore?.();
-    if (!db) return;
-    try {
-      const snap = await db.collection("smartVisualOverrides").doc(`placeSmartView:${kind}`).get();
-      if (!snap.exists) return;
-      const row = snap.data() || {};
-      if (row.backgroundId && byId("svStudioPlaceBackground")) {
-        byId("svStudioPlaceBackground").value = row.backgroundId;
-      }
-      if (row.stencilId && byId("svStudioPlaceStencil")) {
-        byId("svStudioPlaceStencil").value = row.stencilId;
-      }
-      if (Array.isArray(row.tags) && byId("svStudioPlaceTags")) {
-        byId("svStudioPlaceTags").value = row.tags.join(", ");
-      }
-    } catch (_) {
-      /* Master Admin read of overrides is optional until signed in */
-      if (asset) return;
-    }
+    host.querySelector("[data-sv-assign-place]")?.addEventListener("click", () => assignPlaceVisual());
+    host.querySelectorAll("[data-sv-saved-place]").forEach(btn => {
+      btn.addEventListener("click", () => loadSavedAssignment(btn.getAttribute("data-sv-saved-place")));
+    });
+    byId("svStudioPlaceKey")?.addEventListener("change", () => {
+      selectedRoomKey = byId("svStudioPlaceKey").value;
+      const row = placeOverrides.find(r => r.id === selectedRoomKey);
+      if (row) loadSavedAssignment(selectedRoomKey);
+    });
+    try { root.FLOQRHelpAttach?.mountAll?.(host); } catch (_) { /* optional */ }
   }
 
   function previewSurface(kind, asset) {
@@ -327,8 +435,8 @@
     const pick = placeAssignFields();
     const payload = Object.assign(root.FLOQRSmartVisuals?.syntheticCancun?.() || {title: "Cancun Trip", demo: true}, {
       override: {
-        backgroundId: pick.backgroundId || (asset.type === "background" ? asset.id : "bg-bali"),
-        stencilId: pick.stencilId || (asset.type === "stencil" ? asset.id : "st-flight"),
+        backgroundId: pick.backgroundId || (asset?.type === "background" ? asset.id : "bg-bali"),
+        stencilId: pick.stencilId || (asset?.type === "stencil" ? asset.id : "st-flight"),
         authorized: true
       }
     });
@@ -369,7 +477,7 @@
     try { root.FLOQRChromeScheme?.applyDocument?.(); } catch (_) { /* ignore */ }
   }
 
-  async function assignPlaceVisual(asset) {
+  async function assignPlaceVisual() {
     const status = byId("svStudioPlaceStatus");
     const pick = placeAssignFields();
     if (!pick.backgroundId || !pick.stencilId) {
@@ -392,21 +500,25 @@
     }
     try {
       const result = await studioCallable("setSmartVisualOverride", {
-        roomKey: `placeSmartView:${pick.kind}`,
+        roomKey: pick.roomKey,
         backgroundId: pick.backgroundId,
         stencilId: pick.stencilId,
         tags: pick.tags,
         reason
       });
-      if (status) {
+      selectedRoomKey = pick.roomKey;
+      await overlayPublishedDrafts();
+      renderPlaceAssign();
+      const previewHost = byId("svStudioLivePreview");
+      if (previewHost) previewPlaceCard(assets().find(a => a.id === selectedId), previewHost);
+      const statusAfter = byId("svStudioPlaceStatus");
+      if (statusAfter) {
         const saved = [result.data?.backgroundId || pick.backgroundId, result.data?.stencilId || pick.stencilId]
           .concat(result.data?.tags || pick.tags)
           .join(" · ");
-        status.textContent = t("sv.placeAssignSaved", "Place SMARTview stencil, background, and tags saved.")
+        statusAfter.textContent = t("sv.placeAssignSaved", "Place SMARTview stencil, background, and tags saved.")
           + ` (${saved})`;
       }
-      const previewHost = byId("svStudioLivePreview");
-      if (previewHost) previewPlaceCard(asset, previewHost);
     } catch (err) {
       if (status) status.textContent = err?.message || t("sv.studioDenied", "Publish denied.");
     }
@@ -568,6 +680,7 @@
       const msg = t("sv.studioPublishedOk", "Published {id}. Asset detail shows this file.")
         .replace("{id}", result.data?.id || row.id);
       await renderReview();
+      renderPlaceAssign();
       if (match) showDetail(match.id);
       const statusAfter = byId("svStudioReviewStatus");
       if (statusAfter) statusAfter.textContent = msg;
@@ -580,10 +693,34 @@
 
   async function overlayPublishedDrafts() {
     try {
-      const snap = await firebase.firestore().collection("smartVisualDrafts").limit(40).get();
+      const snap = await firebase.firestore().collection("smartVisualDrafts").limit(80).get();
       reviewDrafts = snap.docs.map(doc => ({id: doc.id, ...(doc.data() || {})}));
       reviewDrafts.filter(row => String(row.approvalStatus || "") === "published").forEach(applyDraftToCatalog);
     } catch (_) { /* Master Admin read of drafts is optional until signed in */ }
+    try {
+      const snap = await firebase.firestore().collection("smartVisualPublished").limit(80).get();
+      snap.docs.forEach(doc => {
+        const data = doc.data() || {};
+        applyDraftToCatalog({
+          id: data.draftId || doc.id,
+          catalogAssetId: data.catalogAssetId || doc.id,
+          approvalStatus: "published",
+          name: data.name || "",
+          type: data.type || "background",
+          svgXml: data.svgXml,
+          imageBase64: data.imageBase64,
+          contentType: data.contentType
+        });
+      });
+    } catch (_) { /* published overlay optional until signed in */ }
+    try {
+      const snap = await firebase.firestore().collection("smartVisualOverrides").limit(80).get();
+      placeOverrides = snap.docs
+        .map(doc => ({id: doc.id, ...(doc.data() || {})}))
+        .filter(row => String(row.id || "").startsWith("placeSmartView:"));
+    } catch (_) {
+      placeOverrides = placeOverrides || [];
+    }
   }
 
   async function renderReview() {
@@ -753,6 +890,7 @@
     }
     bindCreate();
     await overlayPublishedDrafts();
+    renderPlaceAssign();
     setPage(page);
     const search = byId("svStudioSearch");
     search?.addEventListener("input", () => {
@@ -778,7 +916,13 @@
     });
   }
 
-  root.FLOQRSmartVisualStudio = {load, setPage, studioCallable, classify: payload => studioCallable("classifySmartVisual", payload || {})};
+  root.FLOQRSmartVisualStudio = {
+    load,
+    setPage,
+    studioCallable,
+    collapsePlaceKitDuplicates,
+    classify: payload => studioCallable("classifySmartVisual", payload || {})
+  };
 
   document.addEventListener("DOMContentLoaded", () => {
     if (byId("smartvisualStudio")) load().catch(err => console.warn("SMARTvisual Studio", err));

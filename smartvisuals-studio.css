@@ -28,6 +28,17 @@
 .sv-studio-place-preview{max-width:420px}
 .sv-studio-place-preview .botdee-sv-place{margin:0}
 .sv-studio-assign-head{margin:12px 0 4px;font-size:15px}
+.sv-studio-saved-list{display:flex;flex-direction:column;gap:6px;margin:0 0 12px}
+.sv-studio-saved{
+  text-align:left;border:1px solid var(--line,#2b505a);border-radius:10px;padding:8px 10px;
+  background:rgba(8,18,28,.4);color:inherit;cursor:pointer
+}
+.sv-studio-saved b{display:block;font-size:13px}
+.sv-studio-saved small{opacity:.75}
+.sv-studio-saved.is-selected{
+  outline:2px solid var(--accent,#00d4fe);
+  background:color-mix(in srgb, var(--accent,#00d4fe) 12%, transparent)
+}
 .sv-studio-tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .sv-studio-tag{
   min-height:32px;padding:4px 10px;border-radius:999px;border:1px solid var(--line,#2b505a);

@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.085";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.085";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.086";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.086";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -222,6 +222,15 @@
   ];
 
   const PACKAGE_INSTALL_CHECKS = [
+    {
+      version: "s3.3.086",
+      title: "s3.3.086 — Studio Place SMARTview edit + published photos",
+      checks: [
+        {label:"Saved Place cards + published photo dropdown", file:"smartvisuals-studio.js", includes:["svStudioPlaceAssign", "collapsePlaceKitDuplicates", "smartVisualPublished", "applyAssetToPlaceForm"]},
+        {label:"Place assign host", file:"master-admin.html", includes:["id=\"svStudioPlaceAssign\""]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-086-studio-place-assign-edit", "s3.3.086"]}
+      ]
+    },
     {
       version: "s3.3.085",
       title: "s3.3.085 — BOT DEE city / place tokens (11 langs)",
@@ -3936,6 +3945,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-086-studio-place-assign-edit",
+      area:"Master Admin",
+      feature:"SMARTvisual Studio Place SMARTview assign",
+      changed:"s3.3.086 — Opening Milan Fashion Week snapped the SMARTbackground dropdown to Bali (saved venue override). Duplicate Milan kit rows. Saved Place SMARTview cards could not be edited. Fix: saved cards list on the right; click to edit; published photos in the SMARTbackground list; library click keeps that SMARTbackground; kit duplicates collapse when a published photo overlays the same place.",
+      howToTest:"1) After Pages publish, hard-refresh https://jadzadco.github.io/shoutout-demo/master-admin.html#smartvisualStudio until smartvisuals-studio.js / .css / floqr-i18n.js ?v=s3.3.086. Sign in as Master Admin. 2) Library: open Milan Fashion Week. SMARTbackground stays Milan Fashion Week (published photo if Review Publish already ran) — not Bali. Duplicate Milan kit row is gone when the photo overlays Milan. 3) Saved Place SMARTview cards: click a saved row, change SMARTbackground / SMARTstencil / tags, Save (SOS2FA + reason). 4) Phone ~390 and desktop. Display URLs have no ?v=. Mark Succeed/Failed.",
+      expected:"Published photos appear in the SMARTbackground list. Viewing an asset does not snap to another saved card. Saved Place SMARTview cards are editable. One Milan row when a published photo overlays that place.",
+      troubleshoot:"Dropdown still Bali → cached smartvisuals-studio.js before s3.3.086 (fillPlaceOverride on library click). Photo missing → Review / Publish did not overlay smartVisualDrafts / smartVisualPublished; hard-refresh. Two Milan kit SVGs after photo publish → collapsePlaceKitDuplicates not served. Save still blocked → SOS2FA Entity Management + Functions setSmartVisualOverride."
+    },
       {
       id:"s3-3-085-botdee-city-tokens",
       area:"BOT DEE",
