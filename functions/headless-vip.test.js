@@ -38,6 +38,9 @@ test("VIP execute prompts vs how-to", () => {
   assert.equal(vip.isVipExecutePrompt("VIP reserv at Aurelia"), true);
   assert.equal(vip.isVipExecutePrompt("how do I book a VIP table"), false);
   assert.equal(vip.isVipExecutePrompt("throw a shoutout at Aurelia"), false);
+  assert.equal(vip.isVipExecutePrompt(
+    "Place SMARTview for milan Fashion Week. What would you like to do — reserve a VIP reserV table, throw a ShoutOut, or just talk?"
+  ), false);
   assert.equal(vip.isVipExecutePrompt("Invite lorna"), false);
   assert.equal(vip.isVipExecutePrompt("invite @lornaawuro"), false);
   assert.equal(vip.isVipExecutePrompt("open a room smart card"), false);

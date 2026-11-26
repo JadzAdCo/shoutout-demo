@@ -231,6 +231,9 @@ function parseVipExecute(raw) {
 function isVipExecutePrompt(raw) {
   const q = fold(raw);
   if (!q || q.length > 2000) return false;
+  try {
+    if (require("./botdee-session-intent").isBotPlaceSelfQuote(raw)) return false;
+  } catch (_) { /* session-intent optional on this path */ }
   if (/\b(?:how|help|what is|where do i|instructions?|explain)\b/.test(q)) return false;
   if (/\broom smart(?:view| ?card)\b/.test(q)) return false;
   if (/^(?:invite|bring)\s+\S+/.test(q) && !/\b(?:table|vip|reservation)\b/.test(q)) return false;

@@ -445,6 +445,9 @@ function isShoutOutExecutePrompt(raw) {
   const q = normalize(raw);
   // Venue + board copy can exceed 200 chars (composer 160 + venue). Cap at stored-message size.
   if (!q || q.length > MAX_MESSAGE_CHARS) return false;
+  try {
+    if (require("./botdee-session-intent").isBotPlaceSelfQuote(raw)) return false;
+  } catch (_) { /* session-intent optional on this path */ }
   if (/\b(?:how|help|what is|where do i|instructions?|explain)\b/.test(q)) return false;
   if (/\b(?:throw|send|post|compose|buy|pay for)\b.{0,48}\bshout\s*out/.test(q)) return true;
   if (/^shout\s*out\b/.test(q) && /\b(?:for|at|to|please)\b/.test(q)) return true;

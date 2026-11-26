@@ -1392,7 +1392,7 @@ function destinationSmartView(classified, workflow) {
   const payload = {
     kind: "venue",
     title: city,
-    summary: `${city} · Place SMARTview`,
+    summary: "",
     images: [],
     floqrPublicData: {city, cuisine: [], cuisines: []},
     canonicalFloqrPageId: "",

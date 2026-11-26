@@ -34,7 +34,30 @@ test("I like fashion week in Milan has no product intent and uses NEUTRAL stenci
   assert.equal(card.floqrPublicData.smartBackgroundId, "bg-milan-fashion-week");
   assert.ok(card.floqrPublicData.smartTags.includes("milan"));
   assert.ok(card.floqrPublicData.smartTags.includes("fashion-week"));
-  assert.match(intent.askIntentReply(row), /VIP reserV/);
+  const spoken = intent.askIntentReply(row, {name: "Don"});
+  assert.match(spoken, /Don, Milan is a beautiful city/);
+  assert.match(spoken, /SMARTview card of Milan/);
+  assert.match(spoken, /activities would you like to plan with me in regards to Milan/);
+  assert.doesNotMatch(spoken, /Place SMARTview for/i);
+  assert.doesNotMatch(spoken, /VIP reserV/);
+  assert.doesNotMatch(spoken, /ShoutOut/);
+});
+
+test("pasting BOT DEE Place copy is not ShoutOut or VIP intent", () => {
+  const quoted = "Place SMARTview for milan Fashion Week. What would you like to do — reserve a VIP reserV table, throw a ShoutOut, or just talk?";
+  assert.equal(intent.isBotPlaceSelfQuote(quoted), true);
+  const row = intent.classifySessionWorkflow(quoted);
+  assert.deepEqual(row.intents, []);
+  assert.equal(row.productClear, false);
+  assert.equal(row.placeWithoutProduct, true);
+  assert.ok(row.places.includes("milan"));
+  const vip = require("./headless-vip-core");
+  assert.equal(vip.isVipExecutePrompt(quoted), false);
+  const natural = intent.askIntentReply(row, {name: "Don"});
+  assert.equal(intent.isBotPlaceSelfQuote(natural), true);
+  assert.equal(vip.isVipExecutePrompt(natural), false);
+  const coreSrc = fs.readFileSync(path.join(__dirname, "bot-dee-core.js"), "utf8");
+  assert.match(coreSrc, /isBotPlaceSelfQuote\(raw\)/);
 });
 
 test("talk-only uses the Don Papi joke and native-script talk aliases", () => {
@@ -79,4 +102,6 @@ test("executeBotSession persists sessionWorkflow and talk/place branches", () =>
   assert.match(src, /session-talk/);
   assert.match(src, /session-place-intent/);
   assert.match(src, /intents \|\| \[\]\)\.includes\("reserve"\)/);
+  assert.match(src, /replyAfterCards: true/);
+  assert.match(src, /isBotPlaceSelfQuote/);
 });

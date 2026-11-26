@@ -140,11 +140,14 @@ function classifySessionWorkflow(raw) {
   const source = text(raw, 2000);
   if (!source) return emptyWorkflow();
   const hay = haystack(source);
+  const quoted = isBotPlaceSelfQuote(source);
   const intents = [];
-  if (hasAlias(hay, ALIASES.reserve)) intents.push("reserve");
-  if (hasAlias(hay, ALIASES.shoutout)) intents.push("shoutout");
-  if (hasAlias(hay, ALIASES.floqcast)) intents.push("floqcast");
-  const talk = hasAlias(hay, ALIASES.talk);
+  if (!quoted) {
+    if (hasAlias(hay, ALIASES.reserve)) intents.push("reserve");
+    if (hasAlias(hay, ALIASES.shoutout)) intents.push("shoutout");
+    if (hasAlias(hay, ALIASES.floqcast)) intents.push("floqcast");
+  }
+  const talk = !quoted && hasAlias(hay, ALIASES.talk);
   const places = placesFrom(source);
   const topics = [];
   if (hasAlias(hay, ALIASES["fashion-week"])) topics.push("fashion-week");
@@ -232,7 +235,6 @@ function stampPlacePayload(payload, workflow) {
   ]);
   if (tags.length) publicData.smartTags = tags;
   payload.floqrPublicData = publicData;
-  if (row.verbiage) payload.summary = row.verbiage;
   payload.workflowVerbiage = row.verbiage;
   payload.tags = tags;
   return payload;
@@ -242,14 +244,79 @@ function talkJoke() {
   return "Don Papi the founder said humans like talking to bots.";
 }
 
-function askIntentReply(workflow) {
-  const place = (workflow && workflow.places && workflow.places[0]) || "";
-  const topic = (workflow && workflow.topics && workflow.topics[0]) || "";
-  const where = [place, topic === "fashion-week" ? "Fashion Week" : topic].filter(Boolean).join(" ");
-  if (where) {
-    return `Place SMARTview for ${where}. What would you like to do — reserve a VIP reserV table, throw a ShoutOut, or just talk?`;
+/** Patron pasted BOT DEE's own Place ask — not throw-ShoutOut / VIP reserV intent. */
+function isBotPlaceSelfQuote(raw) {
+  const q = text(raw, 2000).toLowerCase().replace(/[’']/g, "'");
+  if (!q) return false;
+  if (/\bplace smartview for\b/.test(q)) return true;
+  if (/i'?ve added a smartview card of/.test(q)) return true;
+  if (/what activities would you like to plan with me/.test(q)) return true;
+  if (/\bbeautiful city/.test(q) && /\bsmartview card\b/.test(q)) return true;
+  if (/what would you like to do/.test(q)
+    && /throw a shout\s*out/.test(q)
+    && /vip\s*reserv/.test(q)) {
+    return true;
   }
-  return "What would you like to do — reserve a VIP reserV table, throw a ShoutOut, or just talk?";
+  return false;
+}
+
+function titlePlace(value) {
+  return String(value || "")
+    .replace(/[-_]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function placeLabel(placeId, lang) {
+  const id = String(placeId || "").trim().toLowerCase();
+  if (!id) return "";
+  const code = String(lang || "en").trim().toLowerCase().split(/[-_]/)[0] || "en";
+  const row = (city.PACKAGED || []).find(item => item && item.placeId === id);
+  const aliases = row && row.aliasesByLang && (row.aliasesByLang[code] || row.aliasesByLang.en);
+  const token = Array.isArray(aliases) && aliases[0] ? aliases[0] : id;
+  return titlePlace(token);
+}
+
+function fillAsk(tpl, vars) {
+  const dict = vars && typeof vars === "object" ? vars : {};
+  return String(tpl || "").replace(/\{(\w+)\}/g, (_, key) => (
+    dict[key] == null ? "" : String(dict[key])
+  ));
+}
+
+const ASK_NAMED = "{name}, {place} is a beautiful city… I've added a SMARTview card of {place} for your quick review. What activities would you like to plan with me in regards to {place}";
+const ASK_UNNAMED = "{place} is a beautiful city… I've added a SMARTview card of {place} for your quick review. What activities would you like to plan with me in regards to {place}";
+const ASK_GENERIC = "I've added a SMARTview card for your quick review. What activities would you like to plan with me?";
+
+function askIntentReply(workflow, opts) {
+  const options = opts && typeof opts === "object" ? opts : {};
+  const lang = String(options.lang || options.uiLanguage || "en").trim() || "en";
+  const name = text(options.name, 40);
+  const placeId = (workflow && workflow.places && workflow.places[0]) || "";
+  const place = placeLabel(placeId, lang) || titlePlace(placeId);
+  if (!place) {
+    return name ? fillAsk("{name}, " + ASK_GENERIC, {name}) : ASK_GENERIC;
+  }
+  return name
+    ? fillAsk(ASK_NAMED, {name, place})
+    : fillAsk(ASK_UNNAMED, {place});
+}
+
+function askIntentMeta(workflow, opts) {
+  const options = opts && typeof opts === "object" ? opts : {};
+  const lang = String(options.lang || options.uiLanguage || "en").trim() || "en";
+  const name = text(options.name, 40);
+  const placeId = (workflow && workflow.places && workflow.places[0]) || "";
+  const place = placeLabel(placeId, lang) || titlePlace(placeId);
+  return {
+    reply: askIntentReply(workflow, options),
+    replyKey: name && place ? "botdee.place.askNamed" : (place ? "botdee.place.askUnnamed" : "botdee.place.askGeneric"),
+    replyVars: {name, place},
+    replyAfterCards: true
+  };
 }
 
 module.exports = {
@@ -262,5 +329,8 @@ module.exports = {
   stampPlacePayload,
   talkJoke,
   askIntentReply,
+  askIntentMeta,
+  isBotPlaceSelfQuote,
+  placeLabel,
   emptyWorkflow
 };
