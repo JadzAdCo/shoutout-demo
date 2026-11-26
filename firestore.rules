@@ -811,6 +811,12 @@ service cloud.firestore {
  allow write: if false;
  }
 
+ // BOT DEE city/place tokens (Master Admin list; executeBotSession reads via Admin SDK).
+ match /botDeeCityTokens/{placeId} {
+ allow read: if isMasterAdmin();
+ allow write: if false;
+ }
+
  // BOT DEE durable threads (one doc per uid). Owner read; Functions-write.
  match /botDeeThreads/{threadId} {
  // hasUsedBotDee 0|1 lives on this session doc (Functions-write only; never client-set, never boolean).

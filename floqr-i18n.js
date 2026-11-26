@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "floqr.uiLanguage";
   const PROMPT_KEY = "floqr.uiLanguagePromptDone";
-  const VERSION = "s3.3.083";
+  const VERSION = "s3.3.085";
   const SUPPORTED = [
     {code: "en", label: "English", native: "English", dir: "ltr"},
     {code: "de", label: "German", native: "Deutsch", dir: "ltr"},
@@ -2224,6 +2224,16 @@
       "master.botDeeSlotsTitle": "Later-fill integration slots",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner, and Eventbrite stay mock until enabled=1, the named Firebase secret is present, and a legal evidence ref is saved. Do not paste API keys here. Live vendor HTTP is not wired.",
       "master.botDeeSaveSlot": "Save integration slot",
+      "master.botDeeSubCities": "City / place tokens",
+      "master.botDeeCitiesNote": "Add a city in any allowed language. You must pick the language. Save translates and fills the other ten languages. Matching in BOT DEE chat uses this list — not Latin-only. Gemini does not auto-learn cities.",
+      "master.botDeeCityTokenLabel": "City or place",
+      "master.botDeeCityLangLabel": "Language (required)",
+      "master.botDeeCityLangPick": "Pick a language",
+      "master.botDeeCityPreview": "Fill other languages",
+      "master.botDeeCityAdd": "Add token",
+      "master.botDeeCityColId": "Place",
+      "master.botDeeCityColAliases": "Aliases",
+      "master.botDeeCityColEnabled": "On",
       "portal.serviceMembers.statusAlreadyRequested": "You already sent a request to {clubs}. Remove that club and try again.",
       "rep.administerTemplates": "Administer Templates — Template Administrator: read, add and remove template tags",
       "rep.manageTemplates": "Manage Templates — Template Manager: read and add template tags",
@@ -4526,6 +4536,16 @@
       "master.botDeeSlotsTitle": "Emplacements d’intégration à remplir plus tard",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner et Eventbrite restent en mock jusqu’à enabled=1, secret Firebase nommé et référence de preuve juridique. Ne collez pas de clés API ici. Pas d’HTTP fournisseur en direct.",
       "master.botDeeSaveSlot": "Enregistrer l’emplacement",
+      "master.botDeeSubCities": "Jetons ville / lieu",
+      "master.botDeeCitiesNote": "Ajoutez une ville dans n’importe quelle langue autorisée. Vous devez choisir la langue. Enregistrer traduit et complète les dix autres. La correspondance dans le chat BOT DEE utilise cette liste — pas le latin seulement. Gemini n’apprend pas les villes.",
+      "master.botDeeCityTokenLabel": "Ville ou lieu",
+      "master.botDeeCityLangLabel": "Langue (obligatoire)",
+      "master.botDeeCityLangPick": "Choisir une langue",
+      "master.botDeeCityPreview": "Remplir les autres langues",
+      "master.botDeeCityAdd": "Ajouter le jeton",
+      "master.botDeeCityColId": "Lieu",
+      "master.botDeeCityColAliases": "Alias",
+      "master.botDeeCityColEnabled": "Actif",
       "cat.settings": "Réglages"
     },
     de: {
@@ -6564,6 +6584,16 @@
       "master.botDeeSlotsTitle": "Später zu füllende Integrations-Slots",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner und Eventbrite bleiben mock bis enabled=1, benanntes Firebase-Geheimnis und rechtlicher Nachweis. Keine API-Schlüssel hier einfügen.",
       "master.botDeeSaveSlot": "Slot speichern",
+      "master.botDeeSubCities": "Stadt-/Ort-Token",
+      "master.botDeeCitiesNote": "Fügen Sie eine Stadt in jeder erlaubten Sprache hinzu. Die Sprache muss gewählt werden. Speichern übersetzt und füllt die anderen zehn. BOT DEE-Chat nutzt diese Liste — nicht nur Latein. Gemini lernt keine Städte.",
+      "master.botDeeCityTokenLabel": "Stadt oder Ort",
+      "master.botDeeCityLangLabel": "Sprache (erforderlich)",
+      "master.botDeeCityLangPick": "Sprache wählen",
+      "master.botDeeCityPreview": "Andere Sprachen füllen",
+      "master.botDeeCityAdd": "Token hinzufügen",
+      "master.botDeeCityColId": "Ort",
+      "master.botDeeCityColAliases": "Aliase",
+      "master.botDeeCityColEnabled": "An",
       "cat.settings": "Einstellungen"
     },
     es: {
@@ -8602,6 +8632,16 @@
       "master.botDeeSlotsTitle": "Ranuras de integración para más adelante",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner y Eventbrite siguen en mock hasta enabled=1, secreto de Firebase y referencia legal. No pegue claves API aquí.",
       "master.botDeeSaveSlot": "Guardar ranura",
+      "master.botDeeSubCities": "Tokens de ciudad / lugar",
+      "master.botDeeCitiesNote": "Añada una ciudad en cualquier idioma permitido. Debe elegir el idioma. Guardar traduce y completa los otros diez. El chat BOT DEE usa esta lista — no solo latín. Gemini no aprende ciudades.",
+      "master.botDeeCityTokenLabel": "Ciudad o lugar",
+      "master.botDeeCityLangLabel": "Idioma (obligatorio)",
+      "master.botDeeCityLangPick": "Elija un idioma",
+      "master.botDeeCityPreview": "Rellenar otros idiomas",
+      "master.botDeeCityAdd": "Añadir token",
+      "master.botDeeCityColId": "Lugar",
+      "master.botDeeCityColAliases": "Alias",
+      "master.botDeeCityColEnabled": "Sí",
       "cat.settings": "Ajustes"
     },
     nl: {
@@ -10640,6 +10680,16 @@
       "master.botDeeSlotsTitle": "Integratieslots voor later",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner en Eventbrite blijven mock tot enabled=1, Firebase-geheim en juridische referentie. Plak geen API-sleutels hier.",
       "master.botDeeSaveSlot": "Slot opslaan",
+      "master.botDeeSubCities": "Stad-/plaatstokens",
+      "master.botDeeCitiesNote": "Voeg een stad toe in elke toegestane taal. U moet de taal kiezen. Opslaan vertaalt en vult de andere tien. BOT DEE-chat gebruikt deze lijst — niet alleen Latijn. Gemini leert geen steden.",
+      "master.botDeeCityTokenLabel": "Stad of plaats",
+      "master.botDeeCityLangLabel": "Taal (verplicht)",
+      "master.botDeeCityLangPick": "Kies een taal",
+      "master.botDeeCityPreview": "Andere talen vullen",
+      "master.botDeeCityAdd": "Token toevoegen",
+      "master.botDeeCityColId": "Plaats",
+      "master.botDeeCityColAliases": "Aliassen",
+      "master.botDeeCityColEnabled": "Aan",
       "cat.settings": "Instellingen"
     },
     ru: {
@@ -12678,6 +12728,16 @@
       "master.botDeeSlotsTitle": "Слоты интеграции на потом",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner и Eventbrite остаются mock до enabled=1, именованного секрета Firebase и юридической ссылки. Не вставляйте API-ключи здесь.",
       "master.botDeeSaveSlot": "Сохранить слот",
+      "master.botDeeSubCities": "Токены города / места",
+      "master.botDeeCitiesNote": "Добавьте город на любом разрешённом языке. Язык нужно выбрать. Сохранение переводит и заполняет остальные десять. Чат BOT DEE использует этот список — не только латиницу. Gemini города не выучивает.",
+      "master.botDeeCityTokenLabel": "Город или место",
+      "master.botDeeCityLangLabel": "Язык (обязательно)",
+      "master.botDeeCityLangPick": "Выберите язык",
+      "master.botDeeCityPreview": "Заполнить другие языки",
+      "master.botDeeCityAdd": "Добавить токен",
+      "master.botDeeCityColId": "Место",
+      "master.botDeeCityColAliases": "Псевдонимы",
+      "master.botDeeCityColEnabled": "Вкл",
       "cat.settings": "Настройки"
     },
     it: {
@@ -14716,6 +14776,16 @@
       "master.botDeeSlotsTitle": "Slot di integrazione da compilare",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner ed Eventbrite restano mock finché enabled=1, secret Firebase e riferimento legale. Non incollare chiavi API qui.",
       "master.botDeeSaveSlot": "Salva slot",
+      "master.botDeeSubCities": "Token città / luogo",
+      "master.botDeeCitiesNote": "Aggiungi una città in qualsiasi lingua consentita. Devi scegliere la lingua. Salva traduce e completa le altre dieci. La chat BOT DEE usa questo elenco — non solo latino. Gemini non impara le città.",
+      "master.botDeeCityTokenLabel": "Città o luogo",
+      "master.botDeeCityLangLabel": "Lingua (obbligatoria)",
+      "master.botDeeCityLangPick": "Scegli una lingua",
+      "master.botDeeCityPreview": "Compila le altre lingue",
+      "master.botDeeCityAdd": "Aggiungi token",
+      "master.botDeeCityColId": "Luogo",
+      "master.botDeeCityColAliases": "Alias",
+      "master.botDeeCityColEnabled": "On",
       "cat.settings": "Impostazioni"
     },
     pt: {
@@ -16754,6 +16824,16 @@
       "master.botDeeSlotsTitle": "Slots de integração para mais tarde",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner e Eventbrite ficam mock até enabled=1, segredo Firebase e referência legal. Não cole chaves API aqui.",
       "master.botDeeSaveSlot": "Guardar slot",
+      "master.botDeeSubCities": "Tokens de cidade / lugar",
+      "master.botDeeCitiesNote": "Adicione uma cidade em qualquer idioma permitido. Tem de escolher o idioma. Guardar traduz e preenche os outros dez. O chat BOT DEE usa esta lista — não só latim. O Gemini não aprende cidades.",
+      "master.botDeeCityTokenLabel": "Cidade ou lugar",
+      "master.botDeeCityLangLabel": "Idioma (obrigatório)",
+      "master.botDeeCityLangPick": "Escolher um idioma",
+      "master.botDeeCityPreview": "Preencher outros idiomas",
+      "master.botDeeCityAdd": "Adicionar token",
+      "master.botDeeCityColId": "Lugar",
+      "master.botDeeCityColAliases": "Alias",
+      "master.botDeeCityColEnabled": "On",
       "cat.settings": "Definições"
     },
     el: {
@@ -18792,6 +18872,16 @@
       "master.botDeeSlotsTitle": "Θέσεις ολοκλήρωσης αργότερα",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner και Eventbrite μένουν mock μέχρι enabled=1, ονομαστικό Firebase secret και νομική αναφορά. Μην επικολλάτε κλειδιά API εδώ.",
       "master.botDeeSaveSlot": "Αποθήκευση θέσης",
+      "master.botDeeSubCities": "Διακριτικά πόλης / τόπου",
+      "master.botDeeCitiesNote": "Προσθέστε μια πόλη σε οποιαδήποτε επιτρεπόμενη γλώσσα. Πρέπει να επιλέξετε γλώσσα. Η αποθήκευση μεταφράζει και συμπληρώνει τις άλλες δέκα. Η συνομιλία BOT DEE χρησιμοποιεί αυτή τη λίστα — όχι μόνο λατινικά. Το Gemini δεν μαθαίνει πόλεις.",
+      "master.botDeeCityTokenLabel": "Πόλη ή τόπος",
+      "master.botDeeCityLangLabel": "Γλώσσα (υποχρεωτική)",
+      "master.botDeeCityLangPick": "Επιλέξτε γλώσσα",
+      "master.botDeeCityPreview": "Συμπλήρωση άλλων γλωσσών",
+      "master.botDeeCityAdd": "Προσθήκη διακριτικού",
+      "master.botDeeCityColId": "Τόπος",
+      "master.botDeeCityColAliases": "Ψευδώνυμα",
+      "master.botDeeCityColEnabled": "On",
       "cat.settings": "Ρυθμίσεις"
     },
     pl: {
@@ -20830,6 +20920,16 @@
       "master.botDeeSlotsTitle": "Sloty integracji do uzupełnienia",
       "master.botDeeSlotsNote": "Google Places, Gemini Search grounding, Yelp, Ticketmaster Discovery, Ticketmaster Partner i Eventbrite pozostają mock do enabled=1, nazwanego sekretu Firebase i odniesienia prawnego. Nie wklejaj kluczy API tutaj.",
       "master.botDeeSaveSlot": "Zapisz slot",
+      "master.botDeeSubCities": "Tokeny miasta / miejsca",
+      "master.botDeeCitiesNote": "Dodaj miasto w dowolnym dozwolonym języku. Musisz wybrać język. Zapis tłumaczy i uzupełnia pozostałe dziesięć. Czat BOT DEE używa tej listy — nie tylko łaciny. Gemini nie uczy się miast.",
+      "master.botDeeCityTokenLabel": "Miasto lub miejsce",
+      "master.botDeeCityLangLabel": "Język (wymagany)",
+      "master.botDeeCityLangPick": "Wybierz język",
+      "master.botDeeCityPreview": "Uzupełnij inne języki",
+      "master.botDeeCityAdd": "Dodaj token",
+      "master.botDeeCityColId": "Miejsce",
+      "master.botDeeCityColAliases": "Aliasy",
+      "master.botDeeCityColEnabled": "Wł",
       "cat.settings": "Ustawienia"
     },
     ar: {
@@ -22868,6 +22968,16 @@
       "master.botDeeSlotsTitle": "فتحات تكامل لاحقًا",
       "master.botDeeSlotsNote": "Google Places وGemini Search grounding وYelp وTicketmaster Discovery وTicketmaster Partner وEventbrite تبقى وهمية حتى enabled=1 والسر Firebase والمرجع القانوني. لا تلصق مفاتيح API هنا.",
       "master.botDeeSaveSlot": "حفظ الفتحة",
+      "master.botDeeSubCities": "رموز المدينة / المكان",
+      "master.botDeeCitiesNote": "أضف مدينة بأي لغة مسموحة. يجب اختيار اللغة. الحفظ يترجم ويملأ اللغات العشر الأخرى. محادثة BOT DEE تستخدم هذه القائمة — ليست اللاتينية فقط. لا يتعلم Gemini المدن.",
+      "master.botDeeCityTokenLabel": "مدينة أو مكان",
+      "master.botDeeCityLangLabel": "اللغة (مطلوبة)",
+      "master.botDeeCityLangPick": "اختر لغة",
+      "master.botDeeCityPreview": "ملء اللغات الأخرى",
+      "master.botDeeCityAdd": "إضافة رمز",
+      "master.botDeeCityColId": "مكان",
+      "master.botDeeCityColAliases": "أسماء بديلة",
+      "master.botDeeCityColEnabled": "تشغيل",
       "cat.settings": "الإعدادات"
     }
   };

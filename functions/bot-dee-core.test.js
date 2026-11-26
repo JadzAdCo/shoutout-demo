@@ -164,6 +164,7 @@ test("setBotDeeSettings callable is exported", () => {
   assert.match(read("master-feature-services.js"), /setBotDeeSettings/);
   assert.match(read("master-feature-services.js"), /const DEFAULT_IDLE_SECONDS = 300/);
   assert.match(read("firestore.rules"), /match \/botDeeSettings\/\{docId\}/);
+  assert.match(read("firestore.rules"), /match \/botDeeCityTokens\/\{placeId\}/);
   assert.match(read("firestore.rules"), /match \/botDeeThreads\/\{threadId\}/);
   assert.match(read("functions/index.js"), /getBotDeeThread:\s*require\("\.\/bot-dee-functions"\)\.getBotDeeThread/);
 });

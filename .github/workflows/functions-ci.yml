@@ -245,6 +245,9 @@ jobs:
               renameBotDeeChat \
               saveBotDeePersonalization \
               setBotDeeSettings \
+              listBotDeeCityTokens \
+              previewBotDeeCityToken \
+              upsertBotDeeCityToken \
               getBotDeeAccess \
               getBotDeeCapabilityManifest \
               getBotDeeConsent \

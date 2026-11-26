@@ -869,7 +869,10 @@ const PLACE_STOP = new Set([
   "recommendation", "recommendations", "spot", "spots", "place", "places",
   "city", "cities", "open", "now", "tonight", "today", "this", "that", "you", "got", "have",
   "lets", "let", "talk", "talks", "talking", "chat", "chatting", "plan", "planning",
-  "discuss", "discussing", "about", "hey", "hi", "hello", "howdy"
+  "discuss", "discussing", "about", "hey", "hi", "hello", "howdy",
+  "en", "dans", "sur", "chez", "im", "am", "zum", "zur", "bei", "di", "da", "nel",
+  "em", "na", "w", "we", "и", "в", "на", "και", "στο", "στη", "في", "من", "على",
+  "hola", "ciao", "salut", "hallo", "olá", "cześć", "γεια", "привет", "مرحبا"
 ]);
 
 const DINING_CUES = new Set([
@@ -878,7 +881,10 @@ const DINING_CUES = new Set([
   "mexican", "spanish", "peruvian", "american", "fusion", "asian", "tapas",
   "pizza", "taco", "tacos", "brunch", "dinner", "lunch", "breakfast",
   "restaurant", "restaurants", "dining", "eatery", "eateries", "cuisine",
-  "steakhouse", "seafood", "cafe", "cafes", "bakery", "bistro"
+  "steakhouse", "seafood", "cafe", "cafes", "bakery", "bistro",
+  "restaurante", "restaurantes", "ristorante", "ristoranti", "restaurant",
+  "ресторан", "рестораны", "εστιατόριο", "εστιατόρια", "مطعم", "مطاعم",
+  "restauracja", "diner", "eten"
 ]);
 
 const FOOD_GENERIC = new Set(["food", "foods", "eat", "eats", "eating"]);
@@ -886,7 +892,9 @@ const FOOD_GENERIC = new Set(["food", "foods", "eat", "eats", "eating"]);
 const VENUE_CUES = new Set([
   "club", "clubs", "lounge", "lounges", "nightlife", "nightclub", "nightclubs",
   "venue", "venues", "bar", "bars", "disco", "discos",
-  "reservation", "reservations", "reserve"
+  "reservation", "reservations", "reserve",
+  "clubes", "discoteca", "discotecas", "boite", "boîte", "nachtclub", "nachtclubs",
+  "клуб", "клубы", "клубъ", "κλαμπ", "κλαμπς", "نادي", "نوادي", "klub", "kluby"
 ]);
 
 const PLACE_LEFTOVER_STOP = new Set([
@@ -925,56 +933,36 @@ const CUISINE_ALIASES = Object.freeze({
 
 const PROFILE_DATAPOINT_ASK = /\b(my|public)\s+profile\b|\bprofile\s+(food|music|travel|hobbies|photos?)\b|\b(food|music|travel|hobbies)\s+(on|in)\s+(my|the)\s+(public\s+)?profile\b/i;
 
+let cityCatalogCache = null;
+let cityCatalogAtMs = 0;
+const CITY_CATALOG_TTL_MS = 60 * 1000;
+
+function activeCityCatalog() {
+  const city = require("./botdee-city-tokens");
+  return cityCatalogCache || city.mergeCatalog([]);
+}
+
+function invalidateCityCatalog() {
+  cityCatalogCache = null;
+  cityCatalogAtMs = 0;
+}
+
+async function primeCityCatalog() {
+  const city = require("./botdee-city-tokens");
+  if (cityCatalogCache && Date.now() - cityCatalogAtMs < CITY_CATALOG_TTL_MS) return cityCatalogCache;
+  let docs = [];
+  try {
+    const snap = await db.collection("botDeeCityTokens").limit(400).get();
+    docs = snap.docs.map(doc => ({placeId: doc.id, ...(doc.data() || {})}));
+  } catch (_) { /* packaged catalog still matches */ }
+  cityCatalogCache = city.mergeCatalog(docs);
+  cityCatalogAtMs = Date.now();
+  return cityCatalogCache;
+}
+
 function matchPlaces(needle) {
-  const tokens = [];
-  const consumed = [];
-  const dcHit = /\bwashington(?:\s*,?\s*d\.?c\.?)?\b|\bdistrict of columbia\b/.test(needle)
-    || (/\bwashington\b/.test(needle) && /\bd\.?\s*c\.?\b/.test(needle))
-    || (/\bd\.?\s*c\.?\b/.test(needle) && !/\bdj\b/.test(needle));
-  if (dcHit) {
-    tokens.push("washington", "dc");
-    consumed.push("washington", "dc", "district", "columbia", "d.c", "d.c.");
-  }
-  if (/\bchinatown\b/.test(needle)) {
-    tokens.push("chinatown");
-    consumed.push("chinatown");
-  }
-  if (/\bdupont\b/.test(needle)) {
-    tokens.push("dupont");
-    consumed.push("dupont", "circle");
-  }
-  if (/\bnew york\b|\bnyc\b|\bmanhattan\b/.test(needle)) {
-    tokens.push("new york", "nyc", "manhattan");
-    consumed.push("new", "york", "nyc", "manhattan", "city");
-  }
-  // Latin regex only. Native-script city aliases (ar/el/ru) need Unicode keep in normalizeNeedle — see design-notes-language-coverage.mdc. No city dashboard.
-  const CITY_HITS = [
-    {re: /\bmiami\s+beach\b|\bsouth beach\b|\bsobe\b/, tokens: ["miami", "miami beach"], consumed: ["miami", "beach", "south", "sobe"]},
-    {re: /\bmiami\b/, tokens: ["miami"], consumed: ["miami"]},
-    {re: /\bparis\b/, tokens: ["paris"], consumed: ["paris"]},
-    {re: /\bibiza\b/, tokens: ["ibiza"], consumed: ["ibiza"]},
-    {re: /\blondon\b/, tokens: ["london"], consumed: ["london"]},
-    {re: /\batlanta\b/, tokens: ["atlanta"], consumed: ["atlanta"]},
-    {re: /\blas vegas\b|\bvegas\b/, tokens: ["vegas", "las vegas"], consumed: ["las", "vegas"]},
-    {re: /\bcancun\b/, tokens: ["cancun"], consumed: ["cancun"]},
-    {re: /\bmykonos\b/, tokens: ["mykonos"], consumed: ["mykonos"]},
-    {re: /\bbali\b/, tokens: ["bali"], consumed: ["bali"]},
-    {re: /\bmilan\b|\bmilano\b/, tokens: ["milan"], consumed: ["milan", "milano"]},
-    {re: /\bbarcelona\b/, tokens: ["barcelona"], consumed: ["barcelona"]},
-    {re: /\bmadrid\b/, tokens: ["madrid"], consumed: ["madrid"]},
-    {re: /\blisbon\b|\blisboa\b/, tokens: ["lisbon"], consumed: ["lisbon", "lisboa"]},
-    {re: /\bseattle\b/, tokens: ["seattle"], consumed: ["seattle"]},
-    {re: /\bthailand\b/, tokens: ["thailand"], consumed: ["thailand"]}
-  ];
-  CITY_HITS.forEach(hit => {
-    if (!hit.re.test(needle)) return;
-    tokens.push(...hit.tokens);
-    consumed.push(...hit.consumed);
-  });
-  return {
-    tokens: [...new Set(tokens)],
-    consumed: [...new Set(consumed)]
-  };
+  const city = require("./botdee-city-tokens");
+  return city.matchPlacesWithCatalog(needle, activeCityCatalog());
 }
 
 function extractPlaceTokens(needle) {
@@ -1049,8 +1037,9 @@ function classifyPlaceSearchIntent(raw) {
     return emptyPlaceIntent();
   }
   if (PROFILE_DATAPOINT_ASK.test(String(raw || ""))) return emptyPlaceIntent();
-  const needle = normalizeNeedle(raw);
-  if (!needle || needle.length < 4) return emptyPlaceIntent();
+  const city = require("./botdee-city-tokens");
+  const needle = city.normalizePlaceNeedle(raw) || normalizeNeedle(raw);
+  if (!needle || needle.length < 2) return emptyPlaceIntent();
   const rawTokens = needle.split(/\s+/).filter(token => token.length > 1 && !PLACE_STOP.has(token));
   const diningHit = rawTokens.some(token => DINING_CUES.has(token))
     || (rawTokens.some(token => FOOD_GENERIC.has(token)) && extractPlaceTokens(needle).length);
@@ -1445,6 +1434,7 @@ async function searchPublicClubs(classified, limit = 5) {
 }
 
 async function attachVenueSearch({query} = {}) {
+  await primeCityCatalog();
   const classified = classifyPlaceSearchIntent(query);
   if (classified.intent === "none") return {handled: false, classified};
   let ranked = [];
@@ -2153,6 +2143,9 @@ module.exports = {
   lookupPublicProfiles,
   classifyPlaceSearchIntent,
   classifyPlaceSearchFromConversation,
+  primeCityCatalog,
+  invalidateCityCatalog,
+  matchPlaces,
   skipPlaceSearchPrompt,
   placeSearchAlongsideRoom,
   placeAttachQuery,

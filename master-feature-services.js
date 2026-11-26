@@ -710,6 +710,10 @@
     byId("featureAuditVerifyBtn")?.addEventListener("click", () => verifyAudit());
     byId("botDeeSettingsSave")?.addEventListener("click", () => saveBotDeeSettings());
     byId("botDeeSettingsReload")?.addEventListener("click", () => loadBotDeeSettings());
+    byId("botDeeCitySave")?.addEventListener("click", () => saveBotDeeCityToken());
+    byId("botDeeCityReload")?.addEventListener("click", () => loadBotDeeCityTokens());
+    byId("botDeeCityPreview")?.addEventListener("click", () => previewBotDeeCityToken());
+    byId("botDeeCityToken")?.addEventListener("input", () => scheduleCitySuggest());
     byId("botDeeMgmtSubtabs")?.addEventListener("click", event => {
       const btn = event.target?.closest?.("[data-botdee-page]");
       if (!btn) return;
@@ -821,6 +825,7 @@
       root.FLOQRBotDeeUpgradeUi?.loadSmartPreviewDemos?.("botDeeMasterSmartPreviewDemo");
     }
     if (key === "pause") loadBotDeeSettings();
+    if (key === "cities") loadBotDeeCityTokens();
   }
 
   function renderBotDeeMeta(row) {
@@ -1056,6 +1061,132 @@
       setStatus("botDeeSettingsStatus", `Saved — idle pause ${clampIdleSeconds(settings.conversationIdleSeconds)}s.`);
     } catch (error) {
       setStatus("botDeeSettingsStatus", errorText(error));
+    }
+  }
+
+  let citySuggestTimer = 0;
+  let lastCityPreview = null;
+
+  function scheduleCitySuggest() {
+    clearTimeout(citySuggestTimer);
+    citySuggestTimer = setTimeout(() => previewBotDeeCityToken({silent: true}), 280);
+  }
+
+  function formatCityAliases(row) {
+    const langs = ["en", "de", "fr", "es", "it", "pt", "ru", "el", "pl", "nl", "ar"];
+    return langs.map(lang => {
+      const list = (row.aliasesByLang && row.aliasesByLang[lang]) || [];
+      return list.length ? `${lang}: ${list.join(", ")}` : "";
+    }).filter(Boolean).join(" · ");
+  }
+
+  function renderCityTable(rows) {
+    const tbody = byId("botDeeCityBody");
+    const suggest = byId("botDeeCitySuggest");
+    if (!tbody) return;
+    if (!rows.length) {
+      tbody.innerHTML = "<tr><td colspan=\"3\">No city tokens yet.</td></tr>";
+      return;
+    }
+    tbody.innerHTML = rows.map(row => `<tr>
+      <td>${esc(row.placeId)} <span class="sub">${esc((row.canonicalTokens || []).join(", "))}</span></td>
+      <td>${esc(formatCityAliases(row))}</td>
+      <td>${row.enabled === 0 ? "0" : "1"}</td>
+    </tr>`).join("");
+    if (suggest) {
+      const names = [];
+      rows.forEach(row => {
+        Object.values(row.aliasesByLang || {}).forEach(list => {
+          (list || []).forEach(alias => names.push(alias));
+        });
+      });
+      suggest.innerHTML = [...new Set(names)].slice(0, 80).map(name => `<option value="${esc(name)}"></option>`).join("");
+    }
+  }
+
+  async function loadBotDeeCityTokens() {
+    if (!isUnlocked()) {
+      setStatus("botDeeCityStatus", "Unlock with SOS2FA to manage BOT DEE city tokens.");
+      return;
+    }
+    setStatus("botDeeCityStatus", "Loading city tokens…");
+    try {
+      const data = await call("listBotDeeCityTokens", {});
+      renderCityTable(data.rows || []);
+      setStatus("botDeeCityStatus", `${(data.rows || []).length} places.`);
+    } catch (error) {
+      setStatus("botDeeCityStatus", errorText(error));
+    }
+  }
+
+  async function previewBotDeeCityToken({silent} = {}) {
+    const token = String(byId("botDeeCityToken")?.value || "").trim();
+    const lang = String(byId("botDeeCityLang")?.value || "").trim();
+    const box = byId("botDeeCityPreviewBox");
+    if (!token || !lang) {
+      lastCityPreview = null;
+      if (box) { box.hidden = true; box.textContent = ""; }
+      if (!silent) setStatus("botDeeCityStatus", "Pick a language and enter a city name.");
+      return;
+    }
+    try {
+      const data = await call("previewBotDeeCityToken", {sourceToken: token, sourceLang: lang});
+      lastCityPreview = data.preview;
+      if (box) {
+        box.hidden = false;
+        box.textContent = JSON.stringify(data.preview.aliasesByLang || {}, null, 2);
+      }
+      if (!silent) setStatus("botDeeCityStatus", `Filled 11 languages for ${data.preview.placeId}.`);
+    } catch (error) {
+      lastCityPreview = null;
+      if (!silent) setStatus("botDeeCityStatus", errorText(error));
+    }
+  }
+
+  async function saveBotDeeCityToken() {
+    if (!isUnlocked()) {
+      setStatus("botDeeCityStatus", "Unlock with SOS2FA to manage BOT DEE city tokens.");
+      return;
+    }
+    const token = String(byId("botDeeCityToken")?.value || "").trim();
+    const lang = String(byId("botDeeCityLang")?.value || "").trim();
+    if (!lang) {
+      setStatus("botDeeCityStatus", "Pick a language. BOT DEE cannot guess which language this city name is.");
+      return;
+    }
+    if (!token) {
+      setStatus("botDeeCityStatus", "Enter a city or place name.");
+      return;
+    }
+    const promptApi = root.FLOQRReasonPrompt;
+    if (!promptApi?.ask) {
+      setStatus("botDeeCityStatus", "Reason prompt is unavailable — nothing was saved.");
+      return;
+    }
+    const reason = await promptApi.ask({
+      summary: `BOT DEE city token: ${token} (${lang})`,
+      minLength: REASON_MIN
+    });
+    if (reason === null) {
+      setStatus("botDeeCityStatus", "Cancelled — nothing was saved.");
+      return;
+    }
+    setStatus("botDeeCityStatus", "Saving…");
+    try {
+      const payload = {
+        sourceToken: token,
+        sourceLang: lang,
+        reason
+      };
+      if (lastCityPreview && lastCityPreview.aliasesByLang) {
+        payload.aliasesByLang = lastCityPreview.aliasesByLang;
+        payload.placeId = lastCityPreview.placeId;
+      }
+      const data = await call("upsertBotDeeCityToken", payload);
+      setStatus("botDeeCityStatus", `Saved ${data.row?.placeId || token}.`);
+      await loadBotDeeCityTokens();
+    } catch (error) {
+      setStatus("botDeeCityStatus", errorText(error));
     }
   }
 

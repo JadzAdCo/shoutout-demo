@@ -1157,6 +1157,19 @@
       page: "patron-portal.html"
     },
     {
+      id: "help-botdee-city-tokens",
+      title: "BOT DEE city / place tokens",
+      body: "In Features Mgmt → BOT DEE → City / place tokens, add a city in any of the 11 languages. You must pick the language. Save fills the other languages from the alias table (or copies your token). BOT DEE chat uses this list, including Arabic, Greek, and Cyrillic. Gemini does not invent cities. Protected brands (BOT DEE, ShoutOut) stay untranslated.",
+      searchPhrases: [
+        "city tokens", "place tokens", "bot dee cities", "miami arabic",
+        "ميامي", "city list", "language city", "master admin city tokens"
+      ],
+      links: [{label: "Features Mgmt · BOT DEE", href: pageUrl("./master-admin.html") + "#featuresBotDee-cities"}],
+      audiences: ["masterAdmin"],
+      source: "help-repository-seed",
+      page: "master-admin.html#featuresBotDee-cities"
+    },
+    {
       id: "help-botdee-place-search",
       title: "Ask BOT DEE for FLOQR venues",
       body: "Ask in plain words — sushi restaurants in Washington DC, clubs in DC, or a named club. BOT DEE searches onboarded FLOQR venues only, not Google or Yelp. Matching clubs open a compact Place SMARTview (name, short blurb, ratings, public-page link) with a SMARTbackground — not a photo well. Short greetings do not search venues. Miami or let’s talk Miami still attaches Miami Place SMARTview even when clubs are listed. Naming a city with VIP reserV (reservations in Miami) still attaches Place SMARTview next to the VIP card. Patron photos and ShoutOut pitches stay off unless you asked for those. If nothing is onboarded yet, BOT DEE says so.",
