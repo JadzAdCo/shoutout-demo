@@ -2040,11 +2040,28 @@
   }
 
   
+  function profileAlreadySaved(profile) {
+    if (!profile || typeof profile !== "object") return false;
+    const flag = profile.profileCompleted;
+    if (flag === true || flag === 1 || flag === "1" || flag === "true") return true;
+    return !!String(profile.floqrHandle || profile.username || "").trim();
+  }
+
   async function getUserProfile() {
     if (!currentUser) return null;
     lastProfileReadError = null;
     try {
-      const doc = await db.collection("users").doc(currentUser.uid).get();
+      const ref = db.collection("users").doc(currentUser.uid);
+      let doc = await ref.get();
+      // SMARTview opens Search in a new tab (start=search&smartvisualInvite=…).
+      // A cache miss or a doc that has not yet shown profileCompleted must be
+      // confirmed on the server before the blank create-profile card opens.
+      if (!profileAlreadySaved(doc.exists ? doc.data() : null)) {
+        try {
+          const serverDoc = await ref.get({source: "server"});
+          if (serverDoc.exists) doc = serverDoc;
+        } catch (_) { /* offline: keep the first read */ }
+      }
       cachedUserProfile = doc.exists ? doc.data() : null;
       resetUserLocationContext();
       if (cachedUserProfile) {
@@ -2245,6 +2262,12 @@
         return;
       }
       const existingProfile = existingSnap.exists ? existingSnap.data() : {};
+      if (profileAlreadySaved(existingProfile) && existingProfile.profileCompleted === true) {
+        cachedUserProfile = existingProfile;
+        status.textContent = "Profile saved.";
+        await continueToMainCategories();
+        return;
+      }
       const savePayload = existingSnap.exists
         ? preserveExistingProfileData(profile, existingProfile)
         : {...profile, createdAt: firebase.firestore.FieldValue.serverTimestamp()};
@@ -2421,7 +2444,7 @@
       showPage("landingPage");
       return;
     }
-    if (!profile || !profile.profileCompleted) {
+    if (!profileAlreadySaved(profile)) {
       showSignupProfile();
       return;
     }

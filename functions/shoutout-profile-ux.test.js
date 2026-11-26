@@ -101,6 +101,22 @@ test("Account type ? sits on the label row and select options stay in the contro
   assert.match(read("botdee-help-repository.js"), /id:\s*"help-profile-account-type"/);
 });
 
+test("completed profiles skip the create-profile card after a server confirm", () => {
+  const src = read("patron-app.js");
+  const helper = src.slice(src.indexOf("function profileAlreadySaved("), src.indexOf("async function getUserProfile("));
+  assert.match(helper, /profileCompleted/);
+  assert.match(helper, /floqrHandle \|\| profile\.username/);
+  const readFn = src.slice(src.indexOf("async function getUserProfile("), src.indexOf("function prefillSignupProfile("));
+  assert.match(readFn, /source:\s*"server"/);
+  assert.match(readFn, /profileAlreadySaved/);
+  const after = src.slice(src.indexOf("async function afterLogin("), src.indexOf("const AUTH_REDIRECT_PENDING_KEY"));
+  assert.match(after, /if \(!profileAlreadySaved\(profile\)\)/);
+  assert.doesNotMatch(after, /if \(!profile \|\| !profile\.profileCompleted\)/);
+  const save = src.slice(src.indexOf("async function saveProfile("), src.indexOf("async function continueToMainCategories("));
+  assert.match(save, /existingProfile\.profileCompleted === true/);
+  assert.match(save, /await continueToMainCategories\(\)/);
+});
+
 test("native selects keep glyph room and center the selected value", () => {
   const css = read("styles.css");
   assert.match(css, /select:not\(\[multiple\]\)\{/);
