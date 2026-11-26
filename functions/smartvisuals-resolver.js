@@ -423,17 +423,35 @@
     return classified;
   }
 
+  function cacheBustedAssetUrl(filePath, checksum) {
+    const rel = `./${String(filePath || "").replace(/^\.\//, "")}`;
+    const c = String(checksum || "").replace(/[^a-f0-9]/gi, "").slice(0, 12);
+    return c ? `${rel}?c=${c}` : rel;
+  }
+
   function urlsFor(selection, catalogOpt) {
     const catalog = loadCatalog(catalogOpt);
     const bg = byId(catalog, selection && selection.backgroundId);
     const st = byId(catalog, selection && selection.stencilId);
+    const explicit = String(
+      (selection && (selection.backgroundUrl || selection.smartBackgroundUrl)) || ""
+    ).trim();
+    const publishedUrl = explicit.indexOf("data:") === 0 || /^\.\/smartvisuals\//.test(explicit) || /^https:\/\//i.test(explicit)
+      ? explicit
+      : "";
     return {
-      backgroundUrl: bg ? `./${bg.path}` : "./smartvisuals/backgrounds/mingl-room.svg",
-      stencilUrl: st ? `./${st.path}` : "./smartvisuals/stencils/people.svg",
+      backgroundUrl: publishedUrl || (bg ? cacheBustedAssetUrl(bg.path, bg.checksum) : "./smartvisuals/backgrounds/mingl-room.svg"),
+      stencilUrl: st ? cacheBustedAssetUrl(st.path, st.checksum) : "./smartvisuals/stencils/people.svg",
       backgroundName: bg ? bg.name : "Mingl Room",
       stencilName: st ? st.name : "People",
       photographic: false
     };
+  }
+
+  function backgroundPlaceId(id, catalogOpt) {
+    const catalog = loadCatalog(catalogOpt);
+    const bg = publishedBackground(catalog, backgroundIdOf(id));
+    return bg && bg.placeId ? String(bg.placeId) : "";
   }
 
   function geminiAllowed() {
@@ -871,6 +889,8 @@
     normalizeSmartViewTags,
     cardMatchesSmartViewTag,
     urlsFor,
+    backgroundPlaceId,
+    cacheBustedAssetUrl,
     contentHash,
     geminiAllowed,
     adPolicy,

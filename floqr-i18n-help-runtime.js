@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "s3.3.081";
+  const VERSION = "s3.3.082";
   const packs = {};
 
   function mergePacks(extra) {

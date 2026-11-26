@@ -497,6 +497,13 @@
       "placeId": "miami",
       "aliases": [],
       "approvalStatus": "published",
+      "intendedSurfaces": [
+        "smartNotification",
+        "roomSmartView",
+        "peopleSmartView",
+        "placeSmartView",
+        "studioPreview"
+      ],
       "path": "smartvisuals/backgrounds/miami.svg",
       "checksum": "2f94a93142d848634626a8269c87d52710975659f917fc8ca4f837686bf6410f",
       "pairedStencilId": "beach",

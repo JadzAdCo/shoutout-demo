@@ -165,6 +165,7 @@ test("Search, BOT DEE, and Master Admin Studio are wired", () => {
   assert.match(read("functions/index.js"), /publishSmartVisualDraft/);
   assert.match(read("functions/index.js"), /approveSmartVisualDraft/);
   assert.match(read("firestore.rules"), /match \/smartVisualDrafts\/\{id\}/);
+  assert.match(read("firestore.rules"), /match \/smartVisualPublished\/\{id\}/);
   assert.match(read("docs/FEATURE-WIRING.md"), /## SMARTvisuals/);
 });
 
@@ -178,6 +179,8 @@ test("T09 publish path requires SOS2FA helper and sanitizer (no client write)", 
   assert.match(src, /imageBase64/);
   assert.match(src, /imageChecksumSha256/);
   assert.match(src, /Name is required/);
+  assert.match(src, /smartVisualPublished/);
+  assert.match(src, /placeSmartView:\$\{placeId\}/);
   assert.doesNotMatch(src, /Rights \/ source is required/);
   assert.match(read("firestore.rules"), /match \/smartVisualDrafts\/\{id\}/);
   assert.match(read("firestore.rules"), /allow write: if false/);
@@ -426,6 +429,15 @@ test("Place SMARTview uses published SMARTbackground, not a photo well", () => {
   }, catalog);
   assert.equal(miamiCard.backgroundId, "bg-miami");
   assert.ok(miamiCard.tags.includes("miami"));
+  assert.equal(resolver.backgroundPlaceId("bg-miami"), "miami");
+  assert.equal(resolver.backgroundPlaceId("bg-bali"), "bali");
+  const miamiUrls = resolver.urlsFor(miamiCard, catalog);
+  assert.match(miamiUrls.backgroundUrl, /smartvisuals\/backgrounds\/miami\.svg\?c=/);
+  const studioUrl = resolver.urlsFor({
+    ...miamiCard,
+    backgroundUrl: "data:image/jpeg;base64,/9j/4AAQ"
+  }, catalog);
+  assert.equal(studioUrl.backgroundUrl, "data:image/jpeg;base64,/9j/4AAQ");
   assert.equal(resolver.cardMatchesSmartViewTag({
     kind: "venue",
     title: "LIV Miami",

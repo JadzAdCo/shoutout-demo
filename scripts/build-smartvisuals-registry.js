@@ -134,7 +134,7 @@ function assetRecord({id, type, file, extra}) {
     mime: "image/svg+xml",
     path: `smartvisuals/${file}`,
     bytes: buf.length,
-    intendedSurfaces: ["smartNotification", "roomSmartView", "peopleSmartView", "studioPreview"],
+    intendedSurfaces: ["smartNotification", "roomSmartView", "peopleSmartView", "placeSmartView", "studioPreview"],
     pairedStencilId: extra.pairedStencilId || null,
     photographic: false,
     officialAffiliation: extra.officialAffiliation === false ? false : null
