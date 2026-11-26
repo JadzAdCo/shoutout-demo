@@ -24,7 +24,7 @@ Any **new or changed** function, matcher, token list, leftover-word filter, or �
 - Venue / club haystack search, discovery city aliases (`CITY_ALIAS_GROUPS`)
 - Intent search aliases, cuisine/stop-word lists, greeting skip lists used as gates
 
-Not a Master Admin city dashboard. Do not invent one. Tokens stay in code until the owner asks for a live list.
+**s3.3.085 (owner asked):** Master Admin → Features Mgmt → BOT DEE → City / place tokens. Language required. Add translates via packaged aliases (never Gemini). Firestore `botDeeCityTokens`. `executeBotSession` reads the list.
 
 ## Required before calling the work done
 
@@ -34,9 +34,9 @@ Not a Master Admin city dashboard. Do not invent one. Tokens stay in code until 
 4. **Tests** must include at least one native-script prompt per new city/place token (ar + el + ru for Miami/Bali-class destinations). Chrome i18n key-count green is **not** enough.
 5. Protected brands stay untranslated (**BOT DEE**, ShoutOut, FloqR, SMARTview, …). Place names may have native aliases; brands never do.
 
-## Known gap (do not pretend it is shipped)
+## Shipped matcher (s3.3.085)
 
-Live `CITY_HITS` is Latin regex. There is **no** committed native-script city token file. Arabic/Greek/Russian Miami/Bali aliases are **not** on `origin/main` until a matcher change keeps Unicode letters. Do not add a dashboard to close this.
+`functions/botdee-city-tokens.js` packaged aliases (11 langs) + Firestore overlay. `normalizePlaceNeedle` keeps `\p{L}`. Unicode boundaries, not ASCII `\b`. Tests cover ميامي / Μαϊάμι / Майами.
 
 ## Checklist (mental, every function iteration)
 
@@ -44,12 +44,12 @@ Live `CITY_HITS` is Latin regex. There is **no** committed native-script city to
 - [ ] Native-script aliases where patrons will type them; ASCII `\b` not the only boundary
 - [ ] Needle fold does not delete the scripts you claim to match
 - [ ] Tests for ar / el / ru (and Latin aliases already in the list)
-- [ ] No city-token admin UI unless the owner asked
+- [ ] City-token admin (when present) requires language pick + SOS2FA + reason; no Gemini auto-learn
 
 ## FIX PROMPT
 
 ```
-Language coverage (always): every new/changed function must work in en de fr es it pt ru el pl nl ar. Token lists, city/place detection, venue search, Place SMARTview — native-script aliases, not Latin-only. Chrome i18n keys are not enough. Incomplete coverage is a product bug. No city dashboard unless asked. Resume: @lang-coverage$
+Language coverage (always): every new/changed function must work in en de fr es it pt ru el pl nl ar. Token lists, city/place detection, venue search, Place SMARTview — native-script aliases, not Latin-only. Chrome i18n keys are not enough. Incomplete coverage is a product bug. City tokens: Master Admin BOT DEE sub-tab (language required, packaged translate, no Gemini). Resume: @lang-coverage$
 ```
 
 Related: `.cursor/rules/floqr-translation.mdc` (chrome/help packs). Wiring: `docs/FEATURE-WIRING.md` → Language coverage.

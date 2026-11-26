@@ -33,8 +33,8 @@
 
   const EXPECTED_FIRESTORE_RULES_VERSION = "v29.08-stripe-connect-hardening";
   const EXPECTED_STORAGE_RULES_VERSION = "v29.06";
-  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.083";
-  const PREVIEW_LINKS_PACKAGE = "s3.3.083";
+  const CURRENT_DIAGNOSTICS_PACKAGE_VERSION = "s3.3.085";
+  const PREVIEW_LINKS_PACKAGE = "s3.3.085";
   const PREVIEW_LINKS_HTTP = "https://us-central1-shoutoutdemo-5b402.cloudfunctions.net/emailFloqrPreviewLinks";
   const STALE_RECORD_DEFINITION = "Stale records are queue records more than 4 days old, records referencing old Firestore/Storage rules, or records referencing old/unknown locations.";
   const STALE_RECORD_DEFAULT_DAYS = 4;
@@ -223,6 +223,17 @@
 
   const PACKAGE_INSTALL_CHECKS = [
     {
+      version: "s3.3.085",
+      title: "s3.3.085 — BOT DEE city / place tokens (11 langs)",
+      checks: [
+        {label:"Master Admin cities sub-tab", file:"master-admin.html", includes:["data-botdee-page=\"cities\"", "botDeeCityLang", "help-botdee-city-tokens"]},
+        {label:"Callables", file:"functions/index.js", includes:["listBotDeeCityTokens", "previewBotDeeCityToken", "upsertBotDeeCityToken"]},
+        {label:"Unicode matcher", file:"functions/botdee-city-tokens.js", includes:["normalizePlaceNeedle", "ميامي", "μαϊάμι", "майами"]},
+        {label:"Rules + classification", file:"firestore.rules", includes:["match /botDeeCityTokens/{placeId}"]},
+        {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-085-botdee-city-tokens"]}
+      ]
+    },
+    {
       version: "s3.3.084",
       title: "s3.3.084 — BOT DEE Hey greets; Miami attaches Place SMARTview",
       checks: [
@@ -236,7 +247,7 @@
       version: "s3.3.083",
       title: "s3.3.083 — Bali Place SMARTview uses published SMARTbackground",
       checks: [
-        {label:"Bali is a city token", file:"functions/bot-dee-tools.js", includes:["\\\\bbali\\\\b", "destinationHit"]},
+        {label:"Bali is a city token", file:"functions/botdee-city-tokens.js", includes:["placeId: \"bali\""]},
         {label:"This turn city wins over Miami history", file:"functions/bot-dee-tools.js", includes:["namedNow"]},
         {label:"Place card prefers stamped URL", file:"botdee-smartview.js", includes:["smartBackgroundUrl"]},
         {label:"Manual test", file:"ai-diagnostics-service.js", includes:["s3-3-083-bali-place-smartbackground", "s3.3.083"]}
@@ -3925,6 +3936,15 @@
   ];
 
   const MANUAL_FEATURE_TESTS = [
+      {
+      id:"s3-3-085-botdee-city-tokens",
+      area:"BOT DEE",
+      feature:"Master Admin city / place tokens (11 langs)",
+      changed:"s3.3.085 — Features Mgmt → BOT DEE → City / place tokens. Operator must pick language. Add fills en de fr es it pt ru el pl nl ar from packaged aliases (no Gemini). Firestore botDeeCityTokens. executeBotSession matchPlaces uses Unicode needles so ميامي / Μαϊάμι / Майами hit miami. SOS2FA + FLOQRReasonPrompt + chained botdee.city_token_upserted.",
+      howToTest:"1) Hard-refresh Master Admin (floqr-i18n.js + master-feature-services.js ?v=s3.3.085). 2) Features Mgmt → BOT DEE → City / place tokens (hash #featuresBotDee-cities). 3) SOS2FA unlock. 4) Type Miami without a language → Add refuses. 5) Pick English, Fill other languages → ar ميامي el Μαϊάμι ru Майами. 6) Add token + reason. 7) BOT DEE chat: ميامي should attach Miami Place SMARTview after Functions deploy [firebase-deploy-botdee].",
+      expected:"Language required; 11-lang preview; save needs reason; native-script Miami matches after Functions deploy. No Gemini city learning.",
+      troubleshoot:"Sub-tab missing → cache-bust master-admin.html. Save fails → SOS2FA + upsertBotDeeCityToken deploy. ميامي still miss → executeBotSession deploy; confirm botDeeCityTokens or packaged catalog."
+    },
       {
       id:"s3-3-084-botdee-hey-miami-place",
       area:"BOT DEE",

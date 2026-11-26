@@ -45,6 +45,188 @@
     "beenModsincelasttextenhun": 1
   },
   {
+    "id": "whatsnew-s3.3.085",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.085",
+      "body": "s3.3.085: BOT DEE city and place tokens in all 11 languages"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.083",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.083",
+      "body": "s3.3.083: Let's plan for Bali opens Bali Place SMARTview with the published SMARTbackground"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.082",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.082",
+      "body": "s3.3.082: Miami Place SMARTview uses the published SMARTbackground, not leftover Bali art"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.081",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.081",
+      "body": "s3.3.081: After Invite sent, type in this BOT DEE room; Search Join Now stays botdee.html?room="
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.080",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.080",
+      "body": "s3.3.080: BOT DEE VIP reserV map at Aurelia plus Miami Place SMARTview on mixed VIP input"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.079",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.079",
+      "body": "s3.3.079: Search Join Now attaches the existing BOT DEE Room SMARTview group chat (Don + Lorna names + shared turns)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.078",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.078",
+      "body": "s3.3.078: Search SMARTnotification for a Miami-tagged room uses Place SMARTview cards"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.077",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.077",
+      "body": "s3.3.077: BOT DEE Room SMARTview Invite chip stays greyed with Invite sent (Lorna / MsLorna)"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.076",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.076",
+      "body": "s3.3.076: BOT DEE named Invite lorna + Search SMARTnotification for scheduled rooms + Miami-tagged Place SMARTview on Room SMARTview city asks"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.075",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.075",
+      "body": "s3.3.075: Room SMARTview shared picks + 60% host election, VIP session popouts"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.074",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.074",
+      "body": "s3.3.074: BOT DEE can throw a ShoutOut from chat using each template's listed inputs"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.072",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.072",
+      "body": "s3.3.072: BOT DEE Search SMARTnotification compact Mingl Room Invitation matches the original Cancun phone card"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.071",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.071",
+      "body": "s3.3.071: Room SMARTview Join Now or Set a schedule. A schedule is when the BOT DEE room starts and can appear on Search for invited Mingl friends. Join Now does not."
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
+    "id": "whatsnew-s3.3.070",
+    "audiences": [
+      "patron"
+    ],
+    "audienceLabel": "patron",
+    "lasttextenhun": {
+      "title": "What's New s3.3.070",
+      "body": "s3.3.070: BOT DEE Room SMARTview: invite chips say That's you or Already in this session"
+    },
+    "locales": {},
+    "beenModsincelasttextenhun": 1
+  },
+  {
     "id": "whatsnew-s3.3.055",
     "audiences": [
       "patron"

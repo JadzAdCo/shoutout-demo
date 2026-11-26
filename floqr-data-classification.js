@@ -108,6 +108,7 @@
     ["featureServiceAuditLogs", "master", 1, "Tamper-evident security audit trail"],
     ["featureServices", "internal", 0, "Feature switches"],
     ["botDeeSettings", "internal", 0, "BOT DEE conversation settings (idle pause); signed-in read, Functions-write"],
+    ["botDeeCityTokens", "internal", 0, "BOT DEE city/place tokens (aliases in 11 langs); Master Admin read, Functions-write; no Gemini auto-learn; no IP"],
     ["botDeeThreads", "ownMaster", 1, "BOT DEE chat thread per signed-in uid (last 12 turns + idle clock + consent + hasUsedBotDee 0|1 + personalization + userbotdeelastUsedtime + chatTitles + headlessShoutOutDraft + headlessVipDraft + joinedRoomId + joinedRoomConversationId); spoken replies privilege-stripped (no Master Admin / Super Admin / SOS2FA / claims / beta-tester / Club Admin status); redaction does not log leaked text; Functions-write"],
     ["botDeeRooms", "ownMaster", 1, "BOT DEE Mingl session (hostUid, memberUids, status scheduled|open|ended|expired|cancelled, scheduledStart, liveOpened, smartNotification 0|1, expiresAt, sharedIntent); Functions-write; member-read; Search list is callable-only; no IP; no email/phone"],
     ["botDeeRooms/turns", "ownMaster", 1, "Shared Room SMARTview turns for joined BOT DEE sessions; Functions-write; no IP"],
@@ -676,7 +677,7 @@
 
   /** Least-privilege manifest: each server job states its purpose and the only collections it may read as System. */
   const SYSTEM_JOBS = {
-    botDeeAccess: {purpose: "Resolve the caller's tier so BOT DEE shows only results their classification allows", collections: ["users", "clubAdminAssignments", "clubLocations", "clubEmployeeDesignations", "botDeeAccessThrottle", "floqAiAccessThrottle", "betaTesters"]},
+    botDeeAccess: {purpose: "Resolve the caller's tier so BOT DEE shows only results their classification allows", collections: ["users", "clubAdminAssignments", "clubLocations", "clubEmployeeDesignations", "botDeeAccessThrottle", "floqAiAccessThrottle", "betaTesters", "botDeeCityTokens"]},
     venuePublicFeed: {purpose: "Publish a club's public profile, events and consented staff to its own website", collections: ["clubLocations", "events", "clubMedia", "scheduleShifts", "clubEmployeeDesignations"]},
     dataClassificationAdmin: {purpose: "Seed, save and edit the classification register for Master Admins", collections: ["dataClassification", "featureServiceAuditLogs", "featureServiceAuditHead"]},
     masterAdminRollup: {purpose: "Precompute Master Admin panel summary counts every 5 minutes", collections: ["masterAdminRollups", "users", "shoutouts", "liveContent", "guestListRequests", "messages", "inboxNotifications", "clubLocations", "clubLocationAliases", "events", "templates", "minglConnections", "minglAudit", "chatRooms", "chatMessages", "roleRequests", "clubEmployeeDesignations", "patronTemplateVariants", "aiIndex", "aiUserNotificationPreferences", "aiSearchLogs", "aiRecommendations", "aiDiscoverySources", "aiDiscoveryQueue", "aiDiscoveryRatingCriteria", "aiCrawlRuns", "aiCrawlerSchedules", "aiDiagnosticsReports", "serviceOrders", "audienceCampaigns", "pickupRequests", "shoutoutRecommendations"]},

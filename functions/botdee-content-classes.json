@@ -51,6 +51,9 @@
     "help-botdee-audience-sections": [
       "masterAdmin"
     ],
+    "help-botdee-city-tokens": [
+      "masterAdmin"
+    ],
     "help-botdee-explain": [
       "masterAdmin",
       "patron",

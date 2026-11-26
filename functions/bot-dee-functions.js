@@ -1227,6 +1227,9 @@ exports.executeBotSession = onCall(CALL_OPTS, async request => {
       console.warn("BOT DEE feature access load failed; fail closed to live defaults", error?.message || error);
       allowedFeatures = ["shoutOut", "botDee", "passes"];
     }
+    try {
+      await require("./bot-dee-tools").primeCityCatalog();
+    } catch (_) { /* packaged city catalog still matches */ }
     const personalization = prefs.fromThread(stored);
     const session = Object.freeze({
       userId: uid,
@@ -2054,6 +2057,97 @@ exports.setBotDeeSettings = onCall(ADMIN_CALL_OPTS, async request => {
       reason: after.lastChangeReason
     }));
     return {ok: true, settings: bot.normalizeBotDeeSettings(after), before, after};
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+const CITY_TOKENS_COL = "botDeeCityTokens";
+
+exports.listBotDeeCityTokens = onCall(ADMIN_CALL_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) throw new HttpsError("unauthenticated", "Sign in as Master Admin.");
+    if (!isServerAdminAuth(request.auth)) throw new HttpsError("permission-denied", "Master Admin only.");
+    const city = require("./botdee-city-tokens");
+    const snap = await db.collection(CITY_TOKENS_COL).limit(400).get();
+    const docs = snap.docs.map(doc => ({placeId: doc.id, ...(doc.data() || {})}));
+    const rows = city.mergeCatalog(docs).map(city.publicTokenRow);
+    return {ok: true, langs: city.ALLOWED_LANGS, rows};
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.previewBotDeeCityToken = onCall(ADMIN_CALL_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) throw new HttpsError("unauthenticated", "Sign in as Master Admin.");
+    if (!isServerAdminAuth(request.auth)) throw new HttpsError("permission-denied", "Master Admin only.");
+    const city = require("./botdee-city-tokens");
+    const preview = city.autocompleteAliases(request.data?.sourceToken, request.data?.sourceLang);
+    if (!preview.ok) {
+      const msg = preview.error === "language_required"
+        ? "Pick a language. BOT DEE cannot guess which language this city name is."
+        : preview.error === "protected_brand"
+          ? "That word is a protected FLOQR brand — not a city token."
+          : "Enter a city or place name.";
+      throw new HttpsError("invalid-argument", msg);
+    }
+    return {ok: true, preview};
+  } catch (error) {
+    throw asHttps(error);
+  }
+});
+
+exports.upsertBotDeeCityToken = onCall(ADMIN_CALL_OPTS, async request => {
+  try {
+    if (!request.auth?.uid) throw new HttpsError("unauthenticated", "Sign in as Master Admin.");
+    if (!isServerAdminAuth(request.auth)) throw new HttpsError("permission-denied", "Master Admin only.");
+    const {email, sessionId} = await assertSos2faSession(request);
+    const reason = String(request.data?.reason || "").trim();
+    if (reason.length < REASON_MIN) {
+      throw new HttpsError(
+        "invalid-argument",
+        `Enter a reason of at least ${REASON_MIN} characters. It is saved in the audit trail.`
+      );
+    }
+    const city = require("./botdee-city-tokens");
+    const sanitized = city.sanitizeWrite(request.data || {});
+    if (!sanitized.ok) {
+      const msg = sanitized.error === "language_required"
+        ? "Pick a language. BOT DEE cannot guess which language this city name is."
+        : sanitized.error === "protected_brand"
+          ? "That word is a protected FLOQR brand — not a city token."
+          : sanitized.error === "place_id_invalid"
+            ? "Place id must be lowercase letters, numbers, and hyphens."
+            : "Enter a city or place name.";
+      throw new HttpsError("invalid-argument", msg);
+    }
+    const ref = db.collection(CITY_TOKENS_COL).doc(sanitized.row.placeId);
+    const snap = await ref.get();
+    const before = snap.exists ? snap.data() : null;
+    const nowMs = Date.now();
+    const after = {
+      ...sanitized.row,
+      revision: Number(before && before.revision || 0) + 1,
+      updatedAtMs: nowMs,
+      updatedAtIso: new Date(nowMs).toISOString(),
+      updatedByUid: request.auth.uid,
+      updatedByEmail: email || request.auth.token?.email || "",
+      lastChangeReason: reason.slice(0, 500),
+      sos2faSessionHash: String(sessionId || "").slice(0, 16)
+    };
+    await ref.set({...after, updatedAt: FieldValue.serverTimestamp()}, {merge: true});
+    await audit.writeChainedAudit(audit.auditRecord(request, {
+      eventType: "botdee.city_token_upserted",
+      outcome: "success",
+      targetType: "botDeeCityTokens",
+      targetId: sanitized.row.placeId,
+      before,
+      after: {placeId: after.placeId, enabled: after.enabled, sourceLang: after.sourceLang, sourceToken: after.sourceToken},
+      reason: after.lastChangeReason
+    }));
+    try { require("./bot-dee-tools").invalidateCityCatalog(); } catch (_) {}
+    return {ok: true, row: city.publicTokenRow(city.mergeCatalog([after]).find(r => r.placeId === after.placeId) || after)};
   } catch (error) {
     throw asHttps(error);
   }
